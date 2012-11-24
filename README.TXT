@@ -1,20 +1,11 @@
-PACKAGE DESCRIPTIONS
+The Wyvern project
 
-CURRENTLY RELEVANT PACKAGES
+See COPYING.TXT for the GPLv2 license under which this software is distributed.
+See AUTHORS.TXT for the list of contributing authors.
 
-secmob.tools.lexer			lexer
-secmob.tools.simpleParser	parser
-secmob.tools.tests			test cases
-secmob.tools.tests.samples	test data
-wyvern.tools.rawAST			the "new" raw AST
+The tools package contains the compiler.  See readme.txt in that directory for
+more information.
 
+For information on the Wyvern language, see:
 
-OBSOLETE PACKAGES
-
-secmob.tools.simpleAST		out of date raw AST
-
-secmob.tools.ast			out of date typed AST
-secmob.tools.constructors	extends ast with a closure constructor
-secmob.tools.errors			errors sent during evaluation or typechecking
-secmob.tools.operations		visitors for evaluation and typechecking
-secmob.tools.types			types for the AST
+http://www.cs.cmu.edu/~aldrich/securemobileweb/spec-rationale.html
