@@ -1,5 +1,8 @@
 package wyvern.tools.tests;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 import java.io.StringReader;
@@ -11,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
+import wyvern.tools.interpreter.Interpreter;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.extensions.FnParser;
 import wyvern.tools.parsing.extensions.ValParser;
@@ -66,5 +70,14 @@ public class ExtensionsTest {
 		Type resultType = typedAST.typecheck();
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
+	}
+	
+	@Test
+	public void testInterpreter() throws IOException {
+		InputStream is = LexingTest.class.getClassLoader().getResource("wyvern/tools/tests/samples/arithmetic-test.wyv").openStream();
+		Reader reader = new InputStreamReader(is);
+		
+		Value resultValue = new Interpreter().interpret(reader);
+		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 }
