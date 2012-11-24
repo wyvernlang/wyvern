@@ -10,21 +10,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.CoreParser;
-import wyvern.tools.parsing.extensions.FnParser;
-import wyvern.tools.parsing.extensions.ValParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.Keyword;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.binding.KeywordNameBinding;
-import wyvern.tools.typedAST.binding.TypeBinding;
-import wyvern.tools.typedAST.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.Executor;
-import wyvern.tools.typedAST.extensions.ExternalFunction;
-import wyvern.tools.typedAST.extensions.IntegerConstant;
-import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
@@ -36,20 +27,6 @@ public class ParsingTestPhase2 {
 	@Rule
     public ExpectedException thrown= ExpectedException.none();
 
-	private Environment getStandardEnv() {
-		Environment env = Environment.getEmptyEnvironment();
-		env = env.extend(new KeywordNameBinding("val", new Keyword(ValParser.getInstance())));
-		env = env.extend(new KeywordNameBinding("fn", new Keyword(FnParser.getInstance())));
-		env = env.extend(new TypeBinding("Int", Int.getInstance()));
-		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(integer, unit), new Executor() {
-			@Override public Value execute(Value argument) {
-				System.out.println(((IntegerConstant)argument).getValue());
-				return UnitVal.getInstance();
-			}
-		})));
-		return env;
-	}
-	
 	@Test
 	public void testValDecl() {
 		Reader reader = new StringReader("val x = 5\n"
@@ -57,7 +34,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Assert.assertEquals("{$I {$L val x = 5 $L} {$L x $L} $I}", parsedResult.toString());
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("ValDeclaration(\"x\", IntegerConstant(5), Variable(\"x\"))", typedAST.toString());		
 		Type resultType = typedAST.typecheck();
@@ -72,7 +49,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Assert.assertEquals("{$I {$L (fn x : Int => x) (1) $L} $I}", parsedResult.toString());
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("Application(Fn(NameBindingImpl(\"x\", Int()), Variable(\"x\")), IntegerConstant(1))", typedAST.toString());
 		Type resultType = typedAST.typecheck();
@@ -87,7 +64,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Assert.assertEquals("{$I {$L (fn x : Int => x + 1) (3) $L} $I}", parsedResult.toString());
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("Application(Fn(NameBindingImpl(\"x\", Int()), Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))), IntegerConstant(3))", typedAST.toString());		
 		Type resultType = typedAST.typecheck();
@@ -102,7 +79,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Assert.assertEquals("{$I {$L 3 * 4 + 5 * 6 $L} $I}", parsedResult.toString());
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("Invocation(Invocation(IntegerConstant(3), \"*\", IntegerConstant(4)), \"+\", Invocation(IntegerConstant(5), \"*\", IntegerConstant(6)))", typedAST.toString());		
 		Type resultType = typedAST.typecheck();
@@ -117,7 +94,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Assert.assertEquals("{$I {$L print (5) $L} $I}", parsedResult.toString());
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("Application(ExternalFunction(), IntegerConstant(5))", typedAST.toString());		
 		Type resultType = typedAST.typecheck();
@@ -132,7 +109,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Assert.assertEquals("{$I {$L fn f : Int -> Int => fn x : Int => f (f (x)) $L} $I}", parsedResult.toString());
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("Fn(NameBindingImpl(\"f\", Arrow(Int(), Int())), Fn(NameBindingImpl(\"x\", Int()), Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\")))))", typedAST.toString());		
 		Type resultType = typedAST.typecheck();
@@ -148,7 +125,7 @@ public class ParsingTestPhase2 {
 										+"applyTwice(addOne)(1)");
 		RawAST parsedResult = Phase1Parser.parse(reader);		
 		
-		Environment env = getStandardEnv();
+		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("ValDeclaration(\"applyTwice\", Fn(NameBindingImpl(\"f\", Arrow(Int(), Int())), Fn(NameBindingImpl(\"x\", Int()), Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\"))))), ValDeclaration(\"addOne\", Fn(NameBindingImpl(\"x\", Int()), Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))), Application(Application(Variable(\"applyTwice\"), Variable(\"addOne\")), IntegerConstant(1))))", typedAST.toString());		
 		Type resultType = typedAST.typecheck();
