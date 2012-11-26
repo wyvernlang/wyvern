@@ -20,6 +20,8 @@ public class TreeWriter {
 			writeObject((TreeWritable)o);
 		} else if (o instanceof Integer) {
 			buf.append((Integer)o);
+		} else if (o instanceof Boolean) {
+			buf.append((Boolean)o);
 		} else if (o instanceof String) {
 			buf.append('\"');
 			buf.append((String)o);

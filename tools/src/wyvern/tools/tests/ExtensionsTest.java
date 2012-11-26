@@ -32,6 +32,7 @@ import wyvern.tools.typedAST.extensions.IntegerConstant;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Unit;
 
@@ -43,16 +44,18 @@ public class ExtensionsTest {
 
 	@Test
 	public void testSimpleBooleans() {
-		Reader reader = new StringReader("val b = true && true\n"
-										+"b || false");
+		Reader reader = new StringReader("val b = true && true && true\n"
+										+"b || false && true");
 		RawAST parsedResult = Phase1Parser.parse(reader);		
-		Assert.assertEquals("{$I {$L val b = true && true $L} {$L b || false $L} $I}", parsedResult.toString());
+		Assert.assertEquals("{$I {$L val b = true && true && true $L} {$L b || false && true $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		//Assert.assertEquals("ValDeclaration(\"x\", IntegerConstant(5), Variable(\"x\"))", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);		
+		Assert.assertEquals("ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true)), " +
+				"Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true))))",
+				typedAST.toString());		
 		Type resultType = typedAST.typecheck();
-		//Assert.assertEquals(Bool.getInstance(), resultType);
+		Assert.assertEquals(Bool.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("BooleanConstant(true)", resultValue.toString());
 	}

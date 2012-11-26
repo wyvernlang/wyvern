@@ -124,6 +124,32 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		
 		return ast;
 	}
+
+	private TypedAST parseAnd(Pair<ExpressionSequence,Environment> ctx) {
+		TypedAST ast = parseSum(ctx);
+		
+		while (ctx.first != null && isAndOperator(ctx.first.getFirst())) {
+			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			ctx.first = ctx.first.getRest();
+			TypedAST argument = parseSum(ctx);
+			ast = new Invocation(ast, operatorName, argument);
+		}
+		
+		return ast;
+	}
+	
+	private TypedAST parseOr(Pair<ExpressionSequence,Environment> ctx) {
+		TypedAST ast = parseAnd(ctx);
+		
+		while (ctx.first != null && isOrOperator(ctx.first.getFirst())) {
+			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			ctx.first = ctx.first.getRest();
+			TypedAST argument = parseAnd(ctx);
+			ast = new Invocation(ast, operatorName, argument);
+		}
+		
+		return ast;
+	}
 	
 	private boolean isProductOperator(RawAST operatorNode) {
 		if (!(operatorNode instanceof Symbol))
@@ -140,10 +166,26 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		
 		return operatorName.equals("+") || operatorName.equals("-");
 	}
+	
+	private boolean isAndOperator(RawAST operatorNode) {
+		if (!(operatorNode instanceof Symbol))
+			return false;
+		String operatorName = ((Symbol) operatorNode).name;
+		
+		return operatorName.equals("&&");
+	}
+	
+	private boolean isOrOperator(RawAST operatorNode) {
+		if (!(operatorNode instanceof Symbol))
+			return false;
+		String operatorName = ((Symbol) operatorNode).name;
+		
+		return operatorName.equals("||");
+	}
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
-		TypedAST result = parseSum(ctx);
+		TypedAST result = parseOr(ctx);
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT, ctx.first);
 		return result;
