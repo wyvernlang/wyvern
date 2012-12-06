@@ -1,6 +1,9 @@
 This file describes the package structure of the Wyvern tool suite.
 View this document with tabs set to 4 characters.
 
+To compile Wyvern, use Java 7 and JUnit 4.  Eclipse version
+4.2 works, earlier versions may not.  
+
 
 PACKAGE DESCRIPTIONS
 
