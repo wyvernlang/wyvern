@@ -49,6 +49,12 @@ public class IntegerConstant extends AbstractTypedAST implements InvokableValue 
 			case "-": return new IntegerConstant(value - argValue.value);
 			case "*": return new IntegerConstant(value * argValue.value);
 			case "/": return new IntegerConstant(value / argValue.value);
+			case ">": return new BooleanConstant(value > argValue.value);
+			case "<": return new BooleanConstant(value < argValue.value);
+			case ">=": return new BooleanConstant(value >= argValue.value);
+			case "<=": return new BooleanConstant(value <= argValue.value);
+			case "==": return new BooleanConstant(value == argValue.value);
+			case "!=": return new BooleanConstant(value != argValue.value);
 			default: throw new RuntimeException("forgot to typecheck!");
 		}
 	}

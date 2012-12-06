@@ -125,13 +125,26 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 
-	private TypedAST parseAnd(Pair<ExpressionSequence,Environment> ctx) {
+	private TypedAST parseRelationalOps(Pair<ExpressionSequence, Environment> ctx) {
 		TypedAST ast = parseSum(ctx);
+		
+		while (ctx.first != null && isRelationalOperator(ctx.first.getFirst())) {
+			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			ctx.first = ctx.first.getRest();
+			TypedAST argument = parseSum(ctx);
+			ast = new Invocation(ast, operatorName, argument);
+		}
+		
+		return ast;
+	}
+	
+	private TypedAST parseAnd(Pair<ExpressionSequence,Environment> ctx) {
+		TypedAST ast = parseRelationalOps(ctx);
 		
 		while (ctx.first != null && isAndOperator(ctx.first.getFirst())) {
 			String operatorName = ((Symbol)ctx.first.getFirst()).name;
 			ctx.first = ctx.first.getRest();
-			TypedAST argument = parseSum(ctx);
+			TypedAST argument = parseRelationalOps(ctx);
 			ast = new Invocation(ast, operatorName, argument);
 		}
 		
@@ -181,6 +194,16 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		String operatorName = ((Symbol) operatorNode).name;
 		
 		return operatorName.equals("||");
+	}
+	
+	private boolean isRelationalOperator(RawAST operatorNode) {
+		if (!(operatorNode instanceof Symbol))
+			return false;
+		String operatorName = ((Symbol) operatorNode).name;
+		
+		return operatorName.equals(">") || operatorName.equals("<") || operatorName.equals("!=")
+			|| operatorName.equals(">=") || operatorName.equals("<=") || operatorName.equals("==")	
+			|| operatorName.equals("!=");
 	}
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
