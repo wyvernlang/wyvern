@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.tools.rawAST.RawAST;
+import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.OperatableType;
@@ -24,6 +26,12 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 			"-",
 			"*",
 			"/",
+			">",
+			"<",
+			">=",
+			"<=",
+			"==",
+			"!=",
 	}));
 	
 	@Override
@@ -37,7 +45,10 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 		if (!(type2 instanceof Int))
 			reportError(OPERATOR_DOES_NOT_APPLY2, operatorName, this.toString(), type2.toString(), opExp);
 		
-		return this;
+		if (isRelationalOperator(operatorName))
+			return Bool.getInstance();
+		else
+			return this;
 	}
 	
 	@Override
@@ -50,4 +61,9 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 		return "Int";
 	}
 
+	private boolean isRelationalOperator(String operatorName) {
+		return operatorName.equals(">") || operatorName.equals("<") || operatorName.equals("!=")
+			|| operatorName.equals(">=") || operatorName.equals("<=") || operatorName.equals("==")	
+			|| operatorName.equals("!=");
+	}
 }
