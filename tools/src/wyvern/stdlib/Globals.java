@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Str;
 
 public class Globals {
 
@@ -27,6 +28,7 @@ public class Globals {
 		env = env.extend(new KeywordNameBinding("fn", new Keyword(FnParser.getInstance())));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
+		env = env.extend(new TypeBinding("Str", Str.getInstance()));
 		env = env.extend(new ValueBinding("true", new BooleanConstant(true)));
 		env = env.extend(new ValueBinding("false", new BooleanConstant(false)));
 		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(integer, unit), new Executor() {

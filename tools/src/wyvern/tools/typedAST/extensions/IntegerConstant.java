@@ -42,20 +42,34 @@ public class IntegerConstant extends AbstractTypedAST implements InvokableValue 
 
 	@Override
 	public Value evaluateInvocation(Invocation exp, Environment env) {
-		IntegerConstant argValue = (IntegerConstant) exp.getArgument().evaluate(env);
+		IntegerConstant intArgValue = null;
 		String operator = exp.getOperationName();
-		switch(operator) {
-			case "+": return new IntegerConstant(value + argValue.value);
-			case "-": return new IntegerConstant(value - argValue.value);
-			case "*": return new IntegerConstant(value * argValue.value);
-			case "/": return new IntegerConstant(value / argValue.value);
-			case ">": return new BooleanConstant(value > argValue.value);
-			case "<": return new BooleanConstant(value < argValue.value);
-			case ">=": return new BooleanConstant(value >= argValue.value);
-			case "<=": return new BooleanConstant(value <= argValue.value);
-			case "==": return new BooleanConstant(value == argValue.value);
-			case "!=": return new BooleanConstant(value != argValue.value);
-			default: throw new RuntimeException("forgot to typecheck!");
+
+		Value argValue = exp.getArgument().evaluate(env);
+		if (argValue instanceof StringConstant) {		// int + "str"
+			if (operator.equals("+")) {
+				return new StringConstant(this.value + ((StringConstant) argValue).getValue());
+			} else {
+				throw new RuntimeException("forgot to typecheck!");
+			}
+		} else if (argValue instanceof IntegerConstant) {		//int op int
+			intArgValue = (IntegerConstant)argValue;
+			switch(operator) {
+				case "+": return new IntegerConstant(value + intArgValue.value);
+				case "-": return new IntegerConstant(value - intArgValue.value);
+				case "*": return new IntegerConstant(value * intArgValue.value);
+				case "/": return new IntegerConstant(value / intArgValue.value);
+				case ">": return new BooleanConstant(value > intArgValue.value);
+				case "<": return new BooleanConstant(value < intArgValue.value);
+				case ">=": return new BooleanConstant(value >= intArgValue.value);
+				case "<=": return new BooleanConstant(value <= intArgValue.value);
+				case "==": return new BooleanConstant(value == intArgValue.value);
+				case "!=": return new BooleanConstant(value != intArgValue.value);
+				default: throw new RuntimeException("forgot to typecheck!");
+			}
+		} else {
+//			shouldn't get here
+			throw new RuntimeException("forgot to typecheck!");
 		}
 	}
 }

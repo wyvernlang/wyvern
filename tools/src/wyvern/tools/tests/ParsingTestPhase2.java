@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Unit;
 
@@ -87,30 +88,6 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(42)", resultValue.toString());
-	}
-	
-	@Test
-	public void testRelationalOps() {
-		RawAST parsedResult;
-		TypedAST typedAST;
-		Type resultType;
-		Value resultValue;
-		Environment env = Globals.getStandardEnv();
-		int first=3, second=4;
-
-		String[] ops = {">", "<", "<=", ">=", "==", "!="};
-		boolean[] results = {first>second, first<second, first<=second, first>=second, first==second, first!=second};
-		for (int i=0; i<ops.length; i++) {
-			Reader reader = new StringReader(first + ops[i] + second);
-			parsedResult = Phase1Parser.parse(reader);
-			Assert.assertEquals("{$I {$L "+ first + " " + ops[i] +" "+ second +" $L} $I}", parsedResult.toString());
-			typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-			Assert.assertEquals("Invocation(IntegerConstant(" + first + "), \"" + ops[i] + "\", IntegerConstant(" + second + "))", typedAST.toString());
-			resultType = typedAST.typecheck();
-			Assert.assertEquals(Bool.getInstance(), resultType);
-			resultValue = typedAST.evaluate(env);
-			Assert.assertEquals("BooleanConstant("+ results[i] +")", resultValue.toString());
-		}
 	}
 	
 	@Test

@@ -42,13 +42,16 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 		if (!(legalOperators.contains(operatorName)))
 			reportError(OPERATOR_DOES_NOT_APPLY, operatorName, this.toString(), opExp);
 		
-		if (!(type2 instanceof Int))
+		if (!((type2 instanceof Int) || ((operatorName.equals("+")) && (type2 instanceof Str))))
 			reportError(OPERATOR_DOES_NOT_APPLY2, operatorName, this.toString(), type2.toString(), opExp);
 		
 		if (isRelationalOperator(operatorName))
-			return Bool.getInstance();
-		else
-			return this;
+			return Bool.getInstance(); //relational operations
+		else if ((operatorName.equals("+")) && (type2 instanceof Str)) {
+			return Str.getInstance(); //string concatenation
+		} else {
+			return this; //arithmetic operations
+		}
 	}
 	
 	@Override

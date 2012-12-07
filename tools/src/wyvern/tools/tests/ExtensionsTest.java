@@ -34,6 +34,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Unit;
 
 import static wyvern.tools.types.TypeUtils.*;
@@ -59,7 +60,46 @@ public class ExtensionsTest {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("BooleanConstant(true)", resultValue.toString());
 	}
+	
+	@Test
+	public void testRelationalOps() {
+		RawAST parsedResult;
+		TypedAST typedAST;
+		Type resultType;
+		Value resultValue;
+		Environment env = Globals.getStandardEnv();
+		int first=3, second=4;
 
+		String[] ops = {">", "<", "<=", ">=", "==", "!="};
+		boolean[] results = {first>second, first<second, first<=second, first>=second, first==second, first!=second};
+		for (int i=0; i<ops.length; i++) {
+			Reader reader = new StringReader(first + ops[i] + second);
+			parsedResult = Phase1Parser.parse(reader);
+			Assert.assertEquals("{$I {$L "+ first + " " + ops[i] +" "+ second +" $L} $I}", parsedResult.toString());
+			typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+			Assert.assertEquals("Invocation(IntegerConstant(" + first + "), \"" + ops[i] + "\", IntegerConstant(" + second + "))", typedAST.toString());
+			resultType = typedAST.typecheck();
+			Assert.assertEquals(Bool.getInstance(), resultType);
+			resultValue = typedAST.evaluate(env);
+			Assert.assertEquals("BooleanConstant("+ results[i] +")", resultValue.toString());
+		}
+	}
+	
+	@Test
+	public void testStrings() {
+		Reader reader = new StringReader("100 + \" Hello \" + \"world!\" ");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Assert.assertEquals("{$I {$L 100 + \" Hello \" + \"world!\" $L} $I}", parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Assert.assertEquals("Invocation(Invocation(IntegerConstant(100), \"+\", StringConstant(\" Hello \")), \"+\", StringConstant(\"world!\"))", typedAST.toString());
+		Type resultType = typedAST.typecheck();
+		Assert.assertEquals(Str.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("StringConstant(\"100 Hello world!\")", resultValue.toString());
+	}
+	
 	@Test(expected=StackOverflowError.class)
 	public void testRecursiveFunction() {
 		Reader reader = new StringReader("fun m(n:Int):Int = 1 + m(n)\n"

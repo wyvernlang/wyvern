@@ -4,6 +4,7 @@ import wyvern.tools.rawAST.*;
 import wyvern.tools.typedAST.*;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
+import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
@@ -22,8 +23,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 
 	@Override
 	public TypedAST visit(StringNode node, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+		return new StringConstant(node.data);
 	}
 
 	@Override
