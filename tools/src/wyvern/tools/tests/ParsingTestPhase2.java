@@ -16,12 +16,16 @@ import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
+import wyvern.tools.typedAST.extensions.ValDeclaration;
+import wyvern.tools.typedAST.visitors.JSCodegenVisitor;
+import wyvern.tools.typedAST.visitors.PrintVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.typedAST.CoreAST;
 
 import static wyvern.tools.types.TypeUtils.*;
 

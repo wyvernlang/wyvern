@@ -6,7 +6,7 @@ import wyvern.tools.types.KeywordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class Keyword extends AbstractTypedAST implements Value {
+public class Keyword extends AbstractTypedAST implements Value, CoreAST {
 	private LineParser parser;
 	
 	public Keyword(LineParser parser) {
@@ -36,6 +36,12 @@ public class Keyword extends AbstractTypedAST implements Value {
 	@Override
 	public Value evaluate(Environment env) {
 		return this;
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		// TODO I don't think that this'll ever show up, as such, throe an exception
+		throw new RuntimeException();
 	}
 
 }

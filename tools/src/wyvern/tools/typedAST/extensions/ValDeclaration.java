@@ -4,6 +4,8 @@ import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.CachingTypedAST;
+import wyvern.tools.typedAST.CoreAST;
+import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
@@ -13,7 +15,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ValDeclaration extends CachingTypedAST {
+public class ValDeclaration extends CachingTypedAST implements CoreAST {
 	TypedAST definition;
 	TypedAST body;		 // initialized incrementally during parsing
 	NameBinding binding;
@@ -57,5 +59,18 @@ public class ValDeclaration extends CachingTypedAST {
 		Value defValue = definition.evaluate(env);
 		Environment newEnv = env.extend(new ValueBinding(binding.getName(), defValue));
 		return body.evaluate(newEnv);
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		if (definition instanceof CoreAST)
+			((CoreAST) definition).accept(visitor);
+		if (body instanceof CoreAST)
+			((CoreAST) body).accept(visitor);
+		visitor.visit(this);
+	}
+	
+	public NameBinding getBinding() {
+		return binding;
 	}
 }

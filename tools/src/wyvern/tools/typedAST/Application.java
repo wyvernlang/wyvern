@@ -9,7 +9,7 @@ import wyvern.tools.util.TreeWriter;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 
-public class Application extends CachingTypedAST {
+public class Application extends CachingTypedAST implements CoreAST {
 	private TypedAST function;
 	private TypedAST argument;
 
@@ -46,6 +46,15 @@ public class Application extends CachingTypedAST {
 			reportEvalError(VALUE_CANNOT_BE_APPLIED, lhs.toString(), this);
 		ApplyableValue fnValue = (ApplyableValue) lhs;
 		return fnValue.evaluateApplication(this, env);
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		if (argument instanceof CoreAST)
+			((CoreAST) argument).accept(visitor);
+		if (function instanceof CoreAST)
+			((CoreAST) function).accept(visitor);
+		visitor.visit(this);
 	}
 
 }

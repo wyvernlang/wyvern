@@ -3,12 +3,14 @@ package wyvern.tools.typedAST.extensions;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.typedAST.ApplyableValue;
+import wyvern.tools.typedAST.CoreAST;
+import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ExternalFunction extends AbstractTypedAST implements ApplyableValue {
+public class ExternalFunction extends AbstractTypedAST implements ApplyableValue, CoreAST {
 	private Type type;
 	private Executor exec;
 	
@@ -42,6 +44,11 @@ public class ExternalFunction extends AbstractTypedAST implements ApplyableValue
 	public Value evaluateApplication(Application app, Environment env) {
 		Value argValue = app.getArgument().evaluate(env);
 		return exec.execute(argValue);
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		// TODO  Not really sure what to do here.
 	}
 
 }

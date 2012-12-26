@@ -9,7 +9,7 @@ import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class Invocation extends CachingTypedAST {
+public class Invocation extends CachingTypedAST implements CoreAST {
 	private String operationName;
 	private TypedAST receiver;
 	private TypedAST argument;
@@ -51,6 +51,15 @@ public class Invocation extends CachingTypedAST {
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		InvokableValue receiverValue = (InvokableValue) lhs;
 		return receiverValue.evaluateInvocation(this, env);
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		if (argument instanceof CoreAST)
+			((CoreAST) argument).accept(visitor);
+		if (receiver instanceof CoreAST)
+			((CoreAST) receiver).accept(visitor);
+		visitor.visit(this);
 	}
 
 }
