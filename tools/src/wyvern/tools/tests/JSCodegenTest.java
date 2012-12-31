@@ -26,7 +26,7 @@ public class JSCodegenTest {
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Type resultType = typedAST.typecheck();
+		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}
 	

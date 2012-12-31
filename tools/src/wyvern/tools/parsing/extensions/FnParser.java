@@ -1,5 +1,8 @@
 package wyvern.tools.parsing.extensions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -31,8 +34,10 @@ public class FnParser implements LineParser {
 		parseSymbol("=>", ctx);
 		NameBinding binding = new NameBindingImpl(varName, type);
 		ctx.second = ctx.second.extend(binding);
+		List<NameBinding> bindings = new ArrayList<NameBinding>();
+		bindings.add(binding);
 		TypedAST exp = ParseUtils.parseExpr(ctx);
 				
-		return new Fn(binding, exp);
+		return new Fn(bindings, exp);
 	}
 }

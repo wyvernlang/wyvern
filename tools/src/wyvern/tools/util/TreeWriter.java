@@ -1,5 +1,7 @@
 package wyvern.tools.util;
 
+import java.util.List;
+
 public class TreeWriter {
 	private StringBuffer buf = new StringBuffer();
 	boolean first;
@@ -26,6 +28,14 @@ public class TreeWriter {
 			buf.append('\"');
 			buf.append((String)o);
 			buf.append('\"');
+		} else if (o instanceof List) {
+			buf.append('[');
+			List<Object> list = (List<Object>)o;
+			if (list.size() > 0)
+				first = true;
+			for (Object elem : list)
+				writeGenericObject(elem);
+			buf.append(']');
 		} else if (o == null){
 			buf.append("null");
 		} else {

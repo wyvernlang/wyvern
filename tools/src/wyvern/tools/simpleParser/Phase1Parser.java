@@ -102,7 +102,7 @@ public class Phase1Parser {
 					return;
 				} else {
 					reportError(INDENT_DEDENT_MISMATCH, token);
-				}			
+				}
 			} else {
 				RawAST node = parseElement(lexer);
 				result.children.add(node);

@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.typedAST.AbstractTypedAST;
+import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Invocation;
@@ -11,7 +12,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.TreeWriter;
 
-public class StringConstant extends AbstractTypedAST implements InvokableValue, CoreAST {
+public class StringConstant extends AbstractValue implements InvokableValue, CoreAST {
 	private String value;
 	
 	public StringConstant(String s) { this.value = s; }
@@ -19,16 +20,6 @@ public class StringConstant extends AbstractTypedAST implements InvokableValue, 
 	@Override
 	public Type getType() {
 		return Str.getInstance();
-	}
-
-	@Override
-	public Type typecheck() {
-		return getType();
-	}
-
-	@Override
-	public Value evaluate(Environment env) {
-		return this;
 	}
 
 	@Override

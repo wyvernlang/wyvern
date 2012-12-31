@@ -10,6 +10,7 @@ import java.util.Set;
 
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
+import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -25,8 +26,8 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 	}));
 
 	@Override
-	public Type checkOperator(Invocation opExp) {
-		Type type2 = opExp.getArgument().typecheck();
+	public Type checkOperator(Invocation opExp, Environment env) {
+		Type type2 = opExp.getArgument().typecheck(env);
 		String operatorName = opExp.getOperationName();
 		
 		if (!(legalOperators.contains(operatorName)))

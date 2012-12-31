@@ -2,9 +2,10 @@ package wyvern.tools.lexer;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Stack;
 
 public class Lexer {
-	String currentPrefix = "";
+	private Stack<String> prefixStack = new Stack<String>();
 	LexerState currentState = InitialState.getInstance();
 	
 	private Reader reader;
@@ -14,6 +15,7 @@ public class Lexer {
 	public Lexer(Reader r) {
 		reader = r;
 		lineNum = 0;
+		prefixStack.push("");
 	}
 	
 	private void fill() {
@@ -118,5 +120,17 @@ public class Lexer {
 	
 	void incrementLine() {
 		lineNum++;
+	}
+
+	String getCurrentPrefix() {
+		return prefixStack.peek();
+	}
+
+	void pushPrefix(String newPrefix) {
+		prefixStack.push(newPrefix);
+	}
+
+	public void popPrefix() {
+		prefixStack.pop();
 	}
 }

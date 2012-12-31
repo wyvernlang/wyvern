@@ -1,9 +1,11 @@
 package wyvern.tools.typedAST.binding;
 
+import wyvern.tools.typedAST.Value;
+import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class AbstractBinding implements Binding {
+public abstract class AbstractBinding implements Binding {
 	private String name;
 	private Type type;
 	
@@ -19,7 +21,7 @@ public class AbstractBinding implements Binding {
 	public Type getType() {
 		return type;
 	}
-
+	
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(name, type);

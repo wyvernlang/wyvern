@@ -24,11 +24,11 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck() {
-		Type fnType = function.typecheck();
+	protected Type doTypecheck(Environment env) {
+		Type fnType = function.typecheck(env);
 		if (!(fnType instanceof ApplyableType))
 			reportError(TYPE_CANNOT_BE_APPLIED, fnType.toString(), this);
-		return ((ApplyableType)fnType).checkApplication(this);
+		return ((ApplyableType)fnType).checkApplication(this, env);
 	}
 
 	public TypedAST getArgument() {

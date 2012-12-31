@@ -11,7 +11,7 @@ public interface TypedAST extends TreeWritable, HasLocation {
 
 	/** should call typecheck() before getType() -- except maybe for declarations */
 	Type getType();
-	Type typecheck();
+	Type typecheck(Environment env);
 	
 	/** an interpreter */
 	Value evaluate(Environment env);

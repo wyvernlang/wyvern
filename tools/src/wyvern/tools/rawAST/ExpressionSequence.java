@@ -8,7 +8,7 @@ public abstract class ExpressionSequence extends Sequence {
 	}
 	
 	public RawAST getFirst() {
-		return children.get(0);
+		return children.size() > 0 ? children.get(0) : null;
 	}
 	
 	public abstract ExpressionSequence getRest();

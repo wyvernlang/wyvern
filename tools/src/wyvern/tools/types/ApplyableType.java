@@ -13,5 +13,5 @@ public interface ApplyableType extends Type {
 	 * @param linearContext
 	 * @return
 	 */
-	Type checkApplication(Application application);
+	Type checkApplication(Application application, Environment env);
 }

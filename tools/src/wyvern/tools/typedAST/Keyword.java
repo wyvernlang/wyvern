@@ -6,7 +6,7 @@ import wyvern.tools.types.KeywordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class Keyword extends AbstractTypedAST implements Value, CoreAST {
+public class Keyword extends AbstractValue implements Value, CoreAST {
 	private LineParser parser;
 	
 	public Keyword(LineParser parser) {
@@ -26,16 +26,6 @@ public class Keyword extends AbstractTypedAST implements Value, CoreAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write; we don't expect to roundtrip this type
-	}
-
-	@Override
-	public Type typecheck() {
-		return getType();
-	}
-
-	@Override
-	public Value evaluate(Environment env) {
-		return this;
 	}
 
 	@Override

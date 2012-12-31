@@ -21,6 +21,6 @@ public class ValParser implements LineParser {
 		parseSymbol("=", ctx);
 		TypedAST exp = ParseUtils.parseExpr(ctx);
 		
-		return new ValDeclaration(varName, exp);		
+		return new ValDeclaration(varName, exp, ctx.second);		
 	}
 }

@@ -30,7 +30,8 @@ public abstract class Sequence implements RawAST {
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		String beforeChar = getOpenChar();
+		buf.append(getOpenChar());
+		String beforeChar = "";
 		
 		for(RawAST n : children) {
 			buf.append(beforeChar);

@@ -1,21 +1,26 @@
 package wyvern.tools.typedAST.extensions;
 
+import java.util.List;
+
 import wyvern.tools.typedAST.AbstractTypedAST;
+import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.typedAST.ApplyableValue;
+import wyvern.tools.typedAST.BoundCode;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Value;
+import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class Closure extends AbstractTypedAST implements ApplyableValue, CoreAST {
-	private Fn function;
+public class Closure extends AbstractValue implements ApplyableValue {
+	private BoundCode function;
 	private Environment env;
 
-	public Closure(Fn function, Environment env) {
+	public Closure(BoundCode function, Environment env) {
 		this.function = function;
 		this.env = env;
 	}
@@ -26,16 +31,6 @@ public class Closure extends AbstractTypedAST implements ApplyableValue, CoreAST
 	}
 
 	@Override
-	public Type typecheck() {
-		return getType();
-	}
-
-	@Override
-	public Value evaluate(Environment env) {
-		return this;
-	}
-
-	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(function, env);
 	}
@@ -43,14 +38,13 @@ public class Closure extends AbstractTypedAST implements ApplyableValue, CoreAST
 	@Override
 	public Value evaluateApplication(Application app, Environment argEnv) {
 		Value argValue = app.getArgument().evaluate(argEnv);
-		Environment bodyEnv = env.extend(new ValueBinding(function.getBinding().getName(), argValue));
+		Environment bodyEnv = env;
+		List<NameBinding> bindings = function.getArgBindings();
+		if (bindings.size() == 1)
+			bodyEnv = bodyEnv.extend(new ValueBinding(bindings.get(0).getName(), argValue));
+		else if (bindings.size() > 1)
+			throw new RuntimeException("not implemented"); // TODO
 		return function.getBody().evaluate(bodyEnv);
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO Think about this more. For now, just let function handle it
-		function.accept(visitor);
 	}
 
 }

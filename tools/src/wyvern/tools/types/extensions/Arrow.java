@@ -5,6 +5,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
+import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
@@ -26,8 +27,8 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	}
 	
 	@Override
-	public Type checkApplication(Application application) {
-		Type actualType = application.getArgument().typecheck();
+	public Type checkApplication(Application application, Environment env) {
+		Type actualType = application.getArgument().typecheck(env);
 		if (!actualType.equals(argument))
 			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application);
 		return result;

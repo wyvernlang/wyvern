@@ -70,14 +70,15 @@ public class InitialState implements LexerState {
 		String start = startOfLine.toString();
 					
 		//Doesen't work hugely well with changing amounts of spacing.
-		if (start.equals(lexer.currentPrefix)) {
+		if (start.equals(lexer.getCurrentPrefix())) {
 			token = Token.getNEWLINE();
-		} else if (start.startsWith(lexer.currentPrefix)) {
+		} else if (start.startsWith(lexer.getCurrentPrefix())) {
 			token = Token.getINDENT();
-			lexer.currentPrefix = start;
-		} else if (lexer.currentPrefix.startsWith(start)) {
-			lexer.currentPrefix = lexer.currentPrefix.substring(0, lexer.currentPrefix.length() - 1);
-			if (!lexer.currentPrefix.equals(start))
+			lexer.pushPrefix(start);
+		} else if (lexer.getCurrentPrefix().startsWith(start)) {
+			lexer.popPrefix();
+			//lexer.pushPrefix(lexer.getCurrentPrefix().substring(0, lexer.getCurrentPrefix().length() - 1));
+			if (!lexer.getCurrentPrefix().equals(start))
 				lexer.currentState = InitialState.getInstance();
 			token = Token.getDEDENT();
 		} else {

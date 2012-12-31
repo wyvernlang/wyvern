@@ -2,6 +2,8 @@ package wyvern.tools.typedAST.binding;
 
 import wyvern.tools.typedAST.Keyword;
 import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.Value;
+import wyvern.tools.types.Environment;
 
 public class KeywordNameBinding extends AbstractBinding implements NameBinding {
 	private Keyword keyword;
@@ -12,6 +14,11 @@ public class KeywordNameBinding extends AbstractBinding implements NameBinding {
 	}
 
 	public TypedAST getUse() {
+		return keyword;
+	}
+
+	@Override
+	public Value getValue(Environment env) {
 		return keyword;
 	}
 }

@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.typedAST.AbstractTypedAST;
+import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.typedAST.ApplyableValue;
 import wyvern.tools.typedAST.CoreAST;
@@ -10,7 +11,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ExternalFunction extends AbstractTypedAST implements ApplyableValue, CoreAST {
+public class ExternalFunction extends AbstractValue implements ApplyableValue, CoreAST {
 	private Type type;
 	private Executor exec;
 	
@@ -28,17 +29,6 @@ public class ExternalFunction extends AbstractTypedAST implements ApplyableValue
 	public void writeArgsToTree(TreeWriter writer) {
 		// no arguments at the moment; also not intended for serialization		
 	}
-
-	@Override
-	public Type typecheck() {
-		return getType();
-	}
-
-	@Override
-	public Value evaluate(Environment env) {
-		return this;
-	}
-
 
 	@Override
 	public Value evaluateApplication(Application app, Environment env) {

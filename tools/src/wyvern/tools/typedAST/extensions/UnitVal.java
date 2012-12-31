@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.typedAST.AbstractTypedAST;
+import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Value;
@@ -9,7 +10,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-public class UnitVal extends AbstractTypedAST implements Value, CoreAST {
+public class UnitVal extends AbstractValue implements Value, CoreAST {
 	private UnitVal() { }
 	private static UnitVal instance = new UnitVal();
 	public static UnitVal getInstance() { return instance; }
@@ -19,16 +20,6 @@ public class UnitVal extends AbstractTypedAST implements Value, CoreAST {
 		return Unit.getInstance();
 	}
 	
-	@Override
-	public Type typecheck() {
-		return getType();
-	}
-
-	@Override
-	public Value evaluate(Environment env) {
-		return this;
-	}
-
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write		

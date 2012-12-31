@@ -96,6 +96,23 @@ public class LexingTest {
 		Assert.assertEquals(Token.getEOF(), lexer.getToken());
 	}
 
+	// caught a bug in an earlier version of the lexer
+	@Test
+	public void testSpacedIndent() {
+		Reader reader = new StringReader("class\n"
+										+"    field\n"
+										+"3");
+		Lexer lexer = new Lexer(reader);
+		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
+		Assert.assertEquals(token("class"), lexer.getToken());
+		Assert.assertEquals(Token.getINDENT(), lexer.getToken());
+		Assert.assertEquals(token("field"), lexer.getToken());
+		Assert.assertEquals(Token.getDEDENT(), lexer.getToken());
+		Assert.assertEquals(Token.getNumber("3"), lexer.getToken());
+		Assert.assertEquals(Token.getEOF(), lexer.getToken());
+	}
+	
+	
 	@Test
 	public void testSymbols() {
 		Reader reader = new StringReader("hello+1++3/[{}](-x)");

@@ -7,8 +7,12 @@ import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
+import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
+import wyvern.tools.typedAST.extensions.LetExpr;
+import wyvern.tools.typedAST.extensions.Meth;
+import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
@@ -62,7 +66,8 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 	
 	@Override
 	public void visit(Fn fn) {
-		elemStack.push(new ASTElement(fn, "function("+fn.getBinding().getName()+") { return "+elemStack.pop().generated+"; }"));
+		// TODO: support multiple arguments
+		elemStack.push(new ASTElement(fn, "function("+fn.getArgBindings().get(0).getName()+") { return "+elemStack.pop().generated+"; }"));
 	}
 
 	@Override
@@ -129,6 +134,24 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(Variable variable) {
 		elemStack.push(new ASTElement(variable, variable.getName()));
+	}
+
+	@Override
+	public void visit(ClassDeclaration clsDeclaration) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(New new1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(LetExpr let) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

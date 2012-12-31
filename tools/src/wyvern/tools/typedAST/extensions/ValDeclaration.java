@@ -6,6 +6,7 @@ import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.CachingTypedAST;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
+import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
@@ -15,62 +16,62 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ValDeclaration extends CachingTypedAST implements CoreAST {
+public class ValDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
-	TypedAST body;		 // initialized incrementally during parsing
 	NameBinding binding;
 	
-	public ValDeclaration(String name, TypedAST definition) {
+	public ValDeclaration(String name, TypedAST definition, Environment env) {
 		this.definition=definition;
-		binding = new NameBindingImpl(name, definition.typecheck());
-	}
-
-	@Override
-	public LineSequenceParser getLineSequenceParser() {
-		return new LineSequenceParser() {
-			@Override
-			public TypedAST parse(
-					TypedAST first,
-					LineSequence rest,
-					Environment env) {
-				
-				Environment newEnv = env.extend(binding);
-				body = rest.accept(CoreParser.getInstance(), newEnv);				
-				return ValDeclaration.this;
-			}
-			
-		};
+		binding = new NameBindingImpl(name, definition.typecheck(env));
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definition, body);
+		writer.writeArgs(binding.getName(), definition);
 	}
 
 	@Override
-	protected Type doTypecheck() {
-		// definition is already typechecked
-		Type bodyType = body.typecheck();
-		return bodyType;
-	}
-
-	@Override
-	public Value evaluate(Environment env) {
-		Value defValue = definition.evaluate(env);
-		Environment newEnv = env.extend(new ValueBinding(binding.getName(), defValue));
-		return body.evaluate(newEnv);
+	protected Type doTypecheck(Environment env) {
+		return binding.getType();
 	}
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		if (definition instanceof CoreAST)
 			((CoreAST) definition).accept(visitor);
-		if (body instanceof CoreAST)
-			((CoreAST) body).accept(visitor);
 		visitor.visit(this);
 	}
 	
 	public NameBinding getBinding() {
 		return binding;
+	}
+
+	@Override
+	public Type getType() {
+		return binding.getType();
+	}
+
+	@Override
+	public String getName() {
+		return binding.getName();
+	}
+
+	@Override
+	protected Environment doExtend(Environment old) {
+		return old.extend(binding);
+	}
+
+	@Override
+	protected Environment extendWithValue(Environment old) {
+		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
+		return newEnv;
+		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
+	}
+
+	@Override
+	protected void evalDecl(Environment env) {
+		Value defValue = definition.evaluate(env);
+		ValueBinding vb = (ValueBinding) env.lookup(binding.getName());
+		vb.setValue(defValue);
 	}
 }

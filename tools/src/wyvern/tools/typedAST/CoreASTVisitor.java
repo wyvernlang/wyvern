@@ -1,8 +1,12 @@
 package wyvern.tools.typedAST;
 
 import wyvern.tools.typedAST.extensions.BooleanConstant;
+import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
+import wyvern.tools.typedAST.extensions.LetExpr;
+import wyvern.tools.typedAST.extensions.Meth;
+import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
@@ -20,4 +24,7 @@ public interface CoreASTVisitor {
 	void visit(StringConstant booleanConstant);
 	void visit(BooleanConstant booleanConstant);
 	void visit(UnitVal unitVal);
+	void visit(ClassDeclaration clsDeclaration);
+	void visit(New new1);
+	void visit(LetExpr let);
 }

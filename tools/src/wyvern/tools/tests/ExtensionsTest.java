@@ -52,10 +52,10 @@ public class ExtensionsTest {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);		
-		Assert.assertEquals("ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true)), " +
+		Assert.assertEquals("LetExpr(ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true))), " +
 				"Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true))))",
 				typedAST.toString());		
-		Type resultType = typedAST.typecheck();
+		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Bool.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("BooleanConstant(true)", resultValue.toString());
@@ -78,7 +78,7 @@ public class ExtensionsTest {
 			Assert.assertEquals("{$I {$L "+ first + " " + ops[i] +" "+ second +" $L} $I}", parsedResult.toString());
 			typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 			Assert.assertEquals("Invocation(IntegerConstant(" + first + "), \"" + ops[i] + "\", IntegerConstant(" + second + "))", typedAST.toString());
-			resultType = typedAST.typecheck();
+			resultType = typedAST.typecheck(env);
 			Assert.assertEquals(Bool.getInstance(), resultType);
 			resultValue = typedAST.evaluate(env);
 			Assert.assertEquals("BooleanConstant("+ results[i] +")", resultValue.toString());
@@ -94,7 +94,7 @@ public class ExtensionsTest {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("Invocation(Invocation(IntegerConstant(100), \"+\", StringConstant(\" Hello \")), \"+\", StringConstant(\"world!\"))", typedAST.toString());
-		Type resultType = typedAST.typecheck();
+		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Str.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("StringConstant(\"100 Hello world!\")", resultValue.toString());
@@ -110,7 +110,7 @@ public class ExtensionsTest {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		//Assert.assertEquals("ValDeclaration(\"x\", IntegerConstant(5), Variable(\"x\"))", typedAST.toString());		
-		Type resultType = typedAST.typecheck();
+		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 	}

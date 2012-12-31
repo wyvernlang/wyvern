@@ -43,7 +43,7 @@ public class Interpreter {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		
-		typedAST.typecheck();
+		typedAST.typecheck(env);
 		
 		return typedAST.evaluate(env);		
 	}

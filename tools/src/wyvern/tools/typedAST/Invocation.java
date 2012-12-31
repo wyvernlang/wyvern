@@ -26,12 +26,12 @@ public class Invocation extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck() {
-		Type receiverType = receiver.typecheck();
+	protected Type doTypecheck(Environment env) {
+		Type receiverType = receiver.typecheck(env);
 		
 		if (!(receiverType instanceof OperatableType))
 			reportError(OPERATOR_DOES_NOT_APPLY, operationName, receiverType.toString(), this);
-		return ((OperatableType)receiverType).checkOperator(this);
+		return ((OperatableType)receiverType).checkOperator(this,env);
 	}
 
 	public TypedAST getArgument() {

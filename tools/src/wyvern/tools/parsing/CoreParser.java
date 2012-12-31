@@ -3,8 +3,11 @@ package wyvern.tools.parsing;
 import wyvern.tools.rawAST.*;
 import wyvern.tools.typedAST.*;
 import wyvern.tools.typedAST.binding.NameBinding;
+import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
 import wyvern.tools.typedAST.extensions.StringConstant;
+import wyvern.tools.typedAST.extensions.UnitVal;
+import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
@@ -30,7 +33,8 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	public TypedAST visit(Symbol node, Environment env) {
 		NameBinding binding = env.lookup(node.name);
 		if (binding == null)
-			reportError(VARIABLE_NOT_DECLARED, node.name, node);
+			return new Variable(new NameBindingImpl(node.name, null));
+			//reportError(VARIABLE_NOT_DECLARED, node.name, node);
 			
 		return binding.getUse();
 	}
@@ -72,8 +76,13 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check
-		if (node.children.size() == 0)
-			throw new RuntimeException("cannot parse an empty list");
+		if (node.children.size() == 0) {
+			if (node instanceof Parenthesis) {
+				ctx.first = null;
+				return UnitVal.getInstance();
+			} else
+				throw new RuntimeException("cannot parse an empty list");
+		}
 
 		TypedAST first = node.getFirst().accept(this, env);
 		LineParser parser = first.getLineParser();
@@ -90,11 +99,17 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseApplication(Pair<ExpressionSequence,Environment> ctx) {
 		TypedAST ast = parseAtomicExpr(ctx);
 		
-		while (ctx.first != null && ctx.first.getFirst() instanceof Parenthesis) {
-			TypedAST argument = parseAtomicExpr(ctx);
-			ast = new Application(ast, argument);
+		while (ctx.first != null && (ctx.first.getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
+			if (ParseUtils.checkFirst(".",ctx)) {
+				ParseUtils.parseSymbol(".", ctx);
+				Symbol sym = ParseUtils.parseSymbol(ctx);
+				ast = new Invocation(ast, sym.name, null);
+			} else {
+				TypedAST argument = parseAtomicExpr(ctx);
+				ast = new Application(ast, argument);
+			}
 		}
-		
+
 		return ast;
 	}
 

@@ -50,7 +50,7 @@ public class Environment implements TreeWritable {
 		if (this.name == null)
 			return null;
 		if (this.name.equals(name) && this.binding instanceof ValueBinding)
-			return (Value)((ValueBinding) binding).getValue();
+			return ((ValueBinding) binding).getValue(this);
 		return parentEnvironment.getValue(name);
 	}
 
