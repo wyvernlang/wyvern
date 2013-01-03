@@ -188,7 +188,7 @@ public class ParsingTestPhase2 {
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		typedAST.typecheck(env);
 		Value resultValue = typedAST.evaluate(env);
-		Assert.assertEquals("IntegerConstant(3)", resultValue.toString());
+		Assert.assertEquals("StringConstant(\"hello\")", resultValue.toString());
 	}
 	
 	// TODO: test scoping for lambdas and methods
@@ -213,10 +213,11 @@ public class ParsingTestPhase2 {
 	/* The plan:
 	 * X get methods on objects working
 	 * X make val a declaration
-	 * (C) get fields on objects working
-	 * (D) get interfaces for objects working (with prop = val)
-	 * (E) introduce var decls - for methods, and for objects
-	 * (F) support methods for implementing prop
+	 * X get fields on objects working
+	 * (D) get field initialization in constructor working, fields read actual values, methods take this
+	 * (E) get interfaces for objects working (with prop = val)
+	 * (F) introduce var decls - for methods, and for objects
+	 * (G) support methods for implementing prop
 	 */
 	@Test
 	public void testClassAndMethods() {

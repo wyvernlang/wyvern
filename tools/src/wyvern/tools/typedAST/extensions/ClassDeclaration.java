@@ -76,12 +76,12 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		vb.setValue(classObj);
 	}
 
-	public Meth getDecl(String opName) {
+	public Declaration getDecl(String opName) {
 		Declaration d = decls;
 		while (d != null) {
 			// TODO: handle fields too
 			if (d.getName().equals(opName))
-				return (Meth) d;
+				return d;
 			d = d.getNextDecl();
 		}
 		return null;	// can't find it

@@ -101,13 +101,13 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(ValDeclaration valDeclaration) {
 		System.out.println("Val decl "+valDeclaration.toString());
-		ASTElement bodyelem= elemStack.pop();
+		ASTElement nextDeclElem = (valDeclaration.getNextDecl() != null) ? elemStack.pop() : null;
 		ASTElement declelem = elemStack.pop();
 		
-		
+		// TODO SMELL: somewhat hackish
+		String nextDeclText = (nextDeclElem == null)? "" : nextDeclElem.generated;
 		elemStack.push(new ASTElement(valDeclaration, 
-				"var "+valDeclaration.getBinding().getName() +" = "+declelem.generated +";\n"
-				+bodyelem.generated));
+				"var "+valDeclaration.getBinding().getName() +" = "+declelem.generated +";\n" + nextDeclText));
 	}
 
 	@Override
@@ -150,8 +150,13 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(LetExpr let) {
-		// TODO Auto-generated method stub
+		System.out.println("Let expr "+let.toString());
+		ASTElement bodyelem= elemStack.pop();
+		ASTElement declelem = elemStack.pop();
 		
+		
+		elemStack.push(new ASTElement(let, 
+				declelem.generated + bodyelem.generated));
 	}
 
 }

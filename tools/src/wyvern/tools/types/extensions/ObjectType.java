@@ -2,6 +2,7 @@ package wyvern.tools.types.extensions;
 
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
+import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Meth;
@@ -35,7 +36,7 @@ public class ObjectType extends AbstractTypeImpl implements OperatableType {
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
-		Meth m = decl.getDecl(opName);
+		Declaration m = decl.getDecl(opName);
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
 		

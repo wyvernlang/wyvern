@@ -40,8 +40,6 @@ public class Obj extends AbstractValue implements InvokableValue {
 	@Override
 	public Value evaluateInvocation(Invocation exp, Environment env) {
 		String operation = exp.getOperationName();
-		Closure m = cls.getClosure(operation);
-		// TODO: bind this
-		return m;
+		return cls.getValue(operation, this);
 	}
 }

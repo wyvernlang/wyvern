@@ -33,8 +33,9 @@ public class ClassObject extends AbstractValue implements Value {
 		return decl.getType();
 	}
 
-	public Closure getClosure(String operation) {
-		return (Closure) memberEnv.getValue(operation);
+	public Value getValue(String operation, Obj receiver) {
+		// TODO: bind receiver in method, use receiver to look up fields
+		return memberEnv.getValue(operation);
 	}
 
 }

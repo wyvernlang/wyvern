@@ -39,6 +39,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	public void accept(CoreASTVisitor visitor) {
 		if (definition instanceof CoreAST)
 			((CoreAST) definition).accept(visitor);
+		if (getNextDecl() != null)
+			((CoreAST) getNextDecl()).accept(visitor);
 		visitor.visit(this);
 	}
 	
