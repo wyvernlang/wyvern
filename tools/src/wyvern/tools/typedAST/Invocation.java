@@ -4,6 +4,8 @@ import static wyvern.tools.errors.ErrorMessage.CANNOT_INVOKE;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
+import wyvern.tools.rawAST.Unit;
+import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
@@ -55,10 +57,6 @@ public class Invocation extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		if (argument instanceof CoreAST)
-			((CoreAST) argument).accept(visitor);
-		if (receiver instanceof CoreAST)
-			((CoreAST) receiver).accept(visitor);
 		visitor.visit(this);
 	}
 

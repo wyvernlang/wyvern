@@ -57,7 +57,7 @@ public class Meth extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		// TODO: visiting happens as part of the LetExpr surrounding me
+		visitor.visit(this);
 	}
 	
 	@Override

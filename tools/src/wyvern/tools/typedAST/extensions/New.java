@@ -53,6 +53,10 @@ public class New extends CachingTypedAST implements CoreAST {
 		ClassObject clsObject = (ClassObject) clsVar.evaluate(env);
 		return new Obj(clsObject, argVals);
 	}
+	
+	public ClassDeclaration getClassDecl() {
+		return cls;
+	}
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {

@@ -27,4 +27,5 @@ public interface CoreASTVisitor {
 	void visit(ClassDeclaration clsDeclaration);
 	void visit(New new1);
 	void visit(LetExpr let);
+	void visit(Meth meth);
 }

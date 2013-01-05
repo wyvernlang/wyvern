@@ -35,7 +35,7 @@ public class JSCodegenTest {
 		TypedAST typedAST = doCompile("val x = 5\nx");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		Assert.assertEquals("var x = 5;\nx", visitor.getCode());
+		Assert.assertEquals("var x = 5;\nreturn x;", visitor.getCode());
 	}
 	
 	@Test
@@ -80,6 +80,101 @@ public class JSCodegenTest {
 		((CoreAST)typedAST).accept(visitor);
 		Assert.assertEquals("var applyTwice = function(f) { return function(x) { return (f)((f)(x)); }; };\n"+
 							"var addOne = function(x) { return x + 1; };\n"+
-							"((applyTwice)(addOne))(1)", visitor.getCode());
+							"return ((applyTwice)(addOne))(1);", visitor.getCode());
+	}
+	
+
+	@Test
+	public void testMethod() {
+		TypedAST typedAST = doCompile("meth double(n:Int):Int = n*2\n"
+									 +"double(5)\n");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertEquals("function double(n) {\n"+
+				"\treturn n * 2;\n}\n"+
+				"return (double)(5);", visitor.getCode());
+	}
+	
+	@Test
+	public void testMethod2() {
+		TypedAST typedAST = doCompile("meth num():Int = 5\n"
+									 +"num()\n");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertEquals("function num() {\n"+
+				"\treturn 5;\n}\n"+
+				"return (num)();", visitor.getCode());
+	}
+	
+	@Test
+	public void testMutuallyRecursiveMethods() {
+		TypedAST typedAST = doCompile("meth doublePlusOne(n:Int):Int = double(n) + 1\n"
+										+"meth double(n:Int):Int = n*2\n"
+										+"doublePlusOne(5)\n");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertEquals("function doublePlusOne(n) {\n"+
+				"\treturn (double)(n) + 1;\n}\n"+
+				"function double(n) {\n"+
+				"\treturn n * 2;\n}\n"+
+				"return (doublePlusOne)(5);", visitor.getCode());
+		
+	}
+	
+	@Test
+	public void testClassAndField() {
+		TypedAST typedAST = doCompile("class Hello\n"
+										+"    val hiString = \"hello\"\n"
+										+"\n"
+										+"val h = new Hello()\n"//hiString: \"hi\")\n"
+										+"h.hiString");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertEquals("function Hello() {\n"+
+        		"\tthis.hiString = \"hello\";\n"+
+				"}\n"+
+				"var h = new Hello();\nreturn h.hiString;", visitor.getCode());
+	}
+
+	@Test
+	public void testNestedMethods() {
+		TypedAST typedAST = doCompile(
+				"meth outer(n:Int):Int -> Int\n"
+				+"    meth nested(m:Int):Int = n+m\n"
+				+"    fn x : Int => nested(x + 1)\n"
+				+"val f1 = outer(1)\n"
+				+"val f2 = outer(2)\n"
+				+"f2(6)");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertEquals(
+				"function outer(n) {\n"+
+				"\tfunction nested(m) {\n"+
+        		"\t\treturn n + m;\n"+
+        		"\t}\n"+
+        		"\treturn function(x) { return (nested)(x + 1); };\n"+
+				"}\n"+
+				"var f1 = (outer)(1);\n" +
+				"var f2 = (outer)(2);\n" +
+				"return (f2)(6);", visitor.getCode());
+	}
+	
+	@Test
+	public void testClassAndMethods() {
+		TypedAST typedAST = doCompile(
+				"class Hello\n"
+				+"    meth get5():Int = 5\n"
+				+"\n"
+				+"val h = new Hello()\n"
+				+"h.get5()");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertEquals("function Hello() {\n" +
+				"\tthis.get5 = function() {\n" +
+				"\t\treturn 5;" +
+				"\n\t}\n" +
+				"}\n" +
+				"var h = new Hello();\n" +
+				"return (h.get5)();", visitor.getCode());
 	}
 }

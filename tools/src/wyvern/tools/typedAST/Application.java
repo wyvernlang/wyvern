@@ -50,10 +50,6 @@ public class Application extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		if (argument instanceof CoreAST)
-			((CoreAST) argument).accept(visitor);
-		if (function instanceof CoreAST)
-			((CoreAST) function).accept(visitor);
 		visitor.visit(this);
 	}
 

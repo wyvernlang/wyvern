@@ -1,11 +1,14 @@
 package wyvern.tools.typedAST.visitors;
 
+import java.util.LinkedList;
 import java.util.Stack;
 
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
+import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
+import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
@@ -22,7 +25,7 @@ import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
 
-public class JSCodegenVisitor implements CoreASTVisitor {
+public class JSCodegenVisitor extends BaseASTVisitor {
 	private class ASTElement {
 		public String generated;
 		public CoreAST elem;
@@ -31,6 +34,11 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 			this.generated = generated;
 			this.elem = elem;
 		}
+	}
+	
+	public String Indent(String input) {
+		
+		return input.replaceAll("\n", "\n\t");
 	}
 	
 	//Checks to see if the type can be reperesented without explicit boxing
@@ -42,6 +50,7 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 	}
 	
 	Stack<ASTElement> elemStack = new Stack<ASTElement>();
+	boolean inClass = false, inBody = false;
 	
 	private boolean isInfix(String operator) {
 		switch(operator) {
@@ -67,96 +76,199 @@ public class JSCodegenVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(Fn fn) {
 		// TODO: support multiple arguments
+		super.visit(fn);
 		elemStack.push(new ASTElement(fn, "function("+fn.getArgBindings().get(0).getName()+") { return "+elemStack.pop().generated+"; }"));
 	}
 
 	@Override
 	public void visit(Invocation invocation) {
-		ASTElement elem1 = elemStack.pop();
-		ASTElement elem2 = elemStack.pop();
+		super.visit(invocation);
+		
+		ASTElement receiver = elemStack.pop();
+		ASTElement argument = null;
+		if (invocation.getArgument() != null)
+			argument = elemStack.pop();
 
 		String operationName = invocation.getOperationName();
 		
 		//If the first element can be operated on by native operators, then use them!
 		//Also check to see if it the operator could work.
 		//TODO: make something that checks this last bit better
-		if (isRawType(elem1.elem.getType()) && isInfix(operationName)) {
-			elemStack.push(new ASTElement(invocation, elem1.generated+" "+operationName+" "+elem2.generated));
+		if (isRawType(receiver.elem.getType()) && argument != null && isInfix(operationName)) {
+			elemStack.push(new ASTElement(invocation, receiver.generated+" "+operationName+" "+argument.generated));
 			return;
 		}
-		elemStack.push(new ASTElement(invocation, elem1.generated+"."+operationName+"("+elem2.generated+")"));
+		
+		if (argument != null) { //Fn call
+			if (argument.elem instanceof UnitVal)
+				elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName+"()"));
+			else
+				elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName+"("+argument.generated+")"));
+			return;
+		} else { //Var access
+			elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName));
+			return;
+		}
 	}
 
 	@Override
 	public void visit(Application application) {
-		System.out.println("Apply "+application.getFunction().toString());
+		super.visit(application);
 		
 		ASTElement fnElem = elemStack.pop();
 		ASTElement argElem = elemStack.pop();
 		
-
-		elemStack.push(new ASTElement(application, "("+fnElem.generated+")("+argElem.generated+")"));
+		if (argElem.elem instanceof UnitVal)
+			elemStack.push(new ASTElement(application, "("+fnElem.generated+")()"));
+		else
+			elemStack.push(new ASTElement(application, "("+fnElem.generated+")("+argElem.generated+")"));
 	}
 
 	@Override
 	public void visit(ValDeclaration valDeclaration) {
-		System.out.println("Val decl "+valDeclaration.toString());
+		super.visit(valDeclaration);
+		
 		ASTElement nextDeclElem = (valDeclaration.getNextDecl() != null) ? elemStack.pop() : null;
 		ASTElement declelem = elemStack.pop();
 		
 		// TODO SMELL: somewhat hackish
-		String nextDeclText = (nextDeclElem == null)? "" : nextDeclElem.generated;
+		String nextDeclText = (nextDeclElem == null)? "" : "\n" + nextDeclElem.generated;
 		elemStack.push(new ASTElement(valDeclaration, 
-				"var "+valDeclaration.getBinding().getName() +" = "+declelem.generated +";\n" + nextDeclText));
+				((inClass)?"this.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
 	}
 
 	@Override
 	public void visit(IntegerConstant intConst) {
+		super.visit(intConst);
 		elemStack.push(new ASTElement(intConst, ""+intConst.getValue()));
 	}
 
 	@Override
 	public void visit(StringConstant strConst) {
-		elemStack.push(new ASTElement(strConst, ""+strConst.getValue()));
+		super.visit(strConst);
+		elemStack.push(new ASTElement(strConst, "\""+strConst.getValue() + "\""));
 	}
 
 	@Override
 	public void visit(BooleanConstant booleanConstant) {
+		super.visit(booleanConstant);
 		elemStack.push(new ASTElement(booleanConstant, 
 				""+booleanConstant.getValue()));
 	}
 
 	@Override
 	public void visit(UnitVal unitVal) {
+		super.visit(unitVal);
 		elemStack.push(new ASTElement(unitVal, "null"));
 	}
 
 	@Override
 	public void visit(Variable variable) {
+		super.visit(variable);
 		elemStack.push(new ASTElement(variable, variable.getName()));
 	}
 
 	@Override
-	public void visit(ClassDeclaration clsDeclaration) {
-		// TODO Auto-generated method stub
-		
+	public void visit(New new1) {
+		super.visit(new1);
+		elemStack.push(new ASTElement(new1, "new "+new1.getClassDecl().getName()+"()"));
 	}
 
 	@Override
-	public void visit(New new1) {
-		// TODO Auto-generated method stub
+	public void visit(ClassDeclaration clsDeclaration) {
+		Declaration decls = clsDeclaration.getDecls();
 		
+		if (!(decls instanceof CoreAST))
+			throw new RuntimeException("All visited elements must implement CoreAST.");
+		
+		inClass = true;
+		((CoreAST)decls).accept(this);
+		inClass = false;
+		
+		if (clsDeclaration.getNextDecl() != null)
+			((CoreAST) clsDeclaration.getNextDecl()).accept(this);
+		
+		ASTElement nextDeclElem = (clsDeclaration.getNextDecl() != null) ? elemStack.pop() : null;
+		
+		StringBuilder textRep = new StringBuilder();
+		textRep.append("function ");
+		textRep.append(clsDeclaration.getName());
+		textRep.append("() {");
+		
+		StringBuilder declBuilder = new StringBuilder();
+		declBuilder.append('\n');
+		
+		for (Declaration current = clsDeclaration.getDecls();
+				current != null;
+				current = current.getNextDecl()) {
+			
+			ASTElement decl = elemStack.pop();
+			declBuilder.append(decl.generated);
+		}
+		textRep.append(Indent(declBuilder.toString())+"\n");
+		textRep.append("}\n");
+		
+		String nextDeclText = (nextDeclElem == null)? "" : nextDeclElem.generated;
+		elemStack.push(new ASTElement(clsDeclaration, textRep.toString() + nextDeclText));
 	}
 
 	@Override
 	public void visit(LetExpr let) {
-		System.out.println("Let expr "+let.toString());
-		ASTElement bodyelem= elemStack.pop();
+		super.visit(let);
+		
+		inBody = true;
+		ASTElement bodyelem = elemStack.pop();
+		inBody = false;
+		
 		ASTElement declelem = elemStack.pop();
 		
+		//TODO: Quick hack to get it working
+		if (bodyelem.elem instanceof LetExpr)
+			elemStack.push(new ASTElement(let, 
+					declelem.generated + "\n" + bodyelem.generated));
+		else {
+			elemStack.push(new ASTElement(let, 
+					declelem.generated + "\n" + "return "+ bodyelem.generated + ";"));
+		}
+	}
+
+
+	@Override
+	public void visit(Meth meth) {
+		super.visit(meth);
 		
-		elemStack.push(new ASTElement(let, 
-				declelem.generated + bodyelem.generated));
+
+		ASTElement nextMethElem = (meth.getNextDecl() != null) ? elemStack.pop() : null;
+		
+		StringBuilder methodDecl = new StringBuilder();
+		if (!inClass)
+			methodDecl.append("function " + meth.getName() + "(");
+		else
+			methodDecl.append("this."+meth.getName()+" = function(");
+		
+		boolean first = true;
+		for (NameBinding binding : meth.getArgBindings()) {
+			if (!first)
+				methodDecl.append(", ");
+			methodDecl.append(binding.getName());
+			first = false;
+		}
+		methodDecl.append(") {");
+		ASTElement elem = elemStack.pop();
+		
+		
+		//TODO: Quick hack to get it working
+		if (elem.elem instanceof LetExpr)
+			methodDecl.append(Indent("\n"+elem.generated));
+		else {
+			methodDecl.append(Indent("\n"+"return "+elem.generated + ";"));
+		}
+		
+		methodDecl.append("\n}");
+		
+
+		String nextMethText = (nextMethElem == null)? "" : "\n" + nextMethElem.generated;
+		elemStack.push(new ASTElement(meth, methodDecl.toString() + nextMethText));
 	}
 
 }

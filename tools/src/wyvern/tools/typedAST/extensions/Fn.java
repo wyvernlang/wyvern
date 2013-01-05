@@ -66,8 +66,6 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		if (body instanceof CoreAST)
-			((CoreAST)body).accept(visitor);
 		visitor.visit(this);
 	}
 

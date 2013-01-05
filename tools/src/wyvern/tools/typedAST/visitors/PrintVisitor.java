@@ -78,4 +78,9 @@ public class PrintVisitor implements CoreASTVisitor {
 		System.out.println("let "+ let.toString());
 	}
 
+	@Override
+	public void visit(Meth meth) {
+		System.out.println("Meth "+ meth.toString());
+	}
+
 }

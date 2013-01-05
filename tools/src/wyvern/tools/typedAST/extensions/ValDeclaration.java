@@ -37,10 +37,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		if (definition instanceof CoreAST)
-			((CoreAST) definition).accept(visitor);
-		if (getNextDecl() != null)
-			((CoreAST) getNextDecl()).accept(visitor);
 		visitor.visit(this);
 	}
 	
@@ -56,6 +52,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	public String getName() {
 		return binding.getName();
+	}
+	
+	public TypedAST getDefinition() {
+		return definition;
 	}
 
 	@Override

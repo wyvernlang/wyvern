@@ -40,7 +40,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		//TODO: visit declarations
 		visitor.visit(this);
 	}
 
@@ -85,6 +84,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			d = d.getNextDecl();
 		}
 		return null;	// can't find it
+	}
+	
+	public Declaration getDecls() {
+		return decls;
 	}
 
 	@Override

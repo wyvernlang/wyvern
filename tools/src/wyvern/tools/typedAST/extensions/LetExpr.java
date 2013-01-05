@@ -21,7 +21,7 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	private TypedAST body;
 	
 	public LetExpr(Declaration decl, TypedAST body) {
-		this.decl=decl;
+		this.decl = decl;
 		this.body = body;
 	}
 
@@ -45,10 +45,6 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
-		if (decl instanceof CoreAST)
-			((CoreAST) decl).accept(visitor);
-		if (body instanceof CoreAST)
-			((CoreAST) body).accept(visitor);
 		visitor.visit(this);
 	}
 
@@ -59,4 +55,12 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 		decl = declToAdd;
 		return old;
 	}	
+	
+	public Declaration getDecl() {
+		return decl;
+	}
+	
+	public TypedAST getBody() {
+		return body;
+	}
 }
