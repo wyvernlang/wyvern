@@ -51,7 +51,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type doTypecheck(Environment env) {
-		decls.typecheck(env);
+		Declaration decl = decls;
+		while (decl != null) {
+			decl.typecheck(env);
+			decl = decl.getNextDecl();
+		}
 		return Unit.getInstance();
 	}	
 	
