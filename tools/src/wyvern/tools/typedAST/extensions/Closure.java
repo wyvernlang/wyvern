@@ -42,8 +42,12 @@ public class Closure extends AbstractValue implements ApplyableValue {
 		List<NameBinding> bindings = function.getArgBindings();
 		if (bindings.size() == 1)
 			bodyEnv = bodyEnv.extend(new ValueBinding(bindings.get(0).getName(), argValue));
-		else if (bindings.size() > 1)
-			throw new RuntimeException("not implemented"); // TODO
+		else if (bindings.size() > 1 && argValue instanceof TupleValue)
+			for (int i = 0; i < bindings.size(); i++)
+				bodyEnv = bodyEnv.extend(new ValueBinding(bindings.get(i).getName(), ((TupleValue)argValue).getValue(i)));
+		else if (bindings.size() != 0)
+			throw new RuntimeException("Something bad happened!");
+		
 		return function.getBody().evaluate(bodyEnv);
 	}
 

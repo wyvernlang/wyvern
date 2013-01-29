@@ -50,6 +50,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		//Value argVals = args.evaluate(env);
 		// TODO: evaluate args
 		Map<String, Value> argVals = null;
+		
 		ClassObject clsObject = (ClassObject) clsVar.evaluate(env);
 		return new Obj(clsObject, argVals);
 	}

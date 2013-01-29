@@ -14,12 +14,22 @@ import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
+import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
 
-public abstract class BaseASTVisitor implements CoreASTVisitor {
-
+public abstract class BaseASTVisitor implements CoreASTVisitor { 
+	
+	@Override
+	public void visit(TupleObject tuple) {
+		for (TypedAST ast : tuple.getObjects()) {
+			if (!(ast instanceof CoreAST))
+				throw new RuntimeException("Something went wrong!");
+			((CoreAST)ast).accept(this);
+		}
+	}
+	
 	@Override
 	public void visit(Fn fn) {
 		if (fn.getBody() instanceof CoreAST)

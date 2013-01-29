@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
+import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
 import wyvern.tools.lexer.Lexer;
 import wyvern.tools.lexer.Token;
 import wyvern.tools.parsing.CoreParser;
@@ -19,7 +20,6 @@ import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
-import wyvern.tools.typedAST.visitors.JSCodegenVisitor;
 import wyvern.tools.typedAST.visitors.PrintVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -159,6 +159,22 @@ public class ParsingTestPhase2 {
 	}
 	
 	@Test
+	public void testTupleMethodCalls() {
+		Reader reader = new StringReader("meth mult(n:Int,m:Int):Int = n+5*m\n"
+				+"mult(3,2)\n");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Assert.assertEquals("{$I {$L meth mult (n : Int , m : Int) : Int = n + 5 * m $L} {$L mult (3 , 2) $L} $I}", parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Assert.assertEquals("LetExpr(Meth(), Application(Variable(\"mult\"), TupleObject(IntegerConstant(3), IntegerConstant(2))))", typedAST.toString());
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(13)", resultValue.toString());
+	}
+	
+	@Test
 	public void testMutuallyRecursiveMethods() {
 		Reader reader = new StringReader("meth doublePlusOne(n:Int):Int = double(n) + 1\n"
 										+"meth double(n:Int):Int = n*2\n"
@@ -236,4 +252,41 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
 	}
 	
+	@Test
+	public void testClassAndMethods2() {
+		Reader reader = new StringReader("class Hello\n"
+										+"	meth get4():Int = 4\n"
+										+"	meth get5():Int = 5\n"
+										+"	meth getP():Int = get4()+get5()\n"
+										+"\n"
+										+"val h = new Hello()\n"
+										+"h.getP()");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(9)", resultValue.toString());
+	}
+	
+	@Test
+	public void testClassMethodsVals() {
+		Reader reader = new StringReader("class Hello\n"
+										+"	val testVal = 5\n"
+										+"	meth getVal():Int = testVal\n"
+										+"	meth getP():Int = getVal()\n"
+										+"\n"
+										+"val h = new Hello()\n"
+										+"h.getP()");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
+	}
 }

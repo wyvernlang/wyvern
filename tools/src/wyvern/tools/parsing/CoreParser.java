@@ -1,11 +1,14 @@
 package wyvern.tools.parsing;
 
+import java.util.LinkedList;
+
 import wyvern.tools.rawAST.*;
 import wyvern.tools.typedAST.*;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
 import wyvern.tools.typedAST.extensions.StringConstant;
+import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.types.Environment;
@@ -89,11 +92,41 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		ExpressionSequence rest = node.getRest();
 		ctx.first = rest;
 		
+		if (ParseUtils.checkFirst(",", ctx)) {
+			ParseUtils.parseSymbol(",",ctx);
+			TypedAST remaining = parseAtomicExpr(ctx);
+			first = new TupleObject(first, remaining);
+		}
+		
 		if (rest == null || parser == null)
 			return first;
 		
 		// if first is a special form, get the expression continuation parser and use it to parse the rest
 		return parser.parse(first, ctx);
+	}
+	
+	
+	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx) {
+		TypedAST ast = parseAtomicExpr(ctx);
+		
+		if (ctx.first != null) { // More than 1 element
+			if (ctx.first instanceof Parenthesis) {
+				LinkedList<TypedAST> saved = new LinkedList<TypedAST>();
+				saved.add(ast);
+				while (ctx.first.getFirst() != null) {
+					saved.add(parseAtomicExpr(ctx));
+					ctx.first = ctx.first.getRest();
+					if (ctx.first != null && !ParseUtils.checkFirst(",",ctx))
+						throw new RuntimeException("Invalid tuple");
+					else if (ctx.first != null)
+						ParseUtils.parseSymbol(",",ctx);
+				}
+				return new TupleObject(saved.toArray(new TypedAST[0]));
+			}
+		} else {
+			return ast;
+		}
+		return ast;
 	}
 	
 	private TypedAST parseApplication(Pair<ExpressionSequence,Environment> ctx) {

@@ -1,8 +1,9 @@
-package wyvern.tools.typedAST.visitors;
+package wyvern.targets.JavaScript.visitors;
 
 import java.util.LinkedList;
 import java.util.Stack;
 
+import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
@@ -17,9 +18,11 @@ import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
+import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Str;
@@ -41,7 +44,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		return input.replaceAll("\n", "\n\t");
 	}
 	
-	//Checks to see if the type can be reperesented without explicit boxing
+	//Checks to see if the type can be represented without explicit boxing
 	//Important for simple operators, an int object won't have an add method.
 	private boolean isRawType(Type type) {
 		return (type instanceof Int) ||
@@ -103,7 +106,10 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 			if (argument.elem instanceof UnitVal)
 				elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName+"()"));
 			else
-				elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName+"("+argument.generated+")"));
+				if (argument.elem instanceof TupleObject)
+					elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName+argument.generated));
+				else
+					elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName+"("+argument.generated+")"));
 			return;
 		} else { //Var access
 			elemStack.push(new ASTElement(invocation, receiver.generated+"."+operationName));
@@ -121,7 +127,10 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		if (argElem.elem instanceof UnitVal)
 			elemStack.push(new ASTElement(application, "("+fnElem.generated+")()"));
 		else
-			elemStack.push(new ASTElement(application, "("+fnElem.generated+")("+argElem.generated+")"));
+			if (argElem.elem instanceof TupleObject)
+				elemStack.push(new ASTElement(application, "("+fnElem.generated+")"+argElem.generated+""));
+			else
+				elemStack.push(new ASTElement(application, "("+fnElem.generated+")("+argElem.generated+")"));
 	}
 
 	@Override
@@ -197,14 +206,10 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		
 		StringBuilder declBuilder = new StringBuilder();
 		declBuilder.append('\n');
+
+		ASTElement decl = elemStack.pop();
+		declBuilder.append(decl.generated);
 		
-		for (Declaration current = clsDeclaration.getDecls();
-				current != null;
-				current = current.getNextDecl()) {
-			
-			ASTElement decl = elemStack.pop();
-			declBuilder.append(decl.generated);
-		}
 		textRep.append(Indent(declBuilder.toString())+"\n");
 		textRep.append("}\n");
 		
@@ -269,6 +274,29 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 
 		String nextMethText = (nextMethElem == null)? "" : "\n" + nextMethElem.generated;
 		elemStack.push(new ASTElement(meth, methodDecl.toString() + nextMethText));
+	}
+	
+	@Override
+	public void visit(TupleObject tuple) {
+		super.visit(tuple);
+		
+		StringBuilder tupleStr = new StringBuilder(2*tuple.getObjects().length + 2);
+		tupleStr.append("(");
+		
+		LinkedList<String> args = new LinkedList<String>();
+		for (int i = 0; i < tuple.getObjects().length; i++) {
+			args.push(elemStack.pop().generated);
+		}
+		for (int i = 0; i < tuple.getObjects().length; i++) {
+			tupleStr.append(((i > 0) ? ", " : "") + args.pollFirst());
+		}
+		tupleStr.append(")");
+		
+		elemStack.push(new ASTElement(tuple, tupleStr.toString()));
+	}
+	
+	public void visit(JSFunction jsfunction) {
+		elemStack.push(new ASTElement(jsfunction, jsfunction.getName()));
 	}
 
 }

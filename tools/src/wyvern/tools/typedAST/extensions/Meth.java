@@ -20,6 +20,7 @@ import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
@@ -37,8 +38,7 @@ public class Meth extends Declaration implements CoreAST, BoundCode {
 		else if (args.size() == 1)
 			argType = args.get(0).getType();
 		else
-			// TODO: implement multiple args
-			throw new RuntimeException("tuple args not implemented");
+			argType = new Tuple(args);
 		type = new Arrow(argType, returnType); 
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
