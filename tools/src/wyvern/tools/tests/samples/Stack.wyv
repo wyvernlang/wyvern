@@ -18,7 +18,6 @@ class StackImpl implements Stack
 		val result = list.data
 		list = list.next
 		result
-	
 		
 class Link
 	type T

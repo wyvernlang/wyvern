@@ -1,0 +1,1 @@
+{$I {$L  $L} {$L interface List {$I {$L type T $L} {$L def add (T) $L} $I} $L} {$L class Link {$I {$L type T $L} {$L val data : T $L} {$L val next : T Link ? $L} $I} $L} {$L class ListImpl implements List {$I {$L var root : T Link ? $L} {$L def add (x) {$I {$L root = Link (x , root) $L} $I} $L} $I} $L} $I}

@@ -1,0 +1,16 @@
+/** Simple Wyvern class example. **/
+
+interface List
+	type T
+	def add(T)
+
+class Link
+	type T
+	val data : T
+	val next : T Link?
+
+class ListImpl implements List
+	var root : T Link?
+	
+	def add(x)
+		root = Link(x, root)
