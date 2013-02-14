@@ -98,9 +98,9 @@ public class Meth extends Declaration implements CoreAST, BoundCode {
 	}
 
 	@Override
-	protected void evalDecl(Environment env) {
-		Closure closure = new Closure(this, env);
-		ValueBinding vb = (ValueBinding) env.lookup(binding.getName());
+	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+		Closure closure = new Closure(this, evalEnv);
+		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(closure);
 	}
 }

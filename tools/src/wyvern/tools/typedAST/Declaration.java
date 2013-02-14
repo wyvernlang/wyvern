@@ -21,10 +21,14 @@ public abstract class Declaration extends AbstractTypedAST {
 		//return UnitVal.getInstance();
 	}
 	
+	public final Type typecheckSelf(Environment env) {
+		return doTypecheck(env);
+	}
+	
 	@Override
 	public final Type typecheck(Environment env) {
 		Environment newEnv = extend(env);
-		return doTypecheck(newEnv);
+		return typecheckSelf(newEnv);
 	}
 
 	public abstract String getName();
@@ -67,21 +71,34 @@ public abstract class Declaration extends AbstractTypedAST {
 
 	protected abstract Environment doExtend(Environment old);
 	protected abstract Environment extendWithValue(Environment old);
-	protected abstract void evalDecl(Environment env);
-
-	public final Environment evalDecls(Environment env) {
-		// build up a new environment
+	protected abstract void evalDecl(Environment evalEnv, Environment declEnv);
+	
+	public final Environment extendWithDecls(Environment env) {
 		Environment newEnv = env;
 		for (Declaration d = this; d != null; d = d.nextDecl) {
 			newEnv = d.extendWithValue(newEnv);
 		}
-		
-		// evaluate decls
-		for (Declaration d = this; d != null; d = d.nextDecl) {
-			d.evalDecl(newEnv);
-		}
-		
 		return newEnv;
+	}
+	
+	public final Environment bindDecls(Environment env) {
+		Environment newEnv = env;
+		for (Declaration d = this; d != null; d = d.nextDecl) {
+			d.evalDecl(newEnv, newEnv);
+		}
+		return newEnv;
+	}
+	
+	public final Environment bindDecls(Environment bodyEnv, Environment declEnv) {
+		Environment newEnv = bodyEnv;
+		for (Declaration d = this; d != null; d = d.nextDecl) {
+			d.evalDecl(bodyEnv, declEnv);
+		}
+		return newEnv;
+	}
+
+	public final Environment evalDecls(Environment env) {
+		return bindDecls(extendWithDecls(env));
 	}
 
 	public Declaration getNextDecl() {

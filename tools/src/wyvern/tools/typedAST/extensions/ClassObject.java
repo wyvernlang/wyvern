@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
+import java.util.Map;
+
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.AbstractValue;
@@ -11,11 +13,9 @@ import wyvern.tools.util.TreeWriter;
 
 public class ClassObject extends AbstractValue implements Value {
 	private ClassDeclaration decl;
-	private Environment memberEnv;
 	
-	public ClassObject(ClassDeclaration decl, Environment memberEnv) {
+	public ClassObject(ClassDeclaration decl) {
 		this.decl = decl;
-		this.memberEnv = memberEnv;
 	}
 
 	@Override
@@ -35,7 +35,10 @@ public class ClassObject extends AbstractValue implements Value {
 
 	public Value getValue(String operation, Obj receiver) {
 		// TODO: bind receiver in method, use receiver to look up fields
-		return memberEnv.getValue(operation);
+		return receiver.getIntEnv().getValue(operation);
 	}
 
+	public Environment getObjEnv(Obj obj) {
+		return decl.evaluateDeclarations(obj);
+	}
 }

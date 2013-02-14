@@ -247,27 +247,27 @@ public class JSCodegenTest {
 		TypedAST typedAST = doCompile("class Hello\n"
 										+"	meth get4():Int = 4\n"
 										+"	meth get5():Int = 5\n"
-										+"	meth getP():Int = get4()+get5()\n"
+										+"	meth getP():Int = this.get4()+this.get5()\n"
 										+"\n"
 										+"val h = new Hello()\n"
 										+"h.getP()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		Assert.fail(); // The code is not valid
+		Assert.assertTrue((Double)wrapInvoke(visitor.getCode()) - 9.0 < .001);
 	}
 	
 	@Test
 	public void testClassMethodsVals() {
 		TypedAST typedAST = doCompile("class Hello\n"
 										+"	val testVal = 5\n"
-										+"	meth getVal():Int = testVal\n"
-										+"	meth getP():Int = getVal()\n"
+										+"	meth getVal():Int = this.testVal\n"
+										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
 										+"val h = new Hello()\n"
 										+"h.getP()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		Assert.fail(); // The code is not valid
+		Assert.assertTrue((Integer)wrapInvoke(visitor.getCode()) == 5);
 	}
 	
 	@Test

@@ -71,9 +71,9 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected void evalDecl(Environment env) {
-		Value defValue = definition.evaluate(env);
-		ValueBinding vb = (ValueBinding) env.lookup(binding.getName());
+	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+		Value defValue = definition.evaluate(evalEnv);
+		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(defValue);
 	}
 }

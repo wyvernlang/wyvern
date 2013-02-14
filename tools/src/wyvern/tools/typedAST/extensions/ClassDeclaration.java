@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
+import java.util.Map;
+
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
@@ -23,6 +25,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private Declaration decls;
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
+	
+	private Environment declEvalEnv;
 	
 	public ClassDeclaration(String name, Declaration decls) {
 		this.decls = decls;
@@ -52,8 +56,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type doTypecheck(Environment env) {
 		Declaration decl = decls;
+		
+		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		while (decl != null) {
-			decl.typecheck(env);
+			decl.typecheckSelf(env);
 			decl = decl.getNextDecl();
 		}
 		return Unit.getInstance();
@@ -72,11 +78,23 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected void evalDecl(Environment env) {
-		Environment declEnv = decls.evalDecls(env);
-		ClassObject classObj = new ClassObject(this, declEnv);
-		ValueBinding vb = (ValueBinding) env.lookup(nameBinding.getName());
+	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+		declEvalEnv = declEnv;
+		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+		ClassObject classObj = new ClassObject(this);
+		
+		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);
+	}
+	
+	public Environment evaluateDeclarations(Obj obj) {
+		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+		
+		ValueBinding thisBinding = new ValueBinding("this", obj);
+		Environment intEnv = declEvalEnv.extend(thisBinding);
+		decls.bindDecls(intEnv, thisEnv);
+		
+		return thisEnv;
 	}
 
 	public Declaration getDecl(String opName) {

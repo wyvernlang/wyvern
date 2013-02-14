@@ -1,5 +1,8 @@
 package wyvern.tools.parsing.extensions;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
@@ -35,6 +38,7 @@ public class ClassParser implements LineParser {
 		TypedAST declAST = lines.accept(CoreParser.getInstance(), ctx.second);
 		if (!(declAST instanceof Declaration))
 			throw new RuntimeException("parse error");
+		
 
 		return new ClassDeclaration(clsName, (Declaration) declAST);
 	}

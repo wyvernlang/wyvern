@@ -1,8 +1,13 @@
 package wyvern.tools.tests;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 import java.io.StringReader;
+import java.util.Scanner;
 
 import junit.framework.Assert;
 
@@ -257,7 +262,7 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("class Hello\n"
 										+"	meth get4():Int = 4\n"
 										+"	meth get5():Int = 5\n"
-										+"	meth getP():Int = get4()+get5()\n"
+										+"	meth getP():Int = this.get4()+this.get5()\n"
 										+"\n"
 										+"val h = new Hello()\n"
 										+"h.getP()");
@@ -275,8 +280,8 @@ public class ParsingTestPhase2 {
 	public void testClassMethodsVals() {
 		Reader reader = new StringReader("class Hello\n"
 										+"	val testVal = 5\n"
-										+"	meth getVal():Int = testVal\n"
-										+"	meth getP():Int = getVal()\n"
+										+"	meth getVal():Int = this.testVal\n"
+										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
 										+"val h = new Hello()\n"
 										+"h.getP()");
@@ -288,5 +293,41 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
+	}
+	
+	@Test
+	public void testClassMethodsVals3() {
+		Reader reader = new StringReader("class Hello\n"
+										+"	val testVal = 5\n"
+										+"	val testVal2 = 15\n"
+										+"	val testVal3 = 25\n"
+										+"	meth getVal():Int = this.testVal + this.testVal3/this.testVal2\n"
+										+"	meth getP():Int = this.getVal()\n"
+										+"\n"
+										+"val h = new Hello()\n"
+										+"h.getP()");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(6)", resultValue.toString());
+	}
+	
+	@Test
+	public void testClasses() throws IOException {
+		InputStream is = ParsingTestPhase2.class.getResource("../tests/samples/testClass.wyv").openStream();
+		Scanner scr = new java.util.Scanner(is).useDelimiter("\\A");
+		String filedat = scr.hasNext() ? scr.next() : "";
+		is.close();
+		RawAST parsedResult = Phase1Parser.parse(new StringReader(filedat));
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(11)", resultValue.toString());
 	}
 }

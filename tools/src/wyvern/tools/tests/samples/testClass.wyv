@@ -1,0 +1,10 @@
+class Test1
+	meth GetValue1() : Int = 5
+	meth GetValue2() : Int = 6
+	
+class Test2
+	meth GetA(n:Int):Int = new Test1().GetValue1()
+	meth GetB(n:Int):Int = new Test1().GetValue2()
+	
+val tester = new Test2()
+tester.GetA(10) + tester.GetB(20)
