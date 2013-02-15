@@ -14,14 +14,24 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.simpleParser.Phase1Parser;
+import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.Value;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Int;
+import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.rawAST.RawAST;
 
 public class ClassTypeCheckerTests {
 	@Test
 	public void testClassDeclaration() throws IOException {
-		String testFileName = "wyvern/tools/tests/samples/SimpleClass.wyv";
-		URL url = ClassTypeCheckerTests.class.getClassLoader().getResource(testFileName);
+		String testFileName;
+		URL url;
+		
+		testFileName = "wyvern/tools/tests/samples/SimpleClass.wyv";
+		url = ClassTypeCheckerTests.class.getClassLoader().getResource(testFileName);
 		if (url == null) {
 			Assert.fail("Unable to open " + testFileName + " file.");
 			return;
@@ -38,6 +48,18 @@ public class ClassTypeCheckerTests {
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		Assert.assertEquals(parsedTestFileAsString, parsedResult.toString());
 		
+		Environment env = Globals.getStandardEnv();
+
 		// TODO: In progress by Alex.
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		System.out.println(typedAST);
+		
+		/*
+		Assert.assertEquals("LetExpr(ValDeclaration(\"x\", IntegerConstant(5)), Variable(\"x\"))", typedAST.toString());		
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
+		*/
 	}
 }
