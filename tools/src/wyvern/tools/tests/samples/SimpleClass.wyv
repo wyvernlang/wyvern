@@ -1,16 +1,22 @@
-/** Simple Wyvern class example. **/
+/** MODULE: Simple Wyvern class example. **/
+
+
+/** Public Interface **/
 
 interface List
 	type T
 	def add(T)
 
-class Link
-	type T
-	val data : T
-	val next : T Link?
+
+/** Private Implementation **/
 
 class ListImpl implements List
 	var root : T Link?
 	
 	def add(x)
 		root = Link(x, root)
+
+class Link
+	type T
+	val data : T
+	val next : T Link?
