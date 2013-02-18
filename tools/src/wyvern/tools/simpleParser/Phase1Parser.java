@@ -145,7 +145,7 @@ public class Phase1Parser {
 		while (token.kind != EOF && token.kind != DEDENT) {
 			
 			// read past any newlines
-			if (token.kind == NEWLINE) {
+			while (token.kind == NEWLINE) {
 				lexer.getToken();
 				token = lexer.peekToken();
 			}

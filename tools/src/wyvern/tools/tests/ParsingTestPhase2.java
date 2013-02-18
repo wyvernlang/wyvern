@@ -316,6 +316,8 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(6)", resultValue.toString());
 	}
 	
+	/*
+	// Alex: What is this supposed to test? 
 	@Test
 	public void testClasses() throws IOException {
 		InputStream is = ParsingTestPhase2.class.getResource("../tests/samples/testClass.wyv").openStream();
@@ -330,4 +332,5 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(11)", resultValue.toString());
 	}
+	*/
 }
