@@ -1,1 +1,1 @@
-{$I {$L class Link {$I {$L val test = 42 $L} $I} $L} $I}
+{$I {$L class Link {$I {$L val test = 42 $L} {$L type T $L} $I} $L} $I}

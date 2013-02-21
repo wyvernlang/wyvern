@@ -79,6 +79,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check
+		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
 			if (node instanceof Parenthesis) {
 				ctx.first = null;

@@ -85,7 +85,8 @@ public class ExtensionsTest {
 		}
 	}
 	
-	@Test void testIf() {
+	@Test 
+	public void testIf() {
 		Reader reader = new StringReader("if true then 5 else 10");
 		// phase 1 parser
 		// create TypedAST

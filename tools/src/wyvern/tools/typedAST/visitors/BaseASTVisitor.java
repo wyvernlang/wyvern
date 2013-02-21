@@ -15,6 +15,7 @@ import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.TupleObject;
+import wyvern.tools.typedAST.extensions.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
@@ -67,6 +68,10 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 			((CoreAST) definition).accept(this);
 		if (valDeclaration.getNextDecl() != null)
 			((CoreAST) valDeclaration.getNextDecl()).accept(this);
+	}
+
+	@Override
+	public void visit(TypeDeclaration typeDeclaration) {
 	}
 
 	@Override

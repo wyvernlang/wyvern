@@ -15,6 +15,7 @@ import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.TypeDeclaration;
 
 //Broken
 public class PrintVisitor implements CoreASTVisitor {
@@ -37,7 +38,11 @@ public class PrintVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(ValDeclaration valDeclaration) {
 		System.out.println("Val decl "+valDeclaration.toString());
+	}
 
+	@Override
+	public void visit(TypeDeclaration typeDeclaration) {
+		System.out.println("Type decl "+typeDeclaration.toString());
 	}
 
 	@Override
