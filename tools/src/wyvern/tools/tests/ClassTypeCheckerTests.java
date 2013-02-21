@@ -21,6 +21,7 @@ import wyvern.tools.typedAST.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.rawAST.RawAST;
 
@@ -50,16 +51,13 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		// TODO: In progress by Alex.
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		System.out.println(typedAST);
-		
-		/*
-		Assert.assertEquals("LetExpr(ValDeclaration(\"x\", IntegerConstant(5)), Variable(\"x\"))", typedAST.toString());		
+		Assert.assertEquals("ClassDeclaration()", typedAST.toString());		
+
 		Type resultType = typedAST.typecheck(env);
-		Assert.assertEquals(Int.getInstance(), resultType);
-		Value resultValue = typedAST.evaluate(env);
-		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
-		*/
+		Assert.assertEquals(Unit.getInstance(), resultType);
+		
+		//Value resultValue = typedAST.evaluate(env);
+		//Assert.assertEquals("()", resultValue.toString());
 	}
 }
