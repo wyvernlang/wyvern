@@ -3,20 +3,26 @@
 
 /** Public Interface **/
 
+/** Not parseable (yet) - interface.
 interface List
 	type T
 	def add(T)
+**/
 
 
 /** Private Implementation **/
 
+/** Not parseable (yet) - var or def.
 class ListImpl implements List
 	var root : T Link?
-	
+
 	def add(x)
 		root = Link(x, root)
+**/
+
+//	type T
+//	val data : T
+//	val next : T Link?
 
 class Link
-	type T
-	val data : T
-	val next : T Link?
+	val test = 42
