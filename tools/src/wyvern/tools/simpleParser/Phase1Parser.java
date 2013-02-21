@@ -142,13 +142,16 @@ public class Phase1Parser {
 	private static void parseLines(Lexer lexer, Sequence result) {
 		Token token = lexer.peekToken();
 		
-		while (token.kind != EOF && token.kind != DEDENT) {
+		while (true) { // token.kind != EOF && token.kind != DEDENT) {
 			
 			// read past any newlines
 			while (token.kind == NEWLINE) {
 				lexer.getToken();
 				token = lexer.peekToken();
 			}
+			
+			if (token.kind == EOF || token.kind == DEDENT)
+				break;
 			
 			Line line = new Line(new ArrayList<RawAST>());
 			parseSequence(lexer, line);

@@ -20,9 +20,11 @@ class ListImpl implements List
 		root = Link(x, root)
 **/
 
-//	type T
-//	val data : T
-//	val next : T Link?
-
 class Link
 	val test = 42
+	// type T
+	
+/**
+	val data : T
+	val next : T Link?
+**/	
