@@ -8,10 +8,10 @@ import wyvern.tools.typedAST.extensions.TypeDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 
-public class TypeParser implements LineParser {
-	private TypeParser() { }
-	private static TypeParser instance = new TypeParser();
-	public static TypeParser getInstance() { return instance; }
+public class TypeDeclarationParser implements LineParser {
+	private TypeDeclarationParser() { }
+	private static TypeDeclarationParser instance = new TypeDeclarationParser();
+	public static TypeDeclarationParser getInstance() { return instance; }
 	
 
 	@Override

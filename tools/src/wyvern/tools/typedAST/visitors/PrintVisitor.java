@@ -12,6 +12,7 @@ import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.TupleObject;
+import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
@@ -93,6 +94,11 @@ public class PrintVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(TupleObject meth) {
 		System.out.println("Tuple "+ meth.toString());
+	}
+
+	@Override
+	public void visit(TypeInstance typeInstance) {
+		System.out.println("Type " + typeInstance.toString());
 	}
 
 }

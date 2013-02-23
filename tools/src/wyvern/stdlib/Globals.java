@@ -7,7 +7,7 @@ import wyvern.tools.parsing.extensions.ClassParser;
 import wyvern.tools.parsing.extensions.FnParser;
 import wyvern.tools.parsing.extensions.MethParser;
 import wyvern.tools.parsing.extensions.NewParser;
-import wyvern.tools.parsing.extensions.TypeParser;
+import wyvern.tools.parsing.extensions.TypeDeclarationParser;
 import wyvern.tools.parsing.extensions.ValParser;
 import wyvern.tools.typedAST.Keyword;
 import wyvern.tools.typedAST.Value;
@@ -25,6 +25,10 @@ import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Unit;
 
+/**
+ * TODO: Write a definitive Wyvern grammar here for reference. (Alex)
+ */
+
 public class Globals {
 
 	public static Environment getStandardEnv() {
@@ -34,7 +38,7 @@ public class Globals {
 		env = env.extend(new KeywordNameBinding("class", new Keyword(ClassParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("new", new Keyword(NewParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("meth", new Keyword(MethParser.getInstance())));
-		env = env.extend(new KeywordNameBinding("type", new Keyword(TypeParser.getInstance())));
+		env = env.extend(new KeywordNameBinding("type", new Keyword(TypeDeclarationParser.getInstance())));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
 		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));

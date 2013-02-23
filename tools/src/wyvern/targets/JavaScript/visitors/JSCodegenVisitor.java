@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.TupleObject;
+import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
 import wyvern.tools.typedAST.extensions.TypeDeclaration;
@@ -305,6 +306,13 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	
 	public void visit(JSFunction jsfunction) {
 		elemStack.push(new ASTElement(jsfunction, jsfunction.getName()));
+	}
+
+	@Override
+	public void visit(TypeInstance typeInstance) {
+		super.visit(typeInstance);
+
+		// TODO: Ben, please implement, though nothing much to do here at this stage...
 	}
 
 }

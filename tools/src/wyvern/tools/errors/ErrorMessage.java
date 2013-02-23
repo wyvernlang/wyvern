@@ -6,6 +6,7 @@ public enum ErrorMessage {
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
 	VARIABLE_NOT_DECLARED("Variable %ARG has no type in the context", 1),
+	TYPE_NOT_DECLARED("Type %ARG has no declaration in the context", 1),
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),
 	OPERATOR_DOES_NOT_APPLY2("Operator %ARG cannot be applied to types %ARG and %ARG", 3),
 	MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
