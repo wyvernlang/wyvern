@@ -85,6 +85,15 @@ public class ExtensionsTest {
 		}
 	}
 	
+	@Test 
+	public void testIf() {
+		Reader reader = new StringReader("if true then 5 else 10");
+		// phase 1 parser
+		// create TypedAST
+		// do a typecheck
+		// do a evaluate
+	}
+	
 	@Test
 	public void testStrings() {
 		Reader reader = new StringReader("100 + \" Hello \" + \"world!\" ");
