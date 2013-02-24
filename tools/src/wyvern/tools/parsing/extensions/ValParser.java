@@ -22,12 +22,11 @@ public class ValParser implements LineParser {
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
-		parseSymbol("=", ctx);
 		
 		if (ParseUtils.checkFirst("=", ctx)) {
 			parseSymbol("=", ctx);
 			TypedAST exp = ParseUtils.parseExpr(ctx);
-			return new ValDeclaration(varName, exp, ctx.second);		
+			return new ValDeclaration(varName, exp);		
 		} else if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
 			String typeName = ParseUtils.parseSymbol(ctx).name; // This can contain several type parameters! E.g. T Link?
@@ -40,7 +39,7 @@ public class ValParser implements LineParser {
 				}
 			}
 			TypeBinding tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
-			return new ValDeclaration(varName, new TypeInstance(tb), ctx.second);
+			return new ValDeclaration(varName, new TypeInstance(tb));
 		} else {
 			throw new RuntimeException("Error parsing val expression, either : or = expected.");
 		}

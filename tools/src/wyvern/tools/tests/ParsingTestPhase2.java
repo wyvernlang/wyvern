@@ -331,6 +331,7 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(11)", resultValue.toString());
 	}
+	*/
 
 	
 	@Test
