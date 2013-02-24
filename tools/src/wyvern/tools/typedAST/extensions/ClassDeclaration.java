@@ -58,8 +58,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Declaration decl = decls;
 		
 		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
+		decl = decls;
+		Environment eenv = decls.extend(env);
 		while (decl != null) {
-			decl.typecheckSelf(env);
+			decl.typecheckSelf(eenv);
 			decl = decl.getNextDecl();
 		}
 		return Unit.getInstance();

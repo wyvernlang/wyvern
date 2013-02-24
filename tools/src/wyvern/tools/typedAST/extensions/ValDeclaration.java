@@ -14,15 +14,21 @@ import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class ValDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
+	Type definitionType;
 	NameBinding binding;
 	
-	public ValDeclaration(String name, TypedAST definition, Environment env) {
+	public ValDeclaration(String name, TypedAST definition) {
 		this.definition=definition;
-		binding = new NameBindingImpl(name, definition.typecheck(env));
+		binding = new NameBindingImpl(name, null);
+	}
+	
+	public ValDeclaration(String name, Type type) {
+		binding = new NameBindingImpl(name, type);
 	}
 
 	@Override
@@ -32,6 +38,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (binding.getType() == null) {
+			this.definitionType = this.definition.typecheck(env);
+			this.binding = new NameBindingImpl(binding.getName(), definitionType);
+		}
 		return binding.getType();
 	}
 

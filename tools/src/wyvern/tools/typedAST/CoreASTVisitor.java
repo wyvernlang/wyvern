@@ -30,4 +30,5 @@ public interface CoreASTVisitor {
 	void visit(LetExpr let);
 	void visit(Meth meth);
 	void visit(TupleObject meth);
+	void visit(Assignment assignment);
 }

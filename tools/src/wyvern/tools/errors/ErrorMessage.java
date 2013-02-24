@@ -4,6 +4,7 @@ public enum ErrorMessage {
 	// Type errors
 	ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument to function does not match function type", 0),
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
+	TYPE_CANNOT_BE_ASSIGNED("Type %ARG cannot assigned to a value after initalization", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
 	VARIABLE_NOT_DECLARED("Variable %ARG has no type in the context", 1),
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),

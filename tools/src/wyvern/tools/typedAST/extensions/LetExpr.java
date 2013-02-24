@@ -32,8 +32,9 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		decl.typecheck(env);
-		Type bodyType = body.typecheck(decl.extend(env));
+		decl.typecheckAll(env);
+		Environment newEnv = decl.extendWithDecls(env);
+		Type bodyType = body.typecheck(newEnv);
 		return bodyType;
 	}
 

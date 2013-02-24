@@ -16,6 +16,8 @@ import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ObjectType;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
@@ -30,12 +32,18 @@ public class ClassParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+		if (ParseUtils.checkFirst("meth", ctx)) {
+			ParseUtils.parseSymbol(ctx);
+			return MethParser.getInstance().parse(first, ctx, Unit.getInstance());
+		}
+		
 		String clsName = ParseUtils.parseSymbol(ctx).name;
 		LineSequence lines = ParseUtils.extractLines(ctx);
 		if (ctx.first != null)
 			throw new RuntimeException("parse error");
 		
-		TypedAST declAST = lines.accept(CoreParser.getInstance(), ctx.second);
+		Environment innerCtx = ctx.second;//ctx.second.extend(new NameBindingImpl(clsName, new ObjectType(new ClassDeclaration(clsName, null))));
+		TypedAST declAST = lines.accept(CoreParser.getInstance(), innerCtx);
 		if (!(declAST instanceof Declaration))
 			throw new RuntimeException("parse error");
 		

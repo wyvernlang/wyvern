@@ -25,6 +25,14 @@ public abstract class Declaration extends AbstractTypedAST {
 		return doTypecheck(env);
 	}
 	
+	public final void typecheckAll(Environment env) {
+		Environment newEnv = env;
+		for (Declaration d = this; d != null; d = d.nextDecl) {
+			d.typecheck(newEnv);
+			newEnv = d.doExtend(newEnv);
+		}
+	}
+	
 	@Override
 	public final Type typecheck(Environment env) {
 		Environment newEnv = extend(env);

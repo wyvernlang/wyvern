@@ -18,9 +18,13 @@ public class ValParser implements LineParser {
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
-		parseSymbol("=", ctx);
-		TypedAST exp = ParseUtils.parseExpr(ctx);
-		
-		return new ValDeclaration(varName, exp, ctx.second);		
+		if (ParseUtils.checkFirst(":", ctx)) {
+			ParseUtils.parseSymbol(":", ctx);
+			return new ValDeclaration(varName, ParseUtils.parseType(ctx));	
+		} else {
+			parseSymbol("=", ctx);
+			TypedAST exp = ParseUtils.parseExpr(ctx);
+			return new ValDeclaration(varName, exp);	
+		}
 	}
 }

@@ -25,7 +25,6 @@ import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
-import wyvern.tools.typedAST.visitors.PrintVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
@@ -329,5 +328,27 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(11)", resultValue.toString());
+	}
+	
+	@Test
+	public void testClassMethods() {
+		Reader reader = new StringReader("class Hello\n"
+				+"\tval testVal:Int\n"
+				+"\tclass meth NewHello(v:Int) = \n" +
+				"\t\tval output = new Hello()\n" +
+				"\t\toutput.testVal = v\n" +
+				"\t\toutput\n"
+				+"\tmeth getTest():Int = testVal\n"
+				+"\n"
+				+"val h = Hello.NewHello(10)\n"
+				+"h.getP()");
+			RawAST parsedResult = Phase1Parser.parse(reader);
+			
+			Environment env = Globals.getStandardEnv();
+			TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+			Type resultType = typedAST.typecheck(env);
+			Assert.assertEquals(Int.getInstance(), resultType);
+			Value resultValue = typedAST.evaluate(env);
+			Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 }

@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.visitors;
 
 import wyvern.tools.typedAST.Application;
+import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
@@ -127,6 +128,19 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 		if (meth.getNextDecl() != null)
 			((CoreAST) meth.getNextDecl()).accept(this);
 
+	}
+	
+
+
+	@Override
+	public void visit(Assignment assignment) {
+		TypedAST target = assignment.getTarget();
+		TypedAST value = assignment.getValue();
+		if (target instanceof CoreAST)
+			((CoreAST) target).accept(this);
+		if (value instanceof CoreAST)
+			((CoreAST) value).accept(this);
+		
 	}
 
 }

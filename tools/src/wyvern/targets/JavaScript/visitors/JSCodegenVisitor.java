@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.tools.typedAST.Application;
+import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;

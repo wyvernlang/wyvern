@@ -105,30 +105,6 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return parser.parse(first, ctx);
 	}
 	
-	
-	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx) {
-		TypedAST ast = parseAtomicExpr(ctx);
-		
-		if (ctx.first != null) { // More than 1 element
-			if (ctx.first instanceof Parenthesis) {
-				LinkedList<TypedAST> saved = new LinkedList<TypedAST>();
-				saved.add(ast);
-				while (ctx.first.getFirst() != null) {
-					saved.add(parseAtomicExpr(ctx));
-					ctx.first = ctx.first.getRest();
-					if (ctx.first != null && !ParseUtils.checkFirst(",",ctx))
-						throw new RuntimeException("Invalid tuple");
-					else if (ctx.first != null)
-						ParseUtils.parseSymbol(",",ctx);
-				}
-				return new TupleObject(saved.toArray(new TypedAST[0]));
-			}
-		} else {
-			return ast;
-		}
-		return ast;
-	}
-	
 	private TypedAST parseApplication(Pair<ExpressionSequence,Environment> ctx) {
 		TypedAST ast = parseAtomicExpr(ctx);
 		
@@ -212,6 +188,17 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
+	private TypedAST parseEquals(Pair<ExpressionSequence, Environment> ctx) {
+		TypedAST ast = parseOr(ctx);
+		while (ctx.first != null && isEqualsOperator(ctx.first.getFirst())) {
+			ctx.first = ctx.first.getRest();
+			TypedAST value = parseOr(ctx);
+			ast = new Assignment(ast, value);
+		}
+		
+		return ast;
+	}
+	
 	private boolean isProductOperator(RawAST operatorNode) {
 		if (!(operatorNode instanceof Symbol))
 			return false;
@@ -253,10 +240,18 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 			|| operatorName.equals(">=") || operatorName.equals("<=") || operatorName.equals("==")	
 			|| operatorName.equals("!=");
 	}
+	
+	private boolean isEqualsOperator(RawAST opNode) {
+		if (!(opNode instanceof Symbol))
+			return false;
+		String opName = ((Symbol)opNode).name;
+		
+		return opName.equals("=");
+	}
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
-		TypedAST result = parseOr(ctx);
+		TypedAST result = parseEquals(ctx);
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT, ctx.first);
 		return result;
