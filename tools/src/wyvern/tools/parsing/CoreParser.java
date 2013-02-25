@@ -17,6 +17,8 @@ import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ErrorMessage.UNEXPECTED_INPUT;
 import static wyvern.tools.errors.ToolError.reportError;
 
+// NB! See: http://en.cppreference.com/w/cpp/language/operator_precedence
+
 public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	private CoreParser() { }
 	private static CoreParser instance = new CoreParser();
@@ -213,6 +215,19 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
+	private TypedAST parseAssignment(Pair<ExpressionSequence,Environment> ctx) {
+		TypedAST ast = parseOr(ctx);
+		
+		while (ctx.first != null && isAssignmentOperator(ctx.first.getFirst())) {
+			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			ctx.first = ctx.first.getRest();
+			TypedAST argument = parseOr(ctx);
+			ast = new Invocation(ast, operatorName, argument);
+		}
+		
+		return ast;
+	}
+	
 	private boolean isProductOperator(RawAST operatorNode) {
 		if (!(operatorNode instanceof Symbol))
 			return false;
@@ -227,6 +242,16 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		String operatorName = ((Symbol) operatorNode).name;
 		
 		return operatorName.equals("+") || operatorName.equals("-");
+	}
+	
+	private boolean isRelationalOperator(RawAST operatorNode) {
+		if (!(operatorNode instanceof Symbol))
+			return false;
+		String operatorName = ((Symbol) operatorNode).name;
+		
+		return operatorName.equals(">") || operatorName.equals("<") || operatorName.equals("!=")
+			|| operatorName.equals(">=") || operatorName.equals("<=") || operatorName.equals("==")	
+			|| operatorName.equals("!=");
 	}
 	
 	private boolean isAndOperator(RawAST operatorNode) {
@@ -245,19 +270,17 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return operatorName.equals("||");
 	}
 	
-	private boolean isRelationalOperator(RawAST operatorNode) {
+	private boolean isAssignmentOperator(RawAST operatorNode) {
 		if (!(operatorNode instanceof Symbol))
 			return false;
 		String operatorName = ((Symbol) operatorNode).name;
 		
-		return operatorName.equals(">") || operatorName.equals("<") || operatorName.equals("!=")
-			|| operatorName.equals(">=") || operatorName.equals("<=") || operatorName.equals("==")	
-			|| operatorName.equals("!=");
+		return operatorName.equals("=");
 	}
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
-		TypedAST result = parseOr(ctx);
+		TypedAST result = parseAssignment(ctx); // Start trying with the lowest precedence operator.
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT, ctx.first);
 		return result;

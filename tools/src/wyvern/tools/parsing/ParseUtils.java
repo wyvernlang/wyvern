@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class ParseUtils {
 
 	public static Type parseType(Pair<ExpressionSequence, Environment> ctx) {
 		Type type = parseSimpleType(ctx);
+		
 		while (ctx.first != null && isArrowOperator(ctx.first.getFirst())) {
 			ctx.first = ctx.first.getRest();
 			Type argument = parseSimpleType(ctx);
@@ -108,8 +110,18 @@ public class ParseUtils {
 		if (first instanceof Symbol) {
 			Symbol symbol = (Symbol) first;
 			TypeBinding typeBinding = ctx.second.lookupType(symbol.name);
-			if (typeBinding == null)
-				reportError(TYPE_NOT_DEFINED, symbol.name, symbol);
+			
+			// Take care of ?. Later properly parse the type parameters etc.
+			if (checkFirst("?", ctx)) {
+				parseSymbol("?", ctx); // Just ignore it for now. FIXME:
+			}
+			
+			if (typeBinding == null) {
+				// This should be picked up by symbol resolution in statically checked language!
+				//	reportError(TYPE_NOT_DEFINED, symbol.name, symbol);
+				typeBinding = new TypeBinding(symbol.name, Unit.getInstance()); // TODO: Create proper type representation.
+			}
+			
 			return typeBinding.getUse();			
 		} else if (first instanceof Parenthesis)
 			return parseType(new Pair<ExpressionSequence, Environment>((Parenthesis)first, ctx.second));

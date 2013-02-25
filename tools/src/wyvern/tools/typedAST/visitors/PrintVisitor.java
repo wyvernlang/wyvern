@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
+import wyvern.tools.typedAST.extensions.InterfaceDeclaration;
 import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
@@ -15,6 +16,7 @@ import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
+import wyvern.tools.typedAST.extensions.VarDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.typedAST.extensions.TypeDeclaration;
 
@@ -99,6 +101,16 @@ public class PrintVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(TypeInstance typeInstance) {
 		System.out.println("Type " + typeInstance.toString());
+	}
+
+	@Override
+	public void visit(VarDeclaration varDeclaration) {
+		System.out.println("Var " + varDeclaration);
+	}
+
+	@Override
+	public void visit(InterfaceDeclaration interfaceDeclaration) {
+		System.out.println("Interface " + interfaceDeclaration);
 	}
 
 }

@@ -4,7 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.CANNOT_INVOKE;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
-import wyvern.tools.rawAST.Unit;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
@@ -30,10 +30,16 @@ public class Invocation extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		Type receiverType = receiver.typecheck(env);
-		
-		if (!(receiverType instanceof OperatableType))
+		 
+		if (receiverType instanceof OperatableType) {
+			return ((OperatableType)receiverType).checkOperator(this,env);
+		} else if (receiverType instanceof Unit) {
+			// FIXME: UnitType is temporary hack till proper type handling is done!
+			return receiverType;
+		} else {
 			reportError(OPERATOR_DOES_NOT_APPLY, operationName, receiverType.toString(), this);
-		return ((OperatableType)receiverType).checkOperator(this,env);
+			return null;
+		}
 	}
 
 	public TypedAST getArgument() {

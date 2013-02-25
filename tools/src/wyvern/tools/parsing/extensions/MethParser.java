@@ -3,11 +3,15 @@ package wyvern.tools.parsing.extensions;
 import java.util.ArrayList;
 import java.util.List;
 
+import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
+import wyvern.tools.rawAST.Line;
+import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.RawAST;
+import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
@@ -19,6 +23,8 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
 /**
+ * Alex: fn or meth???
+ * 
  * Parses "fn x : T => e"
  * 
  * Could specify as:   "fn" symbol ":" type "=>" exp
@@ -50,13 +56,35 @@ public class MethParser implements LineParser {
 		ParseUtils.parseSymbol(":", ctx);
 		Type returnType = ParseUtils.parseType(ctx);
 		
-		if (ctx.first == null)
-			throw new RuntimeException("parse error");
-			
-		if (ParseUtils.checkFirst("=",ctx)) {
+		TypedAST exp;
+		if (ctx.first == null) {
+			// throw new RuntimeException("parse error");
+			// Empty body is OK - say inside interface.
+			exp = null;
+		} else if (ParseUtils.checkFirst("=",ctx)) {
 			ParseUtils.parseSymbol("=",ctx);
+			exp = ParseUtils.parseExpr(ctx);					
+		} else {
+			// Multiline body then!
+			
+			/*
+			LineSequence lines = ParseUtils.extractLines(ctx);
+			
+			Line firstLine = lines.getFirst();
+			
+			while (lines.getRest() != null) {
+				// FIXME: Other lines ignored for now - TODO: as it is not nicely supported for now.
+			}
+			
+			if (ctx.first != null)
+				throw new RuntimeException("parse error");
+
+			exp = firstLine.accept(CoreParser.getInstance(), ctx.second);
+			*/
+			
+			exp = ParseUtils.parseExpr(ctx);					
 		}
-		TypedAST exp = ParseUtils.parseExpr(ctx);					
+
 		return new Meth(methName, args, returnType, exp);
 	}
 }
