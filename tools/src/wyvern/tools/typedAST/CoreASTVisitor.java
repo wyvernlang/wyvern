@@ -1,10 +1,10 @@
 package wyvern.tools.typedAST;
 
-import wyvern.tools.typedAST.extensions.AssignableValueImpl;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.IntegerConstant;
+import wyvern.tools.typedAST.extensions.InterfaceDeclaration;
 import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.extensions.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.ValDeclaration;
+import wyvern.tools.typedAST.extensions.VarDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
 
 public interface CoreASTVisitor {
@@ -22,6 +23,7 @@ public interface CoreASTVisitor {
 	void visit(Application application);
 
 	void visit(ValDeclaration valDeclaration);
+	void visit(VarDeclaration valDeclaration);
 	void visit(Variable variable);
 	
 	void visit(TypeDeclaration typeDeclaration);
@@ -37,5 +39,5 @@ public interface CoreASTVisitor {
 	void visit(TupleObject meth);
 	void visit(TypeInstance typeInstance);
 	void visit(Assignment assignment);
-	void visit(AssignableValueImpl assignableValueImpl);
+	void visit(InterfaceDeclaration interfaceDeclaration);
 }

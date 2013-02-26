@@ -1,16 +1,8 @@
 package wyvern.tools.typedAST.extensions;
 
-import java.util.Map;
-
-import wyvern.tools.parsing.CoreParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.CachingTypedAST;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
-import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
@@ -21,21 +13,20 @@ import wyvern.tools.types.extensions.ObjectType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-public class ClassDeclaration extends Declaration implements CoreAST {
+public class InterfaceDeclaration extends Declaration implements CoreAST {
 	private Declaration decls;
 	private NameBinding nameBinding;
-	private TypeBinding typeBinding;
+	//private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
 	
-	public ClassDeclaration(String name, String implementsName, Declaration decls) {
-		// TODO: Handle implements properly as list of names - what is the syntax though?
-		
+	public InterfaceDeclaration(String name, Declaration decls) {
 		this.decls = decls;
-		Type objectType = new ObjectType(this);
-		Type classType = objectType; // TODO set this to a class type that has the class members
-		typeBinding = new TypeBinding(name, objectType);
-		nameBinding = new NameBindingImpl(name, classType);
+		//Type objectType = new ObjectType(this);
+		//Type classType = objectType; // TODO set this to a class type that has the class members
+		//typeBinding = new TypeBinding(name, objectType);
+		//nameBinding = new NameBindingImpl(name, classType);
+		this.nameBinding = new NameBindingImpl(name, Unit.getInstance());
 	}
 
 	@Override
@@ -59,25 +50,26 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public Type doTypecheck(Environment env) {
 		Declaration decl = decls;
 		
+		// TODO:
+		/*
 		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
-		decl = decls;
-		Environment eenv = decls.extend(env);
 		while (decl != null) {
-			decl.typecheckSelf(eenv);
+			decl.typecheckSelf(env);
 			decl = decl.getNextDecl();
 		}
+		*/
 		return Unit.getInstance();
 	}	
 	
 	@Override
 	protected Environment doExtend(Environment old) {
-		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
+		Environment newEnv = old; // TODO: .extend(nameBinding).extend(typeBinding);
 		return newEnv;
 	}
 
 	@Override
 	protected Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+		Environment newEnv = old; // TODO: .extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 		return newEnv;
 	}
 
@@ -85,10 +77,13 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		ClassObject classObj = new ClassObject(this);
 		
-		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
-		vb.setValue(classObj);
+		// TODO: 
+		
+		// ClassObject classObj = new ClassObject(this);
+		
+		// ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		// vb.setValue(classObj);
 	}
 	
 	public Environment evaluateDeclarations(Obj obj) {

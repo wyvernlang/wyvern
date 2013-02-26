@@ -38,16 +38,27 @@ public class ClassParser implements LineParser {
 		}
 		
 		String clsName = ParseUtils.parseSymbol(ctx).name;
-		LineSequence lines = ParseUtils.extractLines(ctx);
-		if (ctx.first != null)
-			throw new RuntimeException("parse error");
 		
-		Environment innerCtx = ctx.second;//ctx.second.extend(new NameBindingImpl(clsName, new ObjectType(new ClassDeclaration(clsName, null))));
-		TypedAST declAST = lines.accept(CoreParser.getInstance(), innerCtx);
-		if (!(declAST instanceof Declaration))
-			throw new RuntimeException("parse error");
-		
+		String implementsName = "";
+		if (ParseUtils.checkFirst("implements", ctx)) {
+			ParseUtils.parseSymbol("implements", ctx);
+			implementsName = ParseUtils.parseSymbol(ctx).name;
+		}
 
-		return new ClassDeclaration(clsName, (Declaration) declAST);
+		TypedAST declAST = null;
+		if (ctx.first == null) {
+			// Empty body in the class declaration is OK.
+		} else {
+			// Process body.
+			LineSequence lines = ParseUtils.extractLines(ctx);
+			if (ctx.first != null)
+				throw new RuntimeException("parse error");
+		
+			declAST = lines.accept(CoreParser.getInstance(), ctx.second);
+			if (!(declAST instanceof Declaration))
+				throw new RuntimeException("parse error");
+		}
+
+		return new ClassDeclaration(clsName, implementsName, (Declaration) declAST);
 	}
 }

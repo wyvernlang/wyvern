@@ -52,7 +52,7 @@ public class ClassTypeCheckerTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("ClassDeclaration()", typedAST.toString());		
+		Assert.assertEquals("InterfaceDeclaration()", typedAST.toString());		
 
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Unit.getInstance(), resultType);

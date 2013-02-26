@@ -1,20 +1,17 @@
 /** MODULE: Simple Wyvern class example. **/
 
 /** Public Interface **/
-/** Not parseable (yet) - interface.
 interface List
 	type T
-	def add(T)
-**/
+	meth add(x : T) : void
 
 /** Private Implementation **/
-/** Not parseable (yet) - var or def.
 class ListImpl implements List
 	var root : T Link?
 
-	def add(x)
+	meth add(x : T) : void
 		root = Link(x, root)
-**/
+		// something = blah // throws sequences not implemented
 
 class Link
 	val test = 42
