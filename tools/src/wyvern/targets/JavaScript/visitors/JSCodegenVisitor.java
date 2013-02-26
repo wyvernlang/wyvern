@@ -329,10 +329,4 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		super.visit(interfaceDeclaration);
 	}
 
-	@Override
-	public void visit(AssignableValueImpl assignableValueImpl) {
-		super.visit(assignableValueImpl);
-		
-	}
-
 }
