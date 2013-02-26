@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.binding.NameBinding;
+import wyvern.tools.typedAST.extensions.AssignableValueImpl;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
@@ -314,6 +315,12 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		super.visit(typeInstance);
 
 		// TODO: Ben, please implement, though nothing much to do here at this stage...
+	}
+
+	@Override
+	public void visit(AssignableValueImpl assignableValueImpl) {
+		super.visit(assignableValueImpl);
+		
 	}
 
 }

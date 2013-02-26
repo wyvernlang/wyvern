@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST;
 
+import wyvern.tools.typedAST.extensions.AssignableValueImpl;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
@@ -36,4 +37,5 @@ public interface CoreASTVisitor {
 	void visit(TupleObject meth);
 	void visit(TypeInstance typeInstance);
 	void visit(Assignment assignment);
+	void visit(AssignableValueImpl assignableValueImpl);
 }

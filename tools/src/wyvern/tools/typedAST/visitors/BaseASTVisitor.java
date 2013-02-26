@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.extensions.AssignableValueImpl;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
@@ -82,6 +83,10 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(Variable variable) {
+	}
+	
+	@Override
+	public void visit(AssignableValueImpl assignableValueImpl) {
 	}
 
 	@Override
