@@ -11,7 +11,6 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.binding.NameBinding;
-import wyvern.tools.typedAST.extensions.AssignableValueImpl;
 import wyvern.tools.typedAST.extensions.BooleanConstant;
 import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
