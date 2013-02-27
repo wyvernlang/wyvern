@@ -43,11 +43,11 @@ public class Phase1Parser {
 		}
 		
 		if (token.kind == Number) {
-			return new Int(token.value);
+			return new IntLiteral(token.value);
 		}
 		
 		if (token.kind == String) {
-			return new StringNode(token.text);
+			return new StringLiteral(token.text);
 		}
 		
 		if (token.kind == LPAREN) {

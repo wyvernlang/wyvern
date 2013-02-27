@@ -1,8 +1,8 @@
 package wyvern.tools.rawAST;
 
 public interface RawASTVisitor<A,R> {
-	R visit(Int node, A arg);
-	R visit(StringNode node, A arg);
+	R visit(IntLiteral node, A arg);
+	R visit(StringLiteral node, A arg);
 	R visit(Symbol node, A arg);
 	R visit(Unit node, A arg);
 	R visit(LineSequence node, A arg);

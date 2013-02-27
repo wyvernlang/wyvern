@@ -1,10 +1,11 @@
 package wyvern.tools.rawAST;
 
-public class StringNode implements RawAST {
-	public final String data;
+
+public class IntLiteral implements RawAST {
+	public final int data;
 	
-	public StringNode(String s) {
-		data = s;
+	public IntLiteral(int i) {
+		data = i;
 	}
 	
 	@Override
@@ -14,19 +15,19 @@ public class StringNode implements RawAST {
 	
 	@Override
 	public boolean equals(Object other) {
-		if (!(other instanceof StringNode))
+		if (!(other instanceof IntLiteral))
 			return false;
-		StringNode otherData = (StringNode) other; 
-		return otherData.data.equals(data);
+		IntLiteral otherData = (IntLiteral) other; 
+		return otherData.data == data;
 	}
 	
 	@Override
 	public int hashCode() {
-		return data.hashCode();
+		return data;
 	}
 	
 	@Override
 	public String toString() {
-		return "\"" + data + '\"';
+		return Integer.toString(data);
 	}
 }

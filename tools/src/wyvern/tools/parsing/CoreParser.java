@@ -25,12 +25,12 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	public static CoreParser getInstance() { return instance; }
 
 	@Override
-	public TypedAST visit(Int node, Environment env) {
+	public TypedAST visit(IntLiteral node, Environment env) {
 		return new IntegerConstant(node.data);
 	}
 
 	@Override
-	public TypedAST visit(StringNode node, Environment env) {
+	public TypedAST visit(StringLiteral node, Environment env) {
 		return new StringConstant(node.data);
 	}
 
