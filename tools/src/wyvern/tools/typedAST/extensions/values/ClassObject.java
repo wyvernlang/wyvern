@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.values;
 
 import java.util.Map;
 
@@ -7,6 +7,8 @@ import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.BoundCode;
 import wyvern.tools.typedAST.Value;
+import wyvern.tools.typedAST.extensions.Obj;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;

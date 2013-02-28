@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.values;
 
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.AbstractValue;

@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.declarations;
 
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;

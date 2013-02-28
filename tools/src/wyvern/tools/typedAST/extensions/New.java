@@ -11,6 +11,8 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.values.ClassObject;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;

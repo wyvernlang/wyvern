@@ -1,21 +1,21 @@
 package wyvern.tools.typedAST;
 
-import wyvern.tools.typedAST.extensions.BooleanConstant;
-import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
-import wyvern.tools.typedAST.extensions.IntegerConstant;
-import wyvern.tools.typedAST.extensions.InterfaceDeclaration;
 import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
-import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.TupleObject;
-import wyvern.tools.typedAST.extensions.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.TypeInstance;
-import wyvern.tools.typedAST.extensions.UnitVal;
-import wyvern.tools.typedAST.extensions.ValDeclaration;
-import wyvern.tools.typedAST.extensions.VarDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.InterfaceDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
+import wyvern.tools.typedAST.extensions.values.BooleanConstant;
+import wyvern.tools.typedAST.extensions.values.IntegerConstant;
+import wyvern.tools.typedAST.extensions.values.StringConstant;
+import wyvern.tools.typedAST.extensions.values.UnitVal;
 
 public interface CoreASTVisitor {
 	void visit(Fn fn);

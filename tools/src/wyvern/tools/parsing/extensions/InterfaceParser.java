@@ -7,7 +7,7 @@ import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.extensions.InterfaceDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.InterfaceDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 

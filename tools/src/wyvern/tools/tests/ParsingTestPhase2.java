@@ -24,7 +24,7 @@ import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.extensions.ValDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;

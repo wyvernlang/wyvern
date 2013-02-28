@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.values;
 
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;

@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.InvokableValue;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
+import wyvern.tools.typedAST.extensions.values.TupleValue;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;

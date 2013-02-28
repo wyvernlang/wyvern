@@ -6,9 +6,9 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 
