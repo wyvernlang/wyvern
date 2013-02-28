@@ -1,6 +1,6 @@
 package wyvern.tools.typedAST.extensions;
 
-import wyvern.tools.typedAST.AssignableValue;
+import wyvern.tools.typedAST.Assignable;
 import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
@@ -14,7 +14,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class VarDeclaration extends Declaration implements CoreAST, AssignableValue {
+public class VarDeclaration extends Declaration implements CoreAST, Assignable {
 	TypedAST definition;
 	NameBinding binding;
 	
@@ -72,7 +72,7 @@ public class VarDeclaration extends Declaration implements CoreAST, AssignableVa
 	protected void evalDecl(Environment evalEnv, Environment declEnv) {
 		Value defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
-		vb.setValue(defValue);
+		vb.setValue(new VarValue(defValue));
 	}
 
 	@Override

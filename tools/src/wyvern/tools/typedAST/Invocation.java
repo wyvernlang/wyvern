@@ -6,12 +6,13 @@ import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.typedAST.extensions.UnitVal;
+import wyvern.tools.typedAST.extensions.VarValue;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class Invocation extends CachingTypedAST implements CoreAST {
+public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private String operationName;
 	private TypedAST receiver;
 	private TypedAST argument;
@@ -64,6 +65,17 @@ public class Invocation extends CachingTypedAST implements CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public Value evaluateAssignment(Assignment ass, Environment env) {
+		Value gotValue = evaluate(env);
+		if (!(gotValue instanceof VarValue))
+			throw new RuntimeException("Invalid assignment");
+		
+		Value setValue = ass.getValue().evaluate(env);
+		((VarValue)gotValue).setValue(setValue);
+		return setValue;
 	}
 
 }

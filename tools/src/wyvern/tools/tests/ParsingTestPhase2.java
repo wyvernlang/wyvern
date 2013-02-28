@@ -314,6 +314,62 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(6)", resultValue.toString());
 	}
+	
+	@Test
+	public void testVarDecls() {
+		Reader reader = new StringReader("var x = 1\nx");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(1)", resultValue.toString());
+	}
+
+	@Test
+	public void testVarAssignment() {
+		Reader reader = new StringReader("var x = 1\nx=2\nx");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(2)", resultValue.toString());
+	}
+	@Test
+	public void testVarAssignment2() {
+		Reader reader = new StringReader("var x = 1\nx=2\nvar y = 3\ny=4\nx=y\nx");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(4)", resultValue.toString());
+	}
+	
+
+	@Test
+	public void testVarAssignmentInClass() {
+		Reader reader = new StringReader("class Hello\n"
+				+"	var testVal = 5\n"
+				+"	meth setV(n : Int):Int = this.testVal = n\n"
+				+"	meth getV():Int = this.testVal\n"
+				+"val h = new Hello()\n"
+				+"val a = h.setV(10)\n" 
+				+"h.getV()");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
+	}
+	
+	
 
 	//Ben: Testing class methods. Broken currently, current priority.
 	/*

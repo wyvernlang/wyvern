@@ -34,7 +34,6 @@ public class ClassObject extends AbstractValue implements Value {
 	}
 
 	public Value getValue(String operation, Obj receiver) {
-		// TODO: bind receiver in method, use receiver to look up fields
 		return receiver.getIntEnv().getValue(operation);
 	}
 
