@@ -1,5 +1,9 @@
 package wyvern.tools.lexer;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
+
 public class MidLineState implements LexerState {
 	
 	private MidLineState() {}
@@ -26,7 +30,6 @@ public class MidLineState implements LexerState {
 		
 		// on newline, go to initial state
 		if (ch == '\n' || ch == '\r') {
-			lexer.incrementLine();
 			lexer.read();
 			return InitialState.getInstance().getToken(lexer);
 		}
@@ -51,7 +54,8 @@ public class MidLineState implements LexerState {
 		}
 		
 		// else error
-		throw new LexerException();
+		ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
+		return null; // Unreachable.
 	}
 
 }

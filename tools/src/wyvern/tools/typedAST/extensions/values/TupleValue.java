@@ -31,5 +31,9 @@ public class TupleValue extends AbstractValue {
 	public Value getValue(int index) {
 		return values[index];
 	}
-	
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

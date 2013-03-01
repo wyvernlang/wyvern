@@ -80,4 +80,8 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 		return newValue;
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

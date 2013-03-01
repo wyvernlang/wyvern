@@ -29,4 +29,8 @@ public class Symbol implements RawAST {
 	public String toString() {
 		return name;
 	}
+
+	public int getLine() {
+		return -1; // TODO: NOT IMPLEMENTED YET.
+	}
 }

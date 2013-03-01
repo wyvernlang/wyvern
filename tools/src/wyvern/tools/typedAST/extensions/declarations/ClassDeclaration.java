@@ -30,9 +30,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	
 	private Environment declEvalEnv;
 	
-	public ClassDeclaration(String name, String implementsName, Declaration decls) {
-		// TODO: Handle implements properly as list of names - what is the syntax though?
-		
+	public ClassDeclaration(String name, String implementsName, String implementsClassName, Declaration decls) {
 		this.decls = decls;
 		Type objectType = new ObjectType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -123,4 +121,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

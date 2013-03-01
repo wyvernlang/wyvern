@@ -29,4 +29,8 @@ public class StringLiteral implements RawAST {
 	public String toString() {
 		return "\"" + data + '\"';
 	}
+
+	public int getLine() {
+		return -1; // TODO: NOT IMPLEMENTED YET.
+	}
 }

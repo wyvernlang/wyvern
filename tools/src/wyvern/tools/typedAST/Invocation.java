@@ -78,4 +78,8 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		return setValue;
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

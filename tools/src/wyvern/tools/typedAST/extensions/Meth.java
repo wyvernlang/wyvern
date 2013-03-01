@@ -103,4 +103,9 @@ public class Meth extends Declaration implements CoreAST, BoundCode {
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(closure);
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

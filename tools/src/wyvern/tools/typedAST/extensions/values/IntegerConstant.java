@@ -70,4 +70,9 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

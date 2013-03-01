@@ -153,7 +153,7 @@ public class Phase1Parser {
 			if (token.kind == EOF || token.kind == DEDENT)
 				break;
 			
-			Line line = new Line(new ArrayList<RawAST>());
+			Line line = new Line(new ArrayList<RawAST>(), token.getLine());
 			parseSequence(lexer, line);
 			result.children.add(line);
 			token = lexer.peekToken();

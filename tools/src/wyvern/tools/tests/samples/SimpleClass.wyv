@@ -1,19 +1,60 @@
-/** MODULE: Simple Wyvern class example. **/
+/** MODULE: Simple Wyvern class example from http://www.cs.cmu.edu/~aldrich/securemobileweb/spec-rationale.html **/
+
 
 /** Public Interface **/
-interface List
-	type T
-	meth add(x : T) : void
+type IntCell
+	var contents : Int
+
+type Stack
+	prop top : Int?
+	meth push(element : Int)
+	meth pop() : Int?
+
+type StackFactory
+	meth Stack() : Stack
+	meth StackWithFirst(firstElement : Int) : Stack
+
+type ListUtilities
+	meth map(f : Int -> Int, l : IntList) : IntList
+
 
 /** Private Implementation **/
-class ListImpl implements List
-	var root : T Link?
+class StackImpl
+	implements Stack
+	class implements StackFactory
 
-	meth add(x : T) : void
-		root = Link(x, root)
+	var list : Link?
+
+	meth top() = list.data
+
+	meth push(element)
+		list = Link(element, list)
+
+	meth pop()
+		val result = list.data
+		list = list.next
+		result
+
+	class meth Stack() = new StackImpl
+	
+	class meth StackWithFirst(firstElement)
+		new StackImpl
+			list = Link(firstElement, null)
+
 
 class Link
-	val test = 42
-	type T
-	val data : T
-	val next : T Link?
+	val data : Int
+	val next : Link?
+
+	class meth Link(d:Int, n:Link?) = new Link(data=d, next=n)
+
+
+/*
+// The following throws the "sequences not implemented" exception.
+meth stackClient()
+	val s = StackImpl.Stack()
+	s.push(5)
+	print(s.top)
+	val addOne = fn x:Int => x+1
+	print(addOne(s.pop()))
+*/

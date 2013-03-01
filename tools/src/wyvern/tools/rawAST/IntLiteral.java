@@ -30,4 +30,9 @@ public class IntLiteral implements RawAST {
 	public String toString() {
 		return Integer.toString(data);
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

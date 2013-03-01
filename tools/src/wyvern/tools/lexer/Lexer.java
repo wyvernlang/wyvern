@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Stack;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
+
 public class Lexer {
 	private Stack<String> prefixStack = new Stack<String>();
 	LexerState currentState = InitialState.getInstance();
@@ -14,7 +18,7 @@ public class Lexer {
 	
 	public Lexer(Reader r) {
 		reader = r;
-		lineNum = 0;
+		lineNum = 1; // First line is #1, every time we see '\n' when read() method is called, increment. Simple.
 		prefixStack.push("");
 	}
 	
@@ -23,7 +27,7 @@ public class Lexer {
 			if (currentChar == -1)
 				currentChar = reader.read();
 		} catch (IOException e) {
-			throw new LexerException();
+			ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
 		}
 	}
 	
@@ -43,6 +47,7 @@ public class Lexer {
 		fill();
 		char ch = (char) currentChar;
 		currentChar = -1;
+		if (ch == '\n') lineNum++;
 		return ch;
 	}
 
@@ -116,10 +121,6 @@ public class Lexer {
 	
 	public int getLineNumber() {
 		return lineNum;
-	}
-	
-	void incrementLine() {
-		lineNum++;
 	}
 
 	String getCurrentPrefix() {

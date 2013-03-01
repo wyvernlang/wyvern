@@ -3,61 +3,122 @@ package wyvern.tools.typedAST.extensions.declarations;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
+import wyvern.tools.typedAST.binding.NameBinding;
+import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
+import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ObjectType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
-	TypeBinding binding;
+	private Declaration decls;
+	private NameBinding nameBinding;
+	//private TypeBinding typeBinding;
 	
-	public TypeDeclaration(String name, Environment env) {
-		binding = new TypeBinding(name, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+	private Environment declEvalEnv;
+	
+	public TypeDeclaration(String name, Declaration decls) {
+		this.decls = decls;
+		//Type objectType = new ObjectType(this);
+		//Type classType = objectType; // TODO set this to a class type that has the class members
+		//typeBinding = new TypeBinding(name, objectType);
+		//nameBinding = new NameBindingImpl(name, classType);
+		this.nameBinding = new NameBindingImpl(name, Unit.getInstance());
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName());
-	}
-
-	@Override
-	protected Type doTypecheck(Environment env) {
-		return binding.getType();
+		//TODO: implement me
+		//writer.writeArgs(definition);
 	}
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
 	}
-	
-	public TypeBinding getBinding() {
-		return binding;
-	}
 
 	@Override
 	public Type getType() {
-		return binding.getType();
+		// TODO what should the type of a class declaration be?
+		return Unit.getInstance();
 	}
 
 	@Override
-	public String getName() {
-		return binding.getName();
-	}
+	public Type doTypecheck(Environment env) {
+		Declaration decl = decls;
+		
+		// TODO:
+		/*
+		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
+		while (decl != null) {
+			decl.typecheckSelf(env);
+			decl = decl.getNextDecl();
+		}
+		*/
+		return Unit.getInstance();
+	}	
 	
 	@Override
 	protected Environment doExtend(Environment old) {
-		return old.extend(binding);
+		Environment newEnv = old; // TODO: .extend(nameBinding).extend(typeBinding);
+		return newEnv;
 	}
 
 	@Override
 	protected Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new TypeBinding(binding.getName(), binding.getType()));
+		Environment newEnv = old; // TODO: .extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 		return newEnv;
 	}
 
 	@Override
 	protected void evalDecl(Environment evalEnv, Environment declEnv) {
-		// TODO: Check to confirm there is indeed nothing to do here.
+		declEvalEnv = declEnv;
+		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+		
+		// TODO: 
+		
+		// ClassObject classObj = new ClassObject(this);
+		
+		// ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		// vb.setValue(classObj);
+	}
+	
+	public Environment evaluateDeclarations(Obj obj) {
+		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+		
+		ValueBinding thisBinding = new ValueBinding("this", obj);
+		Environment intEnv = declEvalEnv.extend(thisBinding);
+		decls.bindDecls(intEnv, thisEnv);
+		
+		return thisEnv;
+	}
+
+	public Declaration getDecl(String opName) {
+		Declaration d = decls;
+		while (d != null) {
+			// TODO: handle fields too
+			if (d.getName().equals(opName))
+				return d;
+			d = d.getNextDecl();
+		}
+		return null;	// can't find it
+	}
+	
+	public Declaration getDecls() {
+		return decls;
+	}
+
+	@Override
+	public String getName() {
+		return nameBinding.getName();
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

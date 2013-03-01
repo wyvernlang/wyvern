@@ -86,4 +86,9 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(defValue);
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

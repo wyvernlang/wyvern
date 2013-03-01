@@ -3,6 +3,8 @@ package wyvern.tools.parsing.extensions;
 import java.util.LinkedList;
 import java.util.List;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
@@ -22,7 +24,10 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
 /**
- * Parses "class x [indent] decls"
+ * 	class NAME
+ * 		[implements Stack]
+ *		[class implements StackFactory]
+ * 		DELCARATION*
  */
 
 public class ClassParser implements LineParser {
@@ -32,33 +37,46 @@ public class ClassParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
-		if (ParseUtils.checkFirst("meth", ctx)) {
+		if (ParseUtils.checkFirst("meth", ctx)) { // Parses "class meth".
 			ParseUtils.parseSymbol(ctx);
 			return MethParser.getInstance().parse(first, ctx, Unit.getInstance());
 		}
 		
 		String clsName = ParseUtils.parseSymbol(ctx).name;
-		
-		String implementsName = "";
-		if (ParseUtils.checkFirst("implements", ctx)) {
-			ParseUtils.parseSymbol("implements", ctx);
-			implementsName = ParseUtils.parseSymbol(ctx).name;
-		}
 
 		TypedAST declAST = null;
+		String implementsName = "";
+		String implementsClassName = "";
+
 		if (ctx.first == null) {
 			// Empty body in the class declaration is OK.
 		} else {
+			LineSequence lines = ParseUtils.extractLines(ctx); // Get potential body.
+			
+			if (lines.getFirst() != null && lines.getFirst().getFirst() != null &&
+					lines.getFirst().getFirst().toString().equals("implements")) { // FIXME: hack, detected implements
+				implementsName = lines.getFirst().getRest().getFirst().toString();
+				lines.children.remove(0);
+			}
+
+			if (lines.getFirst() != null && lines.getFirst().getFirst() != null &&
+					lines.getFirst().getFirst().toString().equals("class")) { // FIXME: hack, detected class
+				if (lines.getFirst().getRest() != null && lines.getFirst().getRest().getFirst() != null &&
+						lines.getFirst().getRest().getFirst().toString().equals("implements")) { // FIXME: hack, detected implements
+					implementsClassName = lines.getFirst().getRest().getRest().getFirst().toString();
+					lines.children.remove(0);
+				}
+			}
+
 			// Process body.
-			LineSequence lines = ParseUtils.extractLines(ctx);
 			if (ctx.first != null)
-				throw new RuntimeException("parse error");
+				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		
 			declAST = lines.accept(CoreParser.getInstance(), ctx.second);
 			if (!(declAST instanceof Declaration))
-				throw new RuntimeException("parse error");
+				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		}
 
-		return new ClassDeclaration(clsName, implementsName, (Declaration) declAST);
+		return new ClassDeclaration(clsName, implementsName, implementsClassName, (Declaration) declAST);
 	}
 }

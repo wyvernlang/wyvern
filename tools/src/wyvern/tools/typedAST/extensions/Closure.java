@@ -52,4 +52,8 @@ public class Closure extends AbstractValue implements ApplyableValue {
 		return function.getBody().evaluate(bodyEnv);
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

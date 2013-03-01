@@ -1,7 +1,5 @@
 package wyvern.tools.typedAST.extensions.declarations;
 
-import wyvern.tools.typedAST.Assignable;
-import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
@@ -10,27 +8,29 @@ import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.values.VarValue;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class VarDeclaration extends Declaration implements CoreAST, Assignable {
-	TypedAST definition;
+public class PropDeclaration extends Declaration implements CoreAST {
+	Type definitionType;
 	NameBinding binding;
 	
-	public VarDeclaration(String name, TypedAST definition, Environment env) {
-		this.definition=definition;
-		binding = new NameBindingImpl(name, definition.typecheck(env));
+	public PropDeclaration(String name, Type type) {
+		binding = new NameBindingImpl(name, type);
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definition);
+		writer.writeArgs(binding.getName(), definitionType);
 	}
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (binding.getType() == null) {
+			// this.definitionType = this.definition.typecheck(env);
+			this.binding = new NameBindingImpl(binding.getName(), definitionType);
+		}
 		return binding.getType();
 	}
 
@@ -52,10 +52,6 @@ public class VarDeclaration extends Declaration implements CoreAST, Assignable {
 	public String getName() {
 		return binding.getName();
 	}
-	
-	public TypedAST getDefinition() {
-		return definition;
-	}
 
 	@Override
 	protected Environment doExtend(Environment old) {
@@ -71,15 +67,9 @@ public class VarDeclaration extends Declaration implements CoreAST, Assignable {
 
 	@Override
 	protected void evalDecl(Environment evalEnv, Environment declEnv) {
-		Value defValue = definition.evaluate(evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
-		vb.setValue(new VarValue(defValue));
-	}
-
-	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+		// Value defValue = definition.evaluate(evalEnv);
+		// ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
+		// vb.setValue(defValue);
 	}
 
 	private int line = -1;

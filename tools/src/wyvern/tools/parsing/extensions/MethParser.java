@@ -23,11 +23,9 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
 /**
- * Alex: fn or meth???
+ * Parses "meth x : T => e"
  * 
- * Parses "fn x : T => e"
- * 
- * Could specify as:   "fn" symbol ":" type "=>" exp
+ * Could specify as:   "meth" symbol ":" type "=>" exp
  */
 
 public class MethParser implements LineParser {
@@ -45,49 +43,44 @@ public class MethParser implements LineParser {
 		Parenthesis paren = ParseUtils.extractParen(ctx);
 		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second); 
 		List<NameBinding> args = new ArrayList<NameBinding>();
+
 		while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
 			if (args.size() > 0)
 				ParseUtils.parseSymbol(",", newCtx);
 				
 			String argName = ParseUtils.parseSymbol(newCtx).name;
-			ParseUtils.parseSymbol(":", newCtx);
-			Type argType = ParseUtils.parseType(newCtx);
+			
+			Type argType = null;
+			if (ParseUtils.checkFirst(":", newCtx)) {
+				ParseUtils.parseSymbol(":", newCtx);
+				argType = ParseUtils.parseType(newCtx);
+			} else {
+				// What's wrong with no type for arg? Seems allowed...
+			}
 			NameBinding binding = new NameBindingImpl(argName, argType);
 			ctx.second = ctx.second.extend(binding);
 			args.add(binding);
 		}
 		
-		if (returnType == null) {
-			ParseUtils.parseSymbol(":", ctx);
-			returnType = ParseUtils.parseType(ctx);
+		if (ParseUtils.checkFirst(":", ctx)) {
+			if (returnType == null) {
+				ParseUtils.parseSymbol(":", ctx);
+				returnType = ParseUtils.parseType(ctx);
+			}
+		} else {
+			// What's wrong with no return type? Seems allowed...
 		}
 		
 		TypedAST exp;
 		if (ctx.first == null) {
-			// throw new RuntimeException("parse error");
 			// Empty body is OK - say inside interface.
 			exp = null;
 		} else if (ParseUtils.checkFirst("=",ctx)) {
 			ParseUtils.parseSymbol("=",ctx);
 			exp = ParseUtils.parseExpr(ctx);					
 		} else {
-			// Multiline body then!
-			
-			/*
-			LineSequence lines = ParseUtils.extractLines(ctx);
-			
-			Line firstLine = lines.getFirst();
-			
-			while (lines.getRest() != null) {
-				// FIXME: Other lines ignored for now - TODO: as it is not nicely supported for now.
-			}
-			
-			if (ctx.first != null)
-				throw new RuntimeException("parse error");
-
-			exp = firstLine.accept(CoreParser.getInstance(), ctx.second);
-			*/
-			
+			// Multiple line body then! FIXME: This is not working properly!
+			// System.out.println("Multiline: " + methName + " and ctx = " + ctx);
 			exp = ParseUtils.parseExpr(ctx);					
 		}
 

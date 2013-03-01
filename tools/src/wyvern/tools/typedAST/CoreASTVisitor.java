@@ -8,7 +8,7 @@ import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.extensions.declarations.InterfaceDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
@@ -22,11 +22,10 @@ public interface CoreASTVisitor {
 	void visit(Invocation invocation);
 	void visit(Application application);
 
+	void visit(PropDeclaration propDeclaration);
 	void visit(ValDeclaration valDeclaration);
 	void visit(VarDeclaration valDeclaration);
 	void visit(Variable variable);
-	
-	void visit(TypeDeclaration typeDeclaration);
 	
 	void visit(IntegerConstant booleanConstant);
 	void visit(StringConstant booleanConstant);
@@ -39,5 +38,5 @@ public interface CoreASTVisitor {
 	void visit(TupleObject meth);
 	void visit(TypeInstance typeInstance);
 	void visit(Assignment assignment);
-	void visit(InterfaceDeclaration interfaceDeclaration);
+	void visit(TypeDeclaration interfaceDeclaration);
 }

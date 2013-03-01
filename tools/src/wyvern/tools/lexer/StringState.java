@@ -1,5 +1,9 @@
 package wyvern.tools.lexer;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
+
 public class StringState implements LexerState {
 
 	private StringState() {}
@@ -24,7 +28,8 @@ public class StringState implements LexerState {
 		}
 		
 		//Unterminated string
-		throw new LexerException();
+		ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
+		return null; // Unreachable.
 	}
 
 }

@@ -64,4 +64,9 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	public TypedAST getBody() {
 		return body;
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

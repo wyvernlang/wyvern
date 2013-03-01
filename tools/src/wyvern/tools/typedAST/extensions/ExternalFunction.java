@@ -41,4 +41,8 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 		// TODO  Not really sure what to do here.
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

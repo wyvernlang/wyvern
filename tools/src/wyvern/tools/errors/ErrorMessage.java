@@ -13,6 +13,7 @@ public enum ErrorMessage {
 	MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
 	
 	// Syntax errors
+	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),
 	UNEXPECTED_INPUT("Unexpected input", 0),
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),

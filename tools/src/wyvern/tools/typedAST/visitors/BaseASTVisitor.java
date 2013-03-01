@@ -15,7 +15,7 @@ import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.extensions.declarations.InterfaceDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
@@ -75,7 +75,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(TypeDeclaration typeDeclaration) {
+	public void visit(PropDeclaration propDeclaration) {
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(InterfaceDeclaration interfaceDeclaration) {
+	public void visit(TypeDeclaration interfaceDeclaration) {
 	}
 
 	@Override

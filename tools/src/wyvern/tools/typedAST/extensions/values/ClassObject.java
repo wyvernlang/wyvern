@@ -42,4 +42,9 @@ public class ClassObject extends AbstractValue implements Value {
 	public Environment getObjEnv(Obj obj) {
 		return decl.evaluateDeclarations(obj);
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

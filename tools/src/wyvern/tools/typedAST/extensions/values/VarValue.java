@@ -32,4 +32,9 @@ public class VarValue extends AbstractValue {
 	public Value getValue() {
 		return innerValue;
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

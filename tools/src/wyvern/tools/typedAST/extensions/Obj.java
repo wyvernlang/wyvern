@@ -50,4 +50,9 @@ public class Obj extends AbstractValue implements InvokableValue {
 	public Environment getIntEnv() {
 		return intEnv;
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

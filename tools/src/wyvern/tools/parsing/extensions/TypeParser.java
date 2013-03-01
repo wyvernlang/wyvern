@@ -1,5 +1,7 @@
 package wyvern.tools.parsing.extensions;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
@@ -7,14 +9,15 @@ import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.extensions.declarations.InterfaceDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 
-public class InterfaceParser implements LineParser {
-	private InterfaceParser() { }
-	private static InterfaceParser instance = new InterfaceParser();
-	public static InterfaceParser getInstance() { return instance; }
+public class TypeParser implements LineParser {
+	private TypeParser() { }
+	private static TypeParser instance = new TypeParser();
+	public static TypeParser getInstance() { return instance; }
+	
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
@@ -27,13 +30,13 @@ public class InterfaceParser implements LineParser {
 			// Process body.
 			LineSequence lines = ParseUtils.extractLines(ctx);
 			if (ctx.first != null)
-				throw new RuntimeException("parse error");
-		
+				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+
 			declAST = lines.accept(CoreParser.getInstance(), ctx.second);
 			if (!(declAST instanceof Declaration))
-				throw new RuntimeException("parse error");
+				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		}
 
-		return new InterfaceDeclaration(clsName, (Declaration) declAST);
+		return new TypeDeclaration(clsName, (Declaration) declAST);
 	}
 }

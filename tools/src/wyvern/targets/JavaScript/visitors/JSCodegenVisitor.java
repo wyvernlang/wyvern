@@ -19,7 +19,7 @@ import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.extensions.declarations.InterfaceDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
@@ -149,13 +149,6 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		String nextDeclText = (nextDeclElem == null)? "" : "\n" + nextDeclElem.generated;
 		elemStack.push(new ASTElement(valDeclaration, 
 				((inClass)?"this.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
-	}
-	
-	@Override
-	public void visit(TypeDeclaration typeDeclaration) {
-		super.visit(typeDeclaration);
-		
-		// TODO: Ben, please implement, though nothing much to do here at this stage...
 	}
 
 	@Override
@@ -324,8 +317,12 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	}
 
 	@Override
-	public void visit(InterfaceDeclaration interfaceDeclaration) {
+	public void visit(TypeDeclaration interfaceDeclaration) {
 		super.visit(interfaceDeclaration);
 	}
-
+	
+	@Override
+	public void visit(PropDeclaration propDeclaration) {
+		super.visit(propDeclaration);
+	}
 }

@@ -74,4 +74,9 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 			}
 		};
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }
