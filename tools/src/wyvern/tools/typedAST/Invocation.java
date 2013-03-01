@@ -59,7 +59,12 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		if (!(lhs instanceof InvokableValue))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		InvokableValue receiverValue = (InvokableValue) lhs;
-		return receiverValue.evaluateInvocation(this, env);
+		Value out = receiverValue.evaluateInvocation(this, env);
+		
+		//TODO: bit of a hack
+		if (out instanceof VarValue)
+			out = ((VarValue)out).getValue();
+		return out;
 	}
 
 	@Override
@@ -69,13 +74,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Value evaluateAssignment(Assignment ass, Environment env) {
-		Value gotValue = evaluate(env);
-		if (!(gotValue instanceof VarValue))
-			throw new RuntimeException("Invalid assignment");
+		Value lhs = receiver.evaluate(env);
+		if (!(lhs instanceof Assignable))
+			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		
-		Value setValue = ass.getValue().evaluate(env);
-		((VarValue)gotValue).setValue(setValue);
-		return setValue;
+		return ((Assignable)lhs).evaluateAssignment(ass, env);
 	}
 
 	private int line = -1;
