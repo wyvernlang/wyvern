@@ -7,7 +7,7 @@ import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.Obj;
+import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ObjectType;
