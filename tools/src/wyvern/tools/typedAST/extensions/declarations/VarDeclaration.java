@@ -15,7 +15,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class VarDeclaration extends Declaration implements CoreAST, Assignable {
+public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	NameBinding binding;
 	
@@ -74,12 +74,6 @@ public class VarDeclaration extends Declaration implements CoreAST, Assignable {
 		Value defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(new VarValue(defValue));
-	}
-
-	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private int line = -1;
