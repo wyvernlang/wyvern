@@ -366,7 +366,7 @@ public class ParsingTestPhase2 {
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
-		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
+		Assert.assertEquals("VarValue(IntegerConstant(10))", resultValue.toString());
 	}
 	
 	
