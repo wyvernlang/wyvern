@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.values;
 
 import java.util.Map;
 
@@ -11,7 +11,6 @@ import wyvern.tools.typedAST.InvokableValue;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.values.ClassObject;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
