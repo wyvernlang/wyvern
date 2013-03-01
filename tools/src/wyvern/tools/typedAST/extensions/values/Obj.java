@@ -70,9 +70,8 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		return newValue;
 	}
 
-	@Override
+	private int line = -1;
 	public int getLine() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }
