@@ -1,12 +1,14 @@
 package wyvern.tools.tests;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
 import java.io.StringReader;
+import java.net.URL;
 import java.util.Scanner;
 
 import junit.framework.Assert;
@@ -27,6 +29,7 @@ import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
@@ -369,7 +372,6 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 	
-	
 
 	//Ben: Testing class methods. Broken currently, current priority.
 	/*
@@ -395,4 +397,39 @@ public class ParsingTestPhase2 {
 			Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 	*/
+	
+	@Test
+	public void testSequences() throws IOException {
+		String testFileName;
+		URL url;
+		
+		testFileName = "wyvern/tools/tests/samples/testSequences.wyv";
+		url = ClassTypeCheckerTests.class.getClassLoader().getResource(testFileName);
+		if (url == null) {
+			Assert.fail("Unable to open " + testFileName + " file.");
+			return;
+		}
+		InputStream is = url.openStream();
+		Reader reader = new InputStreamReader(is);
+
+		// testFileName = "wyvern/tools/tests/samples/parsedSimpleClass.prsd";
+		// url = ClassTypeCheckerTests.class.getClassLoader().getResource(testFileName);
+		Scanner s = new Scanner(new File(url.getFile()));
+		// String parsedTestFileAsString = s.nextLine();
+		s.close();
+		
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		// Assert.assertEquals(parsedTestFileAsString, parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Assert.assertEquals("Meth()", typedAST.toString());		
+
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals("Unit -> null", resultType.toString());
+		
+		// Value resultValue = typedAST.evaluate(env);
+		// Assert.assertEquals("()", resultValue.toString());
+	}
 }

@@ -18,6 +18,7 @@ public enum ErrorMessage {
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),
+	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

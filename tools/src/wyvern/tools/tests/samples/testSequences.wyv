@@ -1,0 +1,4 @@
+meth foo()
+	val f = 42
+	print(f) // This line breaks.
+	val g = 37

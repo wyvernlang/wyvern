@@ -2,12 +2,16 @@ package wyvern.tools.parsing;
 
 import java.util.LinkedList;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.rawAST.*;
 import wyvern.tools.typedAST.*;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
+import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.values.IntegerConstant;
 import wyvern.tools.typedAST.extensions.values.StringConstant;
 import wyvern.tools.typedAST.extensions.values.UnitVal;
@@ -50,17 +54,29 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return null;
 	}
 
+	/**
+	 * NB! Typically, this includes the root of the RawAST where the parsing of a file starts.
+	 */
 	@Override
 	public TypedAST visit(LineSequence node, Environment env) {
 		// TODO: should not be necessary, but need sanity check somewhere!
-		if (node.children.size() == 0)
-			throw new RuntimeException("cannot parse an empty list");
+		if (node.children.size() == 0) {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
+		}
 
 		TypedAST first = node.getFirst().accept(this, env);
 		LineSequenceParser parser = first.getLineSequenceParser();
 		LineSequence rest = node.getRest();
 		
-		if (rest == null)
+		/*
+		// Alex's debugging stuff.
+		if (first instanceof Application) {
+			Application a = (Application) first;
+			System.out.println("App: " + a.toString() + " rest = " + rest + " parser = " + parser);
+		}
+		*/
+		
+		if (rest == null) // Only one statement in the block.
 			return first;
 		
 		if (parser != null) {
@@ -68,7 +84,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 			return parser.parse(first, rest, env);
 		} else {
 			// otherwise, parse the rest and use a sequence
-			throw new RuntimeException("sequences not implemented");
+			throw new RuntimeException("LineSequence: sequences not implemented - probably means more complex error");
 		}
 	}
 
