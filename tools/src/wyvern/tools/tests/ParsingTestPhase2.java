@@ -1,7 +1,5 @@
 package wyvern.tools.tests;
 
-import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,7 +7,6 @@ import java.io.Reader;
 
 import java.io.StringReader;
 import java.net.URL;
-import java.util.Scanner;
 
 import junit.framework.Assert;
 
@@ -18,25 +15,18 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
-import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
-import wyvern.tools.lexer.Lexer;
-import wyvern.tools.lexer.Token;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Bool;
-import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.typedAST.CoreAST;
 
-import static wyvern.tools.types.TypeUtils.*;
+import static wyvern.tools.types.TypeUtils.integer;
+import static wyvern.tools.types.TypeUtils.arrow;
 
 public class ParsingTestPhase2 {
 	@Rule
@@ -341,6 +331,7 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(2)", resultValue.toString());
 	}
+	
 	@Test
 	public void testVarAssignment2() {
 		Reader reader = new StringReader("var x = 1\nx=2\nvar y = 3\ny=4\nx=y\nx");
@@ -352,7 +343,6 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(4)", resultValue.toString());
 	}
-	
 
 	@Test
 	public void testVarAssignmentInClass() {
@@ -371,7 +361,6 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
-	
 
 	//Ben: Testing class methods. Broken currently, current priority.
 	/*
@@ -411,16 +400,8 @@ public class ParsingTestPhase2 {
 		}
 		InputStream is = url.openStream();
 		Reader reader = new InputStreamReader(is);
-
-		// testFileName = "wyvern/tools/tests/samples/parsedSimpleClass.prsd";
-		// url = ClassTypeCheckerTests.class.getClassLoader().getResource(testFileName);
-		Scanner s = new Scanner(new File(url.getFile()));
-		// String parsedTestFileAsString = s.nextLine();
-		s.close();
 		
-		RawAST parsedResult = Phase1Parser.parse(reader);
-		// Assert.assertEquals(parsedTestFileAsString, parsedResult.toString());
-		
+		RawAST parsedResult = Phase1Parser.parse(reader);		
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);

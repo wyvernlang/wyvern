@@ -49,7 +49,6 @@ class Link
 	class meth Link(d:Int, n:Link?) = new Link(data=d, next=n)
 
 
-// The following throws the "sequences not implemented" exception.
 meth stackClient()
 	val s = StackImpl.Stack()
 	s.push(5)

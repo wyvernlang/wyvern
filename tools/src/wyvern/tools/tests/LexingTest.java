@@ -111,8 +111,7 @@ public class LexingTest {
 		Assert.assertEquals(Token.getNumber("3"), lexer.getToken());
 		Assert.assertEquals(Token.getEOF(), lexer.getToken());
 	}
-	
-	
+
 	@Test
 	public void testSymbols() {
 		Reader reader = new StringReader("hello+1++3/[{}](-x)");

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
 import java.io.StringReader;
 
 import junit.framework.Assert;
@@ -16,28 +15,15 @@ import org.junit.rules.ExpectedException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.interpreter.Interpreter;
 import wyvern.tools.parsing.CoreParser;
-import wyvern.tools.parsing.extensions.FnParser;
-import wyvern.tools.parsing.extensions.ValParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.Keyword;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.binding.KeywordNameBinding;
-import wyvern.tools.typedAST.binding.TypeBinding;
-import wyvern.tools.typedAST.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.Executor;
-import wyvern.tools.typedAST.extensions.ExternalFunction;
-import wyvern.tools.typedAST.extensions.values.IntegerConstant;
-import wyvern.tools.typedAST.extensions.values.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
-import wyvern.tools.types.extensions.Unit;
-
-import static wyvern.tools.types.TypeUtils.*;
 
 public class ExtensionsTest {
 	@Rule
@@ -87,7 +73,7 @@ public class ExtensionsTest {
 	
 	@Test 
 	public void testIf() {
-		Reader reader = new StringReader("if true then 5 else 10");
+		// Reader reader = new StringReader("if true then 5 else 10");
 		// phase 1 parser
 		// create TypedAST
 		// do a typecheck
@@ -122,7 +108,7 @@ public class ExtensionsTest {
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		
-		Value resultValue = typedAST.evaluate(env);
+		typedAST.evaluate(env); // will result in stack overflow
 	}
 	
 	@Test

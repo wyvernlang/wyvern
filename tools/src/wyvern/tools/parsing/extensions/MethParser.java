@@ -16,7 +16,7 @@ import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.extensions.Fn;
-import wyvern.tools.typedAST.extensions.Meth;
+import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
@@ -84,7 +84,7 @@ public class MethParser implements LineParser {
 			exp = ParseUtils.parseExpr(ctx);					
 		}
 
-		return new Meth(methName, args, returnType, exp);
+		return new MethDeclaration(methName, args, returnType, exp);
 		
 	}
 }

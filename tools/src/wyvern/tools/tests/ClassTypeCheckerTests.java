@@ -1,13 +1,11 @@
 package wyvern.tools.tests;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.IOException;
-import java.io.File;
-
 import java.net.URL;
-
 import java.util.Scanner;
 
 import junit.framework.Assert;
@@ -15,15 +13,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import wyvern.stdlib.Globals;
-import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.Value;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.rawAST.RawAST;
+import wyvern.tools.simpleParser.Phase1Parser;
+import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 
 public class ClassTypeCheckerTests {
 	@Test

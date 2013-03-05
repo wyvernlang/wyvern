@@ -2,12 +2,12 @@ package wyvern.tools.typedAST;
 
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.LetExpr;
-import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
 import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
@@ -34,7 +34,7 @@ public interface CoreASTVisitor {
 	void visit(ClassDeclaration clsDeclaration);
 	void visit(New new1);
 	void visit(LetExpr let);
-	void visit(Meth meth);
+	void visit(MethDeclaration meth);
 	void visit(TupleObject meth);
 	void visit(TypeInstance typeInstance);
 	void visit(Assignment assignment);
