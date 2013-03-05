@@ -2,6 +2,7 @@ package wyvern.tools.types;
 
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Unit;
 
 public class TypeUtils {
@@ -11,4 +12,5 @@ public class TypeUtils {
 	
 	public static Unit unit = Unit.getInstance();
 	public static Int integer = Int.getInstance();
+	public static Str str = Str.getInstance();
 }

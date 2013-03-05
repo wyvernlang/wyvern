@@ -105,13 +105,13 @@ public class ParsingTestPhase2 {
 	
 	@Test
 	public void testPrint() {
-		Reader reader = new StringReader("print(5)");
+		Reader reader = new StringReader("print(\"Testing printing.\")");
 		RawAST parsedResult = Phase1Parser.parse(reader);		
-		Assert.assertEquals("{$I {$L print (5) $L} $I}", parsedResult.toString());
+		Assert.assertEquals("{$I {$L print (\"Testing printing.\") $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("Application(ExternalFunction(), IntegerConstant(5))", typedAST.toString());		
+		Assert.assertEquals("Application(ExternalFunction(), StringConstant(\"Testing printing.\"))", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Unit.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);

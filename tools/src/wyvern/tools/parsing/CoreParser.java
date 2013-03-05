@@ -4,11 +4,24 @@ import java.util.LinkedList;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.rawAST.*;
-import wyvern.tools.typedAST.*;
+import wyvern.tools.rawAST.ExpressionSequence;
+import wyvern.tools.rawAST.IntLiteral;
+import wyvern.tools.rawAST.Line;
+import wyvern.tools.rawAST.LineSequence;
+import wyvern.tools.rawAST.Parenthesis;
+import wyvern.tools.rawAST.RawAST;
+import wyvern.tools.rawAST.RawASTVisitor;
+import wyvern.tools.rawAST.StringLiteral;
+import wyvern.tools.rawAST.Symbol;
+import wyvern.tools.rawAST.Unit;
+import wyvern.tools.typedAST.Application;
+import wyvern.tools.typedAST.Assignment;
+import wyvern.tools.typedAST.Invocation;
+import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.extensions.Meth;
+import wyvern.tools.typedAST.extensions.Sequence;
 import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.Variable;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
@@ -68,23 +81,22 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		LineSequenceParser parser = first.getLineSequenceParser();
 		LineSequence rest = node.getRest();
 		
-		/*
-		// Alex's debugging stuff.
-		if (first instanceof Application) {
-			Application a = (Application) first;
-			System.out.println("App: " + a.toString() + " rest = " + rest + " parser = " + parser);
-		}
-		*/
-		
-		if (rest == null) // Only one statement in the block.
+		if (rest == null) // only one statement in the block.
 			return first;
 		
 		if (parser != null) {
 			// if First is a Statement, get the statement continuation parser and use it to parse the rest
 			return parser.parse(first, rest, env);
 		} else {
-			// otherwise, parse the rest and use a sequence
-			throw new RuntimeException("LineSequence: sequences not implemented - probably means more complex error");
+			Sequence s = new Sequence(first);
+			
+			while (rest.getRest() != null) {
+				first = rest.getFirst().accept(this, env);
+				s.append(first);
+				rest = rest.getRest();
+			}
+			
+			return s;
 		}
 	}
 

@@ -3,6 +3,7 @@ package wyvern.stdlib;
 import static wyvern.tools.types.TypeUtils.arrow;
 import static wyvern.tools.types.TypeUtils.integer;
 import static wyvern.tools.types.TypeUtils.unit;
+import static wyvern.tools.types.TypeUtils.str;
 import wyvern.tools.parsing.extensions.ClassParser;
 import wyvern.tools.parsing.extensions.FnParser;
 import wyvern.tools.parsing.extensions.MethParser;
@@ -20,6 +21,7 @@ import wyvern.tools.typedAST.extensions.Executor;
 import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.extensions.values.BooleanConstant;
 import wyvern.tools.typedAST.extensions.values.IntegerConstant;
+import wyvern.tools.typedAST.extensions.values.StringConstant;
 import wyvern.tools.typedAST.extensions.values.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.extensions.Bool;
@@ -44,7 +46,13 @@ public class Globals {
 		env = env.extend(new TypeBinding("Str", Str.getInstance()));
 		env = env.extend(new ValueBinding("true", new BooleanConstant(true)));
 		env = env.extend(new ValueBinding("false", new BooleanConstant(false)));
-		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(integer, unit), new Executor() {
+		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(str, unit), new Executor() {
+			@Override public Value execute(Value argument) {
+				System.out.println(((StringConstant)argument).getValue());
+				return UnitVal.getInstance();
+			}
+		})));
+		env = env.extend(new ValueBinding("printInteger", new ExternalFunction(arrow(integer, unit), new Executor() {
 			@Override public Value execute(Value argument) {
 				System.out.println(((IntegerConstant)argument).getValue());
 				return UnitVal.getInstance();
