@@ -1,7 +1,7 @@
 package wyvern.tools.parsing;
 
-import java.util.LinkedList;
-
+import static wyvern.tools.errors.ErrorMessage.UNEXPECTED_INPUT;
+import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -23,16 +23,11 @@ import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.extensions.Sequence;
 import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.Variable;
-import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
 import wyvern.tools.typedAST.extensions.values.IntegerConstant;
 import wyvern.tools.typedAST.extensions.values.StringConstant;
 import wyvern.tools.typedAST.extensions.values.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
-import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
-import static wyvern.tools.errors.ErrorMessage.UNEXPECTED_INPUT;
-import static wyvern.tools.errors.ToolError.reportError;
 
 // NB! See: http://en.cppreference.com/w/cpp/language/operator_precedence
 
@@ -67,8 +62,8 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return null;
 	}
 
-	/**
-	 * NB! Typically, this includes the root of the RawAST where the parsing of a file starts.
+	/*
+	 * This is a typical entry point to the file being parsed, as well as for parsing indented sub-blocks.
 	 */
 	@Override
 	public TypedAST visit(LineSequence node, Environment env) {
@@ -219,7 +214,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
-	private TypedAST parseAssignment(Pair<ExpressionSequence,Environment> ctx) {
+	private TypedAST parseEquals(Pair<ExpressionSequence,Environment> ctx) {
 		TypedAST ast = parseOr(ctx);
 		while (ctx.first != null && isEqualsOperator(ctx.first.getFirst())) {
 			ctx.first = ctx.first.getRest();
@@ -272,14 +267,6 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		return operatorName.equals("||");
 	}
 	
-	private boolean isAssignmentOperator(RawAST operatorNode) {
-		if (!(operatorNode instanceof Symbol))
-			return false;
-		String operatorName = ((Symbol) operatorNode).name;
-		
-		return operatorName.equals("=");
-	}
-	
 	private boolean isEqualsOperator(RawAST opNode) {
 		if (!(opNode instanceof Symbol))
 			return false;
@@ -290,7 +277,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
-		TypedAST result = parseAssignment(ctx); // Start trying with the lowest precedence operator.
+		TypedAST result = parseEquals(ctx); // Start trying with the lowest precedence operator.
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT, ctx.first);
 		return result;

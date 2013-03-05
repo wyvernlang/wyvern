@@ -1,7 +1,5 @@
 package wyvern.tools.parsing;
 
-import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DEFINED;
-import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -18,7 +16,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import java.util.List;
 
 public class ParseUtils {
 
