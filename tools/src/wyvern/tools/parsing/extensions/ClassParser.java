@@ -1,8 +1,5 @@
 package wyvern.tools.parsing.extensions;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.CoreParser;
@@ -10,23 +7,18 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
+import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.binding.NameBinding;
-import wyvern.tools.typedAST.binding.NameBindingImpl;
-import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ObjectType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import static wyvern.tools.parsing.ParseUtils.*;
 
 /**
  * 	class NAME
- * 		[implements Stack]
- *		[class implements StackFactory]
+ * 		[implements NAME]
+ *		[class implements NAME]
  * 		DELCARATION*
  */
 
@@ -42,7 +34,9 @@ public class ClassParser implements LineParser {
 			return MethParser.getInstance().parse(first, ctx, Unit.getInstance());
 		}
 		
-		String clsName = ParseUtils.parseSymbol(ctx).name;
+		Symbol s = ParseUtils.parseSymbol(ctx);
+		String clsName = s.name;
+		int clsNameLine = s.getLine();
 
 		TypedAST declAST = null;
 		String implementsName = "";
@@ -77,6 +71,6 @@ public class ClassParser implements LineParser {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		}
 
-		return new ClassDeclaration(clsName, implementsName, implementsClassName, (Declaration) declAST);
+		return new ClassDeclaration(clsName, implementsName, implementsClassName, (Declaration) declAST, clsNameLine);
 	}
 }

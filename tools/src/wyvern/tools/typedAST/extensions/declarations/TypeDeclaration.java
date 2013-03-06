@@ -10,24 +10,25 @@ import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ObjectType;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
 	private Declaration decls;
 	private NameBinding nameBinding;
-	//private TypeBinding typeBinding;
+	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
 	
-	public TypeDeclaration(String name, Declaration decls) {
+	public TypeDeclaration(String name, Declaration decls, int line) {
 		this.decls = decls;
-		//Type objectType = new ObjectType(this);
-		//Type classType = objectType; // TODO set this to a class type that has the class members
-		//typeBinding = new TypeBinding(name, objectType);
-		//nameBinding = new NameBindingImpl(name, classType);
-		this.nameBinding = new NameBindingImpl(name, Unit.getInstance());
+		Type objectType = new TypeType(this);
+		Type classType = objectType; // TODO set this to a class type that has the class members
+		typeBinding = new TypeBinding(name, objectType);
+		nameBinding = new NameBindingImpl(name, classType);
+		this.line = line;
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type getType() {
-		// TODO what should the type of a class declaration be?
+		// TODO what should the type of a type (in a sense of interface) declaration be?
 		return Unit.getInstance();
 	}
 
@@ -51,26 +52,25 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Type doTypecheck(Environment env) {
 		Declaration decl = decls;
 		
-		// TODO:
-		/*
 		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
+		Environment eenv = decls.extend(env);
 		while (decl != null) {
-			decl.typecheckSelf(env);
+			decl.typecheckSelf(eenv);
 			decl = decl.getNextDecl();
 		}
-		*/
+
 		return Unit.getInstance();
 	}	
 	
 	@Override
 	protected Environment doExtend(Environment old) {
-		Environment newEnv = old; // TODO: .extend(nameBinding).extend(typeBinding);
+		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		return newEnv;
 	}
 
 	@Override
 	protected Environment extendWithValue(Environment old) {
-		Environment newEnv = old; // TODO: .extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 		return newEnv;
 	}
 
@@ -117,8 +117,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

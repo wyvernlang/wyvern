@@ -17,7 +17,7 @@ import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.ObjectType;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {

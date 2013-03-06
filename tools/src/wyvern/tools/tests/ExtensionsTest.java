@@ -104,7 +104,7 @@ public class ExtensionsTest {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("LetExpr(Meth(), Application(Variable(\"m\"), IntegerConstant(5)))", typedAST.toString());		
+		Assert.assertEquals("LetExpr(MethDeclaration(), Application(Variable(\"m\"), IntegerConstant(5)))", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		

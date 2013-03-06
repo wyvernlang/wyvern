@@ -148,7 +148,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("LetExpr(Meth(), Application(Variable(\"double\"), IntegerConstant(5)))", typedAST.toString());
+		Assert.assertEquals("LetExpr(MethDeclaration(), Application(Variable(\"double\"), IntegerConstant(5)))", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -164,7 +164,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("LetExpr(Meth(), Application(Variable(\"mult\"), TupleObject(IntegerConstant(3), IntegerConstant(2))))", typedAST.toString());
+		Assert.assertEquals("LetExpr(MethDeclaration(), Application(Variable(\"mult\"), TupleObject(IntegerConstant(3), IntegerConstant(2))))", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -181,7 +181,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("LetExpr(Meth(), Application(Variable(\"doublePlusOne\"), IntegerConstant(5)))", typedAST.toString());
+		Assert.assertEquals("LetExpr(MethDeclaration(), Application(Variable(\"doublePlusOne\"), IntegerConstant(5)))", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -405,7 +405,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("Meth()", typedAST.toString());		
+		Assert.assertEquals("MethDeclaration()", typedAST.toString());		
 
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals("Unit -> null", resultType.toString());

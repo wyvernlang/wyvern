@@ -5,17 +5,16 @@ import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ObjectType extends AbstractTypeImpl implements OperatableType {
+public class ClassType extends AbstractTypeImpl implements OperatableType {
 	private ClassDeclaration decl;
 	
-	public ObjectType(ClassDeclaration decl) {
+	public ClassType(ClassDeclaration decl) {
 		this.decl = decl;
 	}
 	
@@ -26,7 +25,7 @@ public class ObjectType extends AbstractTypeImpl implements OperatableType {
 	
 	@Override
 	public String toString() {
-		return "ObjectType";
+		return "ClassType";
 	}
 
 	@Override
@@ -37,6 +36,7 @@ public class ObjectType extends AbstractTypeImpl implements OperatableType {
 		// the operation should exist
 		String opName = opExp.getOperationName();
 		Declaration m = decl.getDecl(opName);
+
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
 		
@@ -45,7 +45,7 @@ public class ObjectType extends AbstractTypeImpl implements OperatableType {
 	}
 
 	public ClassDeclaration getDecl() {
-		return decl;
+		return this.decl;
 	}
 
 }

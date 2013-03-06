@@ -7,6 +7,7 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
+import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
@@ -21,7 +22,9 @@ public class TypeParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
-		String clsName = ParseUtils.parseSymbol(ctx).name;
+		Symbol s = ParseUtils.parseSymbol(ctx);
+		String clsName = s.name;
+		int clsNameLine = s.getLine();
 
 		TypedAST declAST = null;
 		if (ctx.first == null) {
@@ -37,6 +40,6 @@ public class TypeParser implements LineParser {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		}
 
-		return new TypeDeclaration(clsName, (Declaration) declAST);
+		return new TypeDeclaration(clsName, (Declaration) declAST, clsNameLine);
 	}
 }

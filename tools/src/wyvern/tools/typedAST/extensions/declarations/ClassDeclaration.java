@@ -1,16 +1,10 @@
 package wyvern.tools.typedAST.extensions.declarations;
 
-import java.util.Map;
-
-import wyvern.tools.parsing.CoreParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.CachingTypedAST;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
-import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
@@ -19,7 +13,7 @@ import wyvern.tools.typedAST.extensions.values.ClassObject;
 import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ObjectType;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
@@ -28,14 +22,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
+	private String implementsName; // FIXME: Should be bindings with proper equals implementation?
+	private String implementsClassName;
+	
 	private Environment declEvalEnv;
 	
-	public ClassDeclaration(String name, String implementsName, String implementsClassName, Declaration decls) {
+	public ClassDeclaration(String name, String implementsName, String implementsClassName, Declaration decls, int line) {
 		this.decls = decls;
-		Type objectType = new ObjectType(this);
+		Type objectType = new ClassType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
 		typeBinding = new TypeBinding(name, objectType);
 		nameBinding = new NameBindingImpl(name, classType);
+		this.implementsName = implementsName;
+		this.implementsClassName = implementsClassName;
+		this.line = line;
 	}
 
 	@Override
@@ -60,12 +60,27 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Declaration decl = decls;
 		
 		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
-		decl = decls;
 		Environment eenv = decls.extend(env);
 		while (decl != null) {
 			decl.typecheckSelf(eenv);
 			decl = decl.getNextDecl();
 		}
+		
+		// check the implements and class implements
+		if (!this.implementsName.equals("")) {
+			NameBinding nameImplements = env.lookup(this.implementsName);
+			if (nameImplements == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsName, this);
+			}
+		}
+		
+		if (!this.implementsClassName.equals("")) {
+			NameBinding nameImplementsClass = env.lookup(this.implementsClassName);
+			if (nameImplementsClass == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsClassName, this);
+			}
+		}
+
 		return Unit.getInstance();
 	}	
 	
@@ -121,8 +136,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

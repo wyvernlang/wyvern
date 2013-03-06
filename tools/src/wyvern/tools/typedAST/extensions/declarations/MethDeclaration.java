@@ -72,7 +72,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		for (NameBinding bind : args) {
 			extEnv = extEnv.extend(bind);
 		}
-		body.typecheck(extEnv);
+		if (body != null) body.typecheck(extEnv); // Can be null for meth inside type!
 		return type;
 	}
 

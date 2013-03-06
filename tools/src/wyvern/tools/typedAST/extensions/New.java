@@ -17,7 +17,7 @@ import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.ObjectType;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
 
 public class New extends CachingTypedAST implements CoreAST {
@@ -25,9 +25,10 @@ public class New extends CachingTypedAST implements CoreAST {
 	Variable clsVar;
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 
-	public New(Variable clsVar, TypedAST args) {
+	public New(Variable clsVar, TypedAST args, int line) {
 		this.clsVar = clsVar;
 		// TODO: parse args
+		this.line = line;
 	}
 
 	@Override
@@ -38,13 +39,18 @@ public class New extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		// TODO check arg types
-		//Type argTypes = args.typecheck();
+		// Type argTypes = args.typecheck();
 		
 		Type classVarType = clsVar.typecheck(env);
-		if (!(classVarType instanceof ObjectType))
+		
+		if (!(classVarType instanceof ClassType)) {
+			// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 			ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, clsVar.toString(), clsVar);
+		}
+		
 		// TODO SMELL: do I really need to store this?  Can get it any time from the type
-		cls = ((ObjectType)classVarType).getDecl();
+		cls = ((ClassType) classVarType).getDecl();
+		
 		return classVarType;
 	}
 
@@ -68,8 +74,8 @@ public class New extends CachingTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

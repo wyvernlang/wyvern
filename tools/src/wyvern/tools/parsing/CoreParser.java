@@ -50,10 +50,11 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	public TypedAST visit(Symbol node, Environment env) {
 		NameBinding binding = env.lookup(node.name);
 		if (binding == null)
-			return new Variable(new NameBindingImpl(node.name, null));
+			return new Variable(new NameBindingImpl(node.name, null), node.getLine());
 			//reportError(VARIABLE_NOT_DECLARED, node.name, node);
-			
+		
 		return binding.getUse();
+		// return new Variable(binding, node.getLine());
 	}
 
 	@Override

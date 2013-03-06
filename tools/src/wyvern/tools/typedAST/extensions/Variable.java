@@ -19,8 +19,9 @@ import wyvern.tools.util.TreeWriter;
 public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	private NameBinding binding;
 	
-	public Variable(NameBinding binding) {
+	public Variable(NameBinding binding, int line) {
 		this.binding = binding;
+		this.line = line;
 	}
 
 	public String getName() {
@@ -80,8 +81,8 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 		return newValue;
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

@@ -48,6 +48,6 @@ public class NewParser implements LineParser {
 			}
 		}
 		
-		return new New(classExpr, args);
+		return new New(classExpr, args, classExpr.getLine());
 	}
 }

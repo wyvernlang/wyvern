@@ -35,11 +35,11 @@ public class Phase1Parser {
 		}
 		
 		if (token.kind == Identifier) {
-			return new Symbol(token.text);
+			return new Symbol(token.text, token.getLine());
 		}
 		
 		if (token.kind == Symbol) {
-			return new Symbol(token.text);
+			return new Symbol(token.text, token.getLine());
 		}
 		
 		if (token.kind == Number) {

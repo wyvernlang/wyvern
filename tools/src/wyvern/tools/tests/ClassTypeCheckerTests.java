@@ -51,8 +51,13 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
 
-		Type resultType = typedAST.typecheck(env);
-		Assert.assertEquals(Unit.getInstance(), resultType);
+		// FIXME: Type checking Declarations is different!!!
+		if (typedAST instanceof Declaration) {
+			((Declaration) typedAST).typecheckAll(env);
+		} else {
+			Type resultType = typedAST.typecheck(env);
+			Assert.assertEquals(Unit.getInstance(), resultType);
+		}
 		
 		//Value resultValue = typedAST.evaluate(env);
 		//Assert.assertEquals("()", resultValue.toString());

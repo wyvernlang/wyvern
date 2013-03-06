@@ -46,7 +46,13 @@ class Link
 	val data : Int
 	val next : Link?
 
-	class meth Link(d:Int, n:Link?) = new Link(data=d, next=n)
+/* The following is a question of whether Link class method and Link class when used by new should conflict or not? */
+/*
+	class meth Link(d:Int, n:Link?)
+		new Link
+			data=d
+			next=n
+*/
 
 
 meth stackClient()
