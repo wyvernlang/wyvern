@@ -25,9 +25,9 @@ class StackImpl
 
 	var list : Link?
 
-	meth top() = list.data
+	meth top() : Int? = list.data
 
-	meth push(element)
+	meth push(element : Int)
 		list = Link(element, list)
 
 	meth pop()
@@ -35,9 +35,9 @@ class StackImpl
 		list = list.next
 		result
 
-	class meth Stack() = new StackImpl
+	class meth Stack() : Stack = new StackImpl
 	
-	class meth StackWithFirst(firstElement)
+	class meth StackWithFirst(firstElement : Int) : Stack
 		new StackImpl
 			list = Link(firstElement, null)
 

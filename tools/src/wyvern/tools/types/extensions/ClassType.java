@@ -2,9 +2,13 @@ package wyvern.tools.types.extensions;
 
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
+
+import java.util.HashSet;
+
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
@@ -48,4 +52,27 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		return this.decl;
 	}
 
+	// FIXME: This is super simplification to get the ball rolling by Alex. :-)
+	public boolean subtypeOf(TypeType tt) {
+		ClassDeclaration thisD = this.decl;
+		TypeDeclaration typeD = tt.getDecl();
+		
+		HashSet<String> thisDtypes = new HashSet<String>();
+		for (Declaration d = thisD.getDecls(); d != null; d = d.getNextDecl()) {
+			// System.out.println(d.getName() + " of type " + d.getType());
+			thisDtypes.add(d.getType().toString());
+		}
+		
+		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
+		
+		HashSet<String> implDtypes = new HashSet<String>();
+		for (Declaration d = typeD.getDecls(); d != null; d = d.getNextDecl()) {
+			// System.out.println(d.getName() + " of type " + d.getType());
+			implDtypes.add(d.getType().toString());
+		}
+		
+		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
+		
+		return thisDtypes.containsAll(implDtypes);
+	}
 }

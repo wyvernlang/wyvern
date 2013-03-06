@@ -80,7 +80,7 @@ public class MethParser implements LineParser {
 			exp = ParseUtils.parseExpr(ctx);					
 		} else {
 			// Multiple line body then! FIXME: This is not working properly!
-			// System.out.println("Multiline: " + methName + " and ctx = " + ctx);
+			// System.out.println("Multiline: " + methName + " and returntype is " + returnType + " and ctx = " + ctx.first);
 			exp = ParseUtils.parseExpr(ctx);					
 		}
 

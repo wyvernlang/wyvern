@@ -11,6 +11,7 @@ public enum ErrorMessage {
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),
 	OPERATOR_DOES_NOT_APPLY2("Operator %ARG cannot be applied to types %ARG and %ARG", 3),
 	MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
+	NOT_SUBTYPE("%ARG is not a subtype of %ARG", 2),
 	
 	// Syntax errors
 	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),

@@ -31,7 +31,7 @@ public class ClassParser implements LineParser {
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
 		if (ParseUtils.checkFirst("meth", ctx)) { // Parses "class meth".
 			ParseUtils.parseSymbol(ctx);
-			return MethParser.getInstance().parse(first, ctx, Unit.getInstance());
+			return MethParser.getInstance().parse(first, ctx, null);
 		}
 		
 		Symbol s = ParseUtils.parseSymbol(ctx);

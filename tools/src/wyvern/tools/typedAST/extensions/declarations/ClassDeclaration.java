@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
@@ -72,12 +73,35 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			if (nameImplements == null) {
 				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsName, this);
 			}
+			
+			// since there is a valid implements, check that all methods are indeed present
+			ClassType currentCT = (ClassType) this.nameBinding.getType();
+			TypeType implementsTT = (TypeType) nameImplements.getType();
+			
+			if (!currentCT.subtypeOf(implementsTT)) {
+				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
+						this.nameBinding.getName(),
+						nameImplements.getName(),
+						this); 
+			}
 		}
 		
 		if (!this.implementsClassName.equals("")) {
 			NameBinding nameImplementsClass = env.lookup(this.implementsClassName);
 			if (nameImplementsClass == null) {
 				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsClassName, this);
+			}
+
+			// since there is a valid class implements, check that all methods are indeed present
+			ClassType currentCT = (ClassType) this.nameBinding.getType();
+			TypeType implementsCT = (TypeType) nameImplementsClass.getType();
+			
+			// FIXME: Should check only class methods but they are not identifiable now! :-?
+			if (!currentCT.subtypeOf(implementsCT)) {
+				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
+						this.nameBinding.getName(),
+						nameImplementsClass.getName(),
+						this); 
 			}
 		}
 
