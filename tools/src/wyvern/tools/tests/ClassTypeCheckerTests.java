@@ -329,7 +329,6 @@ public class ClassTypeCheckerTests {
 				);
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new StackImpl $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
-//		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new StackImpl $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();

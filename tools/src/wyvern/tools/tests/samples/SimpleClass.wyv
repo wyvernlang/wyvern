@@ -15,7 +15,7 @@ type StackFactory
 	meth StackWithFirst(firstElement : Int) : Stack
 
 type ListUtilities
-	meth map(f : Int -&gt; Int, l : IntList) : IntList
+	meth map(f : Int -> Int, l : IntList) : IntList
 
 
 /** Private Implementation **/
@@ -58,6 +58,6 @@ class Link
 meth stackClient()
 	val s = StackImpl.Stack()
 	s.push(5)
-	printInteger(s.top)
+//	printInteger(s.top)
 //	val addOne = fn x:Int => x+1
 //	printInteger(addOne(s.pop()))

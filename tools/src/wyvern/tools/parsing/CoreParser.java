@@ -86,7 +86,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		} else {
 			Sequence s = new Sequence(first);
 			
-			while (rest.getRest() != null) {
+			while (rest != null) {
 				first = rest.getFirst().accept(this, env);
 				s.append(first);
 				rest = rest.getRest();

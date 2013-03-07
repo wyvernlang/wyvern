@@ -1,7 +1,7 @@
 /** Wyvern example: a Stack **/
 
 interface Stack
-	//type T
+	type T
 	prop top : Int?
 	meth push(element : Int)
 	meth pop() : Int?
@@ -20,6 +20,6 @@ class StackImpl implements Stack
 		result
 		
 class Link
-	//type T
+	type T
 	val data : Int
 	val next : Link?
