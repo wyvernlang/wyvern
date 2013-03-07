@@ -16,6 +16,7 @@ public enum ErrorMessage {
 	// Syntax errors
 	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),
 	UNEXPECTED_INPUT("Unexpected input", 0),
+	UNEXPECTED_INPUT_WITH_ARGS("Unexpected input: %ARG", 1),
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),

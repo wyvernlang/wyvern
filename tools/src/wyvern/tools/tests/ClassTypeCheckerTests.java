@@ -300,4 +300,52 @@ public class ClassTypeCheckerTests {
 		}
 		Assert.fail("Expected Wyvern compiler to detect error!");
 	}
+	
+	@Test
+	public void testFunctionApplicationTypeCheck() {
+		Reader reader = new StringReader("\n"
+				+"type Stack\n"
+				+"    prop top : Int?\n"
+				+"    meth push(element : Int)\n"
+				+"    meth pop() : Int?\n"
+				+"\n"
+				+"class StackImpl\n"
+				+"    implements Stack\n"
+				+"\n"
+				+"    class meth Stack() : Stack = new StackImpl\n"
+				+"\n"
+				+"    var top : Int?\n"
+				+"\n"
+				+"    meth push(element : Int)\n"
+				+"        top = element\n"
+				+"\n"
+				+"    meth pop() : Int?\n"
+				+"        top\n"
+				+"\n"
+				+"meth doIt()\n"
+				+"    val s = StackImpl.Stack()\n"
+//				+"    s.push(42)\n"
+				+"    s.push(\"wrong type\")\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse(reader);
+//		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new StackImpl $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new StackImpl $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
+				parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+
+		// FIXME: Type checking Declarations is different!!!
+		if (typedAST instanceof Declaration) {
+			try {
+				((Declaration) typedAST).typecheckAll(env);
+			} catch (ToolError e) {
+				Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument to function does not match function type on line number -1", e.toString());
+				return;
+			}
+		}
+		Assert.fail("Expected Wyvern compiler to detect error!");
+	}
 }

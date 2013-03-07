@@ -1,4 +1,4 @@
-package wyvern.tools.util;
+package wyvern.tools.errors;
 
 public final class FileLocation {
 	public final String filename;

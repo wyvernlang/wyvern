@@ -1,6 +1,6 @@
 package wyvern.tools.parsing;
 
-import static wyvern.tools.errors.ErrorMessage.UNEXPECTED_INPUT;
+import static wyvern.tools.errors.ErrorMessage.UNEXPECTED_INPUT_WITH_ARGS;
 import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
@@ -280,7 +280,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
 		TypedAST result = parseEquals(ctx); // Start trying with the lowest precedence operator.
 		if (ctx.first != null)
-			reportError(UNEXPECTED_INPUT, ctx.first);
+			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.first.getFirst()!=null)?ctx.first.getFirst().toString():null, ctx.first);
 		return result;
 	}
 
