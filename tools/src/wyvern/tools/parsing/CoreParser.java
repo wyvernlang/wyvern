@@ -125,7 +125,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 			first = new TupleObject(first, remaining);
 		}
 		
-		if (rest == null || parser == null)
+		if (parser == null)
 			return first;
 		
 		// if first is a special form, get the expression continuation parser and use it to parse the rest
