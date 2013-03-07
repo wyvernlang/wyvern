@@ -26,14 +26,15 @@ public class Sequence implements CoreAST {
 	
 	@Override
 	public Type getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // FIXME:
 	}
 
 	@Override
 	public Type typecheck(Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+		for (TypedAST t : exps) {
+			t.typecheck(env);
+		}
+		return null; // FIXME:
 	}
 
 	@Override
@@ -57,13 +58,12 @@ public class Sequence implements CoreAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// TODO Auto-generated method stub
-		
 	}
 
+	private int line = -1;
 	@Override
 	public int getLine() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.line;
 	}
 
 	@Override
