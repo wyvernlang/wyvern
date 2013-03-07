@@ -1,25 +1,25 @@
 /** Wyvern example: a Stack **/
 
 interface Stack
-	type T
-	prop top : T?
-	def push(T)
-	def pop() : T?
+	//type T
+	prop top : Int?
+	meth push(element : Int)
+	meth pop() : Int?
 	
 class StackImpl implements Stack
-	var list : T Link?
+	var list : Link?
 	
-	def top = list.data
+	meth top = list.?data
 	
-	def push(x)
-		list = Link(x, link)
+	meth push(element)
+		list = Link(element, link)
 	
-	def pop()
+	meth pop()
 		val result = list.data
 		list = list.next
 		result
 		
 class Link
-	type T
-	val data : T
-	val next : T Link?
+	//type T
+	val data : Int
+	val next : Link?
