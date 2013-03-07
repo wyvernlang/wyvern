@@ -2,24 +2,24 @@
 
 interface Stack
 	type T
-	prop top : Int?
-	meth push(element : Int)
-	meth pop() : Int?
+	prop top : T?
+	def push(T)
+	def pop() : T?
 	
 class StackImpl implements Stack
-	var list : Link?
+	var list : T Link?
 	
-	meth top = list.?data
+	def top = list.data
 	
-	meth push(element)
-		list = Link(element, link)
+	def push(x)
+		list = Link(x, link)
 	
-	meth pop()
+	def pop()
 		val result = list.data
 		list = list.next
 		result
 		
 class Link
 	type T
-	val data : Int
-	val next : Link?
+	val data : T
+	val next : T Link?
