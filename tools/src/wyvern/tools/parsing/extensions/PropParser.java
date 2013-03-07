@@ -7,26 +7,23 @@ import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.extensions.TypeInstance;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 
-public class ValParser implements LineParser {
-	private ValParser() { }
-	private static ValParser instance = new ValParser();
-	public static ValParser getInstance() { return instance; }
+public class PropParser implements LineParser {
+	private PropParser() { }
+	private static PropParser instance = new PropParser();
+	public static PropParser getInstance() { return instance; }
 	
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
 		
-		if (ParseUtils.checkFirst("=", ctx)) {
-			parseSymbol("=", ctx);
-			TypedAST exp = ParseUtils.parseExpr(ctx);
-			return new ValDeclaration(varName, exp);		
-		} else if (ParseUtils.checkFirst(":", ctx)) {
+		if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
 			String typeName = ParseUtils.parseSymbol(ctx).name;
 			if (ParseUtils.checkFirst("?", ctx)) {
@@ -34,9 +31,9 @@ public class ValParser implements LineParser {
 				ParseUtils.parseSymbol("?", ctx); 
 			}
 			TypeBinding tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
-			return new ValDeclaration(varName, new TypeInstance(tb));
+			return new PropDeclaration(varName, tb.getType()); // FIXME: Wrong. :)
 		} else {
-			throw new RuntimeException("Error parsing val expression, either : or = expected.");
+			throw new RuntimeException("Error parsing prop expression : expected.");
 		}
 	}
 }

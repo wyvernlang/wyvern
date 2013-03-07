@@ -6,13 +6,13 @@ import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 // TODO SMELL: probably should have Declarations not be in an "evaluate" part of the AST
 public abstract class Declaration extends AbstractTypedAST {
 	protected Declaration nextDecl = null;
 
-	/** Most declarations simply evaluate to unit without any computation
+	/** 
+	 * Most declarations simply evaluate to unit without any computation
 	 */
 	@Override
 	public final Value evaluate(Environment env) {

@@ -10,7 +10,7 @@ import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.extensions.IntegerConstant;
+import wyvern.tools.typedAST.extensions.values.IntegerConstant;
 import wyvern.tools.types.Environment;
 
 public class Interpreter {

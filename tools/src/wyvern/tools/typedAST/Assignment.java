@@ -32,13 +32,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		Type fnType = target.typecheck(env);
-		if (!(fnType instanceof AssignableType))
-			reportError(TYPE_CANNOT_BE_ASSIGNED, fnType.toString(), this);
-		Type assignmentType = ((AssignableType)fnType).checkAssignment(this, env);
-		
 		if (nextExpr == null)
-			return assignmentType;
+			return target.typecheck(env);
 		else
 			return nextExpr.typecheck(env);
 	}
@@ -53,11 +48,9 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) {
-		TypedAST lhs = target.evaluate(env);
-		if (!(lhs instanceof AssignableValue))
-			reportEvalError(VALUE_CANNOT_BE_APPLIED, lhs.toString(), this);
-		AssignableValue fnValue = (AssignableValue) lhs;
-		Value evaluated = ((AssignableValue) lhs).evaluateAssignment(this, env);
+		if (!(target instanceof Assignable))
+			reportEvalError(VALUE_CANNOT_BE_APPLIED, target.toString(), this);
+		Value evaluated = ((Assignable) target).evaluateAssignment(this, env);
 		if (nextExpr == null)
 			return evaluated;
 		else
@@ -80,5 +73,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 				return Assignment.this;
 			}
 		};
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

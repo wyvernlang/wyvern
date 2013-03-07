@@ -8,5 +8,4 @@ public interface LineSequenceParser {
 
 	// POSTCONDITION: has parsed everything in rest
 	TypedAST parse(TypedAST first, LineSequence rest, Environment env);
-
 }

@@ -3,8 +3,9 @@ package wyvern.tools.rawAST;
 public class Symbol implements RawAST {
 	public final String name;
 	
-	public Symbol(String s) {
+	public Symbol(String s, int line) {
 		name = s.intern();
+		this.line = line;
 	}
 	
 	@Override
@@ -28,5 +29,10 @@ public class Symbol implements RawAST {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	private int line;
+	public int getLine() {
+		return this.line;
 	}
 }

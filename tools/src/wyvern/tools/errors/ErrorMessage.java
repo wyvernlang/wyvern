@@ -11,12 +11,16 @@ public enum ErrorMessage {
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),
 	OPERATOR_DOES_NOT_APPLY2("Operator %ARG cannot be applied to types %ARG and %ARG", 3),
 	MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
+	NOT_SUBTYPE("%ARG is not a subtype of %ARG", 2),
 	
 	// Syntax errors
+	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),
 	UNEXPECTED_INPUT("Unexpected input", 0),
+	UNEXPECTED_INPUT_WITH_ARGS("Unexpected input: %ARG", 1),
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),
+	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

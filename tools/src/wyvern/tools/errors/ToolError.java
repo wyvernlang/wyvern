@@ -10,7 +10,7 @@ public class ToolError extends RuntimeException {
 		throw new ToolError(message, arg1, errorLocation);
 	}
 
-	// may want to distinguish evaluation errors from typechecking errors at some point
+	// may want to distinguish evaluation errors from type checking errors at some point
 	public static void reportEvalError(ErrorMessage message, String arg1, HasLocation errorLocation) {
 		reportError(message, arg1, errorLocation);
 	}
@@ -24,7 +24,8 @@ public class ToolError extends RuntimeException {
 	}
 
 	protected ToolError(ErrorMessage message, HasLocation errorLocation) {
-		super(message.getErrorMessage());
+		super(message.getErrorMessage() + " on line number " +
+				((errorLocation != null)?errorLocation.getLine():"NULL"));
 		assert message.numberOfArguments() == 0;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;
@@ -32,7 +33,8 @@ public class ToolError extends RuntimeException {
 	}
 
 	protected ToolError(ErrorMessage message, String arg1, HasLocation errorLocation) {
-		super(message.getErrorMessage(arg1));
+		super(message.getErrorMessage(arg1) + " on line number " +
+				((errorLocation != null)?errorLocation.getLine():"NULL"));
 		assert message.numberOfArguments() == 1;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;
@@ -40,7 +42,8 @@ public class ToolError extends RuntimeException {
 	}
 
 	protected ToolError(ErrorMessage message, String arg1, String arg2, HasLocation errorLocation) {
-		super(message.getErrorMessage(arg1, arg2));
+		super(message.getErrorMessage(arg1, arg2) + " on line number " +
+				((errorLocation != null)?errorLocation.getLine():"NULL"));
 		assert message.numberOfArguments() == 2;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;
@@ -48,7 +51,8 @@ public class ToolError extends RuntimeException {
 	}
 
 	protected ToolError(ErrorMessage message, String arg1, String arg2, String arg3, HasLocation errorLocation) {
-		super(message.getErrorMessage(arg1, arg2, arg3));
+		super(message.getErrorMessage(arg1, arg2, arg3) + " on line number " +
+				((errorLocation != null)?errorLocation.getLine():"NULL"));
 		assert message.numberOfArguments() == 3;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;

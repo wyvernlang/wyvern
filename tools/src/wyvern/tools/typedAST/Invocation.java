@@ -5,13 +5,14 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.typedAST.extensions.UnitVal;
+import wyvern.tools.typedAST.extensions.values.UnitVal;
+import wyvern.tools.typedAST.extensions.values.VarValue;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class Invocation extends CachingTypedAST implements CoreAST {
+public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private String operationName;
 	private TypedAST receiver;
 	private TypedAST argument;
@@ -58,7 +59,12 @@ public class Invocation extends CachingTypedAST implements CoreAST {
 		if (!(lhs instanceof InvokableValue))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		InvokableValue receiverValue = (InvokableValue) lhs;
-		return receiverValue.evaluateInvocation(this, env);
+		Value out = receiverValue.evaluateInvocation(this, env);
+		
+		//TODO: bit of a hack
+		if (out instanceof VarValue)
+			out = ((VarValue)out).getValue();
+		return out;
 	}
 
 	@Override
@@ -66,4 +72,17 @@ public class Invocation extends CachingTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
+	@Override
+	public Value evaluateAssignment(Assignment ass, Environment env) {
+		Value lhs = receiver.evaluate(env);
+		if (!(lhs instanceof Assignable))
+			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
+		
+		return ((Assignable)lhs).evaluateAssignment(ass, env);
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

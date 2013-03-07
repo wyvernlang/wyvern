@@ -1,7 +1,7 @@
 package wyvern.tools.parsing;
 
-import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DEFINED;
-import static wyvern.tools.errors.ToolError.reportError;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Parenthesis;
@@ -9,14 +9,13 @@ import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.TypeBinding;
-import wyvern.tools.typedAST.extensions.UnitVal;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.values.UnitVal;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import java.util.List;
 
 public class ParseUtils {
 
@@ -33,51 +32,60 @@ public class ParseUtils {
 	}
 
 	public static Symbol parseSymbol(Pair<ExpressionSequence, Environment> ctx) {
-		if (ctx.first == null)
-			throw new RuntimeException("parse error");
+		if (ctx.first == null) {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+		}
 			
 		RawAST first = ctx.first.getFirst();
 		ExpressionSequence rest = ctx.first.getRest();
 		ctx.first = rest;
-		if (first instanceof Symbol)
+		if (first instanceof Symbol) {
 			return (Symbol) first;
-		else
-			throw new RuntimeException("parse error");
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null; // Unreachable.
+		}
 	}
 
 	public static Parenthesis extractParen(Pair<ExpressionSequence, Environment> ctx) {
 		if (ctx.first == null)
-			throw new RuntimeException("parse error");
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			
 		RawAST first = ctx.first.getFirst();
 		ExpressionSequence rest = ctx.first.getRest();
 		ctx.first = rest;
-		if (first instanceof Parenthesis)
+		if (first instanceof Parenthesis) {
 			return (Parenthesis) first;
-		else
-			throw new RuntimeException("parse error");
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null; // Unreachable.
+		}
 	}
 
 	public static LineSequence extractLines(Pair<ExpressionSequence, Environment> ctx) {
 		if (ctx.first == null)
-			throw new RuntimeException("parse error");
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			
 		RawAST first = ctx.first.getFirst();
 		ExpressionSequence rest = ctx.first.getRest();
 		ctx.first = rest;
-		if (first instanceof LineSequence)
+		if (first instanceof LineSequence) {
 			return (LineSequence) first;
-		else
-			throw new RuntimeException("parse error");
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null; // Unreachable.
+		}
 	}
 
 	public static Symbol parseSymbol(String string,
 			Pair<ExpressionSequence, Environment> ctx) {
 		Symbol symbol = parseSymbol(ctx);
-		if (symbol.name.equals(string))
+		if (symbol.name.equals(string)) {
 			return symbol;
-		else
-			throw new RuntimeException("parse error");				
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null; // Unreachable.
+		}
 	}
 
 	public static Type parseType(Pair<ExpressionSequence, Environment> ctx) {
@@ -102,7 +110,7 @@ public class ParseUtils {
 
 	public static Type parseSimpleType(Pair<ExpressionSequence, Environment> ctx) {
 		if (ctx.first == null)
-			throw new RuntimeException("parse error");
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			
 		RawAST first = ctx.first.getFirst();
 		ExpressionSequence rest = ctx.first.getRest();
@@ -123,10 +131,12 @@ public class ParseUtils {
 			}
 			
 			return typeBinding.getUse();			
-		} else if (first instanceof Parenthesis)
+		} else if (first instanceof Parenthesis) {
 			return parseType(new Pair<ExpressionSequence, Environment>((Parenthesis)first, ctx.second));
-		else
-			throw new RuntimeException("parse error");
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null; // Unreachable.
+		}
 	}
 
 	public static TypedAST parseExpr(Pair<ExpressionSequence, Environment> ctx) {
@@ -139,13 +149,13 @@ public class ParseUtils {
 		Symbol sym = parseSymbol(ctx);
 		TypedAST var = sym.accept(CoreParser.getInstance(), ctx.second);
 		if (!(var instanceof Variable))
-			throw new RuntimeException("parse error");
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		return (Variable) var;
 	}
 
 	public static TypedAST parseExprList(Pair<ExpressionSequence, Environment> ctx) {
 		if (ctx.first == null)
-			throw new RuntimeException("parse error");
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		
 		RawAST first = ctx.first.getFirst();
 		ExpressionSequence rest = ctx.first.getRest();
@@ -153,12 +163,14 @@ public class ParseUtils {
 		if (first instanceof Parenthesis) {
 			Parenthesis parens = (Parenthesis) first;
 			if (parens.getFirst() != null)
-				throw new RuntimeException("parse error");
+				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			// TODO: parse more than unit vals
 			// maybe with parens.accept(CoreParser)?
 			return UnitVal.getInstance();
-		} else
-			throw new RuntimeException("parse error");
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null; // Unreachable.
+		}
 	}
 
 }

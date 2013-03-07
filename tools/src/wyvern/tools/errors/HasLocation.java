@@ -6,5 +6,9 @@ package wyvern.tools.errors;
  * here as a placeholder.
  */
 public interface HasLocation {
-
+	public int getLine();
+	
+	public static HasLocation UNKNOWN = new HasLocation() {
+		public int getLine() { return -1; }
+	};
 }

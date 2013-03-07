@@ -1,5 +1,9 @@
 package wyvern.tools.lexer;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
+
 public class InitialState implements LexerState {
 	
 	private InitialState() {}
@@ -48,7 +52,8 @@ public class InitialState implements LexerState {
 			lexer.currentState = NumberState.getInstance();
 			return getNextToken(lexer);
 		}
-		//Read strings
+		
+		// read strings
 		if (ch == '"') {
 			lexer.read();
 			lexer.currentState = StringState.getInstance();
@@ -62,14 +67,15 @@ public class InitialState implements LexerState {
 		}
 		
 		// else error
-		throw new LexerException();
+		ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
+		return null; // Unreachable.
 	}
 	
 	private Token getNextToken(Lexer lexer) {
 		Token token = null;
 		String start = startOfLine.toString();
 					
-		//Doesen't work hugely well with changing amounts of spacing.
+		// Doesn't work hugely well with changing amounts of spacing.
 		if (start.equals(lexer.getCurrentPrefix())) {
 			token = Token.getNEWLINE();
 		} else if (start.startsWith(lexer.getCurrentPrefix())) {
@@ -82,7 +88,8 @@ public class InitialState implements LexerState {
 				lexer.currentState = InitialState.getInstance();
 			token = Token.getDEDENT();
 		} else {
-			throw new LexerException();				
+			// This is commonly caused by inconsistent indentation (i.e. tabs vs spaces)! I suggest use tabs everywhere.
+			ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
 		}
 		
 		resetBuffer();

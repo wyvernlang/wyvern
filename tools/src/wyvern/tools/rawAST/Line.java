@@ -3,8 +3,9 @@ package wyvern.tools.rawAST;
 import java.util.List;
 
 public class Line extends ExpressionSequence {
-	public Line(List<RawAST> children) {
+	public Line(List<RawAST> children, int line) {
 		super(children);
+		this.line = line;
 	}
 	
 	@Override
@@ -27,6 +28,11 @@ public class Line extends ExpressionSequence {
 		if (children.size() == 1)
 			return null;
 		else
-			return new Line(children.subList(1, children.size()));
+			return new Line(children.subList(1, children.size()), this.line);
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

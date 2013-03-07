@@ -12,7 +12,8 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 	}
 
 	public TypedAST getUse() {
-		return new Variable(this);
+		// throw new RuntimeException("this method should not be needed!!!");
+		return new Variable(this, -11); // FIXME: !!! Cannot replicate its use from outside!
 	}
 	
 	public Value getValue(Environment env) {

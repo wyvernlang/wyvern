@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.declarations;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.Closure;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
@@ -25,13 +26,13 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
-public class Meth extends Declaration implements CoreAST, BoundCode {
+public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	private TypedAST body;
 	private NameBinding binding;
 	private Type type;
 	private List<NameBinding> args;
 	
-	public Meth(String name, List<NameBinding> args, Type returnType, TypedAST body) {
+	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body) {
 		Type argType = null;
 		if (args.size() == 0)
 			argType = Unit.getInstance();
@@ -71,7 +72,7 @@ public class Meth extends Declaration implements CoreAST, BoundCode {
 		for (NameBinding bind : args) {
 			extEnv = extEnv.extend(bind);
 		}
-		body.typecheck(extEnv);
+		if (body != null) body.typecheck(extEnv); // Can be null for meth inside type!
 		return type;
 	}
 
@@ -102,5 +103,10 @@ public class Meth extends Declaration implements CoreAST, BoundCode {
 		Closure closure = new Closure(this, evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(closure);
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

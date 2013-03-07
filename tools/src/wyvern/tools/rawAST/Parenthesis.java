@@ -29,4 +29,8 @@ public class Parenthesis extends ExpressionSequence {
 		else
 			return new Parenthesis(children.subList(1, children.size()));
 	}
+
+	public int getLine() {
+		return -1; // TODO: NOT IMPLEMENTED YET.
+	}
 }

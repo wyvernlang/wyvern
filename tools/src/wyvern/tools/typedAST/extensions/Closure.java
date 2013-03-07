@@ -12,6 +12,7 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.values.TupleValue;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -51,4 +52,8 @@ public class Closure extends AbstractValue implements ApplyableValue {
 		return function.getBody().evaluate(bodyEnv);
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

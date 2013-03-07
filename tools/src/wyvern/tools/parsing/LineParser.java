@@ -6,7 +6,5 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 
 public interface LineParser {
-
 	TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx);
-
 }

@@ -69,4 +69,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 		visitor.visit(this);
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

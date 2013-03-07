@@ -41,8 +41,6 @@ public class CommentState implements LexerState {
 				//Requests the parser to get the next token
 				return lexer.getToken();
 			} else if (type == CommentType.BlockComment) {
-				if (current == '\n')
-					lexer.incrementLine();
 				//If the * of the */ has been seen and the current char is a /
 				if (blockStar && current == '/') {
 					//If the previous state is defined, transition back to that

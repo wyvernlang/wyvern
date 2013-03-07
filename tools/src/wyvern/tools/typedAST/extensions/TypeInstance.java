@@ -59,4 +59,8 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

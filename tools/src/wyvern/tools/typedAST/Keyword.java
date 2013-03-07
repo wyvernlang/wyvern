@@ -34,4 +34,8 @@ public class Keyword extends AbstractValue implements Value, CoreAST {
 		throw new RuntimeException();
 	}
 
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

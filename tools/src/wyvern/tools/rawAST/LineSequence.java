@@ -34,4 +34,9 @@ public class LineSequence extends Sequence {
 		else
 			return new LineSequence(children.subList(1, children.size()));
 	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
 }

@@ -1,7 +1,9 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.declarations;
 
-import wyvern.tools.typedAST.AssignableValue;
-import wyvern.tools.typedAST.Assignment;
+import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.LineSequenceParser;
+import wyvern.tools.rawAST.LineSequence;
+import wyvern.tools.typedAST.CachingTypedAST;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
@@ -12,15 +14,21 @@ import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-public class VarDeclaration extends Declaration implements CoreAST, AssignableValue {
+public class ValDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
+	Type definitionType;
 	NameBinding binding;
 	
-	public VarDeclaration(String name, TypedAST definition, Environment env) {
+	public ValDeclaration(String name, TypedAST definition) {
 		this.definition=definition;
-		binding = new NameBindingImpl(name, definition.typecheck(env));
+		binding = new NameBindingImpl(name, null);
+	}
+	
+	public ValDeclaration(String name, Type type) {
+		binding = new NameBindingImpl(name, type);
 	}
 
 	@Override
@@ -30,6 +38,10 @@ public class VarDeclaration extends Declaration implements CoreAST, AssignableVa
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (binding.getType() == null) {
+			this.definitionType = this.definition.typecheck(env);
+			this.binding = new NameBindingImpl(binding.getName(), definitionType);
+		}
 		return binding.getType();
 	}
 
@@ -75,9 +87,8 @@ public class VarDeclaration extends Declaration implements CoreAST, AssignableVa
 		vb.setValue(defValue);
 	}
 
-	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

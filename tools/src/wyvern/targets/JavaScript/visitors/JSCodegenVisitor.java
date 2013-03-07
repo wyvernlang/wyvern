@@ -11,22 +11,22 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.binding.NameBinding;
-import wyvern.tools.typedAST.extensions.BooleanConstant;
-import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
-import wyvern.tools.typedAST.extensions.IntegerConstant;
-import wyvern.tools.typedAST.extensions.InterfaceDeclaration;
 import wyvern.tools.typedAST.extensions.LetExpr;
-import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
-import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.TypeInstance;
-import wyvern.tools.typedAST.extensions.UnitVal;
-import wyvern.tools.typedAST.extensions.ValDeclaration;
-import wyvern.tools.typedAST.extensions.TypeDeclaration;
-import wyvern.tools.typedAST.extensions.VarDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
+import wyvern.tools.typedAST.extensions.values.BooleanConstant;
+import wyvern.tools.typedAST.extensions.values.IntegerConstant;
+import wyvern.tools.typedAST.extensions.values.StringConstant;
+import wyvern.tools.typedAST.extensions.values.UnitVal;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
@@ -150,13 +150,6 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		elemStack.push(new ASTElement(valDeclaration, 
 				((inClass)?"this.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
 	}
-	
-	@Override
-	public void visit(TypeDeclaration typeDeclaration) {
-		super.visit(typeDeclaration);
-		
-		// TODO: Ben, please implement, though nothing much to do here at this stage...
-	}
 
 	@Override
 	public void visit(IntegerConstant intConst) {
@@ -251,7 +244,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 
 
 	@Override
-	public void visit(Meth meth) {
+	public void visit(MethDeclaration meth) {
 		super.visit(meth);
 		
 
@@ -324,8 +317,12 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	}
 
 	@Override
-	public void visit(InterfaceDeclaration interfaceDeclaration) {
+	public void visit(TypeDeclaration interfaceDeclaration) {
 		super.visit(interfaceDeclaration);
 	}
-
+	
+	@Override
+	public void visit(PropDeclaration propDeclaration) {
+		super.visit(propDeclaration);
+	}
 }

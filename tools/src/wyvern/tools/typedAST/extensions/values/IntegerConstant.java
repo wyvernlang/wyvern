@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.values;
 
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.AbstractValue;
@@ -69,5 +69,10 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

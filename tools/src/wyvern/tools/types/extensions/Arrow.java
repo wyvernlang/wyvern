@@ -41,7 +41,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	
 	@Override
 	public String toString() {
-		String argString = argument.toString();
+		String argString = (argument == null)?null:argument.toString();
 		if (argument instanceof Arrow)
 			argString = "(" + argString + ")";
 		return argString + " -> " + result;

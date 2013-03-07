@@ -86,7 +86,8 @@ public class ParsingTestPhase1 {
 		Phase1Parser.parse(reader);
 	}
 
-	/*@Test
+	/*
+	@Test
 	public void testSymbols() {
 		Reader reader = new StringReader("hello+1++3/[{+}b](-x)");
 		Lexer lexer = new Lexer(reader);
@@ -111,5 +112,6 @@ public class ParsingTestPhase1 {
 
 	private Token token(String string) {
 		return Token.getIdentifier(string);
-	}*/
+	}
+	*/
 }

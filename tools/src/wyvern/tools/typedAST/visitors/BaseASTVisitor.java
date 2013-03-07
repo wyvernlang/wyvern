@@ -7,22 +7,22 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.extensions.BooleanConstant;
-import wyvern.tools.typedAST.extensions.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.Fn;
-import wyvern.tools.typedAST.extensions.IntegerConstant;
-import wyvern.tools.typedAST.extensions.InterfaceDeclaration;
 import wyvern.tools.typedAST.extensions.LetExpr;
-import wyvern.tools.typedAST.extensions.Meth;
 import wyvern.tools.typedAST.extensions.New;
-import wyvern.tools.typedAST.extensions.StringConstant;
 import wyvern.tools.typedAST.extensions.TupleObject;
-import wyvern.tools.typedAST.extensions.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.TypeInstance;
-import wyvern.tools.typedAST.extensions.UnitVal;
-import wyvern.tools.typedAST.extensions.ValDeclaration;
-import wyvern.tools.typedAST.extensions.VarDeclaration;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
+import wyvern.tools.typedAST.extensions.values.BooleanConstant;
+import wyvern.tools.typedAST.extensions.values.IntegerConstant;
+import wyvern.tools.typedAST.extensions.values.StringConstant;
+import wyvern.tools.typedAST.extensions.values.UnitVal;
 
 public abstract class BaseASTVisitor implements CoreASTVisitor { 
 	
@@ -75,7 +75,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(TypeDeclaration typeDeclaration) {
+	public void visit(PropDeclaration propDeclaration) {
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(InterfaceDeclaration interfaceDeclaration) {
+	public void visit(TypeDeclaration interfaceDeclaration) {
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(Meth meth) {
+	public void visit(MethDeclaration meth) {
 		TypedAST body = meth.getBody();
 		
 		if (!(body instanceof CoreAST))

@@ -1,9 +1,7 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.declarations;
 
-import wyvern.tools.parsing.CoreParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.CachingTypedAST;
+import wyvern.tools.typedAST.Assignable;
+import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
@@ -12,23 +10,18 @@ import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.values.VarValue;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-public class ValDeclaration extends Declaration implements CoreAST {
+public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
-	Type definitionType;
 	NameBinding binding;
 	
-	public ValDeclaration(String name, TypedAST definition) {
+	public VarDeclaration(String name, TypedAST definition, Environment env) {
 		this.definition=definition;
-		binding = new NameBindingImpl(name, null);
-	}
-	
-	public ValDeclaration(String name, Type type) {
-		binding = new NameBindingImpl(name, type);
+		binding = new NameBindingImpl(name, definition.typecheck(env));
 	}
 
 	@Override
@@ -38,10 +31,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		if (binding.getType() == null) {
-			this.definitionType = this.definition.typecheck(env);
-			this.binding = new NameBindingImpl(binding.getName(), definitionType);
-		}
 		return binding.getType();
 	}
 
@@ -84,6 +73,11 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	protected void evalDecl(Environment evalEnv, Environment declEnv) {
 		Value defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
-		vb.setValue(defValue);
+		vb.setValue(new VarValue(defValue));
+	}
+
+	private int line = -1;
+	public int getLine() {
+		return this.line; // TODO: NOT IMPLEMENTED YET.
 	}
 }

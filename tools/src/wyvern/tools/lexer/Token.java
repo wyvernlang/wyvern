@@ -1,6 +1,8 @@
 package wyvern.tools.lexer;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 
 public class Token implements HasLocation {
 	
@@ -9,7 +11,11 @@ public class Token implements HasLocation {
 	public final Kind kind;
 	public final String text;
 	public final int value;
+	
 	public final int line;
+	public int getLine() {
+		return line;
+	}
 	
 	private Token(Kind k, int line) { kind = k; text = ""; value = 0; this.line = line; }
 	private Token(Kind k, String t, int line) { kind = k; text = t; value = 0; this.line = line; }
@@ -47,7 +53,8 @@ public class Token implements HasLocation {
 			case '{': return LBRACE;
 			case '}': return RBRACE;
 		}
-		throw new LexerException();
+		ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
+		return null; // Unreachable.
 	}
 	
 	public static Token getIdentifier(String string) {
