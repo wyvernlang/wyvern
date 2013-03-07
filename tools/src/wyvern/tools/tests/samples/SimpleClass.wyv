@@ -30,7 +30,7 @@ class StackImpl
 	meth push(element : Int)
 		list = Link(element, list)
 
-	meth pop()
+	meth pop() : Int?
 		val result = list.data
 		list = list.next
 		result
@@ -58,6 +58,6 @@ class Link
 meth stackClient()
 	val s = StackImpl.Stack()
 	s.push(5)
-	print(s.top)
-	val addOne = fn x:Int =&gt; x+1
-	print(addOne(s.pop()))</pre></body></html>
+	printInteger(s.top)
+//	val addOne = fn x:Int => x+1
+//	printInteger(addOne(s.pop()))
