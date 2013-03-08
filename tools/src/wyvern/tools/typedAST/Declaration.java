@@ -7,6 +7,9 @@ import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 
+// TODO: Consider adding a class "ListOfDeclarations" that only handles indents with decls and make
+// Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)
+
 // TODO SMELL: probably should have Declarations not be in an "evaluate" part of the AST
 public abstract class Declaration extends AbstractTypedAST {
 	protected Declaration nextDecl = null;
