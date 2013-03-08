@@ -191,9 +191,11 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testClassAndField() {
 		Reader reader = new StringReader("class Hello\n"
+										+"    class meth make():Hello\n"
+										+"    \tnew\n"
 										+"    val hiString = \"hello\"\n"
 										+"\n"
-										+"val h = new Hello()\n"//hiString: \"hi\")\n"
+										+"val h = Hello.make()\n"//hiString: \"hi\")\n"
 										+"h.hiString");
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		
@@ -235,9 +237,10 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testClassAndMethods() {
 		Reader reader = new StringReader("class Hello\n"
+										+"    class meth make():Hello = new\n"
 										+"    meth get5():Int = 5\n"
 										+"\n"
-										+"val h = new Hello()\n"
+										+"val h = Hello.make()\n"
 										+"h.get5()");
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		
@@ -252,11 +255,12 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testClassAndMethods2() {
 		Reader reader = new StringReader("class Hello\n"
+										+"	class meth make():Hello = new\n"
 										+"	meth get4():Int = 4\n"
 										+"	meth get5():Int = 5\n"
 										+"	meth getP():Int = this.get4()+this.get5()\n"
 										+"\n"
-										+"val h = new Hello()\n"
+										+"val h = Hello.make()\n"
 										+"h.getP()");
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		
@@ -271,11 +275,12 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testClassMethodsVals() {
 		Reader reader = new StringReader("class Hello\n"
+										+"	class meth make():Hello = new\n"
 										+"	val testVal = 5\n"
 										+"	meth getVal():Int = this.testVal\n"
 										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
-										+"val h = new Hello()\n"
+										+"val h = Hello.make()\n"
 										+"h.getP()");
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		
@@ -290,13 +295,14 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testClassMethodsVals3() {
 		Reader reader = new StringReader("class Hello\n"
+										+"	class meth make():Hello = new\n"
 										+"	val testVal = 5\n"
 										+"	val testVal2 = 15\n"
 										+"	val testVal3 = 25\n"
 										+"	meth getVal():Int = this.testVal + this.testVal3/this.testVal2\n"
 										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
-										+"val h = new Hello()\n"
+										+"val h = Hello.make()\n"
 										+"h.getP()");
 		RawAST parsedResult = Phase1Parser.parse(reader);
 		
@@ -347,10 +353,11 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testVarAssignmentInClass() {
 		Reader reader = new StringReader("class Hello\n"
+				+"	class meth make():Hello = new\n"
 				+"	var testVal = 5\n"
 				+"	meth setV(n : Int):Int = this.testVal = n\n"
 				+"	meth getV():Int = this.testVal\n"
-				+"val h = new Hello()\n"
+				+"val h = Hello.make()\n"
 				+"val a = h.setV(10)\n" 
 				+"h.getV()");
 		RawAST parsedResult = Phase1Parser.parse(reader);
@@ -362,6 +369,26 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 
+	@Test
+	public void testClassMethArgs() {
+		Reader reader = new StringReader("class Hello\n"
+				+"	val testVa:Int\n"
+				+"	var testVr:Int\n"
+				+"	class meth make(n : Int):Hello = new\n" +
+				"		testVa = n\n" +
+				"		testVr = n+1\n"
+				+"	meth getVa():Int = this.testVa\n"
+				+"val h = Hello.make(10)\n"
+				+"h.getVa()");
+		RawAST parsedResult = Phase1Parser.parse(reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
+	}
+	
 	//Ben: Testing class methods. Broken currently, current priority.
 	/*
 	@Test

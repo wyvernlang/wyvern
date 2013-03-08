@@ -2,9 +2,11 @@ package wyvern.tools.typedAST.extensions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CachingTypedAST;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
@@ -22,12 +24,14 @@ import wyvern.tools.util.TreeWriter;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
-	Variable clsVar;
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 
-	public New(Variable clsVar, TypedAST args, int line) {
-		this.clsVar = clsVar;
-		// TODO: parse args
+	public New(TypedAST args, int line) {
+		for (Assignment arg = (Assignment)args; arg != null; arg = (Assignment) arg.getNext()) {
+			if (!(arg.getTarget() instanceof Variable))
+				throw new RuntimeException("Must assign to a variable");
+			this.args.put(((Variable)arg.getTarget()).getName(), arg.getValue());
+		}
 		this.line = line;
 	}
 
@@ -41,11 +45,11 @@ public class New extends CachingTypedAST implements CoreAST {
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
 		
-		Type classVarType = clsVar.typecheck(env);
+		Type classVarType = env.lookupType("class").getType();
 		
 		if (!(classVarType instanceof ClassType)) {
 			// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
-			ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, clsVar.toString(), clsVar);
+			ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, classVarType.toString(), this);
 		}
 		
 		// TODO SMELL: do I really need to store this?  Can get it any time from the type
@@ -58,9 +62,15 @@ public class New extends CachingTypedAST implements CoreAST {
 	public Value evaluate(Environment env) {
 		//Value argVals = args.evaluate(env);
 		// TODO: evaluate args
-		Map<String, Value> argVals = null;
 		
-		ClassObject clsObject = (ClassObject) clsVar.evaluate(env);
+		
+		Map<String, Value> argVals = new HashMap<String,Value>();
+		
+		//TODO vars
+		for (Entry<String, TypedAST> elem : args.entrySet())
+			argVals.put(elem.getKey(), elem.getValue().evaluate(env));
+		
+		ClassObject clsObject = new ClassObject(cls);
 		return new Obj(clsObject, argVals);
 	}
 	

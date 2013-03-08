@@ -35,10 +35,10 @@ public class MethParser implements LineParser {
 	
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
-		return parse(first,ctx,null);
+		return parse(first,ctx,null,false);
 	}
 	
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx, Type returnType) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx, Type returnType, boolean isClassMeth) {
 		String methName = ParseUtils.parseSymbol(ctx).name;
 		Parenthesis paren = ParseUtils.extractParen(ctx);
 		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second); 
@@ -90,7 +90,7 @@ public class MethParser implements LineParser {
 			// LineSequence body = ParseUtils.extractLines(ctx);
 		}
 
-		return new MethDeclaration(methName, args, returnType, exp);
+		return new MethDeclaration(methName, args, returnType, exp, isClassMeth);
 		
 	}
 }

@@ -31,8 +31,9 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	private NameBinding binding;
 	private Type type;
 	private List<NameBinding> args;
+	private boolean isClassMeth;
 	
-	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body) {
+	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth) {
 		Type argType = null;
 		if (args.size() == 0)
 			argType = Unit.getInstance();
@@ -44,6 +45,11 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
 		this.args = args;
+		this.isClassMeth = isClassMeth;
+	}
+	
+	public boolean isClassMeth() {
+		return isClassMeth;
 	}
 
 	@Override

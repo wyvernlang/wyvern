@@ -76,6 +76,10 @@ public abstract class Declaration extends AbstractTypedAST {
 			newEnv = nextDecl.extend(newEnv);
 		return newEnv;
 	}
+	
+	public final Environment extendWithSelf(Environment old) {
+		return doExtend(old);
+	}
 
 	protected abstract Environment doExtend(Environment old);
 	protected abstract Environment extendWithValue(Environment old);
@@ -103,6 +107,15 @@ public abstract class Declaration extends AbstractTypedAST {
 			d.evalDecl(bodyEnv, declEnv);
 		}
 		return newEnv;
+	}
+	
+	public final Environment bindDecl(Environment evalEnv, Environment declEnv) {
+		evalDecl(evalEnv, declEnv);
+		return evalEnv;
+	}
+	
+	public final Environment doExtendWithValue(Environment old) {
+		return extendWithValue(old);
 	}
 
 	public final Environment evalDecls(Environment env) {

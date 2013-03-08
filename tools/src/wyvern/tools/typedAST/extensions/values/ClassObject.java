@@ -6,17 +6,21 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.BoundCode;
+import wyvern.tools.typedAST.Invocation;
+import wyvern.tools.typedAST.InvokableValue;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ClassObject extends AbstractValue implements Value {
+public class ClassObject extends AbstractValue implements InvokableValue, Value {
 	private ClassDeclaration decl;
+	private Environment classEnv;
 	
 	public ClassObject(ClassDeclaration decl) {
 		this.decl = decl;
+		this.classEnv = decl.getClassEnv();
 	}
 
 	@Override
@@ -45,5 +49,11 @@ public class ClassObject extends AbstractValue implements Value {
 	private int line = -1;
 	public int getLine() {
 		return this.line; // TODO: NOT IMPLEMENTED YET.
+	}
+
+	@Override
+	public Value evaluateInvocation(Invocation exp, Environment env) {
+		String operation = exp.getOperationName();
+		return classEnv.getValue(operation);
 	}
 }

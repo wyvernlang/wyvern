@@ -45,6 +45,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	public TypedAST getValue() {
 		return value;
 	}
+	
+	public TypedAST getNext() { 
+		return nextExpr;
+	}
 
 	@Override
 	public Value evaluate(Environment env) {

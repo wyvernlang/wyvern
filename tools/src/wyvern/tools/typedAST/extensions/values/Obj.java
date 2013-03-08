@@ -29,7 +29,12 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	public Obj(ClassObject cls, Map<String, Value> fields) {
 		this.cls = cls;
 		this.fields = fields;
+
 		this.intEnv = cls.getObjEnv(this);
+		for (Map.Entry<String, Value> elem : fields.entrySet())
+			this.intEnv = 
+				this.intEnv.extend(new ValueBinding(elem.getKey(), elem.getValue()));
+		
 	}
 
 	@Override

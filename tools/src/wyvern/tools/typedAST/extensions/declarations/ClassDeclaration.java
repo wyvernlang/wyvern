@@ -19,7 +19,9 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
-	private Declaration decls;
+	protected Declaration decls;
+	protected Declaration classDecls;
+	
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
@@ -59,11 +61,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type doTypecheck(Environment env) {
 		Declaration decl = decls;
-		
-		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
-		Environment eenv = decls.extend(env);
+
+		Environment genv = env.extend(new TypeBinding("class", typeBinding.getType()));
+		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
 		while (decl != null) {
-			decl.typecheckSelf(eenv);
+			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth())
+				decl.typecheckSelf(genv);
+			else
+				decl.typecheckSelf(oenv);
+			
 			decl = decl.getNextDecl();
 		}
 		
@@ -138,6 +144,29 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		decls.bindDecls(intEnv, thisEnv);
 		
 		return thisEnv;
+	}
+	
+	public Environment getClassEnv() {
+		Declaration decl = decls;
+		
+		Environment classEnv = Environment.getEmptyEnvironment();
+		
+		while (decl != null) {
+			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth()){
+				classEnv = decl.doExtendWithValue(classEnv);
+			}
+			decl = decl.getNextDecl();
+		}
+
+		TypeBinding thisBinding = new TypeBinding("class", typeBinding.getType());
+		Environment evalEnv = classEnv.extend(thisBinding);
+		
+		for (decl = decls; decl != null; decl = decl.getNextDecl())
+			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth()){
+				decl.bindDecl(evalEnv,classEnv);
+			}
+		
+		return classEnv;
 	}
 
 	public Declaration getDecl(String opName) {
