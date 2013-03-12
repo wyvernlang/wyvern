@@ -35,10 +35,10 @@ class StackImpl
 		list = list.next
 		result
 
-	class meth Stack() : Stack = new StackImpl
+	class meth Stack() : Stack = new
 	
 	class meth StackWithFirst(firstElement : Int) : Stack
-		new StackImpl
+		new
 			list = Link(firstElement, null)
 
 
@@ -46,13 +46,10 @@ class Link
 	val data : Int
 	val next : Link?
 
-/* The following is a question of whether Link class method and Link class when used by new should conflict or not? */
-/*
 	class meth Link(d:Int, n:Link?)
-		new Link
+		new
 			data=d
 			next=n
-*/
 
 
 meth stackClient()
