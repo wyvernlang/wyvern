@@ -37,7 +37,11 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(cls, args);
+		writer.writeArgs(cls);
+		// FIXME: Not sure if this is rigth (Alex).
+		for (TypedAST a : this.args.values()) {
+			writer.writeArgs(a);
+		}
 	}
 
 	@Override

@@ -19,6 +19,16 @@ type ListUtilities
 
 
 /** Private Implementation **/
+class Link
+	val data : Int
+	val next : Link?
+
+	class meth Link(d:Int, n:Link?)
+		new
+			data=d
+			next=n
+
+
 class StackImpl
 	implements Stack
 	class implements StackFactory
@@ -42,19 +52,9 @@ class StackImpl
 			list = Link(firstElement, null)
 
 
-class Link
-	val data : Int
-	val next : Link?
-
-	class meth Link(d:Int, n:Link?)
-		new
-			data=d
-			next=n
-
-
 meth stackClient()
 	val s = StackImpl.Stack()
 	s.push(5)
-//	printInteger(s.top)
-//	val addOne = fn x:Int => x+1
-//	printInteger(addOne(s.pop()))
+	printInteger(s.top)
+	val addOne = fn x:Int => x+1
+	printInteger(addOne(s.pop()))

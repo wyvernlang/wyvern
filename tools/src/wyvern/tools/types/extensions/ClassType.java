@@ -8,6 +8,7 @@ import java.util.HashSet;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
@@ -29,7 +30,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 	
 	@Override
 	public String toString() {
-		return "ClassType";
+		return "CLASS " + decl.getName();
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		return this.decl;
 	}
 
-	// FIXME: This is super simplification to get the ball rolling by Alex. :-)
+	// FIXME: Does not handle (1) recursive types; (2) props; (3) all else. :-)
 	public boolean subtypeOf(TypeType tt) {
 		ClassDeclaration thisD = this.decl;
 		TypeDeclaration typeD = tt.getDecl();
@@ -60,7 +61,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		HashSet<String> thisDtypes = new HashSet<String>();
 		for (Declaration d = thisD.getDecls(); d != null; d = d.getNextDecl()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
-			thisDtypes.add(d.getType().toString());
+			if (d instanceof PropDeclaration) {
+				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+			} else {
+				thisDtypes.add(d.getType().toString());
+			}
 		}
 		
 		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
@@ -68,11 +73,16 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		HashSet<String> implDtypes = new HashSet<String>();
 		for (Declaration d = typeD.getDecls(); d != null; d = d.getNextDecl()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
-			implDtypes.add(d.getType().toString());
+			if (d instanceof PropDeclaration) {
+				implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+			} else {
+				implDtypes.add(d.getType().toString());
+			}
 		}
 		
 		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
-		
+
+		// System.out.println("This subtype of Implements: " + thisDtypes.containsAll(implDtypes) + "\n");
 		return thisDtypes.containsAll(implDtypes);
 	}
 }

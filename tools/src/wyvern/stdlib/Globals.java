@@ -44,18 +44,19 @@ public class Globals {
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
 		env = env.extend(new TypeBinding("Str", Str.getInstance()));
+		env = env.extend(new ValueBinding("null", UnitVal.getInstance(-20))); // How to represent  shock/horror  null!?
 		env = env.extend(new ValueBinding("true", new BooleanConstant(true)));
 		env = env.extend(new ValueBinding("false", new BooleanConstant(false)));
 		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(str, unit), new Executor() {
 			@Override public Value execute(Value argument) {
 				System.out.println(((StringConstant)argument).getValue());
-				return UnitVal.getInstance();
+				return UnitVal.getInstance(-10); // Fake line number! FIXME:
 			}
 		})));
 		env = env.extend(new ValueBinding("printInteger", new ExternalFunction(arrow(integer, unit), new Executor() {
 			@Override public Value execute(Value argument) {
 				System.out.println(((IntegerConstant)argument).getValue());
-				return UnitVal.getInstance();
+				return UnitVal.getInstance(-10); // Fake line number! FIXME:
 			}
 		})));
 		return env;

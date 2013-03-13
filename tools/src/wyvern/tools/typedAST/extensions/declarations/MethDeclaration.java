@@ -27,25 +27,29 @@ import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
-	private TypedAST body;
+	protected TypedAST body; // HACK
 	private NameBinding binding;
 	private Type type;
 	private List<NameBinding> args;
 	private boolean isClassMeth;
 	
-	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth) {
+	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, int line) {
 		Type argType = null;
-		if (args.size() == 0)
+		if (args.size() == 0) {
 			argType = Unit.getInstance();
-		else if (args.size() == 1)
+			type = new Arrow(argType, returnType);
+		} else if (args.size() == 1) {
 			argType = args.get(0).getType();
-		else
+			type = new Arrow(argType, returnType); 
+		} else {
 			argType = new Tuple(args);
-		type = new Arrow(argType, returnType); 
+			type = new Arrow(argType, returnType); 
+		}
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
 		this.args = args;
 		this.isClassMeth = isClassMeth;
+		this.line = line;
 	}
 	
 	public boolean isClassMeth() {
@@ -111,8 +115,8 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		vb.setValue(closure);
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

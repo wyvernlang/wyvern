@@ -85,7 +85,8 @@ public class ClassParser implements LineParser {
 			
 			mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, clsNameLine);
 			
-			Environment newEnv = ctx.second.extend(new TypeBinding(clsName, new ClassType(mutableDecl)));
+			Environment newEnv = mutableDecl.extend(ctx.second); 
+			
 			declAST = lines.accept(CoreParser.getInstance(), newEnv);
 			if (!(declAST instanceof Declaration))
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);

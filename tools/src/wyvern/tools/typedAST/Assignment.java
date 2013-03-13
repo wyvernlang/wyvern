@@ -20,9 +20,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	
 	private TypedAST nextExpr;
 
-	public Assignment(TypedAST target, TypedAST value) {
+	public Assignment(TypedAST target, TypedAST value, int line) {
 		this.target = target;
 		this.value = value;
+		this.line = line;
 	}
 
 	@Override
@@ -32,10 +33,11 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		if (nextExpr == null)
+		if (nextExpr == null) {
 			return target.typecheck(env);
-		else
+		} else {
 			return nextExpr.typecheck(env);
+		}
 	}
 
 	public TypedAST getTarget() {
@@ -72,15 +74,18 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 			@Override
 			public TypedAST parse(TypedAST first, LineSequence rest,
 					Environment env) {
-				TypedAST body = rest.accept(CoreParser.getInstance(), env);
+				
+				Environment newEnv = env;
+				TypedAST body = rest.accept(CoreParser.getInstance(), newEnv);
+
 				Assignment.this.nextExpr = body;
 				return Assignment.this;
 			}
 		};
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

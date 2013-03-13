@@ -11,9 +11,11 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
-	private UnitVal() { }
-	private static UnitVal instance = new UnitVal();
-	public static UnitVal getInstance() { return instance; }
+	private UnitVal(int line) { this.line = line; }
+	// private static UnitVal instance = new UnitVal(); // FIXME: I have to move away from instance to provide line number! :(
+	public static UnitVal getInstance(int line) {
+		return new UnitVal(line); // instance; 
+	}
 	
 	@Override
 	public Type getType() {
@@ -35,8 +37,8 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 		visitor.visit(this);
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

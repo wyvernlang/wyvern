@@ -53,7 +53,7 @@ public class Phase1Parser {
 		if (token.kind == LPAREN) {
 			Token openParen = token;
 			// read elements in the middle
-			Sequence sequence = new Parenthesis(new ArrayList<RawAST>());
+			Sequence sequence = new Parenthesis(new ArrayList<RawAST>(), lexer.getLineNumber());
 			parseSequence(lexer, sequence);	// TODO: maybe call a separate parseSequence that ignores newlines and indents?
 			
 			token = lexer.getToken();
@@ -90,7 +90,7 @@ public class Phase1Parser {
 			if (token.kind == INDENT) {
 				// eat the token, read a line sequence, and check for a DEDENT
 				token = lexer.getToken();
-				LineSequence node = new LineSequence();
+				LineSequence node = new LineSequence(token.getLine());
 				parseLines(lexer, node);
 				token = lexer.peekToken();
 				// accept an EOF as a DEDENT
@@ -195,7 +195,7 @@ public class Phase1Parser {
 			throw new ParseException();
 		}*/
 		
-		LineSequence topSequence = new LineSequence();
+		LineSequence topSequence = new LineSequence(lexer.peekToken().getLine());
 		parseLines(lexer, topSequence);		
 		return topSequence;
 	}

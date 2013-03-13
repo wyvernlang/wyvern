@@ -139,6 +139,7 @@ public class ParseUtils {
 		}
 	}
 
+	// I do not think this method is needed!? (Alex) Why not use accept directly?
 	public static TypedAST parseExpr(Pair<ExpressionSequence, Environment> ctx) {
 		TypedAST result = ctx.first.accept(CoreParser.getInstance(), ctx.second);
 		ctx.first = null;	// previous line by definition read everything
@@ -166,7 +167,7 @@ public class ParseUtils {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			// TODO: parse more than unit vals
 			// maybe with parens.accept(CoreParser)?
-			return UnitVal.getInstance();
+			return UnitVal.getInstance(parens.getLine());
 		} else {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			return null; // Unreachable.

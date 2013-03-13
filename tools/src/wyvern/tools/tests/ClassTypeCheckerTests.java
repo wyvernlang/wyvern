@@ -197,9 +197,19 @@ public class ClassTypeCheckerTests {
 				+"    meth Stack() : Stack\n"
 				+"    meth StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
+				+"class Link\n"
+				+"    val data : Int\n"
+				+"    val next : Link?\n"
+				+"\n"
+				+"    class meth Link(d:Int, n:Link?)\n"
+				+"        new\n"
+				+"            data=d\n"
+				+"            next=n\n"
+				+"\n"
 				+"class StackImpl\n"
 				+"    class implements StackFactory\n"
 				+"    var top : Int?\n"
+				+"    var list : Link?\n"
 				+"\n"
 				+"    class meth Stack() : Stack = new\n"
 				+"\n"
@@ -208,7 +218,7 @@ public class ClassTypeCheckerTests {
 				+"            list = Link(firstElement, null)\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse(reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L class meth Stack () : Stack = new $L} {$L class meth StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link (firstElement , null) $L} $I} $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class Link {$I {$L val data : Int $L} {$L val next : Link ? $L} {$L class meth Link (d : Int , n : Link ?) {$I {$L new {$I {$L data = d $L} {$L next = n $L} $I} $L} $I} $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L var list : Link ? $L} {$L class meth Stack () : Stack = new $L} {$L class meth StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link (firstElement , null) $L} $I} $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();

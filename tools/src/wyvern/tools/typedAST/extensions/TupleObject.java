@@ -21,7 +21,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		this.objects = objects;
 	}
 	
-	public TupleObject(TypedAST first, TypedAST rest) {
+	public TupleObject(TypedAST first, TypedAST rest, int line) {
 		if (rest instanceof TupleObject) {
 			objects = new TypedAST[((TupleObject) rest).objects.length + 1];
 			objects[0] = first;
@@ -31,6 +31,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		} else {
 			this.objects = new TypedAST[] { first, rest };
 		}
+		this.line = line;
 	}
 
 	@Override
@@ -69,8 +70,8 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		return objects;
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }
