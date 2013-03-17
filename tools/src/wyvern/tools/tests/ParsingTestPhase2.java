@@ -173,11 +173,12 @@ public class ParsingTestPhase2 {
 	
 	@Test
 	public void testMutuallyRecursiveMethods() {
-		Reader reader = new StringReader("meth doublePlusOne(n:Int):Int = double(n) + 1\n"
-										+"meth double(n:Int):Int = n*2\n"
+		Reader reader = new StringReader("meth double(n:Int):Int = n*2\n"
+										+"meth doublePlusOne(n:Int):Int = double(n) + 1\n"
 										+"doublePlusOne(5)\n");
 		RawAST parsedResult = Phase1Parser.parse(reader);
-		Assert.assertEquals("{$I {$L meth doublePlusOne (n : Int) : Int = double (n) + 1 $L} {$L meth double (n : Int) : Int = n * 2 $L} {$L doublePlusOne (5) $L} $I}", parsedResult.toString());
+		Assert.assertEquals("{$I {$L meth double (n : Int) : Int = n * 2 $L} {$L meth doublePlusOne (n : Int) : Int = double (n) + 1 $L} {$L doublePlusOne (5) $L} $I}",
+				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);

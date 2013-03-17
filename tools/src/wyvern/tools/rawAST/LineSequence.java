@@ -3,11 +3,13 @@ package wyvern.tools.rawAST;
 import java.util.List;
 
 public class LineSequence extends Sequence {
-	public LineSequence(List<RawAST> children) {
+	public LineSequence(List<RawAST> children, int line) {
 		super(children);
+		this.line = line;
 	}
 
-	public LineSequence() {
+	public LineSequence(int line) {
+		this.line = line;
 	}
 
 	@Override
@@ -32,11 +34,11 @@ public class LineSequence extends Sequence {
 		if (children.size() == 1)
 			return null;
 		else
-			return new LineSequence(children.subList(1, children.size()));
+			return new LineSequence(children.subList(1, children.size()), this.line);
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

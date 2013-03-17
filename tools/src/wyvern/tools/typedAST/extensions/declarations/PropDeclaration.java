@@ -7,31 +7,34 @@ import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
+import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.binding.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 public class PropDeclaration extends Declaration implements CoreAST {
-	Type definitionType;
-	NameBinding binding;
+	TypeBinding typeBinding;
+	NameBinding nameBinding;
 	
-	public PropDeclaration(String name, Type type) {
-		binding = new NameBindingImpl(name, type);
+	public PropDeclaration(String name, TypeBinding typeBinding, int line) {
+		this.typeBinding = typeBinding;
+		this.nameBinding = new NameBindingImpl(name, typeBinding.getType());
+		this.line = line;
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definitionType);
+		writer.writeArgs(nameBinding.getName(), typeBinding);
 	}
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		if (binding.getType() == null) {
+		if (nameBinding.getType() == null) {
 			// this.definitionType = this.definition.typecheck(env);
-			this.binding = new NameBindingImpl(binding.getName(), definitionType);
+			this.nameBinding = new NameBindingImpl(nameBinding.getName(), typeBinding.getType());
 		}
-		return binding.getType();
+		return typeBinding.getType();
 	}
 
 	@Override
@@ -40,27 +43,27 @@ public class PropDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public NameBinding getBinding() {
-		return binding;
+		return nameBinding;
 	}
 
 	@Override
 	public Type getType() {
-		return binding.getType();
+		return typeBinding.getType();
 	}
 
 	@Override
 	public String getName() {
-		return binding.getName();
+		return nameBinding.getName();
 	}
 
 	@Override
 	protected Environment doExtend(Environment old) {
-		return old.extend(binding);
+		return old.extend(typeBinding).extend(nameBinding);
 	}
 
 	@Override
 	protected Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
+		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), typeBinding.getType()));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
@@ -72,8 +75,8 @@ public class PropDeclaration extends Declaration implements CoreAST {
 		// vb.setValue(defValue);
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

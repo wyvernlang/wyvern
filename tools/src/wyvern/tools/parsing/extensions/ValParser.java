@@ -33,7 +33,10 @@ public class ValParser implements LineParser {
 				typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
 				ParseUtils.parseSymbol("?", ctx); 
 			}
-			TypeBinding tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+			TypeBinding tb = ctx.second.lookupType(typeName);
+			if (tb == null) {
+				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+			}
 			return new ValDeclaration(varName, new TypeInstance(tb));
 		} else {
 			throw new RuntimeException("Error parsing val expression, either : or = expected.");

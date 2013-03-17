@@ -4,6 +4,7 @@ import static wyvern.tools.parsing.ParseUtils.parseSymbol;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
+import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.extensions.TypeInstance;
@@ -21,17 +22,23 @@ public class PropParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
-		String varName = ParseUtils.parseSymbol(ctx).name;
+		Symbol s = ParseUtils.parseSymbol(ctx);
+		
+		String varName = s.name;
+		int line = s.getLine();
 		
 		if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
 			String typeName = ParseUtils.parseSymbol(ctx).name;
 			if (ParseUtils.checkFirst("?", ctx)) {
-				typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
+				// typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
 				ParseUtils.parseSymbol("?", ctx); 
 			}
-			TypeBinding tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
-			return new PropDeclaration(varName, tb.getType()); // FIXME: Wrong. :)
+			TypeBinding tb = ctx.second.lookupType(typeName);
+			if (tb == null) {
+				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+			}
+			return new PropDeclaration(varName, tb, line);
 		} else {
 			throw new RuntimeException("Error parsing prop expression : expected.");
 		}

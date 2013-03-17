@@ -54,14 +54,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type getType() {
-		// TODO what should the type of a class declaration be?
-		return Unit.getInstance();
+		return this.typeBinding.getType();
 	}
 
 	@Override
 	public Type doTypecheck(Environment env) {
 		Declaration decl = decls;
 
+		// FIXME: Currently allow this and class in both class and object methods. :(
+		
 		Environment genv = env.extend(new TypeBinding("class", typeBinding.getType()));
 		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
 		while (decl != null) {
@@ -72,6 +73,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			
 			decl = decl.getNextDecl();
 		}
+		
 		
 		// check the implements and class implements
 		if (!this.implementsName.equals("")) {
@@ -117,6 +119,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Environment doExtend(Environment old) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
+		
+		// FIXME: Currently allow this and class in both class and object methods. :(
+		newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
+		newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
+		
 		return newEnv;
 	}
 

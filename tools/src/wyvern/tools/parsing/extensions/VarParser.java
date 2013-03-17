@@ -27,16 +27,24 @@ public class VarParser implements LineParser {
 			return new VarDeclaration(varName, exp, ctx.second);		
 		} else if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
-			String typeName = ParseUtils.parseSymbol(ctx).name; // This can contain several type parameters! E.g. T Link?
-			if (ctx.first != null) { // Not EOL? Hence, another type name coming?
-				typeName = typeName + " " +
-							ParseUtils.parseSymbol(ctx).name; // FIXME: Just hack for now until parameterised types done.
-				if (ParseUtils.checkFirst("?", ctx)) {
-					typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
-					ParseUtils.parseSymbol("?", ctx); 
-				}
+			String typeName = ParseUtils.parseSymbol(ctx).name; // FIXME: This can contain several type parameters! E.g. T Link?
+
+			// if (ctx.first != null) { // Not EOL? Hence, another type name coming?
+			//	typeName = // typeName + " " + FIXME: Ignoring type params!
+			//			   ParseUtils.parseSymbol(ctx).name; // FIXME: Just hack for now until parameterised types done.
+			// }
+			if (ParseUtils.checkFirst("?", ctx)) {
+				// typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
+				// FIXME: ? ignored
+				ParseUtils.parseSymbol("?", ctx); 
 			}
-			TypeBinding tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+			// System.out.println("Creating type binding for type: " + typeName);
+			// System.out.println("Have I seen " + typeName + "? " + ctx.second.lookupType(typeName).getType().toString());
+			
+			TypeBinding tb = ctx.second.lookupType(typeName);
+			if (tb == null) {
+				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+			}
 			return new VarDeclaration(varName, new TypeInstance(tb), ctx.second);
 		} else {
 			throw new RuntimeException("Error parsing val expression, either : or = expected.");

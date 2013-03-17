@@ -19,6 +19,16 @@ type ListUtilities
 
 
 /** Private Implementation **/
+class Link
+	val data : Int
+	val next : Link?
+
+	class meth Link(d:Int, n:Link?)
+		new
+			data=d
+			next=n
+
+
 class StackImpl
 	implements Stack
 	class implements StackFactory
@@ -35,29 +45,16 @@ class StackImpl
 		list = list.next
 		result
 
-	class meth Stack() : Stack = new StackImpl
+	class meth Stack() : Stack = new
 	
 	class meth StackWithFirst(firstElement : Int) : Stack
-		new StackImpl
+		new
 			list = Link(firstElement, null)
-
-
-class Link
-	val data : Int
-	val next : Link?
-
-/* The following is a question of whether Link class method and Link class when used by new should conflict or not? */
-/*
-	class meth Link(d:Int, n:Link?)
-		new Link
-			data=d
-			next=n
-*/
 
 
 meth stackClient()
 	val s = StackImpl.Stack()
 	s.push(5)
-//	printInteger(s.top)
-//	val addOne = fn x:Int => x+1
-//	printInteger(addOne(s.pop()))
+	printInteger(s.top)
+	val addOne = fn x:Int => x+1
+	printInteger(addOne(s.pop()))

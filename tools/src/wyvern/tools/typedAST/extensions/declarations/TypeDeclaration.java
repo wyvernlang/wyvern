@@ -44,15 +44,14 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type getType() {
-		// TODO what should the type of a type (in a sense of interface) declaration be?
-		return Unit.getInstance();
+		return this.typeBinding.getType();
 	}
 
 	@Override
 	public Type doTypecheck(Environment env) {
 		Declaration decl = decls;
 		
-		env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
+		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env);
 		while (decl != null) {
 			decl.typecheckSelf(eenv);
@@ -65,6 +64,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Environment doExtend(Environment old) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
+		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
 		return newEnv;
 	}
 

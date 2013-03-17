@@ -25,7 +25,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 	
 	@Override
 	public String toString() {
-		return "TypeType";
+		return "TYPE " + decl.getName();
 	}
 
 	@Override

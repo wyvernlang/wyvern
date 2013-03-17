@@ -49,9 +49,10 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	@Override
 	public TypedAST visit(Symbol node, Environment env) {
 		NameBinding binding = env.lookup(node.name);
-		if (binding == null)
-			return new Variable(new NameBindingImpl(node.name, null), node.getLine());
-			//reportError(VARIABLE_NOT_DECLARED, node.name, node);
+		if (binding == null) {
+			// return new Variable(new NameBindingImpl(node.name, null), node.getLine());
+			reportError(ErrorMessage.VARIABLE_NOT_DECLARED, node.name, node);
+		}
 		
 		return binding.getUse();
 		// return new Variable(binding, node.getLine());
@@ -88,7 +89,17 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 			
 			while (rest != null) {
 				first = rest.getFirst().accept(this, env);
-				s.append(first);
+				
+				// Make sure that we allow val's etc to parse their bodies/continuations properly!
+				LineSequenceParser bodyParser = first.getLineSequenceParser();
+				if (bodyParser == null || rest.getRest() == null) {
+					s.append(first);
+				} else {
+					// Has to eat the rest of the LineSequence!!!
+					s.append(bodyParser.parse(first, rest.getRest(), env));
+					return s;
+				}
+				
 				rest = rest.getRest();
 			}
 			
@@ -109,7 +120,7 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		if (node.children.size() == 0) {
 			if (node instanceof Parenthesis) {
 				ctx.first = null;
-				return UnitVal.getInstance();
+				return UnitVal.getInstance(node.getLine());
 			} else
 				throw new RuntimeException("cannot parse an empty list");
 		}
@@ -120,9 +131,9 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		ctx.first = rest;
 		
 		if (ParseUtils.checkFirst(",", ctx)) {
-			ParseUtils.parseSymbol(",",ctx);
+			int commaLine = ParseUtils.parseSymbol(",",ctx).getLine();
 			TypedAST remaining = parseAtomicExpr(ctx);
-			first = new TupleObject(first, remaining);
+			first = new TupleObject(first, remaining, commaLine); // FIXME: should be: remaining.getLine());
 		}
 		
 		if (parser == null)
@@ -139,10 +150,10 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 			if (ParseUtils.checkFirst(".",ctx)) {
 				ParseUtils.parseSymbol(".", ctx);
 				Symbol sym = ParseUtils.parseSymbol(ctx);
-				ast = new Invocation(ast, sym.name, null);
+				ast = new Invocation(ast, sym.name, null, sym.getLine());
 			} else {
 				TypedAST argument = parseAtomicExpr(ctx);
-				ast = new Application(ast, argument);
+				ast = new Application(ast, argument, argument.getLine());
 			}
 		}
 
@@ -154,10 +165,11 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseApplication(ctx);
 		
 		while (ctx.first != null && isProductOperator(ctx.first.getFirst())) {
-			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			Symbol s = (Symbol) ctx.first.getFirst();
+			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
 			TypedAST argument = parseApplication(ctx);
-			ast = new Invocation(ast, operatorName, argument);
+			ast = new Invocation(ast, operatorName, argument, s.getLine());
 		}
 		
 		return ast;
@@ -167,10 +179,11 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseProduct(ctx);
 		
 		while (ctx.first != null && isSumOperator(ctx.first.getFirst())) {
-			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			Symbol s = (Symbol) ctx.first.getFirst();
+			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
 			TypedAST argument = parseProduct(ctx);
-			ast = new Invocation(ast, operatorName, argument);
+			ast = new Invocation(ast, operatorName, argument, s.getLine());
 		}
 		
 		return ast;
@@ -180,10 +193,11 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseSum(ctx);
 		
 		while (ctx.first != null && isRelationalOperator(ctx.first.getFirst())) {
-			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			Symbol s = (Symbol) ctx.first.getFirst();
+			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
 			TypedAST argument = parseSum(ctx);
-			ast = new Invocation(ast, operatorName, argument);
+			ast = new Invocation(ast, operatorName, argument, s.getLine());
 		}
 		
 		return ast;
@@ -193,10 +207,11 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseRelationalOps(ctx);
 		
 		while (ctx.first != null && isAndOperator(ctx.first.getFirst())) {
-			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			Symbol s = (Symbol) ctx.first.getFirst();
+			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
 			TypedAST argument = parseRelationalOps(ctx);
-			ast = new Invocation(ast, operatorName, argument);
+			ast = new Invocation(ast, operatorName, argument, s.getLine());
 		}
 		
 		return ast;
@@ -206,10 +221,11 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseAnd(ctx);
 		
 		while (ctx.first != null && isOrOperator(ctx.first.getFirst())) {
-			String operatorName = ((Symbol)ctx.first.getFirst()).name;
+			Symbol s = (Symbol) ctx.first.getFirst();
+			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
 			TypedAST argument = parseAnd(ctx);
-			ast = new Invocation(ast, operatorName, argument);
+			ast = new Invocation(ast, operatorName, argument, s.getLine());
 		}
 		
 		return ast;
@@ -218,9 +234,10 @@ public class CoreParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseEquals(Pair<ExpressionSequence,Environment> ctx) {
 		TypedAST ast = parseOr(ctx);
 		while (ctx.first != null && isEqualsOperator(ctx.first.getFirst())) {
+			Symbol s = (Symbol) ctx.first.getFirst();			
 			ctx.first = ctx.first.getRest();
 			TypedAST value = parseOr(ctx);
-			ast = new Assignment(ast, value);
+			ast = new Assignment(ast, value, s.getLine());
 		}
 		
 		return ast;

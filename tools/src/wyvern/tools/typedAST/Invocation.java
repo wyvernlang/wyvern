@@ -4,6 +4,8 @@ import static wyvern.tools.errors.ErrorMessage.CANNOT_INVOKE;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.typedAST.extensions.values.UnitVal;
 import wyvern.tools.typedAST.extensions.values.VarValue;
@@ -17,10 +19,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private TypedAST receiver;
 	private TypedAST argument;
 
-	public Invocation(TypedAST op1, String operatorName, TypedAST op2) {
+	public Invocation(TypedAST op1, String operatorName, TypedAST op2, int line) {
 		this.receiver = op1;
 		this.argument = op2;
 		this.operationName = operatorName;
+		this.line = line;
 	}
 
 	@Override
@@ -31,14 +34,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		Type receiverType = receiver.typecheck(env);
-		 
+		
 		if (receiverType instanceof OperatableType) {
 			return ((OperatableType)receiverType).checkOperator(this,env);
-		} else if (receiverType instanceof Unit) {
-			// FIXME: UnitType is temporary hack till proper type handling is done!
-			return receiverType;
 		} else {
-			reportError(OPERATOR_DOES_NOT_APPLY, operationName, receiverType.toString(), this);
+			ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, "Trying to call a function on non OperatableType!", this);
 			return null;
 		}
 	}
@@ -81,8 +81,8 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		return ((Assignable)lhs).evaluateAssignment(ass, env);
 	}
 
-	private int line = -1;
+	private int line;
 	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+		return this.line;
 	}
 }

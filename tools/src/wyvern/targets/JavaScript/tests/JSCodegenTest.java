@@ -153,15 +153,15 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testMutuallyRecursiveMethods() {
-		TypedAST typedAST = doCompile("meth doublePlusOne(n:Int):Int = double(n) + 1\n"
-										+"meth double(n:Int):Int = n*2\n"
+		TypedAST typedAST = doCompile("meth double(n:Int):Int = n*2\n"
+										+"meth doublePlusOne(n:Int):Int = double(n) + 1\n"
 										+"doublePlusOne(5)\n");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		Assert.assertEquals("function doublePlusOne(n) {\n"+
-				"\treturn (double)(n) + 1;\n}\n"+
-				"function double(n) {\n"+
+		Assert.assertEquals("function double(n) {\n"+
 				"\treturn n * 2;\n}\n"+
+				"function doublePlusOne(n) {\n"+
+				"\treturn (double)(n) + 1;\n}\n"+
 				"return (doublePlusOne)(5);", visitor.getCode());
 		
 	}
@@ -171,7 +171,7 @@ public class JSCodegenTest {
 		TypedAST typedAST = doCompile("class Hello\n"
 										+"    val hiString = \"hello\"\n"
 										+"\n"
-										+"val h = new Hello()\n"//hiString: \"hi\")\n"
+										+"val h = new\n"//hiString: \"hi\")\n"
 										+"h.hiString");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -219,7 +219,7 @@ public class JSCodegenTest {
 				"class Hello\n"
 				+"    meth get5():Int = 5\n"
 				+"\n"
-				+"val h = new Hello()\n"
+				+"val h = new\n"
 				+"h.get5()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -249,7 +249,7 @@ public class JSCodegenTest {
 										+"	meth get5():Int = 5\n"
 										+"	meth getP():Int = this.get4()+this.get5()\n"
 										+"\n"
-										+"val h = new Hello()\n"
+										+"val h = new\n"
 										+"h.getP()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -263,7 +263,7 @@ public class JSCodegenTest {
 										+"	meth getVal():Int = this.testVal\n"
 										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
-										+"val h = new Hello()\n"
+										+"val h = new\n"
 										+"h.getP()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
