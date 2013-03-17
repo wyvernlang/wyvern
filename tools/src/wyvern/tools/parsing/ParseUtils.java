@@ -167,7 +167,7 @@ public class ParseUtils {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			// TODO: parse more than unit vals
 			// maybe with parens.accept(CoreParser)?
-			return UnitVal.getInstance(parens.getLine());
+			return UnitVal.getInstance(parens.getLocation());
 		} else {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			return null; // Unreachable.

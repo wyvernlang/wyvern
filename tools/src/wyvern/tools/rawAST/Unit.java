@@ -1,5 +1,7 @@
 package wyvern.tools.rawAST;
 
+import wyvern.tools.errors.FileLocation;
+
 
 public class Unit implements RawAST {
 	private Unit() { }
@@ -16,8 +18,10 @@ public class Unit implements RawAST {
 		return "()";
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 }

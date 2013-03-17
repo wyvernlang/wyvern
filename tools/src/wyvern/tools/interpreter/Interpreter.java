@@ -38,7 +38,7 @@ public class Interpreter {
 	}
 
 	public Value interpret(Reader reader) {
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("stdin", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);

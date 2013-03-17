@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.declarations;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
@@ -17,10 +18,10 @@ public class PropDeclaration extends Declaration implements CoreAST {
 	TypeBinding typeBinding;
 	NameBinding nameBinding;
 	
-	public PropDeclaration(String name, TypeBinding typeBinding, int line) {
+	public PropDeclaration(String name, TypeBinding typeBinding, FileLocation line2) {
 		this.typeBinding = typeBinding;
 		this.nameBinding = new NameBindingImpl(name, typeBinding.getType());
-		this.line = line;
+		this.location = line2;
 	}
 
 	@Override
@@ -75,8 +76,10 @@ public class PropDeclaration extends Declaration implements CoreAST {
 		// vb.setValue(defValue);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; 
 	}
 }

@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.values;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.types.Type;
@@ -33,8 +34,8 @@ public class VarValue extends AbstractValue {
 		return innerValue;
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location; //TODO
 	}
 }

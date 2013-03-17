@@ -25,7 +25,7 @@ public class NumberState implements LexerState {
 		
 		// if end of file or not an ID char, set next lexer state and return number read
 		lexer.currentState = MidLineState.getInstance();
-		return Token.getNumber(buf.toString(), lexer.getLineNumber());
+		return Token.getNumber(buf.toString(), lexer.getLocation());
 	}
 
 }

@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions.declarations;
 
 import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
@@ -33,7 +34,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	private List<NameBinding> args;
 	private boolean isClassMeth;
 	
-	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, int line) {
+	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
 		Type argType = null;
 		if (args.size() == 0) {
 			argType = Unit.getInstance();
@@ -49,7 +50,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		this.body = body;
 		this.args = args;
 		this.isClassMeth = isClassMeth;
-		this.line = line;
+		this.location = location;
 	}
 	
 	public boolean isClassMeth() {
@@ -115,8 +116,10 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		vb.setValue(closure);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; 
 	}
 }

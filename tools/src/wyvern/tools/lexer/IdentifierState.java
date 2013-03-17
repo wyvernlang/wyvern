@@ -24,7 +24,7 @@ public class IdentifierState implements LexerState {
 		
 		// if end of file or not an ID char, set next lexer state and return identifier so far
 		lexer.currentState = MidLineState.getInstance();
-		return Token.getIdentifier(buf.toString(), lexer.getLineNumber());
+		return Token.getIdentifier(buf.toString(), lexer.getLocation());
 	}
 
 }

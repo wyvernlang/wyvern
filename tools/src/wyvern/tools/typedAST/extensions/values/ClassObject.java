@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions.values;
 
 import java.util.Map;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.AbstractValue;
@@ -46,9 +47,9 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 		return decl.evaluateDeclarations(obj);
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
@@ -65,8 +66,8 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 		return body;
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

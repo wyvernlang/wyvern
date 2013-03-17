@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.KeywordType;
@@ -34,8 +35,8 @@ public class Keyword extends AbstractValue implements Value, CoreAST {
 		throw new RuntimeException();
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

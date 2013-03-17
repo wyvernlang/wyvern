@@ -22,7 +22,7 @@ public class LexingTest {
 	@Test
 	public void testSimpleLine() {
 		Reader reader = new StringReader("hel_lo \t  \t\t w0rld  ");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -33,7 +33,7 @@ public class LexingTest {
 	@Test
 	public void testNumber() {
 		Reader reader = new StringReader("one 2 3 four");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("one"), lexer.getToken());
@@ -46,7 +46,7 @@ public class LexingTest {
 	@Test
 	public void testLines() {
 		Reader reader = new StringReader("hel_lo \t \n \t  \nw0rld");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -62,7 +62,7 @@ public class LexingTest {
 										 "w0rld\n" +
 										 "\tone\n\t two \t\n\tone\nback\n \t" +
 										 "\n");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -82,7 +82,7 @@ public class LexingTest {
 	@Test
 	public void testIndents2() {
 		Reader reader = new StringReader("hel_lo\n\tw0rld\n\t\tw1rld\nback");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -102,7 +102,7 @@ public class LexingTest {
 		Reader reader = new StringReader("class\n"
 										+"    field\n"
 										+"3");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("class"), lexer.getToken());
 		Assert.assertEquals(Token.getINDENT(), lexer.getToken());
@@ -115,7 +115,7 @@ public class LexingTest {
 	@Test
 	public void testSymbols() {
 		Reader reader = new StringReader("hello+1++3/[{}](-x)");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hello"), lexer.getToken());
@@ -141,7 +141,7 @@ public class LexingTest {
 										 "//world\n" +
 										 "/*Hello\n world!*/" +
 										 "w0rld");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -153,7 +153,7 @@ public class LexingTest {
 	@Test 
 	public void testComments2() {
 		Reader reader = new StringReader("hel_lo//world\n\tw0rld\n\tw0rld2");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -167,7 +167,7 @@ public class LexingTest {
 	@Test
 	public void testStrings() {
 		Reader reader = new StringReader("hel_lo\n\"world\"\nw0rld");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -181,7 +181,7 @@ public class LexingTest {
 	@Test
 	public void testStrings2() {
 		Reader reader = new StringReader("hel_lo\n\"world\"+\"hello\"\nw0rld");
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("hel_lo"), lexer.getToken());
@@ -198,7 +198,7 @@ public class LexingTest {
 	public void testCodeAldrich() throws IOException {
 		InputStream is = LexingTest.class.getClassLoader().getResource("wyvern/tools/tests/samples/Stack.wyv").openStream();
 		Reader reader = new InputStreamReader(is);
-		Lexer lexer = new Lexer(reader);
+		Lexer lexer = new Lexer("Test", reader);
 		
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());

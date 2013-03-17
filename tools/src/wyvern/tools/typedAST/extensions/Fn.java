@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions;
 
 import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.BoundCode;
 import wyvern.tools.typedAST.CachingTypedAST;
 import wyvern.tools.typedAST.CoreAST;
@@ -69,8 +70,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 		visitor.visit(this);
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

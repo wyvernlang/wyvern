@@ -22,7 +22,7 @@ public class ParsingTestPhase1 {
 	@Test
 	public void testSimpleLine() {
 		Reader reader = new StringReader("hel_lo \t  \t\t w0rld  ");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Assert.assertEquals("{$I {$L hel_lo w0rld $L} $I}", parsedResult.toString());
 	}
@@ -30,7 +30,7 @@ public class ParsingTestPhase1 {
 	@Test
 	public void testNumber() {
 		Reader reader = new StringReader("one 2 3 four");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Assert.assertEquals("{$I {$L one 2 3 four $L} $I}", parsedResult.toString());
 	}
@@ -38,7 +38,7 @@ public class ParsingTestPhase1 {
 	@Test
 	public void testLines() {
 		Reader reader = new StringReader("hel_lo \t \n \t  \nw0rld");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Assert.assertEquals("{$I {$L hel_lo $L} {$L w0rld $L} $I}", parsedResult.toString());
 	}
@@ -53,7 +53,7 @@ public class ParsingTestPhase1 {
 				"\n\tone" +
 				"\nback\n \t");
 		
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		String expected ="{$I {$L hel_lo $L}"
 				+" {$L w0rld"
@@ -70,7 +70,7 @@ public class ParsingTestPhase1 {
 				"\n\ttwo" +
 				"\nback\n \t");
 		
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		String expected ="{$I {$L hel_lo"
 				+" {$I {$L one $L}"
@@ -83,7 +83,7 @@ public class ParsingTestPhase1 {
 	public void testCodeAldrich() throws IOException {
 		InputStream is = ParsingTestPhase1.class.getClassLoader().getResource("wyvern/tools/tests/samples/Stack.wyv").openStream();
 		Reader reader = new InputStreamReader(is);
-		Phase1Parser.parse(reader);
+		Phase1Parser.parse("Test", reader);
 	}
 
 	/*

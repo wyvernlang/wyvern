@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions;
 
 import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.Application;
@@ -52,8 +53,8 @@ public class Closure extends AbstractValue implements ApplyableValue {
 		return function.getBody().evaluate(bodyEnv);
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

@@ -41,6 +41,6 @@ public class NewParser implements LineParser {
 			}
 		}
 		
-		return new New(args, first.getLine());
+		return new New(args, first.getLocation());
 	}
 }

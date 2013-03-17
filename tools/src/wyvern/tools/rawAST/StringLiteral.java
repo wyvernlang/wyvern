@@ -1,5 +1,7 @@
 package wyvern.tools.rawAST;
 
+import wyvern.tools.errors.FileLocation;
+
 public class StringLiteral implements RawAST {
 	public final String data;
 	
@@ -30,7 +32,10 @@ public class StringLiteral implements RawAST {
 		return "\"" + data + '\"';
 	}
 
-	public int getLine() {
-		return -1; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 }

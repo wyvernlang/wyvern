@@ -2,6 +2,7 @@ package wyvern.tools.typedAST;
 
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -13,10 +14,10 @@ public class Application extends CachingTypedAST implements CoreAST {
 	private TypedAST function;
 	private TypedAST argument;
 
-	public Application(TypedAST function, TypedAST argument, int line) {
+	public Application(TypedAST function, TypedAST argument, FileLocation location) {
 		this.function = function;
 		this.argument = argument;
-		this.line = line;
+		this.location = location;
 	}
 
 	@Override
@@ -56,8 +57,8 @@ public class Application extends CachingTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

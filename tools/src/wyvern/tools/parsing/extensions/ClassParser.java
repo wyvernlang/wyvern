@@ -1,6 +1,7 @@
 package wyvern.tools.parsing.extensions;
 
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
@@ -32,8 +33,8 @@ public class ClassParser implements LineParser {
 	//REALLY HACKY
 	private static class MutableClassDeclaration extends ClassDeclaration {
 		public MutableClassDeclaration(String name, String implementsName,
-				String implementsClassName, int line) {
-			super(name, implementsName, implementsClassName, null, line);
+				String implementsClassName, FileLocation clsNameLine) {
+			super(name, implementsName, implementsClassName, null, clsNameLine);
 		}
 
 		public void setDecls(Declaration decl) {
@@ -52,7 +53,7 @@ public class ClassParser implements LineParser {
 		
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String clsName = s.name;
-		int clsNameLine = s.getLine();
+		FileLocation clsNameLine = s.getLocation();
 
 		TypedAST declAST = null;
 		String implementsName = "";

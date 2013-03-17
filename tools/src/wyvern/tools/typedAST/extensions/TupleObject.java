@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.CachingTypedAST;
 import wyvern.tools.typedAST.CoreAST;
@@ -21,7 +22,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		this.objects = objects;
 	}
 	
-	public TupleObject(TypedAST first, TypedAST rest, int line) {
+	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {
 		if (rest instanceof TupleObject) {
 			objects = new TypedAST[((TupleObject) rest).objects.length + 1];
 			objects[0] = first;
@@ -31,7 +32,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		} else {
 			this.objects = new TypedAST[] { first, rest };
 		}
-		this.line = line;
+		this.location = commaLine;
 	}
 
 	@Override
@@ -70,8 +71,8 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		return objects;
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

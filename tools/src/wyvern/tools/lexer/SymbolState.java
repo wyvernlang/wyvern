@@ -26,7 +26,7 @@ public class SymbolState implements LexerState {
 				} else {
 					// return what is read so far; then get back to reading symbols
 					lexer.currentState = SymbolState.getInstance();
-					return Token.getIdentifier(buf.toString(), lexer.getLineNumber());
+					return Token.getIdentifier(buf.toString(), lexer.getLocation());
 				}
 			}
 			
@@ -49,7 +49,7 @@ public class SymbolState implements LexerState {
 		if (symbol.startsWith("//"))
 			return CommentState.getInstance(CommentType.LineComment).getToken(lexer);
 		
-		return Token.getIdentifier(buf.toString(), lexer.getLineNumber());
+		return Token.getIdentifier(buf.toString(), lexer.getLocation());
 	}
 
 }

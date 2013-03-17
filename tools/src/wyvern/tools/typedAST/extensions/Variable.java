@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions;
 
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.Assignable;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.Assignment;
@@ -19,9 +20,9 @@ import wyvern.tools.util.TreeWriter;
 public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	private NameBinding binding;
 	
-	public Variable(NameBinding binding, int line) {
+	public Variable(NameBinding binding, FileLocation location) {
 		this.binding = binding;
-		this.line = line;
+		this.location = location;
 	}
 
 	public String getName() {
@@ -81,8 +82,8 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 		return newValue;
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CachingTypedAST;
@@ -26,13 +27,13 @@ public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 
-	public New(TypedAST args, int line) {
+	public New(TypedAST args, FileLocation fileLocation) {
 		for (Assignment arg = (Assignment)args; arg != null; arg = (Assignment) arg.getNext()) {
 			if (!(arg.getTarget() instanceof Variable))
 				throw new RuntimeException("Must assign to a variable");
 			this.args.put(((Variable)arg.getTarget()).getName(), arg.getValue());
 		}
-		this.line = line;
+		this.location = fileLocation;
 	}
 
 	@Override
@@ -88,8 +89,10 @@ public class New extends CachingTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; 
 	}
 }

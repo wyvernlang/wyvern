@@ -2,10 +2,12 @@ package wyvern.tools.rawAST;
 
 import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
+
 public class Line extends ExpressionSequence {
-	public Line(List<RawAST> children, int line) {
+	public Line(List<RawAST> children, FileLocation location) {
 		super(children);
-		this.line = line;
+		this.location = location;
 	}
 	
 	@Override
@@ -28,11 +30,13 @@ public class Line extends ExpressionSequence {
 		if (children.size() == 1)
 			return null;
 		else
-			return new Line(children.subList(1, children.size()), this.line);
+			return new Line(children.subList(1, children.size()), this.location);
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 }

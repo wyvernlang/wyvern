@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.values;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.CoreAST;
@@ -56,8 +57,8 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 		visitor.visit(this);
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

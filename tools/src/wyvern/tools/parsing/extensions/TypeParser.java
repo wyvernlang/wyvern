@@ -1,6 +1,7 @@
 package wyvern.tools.parsing.extensions;
 
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
@@ -24,7 +25,7 @@ public class TypeParser implements LineParser {
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String clsName = s.name;
-		int clsNameLine = s.getLine();
+		FileLocation clsNameLine = s.getLocation();
 
 		TypedAST declAST = null;
 		if (ctx.first == null) {

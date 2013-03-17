@@ -5,6 +5,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.typedAST.extensions.values.UnitVal;
@@ -19,11 +20,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private TypedAST receiver;
 	private TypedAST argument;
 
-	public Invocation(TypedAST op1, String operatorName, TypedAST op2, int line) {
+	public Invocation(TypedAST op1, String operatorName, TypedAST op2, FileLocation fileLocation) {
 		this.receiver = op1;
 		this.argument = op2;
 		this.operationName = operatorName;
-		this.line = line;
+		this.location = fileLocation;
 	}
 
 	@Override
@@ -81,8 +82,8 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		return ((Assignable)lhs).evaluateAssignment(ass, env);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

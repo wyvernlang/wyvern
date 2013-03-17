@@ -13,4 +13,6 @@ public final class FileLocation {
 	public String toString() {
 		return filename+":"+line+","+character;
 	}
+	
+	public final static FileLocation UNKNOWN = new FileLocation("Unknown",-1,-1);
 }

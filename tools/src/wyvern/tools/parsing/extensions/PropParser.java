@@ -1,6 +1,7 @@
 package wyvern.tools.parsing.extensions;
 
 import static wyvern.tools.parsing.ParseUtils.parseSymbol;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -25,7 +26,7 @@ public class PropParser implements LineParser {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		
 		String varName = s.name;
-		int line = s.getLine();
+		FileLocation line = s.getLocation();
 		
 		if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);

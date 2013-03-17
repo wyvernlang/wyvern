@@ -1,11 +1,13 @@
 package wyvern.tools.rawAST;
 
+import wyvern.tools.errors.FileLocation;
+
 public class Symbol implements RawAST {
 	public final String name;
 	
-	public Symbol(String s, int line) {
+	public Symbol(String s, FileLocation location) {
 		name = s.intern();
-		this.line = line;
+		this.location = location;
 	}
 	
 	@Override
@@ -31,8 +33,10 @@ public class Symbol implements RawAST {
 		return name;
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 }

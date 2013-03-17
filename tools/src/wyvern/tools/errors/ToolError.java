@@ -25,7 +25,7 @@ public class ToolError extends RuntimeException {
 
 	protected ToolError(ErrorMessage message, HasLocation errorLocation) {
 		super(message.getErrorMessage() + " on line number " +
-				((errorLocation != null)?errorLocation.getLine():"NULL"));
+				((errorLocation != null)?errorLocation.getLocation().toString():"NULL"));
 		assert message.numberOfArguments() == 0;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;
@@ -34,7 +34,7 @@ public class ToolError extends RuntimeException {
 
 	protected ToolError(ErrorMessage message, String arg1, HasLocation errorLocation) {
 		super(message.getErrorMessage(arg1) + " on line number " +
-				((errorLocation != null)?errorLocation.getLine():"NULL"));
+				((errorLocation != null)?errorLocation.getLocation().toString():"NULL"));
 		assert message.numberOfArguments() == 1;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;
@@ -43,7 +43,7 @@ public class ToolError extends RuntimeException {
 
 	protected ToolError(ErrorMessage message, String arg1, String arg2, HasLocation errorLocation) {
 		super(message.getErrorMessage(arg1, arg2) + " on line number " +
-				((errorLocation != null)?errorLocation.getLine():"NULL"));
+				((errorLocation != null)?errorLocation.getLocation().toString():"NULL"));
 		assert message.numberOfArguments() == 2;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;
@@ -52,7 +52,7 @@ public class ToolError extends RuntimeException {
 
 	protected ToolError(ErrorMessage message, String arg1, String arg2, String arg3, HasLocation errorLocation) {
 		super(message.getErrorMessage(arg1, arg2, arg3) + " on line number " +
-				((errorLocation != null)?errorLocation.getLine():"NULL"));
+				((errorLocation != null)?errorLocation.getLocation().toString():"NULL"));
 		assert message.numberOfArguments() == 3;
 		this.errorMessage = message;
 		this.errorLocation = errorLocation;

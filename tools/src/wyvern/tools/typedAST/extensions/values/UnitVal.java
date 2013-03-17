@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.values;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.CoreAST;
@@ -11,10 +12,10 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
-	private UnitVal(int line) { this.line = line; }
+	private UnitVal(FileLocation location) { this.location = location; }
 	// private static UnitVal instance = new UnitVal(); // FIXME: I have to move away from instance to provide line number! :(
-	public static UnitVal getInstance(int line) {
-		return new UnitVal(line); // instance; 
+	public static UnitVal getInstance(FileLocation fileLocation) {
+		return new UnitVal(fileLocation); // instance; 
 	}
 	
 	@Override
@@ -37,8 +38,8 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 		visitor.visit(this);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

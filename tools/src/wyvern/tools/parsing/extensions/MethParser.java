@@ -3,6 +3,7 @@ package wyvern.tools.parsing.extensions;
 import java.util.ArrayList;
 import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
@@ -41,8 +42,8 @@ public class MethParser implements LineParser {
 	
 	//REALLY HACKY (to get recursive methods for now until refactoring is done)
 	private static class MutableMethDeclaration extends MethDeclaration {
-		public MutableMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, int line) {
-			super(name, args, returnType, body, isClassMeth, line);
+		public MutableMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation methNameLine) {
+			super(name, args, returnType, body, isClassMeth, methNameLine);
 		}
 		
 		public void setBody(TypedAST body) {
@@ -53,7 +54,7 @@ public class MethParser implements LineParser {
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx, Type returnType, boolean isClassMeth) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String methName = s.name;
-		int methNameLine = s.getLine();
+		FileLocation methNameLine = s.getLocation();
 		
 		Parenthesis paren = ParseUtils.extractParen(ctx);
 		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second); 

@@ -36,7 +36,7 @@ public class ParsingTestPhase2 {
 	public void testValDecl() {
 		Reader reader = new StringReader("val x = 5\n"
 										+"x");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L val x = 5 $L} {$L x $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -51,7 +51,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testLambdaCall() {
 		Reader reader = new StringReader("(fn x : Int => x)(1)");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L (fn x : Int => x) (1) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -66,7 +66,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testLambdaCallWithAdd() {
 		Reader reader = new StringReader("(fn x : Int => x + 1)(3)");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L (fn x : Int => x + 1) (3) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -81,7 +81,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testArithmetic() {
 		Reader reader = new StringReader("3*4+5*6");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L 3 * 4 + 5 * 6 $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -96,7 +96,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testPrint() {
 		Reader reader = new StringReader("print(\"Testing printing.\")");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L print (\"Testing printing.\") $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -111,7 +111,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testHigherOrderTypes() {
 		Reader reader = new StringReader("fn f : Int -> Int => fn x : Int => f(f(x))");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L fn f : Int -> Int => fn x : Int => f (f (x)) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -128,7 +128,7 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("val applyTwice = fn f : Int -> Int => fn x : Int => f(f(x))\n"
 										+"val addOne = fn x : Int => x + 1\n"
 										+"applyTwice(addOne)(1)");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -143,7 +143,7 @@ public class ParsingTestPhase2 {
 	public void testMethod() {
 		Reader reader = new StringReader("meth double(n:Int):Int = n*2\n"
 										+"double(5)\n");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L meth double (n : Int) : Int = n * 2 $L} {$L double (5) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -159,7 +159,7 @@ public class ParsingTestPhase2 {
 	public void testTupleMethodCalls() {
 		Reader reader = new StringReader("meth mult(n:Int,m:Int):Int = n+5*m\n"
 				+"mult(3,2)\n");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L meth mult (n : Int , m : Int) : Int = n + 5 * m $L} {$L mult (3 , 2) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -176,7 +176,7 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("meth double(n:Int):Int = n*2\n"
 										+"meth doublePlusOne(n:Int):Int = double(n) + 1\n"
 										+"doublePlusOne(5)\n");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L meth double (n : Int) : Int = n * 2 $L} {$L meth doublePlusOne (n : Int) : Int = double (n) + 1 $L} {$L doublePlusOne (5) $L} $I}",
 				parsedResult.toString());
 		
@@ -198,7 +198,7 @@ public class ParsingTestPhase2 {
 										+"\n"
 										+"val h = Hello.make()\n"//hiString: \"hi\")\n"
 										+"h.hiString");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -216,7 +216,7 @@ public class ParsingTestPhase2 {
 										+"val f1 = outer(1)\n"
 										+"val f2 = outer(2)\n"
 										+"f2(6)"); // result should be 9
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -243,7 +243,7 @@ public class ParsingTestPhase2 {
 										+"\n"
 										+"val h = Hello.make()\n"
 										+"h.get5()");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -263,7 +263,7 @@ public class ParsingTestPhase2 {
 										+"\n"
 										+"val h = Hello.make()\n"
 										+"h.getP()");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -283,7 +283,7 @@ public class ParsingTestPhase2 {
 										+"\n"
 										+"val h = Hello.make()\n"
 										+"h.getP()");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -305,7 +305,7 @@ public class ParsingTestPhase2 {
 										+"\n"
 										+"val h = Hello.make()\n"
 										+"h.getP()");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -318,7 +318,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testVarDecls() {
 		Reader reader = new StringReader("var x = 1\nx");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
@@ -330,7 +330,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testVarAssignment() {
 		Reader reader = new StringReader("var x = 1\nx=2\nx");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
@@ -342,7 +342,7 @@ public class ParsingTestPhase2 {
 	@Test
 	public void testVarAssignment2() {
 		Reader reader = new StringReader("var x = 1\nx=2\nvar y = 3\ny=4\nx=y\nx");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
@@ -361,7 +361,7 @@ public class ParsingTestPhase2 {
 				+"val h = Hello.make()\n"
 				+"val a = h.setV(10)\n" 
 				+"h.getV()");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
@@ -381,7 +381,7 @@ public class ParsingTestPhase2 {
 				+"	meth getVa():Int = this.testVa\n"
 				+"val h = Hello.make(10)\n"
 				+"h.getVa()");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
@@ -404,7 +404,7 @@ public class ParsingTestPhase2 {
 				+"\n"
 				+"val h = Hello.NewHello(10)\n"
 				+"h.getP()");
-			RawAST parsedResult = Phase1Parser.parse(reader);
+			RawAST parsedResult = Phase1Parser.parse("Test", reader);
 			
 			Environment env = Globals.getStandardEnv();
 			TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
@@ -429,7 +429,7 @@ public class ParsingTestPhase2 {
 		InputStream is = url.openStream();
 		Reader reader = new InputStreamReader(is);
 		
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);

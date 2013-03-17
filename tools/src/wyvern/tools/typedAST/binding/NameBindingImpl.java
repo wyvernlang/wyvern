@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.binding;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.Value;
 import wyvern.tools.typedAST.extensions.Variable;
@@ -13,7 +14,7 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 
 	public TypedAST getUse() {
 		// throw new RuntimeException("this method should not be needed!!!");
-		return new Variable(this, -11); // FIXME: !!! Cannot replicate its use from outside!
+		return new Variable(this, FileLocation.UNKNOWN); // FIXME: !!! Cannot replicate its use from outside!
 	}
 	
 	public Value getValue(Environment env) {

@@ -39,7 +39,7 @@ public class JSCodegenTest {
 	
 	private TypedAST doCompile(String input) {
 		Reader reader = new StringReader(input);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));

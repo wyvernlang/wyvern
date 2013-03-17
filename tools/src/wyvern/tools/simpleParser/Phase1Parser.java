@@ -11,8 +11,8 @@ import static wyvern.tools.errors.ErrorMessage.*;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class Phase1Parser {
-	public static RawAST parse(Reader r) {
-		return parseTopSequence(new Lexer(r));
+	public static RawAST parse(String filename, Reader r) {
+		return parseTopSequence(new Lexer(filename, r));
 	}
 	
 	/** Parses an element.  That is, either:
@@ -35,11 +35,11 @@ public class Phase1Parser {
 		}
 		
 		if (token.kind == Identifier) {
-			return new Symbol(token.text, token.getLine());
+			return new Symbol(token.text, token.getLocation());
 		}
 		
 		if (token.kind == Symbol) {
-			return new Symbol(token.text, token.getLine());
+			return new Symbol(token.text, token.getLocation());
 		}
 		
 		if (token.kind == Number) {
@@ -53,7 +53,7 @@ public class Phase1Parser {
 		if (token.kind == LPAREN) {
 			Token openParen = token;
 			// read elements in the middle
-			Sequence sequence = new Parenthesis(new ArrayList<RawAST>(), lexer.getLineNumber());
+			Sequence sequence = new Parenthesis(new ArrayList<RawAST>(), lexer.getLocation());
 			parseSequence(lexer, sequence);	// TODO: maybe call a separate parseSequence that ignores newlines and indents?
 			
 			token = lexer.getToken();
@@ -90,7 +90,7 @@ public class Phase1Parser {
 			if (token.kind == INDENT) {
 				// eat the token, read a line sequence, and check for a DEDENT
 				token = lexer.getToken();
-				LineSequence node = new LineSequence(token.getLine());
+				LineSequence node = new LineSequence(token.getLocation());
 				parseLines(lexer, node);
 				token = lexer.peekToken();
 				// accept an EOF as a DEDENT
@@ -153,7 +153,7 @@ public class Phase1Parser {
 			if (token.kind == EOF || token.kind == DEDENT)
 				break;
 			
-			Line line = new Line(new ArrayList<RawAST>(), token.getLine());
+			Line line = new Line(new ArrayList<RawAST>(), token.getLocation());
 			parseSequence(lexer, line);
 			result.children.add(line);
 			token = lexer.peekToken();
@@ -195,7 +195,7 @@ public class Phase1Parser {
 			throw new ParseException();
 		}*/
 		
-		LineSequence topSequence = new LineSequence(lexer.peekToken().getLine());
+		LineSequence topSequence = new LineSequence(lexer.peekToken().getLocation());
 		parseLines(lexer, topSequence);		
 		return topSequence;
 	}

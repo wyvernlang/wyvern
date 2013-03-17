@@ -21,7 +21,7 @@ public class StringState implements LexerState {
 			//Has the string ended?
 			if (ch == '"') {
 				lexer.currentState = MidLineState.getInstance();
-				return Token.getString(buf.toString(), lexer.getLineNumber());
+				return Token.getString(buf.toString(), lexer.getLocation());
 			}
 			buf.append(ch);
 			return getToken(lexer);

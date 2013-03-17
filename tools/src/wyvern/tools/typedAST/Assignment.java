@@ -4,6 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_ASSIGNED;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.CoreParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
@@ -20,10 +21,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	
 	private TypedAST nextExpr;
 
-	public Assignment(TypedAST target, TypedAST value, int line) {
+	public Assignment(TypedAST target, TypedAST value, FileLocation fileLocation) {
 		this.target = target;
 		this.value = value;
-		this.line = line;
+		this.location = fileLocation;
 	}
 
 	@Override
@@ -84,8 +85,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		};
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

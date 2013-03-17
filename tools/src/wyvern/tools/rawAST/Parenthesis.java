@@ -2,10 +2,12 @@ package wyvern.tools.rawAST;
 
 import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
+
 public class Parenthesis extends ExpressionSequence {
-	public Parenthesis(List<RawAST> children, int line) {
+	public Parenthesis(List<RawAST> children, FileLocation location) {
 		super(children);
-		this.line = line;
+		this.location = location;
 	}
 	
 	@Override
@@ -28,11 +30,13 @@ public class Parenthesis extends ExpressionSequence {
 		if (children.size() == 1)
 			return null;
 		else
-			return new Parenthesis(children.subList(1, children.size()), this.line);
+			return new Parenthesis(children.subList(1, children.size()), this.location);
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 }

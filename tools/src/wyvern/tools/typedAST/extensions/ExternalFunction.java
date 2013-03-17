@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.AbstractValue;
 import wyvern.tools.typedAST.Application;
@@ -41,8 +42,8 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 		// TODO  Not really sure what to do here.
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

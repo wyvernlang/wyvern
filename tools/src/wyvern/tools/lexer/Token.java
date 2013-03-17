@@ -1,6 +1,7 @@
 package wyvern.tools.lexer;
 
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
@@ -12,37 +13,37 @@ public class Token implements HasLocation {
 	public final String text;
 	public final int value;
 	
-	public final int line;
-	public int getLine() {
-		return line;
+	public final FileLocation location;
+	public FileLocation getLocation() {
+		return location;
 	}
 	
-	private Token(Kind k, int line) { kind = k; text = ""; value = 0; this.line = line; }
-	private Token(Kind k, String t, int line) { kind = k; text = t; value = 0; this.line = line; }
-	private Token(Kind k, String t, int val, int line) { kind = k; text = t; value = val; this.line = line; }
+	private Token(Kind k, FileLocation location) { kind = k; text = ""; value = 0; this.location = location; }
+	private Token(Kind k, String t, FileLocation location) { kind = k; text = t; value = 0; this.location = location; }
+	private Token(Kind k, String t, int val, FileLocation location) { kind = k; text = t; value = val; this.location = location; }
 	
-	private static Token tokenEOF = new Token(Kind.EOF,-1);
+	private static Token tokenEOF = new Token(Kind.EOF,FileLocation.UNKNOWN);
 	public static Token getEOF() {
 		return tokenEOF;
 	}
-	private static Token tokenNEWLINE = new Token(Kind.NEWLINE,-1);
+	private static Token tokenNEWLINE = new Token(Kind.NEWLINE,FileLocation.UNKNOWN);
 	public static Token getNEWLINE() {
 		return tokenNEWLINE;
 	}
-	private static Token tokenINDENT = new Token(Kind.INDENT,-1);
+	private static Token tokenINDENT = new Token(Kind.INDENT,FileLocation.UNKNOWN);
 	public static Token getINDENT() {
 		return tokenINDENT;
 	}
-	private static Token tokenDEDENT = new Token(Kind.DEDENT,-1);
+	private static Token tokenDEDENT = new Token(Kind.DEDENT,FileLocation.UNKNOWN);
 	public static Token getDEDENT() {
 		return tokenDEDENT;
 	}
-	private static Token LPAREN = new Token(Kind.LPAREN, "(",-1);
-	private static Token RPAREN = new Token(Kind.RPAREN, ")",-1);
-	private static Token LBRACE = new Token(Kind.LBRACE, "{",-1);
-	private static Token RBRACE = new Token(Kind.RBRACE, "}",-1);
-	private static Token LBRACK = new Token(Kind.LBRACK, "[",-1);
-	private static Token RBRACK = new Token(Kind.RBRACK, "]",-1);
+	private static Token LPAREN = new Token(Kind.LPAREN, "(",FileLocation.UNKNOWN);
+	private static Token RPAREN = new Token(Kind.RPAREN, ")",FileLocation.UNKNOWN);
+	private static Token LBRACE = new Token(Kind.LBRACE, "{",FileLocation.UNKNOWN);
+	private static Token RBRACE = new Token(Kind.RBRACE, "}",FileLocation.UNKNOWN);
+	private static Token LBRACK = new Token(Kind.LBRACK, "[",FileLocation.UNKNOWN);
+	private static Token RBRACK = new Token(Kind.RBRACK, "]",FileLocation.UNKNOWN);
 	
 	public static Token getGroup(char ch) {
 		switch(ch) {
@@ -58,27 +59,27 @@ public class Token implements HasLocation {
 	}
 	
 	public static Token getIdentifier(String string) {
-		return new Token(Kind.Identifier, string, -1);
+		return new Token(Kind.Identifier, string, FileLocation.UNKNOWN);
 	}
 
 	public static Token getNumber(String string) {
-		return new Token(Kind.Number, string, Integer.parseInt(string), -1);
+		return new Token(Kind.Number, string, Integer.parseInt(string), FileLocation.UNKNOWN);
 	}
 	
 	public static Token getString(String string) {
-		return new Token(Kind.String, string, -1);
+		return new Token(Kind.String, string, FileLocation.UNKNOWN);
 	}
 	
-	public static Token getIdentifier(String string, int line) {
-		return new Token(Kind.Identifier, string, line);
+	public static Token getIdentifier(String string, FileLocation location) {
+		return new Token(Kind.Identifier, string, location);
 	}
 
-	public static Token getNumber(String string, int line) {
-		return new Token(Kind.Number, string, Integer.parseInt(string), line);
+	public static Token getNumber(String string, FileLocation location) {
+		return new Token(Kind.Number, string, Integer.parseInt(string), location);
 	}
 	
-	public static Token getString(String string, int line) {
-		return new Token(Kind.String, string, line);
+	public static Token getString(String string, FileLocation location) {
+		return new Token(Kind.String, string, location);
 	}
 
 	@Override

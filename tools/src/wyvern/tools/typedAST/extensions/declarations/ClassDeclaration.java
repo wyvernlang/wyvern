@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.extensions.declarations;
 
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
@@ -30,7 +31,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	
 	private Environment declEvalEnv;
 	
-	public ClassDeclaration(String name, String implementsName, String implementsClassName, Declaration decls, int line) {
+	public ClassDeclaration(String name, String implementsName, String implementsClassName, Declaration decls, FileLocation location) {
 		this.decls = decls;
 		Type objectType = new ClassType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -38,7 +39,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		nameBinding = new NameBindingImpl(name, classType);
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
-		this.line = line;
+		this.location = location;
 	}
 
 	@Override
@@ -196,8 +197,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
-	private int line;
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	
+	@Override
+	public FileLocation getLocation() {
+		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 }

@@ -46,7 +46,7 @@ public class ClassTypeCheckerTests {
 		String parsedTestFileAsString = s.nextLine();
 		s.close();
 		
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals(parsedTestFileAsString, parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -89,7 +89,7 @@ public class ClassTypeCheckerTests {
 				+"        val result = 42\n"
 				+"        result\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L print (\"test\") $L} $I} $L} {$L meth pop () : Int ? {$I {$L val result = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -127,7 +127,7 @@ public class ClassTypeCheckerTests {
 				+"        val result = 42\n"
 				+"        result\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth pop () {$I {$L val result = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -164,7 +164,7 @@ public class ClassTypeCheckerTests {
 				+"    implements StackBar\n"
 				+"    var top : Int?\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements StackBar $L} {$L var top : Int ? $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -217,7 +217,7 @@ public class ClassTypeCheckerTests {
 				+"        new\n"
 				+"            list = Link(firstElement, null)\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class Link {$I {$L val data : Int $L} {$L val next : Link ? $L} {$L class meth Link (d : Int , n : Link ?) {$I {$L new {$I {$L data = d $L} {$L next = n $L} $I} $L} $I} $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L var list : Link ? $L} {$L class meth Stack () : Stack = new $L} {$L class meth StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link (firstElement , null) $L} $I} $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -253,7 +253,7 @@ public class ClassTypeCheckerTests {
 				+"\n"
 				+"    class meth Stack() = new\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L class meth Stack () = new $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -290,7 +290,7 @@ public class ClassTypeCheckerTests {
 				+"    class implements StackFactoryFoo\n"
 				+"    var top : Int?\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactoryFoo $L} {$L var top : Int ? $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -337,7 +337,7 @@ public class ClassTypeCheckerTests {
 				+"    s.push(42)\n"
 				+"    s.push(\"wrong type\")\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		
@@ -392,7 +392,7 @@ public class ClassTypeCheckerTests {
 				+"    s.push(\"42\")\n"
 				+"    s.push(\"42\")\n"
 				);
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Str) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new $L} {$L var top : Int ? $L} {$L meth push (element : Str) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		

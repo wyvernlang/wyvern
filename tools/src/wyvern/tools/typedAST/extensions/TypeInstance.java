@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions;
 
 import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.AbstractTypedAST;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
@@ -59,8 +60,8 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 }

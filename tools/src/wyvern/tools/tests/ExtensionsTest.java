@@ -33,7 +33,7 @@ public class ExtensionsTest {
 	public void testSimpleBooleans() {
 		Reader reader = new StringReader("val b = true && true && true\n"
 										+"b || false && true");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L val b = true && true && true $L} {$L b || false && true $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -60,7 +60,7 @@ public class ExtensionsTest {
 		boolean[] results = {first>second, first<second, first<=second, first>=second, first==second, first!=second};
 		for (int i=0; i<ops.length; i++) {
 			Reader reader = new StringReader(first + ops[i] + second);
-			parsedResult = Phase1Parser.parse(reader);
+			parsedResult = Phase1Parser.parse("Test", reader);
 			Assert.assertEquals("{$I {$L "+ first + " " + ops[i] +" "+ second +" $L} $I}", parsedResult.toString());
 			typedAST = parsedResult.accept(CoreParser.getInstance(), env);
 			Assert.assertEquals("Invocation(IntegerConstant(" + first + "), \"" + ops[i] + "\", IntegerConstant(" + second + "))", typedAST.toString());
@@ -83,7 +83,7 @@ public class ExtensionsTest {
 	@Test
 	public void testStrings() {
 		Reader reader = new StringReader("100 + \" Hello \" + \"world!\" ");
-		RawAST parsedResult = Phase1Parser.parse(reader);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Assert.assertEquals("{$I {$L 100 + \" Hello \" + \"world!\" $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -99,7 +99,7 @@ public class ExtensionsTest {
 	public void testRecursiveFunction() {
 		Reader reader = new StringReader("meth m(n:Int):Int = 1 + m(n)\n"
 										+"m(5)");
-		RawAST parsedResult = Phase1Parser.parse(reader);		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		Assert.assertEquals("{$I {$L meth m (n : Int) : Int = 1 + m (n) $L} {$L m (5) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();

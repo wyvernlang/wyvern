@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.util.Stack;
 
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
@@ -14,12 +15,17 @@ public class Lexer {
 	
 	private Reader reader;
 	private int currentChar = -1;
+	private String filename;
+	
+	private int charNum = -1;
 	private int lineNum = -1;
 	
-	public Lexer(Reader r) {
+	public Lexer(String filename, Reader r) {
 		reader = r;
 		lineNum = 1; // First line is #1, every time we see '\n' when read() method is called, increment. Simple.
+		charNum = 0; // Every line starts with a zeroth char. When read() is called, increment. If read sees a '\n', set to 0
 		prefixStack.push("");
+		this.filename = filename;
 	}
 	
 	private void fill() {
@@ -47,7 +53,11 @@ public class Lexer {
 		fill();
 		char ch = (char) currentChar;
 		currentChar = -1;
-		if (ch == '\n') lineNum++;
+		charNum++;
+		if (ch == '\n') {
+			lineNum++;
+			charNum = 0;
+		}
 		return ch;
 	}
 
@@ -121,6 +131,10 @@ public class Lexer {
 	
 	public int getLineNumber() {
 		return lineNum;
+	}
+	
+	public FileLocation getLocation() {
+		return new FileLocation(filename, lineNum, charNum);
 	}
 
 	String getCurrentPrefix() {

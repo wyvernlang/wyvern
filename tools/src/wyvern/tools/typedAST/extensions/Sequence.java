@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.extensions;
 
 import java.util.ArrayList;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.CoreAST;
@@ -60,10 +61,9 @@ public class Sequence implements CoreAST {
 		// TODO Auto-generated method stub
 	}
 
-	private int line = -1;
-	@Override
-	public int getLine() {
-		return this.line;
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location;
 	}
 
 	@Override

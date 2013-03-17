@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.declarations;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.Assignable;
 import wyvern.tools.typedAST.Assignment;
 import wyvern.tools.typedAST.CoreAST;
@@ -76,8 +77,8 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		vb.setValue(new VarValue(defValue));
 	}
 
-	private int line = -1;
-	public int getLine() {
-		return this.line; // TODO: NOT IMPLEMENTED YET.
+	private FileLocation location = FileLocation.UNKNOWN;
+	public FileLocation getLocation() {
+		return this.location; //TODO
 	}
 }
