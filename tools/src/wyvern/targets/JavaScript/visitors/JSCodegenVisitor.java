@@ -303,6 +303,11 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	public void visit(JSFunction jsfunction) {
 		elemStack.push(new ASTElement(jsfunction, jsfunction.getName()));
 	}
+	
+	@Override
+	public void visit(Assignment assignment) {
+		super.visit(assignment);
+	}
 
 	// TODO: Ben, please implement, though nothing much to do here at this stage...
 
@@ -314,11 +319,19 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(VarDeclaration varDeclaration) {
 		super.visit(varDeclaration);
+		ASTElement nextDeclElem = (varDeclaration.getNextDecl() != null) ? elemStack.pop() : null;
+		ASTElement declelem = elemStack.pop();
+		
+		// TODO SMELL: somewhat hackish
+		String nextDeclText = (nextDeclElem == null)? "" : "\n" + nextDeclElem.generated;
+		elemStack.push(new ASTElement(varDeclaration, 
+				((inClass)?"this.":"var ")+varDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
 	}
 
 	@Override
 	public void visit(TypeDeclaration interfaceDeclaration) {
 		super.visit(interfaceDeclaration);
+		//Not needed
 	}
 	
 	@Override
