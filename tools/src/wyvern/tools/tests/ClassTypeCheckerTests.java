@@ -178,7 +178,7 @@ public class ClassTypeCheckerTests {
 			try {
 				((Declaration) typedAST).typecheckAll(env);
 			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackBar has no declaration in the context on line number 11", e.toString());
+				Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackBar has no declaration in the context on line number Test:11,15", e.toString());
 				return;
 			}
 		}
@@ -267,7 +267,7 @@ public class ClassTypeCheckerTests {
 			try {
 				((Declaration) typedAST).typecheckAll(env);
 			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of StackFactory on line number 11", e.toString());
+				Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of StackFactory on line number Test:11,15", e.toString());
 				return;
 			}
 		}
@@ -304,7 +304,7 @@ public class ClassTypeCheckerTests {
 			try {
 				((Declaration) typedAST).typecheckAll(env);
 			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackFactoryFoo has no declaration in the context on line number 11", e.toString());
+				Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackFactoryFoo has no declaration in the context on line number Test:11,15", e.toString());
 				return;
 			}
 		}
@@ -351,7 +351,7 @@ public class ClassTypeCheckerTests {
 			try {
 				((Declaration) typedAST).typecheckAll(env);
 			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument to function does not match function type on line number -1", e.toString());
+				Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument to function does not match function type on line number Unknown:-1,-1", e.toString());
 				return;
 			}
 		}
