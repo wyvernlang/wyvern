@@ -1,6 +1,6 @@
 package wyvern.tools.typedAST;
 
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.extensions.LetExpr;
@@ -47,30 +47,7 @@ public abstract class Declaration extends AbstractTypedAST {
 
 	@Override
 	public LineSequenceParser getLineSequenceParser() {
-		return new LineSequenceParser() {
-			@Override
-			public TypedAST parse(
-					TypedAST first,
-					LineSequence rest,
-					Environment env) {
-				
-				Environment newEnv = extend(env);
-				TypedAST body = rest.accept(CoreParser.getInstance(), newEnv);
-				
-				// build a let construct, or build/extend a decl block, depending on whether the next thing is a decl
-				if (body instanceof LetExpr) {
-					LetExpr let = (LetExpr) body;
-					nextDecl = let.addDecl(Declaration.this);
-					return body;
-				} else if (body instanceof Declaration) {
-					Declaration decl = (Declaration) body;
-					nextDecl = decl;
-					return Declaration.this;
-				} else
-					return new LetExpr(Declaration.this, body);
-			}
-			
-		};
+		return null;
 	}
 	
 	public final Environment extend(Environment old) {
@@ -85,44 +62,24 @@ public abstract class Declaration extends AbstractTypedAST {
 	}
 
 	protected abstract Environment doExtend(Environment old);
-	protected abstract Environment extendWithValue(Environment old);
-	protected abstract void evalDecl(Environment evalEnv, Environment declEnv);
-	
-	public final Environment extendWithDecls(Environment env) {
-		Environment newEnv = env;
-		for (Declaration d = this; d != null; d = d.nextDecl) {
-			newEnv = d.extendWithValue(newEnv);
-		}
-		return newEnv;
-	}
-	
-	public final Environment bindDecls(Environment env) {
-		Environment newEnv = env;
-		for (Declaration d = this; d != null; d = d.nextDecl) {
-			d.evalDecl(newEnv, newEnv);
-		}
-		return newEnv;
-	}
-	
-	public final Environment bindDecls(Environment bodyEnv, Environment declEnv) {
-		Environment newEnv = bodyEnv;
-		for (Declaration d = this; d != null; d = d.nextDecl) {
-			d.evalDecl(bodyEnv, declEnv);
-		}
-		return newEnv;
-	}
+	public abstract Environment extendWithValue(Environment old);
+	public abstract void evalDecl(Environment evalEnv, Environment declEnv);
 	
 	public final Environment bindDecl(Environment evalEnv, Environment declEnv) {
 		evalDecl(evalEnv, declEnv);
 		return evalEnv;
 	}
 	
+	public final Environment bindDecl(Environment evalEnv) {
+		return bindDecl(evalEnv, evalEnv);
+	}
+	
+	public final Environment evalDecl(Environment env) {
+		return bindDecl(doExtendWithValue(env));
+	}
+	
 	public final Environment doExtendWithValue(Environment old) {
 		return extendWithValue(old);
-	}
-
-	public final Environment evalDecls(Environment env) {
-		return bindDecls(extendWithDecls(env));
 	}
 
 	public Declaration getNextDecl() {

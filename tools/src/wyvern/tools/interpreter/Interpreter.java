@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.Reader;
 
 import wyvern.stdlib.Globals;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
@@ -41,7 +41,7 @@ public class Interpreter {
 		RawAST parsedResult = Phase1Parser.parse("stdin", reader);
 		
 		Environment env = Globals.getStandardEnv();
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		
 		typedAST.typecheck(env);
 		

@@ -24,6 +24,13 @@ public class Environment implements TreeWritable {
 	public Environment extend(Binding binding) {
 		return new Environment(this, binding);
 	}
+	
+	public Environment extend(Environment env) {
+		if (env.binding == null)
+			return this;
+		
+		return new Environment(extend(env.parentEnvironment), env.binding);
+	}
 
 	public static Environment getEmptyEnvironment() {
 		return emptyEnvironment;

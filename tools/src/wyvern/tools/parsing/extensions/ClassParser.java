@@ -3,15 +3,17 @@ package wyvern.tools.parsing.extensions;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.Declaration;
+import wyvern.tools.typedAST.Sequence;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.TypeBinding;
+import wyvern.tools.typedAST.extensions.DeclSequence;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.extensions.ClassType;
@@ -37,7 +39,7 @@ public class ClassParser implements LineParser {
 			super(name, implementsName, implementsClassName, null, clsNameLine);
 		}
 
-		public void setDecls(Declaration decl) {
+		public void setDecls(DeclSequence decl) {
 			this.decls = decl;
 		}
 		
@@ -88,11 +90,11 @@ public class ClassParser implements LineParser {
 			
 			Environment newEnv = mutableDecl.extend(ctx.second); 
 			
-			declAST = lines.accept(CoreParser.getInstance(), newEnv);
-			if (!(declAST instanceof Declaration))
+			declAST = lines.accept(BodyParser.getInstance(), newEnv);
+			if (!(declAST instanceof Declaration) && !(declAST instanceof Sequence))
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			
-			mutableDecl.setDecls((Declaration)declAST);
+			mutableDecl.setDecls(DeclSequence.getDeclSeq(declAST));
 		}
 
 		return mutableDecl;

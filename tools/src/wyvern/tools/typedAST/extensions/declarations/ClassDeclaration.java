@@ -6,10 +6,12 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
+import wyvern.tools.typedAST.Sequence;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.DeclSequence;
 import wyvern.tools.typedAST.extensions.values.ClassObject;
 import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
@@ -20,8 +22,8 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
-	protected Declaration decls;
-	protected Declaration classDecls;
+	protected DeclSequence decls;
+	protected DeclSequence classDecls;
 	
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
@@ -31,7 +33,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	
 	private Environment declEvalEnv;
 	
-	public ClassDeclaration(String name, String implementsName, String implementsClassName, Declaration decls, FileLocation location) {
+	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
 		Type objectType = new ClassType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -60,21 +62,19 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type doTypecheck(Environment env) {
-		Declaration decl = decls;
 
 		// FIXME: Currently allow this and class in both class and object methods. :(
 		
 		Environment genv = env.extend(new TypeBinding("class", typeBinding.getType()));
 		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
-		while (decl != null) {
+		
+		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth())
 				decl.typecheckSelf(genv);
 			else
 				decl.typecheckSelf(oenv);
 			
-			decl = decl.getNextDecl();
 		}
-		
 		
 		// check the implements and class implements
 		if (!this.implementsName.equals("")) {
@@ -129,13 +129,13 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment extendWithValue(Environment old) {
+	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 		return newEnv;
 	}
 
 	@Override
-	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 		ClassObject classObj = new ClassObject(this);
@@ -155,11 +155,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public Environment getClassEnv() {
-		Declaration decl = decls;
 		
 		Environment classEnv = Environment.getEmptyEnvironment();
 		
-		while (decl != null) {
+		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth()){
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
@@ -169,7 +168,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		TypeBinding thisBinding = new TypeBinding("class", typeBinding.getType());
 		Environment evalEnv = classEnv.extend(thisBinding);
 		
-		for (decl = decls; decl != null; decl = decl.getNextDecl())
+		for (Declaration decl : decls.getDeclIterator())
 			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth()){
 				decl.bindDecl(evalEnv,classEnv);
 			}
@@ -178,8 +177,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	public Declaration getDecl(String opName) {
-		Declaration d = decls;
-		while (d != null) {
+		for (Declaration d : decls.getDeclIterator()) {
 			// TODO: handle fields too
 			if (d.getName().equals(opName))
 				return d;
@@ -188,7 +186,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return null;	// can't find it
 	}
 	
-	public Declaration getDecls() {
+	public DeclSequence getDecls() {
 		return decls;
 	}
 

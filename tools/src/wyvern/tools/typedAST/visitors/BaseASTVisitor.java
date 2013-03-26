@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.extensions.DeclSequence;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.New;
@@ -112,13 +113,11 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(ClassDeclaration clsDeclaration) {
-		Declaration decls = clsDeclaration.getDecls();
+		DeclSequence decls = clsDeclaration.getDecls();
 		
 		if (!(decls instanceof CoreAST))
 			throw new RuntimeException("All visited elements must implement CoreAST.");
 		((CoreAST)decls).accept(this);
-		if (clsDeclaration.getNextDecl() != null)
-			((CoreAST) clsDeclaration.getNextDecl()).accept(this);
 	}
 
 	@Override
@@ -127,13 +126,6 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(LetExpr let) {
-		TypedAST decl = let.getDecl();
-		TypedAST body = let.getBody();
-		
-		if (decl instanceof CoreAST)
-			((CoreAST) decl).accept(this);
-		if (body instanceof CoreAST)
-			((CoreAST) body).accept(this);
 	}
 
 	@Override

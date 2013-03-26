@@ -5,7 +5,7 @@ import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.extensions.LetExpr;
@@ -77,7 +77,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 					Environment env) {
 				
 				Environment newEnv = env;
-				TypedAST body = rest.accept(CoreParser.getInstance(), newEnv);
+				TypedAST body = rest.accept(BodyParser.getInstance(), newEnv);
 
 				Assignment.this.nextExpr = body;
 				return Assignment.this;

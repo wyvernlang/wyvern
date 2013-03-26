@@ -1,7 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.CachingTypedAST;
@@ -18,10 +18,10 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 public class LetExpr extends CachingTypedAST implements CoreAST {
-	private Declaration decl;
+	private DeclSequence decl;
 	private TypedAST body;
 	
-	public LetExpr(Declaration decl, TypedAST body) {
+	public LetExpr(DeclSequence decl, TypedAST body) {
 		this.decl = decl;
 		this.body = body;
 	}
@@ -33,7 +33,7 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		decl.typecheckAll(env);
+		decl.typecheck(env);
 		Environment newEnv = decl.extendWithDecls(env);
 		Type bodyType = body.typecheck(newEnv);
 		return bodyType;
@@ -50,17 +50,18 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
+	/*
 	// TODO: SMELL: maybe should have a list of decls here? but reuse between letexpr and class?
 	// depends on declToAdd adding the returned decl to itself
 	public Declaration addDecl(Declaration declToAdd) {
 		Declaration old = decl;
 		decl = declToAdd;
 		return old;
-	}	
-	
+	}
 	public Declaration getDecl() {
 		return decl;
-	}
+	}	
+	*/
 	
 	public TypedAST getBody() {
 		return body;

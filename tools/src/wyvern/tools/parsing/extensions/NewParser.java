@@ -2,7 +2,7 @@ package wyvern.tools.parsing.extensions;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -33,7 +33,7 @@ public class NewParser implements LineParser {
 		if (ctx.first != null) {
 			if (ctx.first.getFirst() instanceof LineSequence) { // All args on individual lines.
 				LineSequence lines = ParseUtils.extractLines(ctx);
-				args = lines.accept(CoreParser.getInstance(), ctx.second);
+				args = lines.accept(BodyParser.getInstance(), ctx.second);
 				// TODO: Parse this properly.
 				// System.out.println(lines);
 			} else {

@@ -3,8 +3,11 @@ package wyvern.tools.parsing.extensions;
 import java.util.ArrayList;
 import java.util.List;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.BodyParser;
+import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -30,7 +33,7 @@ import static wyvern.tools.parsing.ParseUtils.*;
  * Could specify as:   "meth" symbol ":" type "=>" exp
  */
 
-public class MethParser implements LineParser {
+public class MethParser implements DeclParser {
 	private MethParser() { }
 	private static MethParser instance = new MethParser();
 	public static MethParser getInstance() { return instance; }
@@ -84,7 +87,7 @@ public class MethParser implements LineParser {
 				returnType = ParseUtils.parseType(ctx);
 			}
 		} else {
-			// What's wrong with no return type? Seems allowed...
+			returnType = wyvern.tools.types.extensions.Unit.getInstance();
 		}
 		
 		// Process body now.
@@ -96,10 +99,10 @@ public class MethParser implements LineParser {
 			exp = null;
 		} else if (ParseUtils.checkFirst("=",ctx)) {
 			ParseUtils.parseSymbol("=",ctx);
-			exp = ctx.first.accept(CoreParser.getInstance(), md.extend(ctx.second));
+			exp = ctx.first.accept(BodyParser.getInstance(), md.extend(ctx.second));
 			ctx.first = null; // don't forget to reset!
 		} else {
-			exp = ctx.first.accept(CoreParser.getInstance(), md.extend(ctx.second));
+			exp = ctx.first.accept(BodyParser.getInstance(), md.extend(ctx.second));
 			ctx.first = null; // don't forget to reset!
 		}
 		
@@ -107,5 +110,89 @@ public class MethParser implements LineParser {
 
 		return new MethDeclaration(methName, args, returnType, exp, isClassMeth, methNameLine); // Discard mutable md... hack...
 		
+	}
+
+	@Override
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
+			Pair<ExpressionSequence, Environment> ctx) {
+		Symbol s = ParseUtils.parseSymbol(ctx);
+		final String methName = s.name;
+		final FileLocation methNameLine = s.getLocation();
+		final Type returnType;
+		
+		Parenthesis paren = ParseUtils.extractParen(ctx);
+		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second); 
+		final List<NameBinding> args = new ArrayList<NameBinding>();
+		Environment argsEnv = Environment.getEmptyEnvironment();
+
+		while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
+			if (args.size() > 0)
+				ParseUtils.parseSymbol(",", newCtx);
+				
+			String argName = ParseUtils.parseSymbol(newCtx).name;
+			
+			Type argType = null;
+			if (ParseUtils.checkFirst(":", newCtx)) {
+				ParseUtils.parseSymbol(":", newCtx);
+				argType = ParseUtils.parseType(newCtx);
+			} else {
+				// What's wrong with no type for arg? Seems allowed...
+			}
+			NameBinding binding = new NameBindingImpl(argName, argType);
+			argsEnv = argsEnv.extend(binding);
+			args.add(binding);
+		}
+		
+		final Environment savedArgsEnv = argsEnv;
+		
+		if (ParseUtils.checkFirst(":", ctx)) {
+			ParseUtils.parseSymbol(":", ctx);
+			returnType = ParseUtils.parseType(ctx);
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null;
+		}
+		
+		// Process body now.
+		final ExpressionSequence exp;
+		int type = 0;
+		
+		if (ctx.first == null) {
+			// Empty body is OK - say inside interface.
+			exp = null;
+		} else if (ParseUtils.checkFirst("=",ctx)) {
+			ParseUtils.parseSymbol("=",ctx);
+			exp = ctx.first;
+		} else {
+			exp = ctx.first;
+		}
+		
+		
+		ctx.first = null; // don't forget to reset!
+		
+		final MutableMethDeclaration md = new MutableMethDeclaration(methName, args, returnType, null, false, methNameLine);
+		
+		return new Pair<Environment, ContParser>(md.extend(Environment.getEmptyEnvironment()), new ContParser() {
+
+			@Override
+			public TypedAST parse(Environment env) {
+				TypedAST inExp;
+				if (exp == null) {
+					inExp = null;
+				} else {
+					inExp = exp.accept(BodyParser.getInstance(), env.extend(savedArgsEnv));
+				}
+				md.setBody(inExp);
+
+				return new MethDeclaration(methName, args, returnType, inExp, false, methNameLine);
+			}
+			
+		});
+		
+	}
+
+	@Override
+	public Environment getBodyEnv(Environment decls) {
+		return decls;
 	}
 }

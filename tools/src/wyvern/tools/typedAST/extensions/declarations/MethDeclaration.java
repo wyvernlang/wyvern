@@ -3,7 +3,7 @@ package wyvern.tools.typedAST.extensions.declarations;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
@@ -104,13 +104,13 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	}
 
 	@Override
-	protected Environment extendWithValue(Environment old) {
+	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
 		return newEnv;
 	}
 
 	@Override
-	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		Closure closure = new Closure(this, evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(closure);

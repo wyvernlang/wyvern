@@ -10,7 +10,9 @@ import wyvern.tools.typedAST.CoreAST;
 import wyvern.tools.typedAST.CoreASTVisitor;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
+import wyvern.tools.typedAST.Sequence;
 import wyvern.tools.typedAST.binding.NameBinding;
+import wyvern.tools.typedAST.extensions.DeclSequence;
 import wyvern.tools.typedAST.extensions.Fn;
 import wyvern.tools.typedAST.extensions.LetExpr;
 import wyvern.tools.typedAST.extensions.New;
@@ -190,10 +192,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 
 	@Override
 	public void visit(ClassDeclaration clsDeclaration) {
-		Declaration decls = clsDeclaration.getDecls();
-		
-		if (!(decls instanceof CoreAST))
-			throw new RuntimeException("All visited elements must implement CoreAST.");
+		DeclSequence decls = clsDeclaration.getDecls();
 		
 		inClass = true;
 		((CoreAST)decls).accept(this);
@@ -337,5 +336,11 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(PropDeclaration propDeclaration) {
 		super.visit(propDeclaration);
+	}
+
+	@Override
+	public void visit(Sequence sequence) {
+		// TODO Auto-generated method stub
+		
 	}
 }

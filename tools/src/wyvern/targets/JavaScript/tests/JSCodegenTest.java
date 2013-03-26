@@ -15,7 +15,7 @@ import wyvern.stdlib.Globals;
 import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.targets.JavaScript.types.JSObjectType;
 import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.CoreAST;
@@ -43,7 +43,7 @@ public class JSCodegenTest {
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}

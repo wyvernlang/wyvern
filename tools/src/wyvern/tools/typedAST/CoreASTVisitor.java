@@ -39,4 +39,5 @@ public interface CoreASTVisitor {
 	void visit(TypeInstance typeInstance);
 	void visit(Assignment assignment);
 	void visit(TypeDeclaration interfaceDeclaration);
+	void visit(Sequence sequence);
 }

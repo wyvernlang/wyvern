@@ -141,14 +141,14 @@ public class ParseUtils {
 
 	// I do not think this method is needed!? (Alex) Why not use accept directly?
 	public static TypedAST parseExpr(Pair<ExpressionSequence, Environment> ctx) {
-		TypedAST result = ctx.first.accept(CoreParser.getInstance(), ctx.second);
+		TypedAST result = ctx.first.accept(BodyParser.getInstance(), ctx.second);
 		ctx.first = null;	// previous line by definition read everything
 		return result;
 	}
 
 	public static Variable parseVariable(Pair<ExpressionSequence, Environment> ctx) {
 		Symbol sym = parseSymbol(ctx);
-		TypedAST var = sym.accept(CoreParser.getInstance(), ctx.second);
+		TypedAST var = sym.accept(BodyParser.getInstance(), ctx.second);
 		if (!(var instanceof Variable))
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		return (Variable) var;

@@ -59,7 +59,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		TypeDeclaration typeD = tt.getDecl();
 		
 		HashSet<String> thisDtypes = new HashSet<String>();
-		for (Declaration d = thisD.getDecls(); d != null; d = d.getNextDecl()) {
+		for (Declaration d : thisD.getDecls().getDeclIterator()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
 			if (d instanceof PropDeclaration) {
 				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
@@ -71,7 +71,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
 		
 		HashSet<String> implDtypes = new HashSet<String>();
-		for (Declaration d = typeD.getDecls(); d != null; d = d.getNextDecl()) {
+		for (Declaration d : typeD.getDecls().getDeclIterator()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
 			if (d instanceof PropDeclaration) {
 				implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)

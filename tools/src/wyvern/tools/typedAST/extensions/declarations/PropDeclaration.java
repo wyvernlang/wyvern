@@ -63,14 +63,14 @@ public class PropDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment extendWithValue(Environment old) {
+	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), typeBinding.getType()));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
 
 	@Override
-	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		// Value defValue = definition.evaluate(evalEnv);
 		// ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		// vb.setValue(defValue);

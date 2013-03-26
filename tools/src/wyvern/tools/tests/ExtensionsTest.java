@@ -14,7 +14,7 @@ import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.interpreter.Interpreter;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
@@ -37,9 +37,8 @@ public class ExtensionsTest {
 		Assert.assertEquals("{$I {$L val b = true && true && true $L} {$L b || false && true $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);		
-		Assert.assertEquals("LetExpr(ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true))), " +
-				"Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true))))",
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);		
+		Assert.assertEquals("[ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true))), Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true)))]",
 				typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Bool.getInstance(), resultType);
@@ -62,7 +61,7 @@ public class ExtensionsTest {
 			Reader reader = new StringReader(first + ops[i] + second);
 			parsedResult = Phase1Parser.parse("Test", reader);
 			Assert.assertEquals("{$I {$L "+ first + " " + ops[i] +" "+ second +" $L} $I}", parsedResult.toString());
-			typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+			typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 			Assert.assertEquals("Invocation(IntegerConstant(" + first + "), \"" + ops[i] + "\", IntegerConstant(" + second + "))", typedAST.toString());
 			resultType = typedAST.typecheck(env);
 			Assert.assertEquals(Bool.getInstance(), resultType);
@@ -87,7 +86,7 @@ public class ExtensionsTest {
 		Assert.assertEquals("{$I {$L 100 + \" Hello \" + \"world!\" $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Assert.assertEquals("Invocation(Invocation(IntegerConstant(100), \"+\", StringConstant(\" Hello \")), \"+\", StringConstant(\"world!\"))", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Str.getInstance(), resultType);
@@ -103,8 +102,8 @@ public class ExtensionsTest {
 		Assert.assertEquals("{$I {$L meth m (n : Int) : Int = 1 + m (n) $L} {$L m (5) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("LetExpr(MethDeclaration(), Application(Variable(\"m\"), IntegerConstant(5)))", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[MethDeclaration(), Application(Variable(\"m\"), IntegerConstant(5))]", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		

@@ -16,7 +16,7 @@ import org.junit.internal.runners.statements.Fail;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.TypedAST;
@@ -42,7 +42,7 @@ public class ClassTypeCheckerTests {
 
 		testFileName = "wyvern/tools/tests/samples/parsedSimpleClass.prsd";
 		url = ClassTypeCheckerTests.class.getClassLoader().getResource(testFileName);
-		Scanner s = new Scanner(new File(url.getFile()));
+		Scanner s = new Scanner(url.openStream());
 		String parsedTestFileAsString = s.nextLine();
 		s.close();
 		
@@ -51,16 +51,10 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), MethDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			((Declaration) typedAST).typecheckAll(env);
-		} else {
-			Type resultType = typedAST.typecheck(env);
-			Assert.assertEquals(Unit.getInstance(), resultType);
-		}
+		typedAST.typecheck(env);
 		
 		//Value resultValue = typedAST.evaluate(env);
 		//Assert.assertEquals("()", resultValue.toString());
@@ -95,8 +89,8 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
 
 		// FIXME: Type checking Declarations is different!!!
 		if (typedAST instanceof Declaration) {
@@ -133,18 +127,16 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			try {
-				((Declaration) typedAST).typecheckAll(env);
-			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of Stack on line number Test:11,15", e.toString());
-				return;
-			}
+		try {
+			typedAST.typecheck(env);
+		} catch (ToolError e) {
+			Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of Stack on line number Test:11,15", e.toString());
+			return;
 		}
+		
 		Assert.fail("Expected Wyvern compiler to detect error!");
 	}
 	
@@ -170,17 +162,14 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			try {
-				((Declaration) typedAST).typecheckAll(env);
-			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackBar has no declaration in the context on line number Test:11,15", e.toString());
-				return;
-			}
+		try {
+			typedAST.typecheck(env);
+		} catch (ToolError e) {
+			Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackBar has no declaration in the context on line number Test:11,15", e.toString());
+			return;
 		}
 		Assert.fail("Expected Wyvern compiler to detect error!");
 	}
@@ -223,16 +212,11 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			((Declaration) typedAST).typecheckAll(env);
-		} else {
-			Type resultType = typedAST.typecheck(env);
-			Assert.assertEquals(Unit.getInstance(), resultType);
-		}
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Unit.getInstance(), resultType);
 	}
 	
 	@Test
@@ -259,17 +243,14 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			try {
-				((Declaration) typedAST).typecheckAll(env);
-			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of StackFactory on line number Test:11,15", e.toString());
-				return;
-			}
+		try {
+			typedAST.typecheck(env);
+		} catch (ToolError e) {
+			Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of StackFactory on line number Test:11,15", e.toString());
+			return;
 		}
 		Assert.fail("Expected Wyvern compiler to detect error!");
 	}
@@ -296,19 +277,16 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			try {
-				((Declaration) typedAST).typecheckAll(env);
-			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackFactoryFoo has no declaration in the context on line number Test:11,15", e.toString());
-				return;
-			}
+		
+		try {
+			typedAST.typecheck(env);
+		} catch (ToolError e) {
+			Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackFactoryFoo has no declaration in the context on line number Test:11,15", e.toString());
+			return;
 		}
-		Assert.fail("Expected Wyvern compiler to detect error!");
 	}
 	
 	@Test
@@ -343,17 +321,14 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), MutableClassDeclaration(), MethDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			try {
-				((Declaration) typedAST).typecheckAll(env);
-			} catch (ToolError e) {
-				Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument to function does not match function type on line number Unknown:-1,-1", e.toString());
-				return;
-			}
+		try {
+			typedAST.typecheck(env);
+		} catch (ToolError e) {
+			Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument to function does not match function type on line number Unknown:-1,-1", e.toString());
+			return;
 		}
 		Assert.fail("Expected Wyvern compiler to detect error!");
 	}
@@ -398,15 +373,9 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
-		Assert.assertEquals("TypeDeclaration()", typedAST.toString());		
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[TypeDeclaration(), MutableClassDeclaration(), MethDeclaration()]", typedAST.toString());		
 
-		// FIXME: Type checking Declarations is different!!!
-		if (typedAST instanceof Declaration) {
-			((Declaration) typedAST).typecheckAll(env);
-		} else {
-			Type resultType = typedAST.typecheck(env);
-			Assert.assertEquals(Unit.getInstance(), resultType);
-		}
+		typedAST.typecheck(env);
 	}
 }

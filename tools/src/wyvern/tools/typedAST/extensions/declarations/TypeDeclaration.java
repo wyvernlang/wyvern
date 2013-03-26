@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.DeclSequence;
 import wyvern.tools.typedAST.extensions.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -17,13 +18,13 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
-	private Declaration decls;
+	private DeclSequence decls;
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
 	
-	public TypeDeclaration(String name, Declaration decls, FileLocation clsNameLine) {
+	public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
 		this.decls = decls;
 		Type objectType = new TypeType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -50,11 +51,10 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type doTypecheck(Environment env) {
-		Declaration decl = decls;
 		
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env);
-		while (decl != null) {
+		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
 			decl = decl.getNextDecl();
 		}
@@ -70,13 +70,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment extendWithValue(Environment old) {
+	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 		return newEnv;
 	}
 
 	@Override
-	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 		
@@ -99,17 +99,16 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 
 	public Declaration getDecl(String opName) {
-		Declaration d = decls;
-		while (d != null) {
+
+		for (Declaration d : decls.getDeclIterator()) {
 			// TODO: handle fields too
 			if (d.getName().equals(opName))
 				return d;
-			d = d.getNextDecl();
 		}
 		return null;	// can't find it
 	}
 	
-	public Declaration getDecls() {
+	public DeclSequence getDecls() {
 		return decls;
 	}
 

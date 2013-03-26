@@ -1,7 +1,7 @@
 package wyvern.tools.typedAST.extensions.declarations;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.CoreParser;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.CachingTypedAST;
@@ -75,14 +75,14 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment extendWithValue(Environment old) {
+	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
 
 	@Override
-	protected void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		Value defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(defValue);
