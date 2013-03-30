@@ -28,7 +28,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		binding = new NameBindingImpl(name, null);
 	}
 	
-	public ValDeclaration(String name, Type type) {
+	public ValDeclaration(String name, Type type, TypedAST definition) {
+		this.definition=definition;
 		binding = new NameBindingImpl(name, type);
 	}
 
@@ -39,6 +40,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (this.definition != null)
+			this.definitionType = this.definition.typecheck(env);
 		if (binding.getType() == null) {
 			this.definitionType = this.definition.typecheck(env);
 			this.binding = new NameBindingImpl(binding.getName(), definitionType);
@@ -83,7 +86,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		Value defValue = definition.evaluate(evalEnv);
+		if (declEnv.getValue(binding.getName()) != null)
+			return;
+			
+		Value defValue = null;
+		if (definition != null)
+			defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(defValue);
 	}

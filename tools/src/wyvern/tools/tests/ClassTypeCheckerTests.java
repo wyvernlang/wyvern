@@ -80,11 +80,11 @@ public class ClassTypeCheckerTests {
 				+"        print(\"test\")\n"
 				+"\n"
 				+"    meth pop() : Int?\n"
-				+"        val result = 42\n"
+				+"        val result : Int = 42\n"
 				+"        result\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L print (\"test\") $L} $I} $L} {$L meth pop () : Int ? {$I {$L val result = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L print (\"test\") $L} $I} $L} {$L meth pop () : Int ? {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -118,11 +118,11 @@ public class ClassTypeCheckerTests {
 				+"    var top : Int?\n"
 				+"\n"
 				+"    meth pop()\n"
-				+"        val result = 42\n"
+				+"        val result:Int = 42\n"
 				+"        result\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth pop () {$I {$L val result = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth pop () {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -305,18 +305,18 @@ public class ClassTypeCheckerTests {
 				+"    var top : Int?\n"
 				+"\n"
 				+"    meth push(element : Int)\n"
-				+"        top = element\n"
+				+"        this.top = element\n"
 				+"\n"
 				+"    meth pop() : Int?\n"
-				+"        top\n"
+				+"        this.top\n"
 				+"\n"
 				+"meth doIt()\n"
-				+"    val s = StackImpl.Stack()\n"
+				+"    val s : Stack = StackImpl.Stack()\n"
 				+"    s.push(42)\n"
 				+"    s.push(\"wrong type\")\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new $L} {$L var top : Int ? $L} {$L meth push (element : Int) {$I {$L this . top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -349,13 +349,13 @@ public class ClassTypeCheckerTests {
 				+"    var top : Int?\n"
 				+"\n"
 				+"    meth push(element : Str)\n"
-				+"        top = element\n"
+				+"        this.top = element\n"
 				+"\n"
 				+"    meth pop() : Int?\n"
-				+"        top\n"
+				+"        this.top\n"
 				+"\n"
 				+"meth doIt()\n"
-				+"    val s = StackImpl.Stack()\n"
+				+"    val s:Stack = StackImpl.Stack()\n"
 				+"    s.push(\"42\")\n"
 				+"    s.push(\"42\")\n"
 				+"    s.push(\"42\")\n"
@@ -368,7 +368,7 @@ public class ClassTypeCheckerTests {
 				+"    s.push(\"42\")\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Str) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new $L} {$L var top : Int ? $L} {$L meth push (element : Str) {$I {$L top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s = StackImpl . Stack () $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Str) $L} {$L meth pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class meth Stack () : Stack = new $L} {$L var top : Int ? $L} {$L meth push (element : Str) {$I {$L this . top = element $L} $I} $L} {$L meth pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L meth doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();

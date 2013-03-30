@@ -27,10 +27,8 @@ public class ValueBinding extends NameBindingImpl {
 		return value;
 	}
 	
-	/** Can lazily set the value exactly once
-	 */
 	public void setValue(Value newValue) {
-		assert value == null;
+		//assert value == null;
 		assert newValue != null;
 		value = newValue;
 	}

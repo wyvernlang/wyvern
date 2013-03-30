@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.DeclParser.ContParser;
+import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclarationParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
@@ -37,10 +37,10 @@ public class ParsingTestPhase2 {
 
 	@Test
 	public void testValDecl() {
-		Reader reader = new StringReader("val x = 5\n"
+		Reader reader = new StringReader("val x : Int = 5\n"
 										+"x");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
-		Assert.assertEquals("{$I {$L val x = 5 $L} {$L x $L} $I}", parsedResult.toString());
+		Assert.assertEquals("{$I {$L val x : Int = 5 $L} {$L x $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
@@ -128,8 +128,8 @@ public class ParsingTestPhase2 {
 	
 	@Test
 	public void testHigherOrderApplication() {
-		Reader reader = new StringReader("val applyTwice = fn f : Int -> Int => fn x : Int => f(f(x))\n"
-										+"val addOne = fn x : Int => x + 1\n"
+		Reader reader = new StringReader("val applyTwice : (Int -> Int) -> (Int -> Int) = fn f : Int -> Int => fn x : Int => f(f(x))\n"
+										+"val addOne : Int -> Int = fn x : Int => x + 1\n"
 										+"applyTwice(addOne)(1)");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
 		
@@ -197,9 +197,9 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("class Hello\n"
 										+"    class meth make():Hello\n"
 										+"    \tnew\n"
-										+"    val hiString = \"hello\"\n"
+										+"    val hiString : String = \"hello\"\n"
 										+"\n"
-										+"val h = Hello.make()\n"//hiString: \"hi\")\n"
+										+"val h : Hello = Hello.make()\n"//hiString: \"hi\")\n"
 										+"h.hiString");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
@@ -216,8 +216,8 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("meth outer(n:Int):Int -> Int\n"
 										+"    meth nested(m:Int):Int = n+m\n"
 										+"    fn x : Int => nested(x+1)\n"
-										+"val f1 = outer(1)\n"
-										+"val f2 = outer(2)\n"
+										+"val f1 : Int -> Int = outer(1)\n"
+										+"val f2 : Int -> Int = outer(2)\n"
 										+"f2(6)"); // result should be 9
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
@@ -244,7 +244,7 @@ public class ParsingTestPhase2 {
 										+"    class meth make():Hello = new\n"
 										+"    meth get5():Int = 5\n"
 										+"\n"
-										+"val h = Hello.make()\n"
+										+"val h:Hello = Hello.make()\n"
 										+"h.get5()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
@@ -264,7 +264,7 @@ public class ParsingTestPhase2 {
 										+"	meth get5():Int = 5\n"
 										+"	meth getP():Int = this.get4()+this.get5()\n"
 										+"\n"
-										+"val h = Hello.make()\n"
+										+"val h:Hello = Hello.make()\n"
 										+"h.getP()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
@@ -280,11 +280,11 @@ public class ParsingTestPhase2 {
 	public void testClassMethodsVals() {
 		Reader reader = new StringReader("class Hello\n"
 										+"	class meth make():Hello = new\n"
-										+"	val testVal = 5\n"
+										+"	val testVal:Int = 5\n"
 										+"	meth getVal():Int = this.testVal\n"
 										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
-										+"val h = Hello.make()\n"
+										+"val h:Hello = Hello.make()\n"
 										+"h.getP()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
@@ -300,13 +300,13 @@ public class ParsingTestPhase2 {
 	public void testClassMethodsVals3() {
 		Reader reader = new StringReader("class Hello\n"
 										+"	class meth make():Hello = new\n"
-										+"	val testVal = 5\n"
-										+"	val testVal2 = 15\n"
-										+"	val testVal3 = 25\n"
+										+"	val testVal:Int = 5\n"
+										+"	val testVal2:Int = 15\n"
+										+"	val testVal3:Int = 25\n"
 										+"	meth getVal():Int = this.testVal + this.testVal3/this.testVal2\n"
 										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
-										+"val h = Hello.make()\n"
+										+"val h : Hello = Hello.make()\n"
 										+"h.getP()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		
@@ -320,7 +320,7 @@ public class ParsingTestPhase2 {
 	
 	@Test
 	public void testVarDecls() {
-		Reader reader = new StringReader("var x = 1\nx");
+		Reader reader = new StringReader("var x : Int = 1\nx");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
@@ -332,7 +332,7 @@ public class ParsingTestPhase2 {
 
 	@Test
 	public void testVarAssignment() {
-		Reader reader = new StringReader("var x = 1\nx=2\nx");
+		Reader reader = new StringReader("var x:Int = 1\nx=2\nx");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
@@ -344,7 +344,7 @@ public class ParsingTestPhase2 {
 	
 	@Test
 	public void testVarAssignment2() {
-		Reader reader = new StringReader("var x = 1\nx=2\nvar y = 3\ny=4\nx=y\nx");
+		Reader reader = new StringReader("var x:Int = 1\nx=2\nvar y:Int = 3\ny=4\nx=y\nx");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
@@ -358,11 +358,11 @@ public class ParsingTestPhase2 {
 	public void testVarAssignmentInClass() {
 		Reader reader = new StringReader("class Hello\n"
 				+"	class meth make():Hello = new\n"
-				+"	var testVal = 5\n"
+				+"	var testVal:Int = 5\n"
 				+"	meth setV(n : Int):Int = this.testVal = n\n"
 				+"	meth getV():Int = this.testVal\n"
-				+"val h = Hello.make()\n"
-				+"val a = h.setV(10)\n" 
+				+"val h:Hello = Hello.make()\n"
+				+"val a:Int = h.setV(10)\n" 
 				+"h.getV()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
@@ -382,7 +382,7 @@ public class ParsingTestPhase2 {
 				"		testVa = n\n" +
 				"		testVr = n+1\n"
 				+"	meth getVa():Int = this.testVa\n"
-				+"val h = Hello.make(10)\n"
+				+"val h:Hello = Hello.make(10)\n"
 				+"h.getVa()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
@@ -449,9 +449,20 @@ public class ParsingTestPhase2 {
 	public void testDeclParser() {
 		Reader reader = new StringReader("meth double(n:Int):Int = n*2\n"
 				+"meth doublePlusOne(n:Int):Int = double(n) + 1\n");
-				RawAST parsedResult = Phase1Parser.parse("Test", reader);
-				Environment env = Globals.getStandardEnv();
-				Pair<Environment,ContParser> contin = parsedResult.accept(DeclarationParser.getInstance(), env);
-				TypedAST result = contin.second.parse(contin.first);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		Pair<Environment,ContParser> contin = parsedResult.accept(DeclarationParser.getInstance(), env);
+		TypedAST result = contin.second.parse(new ContParser.SimpleResolver(contin.first));
+	}
+	
+	@Test
+	public void testOutOfOrderParsing() {
+		Reader reader = new StringReader(
+				"meth doublePlusOne(n:Int):Int = double(n) + 1\n"+
+				"meth double(n:Int):Int = n*2\n");
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		Pair<Environment,ContParser> contin = parsedResult.accept(DeclarationParser.getInstance(), env);
+		TypedAST result = contin.second.parse(new ContParser.SimpleResolver(contin.first));
 	}
 }

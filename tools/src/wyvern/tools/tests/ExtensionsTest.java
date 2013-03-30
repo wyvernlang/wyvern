@@ -31,10 +31,10 @@ public class ExtensionsTest {
 
 	@Test
 	public void testSimpleBooleans() {
-		Reader reader = new StringReader("val b = true && true && true\n"
+		Reader reader = new StringReader("val b:Bool = true && true && true\n"
 										+"b || false && true");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
-		Assert.assertEquals("{$I {$L val b = true && true && true $L} {$L b || false && true $L} $I}", parsedResult.toString());
+		Assert.assertEquals("{$I {$L val b : Bool = true && true && true $L} {$L b || false && true $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);		

@@ -35,14 +35,14 @@ class StackImpl
 
 	var list : Link?
 
-	meth top() : Int? = list.data
+	meth top() : Int? = this.list.data
 
 	meth push(element : Int)
-		list = Link(element, list)
+		this.list = Link(element, this.list)
 
 	meth pop() : Int?
-		val result = list.data
-		list = list.next
+		val result : Int = this.list.data
+		this.list = this.list.next
 		result
 
 	class meth Stack() : Stack = new
@@ -53,8 +53,8 @@ class StackImpl
 
 
 meth stackClient()
-	val s = StackImpl.Stack()
+	val s : Stack = StackImpl.Stack()
 	s.push(5)
 	printInteger(s.top)
-	val addOne = fn x:Int => x+1
+	val addOne:Int->Int = fn x:Int => x+1
 	printInteger(addOne(s.pop()))

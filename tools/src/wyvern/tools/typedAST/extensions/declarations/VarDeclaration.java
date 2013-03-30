@@ -19,10 +19,10 @@ import wyvern.tools.util.TreeWriter;
 public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	NameBinding binding;
-	
-	public VarDeclaration(String name, TypedAST definition, Environment env) {
+
+	public VarDeclaration(String varName, Type parsedType, TypedAST definition) {
 		this.definition=definition;
-		binding = new NameBindingImpl(name, definition.typecheck(env));
+		binding = new NameBindingImpl(varName, parsedType);
 	}
 
 	@Override
@@ -72,6 +72,19 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
+		Value exVal = declEnv.getValue(binding.getName());
+		if (exVal != null) {
+			if (exVal.getType() instanceof VarValue)
+				return;
+
+			ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
+			vb.setValue(new VarValue(exVal));
+			return;
+		}
+		
+		if (definition == null) {
+			return;
+		}
 		Value defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(new VarValue(defValue));

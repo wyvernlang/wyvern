@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.DeclParser.ContParser;
+import wyvern.tools.parsing.ContParser;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.IntLiteral;
 import wyvern.tools.rawAST.Line;
@@ -51,7 +51,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		
 		return new Pair<Environment, ContParser>(newEnv, new ContParser() {
 			@Override
-			public TypedAST parse(Environment env) {
+			public TypedAST parse(EnvironmentResolver env) {
 				LinkedList<TypedAST> seqBody = new LinkedList<TypedAST>();
 				for (ContParser cp : contParsers)
 					seqBody.add(cp.parse(env));

@@ -13,12 +13,28 @@ public interface ContParser {
 		}
 		
 		@Override
-		public TypedAST parse(Environment env) {
+		public TypedAST parse(EnvironmentResolver r) {
 			return elem;
 		}
 		
 	};
+	public static class SimpleResolver implements EnvironmentResolver {
+		private Environment env;
+
+		public SimpleResolver(Environment env) {
+			this.env = env;
+		}
+
+		@Override
+		public Environment getEnv(TypedAST elem) {
+			return env;
+		}
+	}
 	
-	public TypedAST parse(Environment env);
+	public interface EnvironmentResolver {
+		public Environment getEnv(TypedAST elem);
+	}
+	
+	public TypedAST parse(EnvironmentResolver r);
 
 }

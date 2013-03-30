@@ -27,12 +27,8 @@ public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 
-	public New(TypedAST args, FileLocation fileLocation) {
-		for (Assignment arg = (Assignment)args; arg != null; arg = (Assignment) arg.getNext()) {
-			if (!(arg.getTarget() instanceof Variable))
-				throw new RuntimeException("Must assign to a variable");
-			this.args.put(((Variable)arg.getTarget()).getName(), arg.getValue());
-		}
+	public New(Map<String, TypedAST> args, FileLocation fileLocation) {
+		this.args = args;
 		this.location = fileLocation;
 	}
 

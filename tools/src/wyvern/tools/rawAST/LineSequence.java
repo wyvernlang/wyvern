@@ -1,5 +1,6 @@
 package wyvern.tools.rawAST;
 
+import java.util.Iterator;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;

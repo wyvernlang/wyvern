@@ -38,7 +38,7 @@ public class SubtypingTests {
 				+"    var pty : Int\n"
 				+"\n"
 				+"    meth m1(arg : Int)\n"
-				+"        m1(arg)\n"
+				+"        this.m1(arg)\n"
 				+"\n"
 				+"    meth m2() : Int\n"
 				+"        42\n"
@@ -50,7 +50,7 @@ public class SubtypingTests {
 				+"        new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L meth m1 (arg : Int) $L} {$L meth m2 () : Int $L} $I} $L} {$L type Bar {$I {$L meth Foo1 () : Foo $L} {$L meth Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L var pty : Int $L} {$L meth m1 (arg : Int) {$I {$L m1 (arg) $L} $I} $L} {$L meth m2 () : Int {$I {$L 42 $L} $I} $L} {$L meth m3 () : Foo {$I {$L new $L} $I} $L} {$L meth m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L meth m1 (arg : Int) $L} {$L meth m2 () : Int $L} $I} $L} {$L type Bar {$I {$L meth Foo1 () : Foo $L} {$L meth Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L var pty : Int $L} {$L meth m1 (arg : Int) {$I {$L this . m1 (arg) $L} $I} $L} {$L meth m2 () : Int {$I {$L 42 $L} $I} $L} {$L meth m3 () : Foo {$I {$L new $L} $I} $L} {$L meth m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -87,7 +87,7 @@ public class SubtypingTests {
 				+"    var pty : Int\n"
 				+"\n"
 				+"    meth m1(arg : Int)\n"
-				+"        m1(arg)\n"
+				+"        this.m1(arg)\n"
 				+"\n"
 				+"    meth m2() : Int\n"
 				+"        42\n"
@@ -99,7 +99,7 @@ public class SubtypingTests {
 				+"        new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L meth m1 (arg : Int) $L} {$L meth m2 () : Int $L} $I} $L} {$L type Bar {$I {$L meth Foo1 () : Foo $L} {$L meth Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L class implements Bar $L} {$L var pty : Int $L} {$L meth m1 (arg : Int) {$I {$L m1 (arg) $L} $I} $L} {$L meth m2 () : Int {$I {$L 42 $L} $I} $L} {$L meth m3 () : Foo {$I {$L new $L} $I} $L} {$L meth m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L meth m1 (arg : Int) $L} {$L meth m2 () : Int $L} $I} $L} {$L type Bar {$I {$L meth Foo1 () : Foo $L} {$L meth Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L class implements Bar $L} {$L var pty : Int $L} {$L meth m1 (arg : Int) {$I {$L this . m1 (arg) $L} $I} $L} {$L meth m2 () : Int {$I {$L 42 $L} $I} $L} {$L meth m3 () : Foo {$I {$L new $L} $I} $L} {$L meth m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();

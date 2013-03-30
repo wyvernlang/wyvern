@@ -7,6 +7,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
+import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
@@ -115,6 +116,12 @@ public class MethParser implements DeclParser {
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
+		return this.parseDeferred(first, ctx, false);
+		
+	}
+	
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
+			Pair<ExpressionSequence, Environment> ctx, final boolean isClassMeth) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		final String methName = s.name;
 		final FileLocation methNameLine = s.getLocation();
@@ -149,8 +156,7 @@ public class MethParser implements DeclParser {
 			ParseUtils.parseSymbol(":", ctx);
 			returnType = ParseUtils.parseType(ctx);
 		} else {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-			return null;
+			returnType = wyvern.tools.types.extensions.Unit.getInstance();
 		}
 		
 		// Process body now.
@@ -170,12 +176,13 @@ public class MethParser implements DeclParser {
 		
 		ctx.first = null; // don't forget to reset!
 		
-		final MutableMethDeclaration md = new MutableMethDeclaration(methName, args, returnType, null, false, methNameLine);
+		final MutableMethDeclaration md = new MutableMethDeclaration(methName, args, returnType, null, isClassMeth, methNameLine);
 		
 		return new Pair<Environment, ContParser>(md.extend(Environment.getEmptyEnvironment()), new ContParser() {
 
 			@Override
-			public TypedAST parse(Environment env) {
+			public TypedAST parse(EnvironmentResolver envR) {
+				Environment env = envR.getEnv(md);
 				TypedAST inExp;
 				if (exp == null) {
 					inExp = null;
@@ -184,15 +191,10 @@ public class MethParser implements DeclParser {
 				}
 				md.setBody(inExp);
 
-				return new MethDeclaration(methName, args, returnType, inExp, false, methNameLine);
+				return new MethDeclaration(methName, args, returnType, inExp, isClassMeth, methNameLine);
 			}
 			
 		});
 		
-	}
-
-	@Override
-	public Environment getBodyEnv(Environment decls) {
-		return decls;
 	}
 }

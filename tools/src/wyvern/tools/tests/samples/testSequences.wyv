@@ -1,4 +1,4 @@
 meth foo()
-	val f = 42
+	val f:Int = 42
 	printInteger(f) // This line breaks.
-	val g = 37
+	val g:Int = 37

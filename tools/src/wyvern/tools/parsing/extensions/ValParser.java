@@ -1,18 +1,24 @@
 package wyvern.tools.parsing.extensions;
 
 import static wyvern.tools.parsing.ParseUtils.parseSymbol;
-import wyvern.tools.parsing.LineParser;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.ContParser;
+import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.binding.NameBindingImpl;
 import wyvern.tools.typedAST.binding.TypeBinding;
 import wyvern.tools.typedAST.extensions.TypeInstance;
 import wyvern.tools.typedAST.extensions.declarations.ValDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.VarDeclaration;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 
-public class ValParser implements LineParser {
+public class ValParser implements DeclParser {
 	private ValParser() { }
 	private static ValParser instance = new ValParser();
 	public static ValParser getInstance() { return instance; }
@@ -22,24 +28,57 @@ public class ValParser implements LineParser {
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
 		
+		if (!ParseUtils.checkFirst(":", ctx)) {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null;
+		}
+		parseSymbol(":", ctx);
+		Type type = ParseUtils.parseType(ctx);
+		
 		if (ParseUtils.checkFirst("=", ctx)) {
 			parseSymbol("=", ctx);
 			TypedAST exp = ParseUtils.parseExpr(ctx);
-			return new ValDeclaration(varName, exp);		
+			return new ValDeclaration(varName, type, exp);	
+		} else if (ctx.first == null) {
+			return new ValDeclaration(varName, type, null);
+		} else {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null;
+		}
+	}
+
+
+	@Override
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
+			final Pair<ExpressionSequence, Environment> ctx) {
+		final String varName = ParseUtils.parseSymbol(ctx).name;
+		
+		if (ParseUtils.checkFirst("=", ctx)) {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null;	
 		} else if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
-			String typeName = ParseUtils.parseSymbol(ctx).name;
-			if (ParseUtils.checkFirst("?", ctx)) {
-				typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
-				ParseUtils.parseSymbol("?", ctx); 
-			}
-			TypeBinding tb = ctx.second.lookupType(typeName);
-			if (tb == null) {
-				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
-			}
-			return new ValDeclaration(varName, new TypeInstance(tb));
+			final Type parsedType = ParseUtils.parseType(ctx);
+			final ValDeclaration intermvd = new ValDeclaration(varName, parsedType, null);
+			
+			return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(varName, parsedType)), new ContParser(){
+
+				@Override
+				public TypedAST parse(EnvironmentResolver r) {
+					if (ctx.first == null)
+						return new ValDeclaration(varName, parsedType, null);
+					else if (ParseUtils.checkFirst("=", ctx)) {
+						ParseUtils.parseSymbol("=", ctx);
+						Pair<ExpressionSequence,Environment> ctxi = new Pair<ExpressionSequence,Environment>(ctx.first, r.getEnv(intermvd));
+						return new ValDeclaration(varName, parsedType, ParseUtils.parseExpr(ctx));
+					} else {
+						ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+						return null;
+					}
+				}});
 		} else {
-			throw new RuntimeException("Error parsing val expression, either : or = expected.");
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			return null;
 		}
 	}
 }
