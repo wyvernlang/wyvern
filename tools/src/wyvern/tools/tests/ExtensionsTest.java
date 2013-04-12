@@ -38,7 +38,7 @@ public class ExtensionsTest {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);		
-		Assert.assertEquals("[ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true))), Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true)))]",
+		Assert.assertEquals("[[ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true)))], Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true)))]",
 				typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Bool.getInstance(), resultType);
@@ -103,7 +103,7 @@ public class ExtensionsTest {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[MethDeclaration(), Application(Variable(\"m\"), IntegerConstant(5))]", typedAST.toString());		
+		Assert.assertEquals("[[MethDeclaration()], Application(Variable(\"m\"), IntegerConstant(5))]", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		

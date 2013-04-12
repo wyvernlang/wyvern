@@ -23,8 +23,10 @@ import wyvern.tools.typedAST.Sequence;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.typedAST.binding.NameBinding;
 import wyvern.tools.typedAST.binding.NameBindingImpl;
+import wyvern.tools.typedAST.extensions.PartialDeclSequence;
 import wyvern.tools.typedAST.extensions.TupleObject;
 import wyvern.tools.typedAST.extensions.Variable;
+import wyvern.tools.typedAST.extensions.declarations.PartialDecl;
 import wyvern.tools.typedAST.extensions.values.IntegerConstant;
 import wyvern.tools.typedAST.extensions.values.StringConstant;
 import wyvern.tools.typedAST.extensions.values.UnitVal;
@@ -82,17 +84,43 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		LineSequenceParser parser = first.getLineSequenceParser();
 		LineSequence rest = node.getRest();
 		
-		if (rest == null) // only one statement in the block.
+		if (rest == null) // only one statement in the block. 
+		{
+			if (first instanceof PartialDecl)
+				first = ((PartialDecl) first).getAST(env);
 			return first;
+		}
 		
 		if (parser != null) {
 			// if First is a Statement, get the statement continuation parser and use it to parse the rest
 			return parser.parse(first, rest, env);
 		} else {
-			Sequence s = new Sequence(first);
+			
+			PartialDeclSequence pds = new PartialDeclSequence();
+			Sequence s = new Sequence();
+			
+			if (first instanceof PartialDecl) {
+				env = pds.add((PartialDecl) first, env);
+			} else {
+				s.append(first);
+			}
 			
 			while (rest != null) {
 				first = rest.getFirst().accept(this, env);
+				if (first instanceof PartialDecl && pds != null) {
+					env = pds.add((PartialDecl)first, env);
+					rest = rest.getRest();
+					continue;
+				} else if (!(first instanceof PartialDecl) && pds != null) {
+					Pair<TypedAST, Environment> pair = pds.resolve(env);
+					pds = null;
+					s.append(pair.first);
+				} else if (first instanceof PartialDecl && pds == null) {
+					pds = new PartialDeclSequence();
+					env = pds.add((PartialDecl)first, env);
+					rest = rest.getRest();
+					continue;
+				}
 				
 				if (first instanceof Declaration)
 					env = ((Declaration)first).extend(env);
@@ -108,6 +136,12 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 				}
 				
 				rest = rest.getRest();
+			}
+			
+			if (pds != null && !pds.isResolved()) {
+				Pair<TypedAST, Environment> pair = pds.resolve(env);
+				env = pair.second;
+				s.append(pair.first);
 			}
 			
 			return s;
@@ -146,6 +180,9 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		if (parser == null)
 			return first;
 		
+		if (parser instanceof DeclParser) {
+			return new PartialDecl(((DeclParser) parser).parseDeferred(first, ctx));
+		}
 		// if first is a special form, get the expression continuation parser and use it to parse the rest
 		return parser.parse(first, ctx);
 	}

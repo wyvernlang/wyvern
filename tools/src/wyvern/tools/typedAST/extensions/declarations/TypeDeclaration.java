@@ -18,7 +18,7 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
-	private DeclSequence decls;
+	protected DeclSequence decls;
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	

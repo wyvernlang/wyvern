@@ -59,18 +59,22 @@ public class VarParser implements DeclParser {
 		} else if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
 			final Type parsedType = ParseUtils.parseType(ctx);
+			
+			final Pair<ExpressionSequence, Environment> restctx = new Pair<ExpressionSequence,Environment>(ctx.first,ctx.second);
+			ctx.first = null;
+			
 			final VarDeclaration intermvd = new VarDeclaration(varName, parsedType, null);
 			
 			return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(varName, parsedType)), new ContParser(){
 
 				@Override
 				public TypedAST parse(EnvironmentResolver r) {
-					if (ctx.first == null)
+					if (restctx.first == null)
 						return new VarDeclaration(varName, parsedType, null);
-					else if (ParseUtils.checkFirst("=", ctx)) {
-						ParseUtils.parseSymbol("=", ctx);
-						Pair<ExpressionSequence,Environment> ctxi = new Pair<ExpressionSequence,Environment>(ctx.first, r.getEnv(intermvd));
-						return new VarDeclaration(varName, parsedType, ParseUtils.parseExpr(ctx));
+					else if (ParseUtils.checkFirst("=", restctx)) {
+						ParseUtils.parseSymbol("=", restctx);
+						Pair<ExpressionSequence,Environment> ctxi = new Pair<ExpressionSequence,Environment>(restctx.first, r.getEnv(intermvd));
+						return new VarDeclaration(varName, parsedType, ParseUtils.parseExpr(restctx));
 					} else {
 						ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 						return null;

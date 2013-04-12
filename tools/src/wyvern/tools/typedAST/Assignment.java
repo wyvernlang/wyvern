@@ -71,18 +71,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	
 	@Override
 	public LineSequenceParser getLineSequenceParser() {
-		return new LineSequenceParser() {
-			@Override
-			public TypedAST parse(TypedAST first, LineSequence rest,
-					Environment env) {
-				
-				Environment newEnv = env;
-				TypedAST body = rest.accept(BodyParser.getInstance(), newEnv);
-
-				Assignment.this.nextExpr = body;
-				return Assignment.this;
-			}
-		};
+		return null;
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

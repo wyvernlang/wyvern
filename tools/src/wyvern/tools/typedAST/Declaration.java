@@ -11,7 +11,7 @@ import wyvern.tools.types.Type;
 // Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)
 
 // TODO SMELL: probably should have Declarations not be in an "evaluate" part of the AST
-public abstract class Declaration extends AbstractTypedAST {
+public abstract class Declaration extends AbstractTypedAST implements EnvironmentExtender {
 	protected Declaration nextDecl = null;
 
 	/** 

@@ -56,7 +56,7 @@ public class SubtypingTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		// FIXME: Type checking Declarations is different!!!
 		if (typedAST instanceof Declaration) {
@@ -105,7 +105,7 @@ public class SubtypingTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[TypeDeclaration(), TypeDeclaration(), MutableClassDeclaration()]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		// FIXME: Type checking Declarations is different!!!
 		if (typedAST instanceof Declaration) {

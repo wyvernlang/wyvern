@@ -44,7 +44,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[ValDeclaration(\"x\", IntegerConstant(5)), Variable(\"x\")]", typedAST.toString());		
+		Assert.assertEquals("[[ValDeclaration(\"x\", IntegerConstant(5))], Variable(\"x\")]", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -135,7 +135,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[ValDeclaration(\"applyTwice\", Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\")))))), ValDeclaration(\"addOne\", Fn([NameBindingImpl(\"x\", Int())], Invocation(Variable(\"x\"), \"+\", IntegerConstant(1)))), Application(Application(Variable(\"applyTwice\"), Variable(\"addOne\")), IntegerConstant(1))]", typedAST.toString());		
+		Assert.assertEquals("[[ValDeclaration(\"applyTwice\", Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\")))))), ValDeclaration(\"addOne\", Fn([NameBindingImpl(\"x\", Int())], Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))))], Application(Application(Variable(\"applyTwice\"), Variable(\"addOne\")), IntegerConstant(1))]", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(integer, resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -151,7 +151,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[MethDeclaration(), Application(Variable(\"double\"), IntegerConstant(5))]", typedAST.toString());
+		Assert.assertEquals("[[MethDeclaration()], Application(Variable(\"double\"), IntegerConstant(5))]", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -167,7 +167,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[MethDeclaration(), Application(Variable(\"mult\"), TupleObject(IntegerConstant(3), IntegerConstant(2)))]", typedAST.toString());
+		Assert.assertEquals("[[MethDeclaration()], Application(Variable(\"mult\"), TupleObject(IntegerConstant(3), IntegerConstant(2)))]", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -185,7 +185,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[MethDeclaration(), MethDeclaration(), Application(Variable(\"doublePlusOne\"), IntegerConstant(5))]", typedAST.toString());
+		Assert.assertEquals("[[MethDeclaration(), MethDeclaration()], Application(Variable(\"doublePlusOne\"), IntegerConstant(5))]", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -459,10 +459,12 @@ public class ParsingTestPhase2 {
 	public void testOutOfOrderParsing() {
 		Reader reader = new StringReader(
 				"meth doublePlusOne(n:Int):Int = double(n) + 1\n"+
-				"meth double(n:Int):Int = n*2\n");
+				"meth double(n:Int):Int = n*2\n"+
+				"doublePlusOne(5)\n");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
-		Pair<Environment,ContParser> contin = parsedResult.accept(DeclarationParser.getInstance(), env);
-		TypedAST result = contin.second.parse(new ContParser.SimpleResolver(contin.first));
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("IntegerConstant(11)", result.evaluate(env).toString());
 	}
 }

@@ -5,12 +5,13 @@ import java.util.Iterator;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.Declaration;
+import wyvern.tools.typedAST.EnvironmentExtender;
 import wyvern.tools.typedAST.Sequence;
 import wyvern.tools.typedAST.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 
-public class DeclSequence extends Sequence {
+public class DeclSequence extends Sequence implements EnvironmentExtender {
 	
 	public DeclSequence(final Iterable<Declaration> first) {
 		super(new Iterable<TypedAST>() {
@@ -128,5 +129,10 @@ public class DeclSequence extends Sequence {
 		for (Declaration d : this.getDeclIterator())
 			newEnv = d.extend(newEnv);
 		return newEnv;
+	}
+
+	@Override
+	public Environment evalDecl(Environment env) {
+		return evalDecls(env);
 	}
 }

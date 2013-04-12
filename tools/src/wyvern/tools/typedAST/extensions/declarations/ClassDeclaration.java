@@ -122,8 +122,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		
 		// FIXME: Currently allow this and class in both class and object methods. :(
-		newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
-		newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
+		//newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
+		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
 		
 		return newEnv;
 	}
