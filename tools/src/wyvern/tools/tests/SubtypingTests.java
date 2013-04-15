@@ -2,6 +2,7 @@ package wyvern.tools.tests;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Iterator;
 
 import junit.framework.Assert;
 
@@ -13,9 +14,13 @@ import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.Declaration;
+import wyvern.tools.typedAST.Sequence;
 import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.extensions.DeclSequence;
+import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 
 public class SubtypingTests {
@@ -127,14 +132,14 @@ public class SubtypingTests {
 	public void testRecursiveSubtype1() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    meth m(arg : B)\n"
+				+"    meth m(arg : A)\n"
 				+"\n"
 				+"type B\n"
-				+"    meth m(arg : A)\n"
+				+"    meth m(arg : B)\n"
 				+"\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L meth m (arg : B) $L} $I} $L} {$L type B {$I {$L meth m (arg : A) $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L meth m (arg : A) $L} $I} $L} {$L type B {$I {$L meth m (arg : B) $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -142,6 +147,20 @@ public class SubtypingTests {
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
+		Sequence s = (Sequence) typedAST;
+		s.typecheck(env);
+		
+		DeclSequence ds = (DeclSequence) s.iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+		
 		// TODO:
+		// Assert.assertTrue(tAt.subtypeOf(tBt));
+		// Assert.assertTrue(tBt.subtypeOf(tAt));
 	}
 }
