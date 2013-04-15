@@ -8,6 +8,7 @@ import java.util.HashSet;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.extensions.declarations.MethDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.PropDeclaration;
 import wyvern.tools.typedAST.extensions.declarations.TypeDeclaration;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -53,8 +54,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		return this.decl;
 	}
 
-	// FIXME: Does not handle (1) recursive types; (2) props; (3) all else. :-)
-	public boolean subtypeOf(TypeType tt) {
+	public boolean checkImplements(TypeType tt) {
 		ClassDeclaration thisD = this.decl;
 		TypeDeclaration typeD = tt.getDecl();
 		
@@ -63,6 +63,44 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 			// System.out.println(d.getName() + " of type " + d.getType());
 			if (d instanceof PropDeclaration) {
 				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+			} else {
+				thisDtypes.add(d.getType().toString());
+			}
+		}
+		
+		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
+		
+		HashSet<String> implDtypes = new HashSet<String>();
+		for (Declaration d : typeD.getDecls().getDeclIterator()) {
+			// System.out.println(d.getName() + " of type " + d.getType());
+			if (d instanceof PropDeclaration) {
+				implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+			} else {
+				implDtypes.add(d.getType().toString());
+			}
+		}
+		
+		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
+
+		// System.out.println("This subtype of Implements: " + thisDtypes.containsAll(implDtypes) + "\n");
+		return thisDtypes.containsAll(implDtypes);
+	}
+
+	public boolean checkImplementsClass(TypeType tt) {
+		ClassDeclaration thisD = this.decl;
+		TypeDeclaration typeD = tt.getDecl();
+		
+		HashSet<String> thisDtypes = new HashSet<String>();
+		for (Declaration d : thisD.getDecls().getDeclIterator()) {
+			// System.out.println(d.getName() + " of type " + d.getType());
+			if (d instanceof PropDeclaration) {
+				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+			} else if (d instanceof MethDeclaration) {
+				// Only interested in class methods.
+				MethDeclaration md = (MethDeclaration) d;
+				if (md.isClassMeth()) {
+					thisDtypes.add(d.getType().toString());
+				}
 			} else {
 				thisDtypes.add(d.getType().toString());
 			}

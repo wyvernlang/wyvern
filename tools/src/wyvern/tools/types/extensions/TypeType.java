@@ -47,5 +47,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 	public TypeDeclaration getDecl() {
 		return this.decl;
 	}
-
+	
+	public boolean subtypeOf(TypeType tt) {
+		// TODO: This is my current platform for implementing the recursive subtype check right as types only have methods and props to worry about.
+		
+		return false;
+	}
 }

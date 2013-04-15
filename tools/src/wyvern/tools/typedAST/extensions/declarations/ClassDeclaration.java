@@ -87,7 +87,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
 			TypeType implementsTT = (TypeType) nameImplements.getType();
 			
-			if (!currentCT.subtypeOf(implementsTT)) {
+			if (!currentCT.checkImplements(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this.nameBinding.getName(),
 						nameImplements.getName(),
@@ -106,7 +106,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			TypeType implementsCT = (TypeType) nameImplementsClass.getType();
 			
 			// FIXME: Should check only class methods but they are not identifiable now! :-?
-			if (!currentCT.subtypeOf(implementsCT)) {
+			if (!currentCT.checkImplementsClass(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this.nameBinding.getName(),
 						nameImplementsClass.getName(),
