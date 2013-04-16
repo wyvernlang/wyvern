@@ -5,6 +5,9 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.Declaration;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.typedAST.TypedAST;
@@ -15,6 +18,7 @@ import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType {
@@ -61,6 +65,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		String thisName = this.decl.getName();
 		DeclSequence otherDs = tt.decl.getDecls();
 		String otherName = tt.decl.getName();
+		
+		// FIXME: In reality, do a building of the subtype relations to see if this can be resolved to be a subtype of other.
+		
 		
 		HashSet<String> thisMembers = new HashSet<String>();
 		for (TypedAST t: thisDs) {
@@ -124,5 +131,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		// System.out.println("Result of " + thisName + " subtypeOf " + otherName + ": " + result);
 		
 		return result;
+	}
+
+	@Override
+	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
+		return super.subtype(other, subtypes);
 	}
 }

@@ -20,7 +20,6 @@ public class Environment implements TreeWritable {
 			this.name = binding.getName();
 	}
 
-
 	public Environment extend(Binding binding) {
 		return new Environment(this, binding);
 	}

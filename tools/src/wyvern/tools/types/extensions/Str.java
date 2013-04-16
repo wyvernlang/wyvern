@@ -8,11 +8,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class Str extends AbstractTypeImpl implements OperatableType {
@@ -46,4 +50,8 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 		return "Str";
 	}
 
+	@Override
+	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
+		return super.subtype(other, subtypes);
+	}
 }

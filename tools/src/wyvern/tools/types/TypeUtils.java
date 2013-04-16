@@ -13,4 +13,14 @@ public class TypeUtils {
 	public static Unit unit = Unit.getInstance();
 	public static Int integer = Int.getInstance();
 	public static Str str = Str.getInstance();
+	
+	public class SubtypeRelation {
+		private Type subtype;
+		private Type supertype;
+		
+		public SubtypeRelation(Type subtype, Type supertype) {
+			this.subtype = subtype; 
+			this.supertype = supertype;
+		}
+	}
 }

@@ -2,11 +2,18 @@ package wyvern.tools.types.extensions;
 
 import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
 import static wyvern.tools.errors.ToolError.reportError;
+
+import java.util.HashSet;
+
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.Application;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
@@ -59,4 +66,9 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	public int hashCode() {
 		return 37*argument.hashCode()+result.hashCode();
 	}	
+
+	@Override
+	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
+		return super.subtype(other, subtypes);
+	}
 }

@@ -194,8 +194,7 @@ public class SubtypingTests {
 		TypeType tAt = (TypeType) tA.getType();
 		TypeType tBt = (TypeType) tB.getType();
 		
-		// FIXME: Should these be?
-		// Assert.assertTrue(tAt.subtypeOf(tBt));
-		// Assert.assertTrue(tBt.subtypeOf(tAt));
+		Assert.assertTrue(tAt.subtypeOf(tBt));
+		Assert.assertTrue(tBt.subtypeOf(tAt));
 	}
 }

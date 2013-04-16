@@ -59,7 +59,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			decl = decl.getNextDecl();
 		}
 
-		return Unit.getInstance();
+		return this.typeBinding.getType();
 	}	
 	
 	@Override
