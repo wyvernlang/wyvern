@@ -1,8 +1,8 @@
 package wyvern.tools.parsing;
 
 import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.Declaration;
-import wyvern.tools.typedAST.TypedAST;
+import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 
 public interface ContParser {

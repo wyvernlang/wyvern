@@ -8,7 +8,7 @@ import java.util.HashSet;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.Application;
+import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;

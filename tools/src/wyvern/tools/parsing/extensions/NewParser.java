@@ -13,11 +13,11 @@ import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.Assignment;
-import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.extensions.New;
-import wyvern.tools.typedAST.extensions.Variable;
-import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.Assignment;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.expressions.New;
+import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
 

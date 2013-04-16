@@ -20,8 +20,8 @@ import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclarationParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.Value;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
@@ -393,30 +393,27 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 	
-	//Ben: Testing class methods. Broken currently, current priority.
-	/*
 	@Test
 	public void testClassMethods() {
 		Reader reader = new StringReader("class Hello\n"
 				+"\tval testVal:Int\n"
 				+"\tclass meth NewHello(v:Int) = \n" +
-				"\t\tval output = new Hello()\n" +
+				"\t\tval output:Hello = new\n" +
 				"\t\t\ttestVal = v\n" +
 				"\t\toutput\n"
-				+"\tmeth getTest():Int = testVal\n"
+				+"\tmeth getTest():Int = this.testVal\n"
 				+"\n"
-				+"val h = Hello.NewHello(10)\n"
-				+"h.getP()");
+				+"val h:Hello = Hello.NewHello(10)\n"
+				+"h.getTest()");
 			RawAST parsedResult = Phase1Parser.parse("Test", reader);
 			
 			Environment env = Globals.getStandardEnv();
-			TypedAST typedAST = parsedResult.accept(CoreParser.getInstance(), env);
+			TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 			Type resultType = typedAST.typecheck(env);
 			Assert.assertEquals(Int.getInstance(), resultType);
 			Value resultValue = typedAST.evaluate(env);
 			Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
-	*/
 	
 	@Test
 	public void testSequences() throws IOException {
@@ -467,4 +464,6 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("Int",result.typecheck(env).toString());
 		Assert.assertEquals("IntegerConstant(11)", result.evaluate(env).toString());
 	}
+
+	
 }

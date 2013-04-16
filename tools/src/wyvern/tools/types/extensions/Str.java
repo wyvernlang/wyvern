@@ -11,7 +11,7 @@ import java.util.Set;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.Invocation;
+import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;

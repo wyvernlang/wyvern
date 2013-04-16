@@ -1,10 +1,10 @@
 package wyvern.tools.types;
 
-import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.binding.Binding;
-import wyvern.tools.typedAST.binding.NameBinding;
-import wyvern.tools.typedAST.binding.TypeBinding;
-import wyvern.tools.typedAST.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
+import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 

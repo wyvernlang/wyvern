@@ -8,9 +8,9 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.TypedAST;
-import wyvern.tools.typedAST.Value;
-import wyvern.tools.typedAST.extensions.values.IntegerConstant;
+import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 
 public class Interpreter {

@@ -2,10 +2,10 @@ package wyvern.targets.JavaScript.types;
 
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
-import wyvern.tools.typedAST.Application;
-import wyvern.tools.typedAST.Declaration;
-import wyvern.tools.typedAST.Invocation;
-import wyvern.tools.typedAST.extensions.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Application;
+import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;

@@ -13,7 +13,7 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.Invocation;
+import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;

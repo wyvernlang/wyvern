@@ -1,13 +1,14 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.AbstractTypedAST;
-import wyvern.tools.typedAST.AbstractValue;
-import wyvern.tools.typedAST.Application;
-import wyvern.tools.typedAST.ApplyableValue;
-import wyvern.tools.typedAST.CoreAST;
-import wyvern.tools.typedAST.CoreASTVisitor;
-import wyvern.tools.typedAST.Value;
+import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractValue;
+import wyvern.tools.typedAST.core.Application;
+import wyvern.tools.typedAST.interfaces.ApplyableValue;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.Executor;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;

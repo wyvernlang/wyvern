@@ -1,6 +1,6 @@
 package wyvern.tools.types;
 
-import wyvern.tools.typedAST.Application;
+import wyvern.tools.typedAST.core.Application;
 
 public interface ApplyableType extends Type {
 	/**
