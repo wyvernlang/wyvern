@@ -1,24 +1,19 @@
 package wyvern.tools.types.extensions;
 
-import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
+import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.rawAST.RawAST;
-import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class Int extends AbstractTypeImpl implements OperatableType {
@@ -76,7 +71,7 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 	}
 
 	@Override
-	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		return super.subtype(other, subtypes);
 	}
 }

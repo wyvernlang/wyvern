@@ -1,20 +1,12 @@
 package wyvern.tools.types.extensions;
 
-import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
-import static wyvern.tools.errors.ToolError.reportError;
-
 import java.util.HashSet;
 import java.util.List;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.types.AbstractTypeImpl;
-import wyvern.tools.types.Environment;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class Tuple extends AbstractTypeImpl {
@@ -77,7 +69,9 @@ public class Tuple extends AbstractTypeImpl {
 	}	
 
 	@Override
-	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		// FIXME: Implement S-RcdWidth, S-RcdDepth, and S-RcdPerm I suppose. :)
+		
 		return super.subtype(other, subtypes);
 	}
 }

@@ -2,6 +2,7 @@ package wyvern.tools.tests;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import junit.framework.Assert;
@@ -19,7 +20,9 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 
@@ -159,8 +162,8 @@ public class SubtypingTests {
 		TypeType tAt = (TypeType) tA.getType();
 		TypeType tBt = (TypeType) tB.getType();
 		
-		Assert.assertTrue(tAt.subtypeOf(tBt));
-		Assert.assertTrue(tBt.subtypeOf(tAt));
+		Assert.assertTrue(tAt.subtype(tBt));
+		Assert.assertTrue(tBt.subtype(tAt));
 	}
 
 	@Test
@@ -194,8 +197,8 @@ public class SubtypingTests {
 		TypeType tAt = (TypeType) tA.getType();
 		TypeType tBt = (TypeType) tB.getType();
 		
-		Assert.assertTrue(tAt.subtypeOf(tBt));
-		Assert.assertTrue(tBt.subtypeOf(tAt));
+		Assert.assertTrue(tAt.subtype(tBt));
+		Assert.assertTrue(tBt.subtype(tAt));
 	}
 
 	@Test
@@ -229,7 +232,75 @@ public class SubtypingTests {
 		TypeType tAt = (TypeType) tA.getType();
 		TypeType tBt = (TypeType) tB.getType();
 		
-		Assert.assertTrue(tAt.subtypeOf(tBt));
-		Assert.assertTrue(tBt.subtypeOf(tAt));
+		Assert.assertTrue(tAt.subtype(tBt));
+		Assert.assertTrue(tBt.subtype(tAt));
+	}
+
+	@Test
+	public void testSubtypeRelation() {
+		Reader reader = new StringReader("\n"
+				+"type A\n"
+				+"    meth m() : Bool\n"
+				+"\n"
+				+"type B\n"
+				+"    meth m() : Unit\n"
+				+"\n"
+				+"type C\n"
+				+"    meth m() : Int\n"
+				+"\n"
+				+"type D\n"
+				+"    meth m() : Str\n"
+				+"\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Assert.assertEquals("{$I {$L type A {$I {$L meth m () : Bool $L} $I} $L} {$L type B {$I {$L meth m () : Unit $L} $I} $L} {$L type C {$I {$L meth m () : Int $L} $I} $L} {$L type D {$I {$L meth m () : Str $L} $I} $L} $I}",
+				parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
+		
+		Sequence s = (Sequence) typedAST;
+		s.typecheck(env);
+		
+		DeclSequence ds = (DeclSequence) s.iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		TypeDeclaration tC = (TypeDeclaration) i.next();
+		TypeDeclaration tD = (TypeDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+		TypeType tCt = (TypeType) tC.getType();
+		TypeType tDt = (TypeType) tD.getType();
+
+		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
+
+		Assert.assertTrue(tAt.subtype(tAt, subtypes)); // S-Refl
+		
+		SubtypeRelation sr = new SubtypeRelation(tAt, tBt);
+		subtypes.add(sr);
+		
+		Assert.assertTrue(tAt.subtype(tBt, subtypes)); // S-Assumption
+
+		sr = new SubtypeRelation(tBt, tCt);
+		subtypes.add(sr);
+		
+		Assert.assertTrue(tAt.subtype(tCt, subtypes)); // S-Trans
+		
+		subtypes.clear();
+		subtypes.add(new SubtypeRelation(tCt, tAt));
+		subtypes.add(new SubtypeRelation(tBt, tDt));
+		
+		Arrow a1 = new Arrow(tAt, tBt);
+		Arrow a2 = new Arrow(tCt, tDt);
+		Assert.assertTrue(a1.subtype(a2, subtypes)); // S-Arrow
+		Assert.assertFalse(a1.subtype(tAt, subtypes)); // S-Arrow
+		Assert.assertFalse(a2.subtype(a1, subtypes)); // S-Arrow
+		
+		subtypes.clear();
 	}
 }

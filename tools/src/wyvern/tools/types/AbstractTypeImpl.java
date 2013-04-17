@@ -2,17 +2,38 @@ package wyvern.tools.types;
 
 import java.util.HashSet;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
-
 public abstract class AbstractTypeImpl implements Type {
 
 	@Override
-	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
-		ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this.toString(), other.toString(),
-				HasLocation.UNKNOWN);
-		return false; // Unreachable.
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		// S-Refl
+		if (this.equals(other)) {
+			return true;
+		}
+
+		// S-Assumption
+		if (subtypes.contains(new SubtypeRelation(this, other))) {
+			return true;
+		}
+		
+		// S-Trans
+		HashSet<Type> t2s = new HashSet<Type>();
+		for (SubtypeRelation sr : subtypes) {
+			if (sr.getSubtype().equals(this)) {
+				t2s.add(sr.getSupertype());
+			}
+		}
+		for (Type t : t2s) {
+			if (subtypes.contains(new SubtypeRelation(t, other))) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
+	@Override
+	public boolean subtype(Type other) {
+		return this.subtype(other, new HashSet<SubtypeRelation>());
+	}
 }

@@ -5,15 +5,12 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
@@ -68,7 +65,18 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	}	
 
 	@Override
-	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
-		return super.subtype(other, subtypes);
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		if (super.subtype(other, subtypes)) {
+			return true;
+		}
+		
+		if (other instanceof Arrow) {
+			Arrow oa = (Arrow) other;
+			
+			return 	oa.argument.subtype(this.argument, subtypes) &&
+					this.result.subtype(oa.result, subtypes);
+		} else {
+			return false;
+		}
 	}
 }

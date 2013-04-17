@@ -5,9 +5,6 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
@@ -17,8 +14,8 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType {
@@ -129,7 +126,10 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 	}
 
 	@Override
-	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		// FIXME: Do something similar here to TypeType maybe and maybe try to integrate the above
+		// implements checks into here and change ClassDeclaration to use this instead.
+		
 		return super.subtype(other, subtypes);
 	}
 }
