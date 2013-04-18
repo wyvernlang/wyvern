@@ -71,8 +71,7 @@ public class TypeParser implements DeclParser {
 		Environment newEnv = mtd.extend(ctx.second);
 		newEnv = newEnv.extend(new TypeBinding("class", mtd.getType()));
 		
-
-		final Pair<Environment,ContParser> declAST = ParseUtils.extractLines(ctx).accept(DeclarationParser.getInstance(), newEnv);
+		final LineSequence body = ParseUtils.extractLines(ctx);
 		
 		return new Pair<Environment,ContParser>(mtd.extend(Environment.getEmptyEnvironment()), new ContParser() {
 
@@ -82,10 +81,15 @@ public class TypeParser implements DeclParser {
 
 				Environment envin = mtd.extend(eEnv); 
 				final Environment envs = envin.extend(new TypeBinding("class", mtd.getType()));
+
+				final Pair<Environment,ContParser> declAST = body.accept(DeclarationParser.getInstance(), envs);
+				
+				final Environment envsf = envs.extend(declAST.first);
+				
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
 					@Override
 					public Environment getEnv(TypedAST elem) {
-						return envs;
+						return envsf;
 					} 
 				});
 				

@@ -184,6 +184,7 @@ public class MethParser implements DeclParser {
 			public TypedAST parse(EnvironmentResolver envR) {
 				Environment env = envR.getEnv(md);
 				TypedAST inExp;
+				MethDeclaration iMD = md;
 				if (exp == null) {
 					inExp = null;
 				} else {
