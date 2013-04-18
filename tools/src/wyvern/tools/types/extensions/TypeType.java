@@ -139,85 +139,104 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		if (other instanceof TypeType) {
 			// return this.subtypeOf((TypeType) other);
 			
+			System.out.println("THIS TYPE " + this.getDecl().getName() + " has:");
 			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
 			for (TypedAST d : this.decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
 					Arrow a = (Arrow) ((MethDeclaration) d).getType();
 					thisMeths.add(a);
+					System.out.println(a);
 				} else {
 					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
+			System.out.println("OTHER TYPE " + ((TypeType) other).getDecl().getName() + " has:");
 			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
 			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
 					Arrow a = (Arrow) ((MethDeclaration) d).getType();
 					otherMeths.add(a);
+					System.out.println(a);
 				} else {
 					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
-			// Not necessary due to below, but I'd like to separate for my own clarity at this stage.
-			boolean subset = true;
-			for (Arrow aOther : otherMeths) {
-				if (!thisMeths.contains(aOther)) {
-					subset = false;
-					break;
-				}
-			}
-			if (subset) return true;
-			
 			// FIXME: Allows to have multiple methods that match to implement several methods
 			// from supertype - is this OK? Seems OK to me but not sure. :-)
-			subset = true;
+			boolean subset = true;
 			for (Arrow aOther : otherMeths) {
 				// What if aOther is recursive?
-				if (aOther.getArgument().equals(other) ||
-					aOther.getResult().equals(other)) {
+				// if (aOther.getArgument().equals(other) ||
+				//	aOther.getResult().equals(other)) {
 					
-					System.out.println("Detected recursive type (in other) occurrence: " + aOther);
-					
-					System.out.println("THEN, is " + this + " a subtype of " + other + "?");
-					
-					subset = false;
-					continue; // FIXME:
-				}
-				boolean hasImplementingCandidate = false;
-				for (Arrow aThis : thisMeths) {
-					// What if aThis is recursive?
-					if (aThis.getArgument().equals(this) ||
-						aThis.getResult().equals(this)) {
+					boolean hasImplementingCandidate = false;
+					for (Arrow aThis : thisMeths) {
+						// What if aThis is recursive?
+						// if (aThis.getArgument().equals(this) ||
+						// 	aThis.getResult().equals(this)) {
 						
-						System.out.println("Detected recursive type (in this) occurrence: " + aThis);
-						hasImplementingCandidate = false;
-						continue; // FIXME:
+						//	System.out.println("Detected recursive type (in this) occurrence: " + aThis);
+						//	System.out.println("Detected recursive type (in other) occurrence: " + aOther);
+							
+							// Apply S-Amber rule here!
+							SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
+							if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+								System.out.println("Assuming: " + sr);
+								subtypes.add(sr);
+								
+								System.out.println("Trying to prove if: " + aThis + " <: " + aOther);
+								boolean result = aThis.subtype(aOther, subtypes);
+								subtypes.remove(sr);
+								
+								if (result) {
+									System.out.println("Decided that " + aThis + " <: " + aOther);
+									hasImplementingCandidate = true;
+									break;
+								}
+							} else {
+								// return false;
+							}
+						/*
+						} else {
+							// FIXME: Skip recursive comparison since aThis is not?
+							subset = false;
+							continue;
+						}
+						*/
+					}					
+					if (!hasImplementingCandidate) {
+						subset = false;
+						break;
 					}
-					if (aThis.subtype(aOther)) {
-						hasImplementingCandidate = true;
+				/*
+				} else {
+					boolean hasImplementingCandidate = false;
+					for (Arrow aThis : thisMeths) {
+						// What if aThis is recursive?
+						if (aThis.getArgument().equals(this) ||
+							aThis.getResult().equals(this)) {
+							
+							// FIXME: Skip recursive comparison since aOther is not?
+							hasImplementingCandidate = false;
+							continue;
+						}
+						if (aThis.subtype(aOther)) {
+							hasImplementingCandidate = true;
+							break;
+						}
+					}
+					if (!hasImplementingCandidate) {
+						subset = false;
 						break;
 					}
 				}
-				if (!hasImplementingCandidate) {
-					subset = false;
-					break;
-				}
+				*/
 			}
 			if (subset) return true;
-			
-			// Note that every TypeType is by definition a "mu" or isorecursive type with its
-			// declared name as the type variable. Hence, can apply S-Amber rule.
-			SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
-			if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
-				// subtypes.add(sr);
-				// return this.subtype(other, subtypes);
-				return false; // FIXME: Still working on it.
-			} else {
-				return false;
-			}
 		}
 		
 		return false;

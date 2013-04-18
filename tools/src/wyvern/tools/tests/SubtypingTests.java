@@ -170,6 +170,41 @@ public class SubtypingTests {
 	public void testRecursiveSubtype2() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
+				+"    meth m() : A\n"
+				+"\n"
+				+"type B\n"
+				+"    meth m() : B\n"
+				+"\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Assert.assertEquals("{$I {$L type A {$I {$L meth m () : A $L} $I} $L} {$L type B {$I {$L meth m () : B $L} $I} $L} $I}",
+				parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
+		
+		Sequence s = (Sequence) typedAST;
+		s.typecheck(env);
+		
+		DeclSequence ds = (DeclSequence) s.iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+		
+		Assert.assertTrue(tAt.subtype(tBt));
+		Assert.assertTrue(tBt.subtype(tAt));
+	}
+
+	@Test
+	public void testRecursiveSubtype3() {
+		Reader reader = new StringReader("\n"
+				+"type A\n"
 				+"    meth m(arg : B)\n"
 				+"\n"
 				+"type B\n"
@@ -202,7 +237,7 @@ public class SubtypingTests {
 	}
 
 	@Test
-	public void testRecursiveSubtype3() {
+	public void testRecursiveSubtype4() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
 				+"    meth m() : B\n"
