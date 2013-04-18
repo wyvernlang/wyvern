@@ -161,9 +161,47 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 				}
 			}
 			
+			// Not necessary due to below, but I'd like to separate for my own clarity at this stage.
 			boolean subset = true;
 			for (Arrow aOther : otherMeths) {
 				if (!thisMeths.contains(aOther)) {
+					subset = false;
+					break;
+				}
+			}
+			if (subset) return true;
+			
+			// FIXME: Allows to have multiple methods that match to implement several methods
+			// from supertype - is this OK? Seems OK to me but not sure. :-)
+			subset = true;
+			for (Arrow aOther : otherMeths) {
+				// What if aOther is recursive?
+				if (aOther.getArgument().equals(other) ||
+					aOther.getResult().equals(other)) {
+					
+					System.out.println("Detected recursive type (in other) occurrence: " + aOther);
+					
+					System.out.println("THEN, is " + this + " a subtype of " + other + "?");
+					
+					subset = false;
+					continue; // FIXME:
+				}
+				boolean hasImplementingCandidate = false;
+				for (Arrow aThis : thisMeths) {
+					// What if aThis is recursive?
+					if (aThis.getArgument().equals(this) ||
+						aThis.getResult().equals(this)) {
+						
+						System.out.println("Detected recursive type (in this) occurrence: " + aThis);
+						hasImplementingCandidate = false;
+						continue; // FIXME:
+					}
+					if (aThis.subtype(aOther)) {
+						hasImplementingCandidate = true;
+						break;
+					}
+				}
+				if (!hasImplementingCandidate) {
 					subset = false;
 					break;
 				}
