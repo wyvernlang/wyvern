@@ -54,81 +54,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 	public TypeDeclaration getDecl() {
 		return this.decl;
 	}
-	
-	private boolean subtypeOf(TypeType tt) {
-		// TODO: This is my current platform for implementing the recursive subtype check right as types only have methods and props to worry about.
-		
-		DeclSequence thisDs = this.decl.getDecls();
-		String thisName = this.decl.getName();
-		DeclSequence otherDs = tt.decl.getDecls();
-		String otherName = tt.decl.getName();
-		
-		// FIXME: In reality, do a building of the subtype relations to see if this can be resolved to be a subtype of other.
-		
-		
-		HashSet<String> thisMembers = new HashSet<String>();
-		for (TypedAST t: thisDs) {
-			if (t instanceof MethDeclaration) {
-				MethDeclaration m = (MethDeclaration) t;
-				Arrow a = (Arrow) m.getType();
-				thisMembers.add(a.toString());
-			} else {
-				System.out.println("Unsupported type member in subtypeOf: " + t.getClass());
-			}
-		}
-		
-		HashSet<String> otherMembers = new HashSet<String>();
-		for (TypedAST t: otherDs) {
-			if (t instanceof MethDeclaration) {
-				MethDeclaration m = (MethDeclaration) t;
-				Arrow a = (Arrow) m.getType();
-				otherMembers.add(a.toString());
-			} else {
-				System.out.println("Unsupported type member in subtypeOf: " + t.getClass());
-			}
-		}
-
-		// System.out.println("THIS (" + thisName + ": " + thisMembers);
-		// System.out.println("OTHER (" + otherName + ": " + otherMembers);
-		
-		boolean result = false;
-		
-		result = thisMembers.containsAll(otherMembers);
-		
-		if (!result) {
-			// Perform Amber rule for recursive subtyping assuming there is recursion in the type.
-			boolean thisIsRec = false;
-			HashSet<String> thisMembersReplaced = new HashSet<String>();
-			for (String type : thisMembers) {
-				if (type.contains(thisName)) {
-					thisIsRec = true;
-					thisMembersReplaced.add(type.replaceAll(thisName, otherName));
-				} else {
-					thisMembersReplaced.add(type);
-				}
-			}
-			
-			// System.out.println("THIS WITH REPLACEMENT: " + thisMembersReplaced);
-			
-			boolean otherIsRec = false;
-			for (String type : otherMembers) {
-				if (type.contains(otherName)) {
-					otherIsRec = true;
-					break;
-				}
-			}
-			
-			if (thisIsRec && otherIsRec) {
-				// Both are recursive, it is possible to try and see if amber rule applies.
-				// FIXME: Really need to do subtype properly with environments and all...
-				result = thisMembersReplaced.containsAll(otherMembers);
-			}
-		}
-		
-		// System.out.println("Result of " + thisName + " subtypeOf " + otherName + ": " + result);
-		
-		return result;
-	}
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
@@ -137,28 +62,22 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		}
 		
 		if (other instanceof TypeType) {
-			// return this.subtypeOf((TypeType) other);
-			
-			System.out.println("THIS TYPE " + this.getDecl().getName() + " has:");
 			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
 			for (TypedAST d : this.decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
 					Arrow a = (Arrow) ((MethDeclaration) d).getType();
 					thisMeths.add(a);
-					System.out.println(a);
 				} else {
 					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
-			System.out.println("OTHER TYPE " + ((TypeType) other).getDecl().getName() + " has:");
 			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
 			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
 					Arrow a = (Arrow) ((MethDeclaration) d).getType();
 					otherMeths.add(a);
-					System.out.println(a);
 				} else {
 					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
@@ -169,72 +88,25 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 			// from supertype - is this OK? Seems OK to me but not sure. :-)
 			boolean subset = true;
 			for (Arrow aOther : otherMeths) {
-				// What if aOther is recursive?
-				// if (aOther.getArgument().equals(other) ||
-				//	aOther.getResult().equals(other)) {
-					
-					boolean hasImplementingCandidate = false;
-					for (Arrow aThis : thisMeths) {
-						// What if aThis is recursive?
-						// if (aThis.getArgument().equals(this) ||
-						// 	aThis.getResult().equals(this)) {
-						
-						//	System.out.println("Detected recursive type (in this) occurrence: " + aThis);
-						//	System.out.println("Detected recursive type (in other) occurrence: " + aOther);
-							
-							// Apply S-Amber rule here!
-							SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
-							if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
-								System.out.println("Assuming: " + sr);
-								subtypes.add(sr);
+				boolean hasImplementingCandidate = false;
+				for (Arrow aThis : thisMeths) {
+					// Apply S-Amber rule here!
+					SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
+					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+						subtypes.add(sr);
+						boolean result = aThis.subtype(aOther, subtypes);
+						subtypes.remove(sr);
 								
-								System.out.println("Trying to prove if: " + aThis + " <: " + aOther);
-								boolean result = aThis.subtype(aOther, subtypes);
-								subtypes.remove(sr);
-								
-								if (result) {
-									System.out.println("Decided that " + aThis + " <: " + aOther);
-									hasImplementingCandidate = true;
-									break;
-								}
-							} else {
-								// return false;
-							}
-						/*
-						} else {
-							// FIXME: Skip recursive comparison since aThis is not?
-							subset = false;
-							continue;
+						if (result) {
+							hasImplementingCandidate = true;
+							break;
 						}
-						*/
 					}					
 					if (!hasImplementingCandidate) {
 						subset = false;
 						break;
 					}
-				/*
-				} else {
-					boolean hasImplementingCandidate = false;
-					for (Arrow aThis : thisMeths) {
-						// What if aThis is recursive?
-						if (aThis.getArgument().equals(this) ||
-							aThis.getResult().equals(this)) {
-							
-							// FIXME: Skip recursive comparison since aOther is not?
-							hasImplementingCandidate = false;
-							continue;
-						}
-						if (aThis.subtype(aOther)) {
-							hasImplementingCandidate = true;
-							break;
-						}
-					}
-					if (!hasImplementingCandidate) {
-						subset = false;
-						break;
-					}
 				}
-				*/
 			}
 			if (subset) return true;
 		}
