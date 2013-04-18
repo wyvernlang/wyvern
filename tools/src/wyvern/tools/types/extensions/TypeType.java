@@ -5,9 +5,6 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
@@ -17,8 +14,8 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType {
@@ -58,7 +55,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		return this.decl;
 	}
 	
-	public boolean subtypeOf(TypeType tt) {
+	private boolean subtypeOf(TypeType tt) {
 		// TODO: This is my current platform for implementing the recursive subtype check right as types only have methods and props to worry about.
 		
 		DeclSequence thisDs = this.decl.getDecls();
@@ -134,7 +131,114 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 	}
 
 	@Override
-	public boolean subtype(Type other, HashSet<TypeUtils.SubtypeRelation> subtypes) {
-		return super.subtype(other, subtypes);
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		if (super.subtype(other, subtypes)) {
+			return true;
+		}
+		
+		if (other instanceof TypeType) {
+			// return this.subtypeOf((TypeType) other);
+			
+			System.out.println("THIS TYPE " + this.getDecl().getName() + " has:");
+			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
+			for (TypedAST d : this.decl.getDecls()) {
+				if (d instanceof MethDeclaration) {
+					Arrow a = (Arrow) ((MethDeclaration) d).getType();
+					thisMeths.add(a);
+					System.out.println(a);
+				} else {
+					// FIXME: Can type contains more than meth? Props?
+					System.out.println("Unsupported type member in subtype: " + d.getClass());
+				}
+			}
+			
+			System.out.println("OTHER TYPE " + ((TypeType) other).getDecl().getName() + " has:");
+			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
+			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
+				if (d instanceof MethDeclaration) {
+					Arrow a = (Arrow) ((MethDeclaration) d).getType();
+					otherMeths.add(a);
+					System.out.println(a);
+				} else {
+					// FIXME: Can type contains more than meth? Props?
+					System.out.println("Unsupported type member in subtype: " + d.getClass());
+				}
+			}
+			
+			// FIXME: Allows to have multiple methods that match to implement several methods
+			// from supertype - is this OK? Seems OK to me but not sure. :-)
+			boolean subset = true;
+			for (Arrow aOther : otherMeths) {
+				// What if aOther is recursive?
+				// if (aOther.getArgument().equals(other) ||
+				//	aOther.getResult().equals(other)) {
+					
+					boolean hasImplementingCandidate = false;
+					for (Arrow aThis : thisMeths) {
+						// What if aThis is recursive?
+						// if (aThis.getArgument().equals(this) ||
+						// 	aThis.getResult().equals(this)) {
+						
+						//	System.out.println("Detected recursive type (in this) occurrence: " + aThis);
+						//	System.out.println("Detected recursive type (in other) occurrence: " + aOther);
+							
+							// Apply S-Amber rule here!
+							SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
+							if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+								System.out.println("Assuming: " + sr);
+								subtypes.add(sr);
+								
+								System.out.println("Trying to prove if: " + aThis + " <: " + aOther);
+								boolean result = aThis.subtype(aOther, subtypes);
+								subtypes.remove(sr);
+								
+								if (result) {
+									System.out.println("Decided that " + aThis + " <: " + aOther);
+									hasImplementingCandidate = true;
+									break;
+								}
+							} else {
+								// return false;
+							}
+						/*
+						} else {
+							// FIXME: Skip recursive comparison since aThis is not?
+							subset = false;
+							continue;
+						}
+						*/
+					}					
+					if (!hasImplementingCandidate) {
+						subset = false;
+						break;
+					}
+				/*
+				} else {
+					boolean hasImplementingCandidate = false;
+					for (Arrow aThis : thisMeths) {
+						// What if aThis is recursive?
+						if (aThis.getArgument().equals(this) ||
+							aThis.getResult().equals(this)) {
+							
+							// FIXME: Skip recursive comparison since aOther is not?
+							hasImplementingCandidate = false;
+							continue;
+						}
+						if (aThis.subtype(aOther)) {
+							hasImplementingCandidate = true;
+							break;
+						}
+					}
+					if (!hasImplementingCandidate) {
+						subset = false;
+						break;
+					}
+				}
+				*/
+			}
+			if (subset) return true;
+		}
+		
+		return false;
 	}
 }
