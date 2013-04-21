@@ -2,6 +2,7 @@ package wyvern.targets.JavaScript.visitors;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import wyvern.targets.JavaScript.typedAST.JSFunction;
@@ -147,13 +148,14 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	public void visit(ValDeclaration valDeclaration) {
 		super.visit(valDeclaration);
 		
-		ASTElement nextDeclElem = (valDeclaration.getNextDecl() != null) ? elemStack.pop() : null;
-		ASTElement declelem = elemStack.pop();
-		
-		// TODO SMELL: somewhat hackish
-		String nextDeclText = (nextDeclElem == null)? "" : "\n" + nextDeclElem.generated;
-		elemStack.push(new ASTElement(valDeclaration, 
-				((inClass)?className+".prototype.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
+		if (valDeclaration.getDefinition() != null) {
+			ASTElement declelem = elemStack.pop();
+			elemStack.push(new ASTElement(valDeclaration, 
+					((inClass)?className+".prototype.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";"));
+		} else {
+			//Nothing, just add the variable at runtime
+			elemStack.push(new ASTElement(valDeclaration, ""));
+		}
 	}
 
 	@Override
@@ -190,7 +192,25 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(New new1) {
 		super.visit(new1);
-		elemStack.push(new ASTElement(new1, "new "+new1.getClassDecl().getName()+"()"));
+		
+		if (new1.getArgs().isEmpty())
+			elemStack.push(new ASTElement(new1, "new "+new1.getClassDecl().getName()+"()"));
+		else {
+			StringBuilder body = new StringBuilder("\nthis.__proto__ = new "+new1.getClassDecl().getName()+"();");
+			
+			int setSize = new1.getArgs().size();
+			String[] reverser = new String[setSize];
+			int idx = 1;
+			for (Entry<String,TypedAST> elem : new1.getArgs().entrySet()) {
+				reverser[setSize - (idx++)] = (elemStack.pop().generated);
+			}
+			
+			idx = 0;
+			for (Entry<String,TypedAST> elem : new1.getArgs().entrySet()) {
+				body.append("\nthis."+elem.getKey() +" = "+reverser[idx++] +";");
+			}
+			elemStack.push(new ASTElement(new1, "new function() {"+Indent(body.toString()) + "\n}"));
+		}
 	}
 
 	@Override
@@ -307,6 +327,9 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(Assignment assignment) {
 		super.visit(assignment);
+		ASTElement value = elemStack.pop();
+		ASTElement target = elemStack.pop();
+		elemStack.push(new ASTElement(assignment, target.generated + " = " + value.generated + ";"));
 	}
 
 	// TODO: Ben, please implement, though nothing much to do here at this stage...
@@ -319,13 +342,15 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(VarDeclaration varDeclaration) {
 		super.visit(varDeclaration);
-		ASTElement nextDeclElem = (varDeclaration.getNextDecl() != null) ? elemStack.pop() : null;
-		ASTElement declelem = elemStack.pop();
 		
-		// TODO SMELL: somewhat hackish
-		String nextDeclText = (nextDeclElem == null)? "" : "\n" + nextDeclElem.generated;
-		elemStack.push(new ASTElement(varDeclaration, 
-				((inClass)?"this.":"var ")+varDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
+		if (varDeclaration.getDefinition() != null) {
+			ASTElement declelem = elemStack.pop();
+			elemStack.push(new ASTElement(varDeclaration, 
+					((inClass)?className+".prototype.":"var ")+varDeclaration.getBinding().getName() +" = "+declelem.generated +";"));
+		} else {
+			//Nothing, just add the variable at runtime
+			elemStack.push(new ASTElement(varDeclaration, ""));
+		}
 	}
 
 	@Override
@@ -357,7 +382,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 			String out = str.generated;
 			if (!elemStrs.hasNext() && !(sequence instanceof DeclSequence))
 				out = "return "+str.generated+";";
-			else if (elemStrs.hasNext() && !(str.elem instanceof Sequence) && !(str.elem instanceof ClassDeclaration))
+			else if (elemStrs.hasNext() && !(str.elem instanceof Sequence) && !(str.elem instanceof ClassDeclaration) && !str.generated.isEmpty())
 				out = str.generated + "\n";
 			declString.append(out);
 		}

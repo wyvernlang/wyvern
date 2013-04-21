@@ -84,6 +84,10 @@ public class New extends CachingTypedAST implements CoreAST {
 		//TODO: fix args
 		visitor.visit(this);
 	}
+	
+	public Map<String, TypedAST> getArgs() {
+		return args;
+	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
 	

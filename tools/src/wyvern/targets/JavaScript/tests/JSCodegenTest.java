@@ -287,4 +287,32 @@ public class JSCodegenTest {
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 	}
+	
+	@Test
+	public void testVar() {
+		TypedAST typedAST = doCompile(
+				  "var x : Int = 1\n" +
+				  "x = x + 1\n" +
+				  "x");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		Assert.assertTrue((Double)wrapInvoke(visitor.getCode()) - 2 < 0.001);
+	}
+	
+
+	@Test
+	public void testClassMethArgs() {
+		TypedAST typedAST = doCompile("class Hello\n"
+				+"	val testVa:Int\n"
+				+"	var testVr:Int\n"
+				+"	class meth make(n : Int):Hello = new\n" +
+				"		testVa = n\n" +
+				"		testVr = n+1\n"
+				+"	meth getVa():Int = this.testVa\n"
+				+"val h:Hello = Hello.make(10)\n"
+				+"h.getVa()");
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String testVal = visitor.getCode();
+	}
 }

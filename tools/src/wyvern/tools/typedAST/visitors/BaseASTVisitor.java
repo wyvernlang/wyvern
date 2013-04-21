@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.visitors;
 
+import java.util.Map.Entry;
+
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
@@ -72,8 +74,6 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 		
 		if (definition instanceof CoreAST)
 			((CoreAST) definition).accept(this);
-		if (valDeclaration.getNextDecl() != null)
-			((CoreAST) valDeclaration.getNextDecl()).accept(this);
 	}
 
 	@Override
@@ -82,6 +82,10 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(VarDeclaration varDeclaration) {
+		TypedAST definition = varDeclaration.getDefinition();
+		
+		if (definition instanceof CoreAST)
+			((CoreAST) definition).accept(this);
 	}
 
 	@Override
@@ -123,6 +127,9 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(New new1) {
+		for (Entry<String,TypedAST> elem : new1.getArgs().entrySet()) {
+			((CoreAST)elem.getValue()).accept(this);
+		}
 	}
 
 	@Override
