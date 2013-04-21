@@ -111,11 +111,11 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 					env = pds.add((PartialDecl)first, env);
 					rest = rest.getRest();
 					continue;
-				} else if (!(first instanceof PartialDecl) && pds != null) {
+				} else if (!(first instanceof PartialDecl) && !pds.isEmpty()) {
 					Pair<TypedAST, Environment> pair = pds.resolve(env);
-					pds = null;
+					pds = new PartialDeclSequence();
 					s.append(pair.first);
-				} else if (first instanceof PartialDecl && pds == null) {
+				} else if (first instanceof PartialDecl && pds.isEmpty()) {
 					pds = new PartialDeclSequence();
 					env = pds.add((PartialDecl)first, env);
 					rest = rest.getRest();
@@ -138,7 +138,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 				rest = rest.getRest();
 			}
 			
-			if (pds != null && !pds.isResolved()) {
+			if (pds != null && !pds.isResolved() && !pds.isEmpty()) {
 				Pair<TypedAST, Environment> pair = pds.resolve(env);
 				env = pair.second;
 				s.append(pair.first);

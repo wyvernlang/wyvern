@@ -46,5 +46,9 @@ public class PartialDeclSequence {
 	public boolean isResolved() {
 		return decls == null;
 	}
+	
+	public boolean isEmpty() {
+		return decls.isEmpty();
+	}
 
 }
