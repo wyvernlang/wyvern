@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import wyvern.DSL.html.Html;
 import wyvern.stdlib.Globals;
 import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.targets.JavaScript.types.JSObjectType;
@@ -38,11 +39,16 @@ import org.mozilla.javascript.*;
 public class JSCodegenTest {
 	
 	private TypedAST doCompile(String input) {
+		return doCompile(input, Environment.getEmptyEnvironment());
+	}
+
+	private TypedAST doCompile(String input, Environment ienv) {
 		Reader reader = new StringReader(input);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));
+		env = env.extend(ienv);
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
@@ -313,6 +319,29 @@ public class JSCodegenTest {
 				+"h.getVa()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		String testVal = visitor.getCode();
+		Assert.assertTrue((Integer)wrapInvoke(visitor.getCode()) == 10);
+	}
+	
+	@Test
+	public void testHtmlDSLAndJS() {
+		String testStr = 
+				 "val htmlv : Str = html\n" +
+				 "	body\n" +
+				 "		div\n" +
+				 "			attrs\n" +
+				 "				id=\"main\"\n" +
+				 "				class=\"test\"\n" +
+				 "			\"Hi, this was served by Node.js running compiled Wyvern code!\"\n" +
+				 "			br\n" +
+				 "			button\n" +
+				 "				\"Press me!\"\n" +
+				 "val http : JSObject = require(\"http\")\n" +
+				 "meth doServer(req : JSObject, resp : JSObject):Unit = resp.end(htmlv)\n" +
+				 "http.createServer(doServer).listen(8081, \"127.0.0.1\")";
+		
+		TypedAST typedAST = doCompile(testStr, Html.extend(Environment.getEmptyEnvironment()));
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
 	}
 }

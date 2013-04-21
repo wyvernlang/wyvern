@@ -26,6 +26,7 @@ public class HtmlTagParser implements LineParser {
 	public static class ParsingPrefs {
 		private boolean injectEnv = false;
 		private String tag = null;
+		private boolean empty = false;
 		public ParsingPrefs() {}
 		public ParsingPrefs(String tag) {
 			this.tag = tag;
@@ -36,6 +37,11 @@ public class HtmlTagParser implements LineParser {
 		public ParsingPrefs(String tag, boolean injectEnv) {
 			this.tag = tag;
 			this.injectEnv = injectEnv;
+		}
+		public ParsingPrefs(String tag, boolean injectEnv, boolean empty) {
+			this.tag = tag;
+			this.injectEnv = injectEnv;
+			this.empty  = empty;
 		}
 	}
 	
@@ -49,6 +55,8 @@ public class HtmlTagParser implements LineParser {
 	@Override
 	public TypedAST parse(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
+		if (prefs.empty)
+			return new StringConstant(String.format("</%s>\n",prefs.tag));
 		if (ctx.first == null)
 			return new StringConstant(String.format("<%s>\n</%s>\n",prefs.tag, prefs.tag));
 		
@@ -67,6 +75,8 @@ public class HtmlTagParser implements LineParser {
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("head", new Keyword(new HtmlTagParser(new ParsingPrefs("head")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("title", new Keyword(new HtmlTagParser(new ParsingPrefs("title")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("div", new Keyword(new HtmlTagParser(new ParsingPrefs("div")))));
+			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("br", new Keyword(new HtmlTagParser(new ParsingPrefs("br", false, true)))));
+			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("button", new Keyword(new HtmlTagParser(new ParsingPrefs("button")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("attrs", new Keyword(new AttributeParser())));
 		} else {
 			htmlBodyEnv = ctx.second;

@@ -167,7 +167,10 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(StringConstant strConst) {
 		super.visit(strConst);
-		elemStack.push(new ASTElement(strConst, "\""+strConst.getValue() + "\""));
+		elemStack.push(new ASTElement(strConst, "\""+ strConst.getValue()
+															  .replace("\n", "\\n")
+															  .replace("\"","\\\"")
+															  + "\""));
 	}
 
 	@Override
