@@ -25,12 +25,10 @@ public interface CoreASTVisitor {
 	void visit(Fn fn);
 	void visit(Invocation invocation);
 	void visit(Application application);
-
 	void visit(PropDeclaration propDeclaration);
 	void visit(ValDeclaration valDeclaration);
 	void visit(VarDeclaration valDeclaration);
 	void visit(Variable variable);
-	
 	void visit(IntegerConstant booleanConstant);
 	void visit(StringConstant booleanConstant);
 	void visit(BooleanConstant booleanConstant);

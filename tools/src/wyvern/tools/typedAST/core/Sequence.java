@@ -151,4 +151,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	public TypedAST getLast() {
 		return exps.getLast();
 	}
+	public int size() {
+		return exps.size();
+	}
 }

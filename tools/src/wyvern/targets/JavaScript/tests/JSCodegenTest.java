@@ -65,11 +65,11 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testValDecl() {
-		TypedAST typedAST = doCompile("val x = 5\nx");
+		TypedAST typedAST = doCompile("val x : Int = 5\nx");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 		String source = visitor.getCode();
-		Assert.assertEquals("var x = 5;\nreturn x;", source);
+		Assert.assertEquals("var x = 5;\nreturn x;\n", source);
 		Assert.assertEquals(new Integer(5),wrapInvoke(source));
 	}
 	
@@ -113,15 +113,15 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testHigherOrderApplication() {
-		TypedAST typedAST = doCompile("val applyTwice = fn f : Int -> Int => fn x : Int => f(f(x))\n"
-				+"val addOne = fn x : Int => x + 1\n"
+		TypedAST typedAST = doCompile("val applyTwice : (Int -> Int) -> (Int -> Int) = fn f : Int -> Int => fn x : Int => f(f(x))\n"
+				+"val addOne : Int -> Int = fn x : Int => x + 1\n"
 				+"applyTwice(addOne)(1)");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 		String source = visitor.getCode();
 		Assert.assertEquals("var applyTwice = function(f) { return function(x) { return (f)((f)(x)); }; };\n"+
 							"var addOne = function(x) { return x + 1; };\n"+
-							"return ((applyTwice)(addOne))(1);", source);
+							"return ((applyTwice)(addOne))(1);\n", source);
 
 		Assert.assertTrue((Double)wrapInvoke(source) - 3.0 < .001);
 	}
@@ -136,7 +136,7 @@ public class JSCodegenTest {
 		String source = visitor.getCode();
 		Assert.assertEquals("function double(n) {\n"+
 				"\treturn n * 2;\n}\n"+
-				"return (double)(5);", source);
+				"return (double)(5);\n", source);
 		Assert.assertTrue((Double)wrapInvoke(source) - 10.0 < .001);
 	}
 	
@@ -148,7 +148,7 @@ public class JSCodegenTest {
 		((CoreAST)typedAST).accept(visitor);
 		Assert.assertEquals("function num() {\n"+
 				"\treturn 5;\n}\n"+
-				"return (num)();", visitor.getCode());
+				"return (num)();\n", visitor.getCode());
 	}
 	
 	@Test
@@ -162,23 +162,27 @@ public class JSCodegenTest {
 				"\treturn n * 2;\n}\n"+
 				"function doublePlusOne(n) {\n"+
 				"\treturn (double)(n) + 1;\n}\n"+
-				"return (doublePlusOne)(5);", visitor.getCode());
+				"return (doublePlusOne)(5);\n", visitor.getCode());
 		
 	}
 	
 	@Test
 	public void testClassAndField() {
 		TypedAST typedAST = doCompile("class Hello\n"
-										+"    val hiString = \"hello\"\n"
+										+"	class meth NewHello() = new\n"
+										+"	val hiString : Str= \"hello\"\n"
 										+"\n"
-										+"val h = new\n"//hiString: \"hi\")\n"
+										+"val h : Hello = Hello.NewHello()\n"//hiString: \"hi\")\n"
 										+"h.hiString");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		Assert.assertEquals("function Hello() {\n"+
-        		"\tthis.hiString = \"hello\";\n"+
-				"}\n"+
-				"var h = new Hello();\nreturn h.hiString;", visitor.getCode());
+		Assert.assertEquals("function Hello() {}\n"+
+							"Hello.NewHello = function() {\n"+
+							"	return new Hello();\n"+
+							"}\n"+
+							"Hello.prototype.hiString = \"hello\";\n"+
+							"var h = (Hello.NewHello)();\n"+
+							"return h.hiString;\n", visitor.getCode());
 	}
 
 	@Test
@@ -187,8 +191,8 @@ public class JSCodegenTest {
 				"meth outer(n:Int):Int -> Int\n"
 				+"    meth nested(m:Int):Int = n+m\n"
 				+"    fn x : Int => nested(x + 1)\n"
-				+"val f1 = outer(1)\n"
-				+"val f2 = outer(2)\n"
+				+"val f1 : Int->Int = outer(1)\n"
+				+"val f2 : Int->Int = outer(2)\n"
 				+"f2(6)");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -197,11 +201,11 @@ public class JSCodegenTest {
 				"\tfunction nested(m) {\n"+
         		"\t\treturn n + m;\n"+
         		"\t}\n"+
-        		"\treturn function(x) { return (nested)(x + 1); };\n"+
+        		"\treturn function(x) { return (nested)(x + 1); };\n\t\n"+
 				"}\n"+
 				"var f1 = (outer)(1);\n" +
 				"var f2 = (outer)(2);\n" +
-				"return (f2)(6);", visitor.getCode());
+				"return (f2)(6);\n", visitor.getCode());
 	}
 	
 	@Test
@@ -217,24 +221,28 @@ public class JSCodegenTest {
 	public void testClassAndMethods() {
 		TypedAST typedAST = doCompile(
 				"class Hello\n"
-				+"    meth get5():Int = 5\n"
+				+"	class meth make() : Hello = new\n"
+				+"	meth get5():Int = 5\n"
 				+"\n"
-				+"val h = new\n"
+				+"val h : Hello = Hello.make()\n"
 				+"h.get5()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
-		Assert.assertEquals("function Hello() {\n" +
-				"\tthis.get5 = function() {\n" +
-				"\t\treturn 5;" +
-				"\n\t}\n" +
+		Assert.assertEquals(
+				"function Hello() {}\n" +
+				"Hello.make = function() {\n" +
+				"	return new Hello();\n" +
 				"}\n" +
-				"var h = new Hello();\n" +
-				"return (h.get5)();", visitor.getCode());
+				"Hello.prototype.get5 = function() {\n" +
+				"	return 5;\n" +
+				"}\n" +
+				"var h = (Hello.make)();\n" +
+				"return (h.get5)();\n", visitor.getCode());
 	}
 	
 	@Test
 	public void testExternalMethodGeneration() {
-		TypedAST typedAST = doCompile("val http = require(\"http\")\n" +
+		TypedAST typedAST = doCompile("val http : JSObject = require(\"http\")\n" +
 									  "meth doServer(req : JSObject, resp : JSObject):Unit = resp.write(\"test\")\n" +
 									  "http.createServer(doServer)");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
@@ -245,11 +253,12 @@ public class JSCodegenTest {
 	@Test
 	public void testClassAndMethods2() {
 		TypedAST typedAST = doCompile("class Hello\n"
+										+"	class meth make():Hello = new\n"
 										+"	meth get4():Int = 4\n"
 										+"	meth get5():Int = 5\n"
 										+"	meth getP():Int = this.get4()+this.get5()\n"
 										+"\n"
-										+"val h = new\n"
+										+"val h:Hello = Hello.make()\n"
 										+"h.getP()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -259,11 +268,12 @@ public class JSCodegenTest {
 	@Test
 	public void testClassMethodsVals() {
 		TypedAST typedAST = doCompile("class Hello\n"
-										+"	val testVal = 5\n"
+										+"	val testVal:Int = 5\n"
+										+"	class meth make():Hello = new\n"
 										+"	meth getVal():Int = this.testVal\n"
 										+"	meth getP():Int = this.getVal()\n"
 										+"\n"
-										+"val h = new\n"
+										+"val h:Hello = Hello.make()\n"
 										+"h.getP()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -272,7 +282,7 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testJSFunction() {
-		TypedAST typedAST = doCompile("val http = require(\"http\")\n" +
+		TypedAST typedAST = doCompile("val http : JSObject = require(\"http\")\n" +
 									  "http.bad()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);

@@ -44,7 +44,7 @@ public class MethParser implements DeclParser {
 		return parse(first,ctx,null,false);
 	}
 	
-	//REALLY HACKY (to get recursive methods for now until refactoring is done)
+	//REALLY HACKY (we don't have much of a choice, though)
 	private static class MutableMethDeclaration extends MethDeclaration {
 		public MutableMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation methNameLine) {
 			super(name, args, returnType, body, isClassMeth, methNameLine);

@@ -4,6 +4,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
@@ -141,8 +142,6 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 			((CoreAST) meth.getNextDecl()).accept(this);
 
 	}
-	
-
 
 	@Override
 	public void visit(Assignment assignment) {
@@ -155,4 +154,13 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 		
 	}
 
+
+	@Override
+	public void visit(Sequence sequence) {
+		for (TypedAST elem : sequence) {
+			if (!(elem instanceof CoreAST))
+				throw new RuntimeException();
+			((CoreAST)elem).accept(this);
+		}
+	}
 }

@@ -1,5 +1,6 @@
 package wyvern.targets.JavaScript.visitors;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
 
@@ -29,6 +30,7 @@ import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
@@ -61,6 +63,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	
 	Stack<ASTElement> elemStack = new Stack<ASTElement>();
 	boolean inClass = false, inBody = false;
+	String className = null;
 	
 	private boolean isInfix(String operator) {
 		switch(operator) {
@@ -150,7 +153,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		// TODO SMELL: somewhat hackish
 		String nextDeclText = (nextDeclElem == null)? "" : "\n" + nextDeclElem.generated;
 		elemStack.push(new ASTElement(valDeclaration, 
-				((inClass)?"this.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
+				((inClass)?className+".prototype.":"var ")+valDeclaration.getBinding().getName() +" = "+declelem.generated +";" + nextDeclText));
 	}
 
 	@Override
@@ -194,9 +197,14 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	public void visit(ClassDeclaration clsDeclaration) {
 		DeclSequence decls = clsDeclaration.getDecls();
 		
+		boolean lic = inClass;
+		String oldClassName = className;
 		inClass = true;
+		className = clsDeclaration.getName();
 		((CoreAST)decls).accept(this);
-		inClass = false;
+		className = oldClassName;
+		inClass = lic;
+		
 		
 		if (clsDeclaration.getNextDecl() != null)
 			((CoreAST) clsDeclaration.getNextDecl()).accept(this);
@@ -206,19 +214,9 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		StringBuilder textRep = new StringBuilder();
 		textRep.append("function ");
 		textRep.append(clsDeclaration.getName());
-		textRep.append("() {");
+		textRep.append("() {}\n");
 		
-		StringBuilder declBuilder = new StringBuilder();
-		declBuilder.append('\n');
-
-		ASTElement decl = elemStack.pop();
-		declBuilder.append(decl.generated);
-		
-		textRep.append(Indent(declBuilder.toString())+"\n");
-		textRep.append("}\n");
-		
-		String nextDeclText = (nextDeclElem == null)? "" : nextDeclElem.generated;
-		elemStack.push(new ASTElement(clsDeclaration, textRep.toString() + nextDeclText));
+		elemStack.push(new ASTElement(clsDeclaration, textRep.toString() + elemStack.pop().generated));
 	}
 
 	@Override
@@ -253,7 +251,10 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		if (!inClass)
 			methodDecl.append("function " + meth.getName() + "(");
 		else
-			methodDecl.append("this."+meth.getName()+" = function(");
+			if (!meth.isClassMeth())
+				methodDecl.append(className+".prototype."+meth.getName()+" = function(");
+			else
+				methodDecl.append(className+"."+meth.getName()+" = function(");
 		
 		boolean first = true;
 		for (NameBinding binding : meth.getArgBindings()) {
@@ -267,7 +268,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		
 		
 		//TODO: Quick hack to get it working
-		if (elem.elem instanceof LetExpr)
+		if (elem.elem instanceof Sequence)
 			methodDecl.append(Indent("\n"+elem.generated));
 		else {
 			methodDecl.append(Indent("\n"+"return "+elem.generated + ";"));
@@ -337,10 +338,30 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	public void visit(PropDeclaration propDeclaration) {
 		super.visit(propDeclaration);
 	}
-
+	
 	@Override
 	public void visit(Sequence sequence) {
-		// TODO Auto-generated method stub
+		super.visit(sequence);
 		
+		Iterator<TypedAST> elems = sequence.iterator();
+		StringBuilder declString = new StringBuilder();
+		LinkedList<ASTElement> args = new LinkedList<ASTElement>();
+		while (elems.hasNext()) {
+			TypedAST elem = elems.next();
+			args.push(elemStack.pop());
+		}
+
+		Iterator<ASTElement> elemStrs = args.iterator();
+		while (elemStrs.hasNext()) {
+			ASTElement str = elemStrs.next();
+			String out = str.generated;
+			if (!elemStrs.hasNext() && !(sequence instanceof DeclSequence))
+				out = "return "+str.generated+";";
+			else if (elemStrs.hasNext() && !(str.elem instanceof Sequence) && !(str.elem instanceof ClassDeclaration))
+				out = str.generated + "\n";
+			declString.append(out);
+		}
+		
+		elemStack.push(new ASTElement(sequence, declString.toString()+"\n"));
 	}
 }
