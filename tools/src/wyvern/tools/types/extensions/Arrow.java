@@ -33,7 +33,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	@Override
 	public Type checkApplication(Application application, Environment env) {
 		Type actualType = application.getArgument().typecheck(env);
-		if (!actualType.equals(argument))
+		if (!actualType.subtype(argument))
 			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application);
 		return result;
 	}
