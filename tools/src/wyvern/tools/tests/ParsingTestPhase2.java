@@ -493,4 +493,19 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("Int",result.typecheck(env).toString());
 		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
 	}
+	@Test
+	public void testWhile() {
+		Reader reader = new StringReader(
+				"var x:Int = 5\n" +
+				"var y:Int = 0\n" +
+				"while x > 0\n" +
+				"	x = x-1\n" +
+				"	y = y+1\n" +
+				"y");
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("IntegerConstant(5)", result.evaluate(env).toString());
+	}
 }

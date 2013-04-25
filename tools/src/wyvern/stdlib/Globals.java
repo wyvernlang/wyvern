@@ -14,6 +14,7 @@ import wyvern.tools.parsing.extensions.PropParser;
 import wyvern.tools.parsing.extensions.TypeParser;
 import wyvern.tools.parsing.extensions.ValParser;
 import wyvern.tools.parsing.extensions.VarParser;
+import wyvern.tools.parsing.extensions.WhileParser;
 import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
@@ -43,6 +44,7 @@ public class Globals {
 		env = env.extend(new KeywordNameBinding("var", new Keyword(VarParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("new", new Keyword(NewParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("if", new Keyword(IfParser.getInstance())));
+		env = env.extend(new KeywordNameBinding("while", new Keyword(WhileParser.getInstance())));
 		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));

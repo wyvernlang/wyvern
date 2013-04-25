@@ -106,7 +106,7 @@ public class IfParser implements LineParser {
 			TypedAST clause = new BooleanConstant(true);
 			if (ParseUtils.checkFirst("if",ctx)) {
 				ParseUtils.parseSymbol("if", ctx);
-				clause = ParseUtils.parseExpr(ctx);
+				clause =  ParseUtils.parseCond(ctx);
 			}
 			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.second);
 			return new IfClause(clause,body,false);
@@ -116,8 +116,7 @@ public class IfParser implements LineParser {
 	@Override
 	public TypedAST parse(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
-		TypedAST thenClause = ctx.first.getFirst().accept(BodyParser.getInstance(), ctx.second);
-		ctx.first = ctx.first.getRest();
+		TypedAST thenClause = ParseUtils.parseCond(ctx);
 		
 		Environment bodyEnv = Environment.getEmptyEnvironment();
 		bodyEnv = bodyEnv.extend(new KeywordNameBinding("then", new Keyword(new ThenParser(thenClause,ctx.second))));

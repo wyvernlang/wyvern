@@ -1,8 +1,12 @@
 package wyvern.tools.parsing;
 
+import java.util.ArrayList;
+
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.rawAST.ExpressionSequence;
+import wyvern.tools.rawAST.Line;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.RawAST;
@@ -179,6 +183,15 @@ public class ParseUtils {
 		TypedAST result = ctx.first.accept(BodyParser.getInstance(), ctx.second);
 		ctx.first = null;	// previous line by definition read everything
 		return result;
+	}
+	
+	public static TypedAST parseCond(Pair<ExpressionSequence, Environment> ctx) {
+		ArrayList<RawAST> condRaw = new ArrayList<RawAST>();
+		while (ctx.first != null && !(ctx.first.getFirst() instanceof LineSequence)) {
+			condRaw.add(ctx.first.getFirst());
+			ctx.first = ctx.first.getRest();
+		}
+		return new Line(condRaw, FileLocation.UNKNOWN).accept(BodyParser.getInstance(), ctx.second);
 	}
 
 	public static Variable parseVariable(Pair<ExpressionSequence, Environment> ctx) {
