@@ -465,5 +465,32 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(11)", result.evaluate(env).toString());
 	}
 
-	
+	@Test
+	public void testIf() {
+		Reader reader = new StringReader(
+				"if true\n" +
+				"	then\n" +
+				"		1\n" +
+				"	else\n" +
+				"		2\n");
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("IntegerConstant(1)", result.evaluate(env).toString());
+	}
+	@Test
+	public void testIf2() {
+		Reader reader = new StringReader(
+				"if false\n" +
+				"	then\n" +
+				"		1\n" +
+				"	else\n" +
+				"		2\n");
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
+	}
 }

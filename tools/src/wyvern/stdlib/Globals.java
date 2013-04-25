@@ -7,6 +7,7 @@ import static wyvern.tools.types.TypeUtils.str;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.extensions.ClassParser;
 import wyvern.tools.parsing.extensions.FnParser;
+import wyvern.tools.parsing.extensions.IfParser;
 import wyvern.tools.parsing.extensions.MethParser;
 import wyvern.tools.parsing.extensions.NewParser;
 import wyvern.tools.parsing.extensions.PropParser;
@@ -41,6 +42,7 @@ public class Globals {
 		env = env.extend(new KeywordNameBinding("val", new Keyword(ValParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("var", new Keyword(VarParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("new", new Keyword(NewParser.getInstance())));
+		env = env.extend(new KeywordNameBinding("if", new Keyword(IfParser.getInstance())));
 		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
