@@ -43,6 +43,9 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	protected Type doTypecheck(Environment env) {
 		Type receiverType = receiver.typecheck(env);
 		
+		if (argument != null)
+			argument.typecheck(env);
+		
 		if (receiverType instanceof OperatableType) {
 			return ((OperatableType)receiverType).checkOperator(this,env);
 		} else {

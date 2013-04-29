@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
@@ -43,9 +45,11 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		if (this.definition != null)
 			this.definitionType = this.definition.typecheck(env);
 		if (binding.getType() == null) {
-			this.definitionType = this.definition.typecheck(env);
 			this.binding = new NameBindingImpl(binding.getName(), definitionType);
+		} else if (this.definitionType != null && !this.definitionType.subtype(binding.getType())){
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, this);
 		}
+		
 		return binding.getType();
 	}
 

@@ -35,6 +35,9 @@ public class Application extends CachingTypedAST implements CoreAST {
 	protected Type doTypecheck(Environment env) {
 		Type fnType = function.typecheck(env);
 		
+		if (this.argument != null)
+			this.argument.typecheck(env);
+		
 		if (!(fnType instanceof ApplyableType))
 			reportError(TYPE_CANNOT_BE_APPLIED, fnType.toString(), this);
 		
