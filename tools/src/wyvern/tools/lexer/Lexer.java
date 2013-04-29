@@ -62,9 +62,11 @@ public class Lexer {
 	}
 
 	private Token currentTok = null;
+	
 	private void fillToken() {
-		if (currentTok == null)
+		if (currentTok == null) {
 			currentTok = currentState.getToken(this);
+		}
 	}
 	
 	public Token getToken() {

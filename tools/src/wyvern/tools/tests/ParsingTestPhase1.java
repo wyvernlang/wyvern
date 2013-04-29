@@ -80,6 +80,21 @@ public class ParsingTestPhase1 {
 	}
 	
 	@Test
+	public void testSimpleIndent2() {
+		Reader reader = new StringReader(
+				"hi\n" +
+				"	hello\n" +
+				"		world\n" +
+				"			today\n" +
+				"	goodbye");
+		
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		
+		String expected ="{$I {$L hi {$I {$L hello {$I {$L world {$I {$L today $L} $I} $L} $I} $L} {$L goodbye $L} $I} $L} $I}";
+		Assert.assertEquals(expected, parsedResult.toString());
+	}
+	
+	@Test
 	public void testCodeAldrich() throws IOException {
 		InputStream is = ParsingTestPhase1.class.getClassLoader().getResource("wyvern/tools/tests/samples/Stack.wyv").openStream();
 		Reader reader = new InputStreamReader(is);

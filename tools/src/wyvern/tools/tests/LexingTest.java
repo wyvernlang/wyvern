@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 import junit.framework.Assert;
 
@@ -14,6 +15,8 @@ import org.junit.rules.ExpectedException;
 
 import wyvern.tools.lexer.Lexer;
 import wyvern.tools.lexer.Token;
+import wyvern.tools.rawAST.RawAST;
+import wyvern.tools.simpleParser.Phase1Parser;
 
 public class LexingTest {
 	@Rule
@@ -192,6 +195,31 @@ public class LexingTest {
 		Assert.assertEquals(Token.getNEWLINE(), lexer.getToken());
 		Assert.assertEquals(token("w0rld"), lexer.getToken());
 		Assert.assertEquals(Token.getEOF(), lexer.getToken());
+	}
+	
+	@Test
+	public void testSimpleIndent2() {
+		ArrayList<ArrayList<Token>> tokensTokens = new ArrayList<ArrayList<Token>>();
+		
+		Reader reader = new StringReader(
+				"hi\n" +
+				"	hello\n" +
+				"		world\n" +
+				"			world\n" +
+				"	goodbye\n" +
+				"		hello\n");
+		Lexer lexer = new Lexer("Test", reader);
+		
+		ArrayList<Token> tokens = new ArrayList<Token>();
+		int n = 0;
+		Token token = lexer.getToken();
+		while (token != Token.getEOF()) {
+			tokens.add(token);
+			token = lexer.getToken();
+			n++;
+		}
+		tokensTokens.add(tokens);
+		int x = 2;
 	}
 	
 	@Test

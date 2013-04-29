@@ -15,7 +15,7 @@ public class InitialState implements LexerState {
 	private StringBuffer startOfLine = new StringBuffer();
 	
 	int depth = 0;
-
+	
 	@Override
 	public Token getToken(Lexer lexer) {
 		
@@ -92,7 +92,8 @@ public class InitialState implements LexerState {
 			ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
 		}
 		
-		resetBuffer();
+		if (start.equals(lexer.getCurrentPrefix()))
+			resetBuffer();
 		return token;
 	}
 

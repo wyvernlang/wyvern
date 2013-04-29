@@ -197,7 +197,7 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("class Hello\n"
 										+"    class meth make():Hello\n"
 										+"    \tnew\n"
-										+"    val hiString : String = \"hello\"\n"
+										+"    val hiString : Str = \"hello\"\n"
 										+"\n"
 										+"val h : Hello = Hello.make()\n"//hiString: \"hi\")\n"
 										+"h.hiString");
@@ -397,7 +397,7 @@ public class ParsingTestPhase2 {
 	public void testClassMethods() {
 		Reader reader = new StringReader("class Hello\n"
 				+"\tval testVal:Int\n"
-				+"\tclass meth NewHello(v:Int) = \n" +
+				+"\tclass meth NewHello(v:Int):Hello = \n" +
 				"\t\tval output:Hello = new\n" +
 				"\t\t\ttestVal = v\n" +
 				"\t\toutput\n"

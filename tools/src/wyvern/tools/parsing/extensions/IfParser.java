@@ -44,7 +44,7 @@ public class IfParser implements LineParser {
 		@Override
 		public Value evaluate(Environment env) {
 			return body.evaluate(env);
-		}
+		} 
 		@Override
 		public LineParser getLineParser() {
 			return null;
