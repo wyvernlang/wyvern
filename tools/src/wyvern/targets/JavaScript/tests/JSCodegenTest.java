@@ -13,12 +13,15 @@ import org.junit.Test;
 
 import wyvern.DSL.html.Html;
 import wyvern.stdlib.Globals;
+import wyvern.targets.JavaScript.parsers.JSLoadParser;
 import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.targets.JavaScript.types.JSObjectType;
 import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
+import wyvern.tools.typedAST.core.Keyword;
+import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
@@ -47,6 +50,7 @@ public class JSCodegenTest {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
+		env = env.extend(new KeywordNameBinding("load", new Keyword(new JSLoadParser())));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));
 		env = env.extend(ienv);
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
@@ -175,7 +179,7 @@ public class JSCodegenTest {
 	@Test
 	public void testClassAndField() {
 		TypedAST typedAST = doCompile("class Hello\n"
-										+"	class meth NewHello() = new\n"
+										+"	class meth NewHello():Hello = new\n"
 										+"	val hiString : Str= \"hello\"\n"
 										+"\n"
 										+"val h : Hello = Hello.NewHello()\n"//hiString: \"hi\")\n"
@@ -343,5 +347,17 @@ public class JSCodegenTest {
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 		String result = visitor.getCode();
+	}
+	
+	@Test
+	public void testLoad() {
+		String test = "type T\n" +
+					  "\tmeth asString(from:JSObject):Str\n" +
+					  "val t : T = load T of \"./test.js\"\n";
+		TypedAST typedAST = doCompile(test, Html.extend(Environment.getEmptyEnvironment()));
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+		
 	}
 }

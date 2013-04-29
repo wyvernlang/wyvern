@@ -11,9 +11,11 @@ import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class JSObjectType extends AbstractTypeImpl implements OperatableType, ApplyableType {
@@ -38,18 +40,12 @@ public class JSObjectType extends AbstractTypeImpl implements OperatableType, Ap
 	}
 
 	@Override
-	public Type checkOperator(Invocation opExp, Environment env) {
-		if (opExp.getOperationName().equals("asInt"))
-			return Int.getInstance();
-		else if (opExp.getOperationName().equals("asBool"))
-			return Bool.getInstance();
-		else if (opExp.getOperationName().equals("asString"))
-			return Str.getInstance();
+	public Type checkApplication(Application application, Environment env) {
 		return this;
 	}
 
 	@Override
-	public Type checkApplication(Application application, Environment env) {
+	public Type checkOperator(Invocation opExp, Environment env) {
 		return this;
 	}
 }

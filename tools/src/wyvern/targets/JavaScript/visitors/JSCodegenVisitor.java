@@ -359,7 +359,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(TypeDeclaration interfaceDeclaration) {
 		super.visit(interfaceDeclaration);
-		//Not needed
+		elemStack.push(new ASTElement(interfaceDeclaration,""));
 	}
 	
 	@Override
