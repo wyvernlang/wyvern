@@ -77,6 +77,8 @@ public class HtmlTagParser implements LineParser {
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("div", new Keyword(new HtmlTagParser(new ParsingPrefs("div")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("br", new Keyword(new HtmlTagParser(new ParsingPrefs("br", false, true)))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("button", new Keyword(new HtmlTagParser(new ParsingPrefs("button")))));
+			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("form", new Keyword(new HtmlTagParser(new ParsingPrefs("form")))));
+			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("input", new Keyword(new HtmlTagParser(new ParsingPrefs("input")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("attrs", new Keyword(new AttributeParser())));
 		} else {
 			htmlBodyEnv = ctx.second;
