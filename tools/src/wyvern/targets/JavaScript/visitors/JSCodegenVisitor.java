@@ -20,11 +20,14 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
+import wyvern.tools.typedAST.core.expressions.IfExpr;
+import wyvern.tools.typedAST.core.expressions.IfExpr.IfClause;
 import wyvern.tools.typedAST.core.expressions.LetExpr;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.expressions.TypeInstance;
 import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.core.expressions.WhileStatement;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
@@ -37,6 +40,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.util.Pair;
 
 public class JSCodegenVisitor extends BaseASTVisitor {
 	private class ASTElement {
@@ -391,5 +395,39 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		}
 		
 		elemStack.push(new ASTElement(sequence, declString.toString()+"\n"));
+	}
+	
+
+	@Override
+	public void visit(IfExpr ifExpr) {
+		super.visit(ifExpr);
+		
+		LinkedList<Pair<String,String>> generatedClauses = new LinkedList<Pair<String, String>>();
+		for (IfExpr.IfClause clause : ifExpr.getClauses()) {
+			generatedClauses.push(new Pair<String, String>(elemStack.pop().generated, elemStack.pop().generated));
+		}
+		
+		boolean isFirst = true;
+		StringBuilder out = new StringBuilder();
+		for (Pair<String, String> clause : generatedClauses) {
+			if (isFirst) { // Must be then clause
+				out.append("if (" + clause.first + ") {" + Indent("\n" + clause.second) + "\n}");
+				isFirst = false;
+				continue;
+			}
+			out.append(" else if (" + clause.first + ") {" + Indent("\n" + clause.second) + "\n}\n");
+		}
+		
+		elemStack.push(new ASTElement(ifExpr, out.toString()));
+	}
+	
+	@Override
+	public void visit(WhileStatement whileStatement) {
+		super.visit(whileStatement);
+		
+		elemStack.push(new ASTElement(
+				whileStatement, 
+				"while (" + elemStack.pop().generated + ") {" 
+						+ Indent("\n" + elemStack.pop().generated)+ "\n}\n"));
 	}
 }

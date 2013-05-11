@@ -360,4 +360,28 @@ public class JSCodegenTest {
 		String result = visitor.getCode();
 		
 	}
+	
+	@Test
+	public void testIf() {
+		String test = "if true\n" +
+					  "	then\n" +
+					  "		1\n" +
+					  "	else\n" +
+					  "		2\n";
+		TypedAST typedAST = doCompile(test, Html.extend(Environment.getEmptyEnvironment()));
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+		
+	}
+	
+	@Test
+	public void testWhile() {
+		String test = "while true\n" +
+						  "	1";
+		TypedAST typedAST = doCompile(test, Html.extend(Environment.getEmptyEnvironment()));
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+	}
 }

@@ -15,11 +15,13 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
+import wyvern.tools.typedAST.core.expressions.IfExpr;
 import wyvern.tools.typedAST.core.expressions.LetExpr;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.expressions.TypeInstance;
 import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.core.expressions.WhileStatement;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
@@ -169,5 +171,26 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 				throw new RuntimeException();
 			((CoreAST)elem).accept(this);
 		}
+	}
+	
+
+	@Override
+	public void visit(IfExpr ifExpr) {
+		for (IfExpr.IfClause clause : ifExpr.getClauses()) {
+			TypedAST exprClause = clause.getClause();
+			TypedAST body = clause.getBody();
+
+			((CoreAST)body).accept(this);
+			((CoreAST)exprClause).accept(this);
+		}
+	}
+	
+	@Override
+	public void visit(WhileStatement whileStatement) {
+		TypedAST body = whileStatement.getBody();
+		TypedAST conditional = whileStatement.getConditional();
+
+		((CoreAST)body).accept(this);
+		((CoreAST)conditional).accept(this);
 	}
 }

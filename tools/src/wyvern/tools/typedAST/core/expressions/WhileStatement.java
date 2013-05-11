@@ -7,6 +7,8 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -15,7 +17,7 @@ import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-public class WhileStatement implements TypedAST {
+public class WhileStatement implements TypedAST, CoreAST {
 
 	private TypedAST conditional;
 	private TypedAST body;
@@ -73,4 +75,16 @@ public class WhileStatement implements TypedAST {
 		return null;
 	}
 
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	public TypedAST getConditional() {
+		return conditional;
+	}
+	
+	public TypedAST getBody() {
+		return body;
+	}
 }

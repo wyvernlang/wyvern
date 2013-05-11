@@ -19,6 +19,8 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.expressions.IfExpr;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -75,6 +77,15 @@ public class IfParser implements LineParser {
 			return body.typecheck(env);
 		}
 		public boolean getIsThen() { return isThen; }
+		
+		@Override
+		public TypedAST getClause() {
+			return clause;
+		}
+		@Override
+		public TypedAST getBody() {
+			return body;
+		}
 	}
 	private class ThenParser implements LineParser {
 		
@@ -89,7 +100,7 @@ public class IfParser implements LineParser {
 		@Override
 		public TypedAST parse(TypedAST first,
 				Pair<ExpressionSequence, Environment> ctx) {
-			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.second);
+			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), env);
 			return new IfClause(clause,body,true);
 		}
 	}
@@ -108,7 +119,7 @@ public class IfParser implements LineParser {
 				ParseUtils.parseSymbol("if", ctx);
 				clause =  ParseUtils.parseCond(ctx);
 			}
-			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.second);
+			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), env);
 			return new IfClause(clause,body,false);
 		}
 	}

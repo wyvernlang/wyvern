@@ -16,6 +16,9 @@ import wyvern.tools.util.TreeWriter;
 public class IfExpr extends CachingTypedAST implements CoreAST {
 	public interface IfClause extends TypedAST {
 		public boolean satisfied(Environment env);
+		
+		public TypedAST getClause();
+		public TypedAST getBody();
 	}
 
 	private Iterable<IfClause> clauses;
@@ -46,6 +49,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public void accept(CoreASTVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override
@@ -63,6 +67,10 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		if (lastType == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, this);
 		return lastType;
+	}
+	
+	public Iterable<IfClause> getClauses() {
+		return clauses;
 	}
 
 }

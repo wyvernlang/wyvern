@@ -11,11 +11,13 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
+import wyvern.tools.typedAST.core.expressions.IfExpr;
 import wyvern.tools.typedAST.core.expressions.LetExpr;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.expressions.TypeInstance;
 import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.core.expressions.WhileStatement;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
@@ -42,4 +44,6 @@ public interface CoreASTVisitor {
 	void visit(Assignment assignment);
 	void visit(TypeDeclaration interfaceDeclaration);
 	void visit(Sequence sequence);
+	void visit(IfExpr ifExpr);
+	void visit(WhileStatement whileStatement);
 }
