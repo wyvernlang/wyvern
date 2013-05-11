@@ -1,10 +1,14 @@
 package wyvern.DSL.html.typedAST;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
+import wyvern.DSL.html.parsing.HtmlTagParser;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
+import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -19,6 +23,24 @@ public class AttrAST implements TypedAST {
 	public AttrAST(HashMap<String,TypedAST> attrs, FileLocation loc) {
 		this.attrs = attrs;
 		this.loc = loc;
+	}
+	
+	public TypedAST getVal(TypedAST orig) {
+		TypedAST out = orig;
+		for (Entry<String, TypedAST> elems  : attrs.entrySet()) {
+			out = new Invocation(
+					(out==null)?new StringConstant(""):out, 
+					"+", 
+					new Invocation(
+							new StringConstant(" "+elems.getKey()+"="),
+							"+",
+							HtmlTagParser.enquote(elems.getValue()),
+							elems.getValue().getLocation()),
+							elems.getValue().getLocation()
+			);
+		}
+		
+		return out;
 	}
 	
 	public HashMap<String,TypedAST> getAttrs() {
