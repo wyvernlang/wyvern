@@ -19,7 +19,7 @@ public class JSLoadParser implements LineParser {
 	public TypedAST parse(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
 		Type resultType = ParseUtils.parseType(ctx);
-		ParseUtils.parseSymbol("of", ctx);
+		ParseUtils.parseSymbol("in", ctx);
 		TypedAST body = ParseUtils.parseExpr(ctx);
 		
 		return new Application(new JSFunction(arrow(Str.getInstance(),resultType), "require"), body, first.getLocation());
