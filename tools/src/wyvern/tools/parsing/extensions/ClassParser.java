@@ -147,7 +147,7 @@ public class ClassParser implements DeclParser {
 			});
 		}
 		
-		LineSequence lines = ParseUtils.extractLines(ctx); // Get potential body.
+		final LineSequence lines = ParseUtils.extractLines(ctx); // Get potential body.
 		
 		if (lines.getFirst() != null && lines.getFirst().getFirst() != null &&
 				lines.getFirst().getFirst().toString().equals("implements")) { // FIXME: hack, detected implements
@@ -175,16 +175,16 @@ public class ClassParser implements DeclParser {
 		Environment typecheckEnv = ctx.second.extend(newEnv);
 		typecheckEnv = typecheckEnv.extend(new TypeBinding("class", mutableDeclf.getType()));
 		
-		final Pair<Environment,ContParser> declAST = lines.accept(DeclarationParser.getInstance(), typecheckEnv);
 		
 		return new Pair<Environment,ContParser>(newEnv, new ContParser() {
 
 			@Override
 			public TypedAST parse(EnvironmentResolver envR) {
 				Environment external = envR.getEnv(mutableDeclf);
-				
+
 				Environment envin = mutableDeclf.extend(external); 
 				final Environment envs = envin.extend(new TypeBinding("class", mutableDeclf.getType()));
+				final Pair<Environment,ContParser> declAST = lines.accept(DeclarationParser.getInstance(), envs);
 				final Environment envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
 				
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
