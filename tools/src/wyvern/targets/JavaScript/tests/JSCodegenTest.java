@@ -353,7 +353,7 @@ public class JSCodegenTest {
 	public void testLoad() {
 		String test = "type T\n" +
 					  "\tmeth asString(from:JSObject):Str\n" +
-					  "val t : T = load T of \"./test.js\"\n";
+					  "val t : T = load T in \"./test.js\"\n";
 		TypedAST typedAST = doCompile(test, Html.extend(Environment.getEmptyEnvironment()));
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
