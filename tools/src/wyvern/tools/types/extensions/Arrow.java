@@ -22,11 +22,11 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 		this.result = result;
 	}
 
-	Type getResult() {
+	public Type getResult() {
 		return result;
 	}
 	
-	Type getArgument() {
+	public Type getArgument() {
 		return argument;
 	}
 	

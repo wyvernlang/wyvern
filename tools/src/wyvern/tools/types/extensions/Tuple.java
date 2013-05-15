@@ -23,7 +23,7 @@ public class Tuple extends AbstractTypeImpl {
 		}
 	}
 
-	Type[] getTypes() {
+	public Type[] getTypes() {
 		return types;
 	}
 	
