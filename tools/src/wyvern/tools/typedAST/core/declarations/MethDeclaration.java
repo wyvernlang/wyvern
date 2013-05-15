@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
@@ -52,7 +53,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		this.isClassMeth = isClassMeth;
 		this.location = location;
 	}
-	
+
 	public boolean isClassMeth() {
 		return isClassMeth;
 	}

@@ -3,10 +3,6 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -17,7 +13,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class ValDeclaration extends Declaration implements CoreAST {
