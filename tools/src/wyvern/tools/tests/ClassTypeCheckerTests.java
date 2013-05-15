@@ -52,7 +52,7 @@ public class ClassTypeCheckerTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), MethDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), MethDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
 		

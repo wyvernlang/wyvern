@@ -14,9 +14,6 @@ type StackFactory
 	meth Stack() : Stack
 	meth StackWithFirst(firstElement : Int) : Stack
 
-type ListUtilities
-	meth map(f : Int -> Int, l : IntList) : IntList
-
 
 /** Private Implementation **/
 class Link
@@ -37,7 +34,7 @@ class StackImpl
 
 	meth top() : Int? = this.list.data
 
-	meth push(element : Int)
+	meth push(element : Int) : Unit
 		this.list = Link(element, this.list)
 
 	meth pop() : Int?

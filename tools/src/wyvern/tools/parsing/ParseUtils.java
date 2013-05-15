@@ -158,8 +158,8 @@ public class ParseUtils {
 					
 					if (typeBinding == null) {
 						// This should be picked up by symbol resolution in statically checked language!
-						//	reportError(TYPE_NOT_DEFINED, symbol.name, symbol);
-						typeBinding = new TypeBinding(symbol.name, Unit.getInstance()); // TODO: Create proper type representation.
+						ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, symbol.name, symbol);
+						//typeBinding = new TypeBinding(symbol.name, null); // TODO: Create proper type representation.
 					}
 					
 					return typeBinding.getUse();
