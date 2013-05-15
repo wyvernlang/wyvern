@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
@@ -125,11 +126,65 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		return thisDtypes.containsAll(implDtypes);
 	}
 
+	// FIXME: Do something similar here to TypeType maybe and maybe try to integrate the above
+	// implements checks into here and change ClassDeclaration to use this instead.
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		// FIXME: Do something similar here to TypeType maybe and maybe try to integrate the above
-		// implements checks into here and change ClassDeclaration to use this instead.
+		if (super.subtype(other, subtypes)) {
+			return true;
+		}
+		if (other instanceof TypeType) {
+			return this.checkImplements((TypeType) other);
+		} else if (other instanceof ClassType) {
+			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
+			for (TypedAST d : this.decl.getDecls()) {
+				if (d instanceof MethDeclaration) {
+					Arrow a = (Arrow) ((MethDeclaration) d).getType();
+					thisMeths.add(a);
+				} else {
+					// FIXME: Can class contains more than meth? Vars?
+					System.out.println("Unsupported class member in subtype: " + d.getClass());
+				}
+			}
+			
+			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
+			for (TypedAST d : ((ClassType) other).decl.getDecls()) {
+				if (d instanceof MethDeclaration) {
+					Arrow a = (Arrow) ((MethDeclaration) d).getType();
+					otherMeths.add(a);
+				} else {
+					// FIXME: Can class contains more than meth? Vars?
+					System.out.println("Unsupported class member in subtype: " + d.getClass());
+				}
+			}
+			
+			// FIXME: Allows to have multiple methods that match to implement several methods
+			// from supertype - is this OK? Seems OK to me but not sure. :-)
+			boolean subset = true;
+			for (Arrow aOther : otherMeths) {
+				boolean hasImplementingCandidate = false;
+				for (Arrow aThis : thisMeths) {
+					// Apply S-Amber rule here!
+					SubtypeRelation sr = new SubtypeRelation(this, (ClassType) other);
+					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+						subtypes.add(sr);
+						boolean result = aThis.subtype(aOther, subtypes);
+						subtypes.remove(sr);
+								
+						if (result) {
+							hasImplementingCandidate = true;
+							break;
+						}
+					}					
+					if (!hasImplementingCandidate) {
+						subset = false;
+						break;
+					}
+				}
+			}
+			if (subset) return true;
+		}
 		
-		return super.subtype(other, subtypes);
+		return false;
 	}
 }
