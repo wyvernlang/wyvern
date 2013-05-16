@@ -265,7 +265,7 @@ public class MethVisitor extends BaseASTVisitor {
 	public void visit(MethDeclaration md) {
 		frame = new Frame();
 		
-		MethodType mt = MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class);
+		MethodType mt = MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, Object[].class);
 		bootstrap = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrap", mt.toMethodDescriptorString());
 		
 		Label startLabel = new Label();

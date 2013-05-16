@@ -4,13 +4,7 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Bool;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Str;
-import wyvern.tools.types.extensions.Tuple;
-import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.types.extensions.*;
 import wyvern.tools.util.Pair;
 
 public class ClassStore {
@@ -72,6 +66,8 @@ public class ClassStore {
 			return outputBuilder.toString();
 		} else if (type instanceof Arrow) {
 			return "(" + getTypeName(((Arrow) type).getArgument(), false) + ")" + getTypeName(((Arrow) type).getResult(), true);
+        } else if (type instanceof TypeType) {
+            return "Ljava/lang/Object;";
 		} else if (classes.containsKey(type)) {
 			return "L"+classes.get(type).first+";";
 		}
