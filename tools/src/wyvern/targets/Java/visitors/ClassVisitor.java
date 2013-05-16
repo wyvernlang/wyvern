@@ -83,19 +83,19 @@ public class ClassVisitor extends BaseASTVisitor {
 		for (Declaration decl : classDecl.getDecls().getDeclIterator()) {
 			context.setVariable(decl.getName(), decl.getType(), ExternalContext.INTERNAL);
 		}
-		
+
+        registerClass(classDecl.getType());
 		cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS); // Makes it a LOT slower. Easier, though. TODO: Actually implement own stack/var size determination.
 		cw.visit(V1_7, 
-				ACC_PUBLIC, 
-				mangleTypeName(classDecl.getType()), 
+				ACC_PUBLIC,
+                store.getRawTypeName(classDecl.getType()),
 				null, 
 				"java/lang/Object", 
 				null);
-		registerClass(classDecl.getType());
 		
 		currentType = classDecl.getType();
-		currentTypeName = mangleTypeName(classDecl.getType());
-		
+		currentTypeName = store.getRawTypeName(classDecl.getType());
+
 		addDefaultConstructor();
 		
 		super.visit(classDecl);

@@ -1,10 +1,7 @@
 package wyvern.targets.Java.visitors;
 
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
@@ -36,9 +33,22 @@ public class ClassStore {
 
 	}
 	private Hashtable<Type, Pair<String, byte[]>> classes = new Hashtable<Type, Pair<String, byte[]>>();
+    private HashSet<String> classNames = new HashSet<String>();
 
-	public String mangleTypeName(Type type) {
-		return type.toString().replace(" ", "");
+    public String mangleTypeName(Type type) {
+        return type.toString().replace(" ", "");
+    }
+
+    public String getRawTypeName(Type type) {
+        return classes.get(type).first;
+    }
+
+	public String getNewTypeName(Type type) {
+        String output = mangleTypeName(type);
+        while (classNames.contains(output))
+            output += "$";
+        classNames.add(output);
+        return output;
 	}
 
 	public String getTypeName(Type type, boolean isUnitVoid) {
@@ -73,13 +83,15 @@ public class ClassStore {
 	}
 	
 	public void registerClass(Type type) {
-		classes.put(type, new Pair<String, byte[]>(mangleTypeName(type), null));
+		classes.put(type, new Pair<String, byte[]>(getNewTypeName(type), null));
 		
 	}
 
 	public void registerClass(Type type, byte[] bytecode) {
-		classes.put(type, new Pair<String, byte[]>(mangleTypeName(type), bytecode));
-		
+        if (classes.containsKey(type) && classes.get(type).second == null)
+		    classes.put(type, new Pair<String, byte[]>(classes.get(type).first, bytecode));
+        else
+            throw new RuntimeException("Tried to create a second identical class");
 	}
 	
 

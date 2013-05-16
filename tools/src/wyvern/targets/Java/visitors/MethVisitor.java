@@ -24,6 +24,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.Variable;
@@ -252,6 +253,13 @@ public class MethVisitor extends BaseASTVisitor {
 		
 		localEnv = localEnv.extend(new TypeBinding(cd.getName(), cd.getType()));
 	}
+
+    @Override
+    public void visit(TypeDeclaration td) {
+        TypeVisitor typev = new TypeVisitor(jv.getStore());
+        typev.visit(td);
+        localEnv = localEnv.extend(new TypeBinding(td.getName(), td.getType()));
+    }
 	
 	@Override
 	public void visit(MethDeclaration md) {
@@ -306,6 +314,7 @@ public class MethVisitor extends BaseASTVisitor {
 				mv.visitMethodInsn(INVOKESTATIC, jv.getStore().getUnmangledClassName((ClassType) staticType), funInv.getOperationName(), jv.getStore().getTypeName(app.getFunction().getType(), true));
 				isStatic = false;
 			} else {
+                frame.popStackType();
 				mv.visitInvokeDynamicInsn(
 						funInv.getOperationName(), 
 						jv.getStore().getTypeName(
@@ -319,10 +328,6 @@ public class MethVisitor extends BaseASTVisitor {
 			return;
 		}
 		throw new RuntimeException("Not implemented");
-	}
-
-	public void generateMethodCall(TypedAST receiver, String operationName, TypedAST argument) {
-		
 	}
 	
 	@Override
@@ -419,7 +424,8 @@ public class MethVisitor extends BaseASTVisitor {
 		if (type instanceof Int) {
 			mv.visitIntInsn(ILOAD, varIdx);
 			frame.pushStackType(Int.getInstance());
-		} else if (type instanceof ClassType) {
+		} else if (type instanceof ClassType
+                || type instanceof TypeType) {
 			mv.visitIntInsn(ALOAD, varIdx);
 			frame.pushStackType(type);
 		} else

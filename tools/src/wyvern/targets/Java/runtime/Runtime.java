@@ -1,9 +1,6 @@
 package wyvern.targets.Java.runtime;
 
-import java.lang.invoke.CallSite;
-import java.lang.invoke.ConstantCallSite;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.invoke.*;
 
 public class Runtime {
 	public static CallSite bootstrap(MethodHandles.Lookup caller, String dynMethodName, MethodType dMT) throws NoSuchMethodException, IllegalAccessException {
@@ -12,6 +9,6 @@ public class Runtime {
 		System.out.println(clazz.getName());
 		System.out.println(dMT.parameterArray()[0]);
 		
-		return new ConstantCallSite(caller.findVirtual(dMT.parameterArray()[0], dynMethodName, MethodType.methodType(dMT.returnType(), dMT.parameterList().subList(1, dMT.parameterCount()))));
+		return new MutableCallSite(caller.findVirtual(dMT.parameterArray()[0], dynMethodName, MethodType.methodType(dMT.returnType(), dMT.parameterList().subList(1, dMT.parameterCount()))));
 	}
 }
