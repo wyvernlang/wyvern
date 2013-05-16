@@ -1,16 +1,9 @@
 package wyvern.targets.Java.tests;
 
-import static org.junit.Assert.*;
 import static wyvern.tools.types.TypeUtils.arrow;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,7 +12,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import wyvern.stdlib.Globals;
-import wyvern.targets.Java.visitors.ClassVisitor;
 import wyvern.targets.Java.visitors.JavaGenerator;
 import wyvern.targets.Java.visitors.VariableResolver;
 import wyvern.targets.JavaScript.parsers.JSLoadParser;
@@ -361,9 +353,51 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(2));
 	}
-	
-	
-	//Needs Alex's attention
+
+    @Test
+    public void testShadowing() throws Exception {
+        String test =
+                "val n : Int = 2\n" +
+                "val n : Int = 3\n" +
+                "n";
+
+        ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Object returned = generated.getMethod("main").invoke(null);
+        Assert.assertEquals(returned, new Integer(3));
+    }
+
+    @Test
+    public void testClassShadowing() throws Exception {
+        String test =
+                "class Test\n" +
+                "   class meth create():Test = new\n" +
+                "   meth a() : Int = 1\n" +
+                "val y : Test = Test.create()\n"+
+                "class Test\n" +
+                "   class meth create():Test = new\n" +
+                "   meth a():Int = 2\n" +
+                "val x : Test = Test.create()\n" +
+                "x.a() + y.a()";
+        ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Object returned = generated.getMethod("main").invoke(null);
+        Assert.assertEquals(returned, 3);
+    }
+
+    @Test
+    public void testClassShadowing2() throws Exception {
+        String test =
+                "val x : Int = 1\n" +
+                "class Test\n" +
+                "   class meth create():Test = new\n" +
+                "   meth a(i : Int) : Int =\n" +
+                "       class Inner\n" +
+                "           class meth create() : Test = new\n" +
+                "           meth a() : Int = i\n" +
+                "Test.create().a()";
+    }
+
 	@Test
 	public void testTypeMeths1() throws Exception {
 		String test = 
@@ -382,7 +416,6 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));
 	}
-	//Ends attention
 	
 	
 	//TODO: Dependent on closures
