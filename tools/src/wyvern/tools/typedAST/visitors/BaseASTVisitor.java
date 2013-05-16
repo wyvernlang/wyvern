@@ -92,6 +92,11 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 
 	@Override
 	public void visit(TypeDeclaration interfaceDeclaration) {
+        DeclSequence decls = interfaceDeclaration.getDecls();
+
+        if (!(decls instanceof CoreAST))
+            throw new RuntimeException("All visited elements must implement CoreAST.");
+        ((CoreAST)decls).accept(this);
 	}
 
 	@Override
@@ -141,7 +146,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(MethDeclaration meth) {
 		TypedAST body = meth.getBody();
-		
+
 		if (!(body instanceof CoreAST))
 			throw new RuntimeException("Codegenerated elements must implement CoreAST");
 		
