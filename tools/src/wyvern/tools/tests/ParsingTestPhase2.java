@@ -359,10 +359,10 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("class Hello\n"
 				+"	class meth make():Hello = new\n"
 				+"	var testVal:Int = 5\n"
-				+"	meth setV(n : Int):Int = this.testVal = n\n"
+				+"	meth setV(n : Int):Unit = this.testVal = n\n"
 				+"	meth getV():Int = this.testVal\n"
 				+"val h:Hello = Hello.make()\n"
-				+"val a:Int = h.setV(10)\n" 
+				+"h.setV(10)\n"
 				+"h.getV()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
