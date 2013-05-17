@@ -52,12 +52,12 @@ public class ClassVisitor extends BaseASTVisitor {
 		context.setVariables(list, ExternalContext.EXTERNAL);
 	}
 
+    public Iterable<Pair<String, Type> > getExternalVars() {
+        return context.getExternalDecls();
+    }
+
 	private ClassWriter cw = null;
-	
-	private String mangleTypeName(Type type) {
-		return store.mangleTypeName(type);
-	}
-	
+
 	private String getTypeName(Type type) {
 		return getTypeName(type, true);
 	}
@@ -102,10 +102,15 @@ public class ClassVisitor extends BaseASTVisitor {
 		
 		for (Pair<String, Type> externalVar : context.getExternalDecls()) {
 
-			cw.visitField(ACC_PUBLIC | ACC_STATIC, externalVar.first, 
+			cw.visitField(ACC_PUBLIC | ACC_STATIC, externalVar.first + "$stat",
 					getTypeName(externalVar.second),
 					null, 
 					new Integer(0)).visitEnd();
+
+            cw.visitField(ACC_PRIVATE, externalVar.first + "$dyn",
+                    getTypeName(externalVar.second),
+                    null,
+                    new Integer(0)).visitEnd();
 		}
 		
 		cw.visitEnd();

@@ -3,11 +3,36 @@ package wyvern.targets.Java.visitors;
 import java.io.FileOutputStream;
 import java.util.*;
 
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.TreeWriter;
 
 public class ClassStore {
+    private class GenericClassType implements Type {
+        public final Type parent;
+        public final int n;
+
+        public GenericClassType(Type parent, int n) {
+            this.parent = parent;
+            this.n = n;
+        }
+
+        @Override
+        public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+            return false;
+        }
+
+        @Override
+        public boolean subtype(Type other) {
+            return false;
+        }
+
+        @Override
+        public void writeArgsToTree(TreeWriter writer) {
+        }
+    }
 	private static class ByteClassLoader extends ClassLoader {
 		private final Map<String, byte[]> extraClassDefs;
 
@@ -37,12 +62,16 @@ public class ClassStore {
         return classes.get(type).first;
     }
 
-	public String getNewTypeName(Type type) {
-        String output = mangleTypeName(type);
+    public String getNewTypeName(Type type, String postfix) {
+        String output = mangleTypeName(type) + postfix;
         while (classNames.contains(output))
             output += "$";
         classNames.add(output);
         return output;
+    }
+
+	public String getNewTypeName(Type type) {
+        return getNewTypeName(type, "");
 	}
 
 	public String getTypeName(Type type, boolean isUnitVoid) {
@@ -89,7 +118,12 @@ public class ClassStore {
         else
             throw new RuntimeException("Tried to create a second identical class");
 	}
-	
+
+    public Type registerGenericClass(Type type, int n) {
+        Type gct = new GenericClassType(type, n);
+        classes.put(gct, new Pair<String, byte[]>(getNewTypeName(type, "$"+n), null));
+        return gct;
+    }
 
 	
 	public ClassLoader getLoader() {

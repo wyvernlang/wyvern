@@ -350,9 +350,45 @@ public class JavaTests {
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
-		Object returned = generated.getMethod("main").invoke(null);
-		Assert.assertEquals(returned, new Integer(2));
-	}
+        Object returned = generated.getMethod("main").invoke(null);
+        Assert.assertEquals(returned, new Integer(2));
+    }
+    @Test
+    public void testClassClosure2() throws Exception {
+        String test =
+                "val n : Int = 2\n" +
+                "val t : Int = 3\n" +
+                "class Test\n" +
+                "	class meth create():Test = new\n" +
+                "	meth test():Int = n+t\n" +
+                "Test.create().test()";
+
+        ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Object returned = generated.getMethod("main").invoke(null);
+        Assert.assertEquals(returned, new Integer(5));
+    }
+
+    @Test
+    public void testClassClosure3() throws Exception {
+        String test =
+                        "type T\n" +
+                        "	meth test():Int\n" +
+                        "class Tester\n" +
+                        "	class meth create():Tester = new\n" +
+						"	meth test(e : Int):T =\n" +
+                        "		class Inner\n" +
+                        "			implements T\n" +
+						"			class meth create():Inner = new\n" +
+                        "			meth test():Int = e\n" +
+						"		Inner.create()\n" +
+                        "Tester.create().test(2).test() + Tester.create().test(3).test()";
+
+        ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Object returned = generated.getMethod("main").invoke(null);
+        Assert.assertEquals(returned, new Integer(5));
+    }
 
     @Test
     public void testShadowing() throws Exception {

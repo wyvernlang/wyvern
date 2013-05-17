@@ -44,27 +44,7 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
-import static org.objectweb.asm.Opcodes.IADD;
-import static org.objectweb.asm.Opcodes.ICONST_0;
-import static org.objectweb.asm.Opcodes.ICONST_1;
-import static org.objectweb.asm.Opcodes.ICONST_2;
-import static org.objectweb.asm.Opcodes.ICONST_3;
-import static org.objectweb.asm.Opcodes.ICONST_4;
-import static org.objectweb.asm.Opcodes.ICONST_5;
-import static org.objectweb.asm.Opcodes.BIPUSH;
-import static org.objectweb.asm.Opcodes.RETURN;
-import static org.objectweb.asm.Opcodes.IRETURN;
-import static org.objectweb.asm.Opcodes.ARETURN;
-import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.NEW;
-import static org.objectweb.asm.Opcodes.DUP;
-import static org.objectweb.asm.Opcodes.ILOAD;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ISTORE;
-import static org.objectweb.asm.Opcodes.ASTORE;
-import static org.objectweb.asm.Opcodes.PUTSTATIC;
-import static org.objectweb.asm.Opcodes.GETSTATIC;
+import static org.objectweb.asm.Opcodes.*;
 
 //The names are getting pretty bad...
 public class MethVisitor extends BaseASTVisitor {
@@ -248,7 +228,7 @@ public class MethVisitor extends BaseASTVisitor {
 		
 		for (Pair<String, Type> pair : usedVars) {
 			writeVariable(pair.first, pair.second);
-			mv.visitFieldInsn(PUTSTATIC, classVisitor.getCurrentTypeName(), pair.first, jv.getStore().getTypeName(pair.second, true));
+			mv.visitFieldInsn(PUTSTATIC, classVisitor.getCurrentTypeName(), pair.first+"$stat", jv.getStore().getTypeName(pair.second, true));
 		}
 		
 		localEnv = localEnv.extend(new TypeBinding(cd.getName(), cd.getType()));
@@ -389,8 +369,17 @@ public class MethVisitor extends BaseASTVisitor {
 		frame.pushStackType(jv.getCurrentType());
 		frame.popStackType();
 		mv.visitMethodInsn(INVOKESPECIAL, jv.getCurrentTypeName(), "<init>", "()V");
+
+        for (Pair<String, Type> pair : jv.getExternalVars()) {
+            mv.visitInsn(DUP);
+            frame.pushStackType(jv.getCurrentType());
+            mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), pair.first + "$stat", jv.getStore().getTypeName(pair.second, false));
+            frame.pushStackType(pair.second);
+            mv.visitFieldInsn(PUTFIELD, jv.getCurrentTypeName(), pair.first + "$dyn", jv.getStore().getTypeName(pair.second, false));
+            frame.popStackTypePair();
+        }
 	}
-	
+
 	@Override
 	public void visit(Variable var) {
 		String name = var.getName();
@@ -411,7 +400,7 @@ public class MethVisitor extends BaseASTVisitor {
 				Pair<Type, Integer> varInfo = mec.getExternalVar(name);
 				if (varInfo.second == MethodExternalContext.STATIC && frame.containsVariable("this")) {
 					mv.visitIntInsn(ALOAD, frame.getVariableIndex("this"));
-					mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), name, jv.getStore().getTypeName(type, true));
+					mv.visitFieldInsn(GETFIELD, jv.getCurrentTypeName(), name+"$dyn", jv.getStore().getTypeName(type, true));
 					frame.pushStackType(type);
 					return;
 				} else {
