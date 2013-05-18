@@ -45,9 +45,6 @@ public class JavaTests {
 		Reader reader = new StringReader(input);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
-		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
-		env = env.extend(new KeywordNameBinding("load", new Keyword(new JSLoadParser())));
-		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));
 		env = env.extend(ienv);
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
@@ -244,10 +241,10 @@ public class JavaTests {
 	}
 	@Test
 	public void testMeths() throws Exception {
-		String test = "class Test\n" +
-				  "	class meth create() : Test = new\n" +
+		String test = "class Test6\n" +
+				  "	class meth create() : Test6 = new\n" +
 				  "	meth n() : Int = 1\n" +
-				  "val x : Test = Test.create()\n" +
+				  "val x : Test6 = Test6.create()\n" +
 				  "x.n()";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -258,10 +255,10 @@ public class JavaTests {
 
 	@Test
 	public void testMeths2() throws Exception {
-		String test = "class Test\n" +
-				  "	class meth create() : Test = new\n" +
+		String test = "class Test7\n" +
+				  "	class meth create() : Test7 = new\n" +
 				  "	meth n(a : Int) : Int = a+1\n" +
-				  "val x : Test = Test.create()\n" +
+				  "val x : Test7 = Test7.create()\n" +
 				  "x.n(10)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -272,17 +269,32 @@ public class JavaTests {
 	
 	@Test
 	public void testMeths3() throws Exception {
-		String test = "class Test\n" +
-				  "	class meth create() : Test = new\n" +
+		String test = "class Test8\n" +
+				  "	class meth create() : Test8 = new\n" +
 				  "	meth n(a : Int) : Int = a+1\n" +
 				  "	meth b(s : Int) : Int = this.n(s+1) + 2\n" +
-				  "val x : Test = Test.create()\n" +
+				  "val x : Test8 = Test8.create()\n" +
 				  "x.b(10)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));
+	}
+
+	@Test
+	public void testMeths4() throws Exception {
+		String test = "class Test\n" +
+				"	class meth create() : Test = new\n" +
+				"	meth n(a : Int) : Int = a+1\n" +
+				"	meth b(s : Int) : Int = s+1\n" +
+				"val x : Test = Test.create()\n" +
+				"x.n(x.b(4))";
+
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(6));
 	}
 	
 	@Test
@@ -303,7 +315,7 @@ public class JavaTests {
 	public void testVarVisitor2() {
 		String test = "val x : Int = 2\n" +
 					  "class Test\n" +
-					  "	class meth create() = new\n" +
+					  "	class meth create():Test = new\n" +
 					  "	meth s() : Int = x";
 		CoreAST ast = (CoreAST) doCompile(test);
 		HashMap<String, Type> externalContext = new HashMap<String, Type>();
@@ -343,10 +355,10 @@ public class JavaTests {
 	@Test
 	public void testClassClosure() throws Exception {
 		String test = "val n : Int = 2\n" +
-					  "class Test\n" +
-					  "	class meth create():Test = new\n" +
+					  "class Test9\n" +
+					  "	class meth create():Test9 = new\n" +
 					  "	meth test():Int = n\n" +
-					  "Test.create().test()";
+					  "Test9.create().test()";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
@@ -358,10 +370,10 @@ public class JavaTests {
         String test =
                 "val n : Int = 2\n" +
                 "val t : Int = 3\n" +
-                "class Test\n" +
-                "	class meth create():Test = new\n" +
+                "class Test2\n" +
+                "	class meth create():Test2 = new\n" +
                 "	meth test():Int = n+t\n" +
-                "Test.create().test()";
+                "Test2.create().test()";
 
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
         Class generated = generatedLoader.loadClass("CLASSwycCode");
@@ -406,14 +418,14 @@ public class JavaTests {
     @Test
     public void testClassShadowing() throws Exception {
         String test =
-                "class Test\n" +
-                "   class meth create():Test = new\n" +
+                "class Test4\n" +
+                "   class meth create():Test4 = new\n" +
                 "   meth a() : Int = 1\n" +
-                "val y : Test = Test.create()\n"+
-                "class Test\n" +
-                "   class meth create():Test = new\n" +
+                "val y : Test4 = Test4.create()\n"+
+                "class Test4\n" +
+                "   class meth create():Test4 = new\n" +
                 "   meth a():Int = 2\n" +
-                "val x : Test = Test.create()\n" +
+                "val x : Test4 = Test4.create()\n" +
                 "x.a() + y.a()";
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
         Class generated = generatedLoader.loadClass("CLASSwycCode");
@@ -439,18 +451,44 @@ public class JavaTests {
 		String test = 
 				  "type T\n" +
 				  "	meth b(s:Int):Int\n" +
-				  "class Test\n" +
+				  "class Test3\n" +
 				  "	implements T\n" +
-				  "	class meth create() : Test = new\n" +
+				  "	class meth create() : Test3 = new\n" +
 				  "	meth n(a : Int) : Int = a+1\n" +
 				  "	meth b(s : Int) : Int = this.n(s+1) + 2\n" +
-				  "val x : T = Test.create()\n" +
+				  "val x : T = Test3.create()\n" +
 				  "x.b(10)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));
+	}
+
+	@Test
+	public void testFields1() throws Exception {
+		String test =
+				"class Test\n" +
+				"	class meth create():Test = new\n" +
+				"	val x : Int = 2\n" +
+				"val t : Test = Test.create()\n" +
+				"t.x";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(2));
+	}
+
+	@Test
+	public void testVars1() throws Exception {
+		String test = "var x : Int = 1\n" +
+				"x = 4\n" +
+				"x";
+
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(4));
 	}
 	
 	

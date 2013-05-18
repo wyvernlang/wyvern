@@ -1,11 +1,12 @@
 package wyvern.targets.Java.visitors;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.Hashtable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import wyvern.tools.typedAST.abs.Declaration;
@@ -15,29 +16,20 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Bool;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 
-import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.objectweb.asm.Opcodes.V1_7;
+import static org.objectweb.asm.Opcodes.*;
 
 public class ClassVisitor extends BaseASTVisitor {
-
 	private String typePrefix;
 	private ClassStore store = null;
 	private ExternalContext context = new ExternalContext();
-	
+	private List<MethDeclaration> meths = new ArrayList<MethDeclaration>();
 
 	public ClassVisitor(String typePrefix, ClassStore store) {
 		this.typePrefix = typePrefix;
@@ -73,10 +65,19 @@ public class ClassVisitor extends BaseASTVisitor {
 	private void registerClass(Type type, byte[] bytecode) {
 		store.registerClass(type, bytecode);
 	}
-	
+
+	private void pushClassType(MethodVisitor mv, String descriptor) {
+		if (descriptor.equals("V")) {
+			mv.visitFieldInsn(GETSTATIC, "java/lang/Void", "TYPE", "Ljava/lang/Class;");
+		} else if (descriptor.equals("I")) {
+			mv.visitFieldInsn(GETSTATIC, "java/lang/Integer", "TYPE", "Ljava/lang/Class;");
+		} else
+			mv.visitLdcInsn(org.objectweb.asm.Type.getType(descriptor));
+	}
+
 	private Type currentType;
 	private String currentTypeName;
-	
+
 	@Override
 	public void visit(ClassDeclaration classDecl) {
 		// No support for inner classes (yet)
@@ -112,9 +113,98 @@ public class ClassVisitor extends BaseASTVisitor {
                     null,
                     new Integer(0)).visitEnd();
 		}
-		
+		initializeMethodHandles();
 		cw.visitEnd();
 		registerClass(classDecl.getType(), cw.toByteArray());
+	}
+
+	private void initializeMethodHandles() {
+		MethodVisitor mv = cw.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
+		Label start = new Label();
+		Label exceptionBlock = new Label();
+		Label exceptionEnd = new Label();
+		Label handler = new Label();
+		mv.visitTryCatchBlock(exceptionBlock, exceptionEnd, handler, "java/lang/Exception");
+		Label returnStatement = new Label();
+
+		mv.visitLabel(start);
+		mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;");
+		mv.visitIntInsn(ASTORE, 0);
+		pushClassType(mv, store.getTypeName(currentType, true));
+		mv.visitIntInsn(ASTORE, 1);
+
+		mv.visitLabel(exceptionBlock);
+
+		for (MethDeclaration md : meths) {
+			mv.visitIntInsn(ALOAD,0);
+			mv.visitIntInsn(ALOAD,1);
+			mv.visitLdcInsn(md.getName());
+			StringBuilder sb = new StringBuilder("(Ljava/lang/Class;");
+			Arrow arrow = (Arrow)md.getType();
+			pushClassType(mv, store.getTypeName(arrow.getResult(), true));
+			if (arrow.getArgument() instanceof Tuple) {
+				Type[] types = ((Tuple)arrow.getArgument()).getTypes();
+				if (types.length < 2) {
+					for (Type type : types){
+						sb.append("Ljava/lang/Class;");
+						pushClassType(mv, store.getTypeName(type, true));
+					}
+				} else {
+					int nth = 0;
+					sb.append("[Ljava/lang/Class;");
+					mv.visitLdcInsn(types.length);
+					mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
+					mv.visitInsn(DUP);
+					mv.visitIntInsn(ASTORE,2);
+					for (Type type : types) {
+						mv.visitInsn(DUP);
+						mv.visitLdcInsn(nth);
+						pushClassType(mv, store.getTypeName(types[0], true));
+						mv.visitInsn(AASTORE);
+						++nth;
+					}
+				}
+			} else if (!(arrow.getArgument() instanceof Unit)) {
+				sb.append("Ljava/lang/Class;");
+				pushClassType(mv, store.getTypeName(arrow.getArgument(), true));
+			}
+			sb.append(")Ljava/lang/invoke/MethodType;");
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType","methodType",sb.toString());
+			if (!md.isClassMeth())
+				mv.visitMethodInsn(INVOKEVIRTUAL,
+						"java/lang/invoke/MethodHandles$Lookup",
+						"findVirtual",
+						"(Ljava/lang/Class;" +
+								"Ljava/lang/String;" +
+								"Ljava/lang/invoke/MethodType;)" +
+								"Ljava/lang/invoke/MethodHandle;");
+			else
+				mv.visitMethodInsn(INVOKEVIRTUAL,
+						"java/lang/invoke/MethodHandles$Lookup",
+						"findStatic",
+						"(Ljava/lang/Class;" +
+								"Ljava/lang/String;" +
+								"Ljava/lang/invoke/MethodType;)" +
+								"Ljava/lang/invoke/MethodHandle;");
+
+			mv.visitFieldInsn(
+					PUTSTATIC,
+					store.getRawTypeName(getCurrentType()),
+					md.getName()+"$handle","Ljava/lang/invoke/MethodHandle;");
+		}
+		mv.visitLabel(exceptionEnd);
+		mv.visitJumpInsn(GOTO, returnStatement);
+		mv.visitLabel(handler);
+		mv.visitIntInsn(ASTORE, 2);
+		mv.visitTypeInsn(NEW, "java/lang/RuntimeException");
+		mv.visitInsn(DUP);
+		mv.visitVarInsn(ALOAD, 2);
+		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/RuntimeException", "<init>", "(Ljava/lang/Throwable;)V");
+		mv.visitInsn(ATHROW);
+		mv.visitLabel(returnStatement);
+		mv.visitInsn(RETURN);
+		mv.visitMaxs(0,0);
+		mv.visitEnd();
 	}
 
 	private void addDefaultConstructor() {
@@ -167,7 +257,16 @@ public class ClassVisitor extends BaseASTVisitor {
 		int access = ACC_PUBLIC;
 		if (methDeclaration.isClassMeth())
 			access += ACC_STATIC;
-		
+
+
+		cw.visitField(ACC_PUBLIC | ACC_STATIC,
+				methDeclaration.getName() + "$handle",
+				org.objectweb.asm.Type.getType(MethodHandle.class).getDescriptor(),
+				null,
+				null).visitEnd();
+
+		meths.add(methDeclaration);
+
 		MethodVisitor mv = cw.visitMethod(access, methDeclaration.getName(),
 				getTypeName(methDeclaration.getType(), false), null, null);
 		new MethVisitor(this, mv, context.getExternalDecls()).visit(methDeclaration);
@@ -180,6 +279,7 @@ public class ClassVisitor extends BaseASTVisitor {
 	public Type getCurrentType() {
 		return currentType;
 	}
+
 
 
 	public ClassStore getStore() {

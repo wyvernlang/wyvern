@@ -18,14 +18,12 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import wyvern.tools.typedAST.core.Application;
+import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
@@ -52,11 +50,14 @@ public class MethVisitor extends BaseASTVisitor {
 	private MethodVisitor mv;
 	private Frame frame;
 	private Handle bootstrap;
+	private Handle bootstrapVar;
 	
 	private Environment localEnv = Environment.getEmptyEnvironment();
 	
 	private Boolean isStatic = false;
-	private Type staticType = null;
+	private Boolean isReceiver = false;
+	private Type receiverType = null;
+
 	
 	private MethodExternalContext mec = new MethodExternalContext();
 	private class MethodExternalContext {
@@ -102,7 +103,47 @@ public class MethVisitor extends BaseASTVisitor {
 				types.add(t);
 			return new Arrow(new Tuple((Type[])types.toArray()), input.getResult());
 		}
+		if (argType instanceof Unit)
+			return new Arrow(newt, input.getResult());
 		return new Arrow(new Tuple(new Type[] { newt, argType }), input.getResult());
+	}
+
+	private String getMethodDescription(Arrow arrow) {
+		StringBuilder output = new StringBuilder("(");
+		Type arrowArgument = arrow.getArgument();
+		if (arrowArgument instanceof Tuple) {
+			Tuple tuple = (Tuple) arrowArgument;
+			Type[] types = tuple.getTypes();
+			for (Type t : types) {
+				output.append(jv.getStore().getTypeName(t,true));
+			}
+		} else {
+			if (!(arrowArgument instanceof Unit))
+				output.append(jv.getStore().getTypeName(arrowArgument,true));
+		}
+		output.append(")");
+		output.append(jv.getStore().getTypeName(arrow.getResult(), true));
+		return output.toString();
+	}
+
+	private void doFnInv(Arrow arrow) {
+		Type arrowArgument = arrow.getArgument();
+		if (arrowArgument instanceof Tuple) {
+			Tuple tuple = (Tuple) arrowArgument;
+			Type[] types = tuple.getTypes();
+			for (int i = types.length-1; i >= 0; i--) {
+				Type t = types[i];
+				Type type = frame.popStackType();
+				assert type.equals(t);
+			}
+		} else if (arrowArgument instanceof Unit) {
+			//Nothing
+		} else {
+			assert arrowArgument.subtype(frame.popStackType());
+		}
+	}
+	private void putFnRes(Arrow arrow) {
+		frame.pushStackType(arrow.getResult());
 	}
 	
 	private class ObjectType implements Type {
@@ -183,6 +224,13 @@ public class MethVisitor extends BaseASTVisitor {
 		public Type popStackType() {
 			return stackTypes.pop();
 		}
+
+		public void swap() {
+			Type a = stackTypes.pop();
+			Type b = stackTypes.pop();
+			stackTypes.push(a);
+			stackTypes.push(b);
+		}
 		
 		public Pair<Type, Type> popStackTypePair() {
 			return new Pair<Type, Type>(stackTypes.pop(), stackTypes.pop());
@@ -247,6 +295,7 @@ public class MethVisitor extends BaseASTVisitor {
 		
 		MethodType mt = MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, Object[].class);
 		bootstrap = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrap", mt.toMethodDescriptorString());
+		bootstrapVar = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapMethHandle", mt.toMethodDescriptorString());
 		
 		Label startLabel = new Label();
 		mv.visitLabel(startLabel);
@@ -274,7 +323,23 @@ public class MethVisitor extends BaseASTVisitor {
 	}
 
 	@Override
-	public void visit(Application app) { 
+	public void visit(Application app) {
+		isReceiver = true;
+		((CoreAST)app.getFunction()).accept(this); //Assumed to have pushed a MethodHandle
+		isReceiver = false;
+		((CoreAST)app.getArgument()).accept(this); //Assumed to have pushed every argument
+		Arrow fnType;
+		if (!isStatic)
+			fnType = addClassToArgs((Arrow) app.getFunction().getType(), receiverType);
+		else {
+			fnType = (Arrow) app.getFunction().getType();
+		}
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandle", "invokeExact", getMethodDescription(fnType));
+		doFnInv(fnType);
+		assert frame.popStackType().equals(app.getFunction().getType());
+		putFnRes(fnType);
+		isStatic = false;
+		/*
 		if (app.getFunction() instanceof Invocation && ((Invocation) app.getFunction()).getArgument() == null) {
 			Invocation funInv = (Invocation) app.getFunction();
 			//argument == null
@@ -307,9 +372,10 @@ public class MethVisitor extends BaseASTVisitor {
 			frame.pushStackType(app.getType());
 			return;
 		}
-		throw new RuntimeException("Not implemented");
+		*/
+		//throw new RuntimeException("Not implemented");
 	}
-	
+
 	@Override
 	public void visit(ValDeclaration vd) {
 		super.visit(vd);
@@ -332,13 +398,35 @@ public class MethVisitor extends BaseASTVisitor {
 
 		localEnv = localEnv.extend(new TypeBinding(vd.getName(), outputType));
 	}
+
+	@Override
+	public void visit(VarDeclaration vd) {
+		super.visit(vd);
+		Label defLoc = new Label();
+		mv.visitLabel(defLoc);
+		frame.registerVariable(vd.getName(), vd.getType(), defLoc);
+		Type type = frame.popStackType();
+
+
+		if (type instanceof Int)
+			mv.visitIntInsn(ISTORE, frame.getVariableIndex(vd.getName()));
+		else if (type instanceof ClassType)
+			mv.visitIntInsn(ASTORE, frame.getVariableIndex(vd.getName()));
+		else
+			throw new RuntimeException("Not implemented");
+
+		Type outputType = vd.getType();
+		if (outputType instanceof ClassType)
+			outputType = new ObjectType((ClassType) outputType);
+
+		localEnv = localEnv.extend(new TypeBinding(vd.getName(), outputType));
+	}
 	
 	@Override
 	public void visit(Invocation inv) {
 
 		TypedAST argument = inv.getArgument();
 		TypedAST receiver = inv.getReceiver();
-
 		if (receiver instanceof CoreAST)
 			((CoreAST) receiver).accept(this);
 		if (argument instanceof CoreAST)
@@ -356,7 +444,25 @@ public class MethVisitor extends BaseASTVisitor {
 				throw new RuntimeException("Not implemented");
 			}
 		} else { //variable or function as first class value
-			//TODO: Use invokedynamic to resolve this
+			if (inv.getType() instanceof Arrow) {
+				//TODO: Make this work
+				if (isReceiver)
+					receiverType = receiver.getType();
+				//Method lookup, look in class for name$handle:MethodHande
+				frame.pushStackType(inv.getType());
+				if (isStatic) {
+					mv.visitFieldInsn(GETSTATIC, jv.getStore().getRawTypeName(inv.getReceiver().getType()), inv.getOperationName() + "$handle", "Ljava/lang/invoke/MethodHandle;");
+				} else {
+					Type old = frame.popStackType();
+					mv.visitInsn(DUP);
+					frame.pushStackType(old);
+					mv.visitInvokeDynamicInsn(inv.getOperationName(),"(Ljava/lang/Object;)Ljava/lang/invoke/MethodHandle;", bootstrapVar);
+					frame.swap();
+					mv.visitInsn(SWAP);
+				}
+				return;
+			}
+			throw new RuntimeException("Not implemented");
 		}
 	}
 	
@@ -386,11 +492,10 @@ public class MethVisitor extends BaseASTVisitor {
 		TypeBinding assocType = localEnv.lookupType(name);
 		if (assocType != null && assocType.getType() instanceof ClassType) {
 			isStatic = true;
-			staticType = localEnv.lookupType(name).getType();
 			return;
 		}
 		Type type = var.getType();
-		
+
 		writeVariable(name, type);
 	}
 

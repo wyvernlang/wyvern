@@ -45,7 +45,7 @@ public class ClassStore {
 		protected Class<?> findClass(final String name) throws ClassNotFoundException {
 			byte[] classBytes = this.extraClassDefs.remove(name);
 			if (classBytes != null) {
-				return defineClass(name, classBytes, 0, classBytes.length); 
+				return defineClass(name, classBytes, 0, classBytes.length);
 			}
 			return super.findClass(name);
 		}
@@ -138,8 +138,9 @@ public class ClassStore {
 				
 			}
 		}
-	
-		return new ByteClassLoader(nc, ClassStore.class.getClassLoader());
+
+		ByteClassLoader byteClassLoader = new ByteClassLoader(nc, ClassStore.class.getClassLoader());
+		return byteClassLoader;
 	}
 
 }
