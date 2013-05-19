@@ -115,14 +115,16 @@ public class MethVisitor extends BaseASTVisitor {
 			Tuple tuple = (Tuple) arrowArgument;
 			Type[] types = tuple.getTypes();
 			for (Type t : types) {
-				output.append(jv.getStore().getTypeName(t,true));
+				output.append(jv.getStore().getTypeName((t instanceof ClassType)?jv.getStore().getObjectType() : t,true));
 			}
 		} else {
 			if (!(arrowArgument instanceof Unit))
-				output.append(jv.getStore().getTypeName(arrowArgument,true));
+				output.append(jv.getStore().getTypeName((arrowArgument instanceof ClassType)?jv.getStore().getObjectType() : arrowArgument,true));
 		}
 		output.append(")");
-		output.append(jv.getStore().getTypeName(arrow.getResult(), true));
+		Type result = arrow.getResult();
+
+		output.append(jv.getStore().getTypeName((result instanceof ClassType)?jv.getStore().getObjectType() : result, true));
 		return output.toString();
 	}
 
@@ -139,7 +141,8 @@ public class MethVisitor extends BaseASTVisitor {
 		} else if (arrowArgument instanceof Unit) {
 			//Nothing
 		} else {
-			assert arrowArgument.subtype(frame.popStackType());
+			Type fromStack = frame.popStackType();
+			assert arrowArgument.subtype(fromStack);
 		}
 	}
 	private void putFnRes(Arrow arrow) {
@@ -324,10 +327,14 @@ public class MethVisitor extends BaseASTVisitor {
 
 	@Override
 	public void visit(Application app) {
-		isReceiver = true;
+		//isReceiver = true;
 		((CoreAST)app.getFunction()).accept(this); //Assumed to have pushed a MethodHandle
-		isReceiver = false;
+		//isReceiver = false;
 		((CoreAST)app.getArgument()).accept(this); //Assumed to have pushed every argument
+
+		if (app.getFunction() instanceof Invocation) {
+			receiverType = ((Invocation)app.getFunction()).getReceiver().getType();
+		}
 		Arrow fnType;
 		if (!isStatic)
 			fnType = addClassToArgs((Arrow) app.getFunction().getType(), receiverType);
@@ -552,6 +559,7 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 		frame.pushStackType(Int.getInstance());
 	}
-	
+
+
 	//TODO: Invocation (urgh), Application (even more urgh), assignment, local variable definitions (we don't even do data flow analysis!), and so on
 }

@@ -65,7 +65,10 @@ public class Runtime {
 		MethodHandle guard = MethodHandles.guardWithTest(test, target, site.getTarget());
 		site.setTarget(guard);
 
-		return (MethodHandle)target.invokeExact(receiver);
+
+		MethodHandle methodHandle = (MethodHandle) target.invokeExact(receiver);
+		System.out.println(methodHandle.type());
+		return methodHandle;
 	}
 
 	public static CallSite bootstrapMethHandle(MethodHandles.Lookup lookup, String name, MethodType type, Object... args) throws NoSuchMethodException, IllegalAccessException {

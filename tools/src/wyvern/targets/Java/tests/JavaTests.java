@@ -4,6 +4,8 @@ import static wyvern.tools.types.TypeUtils.arrow;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.List;
 
@@ -424,13 +426,13 @@ public class JavaTests {
                 "val y : Test4 = Test4.create()\n"+
                 "class Test4\n" +
                 "   class meth create():Test4 = new\n" +
-                "   meth a():Int = 2\n" +
+                "   meth a(x : Int):Int = 2+x\n" +
                 "val x : Test4 = Test4.create()\n" +
-                "x.a() + y.a()";
+                "x.a(2) + y.a()";
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
         Class generated = generatedLoader.loadClass("CLASSwycCode");
         Object returned = generated.getMethod("main").invoke(null);
-        Assert.assertEquals(returned, 3);
+        Assert.assertEquals(returned, 5);
     }
 
     @Test
@@ -447,7 +449,7 @@ public class JavaTests {
     }
 
 	@Test
-	public void testTypeMeths1() throws Exception {
+	public void testTypeMeths1() throws Throwable {
 		String test = 
 				  "type T\n" +
 				  "	meth b(s:Int):Int\n" +
@@ -460,6 +462,14 @@ public class JavaTests {
 				  "x.b(10)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+
+		Class test3 = generatedLoader.loadClass("CLASSTest3");
+
+		Object instance = test3.getMethod("create").invoke(null);
+		MethodHandle bhandle = ((MethodHandle) test3.getDeclaredField("b$handle").get(null)).asType(MethodType.methodType(Object.class, Object.class, int.class));
+		Object output = bhandle.invokeExact(instance, 10);
+		int val = ((Integer)output);
+
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));

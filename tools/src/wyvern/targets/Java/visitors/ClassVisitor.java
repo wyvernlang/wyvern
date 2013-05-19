@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
@@ -64,6 +65,13 @@ public class ClassVisitor extends BaseASTVisitor {
 	
 	private void registerClass(Type type, byte[] bytecode) {
 		store.registerClass(type, bytecode);
+	}
+
+	private Type checkForClassType(Type type) {
+		if (type instanceof ClassType)
+			return store.getObjectType();
+		else
+			return type;
 	}
 
 	private void pushClassType(MethodVisitor mv, String descriptor) {
@@ -144,26 +152,7 @@ public class ClassVisitor extends BaseASTVisitor {
 			pushClassType(mv, store.getTypeName(arrow.getResult(), true));
 			if (arrow.getArgument() instanceof Tuple) {
 				Type[] types = ((Tuple)arrow.getArgument()).getTypes();
-				if (types.length < 2) {
-					for (Type type : types){
-						sb.append("Ljava/lang/Class;");
-						pushClassType(mv, store.getTypeName(type, true));
-					}
-				} else {
-					int nth = 0;
-					sb.append("[Ljava/lang/Class;");
-					mv.visitLdcInsn(types.length);
-					mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
-					mv.visitInsn(DUP);
-					mv.visitIntInsn(ASTORE,2);
-					for (Type type : types) {
-						mv.visitInsn(DUP);
-						mv.visitLdcInsn(nth);
-						pushClassType(mv, store.getTypeName(types[0], true));
-						mv.visitInsn(AASTORE);
-						++nth;
-					}
-				}
+				makeAndPopulateTypes(mv, sb, types);
 			} else if (!(arrow.getArgument() instanceof Unit)) {
 				sb.append("Ljava/lang/Class;");
 				pushClassType(mv, store.getTypeName(arrow.getArgument(), true));
@@ -186,7 +175,33 @@ public class ClassVisitor extends BaseASTVisitor {
 								"Ljava/lang/String;" +
 								"Ljava/lang/invoke/MethodType;)" +
 								"Ljava/lang/invoke/MethodHandle;");
+			//Just the methodhandle on the stack here
 
+			sb = new StringBuilder("(Ljava/lang/Class;");// Construct the return type argument
+			pushClassType(mv, store.getTypeName(checkForClassType(arrow.getResult()), true)); // Return type
+
+			if (!md.isClassMeth()) {
+				sb.append("Ljava/lang/Class;"); //Append the receiver type
+				pushClassType(mv, store.getTypeName(store.getObjectType(), true)); // Push the receiver type
+			}
+
+			if (arrow.getArgument() instanceof Tuple) {
+				Type[] types = ((Tuple)arrow.getArgument()).getTypes();
+				Type[] nTypes = new Type[types.length];
+				int nTypePtr = 0;
+				for (Type t : types) {
+					nTypes[nTypePtr++] = checkForClassType(t);
+				}
+
+				makeAndPopulateTypes(mv, sb, nTypes);
+			} else if (!(arrow.getArgument() instanceof Unit)) {
+				makeAndPopulateTypes(mv, sb, new Type[] { checkForClassType(arrow.getArgument()) });
+			}
+			sb.append(")Ljava/lang/invoke/MethodType;");//The return value
+
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType","methodType",sb.toString());
+
+			mv.visitMethodInsn(INVOKEVIRTUAL,"java/lang/invoke/MethodHandle","asType", "(Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;");
 			mv.visitFieldInsn(
 					PUTSTATIC,
 					store.getRawTypeName(getCurrentType()),
@@ -205,6 +220,22 @@ public class ClassVisitor extends BaseASTVisitor {
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0,0);
 		mv.visitEnd();
+	}
+
+	private void makeAndPopulateTypes(MethodVisitor mv, StringBuilder sb, Type[] types) {
+		int nth = 0;
+		sb.append("[Ljava/lang/Class;");
+		mv.visitLdcInsn(types.length);
+		mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
+		mv.visitInsn(DUP);
+		mv.visitIntInsn(ASTORE,2);
+		for (Type type : types) {
+			mv.visitInsn(DUP);
+			mv.visitLdcInsn(nth);
+			pushClassType(mv, store.getTypeName(types[0], true));
+			mv.visitInsn(AASTORE);
+			++nth;
+		}
 	}
 
 	private void addDefaultConstructor() {

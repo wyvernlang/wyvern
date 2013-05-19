@@ -10,6 +10,23 @@ import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassStore {
+	private class ObjectType implements Type {
+
+		@Override
+		public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+			return false;  //To change body of implemented methods use File | Settings | File Templates.
+		}
+
+		@Override
+		public boolean subtype(Type other) {
+			return false;  //To change body of implemented methods use File | Settings | File Templates.
+		}
+
+		@Override
+		public void writeArgsToTree(TreeWriter writer) {
+			//To change body of implemented methods use File | Settings | File Templates.
+		}
+	}
     private class GenericClassType implements Type {
         public final Type parent;
         public final int n;
@@ -74,6 +91,10 @@ public class ClassStore {
         return getNewTypeName(type, "");
 	}
 
+	Type getObjectType() {
+		return new ObjectType();
+	}
+
 	public String getTypeName(Type type, boolean isUnitVoid) {
 		if (type instanceof Int) {
 			return "I";
@@ -95,7 +116,7 @@ public class ClassStore {
 			return outputBuilder.toString();
 		} else if (type instanceof Arrow) {
 			return "(" + getTypeName(((Arrow) type).getArgument(), false) + ")" + getTypeName(((Arrow) type).getResult(), true);
-        } else if (type instanceof TypeType) {
+        } else if (type instanceof TypeType || type instanceof ObjectType) {
             return "Ljava/lang/Object;";
 		} else if (classes.containsKey(type)) {
 			return "L"+classes.get(type).first+";";
