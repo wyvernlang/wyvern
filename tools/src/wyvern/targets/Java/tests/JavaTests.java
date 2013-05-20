@@ -463,13 +463,6 @@ public class JavaTests {
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 
-		Class test3 = generatedLoader.loadClass("CLASSTest3");
-
-		Object instance = test3.getMethod("create").invoke(null);
-		MethodHandle bhandle = ((MethodHandle) test3.getDeclaredField("b$handle").get(null)).asType(MethodType.methodType(Object.class, Object.class, int.class));
-		Object output = bhandle.invokeExact(instance, 10);
-		int val = ((Integer)output);
-
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));
@@ -501,8 +494,7 @@ public class JavaTests {
 		Assert.assertEquals(returned, new Integer(4));
 	}
 	
-	
-	//TODO: Dependent on closures
+
 	@Test
 	public void testInlineMeths() throws Exception {
 		String test = 
@@ -514,10 +506,24 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(0));
 	}
+	@Test
+	public void testInlineMeths2() throws Exception {
+		String test =
+				"val y : Int = 2\n" +
+				"meth a (s : Int) :Int = s + y\n" +
+				"a(0)";
+
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(2));
+	}
 	
 	@Test
 	public void testInlineFuncs() throws Exception {
-		String test = "(fn (a : Int) = a+1)(2)";
+		String test = "val applyTwice : (Int -> Int) -> (Int -> Int) = fn f : Int -> Int => fn x : Int => f(f(x))\n"
+				+"val addOne : Int -> Int = fn x : Int => x + 1\n"
+				+"applyTwice(addOne)(1)";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
 		Object returned = generated.getMethod("main").invoke(null);

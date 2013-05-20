@@ -58,7 +58,7 @@ public class Runtime {
 		MethodType type = site.type();
 		Class<?> receiverClass = receiver.getClass();
 
-		MethodHandle target = MethodHandles.dropArguments(site.lookup.findStaticGetter(receiverClass, site.name+"$handle", MethodHandle.class),0,Object.class);
+		MethodHandle target = MethodHandles.dropArguments(site.lookup.findStaticGetter(receiverClass, site.name + "$handle", MethodHandle.class), 0, Object.class);
 		MethodHandle test = CHECK_CLASS.bindTo(receiverClass);
 		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
 
@@ -67,7 +67,6 @@ public class Runtime {
 
 
 		MethodHandle methodHandle = (MethodHandle) target.invokeExact(receiver);
-		System.out.println(methodHandle.type());
 		return methodHandle;
 	}
 
@@ -77,11 +76,32 @@ public class Runtime {
 		return callSite;
 	}
 
+	public static CallSite bootstrapField(MethodHandles.Lookup lookup, String name, MethodType type, Object... args) throws NoSuchMethodException, IllegalAccessException {
+		InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type);
+		callSite.setTarget(MethodHandles.insertArguments(LOOKUP_FIELD, 0, callSite).asType(type));
+		return callSite;
+	}
+
+	private static Object lookupField(InliningCacheCallSite site, Object receiver, Class cls) throws Throwable {
+		MethodType type = site.type();
+		Class<?> receiverClass = receiver.getClass();
+		MethodHandle target = MethodHandles.dropArguments(site.lookup.findGetter(receiverClass, site.name, cls), 1, Class.class);
+		target = target.asType(site.type());
+		MethodHandle test = CHECK_CLASS.bindTo(receiverClass);
+		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
+
+		MethodHandle guard = MethodHandles.guardWithTest(test, target, site.getTarget());
+		site.setTarget(guard);
+
+		return target.asType(MethodType.methodType(Object.class,Object.class,Class.class)).invokeExact(receiver, cls);
+	}
+
     private static final MethodHandle LOOKUP;
     private static final MethodHandle CHECK_CLASS;
 	private static final MethodHandle LOOKUP_METHOD_HANDLE;
+	private static final MethodHandle LOOKUP_FIELD;
 
-    static {
+	static {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             LOOKUP = lookup.findStatic(Runtime.class, "lookup",
@@ -90,6 +110,8 @@ public class Runtime {
                     MethodType.methodType(boolean.class, Class.class, Object.class));
 			LOOKUP_METHOD_HANDLE = lookup.findStatic(Runtime.class, "lookupMethodHandle",
 					MethodType.methodType(MethodHandle.class, InliningCacheCallSite.class, Object.class));
+			LOOKUP_FIELD = lookup.findStatic(Runtime.class, "lookupField",
+					MethodType.methodType(Object.class, InliningCacheCallSite.class, Object.class, Class.class));
         } catch (ReflectiveOperationException e) {
             throw (AssertionError)new AssertionError().initCause(e);
         }

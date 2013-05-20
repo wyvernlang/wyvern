@@ -3,7 +3,9 @@ package wyvern.targets.Java.visitors;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -16,6 +18,8 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
@@ -31,6 +35,7 @@ public class ClassVisitor extends BaseASTVisitor {
 	private ClassStore store = null;
 	private ExternalContext context = new ExternalContext();
 	private List<MethDeclaration> meths = new ArrayList<MethDeclaration>();
+	private Map<String, TypedAST> initalizeFieldValues = new HashMap<String,TypedAST>();
 
 	public ClassVisitor(String typePrefix, ClassStore store) {
 		this.typePrefix = typePrefix;
@@ -105,9 +110,9 @@ public class ClassVisitor extends BaseASTVisitor {
 		currentType = classDecl.getType();
 		currentTypeName = store.getRawTypeName(classDecl.getType());
 
-		addDefaultConstructor();
-		
 		super.visit(classDecl);
+
+		addDefaultConstructor();
 		
 		for (Pair<String, Type> externalVar : context.getExternalDecls()) {
 
@@ -239,17 +244,26 @@ public class ClassVisitor extends BaseASTVisitor {
 	}
 
 	private void addDefaultConstructor() {
-		MethodVisitor defaultCstr = cw.visitMethod(ACC_PRIVATE, 
+		MethodVisitor mv = cw.visitMethod(ACC_PRIVATE,
 				"<init>", 
 				"()V", 
 				null,
 				null);
-		defaultCstr.visitCode();
-		defaultCstr.visitIntInsn(org.objectweb.asm.Opcodes.ALOAD, 0);
-		defaultCstr.visitMethodInsn(org.objectweb.asm.Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
-		defaultCstr.visitInsn(org.objectweb.asm.Opcodes.RETURN);
-		defaultCstr.visitMaxs(0, 0);//Unused
-		defaultCstr.visitEnd();
+		mv.visitCode();
+		mv.visitIntInsn(org.objectweb.asm.Opcodes.ALOAD, 0);
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(org.objectweb.asm.Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+		MethVisitor imv = new MethVisitor(this, mv, new ArrayList<Pair<String, Type>>());
+		for (Map.Entry<String, TypedAST> entry : initalizeFieldValues.entrySet()) {
+			mv.visitInsn(DUP);
+			if (entry.getValue() == null)
+				continue;
+			((CoreAST)entry.getValue()).accept(imv);
+			mv.visitFieldInsn(PUTFIELD, getCurrentTypeName(), entry.getKey(), store.getTypeName(entry.getValue().getType(), true, true));
+		}
+		mv.visitInsn(org.objectweb.asm.Opcodes.RETURN);
+		mv.visitMaxs(0, 0);//Unused
+		mv.visitEnd();
 	}
 	
 	@Override
@@ -266,11 +280,12 @@ public class ClassVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(ValDeclaration valDeclaration) {
 		super.visit(valDeclaration);
-		cw.visitField(ACC_PRIVATE,
+		cw.visitField(ACC_PUBLIC,
 				valDeclaration.getName(), 
 				getTypeName(valDeclaration.getBinding().getType()),
 				null, 
 				new Integer(0)).visitEnd();
+		initalizeFieldValues.put(valDeclaration.getName(), valDeclaration.getDefinition());
 	}
 
 	@Override
@@ -281,6 +296,7 @@ public class ClassVisitor extends BaseASTVisitor {
 				getTypeName(valDeclaration.getBinding().getType()),
 				null, 
 				new Integer(0)).visitEnd();
+		initalizeFieldValues.put(valDeclaration.getName(), valDeclaration.getDefinition());
 	}
 	
 	@Override
@@ -300,7 +316,7 @@ public class ClassVisitor extends BaseASTVisitor {
 
 		MethodVisitor mv = cw.visitMethod(access, methDeclaration.getName(),
 				getTypeName(methDeclaration.getType(), false), null, null);
-		new MethVisitor(this, mv, context.getExternalDecls()).visit(methDeclaration);
+		new MethVisitor(this, mv, context.getExternalDecls()).visitInitial(methDeclaration);
 	}
 
 	public String getCurrentTypeName() {

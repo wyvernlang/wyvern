@@ -96,6 +96,10 @@ public class ClassStore {
 	}
 
 	public String getTypeName(Type type, boolean isUnitVoid) {
+		return getTypeName(type, isUnitVoid, false);
+	}
+
+	public String getTypeName(Type type, boolean isUnitVoid, boolean isArrowMethodHandle) {
 		if (type instanceof Int) {
 			return "I";
 		} else if (type instanceof Bool) {
@@ -114,8 +118,10 @@ public class ClassStore {
 				outputBuilder.append(getTypeName(t, isUnitVoid));
 			}
 			return outputBuilder.toString();
-		} else if (type instanceof Arrow) {
+		} else if (type instanceof Arrow && !isArrowMethodHandle) {
 			return "(" + getTypeName(((Arrow) type).getArgument(), false) + ")" + getTypeName(((Arrow) type).getResult(), true);
+		} else if (type instanceof Arrow && isArrowMethodHandle) {
+			return "Ljava/lang/invoke/MethodHandle;";
         } else if (type instanceof TypeType || type instanceof ObjectType) {
             return "Ljava/lang/Object;";
 		} else if (classes.containsKey(type)) {

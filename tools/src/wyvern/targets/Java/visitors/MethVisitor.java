@@ -51,15 +51,22 @@ public class MethVisitor extends BaseASTVisitor {
 	private Frame frame;
 	private Handle bootstrap;
 	private Handle bootstrapVar;
+	private Handle bootstrapFun;
 	
 	private Environment localEnv = Environment.getEmptyEnvironment();
 	
 	private Boolean isStatic = false;
 	private Boolean isReceiver = false;
 	private Type receiverType = null;
-
 	
 	private MethodExternalContext mec = new MethodExternalContext();
+
+
+	private Type convertClassType(Type in) {
+		if (in instanceof ClassType)
+			return jv.getStore().getObjectType();
+		return in;
+	}
 	private class MethodExternalContext {
 		private HashMap<String, Pair<Type, Integer>> varMap = new HashMap<String, Pair<Type, Integer>>();
 		
@@ -80,7 +87,6 @@ public class MethVisitor extends BaseASTVisitor {
 			return varMap.get(name);
 		}
 	}
-	
 	public static void generateReturn(Type retType, MethodVisitor mv) {
 		if (retType == null)
 			mv.visitInsn(RETURN);
@@ -93,7 +99,6 @@ public class MethVisitor extends BaseASTVisitor {
 				throw new RuntimeException("Unimplemented");
 		}
 	}
-	
 	public Arrow addClassToArgs(Arrow input, Type newt) {
 		Type argType = input.getArgument();
 		if (argType instanceof Tuple) {
@@ -107,7 +112,6 @@ public class MethVisitor extends BaseASTVisitor {
 			return new Arrow(newt, input.getResult());
 		return new Arrow(new Tuple(new Type[] { newt, argType }), input.getResult());
 	}
-
 	private String getMethodDescription(Arrow arrow) {
 		StringBuilder output = new StringBuilder("(");
 		Type arrowArgument = arrow.getArgument();
@@ -127,7 +131,6 @@ public class MethVisitor extends BaseASTVisitor {
 		output.append(jv.getStore().getTypeName((result instanceof ClassType)?jv.getStore().getObjectType() : result, true));
 		return output.toString();
 	}
-
 	private void doFnInv(Arrow arrow) {
 		Type arrowArgument = arrow.getArgument();
 		if (arrowArgument instanceof Tuple) {
@@ -148,7 +151,14 @@ public class MethVisitor extends BaseASTVisitor {
 	private void putFnRes(Arrow arrow) {
 		frame.pushStackType(arrow.getResult());
 	}
-	
+	private void pushClassType(MethodVisitor mv, String descriptor) {
+		if (descriptor.equals("V")) {
+			mv.visitFieldInsn(GETSTATIC, "java/lang/Void", "TYPE", "Ljava/lang/Class;");
+		} else if (descriptor.equals("I")) {
+			mv.visitFieldInsn(GETSTATIC, "java/lang/Integer", "TYPE", "Ljava/lang/Class;");
+		} else
+			mv.visitLdcInsn(org.objectweb.asm.Type.getType(descriptor));
+	}
 	private class ObjectType implements Type {
 		private ClassType refType;
 
@@ -174,7 +184,6 @@ public class MethVisitor extends BaseASTVisitor {
 			return false;
 		}
 	}
-	
 	private class Frame {
 		public class VarInfo {
 			private String name;
@@ -208,6 +217,12 @@ public class MethVisitor extends BaseASTVisitor {
 			if (!variableMap.containsKey(varName))
 				throw new RuntimeException();
 			return variableMap.get(varName).getIdx();
+		}
+
+		public Type getVariableType(String varName) {
+			if (!variableMap.containsKey(varName))
+				throw new RuntimeException();
+			return variableMap.get(varName).getType();
 		}
 		
 		public void registerVariable(String varName, Type varType, Label definitionLocation) {
@@ -243,7 +258,7 @@ public class MethVisitor extends BaseASTVisitor {
 			Label endLabel = new Label();
 			mv.visitLabel(endLabel);
 			for (VarInfo vi : variableMap.values()) {
-				mv.visitLocalVariable(vi.getName(), jv.getStore().getTypeName(vi.getType(), true), null, vi.getDefLoc(), endLabel, vi.getIdx());
+				mv.visitLocalVariable(vi.getName(), jv.getStore().getTypeName(vi.getType(), true, true), null, vi.getDefLoc(), endLabel, vi.getIdx());
 			}
 			
 		}
@@ -257,15 +272,43 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 	}
 
-	int x = 1;
-	public int test() {
-		return x;
-	}
-
-	public MethVisitor(ClassVisitor jv, MethodVisitor mv, Iterable<Pair<String, Type>> iterable) {
+	public MethVisitor(ClassVisitor jv, MethodVisitor mv, Iterable<Pair<String, Type>> externals) {
 		this.jv = jv;
 		this.mv = mv;
-		mec.addExternal(iterable, MethodExternalContext.STATIC);
+		mec.addExternal(externals, MethodExternalContext.STATIC);
+
+		frame = new Frame();
+		MethodType mt = MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, Object[].class);
+		bootstrap = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrap", mt.toMethodDescriptorString());
+		bootstrapVar = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapMethHandle", mt.toMethodDescriptorString());
+		bootstrapFun = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapField", mt.toMethodDescriptorString());
+	}
+
+	public void visitInitial(MethDeclaration md) {
+
+		Label startLabel = new Label();
+		mv.visitLabel(startLabel);
+
+		if (!md.isClassMeth())
+			frame.registerVariable("this", jv.getCurrentType(), startLabel);
+
+		for (NameBinding nb : md.getArgBindings()) {
+			frame.registerVariable(nb.getName(), nb.getType(), startLabel);
+		}
+
+		mv.visitCode();
+		super.visit(md);
+		Type returnType = null;
+		if (!frame.stackEmpty())
+			returnType = frame.popStackType();
+
+		generateReturn(returnType, mv);
+
+		frame.endFrame(mv);
+
+		mv.visitMaxs(0, 0); //Ignored
+		mv.visitEnd();
+		localEnv = localEnv.extend(new TypeBinding(md.getName(), md.getType()));
 	}
 	
 	@Override
@@ -294,35 +337,48 @@ public class MethVisitor extends BaseASTVisitor {
 	
 	@Override
 	public void visit(MethDeclaration md) {
-		frame = new Frame();
-		
-		MethodType mt = MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, Object[].class);
-		bootstrap = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrap", mt.toMethodDescriptorString());
-		bootstrapVar = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapMethHandle", mt.toMethodDescriptorString());
-		
-		Label startLabel = new Label();
-		mv.visitLabel(startLabel);
-		
-		if (!md.isClassMeth())
-			frame.registerVariable("this", jv.getCurrentType(), startLabel);
-		
-		for (NameBinding nb : md.getArgBindings()) {
-			frame.registerVariable(nb.getName(), nb.getType(), startLabel);
+		VariableResolver visitor = new VariableResolver(frame.getVars());
+		md.accept(visitor);
+		List<Pair<String, Type>> usedVars = visitor.getUsedVars();
+
+		List<NameBinding> newArgs = new ArrayList<NameBinding>(md.getArgBindings().size() + usedVars.size());
+		for (Pair<String, Type> pair : usedVars) {
+			newArgs.add(new NameBindingImpl(pair.first, pair.second));
 		}
-		
-		mv.visitCode();
-		super.visit(md);
-		Type returnType = null;
-		if (!frame.stackEmpty())
-			returnType = frame.popStackType();
-		
-		generateReturn(returnType, mv);
-		
-		frame.endFrame(mv);
-		
-		mv.visitMaxs(0, 0); //Ignored
-		mv.visitEnd();
-		localEnv = localEnv.extend(new TypeBinding(md.getName(), md.getType()));
+		for (NameBinding nb : md.getArgBindings()) {
+			newArgs.add(nb);
+		}
+
+		Label defLoc = new Label();
+		MethDeclaration implMd =
+				new MethDeclaration(md.getName()+"$impl", newArgs, ((Arrow)md.getType()).getResult(), md.getBody(), true, md.getLocation());
+		jv.visit(implMd);
+
+		frame.registerVariable(md.getName(), md.getType(), defLoc);
+		mv.visitLabel(defLoc);
+		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), md.getName()+"$impl$handle", "Ljava/lang/invoke/MethodHandle;");
+		if (usedVars.size() > 0) {
+			mv.visitInsn(ICONST_0);
+			mv.visitLdcInsn(usedVars.size());
+			mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+			//mv.visitInsn(DUP);
+			int idx = 0;
+			for (Pair<String, Type> p : usedVars) {
+				mv.visitInsn(DUP);
+				mv.visitLdcInsn(idx++);
+
+				if (frame.getVariableType(p.first) instanceof Int) {
+					mv.visitIntInsn(ILOAD, frame.getVariableIndex(p.first));
+					mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;");
+				} else {
+					mv.visitIntInsn(ALOAD, frame.getVariableIndex(p.first));
+				}
+				mv.visitInsn(AASTORE);
+			}
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "insertArguments",
+					"(Ljava/lang/invoke/MethodHandle;I[Ljava/lang/Object;)Ljava/lang/invoke/MethodHandle;");
+		}
+		mv.visitIntInsn(ASTORE, frame.getVariableIndex(md.getName()));
 	}
 
 	@Override
@@ -336,7 +392,7 @@ public class MethVisitor extends BaseASTVisitor {
 			receiverType = ((Invocation)app.getFunction()).getReceiver().getType();
 		}
 		Arrow fnType;
-		if (!isStatic)
+		if (receiverType != null && !isStatic)
 			fnType = addClassToArgs((Arrow) app.getFunction().getType(), receiverType);
 		else {
 			fnType = (Arrow) app.getFunction().getType();
@@ -469,7 +525,19 @@ public class MethVisitor extends BaseASTVisitor {
 				}
 				return;
 			}
-			throw new RuntimeException("Not implemented");
+			//Variable, then
+			//Invokedynamic to reference
+			//Assigning in here is going to be fun
+			assert frame.popStackType() == receiver.getType();
+			String invTypeName = jv.getStore().getTypeName(convertClassType(inv.getType()), true, true);
+			pushClassType(mv, invTypeName);
+			mv.visitInvokeDynamicInsn(inv.getOperationName(),
+					"("+
+							jv.getStore().getTypeName(convertClassType(receiver.getType()),true,true)+
+					"Ljava/lang/Class;)"+ invTypeName,
+					bootstrapFun);
+			frame.pushStackType(inv.getType());
+			//throw new RuntimeException("Not implemented");
 		}
 	}
 	
@@ -526,10 +594,11 @@ public class MethVisitor extends BaseASTVisitor {
 			mv.visitIntInsn(ILOAD, varIdx);
 			frame.pushStackType(Int.getInstance());
 		} else if (type instanceof ClassType
-                || type instanceof TypeType) {
+                || type instanceof TypeType
+				|| type instanceof Arrow) {
 			mv.visitIntInsn(ALOAD, varIdx);
 			frame.pushStackType(type);
-		} else
+		}	else
 			throw new RuntimeException("Not implemented");
 	}
 	
@@ -560,6 +629,16 @@ public class MethVisitor extends BaseASTVisitor {
 		frame.pushStackType(Int.getInstance());
 	}
 
+	@Override
+	public void visit(Assignment ass) {
+		((CoreAST)ass.getValue()).accept(this); //Assumes that the value is now on the top of the stack
 
+		int variableIndex = frame.getVariableIndex(((Variable) ass.getTarget()).getName());
+
+		if (ass.getValue().getType() instanceof Int)
+			mv.visitIntInsn(ISTORE, variableIndex);
+		else
+			mv.visitIntInsn(ASTORE, variableIndex);
+	}
 	//TODO: Invocation (urgh), Application (even more urgh), assignment, local variable definitions (we don't even do data flow analysis!), and so on
 }
