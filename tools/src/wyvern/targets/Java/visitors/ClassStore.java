@@ -115,11 +115,11 @@ public class ClassStore {
 			StringBuilder outputBuilder = new StringBuilder();
 			
 			for (Type t : ((Tuple)type).getTypes()) {
-				outputBuilder.append(getTypeName(t, isUnitVoid));
+				outputBuilder.append(getTypeName(t, isUnitVoid, isArrowMethodHandle));
 			}
 			return outputBuilder.toString();
 		} else if (type instanceof Arrow && !isArrowMethodHandle) {
-			return "(" + getTypeName(((Arrow) type).getArgument(), false) + ")" + getTypeName(((Arrow) type).getResult(), true);
+			return "(" + getTypeName(((Arrow) type).getArgument(), false, true) + ")" + getTypeName(((Arrow) type).getResult(), true, true);
 		} else if (type instanceof Arrow && isArrowMethodHandle) {
 			return "Ljava/lang/invoke/MethodHandle;";
         } else if (type instanceof TypeType || type instanceof ObjectType) {

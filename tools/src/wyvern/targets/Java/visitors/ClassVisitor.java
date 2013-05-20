@@ -36,6 +36,7 @@ public class ClassVisitor extends BaseASTVisitor {
 	private ExternalContext context = new ExternalContext();
 	private List<MethDeclaration> meths = new ArrayList<MethDeclaration>();
 	private Map<String, TypedAST> initalizeFieldValues = new HashMap<String,TypedAST>();
+	private int anonMethNum = 0;
 
 	public ClassVisitor(String typePrefix, ClassStore store) {
 		this.typePrefix = typePrefix;
@@ -55,6 +56,10 @@ public class ClassVisitor extends BaseASTVisitor {
     }
 
 	private ClassWriter cw = null;
+
+	public String getAnonMethodName() {
+		return "func$"+anonMethNum++;
+	}
 
 	private String getTypeName(Type type) {
 		return getTypeName(type, true);
@@ -154,13 +159,13 @@ public class ClassVisitor extends BaseASTVisitor {
 			mv.visitLdcInsn(md.getName());
 			StringBuilder sb = new StringBuilder("(Ljava/lang/Class;");
 			Arrow arrow = (Arrow)md.getType();
-			pushClassType(mv, store.getTypeName(arrow.getResult(), true));
+			pushClassType(mv, store.getTypeName(arrow.getResult(), true, true));
 			if (arrow.getArgument() instanceof Tuple) {
 				Type[] types = ((Tuple)arrow.getArgument()).getTypes();
 				makeAndPopulateTypes(mv, sb, types);
 			} else if (!(arrow.getArgument() instanceof Unit)) {
 				sb.append("Ljava/lang/Class;");
-				pushClassType(mv, store.getTypeName(arrow.getArgument(), true));
+				pushClassType(mv, store.getTypeName(arrow.getArgument(), true, true));
 			}
 			sb.append(")Ljava/lang/invoke/MethodType;");
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType","methodType",sb.toString());
@@ -183,11 +188,11 @@ public class ClassVisitor extends BaseASTVisitor {
 			//Just the methodhandle on the stack here
 
 			sb = new StringBuilder("(Ljava/lang/Class;");// Construct the return type argument
-			pushClassType(mv, store.getTypeName(checkForClassType(arrow.getResult()), true)); // Return type
+			pushClassType(mv, store.getTypeName(checkForClassType(arrow.getResult()), true, true)); // Return type
 
 			if (!md.isClassMeth()) {
 				sb.append("Ljava/lang/Class;"); //Append the receiver type
-				pushClassType(mv, store.getTypeName(store.getObjectType(), true)); // Push the receiver type
+				pushClassType(mv, store.getTypeName(store.getObjectType(), true, true)); // Push the receiver type
 			}
 
 			if (arrow.getArgument() instanceof Tuple) {
@@ -237,7 +242,7 @@ public class ClassVisitor extends BaseASTVisitor {
 		for (Type type : types) {
 			mv.visitInsn(DUP);
 			mv.visitLdcInsn(nth);
-			pushClassType(mv, store.getTypeName(types[0], true));
+			pushClassType(mv, store.getTypeName(type, true, true));
 			mv.visitInsn(AASTORE);
 			++nth;
 		}

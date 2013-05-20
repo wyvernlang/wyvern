@@ -24,6 +24,7 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.*;
+import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
@@ -93,10 +94,8 @@ public class MethVisitor extends BaseASTVisitor {
 		else {
 			if (retType instanceof Int)
 				mv.visitInsn(IRETURN);
-			else if (retType instanceof ClassType)
-				mv.visitInsn(ARETURN);
 			else
-				throw new RuntimeException("Unimplemented");
+				mv.visitInsn(ARETURN);
 		}
 	}
 	public Arrow addClassToArgs(Arrow input, Type newt) {
@@ -119,16 +118,16 @@ public class MethVisitor extends BaseASTVisitor {
 			Tuple tuple = (Tuple) arrowArgument;
 			Type[] types = tuple.getTypes();
 			for (Type t : types) {
-				output.append(jv.getStore().getTypeName((t instanceof ClassType)?jv.getStore().getObjectType() : t,true));
+				output.append(jv.getStore().getTypeName((t instanceof ClassType)?jv.getStore().getObjectType() : t,true,true));
 			}
 		} else {
 			if (!(arrowArgument instanceof Unit))
-				output.append(jv.getStore().getTypeName((arrowArgument instanceof ClassType)?jv.getStore().getObjectType() : arrowArgument,true));
+				output.append(jv.getStore().getTypeName((arrowArgument instanceof ClassType)?jv.getStore().getObjectType() : arrowArgument,true,true));
 		}
 		output.append(")");
 		Type result = arrow.getResult();
 
-		output.append(jv.getStore().getTypeName((result instanceof ClassType)?jv.getStore().getObjectType() : result, true));
+		output.append(jv.getStore().getTypeName((result instanceof ClassType)?jv.getStore().getObjectType() : result, true,true));
 		return output.toString();
 	}
 	private void doFnInv(Arrow arrow) {
@@ -357,6 +356,11 @@ public class MethVisitor extends BaseASTVisitor {
 		frame.registerVariable(md.getName(), md.getType(), defLoc);
 		mv.visitLabel(defLoc);
 		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), md.getName()+"$impl$handle", "Ljava/lang/invoke/MethodHandle;");
+		fillClosure(usedVars);
+		mv.visitIntInsn(ASTORE, frame.getVariableIndex(md.getName()));
+	}
+
+	private void fillClosure(List<Pair<String, Type>> usedVars) {
 		if (usedVars.size() > 0) {
 			mv.visitInsn(ICONST_0);
 			mv.visitLdcInsn(usedVars.size());
@@ -378,7 +382,6 @@ public class MethVisitor extends BaseASTVisitor {
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "insertArguments",
 					"(Ljava/lang/invoke/MethodHandle;I[Ljava/lang/Object;)Ljava/lang/invoke/MethodHandle;");
 		}
-		mv.visitIntInsn(ASTORE, frame.getVariableIndex(md.getName()));
 	}
 
 	@Override
@@ -450,10 +453,8 @@ public class MethVisitor extends BaseASTVisitor {
 		
 		if (type instanceof Int)
 			mv.visitIntInsn(ISTORE, frame.getVariableIndex(vd.getName()));
-		else if (type instanceof ClassType)
-			mv.visitIntInsn(ASTORE, frame.getVariableIndex(vd.getName()));
 		else
-			throw new RuntimeException("Not implemented");
+			mv.visitIntInsn(ASTORE, frame.getVariableIndex(vd.getName()));
 		
 		Type outputType = vd.getType();
 		if (outputType instanceof ClassType)
@@ -639,6 +640,28 @@ public class MethVisitor extends BaseASTVisitor {
 			mv.visitIntInsn(ISTORE, variableIndex);
 		else
 			mv.visitIntInsn(ASTORE, variableIndex);
+	}
+
+	@Override
+	public void visit(Fn fnDef) {
+		VariableResolver visitor = new VariableResolver(frame.getVars());
+		fnDef.accept(visitor);
+		List<Pair<String, Type>> usedVars = visitor.getUsedVars();
+
+		List<NameBinding> newArgs = new ArrayList<NameBinding>(fnDef.getArgBindings().size() + usedVars.size());
+		for (Pair<String, Type> pair : usedVars) {
+			newArgs.add(new NameBindingImpl(pair.first, pair.second));
+		}
+		for (NameBinding nb : fnDef.getArgBindings()) {
+			newArgs.add(nb);
+		}
+
+		String anonFnName = jv.getAnonMethodName();
+		MethDeclaration anonMeth = new MethDeclaration(anonFnName, newArgs, ((Arrow)fnDef.getType()).getResult(), fnDef.getBody(), true, fnDef.getLocation());
+		jv.visit(anonMeth);
+		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), anonFnName+"$handle", "Ljava/lang/invoke/MethodHandle;");
+		fillClosure(usedVars);
+		frame.pushStackType(fnDef.getType());
 	}
 	//TODO: Invocation (urgh), Application (even more urgh), assignment, local variable definitions (we don't even do data flow analysis!), and so on
 }
