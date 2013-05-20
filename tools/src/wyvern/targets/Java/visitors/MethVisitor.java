@@ -3,13 +3,7 @@ package wyvern.targets.Java.visitors;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.objectweb.asm.Handle;
@@ -17,6 +11,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
@@ -59,7 +54,7 @@ public class MethVisitor extends BaseASTVisitor {
 	private Boolean isStatic = false;
 	private Boolean isReceiver = false;
 	private Type receiverType = null;
-	
+
 	private MethodExternalContext mec = new MethodExternalContext();
 
 
@@ -138,7 +133,7 @@ public class MethVisitor extends BaseASTVisitor {
 			for (int i = types.length-1; i >= 0; i--) {
 				Type t = types[i];
 				Type type = frame.popStackType();
-				assert type.equals(t);
+				assert type.subtype(t);
 			}
 		} else if (arrowArgument instanceof Unit) {
 			//Nothing
@@ -388,23 +383,33 @@ public class MethVisitor extends BaseASTVisitor {
 	public void visit(Application app) {
 		//isReceiver = true;
 		((CoreAST)app.getFunction()).accept(this); //Assumed to have pushed a MethodHandle
+		boolean fnIsStatic = isStatic;
 		//isReceiver = false;
 		((CoreAST)app.getArgument()).accept(this); //Assumed to have pushed every argument
 
 		if (app.getFunction() instanceof Invocation) {
 			receiverType = ((Invocation)app.getFunction()).getReceiver().getType();
 		}
+
 		Arrow fnType;
-		if (receiverType != null && !isStatic)
+		if (receiverType != null && !fnIsStatic)
 			fnType = addClassToArgs((Arrow) app.getFunction().getType(), receiverType);
 		else {
 			fnType = (Arrow) app.getFunction().getType();
 		}
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandle", "invokeExact", getMethodDescription(fnType));
 		doFnInv(fnType);
-		assert frame.popStackType().equals(app.getFunction().getType());
+		Type st = frame.popStackType();
+		assert st.equals(app.getFunction().getType());
 		putFnRes(fnType);
-		isStatic = false;
+
+		Type resultType = fnType.getResult();
+
+		if (resultType instanceof ClassType || resultType instanceof TypeType)
+			isStatic = false;
+		else
+			isStatic = true;
+
 		/*
 		if (app.getFunction() instanceof Invocation && ((Invocation) app.getFunction()).getArgument() == null) {
 			Invocation funInv = (Invocation) app.getFunction();
@@ -495,6 +500,12 @@ public class MethVisitor extends BaseASTVisitor {
 			((CoreAST) receiver).accept(this);
 		if (argument instanceof CoreAST)
 			((CoreAST) argument).accept(this);
+
+		if (!isStatic) {
+			if (!(receiver.getType() instanceof ClassType) && !(receiver.getType() instanceof TypeType)) {
+				isStatic = true;
+			}
+		}
 		
 		if (argument != null) {
 			Pair<Type, Type> pair = frame.popStackTypePair();
@@ -560,6 +571,12 @@ public class MethVisitor extends BaseASTVisitor {
             mv.visitFieldInsn(PUTFIELD, jv.getCurrentTypeName(), pair.first + "$dyn", jv.getStore().getTypeName(pair.second, false));
             frame.popStackTypePair();
         }
+		for (Entry<String, TypedAST> arg : ndw.getArgs().entrySet()) {
+			mv.visitInsn(DUP);
+			((CoreAST)arg.getValue()).accept(this);
+			mv.visitFieldInsn(PUTFIELD, jv.getCurrentTypeName(), arg.getKey(),jv.getStore().getTypeName(arg.getValue().getType(), true, true));
+			assert frame.popStackType().subtype(arg.getValue().getType());
+		}
 	}
 
 	@Override
@@ -570,6 +587,8 @@ public class MethVisitor extends BaseASTVisitor {
 			isStatic = true;
 			return;
 		}
+
+		isStatic = false;
 		Type type = var.getType();
 
 		writeVariable(name, type);
@@ -659,7 +678,7 @@ public class MethVisitor extends BaseASTVisitor {
 		String anonFnName = jv.getAnonMethodName();
 		MethDeclaration anonMeth = new MethDeclaration(anonFnName, newArgs, ((Arrow)fnDef.getType()).getResult(), fnDef.getBody(), true, fnDef.getLocation());
 		jv.visit(anonMeth);
-		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), anonFnName+"$handle", "Ljava/lang/invoke/MethodHandle;");
+		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), anonFnName + "$handle", "Ljava/lang/invoke/MethodHandle;");
 		fillClosure(usedVars);
 		frame.pushStackType(fnDef.getType());
 	}

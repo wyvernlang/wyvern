@@ -529,4 +529,38 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(3));
 	}
+
+	@Test
+	public void testNewInitalizer() throws Exception {
+		String test =
+				"class Test\n" +
+				"	val t : Int\n" +
+				"	class meth create(n : Int) : Test =\n" +
+				"		new\n" +
+				"			t=n\n" +
+				"val ins : Test = Test.create(10)\n" +
+				"ins.t";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(10));
+	}
+
+	@Test
+	public void testClosures4() throws Exception {
+		String test =
+				"class Test\n" +
+						"	val t : Int\n" +
+						"	meth getFn() : Int -> Int =\n" +
+						"		fn x : Int => x + this.t\n" +
+						"	class meth create(n : Int) : Test =\n" +
+						"		new\n" +
+						"			t=n\n" +
+						"val ins : Test = Test.create(10)\n" +
+						"ins.getFn()(5)";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(15));
+	}
 }
