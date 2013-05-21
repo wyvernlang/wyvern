@@ -3,7 +3,9 @@ package wyvern.tools.typedAST.core.declarations;
 import java.util.ArrayList;
 import java.util.List;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
@@ -34,7 +36,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	private Type type;
 	private List<NameBinding> args;
 	private boolean isClassMeth;
-	
+
 	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
 		Type argType = null;
 		if (args.size() == 0) {
@@ -42,10 +44,10 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 			type = new Arrow(argType, returnType);
 		} else if (args.size() == 1) {
 			argType = args.get(0).getType();
-			type = new Arrow(argType, returnType); 
+			type = new Arrow(argType, returnType);
 		} else {
 			argType = new Tuple(args);
-			type = new Arrow(argType, returnType); 
+			type = new Arrow(argType, returnType);
 		}
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
@@ -62,7 +64,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	public String getName() {
 		return binding.getName();
 	}
-	
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// TODO: implement me
@@ -72,7 +74,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
 	}
-	
+
 	@Override
 	public Type getType() {
 		return type;
@@ -84,7 +86,11 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		for (NameBinding bind : args) {
 			extEnv = extEnv.extend(bind);
 		}
-		if (body != null) body.typecheck(extEnv); // Can be null for meth inside type!
+		if (body != null) {
+			Type bodyType = body.typecheck(extEnv); // Can be null for meth inside type!
+			if (!bodyType.subtype(((Arrow)type).getResult()))
+				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, bodyType.toString(), ((Arrow)type).getResult().toString(), this);
+		}
 		return type;
 	}
 

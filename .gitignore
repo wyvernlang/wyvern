@@ -1,1 +1,4 @@
 bin
+.idea
+tools/wyvern-tools.iml
+*.class

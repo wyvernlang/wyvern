@@ -19,6 +19,7 @@ import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.AssignableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
@@ -41,10 +42,11 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		if (nextExpr == null) {
-			return target.typecheck(env);
+			target.typecheck(env);
 		} else {
-			return nextExpr.typecheck(env);
+			nextExpr.typecheck(env);
 		}
+		return Unit.getInstance();
 	}
 
 	public TypedAST getTarget() {

@@ -362,7 +362,6 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 
 	@Override
 	public void visit(TypeDeclaration interfaceDeclaration) {
-		super.visit(interfaceDeclaration);
 		elemStack.push(new ASTElement(interfaceDeclaration,""));
 	}
 	
@@ -370,7 +369,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	public void visit(PropDeclaration propDeclaration) {
 		super.visit(propDeclaration);
 	}
-	
+
 	@Override
 	public void visit(Sequence sequence) {
 		super.visit(sequence);

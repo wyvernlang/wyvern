@@ -359,10 +359,10 @@ public class ParsingTestPhase2 {
 		Reader reader = new StringReader("class Hello\n"
 				+"	class meth make():Hello = new\n"
 				+"	var testVal:Int = 5\n"
-				+"	meth setV(n : Int):Int = this.testVal = n\n"
+				+"	meth setV(n : Int):Unit = this.testVal = n\n"
 				+"	meth getV():Int = this.testVal\n"
 				+"val h:Hello = Hello.make()\n"
-				+"val a:Int = h.setV(10)\n" 
+				+"h.setV(10)\n"
 				+"h.getV()");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
@@ -395,16 +395,15 @@ public class ParsingTestPhase2 {
 	
 	@Test
 	public void testClassMethods() {
-		Reader reader = new StringReader("class Hello\n"
-				+"\tval testVal:Int\n"
-				+"\tclass meth NewHello(v:Int):Hello = \n" +
-				"\t\tval output:Hello = new\n" +
-				"\t\t\ttestVal = v\n" +
-				"\t\toutput\n"
-				+"\tmeth getTest():Int = this.testVal\n"
-				+"\n"
-				+"val h:Hello = Hello.NewHello(10)\n"
-				+"h.getTest()");
+		Reader reader = new StringReader("class Hello\n" +
+				"   val testVal:Int\n" +
+                "   class meth NewHello(v:Int):Hello = \n" +
+				"       val output:Hello = new\n" +
+                "           testVal = v\n" +
+				"       output\n" +
+				"   meth getTest():Int = this.testVal\n" +
+				"val h:Hello = Hello.NewHello(10)\n" +
+				"h.getTest()");
 			RawAST parsedResult = Phase1Parser.parse("Test", reader);
 			
 			Environment env = Globals.getStandardEnv();

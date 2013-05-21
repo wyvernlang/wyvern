@@ -117,12 +117,12 @@ public class ClassTypeCheckerTests {
 				+"    implements Stack\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    meth pop()\n"
+				+"    meth pop() : Int\n"
 				+"        val result:Int = 42\n"
 				+"        result\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth pop () {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L meth pop () : Int {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -190,12 +190,13 @@ public class ClassTypeCheckerTests {
 				+"    val data : Int\n"
 				+"    val next : Link?\n"
 				+"\n"
-				+"    class meth Link(d:Int, n:Link?)\n"
+				+"    class meth Link(d:Int, n:Link?) : Link\n"
 				+"        new\n"
 				+"            data=d\n"
 				+"            next=n\n"
 				+"\n"
 				+"class StackImpl\n"
+				+"    implements Stack\n"
 				+"    class implements StackFactory\n"
 				+"    var top : Int?\n"
 				+"    var list : Link?\n"
@@ -204,10 +205,16 @@ public class ClassTypeCheckerTests {
 				+"\n"
 				+"    class meth StackWithFirst(firstElement : Int) : Stack\n"
 				+"        new\n"
-				+"            list = Link(firstElement, null)\n"
+				+"            list = Link(firstElement, null)\n" +
+				"    meth push(el : Int) : Unit =\n" +
+				"        this.list = Link.Link(el, this.list)\n" +
+				"    meth pop() : Int =\n" +
+				"        val old : Link = this.list\n" +
+				"        this.list = this.list.next\n" +
+				"        old.data"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class Link {$I {$L val data : Int $L} {$L val next : Link ? $L} {$L class meth Link (d : Int , n : Link ?) {$I {$L new {$I {$L data = d $L} {$L next = n $L} $I} $L} $I} $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L var list : Link ? $L} {$L class meth Stack () : Stack = new $L} {$L class meth StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link (firstElement , null) $L} $I} $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class Link {$I {$L val data : Int $L} {$L val next : Link ? $L} {$L class meth Link (d : Int , n : Link ?) : Link {$I {$L new {$I {$L data = d $L} {$L next = n $L} $I} $L} $I} $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L var list : Link ? $L} {$L class meth Stack () : Stack = new $L} {$L class meth StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link (firstElement , null) $L} $I} $L} $I} $L} {$L meth push (el : Int) : Unit = {$I {$L this . list = Link . Link (el , this . list) $L} $I} $L} {$L meth pop () : Int = {$I {$L val old : Link = this . list $L} {$L this . list = this . list . next $L} {$L old . data $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -235,10 +242,10 @@ public class ClassTypeCheckerTests {
 				+"    class implements StackFactory\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    class meth Stack() = new\n"
+				+"    class meth Stack() : StackImpl = new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L class meth Stack () = new $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L meth push (element : Int) $L} {$L meth pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L meth Stack () : Stack $L} {$L meth StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L class meth Stack () : StackImpl = new $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
