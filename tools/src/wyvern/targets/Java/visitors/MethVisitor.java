@@ -23,18 +23,14 @@ import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Tuple;
-import wyvern.tools.types.extensions.TypeType;
-import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.types.extensions.*;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
@@ -48,6 +44,7 @@ public class MethVisitor extends BaseASTVisitor {
 	private Handle bootstrap;
 	private Handle bootstrapVar;
 	private Handle bootstrapFun;
+	private Handle bootstrapVarSet;
 	
 	private Environment localEnv = Environment.getEmptyEnvironment();
 	
@@ -56,6 +53,7 @@ public class MethVisitor extends BaseASTVisitor {
 	private Type receiverType = null;
 
 	private MethodExternalContext mec = new MethodExternalContext();
+	private boolean isAssignment;
 
 
 	private Type convertClassType(Type in) {
@@ -276,6 +274,7 @@ public class MethVisitor extends BaseASTVisitor {
 		bootstrap = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrap", mt.toMethodDescriptorString());
 		bootstrapVar = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapMethHandle", mt.toMethodDescriptorString());
 		bootstrapFun = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapField", mt.toMethodDescriptorString());
+		bootstrapVarSet = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapSetField", mt.toMethodDescriptorString());
 	}
 
 	public void visitInitial(MethDeclaration md) {
@@ -515,6 +514,16 @@ public class MethVisitor extends BaseASTVisitor {
 					pair.second instanceof Int) {
 				mv.visitInsn(IADD);
 				frame.pushStackType(Int.getInstance());
+			} else if (inv.getOperationName().equals("*") &&
+						pair.first instanceof Int &&
+						pair.second instanceof Int) {
+					mv.visitInsn(IMUL);
+					frame.pushStackType(Int.getInstance());
+			} else if (inv.getOperationName().equals("/") &&
+					pair.first instanceof Int &&
+					pair.second instanceof Int) {
+				mv.visitInsn(IDIV);
+				frame.pushStackType(Int.getInstance());
 			} else {
 				throw new RuntimeException("Not implemented");
 			}
@@ -540,16 +549,31 @@ public class MethVisitor extends BaseASTVisitor {
 			//Variable, then
 			//Invokedynamic to reference
 			//Assigning in here is going to be fun
-			assert frame.popStackType() == receiver.getType();
-			String invTypeName = jv.getStore().getTypeName(convertClassType(inv.getType()), true, true);
-			pushClassType(mv, invTypeName);
-			mv.visitInvokeDynamicInsn(inv.getOperationName(),
-					"("+
-							jv.getStore().getTypeName(convertClassType(receiver.getType()),true,true)+
-					"Ljava/lang/Class;)"+ invTypeName,
-					bootstrapFun);
-			frame.pushStackType(inv.getType());
-			//throw new RuntimeException("Not implemented");
+			if (!isAssignment) {
+				assert frame.popStackType() == receiver.getType();
+				String invTypeName = jv.getStore().getTypeName(convertClassType(inv.getType()), true, true);
+				pushClassType(mv, invTypeName);
+				mv.visitInvokeDynamicInsn(inv.getOperationName(),
+						"("+
+								jv.getStore().getTypeName(convertClassType(receiver.getType()),true,true)+
+						"Ljava/lang/Class;)"+ invTypeName,
+						bootstrapFun);
+				frame.pushStackType(inv.getType());
+			} else {
+				//We need the receiver, the new value, and the type on the stack in that order
+				//The new value and the receiver are already on the stack, but in the order of value, receiver
+				frame.swap();
+				mv.visitInsn(SWAP);
+				//Now in receiver, value form
+				pushClassType(mv, jv.getStore().getTypeName(convertClassType(inv.getType()), true, true)); // class type of field
+				//Do the invocation
+				mv.visitInvokeDynamicInsn(inv.getOperationName(),
+						"("+
+								jv.getStore().getTypeName(convertClassType(receiver.getType()),true,true)+
+								"Ljava/lang/Object;Ljava/lang/Class;)V",
+						bootstrapVarSet);
+				frame.popStackTypePair(); //Pull the receiver and value off the stack
+			}
 		}
 	}
 	
@@ -652,13 +676,27 @@ public class MethVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(Assignment ass) {
 		((CoreAST)ass.getValue()).accept(this); //Assumes that the value is now on the top of the stack
+		if (ass.getTarget() instanceof Variable) {
+			int variableIndex = frame.getVariableIndex(((Variable) ass.getTarget()).getName());
+			assert frame.popStackType() == frame.getVariableType(((Variable) ass.getTarget()).getName());
 
-		int variableIndex = frame.getVariableIndex(((Variable) ass.getTarget()).getName());
+			if (ass.getValue().getType() instanceof Int)
+				mv.visitIntInsn(ISTORE, variableIndex);
+			else
+				mv.visitIntInsn(ASTORE, variableIndex);
 
-		if (ass.getValue().getType() instanceof Int)
-			mv.visitIntInsn(ISTORE, variableIndex);
-		else
-			mv.visitIntInsn(ASTORE, variableIndex);
+		} else if (ass.getTarget() instanceof Invocation) {
+			Type assType = ass.getValue().getType();
+			box(assType);
+			isAssignment = true;
+			((Invocation)ass.getTarget()).accept(this);
+			isAssignment = false;
+		}
+	}
+
+	private void box(Type assType) {
+		if (assType instanceof Int)
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;");
 	}
 
 	@Override
@@ -682,5 +720,10 @@ public class MethVisitor extends BaseASTVisitor {
 		fillClosure(usedVars);
 		frame.pushStackType(fnDef.getType());
 	}
-	//TODO: Invocation (urgh), Application (even more urgh), assignment, local variable definitions (we don't even do data flow analysis!), and so on
+
+	@Override
+	public void visit(StringConstant sc) {
+		mv.visitLdcInsn(sc.getValue());
+		frame.pushStackType(Str.getInstance());
+	}
 }

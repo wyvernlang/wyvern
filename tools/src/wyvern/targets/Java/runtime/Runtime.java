@@ -96,10 +96,31 @@ public class Runtime {
 		return target.asType(MethodType.methodType(Object.class,Object.class,Class.class)).invokeExact(receiver, cls);
 	}
 
+	public static CallSite bootstrapSetField(MethodHandles.Lookup lookup, String name, MethodType type, Object... args) throws NoSuchMethodException, IllegalAccessException {
+		InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type);
+		callSite.setTarget(MethodHandles.insertArguments(LOOKUP_SET_FIELD, 0, callSite).asType(type));
+		return callSite;
+	}
+
+	private static void lookupSetField(InliningCacheCallSite site, Object receiver, Object value, Class cls) throws Throwable {
+		MethodType type = site.type();
+		Class<?> receiverClass = receiver.getClass();
+		MethodHandle target = MethodHandles.dropArguments(site.lookup.findSetter(receiverClass, site.name, cls), 2, Class.class);
+		target = target.asType(site.type());
+		MethodHandle test = CHECK_CLASS.bindTo(receiverClass);
+		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
+
+		MethodHandle guard = MethodHandles.guardWithTest(test, target, site.getTarget());
+		site.setTarget(guard);
+
+		target.asType(MethodType.methodType(void.class,Object.class,Object.class,Class.class)).invokeExact(receiver, value, cls);
+	}
+
     private static final MethodHandle LOOKUP;
     private static final MethodHandle CHECK_CLASS;
 	private static final MethodHandle LOOKUP_METHOD_HANDLE;
 	private static final MethodHandle LOOKUP_FIELD;
+	private static final MethodHandle LOOKUP_SET_FIELD;
 
 	static {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -112,6 +133,8 @@ public class Runtime {
 					MethodType.methodType(MethodHandle.class, InliningCacheCallSite.class, Object.class));
 			LOOKUP_FIELD = lookup.findStatic(Runtime.class, "lookupField",
 					MethodType.methodType(Object.class, InliningCacheCallSite.class, Object.class, Class.class));
+			LOOKUP_SET_FIELD = lookup.findStatic(Runtime.class, "lookupSetField",
+					MethodType.methodType(void.class, InliningCacheCallSite.class, Object.class, Object.class, Class.class));
         } catch (ReflectiveOperationException e) {
             throw (AssertionError)new AssertionError().initCause(e);
         }

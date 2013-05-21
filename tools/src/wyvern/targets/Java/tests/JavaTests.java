@@ -563,4 +563,191 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(15));
 	}
+
+	@Test
+	public void testMeths5() throws Exception {
+		String test =
+				"meth mult(n:Int,m:Int):Int = n+5*m\n"
+						+"mult(3,2)\n";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(13));
+	}
+
+	@Test
+	public void testMeths6() throws Exception {
+		String test =
+				"meth double(n:Int):Int = n*2\n"
+						+"meth doublePlusOne(n:Int):Int = double(n) + 1\n"
+						+"doublePlusOne(5)\n";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(11));
+	}
+
+	@Test
+	public void testClassAndField() throws Exception {
+		String test =
+				"class Hello\n"
+						+"    class meth make():Hello\n"
+						+"    \tnew\n"
+						+"    val hiString : Str = \"hello\"\n"
+						+"\n"
+						+"val h : Hello = Hello.make()\n"//hiString: \"hi\")\n"
+						+"h.hiString";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, "hello");
+	}
+
+	@Test
+	public void testMethodClosures() throws Exception {
+		String test =
+				"meth outer(n:Int):Int -> Int\n"
+						+"    meth nested(m:Int):Int = n+m\n"
+						+"    fn x : Int => nested(x+1)\n"
+						+"val f1 : Int -> Int = outer(1)\n"
+						+"val f2 : Int -> Int = outer(2)\n"
+						+"f2(6)";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(9));
+	}
+
+	@Test
+	public void testClassAndMethods() throws Exception {
+		String test =
+				"class Hello\n"
+						+"    class meth make():Hello = new\n"
+						+"    meth get5():Int = 5\n"
+						+"\n"
+						+"val h:Hello = Hello.make()\n"
+						+"h.get5()";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(5));
+	}
+
+	@Test
+	public void testClassAndMethods2() throws Exception {
+		String test =
+				"class Hello\n"
+						+"	class meth make():Hello = new\n"
+						+"	meth get4():Int = 4\n"
+						+"	meth get5():Int = 5\n"
+						+"	meth getP():Int = this.get4()+this.get5()\n"
+						+"\n"
+						+"val h:Hello = Hello.make()\n"
+						+"h.getP()";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(9));
+	}
+
+	@Test
+	public void testClassMethodsVals() throws Exception {
+		String test =
+				"class Hello\n"
+						+"	class meth make():Hello = new\n"
+						+"	val testVal:Int = 5\n"
+						+"	meth getVal():Int = this.testVal\n"
+						+"	meth getP():Int = this.getVal()\n"
+						+"\n"
+						+"val h:Hello = Hello.make()\n"
+						+"h.getP()";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(5));
+	}
+
+	@Test
+	public void testClassMethodsVals2() throws Exception {
+		String test =
+				"class Hello\n"
+						+"	class meth make():Hello = new\n"
+						+"	val testVal:Int = 5\n"
+						+"	val testVal2:Int = 15\n"
+						+"	val testVal3:Int = 25\n"
+						+"	meth getVal():Int = this.testVal + this.testVal3/this.testVal2\n"
+						+"	meth getP():Int = this.getVal()\n"
+						+"\n"
+						+"val h : Hello = Hello.make()\n"
+						+"h.getP()";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(6));
+	}
+
+	@Test
+	public void testVarDecls() throws Exception {
+		String test =
+				"var x : Int = 1\nx";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(1));
+	}
+
+	@Test
+	public void testVarDecls2() throws Exception {
+		String test =
+				"var x:Int = 1\nx=2\nx";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(2));
+	}
+
+	@Test
+	public void testVarDecls3() throws Exception {
+		String test =
+				"var x:Int = 1\nx=2\nvar y:Int = 3\ny=4\nx=y\nx";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(4));
+	}
+
+	@Test
+	public void testVarAssignmentInClass() throws Exception {
+		String test =
+				"class Hello\n"
+						+"	class meth make():Hello = new\n"
+						+"	var testVal:Int = 5\n"
+						+"	meth setV(n : Int):Unit = this.testVal = n\n"
+						+"	meth getV():Int = this.testVal\n"
+						+"val h:Hello = Hello.make()\n"
+						+"h.setV(10)\n"
+						+"h.getV()";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(10));
+	}
+
+	@Test
+	public void testClassMethods() throws Exception {
+		String test =
+				"class Hello\n" +
+						"   val testVal:Int\n" +
+						"   class meth NewHello(v:Int):Hello = \n" +
+						"       val output:Hello = new\n" +
+						"           testVal = v\n" +
+						"       output\n" +
+						"   meth getTest():Int = this.testVal\n" +
+						"val h:Hello = Hello.NewHello(10)\n" +
+						"h.getTest()";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(10));
+	}
 }
