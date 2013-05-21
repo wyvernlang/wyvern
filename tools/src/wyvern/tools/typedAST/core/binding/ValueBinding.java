@@ -29,7 +29,7 @@ public class ValueBinding extends NameBindingImpl {
 	
 	public void setValue(Value newValue) {
 		//assert value == null;
-		assert newValue != null;
+		//assert newValue != null;
 		value = newValue;
 	}
 	

@@ -20,7 +20,7 @@ class Link
 	val data : Int
 	val next : Link?
 
-	class meth Link(d:Int, n:Link?)
+	class meth Link(d:Int, n:Link?) : Link
 		new
 			data=d
 			next=n

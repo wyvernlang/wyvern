@@ -253,7 +253,7 @@ public class JSCodegenTest {
 	@Test
 	public void testExternalMethodGeneration() {
 		TypedAST typedAST = doCompile("val http : JSObject = require(\"http\")\n" +
-									  "meth doServer(req : JSObject, resp : JSObject):Unit = resp.write(\"test\")\n" +
+									  "meth doServer(req : JSObject, resp : JSObject):JSObject = resp.write(\"test\")\n" +
 									  "http.createServer(doServer)");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -340,7 +340,7 @@ public class JSCodegenTest {
 				 "			button\n" +
 				 "				\"Press me!\"\n" +
 				 "val http : JSObject = require(\"http\")\n" +
-				 "meth doServer(req : JSObject, resp : JSObject):Unit = resp.end(htmlv)\n" +
+				 "meth doServer(req : JSObject, resp : JSObject):JSObject = resp.end(htmlv)\n" +
 				 "http.createServer(doServer).listen(8081, \"127.0.0.1\")";
 		
 		TypedAST typedAST = doCompile(testStr, Html.extend(Environment.getEmptyEnvironment()));
