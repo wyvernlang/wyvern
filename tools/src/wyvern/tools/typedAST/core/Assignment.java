@@ -43,6 +43,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	protected Type doTypecheck(Environment env) {
 		if (nextExpr == null) {
 			target.typecheck(env);
+			value.typecheck(env);
 		} else {
 			nextExpr.typecheck(env);
 		}
