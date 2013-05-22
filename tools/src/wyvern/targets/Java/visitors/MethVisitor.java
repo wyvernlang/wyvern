@@ -129,13 +129,15 @@ public class MethVisitor extends BaseASTVisitor {
 			for (int i = types.length-1; i >= 0; i--) {
 				Type t = types[i];
 				Type type = frame.popStackType();
-				assert type.subtype(t);
+				if (!type.subtype(t))
+					throw new RuntimeException();
 			}
 		} else if (arrowArgument instanceof Unit) {
 			//Nothing
 		} else {
 			Type fromStack = frame.popStackType();
-			assert arrowArgument.subtype(fromStack);
+			if (! arrowArgument.subtype(fromStack))
+				throw new RuntimeException();
 		}
 	}
 	private void putFnRes(Arrow arrow) {
@@ -644,7 +646,8 @@ public class MethVisitor extends BaseASTVisitor {
 			//Invokedynamic to reference
 			//Assigning in here is going to be fun
 			if (!isAssignment) {
-				assert frame.popStackType() == receiver.getType();
+				if (frame.popStackType() != receiver.getType())
+					throw new RuntimeException("Invariant broken");
 				String invTypeName = jv.getStore().getTypeName(convertClassType(inv.getType()), true, true);
 				pushClassType(mv, invTypeName);
 				mv.visitInvokeDynamicInsn(inv.getOperationName(),
@@ -693,7 +696,10 @@ public class MethVisitor extends BaseASTVisitor {
 			mv.visitInsn(DUP);
 			((CoreAST)arg.getValue()).accept(this);
 			mv.visitFieldInsn(PUTFIELD, jv.getCurrentTypeName(), arg.getKey(),jv.getStore().getTypeName(arg.getValue().getType(), true, true));
-			assert frame.popStackType().subtype(arg.getValue().getType());
+			Type frameType = frame.popStackType();
+
+			if (!frameType.subtype(arg.getValue().getType()))
+				throw new RuntimeException("Invariant broken");
 		}
 	}
 
@@ -731,13 +737,10 @@ public class MethVisitor extends BaseASTVisitor {
 		if (type instanceof Int) {
 			mv.visitVarInsn(ILOAD, varIdx);
 			frame.pushStackType(Int.getInstance());
-		} else if (type instanceof ClassType
-                || type instanceof TypeType
-				|| type instanceof Arrow) {
+		} else {
 			mv.visitVarInsn(ALOAD, varIdx);
 			frame.pushStackType(type);
-		}	else
-			throw new RuntimeException("Not implemented");
+		}
 	}
 	
 	@Override
@@ -772,7 +775,8 @@ public class MethVisitor extends BaseASTVisitor {
 		((CoreAST)ass.getValue()).accept(this); //Assumes that the value is now on the top of the stack
 		if (ass.getTarget() instanceof Variable) {
 			int variableIndex = frame.getVariableIndex(((Variable) ass.getTarget()).getName());
-			assert frame.popStackType() == frame.getVariableType(((Variable) ass.getTarget()).getName());
+			if (frame.popStackType() != frame.getVariableType(((Variable) ass.getTarget()).getName()))
+				throw new RuntimeException();
 
 			if (ass.getValue().getType() instanceof Int)
 				mv.visitVarInsn(ISTORE, variableIndex);
@@ -841,7 +845,8 @@ public class MethVisitor extends BaseASTVisitor {
 		for (IfExpr.IfClause clause : ifStmt.getClauses()) {
 			frame = new Frame(frame);
 			((CoreAST)clause.getClause()).accept(this); //Assumed to push a boolean value onto the stack
-			assert frame.popStackType() instanceof Bool;
+			if (!(frame.popStackType() instanceof Bool))
+				throw new RuntimeException();
 			Label end = new Label();
 			mv.visitJumpInsn(IFEQ, end);
 			((CoreAST)clause.getBody()).accept(this);
@@ -861,7 +866,8 @@ public class MethVisitor extends BaseASTVisitor {
 		Label end = new Label();
 		mv.visitLabel(conditionalPos);
 		((CoreAST)whileStatement.getConditional()).accept(this);
-		assert frame.popStackType() instanceof Bool;
+		if (!(frame.popStackType() instanceof Bool))
+			throw new RuntimeException();
 		mv.visitJumpInsn(IFEQ, end);
 		((CoreAST)whileStatement.getBody()).accept(this);
 		mv.visitJumpInsn(GOTO, conditionalPos);
