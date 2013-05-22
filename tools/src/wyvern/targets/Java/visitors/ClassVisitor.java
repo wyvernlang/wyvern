@@ -7,10 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import org.objectweb.asm.util.CheckClassAdapter;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
@@ -37,6 +39,8 @@ public class ClassVisitor extends BaseASTVisitor {
 	private List<MethDeclaration> meths = new ArrayList<MethDeclaration>();
 	private Map<String, TypedAST> initalizeFieldValues = new HashMap<String,TypedAST>();
 	private int anonMethNum = 0;
+	private org.objectweb.asm.ClassVisitor cw = null;
+	private ClassWriter writer = null;
 
 	public ClassVisitor(String typePrefix, ClassStore store) {
 		this.typePrefix = typePrefix;
@@ -55,7 +59,6 @@ public class ClassVisitor extends BaseASTVisitor {
         return context.getExternalDecls();
     }
 
-	private ClassWriter cw = null;
 
 	public String getAnonMethodName() {
 		return "func$"+anonMethNum++;
@@ -104,8 +107,10 @@ public class ClassVisitor extends BaseASTVisitor {
 		}
 
         registerClass(classDecl.getType());
-		cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS); // Makes it a LOT slower. Easier, though. TODO: Actually implement own stack/var size determination.
-		cw.visit(V1_7, 
+
+		writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES); // Makes it a LOT slower. Easier, though. TODO: Actually implement own stack/var size determination.
+		cw = new CheckClassAdapter(writer, false);
+		cw.visit(V1_7,
 				ACC_PUBLIC,
                 store.getRawTypeName(classDecl.getType()),
 				null, 
@@ -133,11 +138,14 @@ public class ClassVisitor extends BaseASTVisitor {
 		}
 		initializeMethodHandles();
 		cw.visitEnd();
-		registerClass(classDecl.getType(), cw.toByteArray());
+		registerClass(classDecl.getType(), writer.toByteArray());
 	}
 
 	private void initializeMethodHandles() {
+		if (meths.isEmpty())
+			return;
 		MethodVisitor mv = cw.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
+		mv.visitCode();
 		Label start = new Label();
 		Label exceptionBlock = new Label();
 		Label exceptionEnd = new Label();
@@ -147,15 +155,15 @@ public class ClassVisitor extends BaseASTVisitor {
 
 		mv.visitLabel(start);
 		mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;");
-		mv.visitIntInsn(ASTORE, 0);
+		mv.visitVarInsn(ASTORE, 0);
 		pushClassType(mv, store.getTypeName(currentType, true));
-		mv.visitIntInsn(ASTORE, 1);
+		mv.visitVarInsn(ASTORE, 1);
 
 		mv.visitLabel(exceptionBlock);
 
 		for (MethDeclaration md : meths) {
-			mv.visitIntInsn(ALOAD,0);
-			mv.visitIntInsn(ALOAD,1);
+			mv.visitVarInsn(ALOAD,0);
+			mv.visitVarInsn(ALOAD,1);
 			mv.visitLdcInsn(md.getName());
 			StringBuilder sb = new StringBuilder("(Ljava/lang/Class;");
 			Arrow arrow = (Arrow)md.getType();
@@ -220,7 +228,7 @@ public class ClassVisitor extends BaseASTVisitor {
 		mv.visitLabel(exceptionEnd);
 		mv.visitJumpInsn(GOTO, returnStatement);
 		mv.visitLabel(handler);
-		mv.visitIntInsn(ASTORE, 2);
+		mv.visitVarInsn(ASTORE, 2);
 		mv.visitTypeInsn(NEW, "java/lang/RuntimeException");
 		mv.visitInsn(DUP);
 		mv.visitVarInsn(ALOAD, 2);
@@ -238,7 +246,7 @@ public class ClassVisitor extends BaseASTVisitor {
 		mv.visitLdcInsn(types.length);
 		mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
 		mv.visitInsn(DUP);
-		mv.visitIntInsn(ASTORE,2);
+		mv.visitVarInsn(ASTORE,2);
 		for (Type type : types) {
 			mv.visitInsn(DUP);
 			mv.visitLdcInsn(nth);
@@ -255,7 +263,7 @@ public class ClassVisitor extends BaseASTVisitor {
 				null,
 				null);
 		mv.visitCode();
-		mv.visitIntInsn(org.objectweb.asm.Opcodes.ALOAD, 0);
+		mv.visitVarInsn(org.objectweb.asm.Opcodes.ALOAD, 0);
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(org.objectweb.asm.Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
 		MethVisitor imv = new MethVisitor(this, mv, new ArrayList<Pair<String, Type>>());

@@ -11,6 +11,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import sun.org.mozilla.javascript.internal.ast.WhileLoop;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
@@ -19,9 +20,8 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.*;
-import wyvern.tools.typedAST.core.expressions.Fn;
-import wyvern.tools.typedAST.core.expressions.New;
-import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.core.expressions.*;
+import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -151,6 +151,15 @@ public class MethVisitor extends BaseASTVisitor {
 		} else
 			mv.visitLdcInsn(org.objectweb.asm.Type.getType(descriptor));
 	}
+	private void initalizeToDefault(int idx, Type type) {
+		if (type instanceof Int) {
+			mv.visitInsn(ICONST_0);
+			mv.visitVarInsn(ISTORE, idx);
+	    } else {
+			mv.visitInsn(ACONST_NULL);
+			mv.visitVarInsn(ASTORE, idx);
+		}
+	}
 	private class ObjectType implements Type {
 		private ClassType refType;
 
@@ -177,6 +186,8 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 	}
 	private class Frame {
+		private final Frame parent;
+
 		public class VarInfo {
 			private String name;
 			private int index;
@@ -198,41 +209,80 @@ public class MethVisitor extends BaseASTVisitor {
 		private Hashtable<String, VarInfo> variableMap = new Hashtable<String, VarInfo>();
 		private int maxVar = 0;
 		private int maxStack = 0;
-		
+		private int parentPull = 0;
+		private int tvn = 0; //Number of temporary vars TODO: fix by generating stack frames
+
 		private LinkedList<Type> stackTypes = new LinkedList<Type>();
-		
+
+
+		public Frame() {
+			this.parent = null;
+		}
+		public Frame(Frame parent) {
+			this.parent = parent;
+			this.maxVar = parent.maxVar;
+			this.maxStack = parent.maxStack;
+		}
 		public boolean containsVariable(String varName) {
-			return variableMap.containsKey(varName);
+			return variableMap.containsKey(varName) ||
+					(parent != null && parent.variableMap.containsKey(varName));
+		}
+
+		private VarInfo getVarInfo(String varName) {
+			if (variableMap.containsKey(varName))
+				return variableMap.get(varName);
+			else if (parent != null && parent.variableMap.containsKey(varName))
+				return parent.variableMap.get(varName);
+			else
+				throw new RuntimeException();
+		}
+
+		private void setMaxStack(int maxStack) {
+			this.maxStack = maxStack;
+			if (parent != null)
+				parent.setMaxStack(maxStack);
+		}
+
+		private int incrMaxVar() {
+			int ret = this.maxVar++;
+			if (parent != null)
+				parent.incrMaxVar();
+			return ret;
 		}
 		
 		public int getVariableIndex(String varName) {
-			if (!variableMap.containsKey(varName))
-				throw new RuntimeException();
-			return variableMap.get(varName).getIdx();
+			return getVarInfo(varName).getIdx();
 		}
 
 		public Type getVariableType(String varName) {
-			if (!variableMap.containsKey(varName))
-				throw new RuntimeException();
-			return variableMap.get(varName).getType();
+			return getVarInfo(varName).getType();
 		}
 		
 		public void registerVariable(String varName, Type varType, Label definitionLocation) {
-			variableMap.put(varName, new VarInfo(varName, maxVar++, varType, definitionLocation));
+			variableMap.put(varName, new VarInfo(varName, incrMaxVar(), varType, definitionLocation));
 		}
 		
 		public void pushStackType(Type t) {
 			stackTypes.push(t);
-			if (stackTypes.size() > maxStack)
-				maxStack = stackTypes.size();
+			if (stackTypes.size() > maxStack) {
+				setMaxStack(stackTypes.size());
+			}
 		}
 		
 		public boolean stackEmpty() {
-			return stackTypes.isEmpty();
+			if (parent == null)
+				return stackTypes.isEmpty();
+			else
+				return stackTypes.isEmpty() && parent.stackEmpty();
 		}
 		
 		public Type popStackType() {
-			return stackTypes.pop();
+			if (!stackTypes.isEmpty())
+				return stackTypes.pop();
+			else {
+				parentPull++;
+				return parent.popStackType();
+			}
 		}
 
 		public void swap() {
@@ -244,6 +294,11 @@ public class MethVisitor extends BaseASTVisitor {
 		
 		public Pair<Type, Type> popStackTypePair() {
 			return new Pair<Type, Type>(stackTypes.pop(), stackTypes.pop());
+		}
+
+		public int getTempVarIdx(Type varType, Label definitionLocation) {
+			registerVariable("temp$$"+tvn, varType, definitionLocation);
+			return getVariableIndex("temp$$"+tvn);
 		}
 
 		public void endFrame(MethodVisitor mv) {
@@ -262,6 +317,25 @@ public class MethVisitor extends BaseASTVisitor {
 			}
 			return map;
 		}
+
+		public Frame getParent() {
+			return parent;
+		}
+	}
+
+	private void storeTopOfStack(int varIdx) {
+		Type type = frame.popStackType();
+		if (type instanceof Int)
+			mv.visitVarInsn(ISTORE, varIdx);
+		else
+			mv.visitVarInsn(ASTORE, varIdx);
+	}
+
+	private void loadByType(Type type, int varIdx) {
+		if (type instanceof Int)
+			mv.visitVarInsn(ILOAD, varIdx);
+		else
+			mv.visitVarInsn(ALOAD, varIdx);
 	}
 
 	public MethVisitor(ClassVisitor jv, MethodVisitor mv, Iterable<Pair<String, Type>> externals) {
@@ -278,6 +352,7 @@ public class MethVisitor extends BaseASTVisitor {
 	}
 
 	public void visitInitial(MethDeclaration md) {
+		mv.visitCode();
 
 		Label startLabel = new Label();
 		mv.visitLabel(startLabel);
@@ -289,7 +364,6 @@ public class MethVisitor extends BaseASTVisitor {
 			frame.registerVariable(nb.getName(), nb.getType(), startLabel);
 		}
 
-		mv.visitCode();
 		super.visit(md);
 		Type returnType = null;
 		if (!frame.stackEmpty())
@@ -299,7 +373,7 @@ public class MethVisitor extends BaseASTVisitor {
 
 		frame.endFrame(mv);
 
-		mv.visitMaxs(0, 0); //Ignored
+		mv.visitMaxs(10, 10); //Ignored
 		mv.visitEnd();
 		localEnv = localEnv.extend(new TypeBinding(md.getName(), md.getType()));
 	}
@@ -351,7 +425,7 @@ public class MethVisitor extends BaseASTVisitor {
 		mv.visitLabel(defLoc);
 		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), md.getName()+"$impl$handle", "Ljava/lang/invoke/MethodHandle;");
 		fillClosure(usedVars);
-		mv.visitIntInsn(ASTORE, frame.getVariableIndex(md.getName()));
+		mv.visitVarInsn(ASTORE, frame.getVariableIndex(md.getName()));
 	}
 
 	private void fillClosure(List<Pair<String, Type>> usedVars) {
@@ -366,10 +440,10 @@ public class MethVisitor extends BaseASTVisitor {
 				mv.visitLdcInsn(idx++);
 
 				if (frame.getVariableType(p.first) instanceof Int) {
-					mv.visitIntInsn(ILOAD, frame.getVariableIndex(p.first));
+					mv.visitVarInsn(ILOAD, frame.getVariableIndex(p.first));
 					mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;");
 				} else {
-					mv.visitIntInsn(ALOAD, frame.getVariableIndex(p.first));
+					mv.visitVarInsn(ALOAD, frame.getVariableIndex(p.first));
 				}
 				mv.visitInsn(AASTORE);
 			}
@@ -456,9 +530,9 @@ public class MethVisitor extends BaseASTVisitor {
 		
 		
 		if (type instanceof Int)
-			mv.visitIntInsn(ISTORE, frame.getVariableIndex(vd.getName()));
+			mv.visitVarInsn(ISTORE, frame.getVariableIndex(vd.getName()));
 		else
-			mv.visitIntInsn(ASTORE, frame.getVariableIndex(vd.getName()));
+			mv.visitVarInsn(ASTORE, frame.getVariableIndex(vd.getName()));
 		
 		Type outputType = vd.getType();
 		if (outputType instanceof ClassType)
@@ -477,9 +551,9 @@ public class MethVisitor extends BaseASTVisitor {
 
 
 		if (type instanceof Int)
-			mv.visitIntInsn(ISTORE, frame.getVariableIndex(vd.getName()));
+			mv.visitVarInsn(ISTORE, frame.getVariableIndex(vd.getName()));
 		else if (type instanceof ClassType)
-			mv.visitIntInsn(ASTORE, frame.getVariableIndex(vd.getName()));
+			mv.visitVarInsn(ASTORE, frame.getVariableIndex(vd.getName()));
 		else
 			throw new RuntimeException("Not implemented");
 
@@ -514,6 +588,11 @@ public class MethVisitor extends BaseASTVisitor {
 					pair.second instanceof Int) {
 				mv.visitInsn(IADD);
 				frame.pushStackType(Int.getInstance());
+			} else if (inv.getOperationName().equals("-") &&
+					pair.first instanceof Int &&
+					pair.second instanceof Int) {
+				mv.visitInsn(ISUB);
+				frame.pushStackType(Int.getInstance());
 			} else if (inv.getOperationName().equals("*") &&
 						pair.first instanceof Int &&
 						pair.second instanceof Int) {
@@ -524,6 +603,23 @@ public class MethVisitor extends BaseASTVisitor {
 					pair.second instanceof Int) {
 				mv.visitInsn(IDIV);
 				frame.pushStackType(Int.getInstance());
+			} else if (inv.getOperationName().equals(">") &&
+					pair.first instanceof Int &&
+					pair.second instanceof Int) {
+				Label truel = new Label();
+				Label end = new Label();
+				mv.visitJumpInsn(IF_ICMPGT, truel);
+				mv.visitInsn(ICONST_0);
+				mv.visitJumpInsn(GOTO, end);
+				mv.visitLabel(truel);
+				mv.visitInsn(ICONST_1);
+				mv.visitLabel(end);
+				frame.pushStackType(Bool.getInstance());
+			} else if (inv.getOperationName().equals("+") &&
+					pair.first instanceof Str &&
+					pair.second instanceof Str) {
+				mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;");
+				frame.pushStackType(Str.getInstance());
 			} else {
 				throw new RuntimeException("Not implemented");
 			}
@@ -623,7 +719,7 @@ public class MethVisitor extends BaseASTVisitor {
 			if (mec.isVarExternal(name)) {
 				Pair<Type, Integer> varInfo = mec.getExternalVar(name);
 				if (varInfo.second == MethodExternalContext.STATIC && frame.containsVariable("this")) {
-					mv.visitIntInsn(ALOAD, frame.getVariableIndex("this"));
+					mv.visitVarInsn(ALOAD, frame.getVariableIndex("this"));
 					mv.visitFieldInsn(GETFIELD, jv.getCurrentTypeName(), name+"$dyn", jv.getStore().getTypeName(type, true));
 					frame.pushStackType(type);
 					return;
@@ -635,12 +731,12 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 		int varIdx= frame.getVariableIndex(name);
 		if (type instanceof Int) {
-			mv.visitIntInsn(ILOAD, varIdx);
+			mv.visitVarInsn(ILOAD, varIdx);
 			frame.pushStackType(Int.getInstance());
 		} else if (type instanceof ClassType
                 || type instanceof TypeType
 				|| type instanceof Arrow) {
-			mv.visitIntInsn(ALOAD, varIdx);
+			mv.visitVarInsn(ALOAD, varIdx);
 			frame.pushStackType(type);
 		}	else
 			throw new RuntimeException("Not implemented");
@@ -681,9 +777,9 @@ public class MethVisitor extends BaseASTVisitor {
 			assert frame.popStackType() == frame.getVariableType(((Variable) ass.getTarget()).getName());
 
 			if (ass.getValue().getType() instanceof Int)
-				mv.visitIntInsn(ISTORE, variableIndex);
+				mv.visitVarInsn(ISTORE, variableIndex);
 			else
-				mv.visitIntInsn(ASTORE, variableIndex);
+				mv.visitVarInsn(ASTORE, variableIndex);
 
 		} else if (ass.getTarget() instanceof Invocation) {
 			Type assType = ass.getValue().getType();
@@ -725,5 +821,52 @@ public class MethVisitor extends BaseASTVisitor {
 	public void visit(StringConstant sc) {
 		mv.visitLdcInsn(sc.getValue());
 		frame.pushStackType(Str.getInstance());
+	}
+
+	@Override
+	public void visit(BooleanConstant bc) {
+		if (bc.getValue())
+			mv.visitInsn(ICONST_1);
+		else
+			mv.visitInsn(ICONST_0);
+		frame.pushStackType(Bool.getInstance());
+	}
+
+	@Override
+	public void visit(IfExpr ifStmt) {
+		Label endOfStmt = new Label();
+
+		Label tdl = new Label();
+		mv.visitLabel(tdl);
+		int tempIdx = frame.getTempVarIdx(ifStmt.getType(), tdl);
+		initalizeToDefault(tempIdx, ifStmt.getType());
+		for (IfExpr.IfClause clause : ifStmt.getClauses()) {
+			frame = new Frame(frame);
+			((CoreAST)clause.getClause()).accept(this); //Assumed to push a boolean value onto the stack
+			assert frame.popStackType() instanceof Bool;
+			Label end = new Label();
+			mv.visitJumpInsn(IFEQ, end);
+			((CoreAST)clause.getBody()).accept(this);
+			storeTopOfStack(tempIdx);
+			frame = frame.getParent();
+			mv.visitJumpInsn(GOTO, endOfStmt); //Successful
+			mv.visitLabel(end);
+		}
+		mv.visitLabel(endOfStmt);
+		loadByType(ifStmt.getType(), tempIdx);
+		frame.pushStackType(ifStmt.getType());
+	}
+
+	@Override
+	public void visit(WhileStatement whileStatement) {
+		Label conditionalPos = new Label();
+		Label end = new Label();
+		mv.visitLabel(conditionalPos);
+		((CoreAST)whileStatement.getConditional()).accept(this);
+		assert frame.popStackType() instanceof Bool;
+		mv.visitJumpInsn(IFEQ, end);
+		((CoreAST)whileStatement.getBody()).accept(this);
+		mv.visitJumpInsn(GOTO, conditionalPos);
+		mv.visitLabel(end);
 	}
 }

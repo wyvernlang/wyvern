@@ -750,4 +750,33 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(10));
 	}
+
+	@Test
+	public void testIf() throws Exception {
+		String test =
+				"if true\n" +
+				"	then\n" +
+				"		1\n" +
+				"	else\n" +
+				"		2\n";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(1));
+	}
+
+	@Test
+	public void testWhile() throws Exception {
+		String test =
+				"var x:Int = 5\n" +
+				"var y:Int = 0\n" +
+				"while x > 0\n" +
+				"	x = x-1\n" +
+				"	y = y+1\n" +
+				"y";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(5));
+	}
 }
