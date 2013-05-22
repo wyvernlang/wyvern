@@ -35,7 +35,7 @@ class StackImpl
 	meth top() : Int? = this.list.data
 
 	meth push(element : Int) : Unit
-		this.list = Link(element, this.list)
+		this.list = Link.Link(element, (this.list))
 
 	meth pop() : Int?
 		val result : Int = this.list.data

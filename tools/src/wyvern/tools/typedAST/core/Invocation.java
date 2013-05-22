@@ -49,7 +49,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		if (receiverType instanceof OperatableType) {
 			return ((OperatableType)receiverType).checkOperator(this,env);
 		} else {
-			ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, "Trying to call a function on non OperatableType!", this);
+			ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, "Trying to call a function on non OperatableType!", receiverType.toString(), this);
 			return null;
 		}
 	}
