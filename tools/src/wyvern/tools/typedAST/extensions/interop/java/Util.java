@@ -213,6 +213,12 @@ public class Util {
 	}
 
 	private static Class<?> generateJavaWrapper(ClassType toWrap, Class javaType) {
+		if (typeCache.containsKey(toWrap)) {
+			Map<Class,Class> innerMap = typeCache.get(toWrap);
+			if (innerMap.containsKey(javaType)) {
+				return innerMap.get(javaType);
+			}
+		}
 		ClassWriter cv = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		String name = toWrap.getDecl().getName() + "$imp$" + javaType.getSimpleName();
 		if (!javaType.isInterface())
@@ -295,17 +301,13 @@ public class Util {
 		cv.visitEnd();
 		byte[] bytes = cv.toByteArray();
 
-		try {
-			FileOutputStream fso = new FileOutputStream(name+".class");
-			fso.write(bytes);
-			fso.close();
-		} catch (Exception e) {
-
-		}
-
 		loader.addClass(name, bytes);
 		try {
-			return loader.loadClass(name);
+			Class<?> aClass = loader.loadClass(name);
+			if (typeCache.containsKey(aClass)) {
+				typeCache.get(aClass).put(javaType, aClass);
+			}
+			return aClass;
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Something awful happened!");
 		}
