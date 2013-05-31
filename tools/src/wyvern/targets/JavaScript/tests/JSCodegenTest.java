@@ -13,7 +13,9 @@ import org.junit.Test;
 
 import wyvern.DSL.html.Html;
 import wyvern.stdlib.Globals;
+import wyvern.targets.JavaScript.parsers.JSCastParser;
 import wyvern.targets.JavaScript.parsers.JSLoadParser;
+import wyvern.targets.JavaScript.parsers.JSVarParser;
 import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.targets.JavaScript.types.JSObjectType;
 import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
@@ -51,11 +53,20 @@ public class JSCodegenTest {
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
 		env = env.extend(new KeywordNameBinding("load", new Keyword(new JSLoadParser())));
+		env = env.extend(new KeywordNameBinding("cast", new Keyword(new JSCastParser())));
+		env = env.extend(new KeywordNameBinding("JSvar", new Keyword(new JSVarParser())));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));
 		env = env.extend(ienv);
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
+	}
+
+	private String getJS(String wyvern) {
+		TypedAST typedAST = doCompile(wyvern);
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		return visitor.getCode();
 	}
 	
 	private Object execJS(String source) {
@@ -380,6 +391,32 @@ public class JSCodegenTest {
 		String test = "while true\n" +
 						  "	1";
 		TypedAST typedAST = doCompile(test, Html.extend(Environment.getEmptyEnvironment()));
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+	}
+
+	@Test
+	public void testCast() {
+		String test =
+				"type T\n" +
+				"	meth a(i : Int) : Int\n" +
+				"val t : T = cast T in require(\"test\")\n" +
+				"t.a(15)";
+		TypedAST typedAST = doCompile(test);
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+	}
+
+	@Test
+	public void testCastAndVar() {
+		String test =
+				"type T\n" +
+						"	meth a(i : Int) : Int\n" +
+						"val t : T = cast T in JSvar external\n" +
+						"t.a(15)";
+		TypedAST typedAST = doCompile(test);
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 		String result = visitor.getCode();

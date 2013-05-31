@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Stack;
 
+import wyvern.targets.JavaScript.typedAST.JSCast;
 import wyvern.targets.JavaScript.typedAST.JSFunction;
+import wyvern.targets.JavaScript.typedAST.JSVar;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
@@ -428,5 +430,13 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 				whileStatement, 
 				"while (" + elemStack.pop().generated + ") {" 
 						+ Indent("\n" + elemStack.pop().generated)+ "\n}\n"));
+	}
+
+	public void visit(JSCast jsCast) {
+		((CoreAST)jsCast.getBody()).accept(this);
+	}
+
+	public void visit(JSVar jsVar) {
+		elemStack.push(new ASTElement(jsVar, jsVar.getName()));
 	}
 }

@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.interfaces;
 
+import wyvern.targets.JavaScript.typedAST.JSCast;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
