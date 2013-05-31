@@ -24,6 +24,10 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 		this.classEnv = decl.getClassEnv();
 	}
 
+	public ClassDeclaration getClassDecl() {
+		return decl;
+	}
+
 	@Override
 	public Type getType() {
 		return decl.getType();

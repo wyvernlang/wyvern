@@ -71,7 +71,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argVals.put(elem.getKey(), elem.getValue().evaluate(env));
 		
-		ClassObject clsObject = new ClassObject(cls);
+		ClassObject clsObject = cls.createObject();
 		return new Obj(clsObject, argVals);
 	}
 	

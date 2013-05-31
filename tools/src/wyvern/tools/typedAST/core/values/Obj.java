@@ -1,25 +1,19 @@
 package wyvern.tools.typedAST.core.values;
 
-import java.util.Map;
-
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
-import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.interfaces.Assignable;
-import wyvern.tools.typedAST.interfaces.BoundCode;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.Map;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	//private ObjectType type;
@@ -35,7 +29,11 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		for (Map.Entry<String, Value> elem : fields.entrySet())
 			this.intEnv = 
 				this.intEnv.extend(new ValueBinding(elem.getKey(), elem.getValue()));
-		
+
+	}
+
+	public ClassObject getCls() {
+		return cls;
 	}
 
 	@Override

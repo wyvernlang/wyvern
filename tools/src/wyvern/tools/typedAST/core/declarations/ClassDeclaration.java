@@ -30,7 +30,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private String implementsName; // FIXME: Should be bindings with proper equals implementation?
 	private String implementsClassName;
 	
-	private Environment declEvalEnv;
+	protected Environment declEvalEnv;
 	
 	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
@@ -198,5 +198,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public FileLocation getLocation() {
 		return location; // TODO: NOT IMPLEMENTED YET.
+	}
+
+	public ClassObject createObject() {
+		return new ClassObject(this);
 	}
 }
