@@ -1,6 +1,9 @@
 package wyvern.targets.Java.visitors;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 import wyvern.tools.types.SubtypeRelation;
@@ -168,6 +171,14 @@ public class ClassStore {
 
 		ByteClassLoader byteClassLoader = new ByteClassLoader(nc, ClassStore.class.getClassLoader());
 		return byteClassLoader;
+	}
+
+	public void writeToDirectory(String directory) throws IOException {
+		for (Pair<String, byte[]> pair : classes.values()) {
+			FileOutputStream fso = new FileOutputStream(new File(directory, pair.first+".class"));
+			fso.write(pair.second);
+			fso.close();
+		}
 	}
 
 }
