@@ -1,11 +1,32 @@
 package wyvern.DSL.deploy.types;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ben Chung
- * Date: 6/6/13
- * Time: 10:03 AM
- * To change this template use File | Settings | File Templates.
- */
-public class ArchitectureType {
+import wyvern.DSL.deploy.typedAST.architecture.Architecture;
+import wyvern.tools.types.SubtypeRelation;
+import wyvern.tools.types.Type;
+import wyvern.tools.util.TreeWriter;
+
+import java.util.HashSet;
+
+public class ArchitectureType implements Type {
+	private Architecture definition;
+
+	public ArchitectureType(Architecture definition) {
+
+		this.definition = definition;
+	}
+
+	@Override
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		return false;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
+	public boolean subtype(Type other) {
+		return false;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
+	public void writeArgsToTree(TreeWriter writer) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 }

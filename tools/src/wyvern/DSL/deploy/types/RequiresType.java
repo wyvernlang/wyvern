@@ -1,11 +1,32 @@
 package wyvern.DSL.deploy.types;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ben Chung
- * Date: 6/6/13
- * Time: 8:50 PM
- * To change this template use File | Settings | File Templates.
- */
-public class RequiresType {
+import wyvern.DSL.deploy.typedAST.architecture.properties.RequiresProperty;
+import wyvern.tools.types.SubtypeRelation;
+import wyvern.tools.types.Type;
+import wyvern.tools.util.TreeWriter;
+
+import java.util.HashSet;
+
+public class RequiresType implements Type {
+	private RequiresProperty base;
+
+	public RequiresType(RequiresProperty base) {
+
+		this.base = base;
+	}
+
+	@Override
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		return false;
+	}
+
+	@Override
+	public boolean subtype(Type other) {
+		return false;
+	}
+
+	@Override
+	public void writeArgsToTree(TreeWriter writer) {
+
+	}
 }
