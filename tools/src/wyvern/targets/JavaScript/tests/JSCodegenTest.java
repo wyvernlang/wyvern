@@ -1,8 +1,6 @@
 package wyvern.targets.JavaScript.tests;
 
 import static wyvern.tools.types.TypeUtils.arrow;
-import static wyvern.tools.types.TypeUtils.integer;
-import static wyvern.tools.types.TypeUtils.unit;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -26,16 +24,10 @@ import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.Executor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
 
 
