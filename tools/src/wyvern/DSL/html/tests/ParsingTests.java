@@ -1,7 +1,5 @@
 package wyvern.DSL.html.tests;
 
-import static wyvern.tools.types.TypeUtils.arrow;
-
 import java.io.Reader;
 import java.io.StringReader;
 
@@ -14,13 +12,10 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Str;
 
 public class ParsingTests {
 	private TypedAST doCompile(String input) {

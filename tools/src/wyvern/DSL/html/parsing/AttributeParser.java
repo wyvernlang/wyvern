@@ -18,7 +18,7 @@ public class AttributeParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+						  Pair<ExpressionSequence, Environment> ctx) {
 		HashMap<String,TypedAST> vars = new HashMap<String,TypedAST>();
 		if (ctx.first != null) {
 			if (ctx.first.getFirst() instanceof LineSequence) { // All args on individual lines.

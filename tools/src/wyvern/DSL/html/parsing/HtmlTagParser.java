@@ -1,7 +1,6 @@
 package wyvern.DSL.html.parsing;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import wyvern.DSL.html.typedAST.AttrAST;
 import wyvern.tools.errors.FileLocation;
@@ -10,8 +9,6 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.rawAST.Parenthesis;
-import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Keyword;
@@ -54,7 +51,7 @@ public class HtmlTagParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+						  Pair<ExpressionSequence, Environment> ctx) {
 		if (prefs.empty)
 			return new StringConstant(String.format("</%s>\n",prefs.tag));
 		if (ctx.first == null)
