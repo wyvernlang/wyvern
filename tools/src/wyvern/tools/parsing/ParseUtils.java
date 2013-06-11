@@ -1,6 +1,7 @@
 package wyvern.tools.parsing;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -11,6 +12,8 @@ import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -91,7 +94,39 @@ public class ParseUtils {
 			return null; // Unreachable.
 		}
 	}
-	
+
+	public static List<NameBinding> getNameBindings(Pair<ExpressionSequence, Environment> ctx) {
+		Parenthesis paren = ParseUtils.extractParen(ctx);
+		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second);
+		List<NameBinding> args = new ArrayList<NameBinding>();
+
+		while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
+			if (args.size() > 0)
+				ParseUtils.parseSymbol(",", newCtx);
+
+			String argName = ParseUtils.parseSymbol(newCtx).name;
+
+			Type argType = null;
+			if (ParseUtils.checkFirst(":", newCtx)) {
+				ParseUtils.parseSymbol(":", newCtx);
+				argType = ParseUtils.parseType(newCtx);
+			} else {
+				// What's wrong with no type for arg? Seems allowed...
+			}
+			NameBinding binding = new NameBindingImpl(argName, argType);
+			ctx.second = ctx.second.extend(binding);
+			args.add(binding);
+		}
+		return args;
+	}
+
+	public static Type parseReturnType(Pair<ExpressionSequence, Environment> ctx) {
+		Type returnType;
+		ParseUtils.parseSymbol(":", ctx);
+		returnType = ParseUtils.parseType(ctx);
+		return returnType;
+	}
+
 	public interface LazyEval<T> {
 		T eval(Environment env);
 	}
@@ -192,6 +227,15 @@ public class ParseUtils {
 			ctx.first = ctx.first.getRest();
 		}
 		return new Line(condRaw, FileLocation.UNKNOWN).accept(BodyParser.getInstance(), ctx.second);
+	}
+
+	public static Pair<Environment, ContParser> parseCondPartial(Pair<ExpressionSequence, Environment> ctx) {
+		ArrayList<RawAST> condRaw = new ArrayList<RawAST>();
+		while (ctx.first != null && !(ctx.first.getFirst() instanceof LineSequence)) {
+			condRaw.add(ctx.first.getFirst());
+			ctx.first = ctx.first.getRest();
+		}
+		return new Line(condRaw, FileLocation.UNKNOWN).accept(DeclarationParser.getInstance(), ctx.second);
 	}
 
 	public static Variable parseVariable(Pair<ExpressionSequence, Environment> ctx) {
