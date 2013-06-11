@@ -1,0 +1,84 @@
+architecture WbesArch
+	endpoint Client
+		connects Server //DI - injects an instance of Server into each Client class
+		WbesClient
+		WbesSuperClient
+	endpoint Server
+		connects many Client //No DI - each method call is passed a (potentially) unique Client
+		WbesServer
+	endpoint DBServer
+		connects many Server
+		DBWebesServer
+			alias findArticleIDByName as lookupArticleID //Creates an adapter to rename the connection
+	
+	domain Server -> DBServer
+		via SecureConnection
+			connection findArticleIDByName ( name : Str ) : ArticleID
+			connection getArticleFromDB (id : ArticleID) : Article
+			connection updateArticle (id : ArticleID, newText : Str) : Unit
+	
+	domain Client -> Server
+		via SecureConnection
+			connection authenticate(user : Str, pass : Byte[]) : Bool
+				
+			connection hasAuthenticated() : Bool
+			
+			connection isAuthorized(id : ArticleID) : Bool
+			
+			connection changePassword(newPass : Str) : Bool
+				requires hasAuthenticated() //requires requires the given method to be: a connection with the same domain and connection type, and boolean return. Checked on receiver side.
+				
+			connection modifyArticle(id : ArticleID, newText : Str) : Unit
+				requires isAuthorized(id)
+			
+			requires WebesSuperClient //Ensures that the connected is of type WebesSuperClient (Is this really needed?)
+				requires hasAuthenticated()
+					connection addNewWriter (username : Str) : Unit
+					connection deleteWriter (username : Str) : Unit
+					connection deleteArticle (id : ArticleID) : Unit
+			
+		via TCPConnection
+			connection findArticleIDByName (name : Str) : ArticleID
+			
+			connection getArticle(id : ArticleID) : Article
+		
+deployment WbesDeploy
+	architecture WbesArch
+	
+	generate
+		source
+			Client
+		target
+			Javascript
+	
+	generate
+		source
+			Server
+		target
+			NodeJS // Subclasses Javascript
+			
+	generate
+		source
+			ServerDB
+		target
+			Java
+
+class WbesClient
+	val server : Server //DI. Represents the standard interface to the server (defined by connections)
+	meth main() =
+		server.authenticate(user, pass)
+		
+class WbesSuperClient
+	val server : Server
+	...
+	
+class WbesServer
+	meth authenticate(client : Client, user : Str, pass : byte[]) : Bool =
+		//Do auth
+	
+	meth hasAuthenticated(client : Client) : Bool =
+		//Do auth
+	
+	meth changePassword(client : Client, newPass : Str) : Unit = 
+		//Change password
+		
