@@ -1,11 +1,30 @@
 package wyvern.DSL.deploy.types;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ben Chung
- * Date: 6/10/13
- * Time: 10:18 AM
- * To change this template use File | Settings | File Templates.
- */
-public class ViaType {
+import wyvern.DSL.deploy.typedAST.architecture.properties.ViaProperty;
+import wyvern.tools.types.SubtypeRelation;
+import wyvern.tools.types.Type;
+import wyvern.tools.util.TreeWriter;
+
+import java.util.HashSet;
+
+public class ViaType implements Type {
+	private ViaProperty host;
+
+	public ViaType(ViaProperty host) {
+		this.host = host;
+	}
+
+	@Override
+	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		return false;
+	}
+
+	@Override
+	public boolean subtype(Type other) {
+		return false;
+	}
+
+	@Override
+	public void writeArgsToTree(TreeWriter writer) {
+	}
 }
