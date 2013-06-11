@@ -10,6 +10,7 @@ import wyvern.tools.util.TreeWriter;
 
 public class Environment implements TreeWritable {
 	private Environment parentEnvironment;
+	private Environment extEnv = null;
 	private String name;
 	private Binding binding;
 
@@ -20,15 +21,20 @@ public class Environment implements TreeWritable {
 			this.name = binding.getName();
 	}
 
+	private Environment(Environment environment, Binding binding, Environment extEnv) {
+		this(environment, binding);
+		this.extEnv = extEnv;
+	}
+
 	public Environment extend(Binding binding) {
-		return new Environment(this, binding);
+		return new Environment(this, binding, extEnv);
 	}
 	
 	public Environment extend(Environment env) {
 		if (env.binding == null)
 			return this;
 		
-		return new Environment(extend(env.parentEnvironment), env.binding);
+		return new Environment(extend(env.parentEnvironment), env.binding, extEnv);
 	}
 
 	public static Environment getEmptyEnvironment() {
@@ -70,4 +76,12 @@ public class Environment implements TreeWritable {
 		}*/
 	}
 
+	public Environment setInternalEnv(Environment internalEnv) {
+		internalEnv.extEnv = this;
+		return internalEnv;
+	}
+
+	public Environment getExternalEnv() {
+		return extEnv;
+	}
 }
