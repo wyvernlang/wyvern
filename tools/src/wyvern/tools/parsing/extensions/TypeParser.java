@@ -7,18 +7,14 @@ import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.DeclarationParser;
-import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.parsing.ContParser.EnvironmentResolver;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -29,7 +25,7 @@ public class TypeParser implements DeclParser {
 	private static TypeParser instance = new TypeParser();
 	public static TypeParser getInstance() { return instance; }
 	
-	private class MutableTypeDeclaration extends TypeDeclaration {
+	public static class MutableTypeDeclaration extends TypeDeclaration {
 		public MutableTypeDeclaration(String name, FileLocation location) {
 			super(name, null, location);
 		}
@@ -40,7 +36,7 @@ public class TypeParser implements DeclParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String clsName = s.name;
 		FileLocation clsNameLine = s.getLocation();

@@ -3,25 +3,17 @@ package wyvern.tools.parsing.extensions;
 import java.util.ArrayList;
 import java.util.List;
 
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
-import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
-import wyvern.tools.rawAST.Line;
-import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Parenthesis;
-import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
-import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -40,7 +32,7 @@ public class MethParser implements DeclParser {
 	public static MethParser getInstance() { return instance; }
 	
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		return parse(first,ctx,null,false);
 	}
 	
@@ -59,33 +51,12 @@ public class MethParser implements DeclParser {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String methName = s.name;
 		FileLocation methNameLine = s.getLocation();
-		
-		Parenthesis paren = ParseUtils.extractParen(ctx);
-		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second); 
-		List<NameBinding> args = new ArrayList<NameBinding>();
 
-		while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
-			if (args.size() > 0)
-				ParseUtils.parseSymbol(",", newCtx);
-				
-			String argName = ParseUtils.parseSymbol(newCtx).name;
-			
-			Type argType = null;
-			if (ParseUtils.checkFirst(":", newCtx)) {
-				ParseUtils.parseSymbol(":", newCtx);
-				argType = ParseUtils.parseType(newCtx);
-			} else {
-				// What's wrong with no type for arg? Seems allowed...
-			}
-			NameBinding binding = new NameBindingImpl(argName, argType);
-			ctx.second = ctx.second.extend(binding);
-			args.add(binding);
-		}
+		List<NameBinding> args = getNameBindings(ctx);
 		
 		if (ParseUtils.checkFirst(":", ctx)) {
 			if (returnType == null) {
-				ParseUtils.parseSymbol(":", ctx);
-				returnType = ParseUtils.parseType(ctx);
+				returnType = parseReturnType(ctx);
 			}
 		} else {
 			returnType = wyvern.tools.types.extensions.Unit.getInstance();
@@ -140,8 +111,7 @@ public class MethParser implements DeclParser {
 			
 			Type argType = null;
 			if (ParseUtils.checkFirst(":", newCtx)) {
-				ParseUtils.parseSymbol(":", newCtx);
-				argType = ParseUtils.parseType(newCtx);
+				argType = parseReturnType(newCtx);
 			} else {
 				// What's wrong with no type for arg? Seems allowed...
 			}
@@ -153,8 +123,7 @@ public class MethParser implements DeclParser {
 		final Environment savedArgsEnv = argsEnv;
 		
 		if (ParseUtils.checkFirst(":", ctx)) {
-			ParseUtils.parseSymbol(":", ctx);
-			returnType = ParseUtils.parseType(ctx);
+			returnType = parseReturnType(ctx);
 		} else {
 			returnType = wyvern.tools.types.extensions.Unit.getInstance();
 		}

@@ -8,14 +8,10 @@ import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
-import wyvern.tools.typedAST.core.declarations.VarDeclaration;
-import wyvern.tools.typedAST.core.expressions.TypeInstance;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 
 public class ValParser implements DeclParser {
@@ -25,7 +21,7 @@ public class ValParser implements DeclParser {
 	
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
 		
 		if (!ParseUtils.checkFirst(":", ctx)) {

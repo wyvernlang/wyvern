@@ -16,7 +16,7 @@ public class WhileParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+						  Pair<ExpressionSequence, Environment> ctx) {
 		TypedAST conditional = ParseUtils.parseCond(ctx);
 		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.second);
 		

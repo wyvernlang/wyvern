@@ -4,15 +4,11 @@ import static wyvern.tools.parsing.ParseUtils.parseSymbol;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
-import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
-import wyvern.tools.typedAST.core.expressions.TypeInstance;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -26,7 +22,7 @@ public class PropParser implements DeclParser {
 	
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		
 		String varName = s.name;

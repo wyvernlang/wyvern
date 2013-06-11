@@ -27,7 +27,7 @@ public class FnParser implements LineParser {
 	public static FnParser getInstance() { return instance; }
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
 		ParseUtils.parseSymbol(":", ctx);
 		Type type = ParseUtils.parseType(ctx);

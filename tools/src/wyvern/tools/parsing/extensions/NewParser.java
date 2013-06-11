@@ -4,19 +4,12 @@ import java.util.HashMap;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
-import wyvern.tools.rawAST.Line;
 import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.RawAST;
-import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.core.Assignment;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.expressions.New;
-import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
@@ -32,7 +25,7 @@ public class NewParser implements LineParser {
 	public static NewParser getInstance() { return instance; }
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		HashMap<String,TypedAST> vars = new HashMap<String,TypedAST>();
 		if (ctx.first != null) {
 			if (ctx.first.getFirst() instanceof LineSequence) { // All args on individual lines.

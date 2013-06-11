@@ -3,11 +3,9 @@ package wyvern.tools.parsing.extensions;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser.EnvironmentResolver;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.DeclarationParser;
-import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -22,8 +20,6 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 
 /**
@@ -53,7 +49,7 @@ public class ClassParser implements DeclParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx) {
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		if (ParseUtils.checkFirst("meth", ctx)) { // Parses "class meth".
 			ParseUtils.parseSymbol(ctx);
 			return MethParser.getInstance().parse(first, ctx, null, true);

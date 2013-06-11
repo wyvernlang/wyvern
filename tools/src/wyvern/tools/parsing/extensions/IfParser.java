@@ -1,26 +1,18 @@
 package wyvern.tools.parsing.extensions;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.parsing.ParseUtils;
+import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.ExpressionSequence;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.expressions.IfExpr;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -99,7 +91,7 @@ public class IfParser implements LineParser {
 
 		@Override
 		public TypedAST parse(TypedAST first,
-				Pair<ExpressionSequence, Environment> ctx) {
+							  Pair<ExpressionSequence, Environment> ctx) {
 			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), env);
 			return new IfClause(clause,body,true);
 		}
@@ -113,7 +105,7 @@ public class IfParser implements LineParser {
 
 		@Override
 		public TypedAST parse(TypedAST first,
-				Pair<ExpressionSequence, Environment> ctx) {
+							  Pair<ExpressionSequence, Environment> ctx) {
 			TypedAST clause = new BooleanConstant(true);
 			if (ParseUtils.checkFirst("if",ctx)) {
 				ParseUtils.parseSymbol("if", ctx);
@@ -126,7 +118,7 @@ public class IfParser implements LineParser {
 	
 	@Override
 	public TypedAST parse(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+						  Pair<ExpressionSequence, Environment> ctx) {
 		TypedAST thenClause = ParseUtils.parseCond(ctx);
 		
 		Environment bodyEnv = Environment.getEmptyEnvironment();
