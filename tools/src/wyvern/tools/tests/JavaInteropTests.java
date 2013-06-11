@@ -2,7 +2,6 @@ package wyvern.tools.tests;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import wyvern.DSL.html.Html;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
