@@ -17,8 +17,10 @@ import wyvern.tools.rawAST.StringLiteral;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.rawAST.Unit;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -44,7 +46,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 			
 			Pair<Environment,ContParser> partiallyParsed = 
-					parseLineInt(new Pair<ExpressionSequence,Environment>((ExpressionSequence)line,env));
+					parseLineInt(new Pair<>((ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
@@ -53,13 +55,20 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 			@Override
 			public TypedAST parse(EnvironmentResolver env) {
 				LinkedList<TypedAST> seqBody = new LinkedList<TypedAST>();
-				for (ContParser cp : contParsers)
-					seqBody.add(cp.parse(env));
+				boolean isExtender = true;
+				for (ContParser cp : contParsers) {
+					TypedAST parsed = cp.parse(env);
+					seqBody.add(parsed);
+					if (!(parsed instanceof EnvironmentExtender))
+						isExtender = false;
+				}
 				
 				if (seqBody.size() == 0)
 					return seqBody.getFirst();
-				else
+				else if (!isExtender)
 					return new Sequence(seqBody);
+				else
+					return new DeclSequence(seqBody);
 			}
 		});
 	}
