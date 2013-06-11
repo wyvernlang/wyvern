@@ -119,39 +119,78 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 	
 	public Iterable<Declaration> getDeclIterator() {
+		return getIterator();
+	}
+
+	public Iterable<EnvironmentExtender> getEnvExts() {
+		return getIterator();
+	}
+
+	public <T extends TypedAST> Iterable<T> getIterator() {
 		final Iterator<TypedAST> inner = iterator();
-		return new Iterable<Declaration>() {
-			
+		return new Iterable<T>() {
+
 			@Override
-			public Iterator<Declaration> iterator() {
-				return new Iterator<Declaration>() {
+			public Iterator<T> iterator() {
+				return new Iterator<T>() {
 
 					@Override
 					public boolean hasNext() {
-						// TODO Auto-generated method stub
 						return inner.hasNext();
 					}
 
 					@Override
-					public Declaration next() {
-						// TODO Auto-generated method stub
-						return (Declaration)inner.next();
+					public T next() {
+						return (T)inner.next();
 					}
 
 					@Override
 					public void remove() {
 						inner.remove();
-						
+
 					}
 				};
 			}
-			
+
 		};
 	}
+
 	public TypedAST getLast() {
 		return exps.getLast();
 	}
 	public int size() {
 		return exps.size();
+	}
+
+	public Iterator<TypedAST> flatten() {
+		final Iterator<TypedAST> internal = this.getIterator().iterator();
+		return new Iterator<TypedAST>() {
+			private Iterator<TypedAST> flattened = null;
+			@Override
+			public boolean hasNext() {
+				return (flattened != null && flattened.hasNext()) || internal.hasNext();
+			}
+
+			@Override
+			public TypedAST next() {
+				if (flattened != null && flattened.hasNext()) {
+					return flattened.next();
+				}
+
+				TypedAST newT = internal.next();
+				if (newT instanceof Sequence) {
+					flattened = ((Sequence) newT).flatten();
+					if (flattened.hasNext())
+						return flattened.next();
+				}
+
+				return newT;  //To change body of implemented methods use File | Settings | File Templates.
+			}
+
+			@Override
+			public void remove() {
+				throw new RuntimeException();
+			}
+		};
 	}
 }

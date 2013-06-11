@@ -13,12 +13,12 @@ import wyvern.tools.types.Type;
 
 public class DeclSequence extends Sequence implements EnvironmentExtender {
 	
-	public DeclSequence(final Iterable<Declaration> first) {
+	public DeclSequence(final Iterable first) {
 		super(new Iterable<TypedAST>() {
 
 			@Override
 			public Iterator<TypedAST> iterator() {
-				final Iterator<Declaration> iter = first.iterator();
+				final Iterator<EnvironmentExtender> iter = first.iterator();
 				return new Iterator<TypedAST>() {
 
 					@Override
@@ -35,17 +35,14 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 					public void remove() {
 						iter.remove();
 					}
-					
+
 				};
 			}
-			
+
 		});
 		
 	}
 
-	public DeclSequence(Declaration decl) {
-		super(decl);
-	}
 
 	public DeclSequence(final Sequence declAST) {
 		super(new Iterable<TypedAST>() {
@@ -75,12 +72,17 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			
 		});
 	}
-	
+
+	public DeclSequence(Declaration decl) {
+		super(decl);
+	}
+
+
 	@Override
 	public Type typecheck(Environment env) {
-		for (Declaration d : this.getDeclIterator())
-			env = ((Declaration) d).extend(env);
-		for (Declaration d : this.getDeclIterator()) {
+		for (TypedAST d : this)
+			env = ((EnvironmentExtender) d).extend(env);
+		for (TypedAST d : this) {
 			d.typecheck(env);
 		}
 		
@@ -126,7 +128,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 
 	public final Environment extend(Environment old) {
 		Environment newEnv = old;
-		for (Declaration d : this.getDeclIterator())
+		for (EnvironmentExtender d : this.getEnvExts())
 			newEnv = d.extend(newEnv);
 		return newEnv;
 	}

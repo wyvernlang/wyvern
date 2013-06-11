@@ -38,22 +38,26 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 	private boolean isClassMeth;
 
 	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
-		Type argType = null;
-		if (args.size() == 0) {
-			argType = Unit.getInstance();
-			type = new Arrow(argType, returnType);
-		} else if (args.size() == 1) {
-			argType = args.get(0).getType();
-			type = new Arrow(argType, returnType);
-		} else {
-			argType = new Tuple(args);
-			type = new Arrow(argType, returnType);
-		}
+		type = getMethodType(args, returnType);
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
 		this.args = args;
 		this.isClassMeth = isClassMeth;
 		this.location = location;
+	}
+
+	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
+		Type argType = null;
+		if (args.size() == 0) {
+			argType = Unit.getInstance();
+			return new Arrow(argType, returnType);
+		} else if (args.size() == 1) {
+			argType = args.get(0).getType();
+			return new Arrow(argType, returnType);
+		} else {
+			argType = new Tuple(args);
+			return new Arrow(argType, returnType);
+		}
 	}
 
 	public boolean isClassMeth() {

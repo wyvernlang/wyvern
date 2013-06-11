@@ -66,14 +66,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		
 		Environment genv = env.extend(new TypeBinding("class", typeBinding.getType()));
 		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
-		
-		for (Declaration decl : decls.getDeclIterator()) {
-			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth())
-				decl.typecheckSelf(genv);
-			else
-				decl.typecheckSelf(oenv);
-			
-		}
+
+		if (decls != null)
+			for (Declaration decl : decls.getDeclIterator()) {
+				if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth())
+					decl.typecheckSelf(genv);
+				else
+					decl.typecheckSelf(oenv);
+
+			}
 		
 		// check the implements and class implements
 		if (!this.implementsName.equals("")) {

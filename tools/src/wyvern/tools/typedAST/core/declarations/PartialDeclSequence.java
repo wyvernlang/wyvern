@@ -9,6 +9,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -20,7 +21,7 @@ public class PartialDeclSequence {
 	
 	private LinkedList<PartialDecl> decls = new LinkedList<PartialDecl>();
 	
-	private LinkedList<Declaration> fullDecls = new LinkedList<Declaration>();
+	private LinkedList<EnvironmentExtender> fullDecls = new LinkedList<>();
 	
 	public PartialDeclSequence () {
 	}
@@ -35,7 +36,8 @@ public class PartialDeclSequence {
 	
 	public Pair<TypedAST,Environment> resolve(Environment env) {
 		for (PartialDecl decl : decls) {
-			fullDecls.addFirst((Declaration) decl.getAST(env));
+			TypedAST ast = decl.getAST(env);
+			fullDecls.addFirst((EnvironmentExtender) ast);
 		}
 		DeclSequence declseq = new DeclSequence(fullDecls);
 		decls = null;
