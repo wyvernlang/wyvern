@@ -26,8 +26,8 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		if (rest instanceof TupleObject) {
 			objects = new TypedAST[((TupleObject) rest).objects.length + 1];
 			objects[0] = first;
-			for (int i = 0; i < ((TupleObject) rest).objects.length; i++) {
-				objects[i] = ((TupleObject) rest).objects[i];
+			for (int i = 1; i < ((TupleObject) rest).objects.length + 1; i++) {
+				objects[i] = ((TupleObject) rest).objects[i-1];
 			}
 		} else {
 			this.objects = new TypedAST[] { first, rest };

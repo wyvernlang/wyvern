@@ -173,7 +173,22 @@ public class ParsingTestPhase2 {
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(13)", resultValue.toString());
 	}
-	
+
+	@Test
+	public void test3TupleMethodCalls() {
+		Reader reader = new StringReader(
+				"meth testTuple1(a:Int, b:Int, c:Int):Int = a\n"
+				+"testTuple1(3,2,1)\n");
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(3)", resultValue.toString());
+	}
+
+
 	@Test
 	public void testMutuallyRecursiveMethods() {
 		Reader reader = new StringReader("meth double(n:Int):Int = n*2\n"
