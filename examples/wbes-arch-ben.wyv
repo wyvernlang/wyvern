@@ -1,18 +1,18 @@
-architecture WbesArch
-	endpoint Client
+architecture WbesArch //Defines a new architecture
+	endpoint Client 
+		//Defines a location that requests begin and end at.
+		//An endpoint is transformed into a Type that implements all of the receiver interfaces
+		//This type is either subclassed for objects receiving, or is converted into an adapter class to preform RMI
+		//on the transmit side
 		connects Server //DI - injects an instance of Server into each Client class
-		WbesClient
-		WbesSuperClient
 	endpoint Server
 		connects many Client //No DI - each method call is passed a (potentially) unique Client
-		WbesServer
 	endpoint DBServer
-		connects many Server
-		DBWebesServer
-			alias findArticleIDByName as lookupArticleID //Creates an adapter to rename the connection
+		connects many Server 
 	
-	domain Server -> DBServer
-		via SecureConnection
+	domain Server -> DBServer //Defines which endpoints are connected
+		via SecureConnection //Which type of connection to use
+			//These connections inherit Server->DBServer and via SecureConnection
 			connection findArticleIDByName ( name : Str ) : ArticleID
 			connection getArticleFromDB (id : ArticleID) : Article
 			connection updateArticle (id : ArticleID, newText : Str) : Unit
@@ -26,7 +26,9 @@ architecture WbesArch
 			connection isAuthorized(id : ArticleID) : Bool
 			
 			connection changePassword(newPass : Str) : Bool
-				requires hasAuthenticated() //requires requires the given method to be: a connection with the same domain and connection type, and boolean return. Checked on receiver side.
+				requires hasAuthenticated() 
+				//requires requires the given method to be: a connection with the same domain and connection type, and boolean return. 
+				//Checked on receiver side.
 				
 			connection modifyArticle(id : ArticleID, newText : Str) : Unit
 				requires isAuthorized(id)
@@ -41,38 +43,17 @@ architecture WbesArch
 			connection findArticleIDByName (name : Str) : ArticleID
 			
 			connection getArticle(id : ArticleID) : Article
-		
-deployment WbesDeploy
-	architecture WbesArch
-	
-	generate
-		source
-			Client
-		target
-			Javascript
-	
-	generate
-		source
-			Server
-		target
-			NodeJS // Subclasses Javascript
-			
-	generate
-		source
-			ServerDB
-		target
-			Java
 
-class WbesClient
+class WbesClient : Client 
 	val server : Server //DI. Represents the standard interface to the server (defined by connections)
 	meth main() =
 		server.authenticate(user, pass)
 		
-class WbesSuperClient
+class WbesSuperClient : Client
 	val server : Server
 	...
 	
-class WbesServer
+class WbesServer : Server
 	meth authenticate(client : Client, user : Str, pass : byte[]) : Bool =
 		//Do auth
 	
@@ -81,4 +62,7 @@ class WbesServer
 	
 	meth changePassword(client : Client, newPass : Str) : Unit = 
 		//Change password
+
+class WbesDBServer : DBServer
+	...
 		
