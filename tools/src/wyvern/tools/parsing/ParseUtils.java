@@ -137,7 +137,7 @@ public class ParseUtils {
 		while (ctx.first != null && isArrowOperator(ctx.first.getFirst())) {
 			ctx.first = ctx.first.getRest();
 			final LazyEval<Type> ctype = type;
-			final LazyEval<Type> argument = parsePartialSimpleType(ctx);
+			final LazyEval<Type> argument = parsePartialType(ctx);
 			type = new LazyEval<Type>() {
 
 				@Override
@@ -153,10 +153,10 @@ public class ParseUtils {
 
 	public static Type parseType(Pair<ExpressionSequence, Environment> ctx) {
 		Type type = parseSimpleType(ctx);
-		
+
 		while (ctx.first != null && isArrowOperator(ctx.first.getFirst())) {
 			ctx.first = ctx.first.getRest();
-			Type argument = parseSimpleType(ctx);
+			Type argument = parseType(ctx);
 			type = new Arrow(type, argument);
 		}
 		
