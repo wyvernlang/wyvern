@@ -36,10 +36,20 @@ public class Tuple extends AbstractTypeImpl {
 	public String toString() {
 		StringBuilder builder = new StringBuilder(types.length + 2);
 		
-		if (types.length > 1)
+		if (types.length > 1) {
+			if (!types[0].isSimple())
+				builder.append('(');
 			builder.append(types[0].toString());
+			if (!types[0].isSimple())
+				builder.append(')');
+		}
 		for (int i = 1; i < types.length; i++) {
-			builder.append("*" + types[i].toString());
+			builder.append('*');
+			if (!types[0].isSimple())
+				builder.append('(');
+			builder.append(types[i].toString());
+			if (!types[0].isSimple())
+				builder.append(')');
 		}
 		return builder.toString();
 	}
@@ -53,7 +63,7 @@ public class Tuple extends AbstractTypeImpl {
 			return false;
 		
 		for (int i = 0; i < types.length; i++) {
-			if (((Tuple)otherT).types[i] != types[i])
+			if (!(((Tuple)otherT).types[i].equals(types[i])))
 				return false;
 		}
 		return true;
@@ -74,4 +84,10 @@ public class Tuple extends AbstractTypeImpl {
 		
 		return super.subtype(other, subtypes);
 	}
+	
+	@Override
+	public boolean isSimple() {
+		return false;
+	}
+
 }

@@ -36,4 +36,8 @@ public abstract class AbstractTypeImpl implements Type {
 	public boolean subtype(Type other) {
 		return this.subtype(other, new HashSet<SubtypeRelation>());
 	}
+	
+	public boolean isSimple() {
+		return true; // default is correct for most types
+	}
 }

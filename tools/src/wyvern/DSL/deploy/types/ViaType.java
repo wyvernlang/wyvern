@@ -27,4 +27,9 @@ public class ViaType implements Type {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 	}
+	@Override
+	public boolean isSimple() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

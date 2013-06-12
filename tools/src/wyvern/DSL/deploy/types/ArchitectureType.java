@@ -29,4 +29,9 @@ public class ArchitectureType implements Type {
 	public void writeArgsToTree(TreeWriter writer) {
 		//To change body of implemented methods use File | Settings | File Templates.
 	}
+	@Override
+	public boolean isSimple() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

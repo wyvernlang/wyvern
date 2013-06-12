@@ -29,4 +29,9 @@ public class RequiresType implements Type {
 	public void writeArgsToTree(TreeWriter writer) {
 
 	}
+	@Override
+	public boolean isSimple() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

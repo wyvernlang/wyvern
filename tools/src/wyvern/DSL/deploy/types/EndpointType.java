@@ -33,4 +33,9 @@ public class EndpointType implements Type {
 	public Endpoint getEndpoint() {
 		return endpoint;
 	}
+	@Override
+	public boolean isSimple() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

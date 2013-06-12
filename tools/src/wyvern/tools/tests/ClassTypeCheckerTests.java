@@ -334,7 +334,7 @@ public class ClassTypeCheckerTests {
 		try {
 			typedAST.typecheck(env);
 		} catch (ToolError e) {
-			Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument to function does not match function type on line number Unknown:-1,-1", e.toString());
+			Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument type Str does not match formal argument type Int on line number Unknown:-1,-1", e.toString());
 			return;
 		}
 		Assert.fail("Expected Wyvern compiler to detect error!");

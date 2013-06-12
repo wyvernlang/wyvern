@@ -2,7 +2,7 @@ package wyvern.tools.errors;
 
 public enum ErrorMessage {
 	// Type errors
-	ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument to function does not match function type", 0),
+	ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument type %ARG does not match formal argument type %ARG", 2),
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
 	TYPE_CANNOT_BE_ASSIGNED("Type %ARG cannot assigned to a value after initalization", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),

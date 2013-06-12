@@ -39,4 +39,9 @@ public class UnresolvedType implements Type {
 	public boolean subtype(Type other) {
 		return this.subtype(other, new HashSet<SubtypeRelation>());
 	}
+
+	@Override
+	public boolean isSimple() {
+		return true;
+	}
 }

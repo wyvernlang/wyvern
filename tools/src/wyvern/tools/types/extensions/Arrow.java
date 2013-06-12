@@ -34,7 +34,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	public Type checkApplication(Application application, Environment env) {
 		Type actualType = application.getArgument().typecheck(env);
 		if (!actualType.subtype(argument))
-			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application);
+			reportError(ACTUAL_FORMAL_TYPE_MISMATCH,actualType.toString(),argument.toString(), application);
 		return result;
 	}
 	
@@ -46,7 +46,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	@Override
 	public String toString() {
 		String argString = (argument == null)?null:argument.toString();
-		if (argument instanceof Arrow)
+		if (!argument.isSimple())
 			argString = "(" + argString + ")";
 		return argString + " -> " + result;
 	}
@@ -78,5 +78,9 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 		} else {
 			return false;
 		}
+	}
+	@Override
+	public boolean isSimple() {
+		return false;
 	}
 }

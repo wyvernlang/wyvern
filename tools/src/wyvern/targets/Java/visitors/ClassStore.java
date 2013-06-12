@@ -29,6 +29,12 @@ public class ClassStore {
 		public void writeArgsToTree(TreeWriter writer) {
 			//To change body of implemented methods use File | Settings | File Templates.
 		}
+
+		@Override
+		public boolean isSimple() {
+			// TODO Auto-generated method stub
+			return true;
+		}
 	}
     private class GenericClassType implements Type {
         public final Type parent;
@@ -52,6 +58,11 @@ public class ClassStore {
         @Override
         public void writeArgsToTree(TreeWriter writer) {
         }
+		@Override
+		public boolean isSimple() {
+			// TODO Auto-generated method stub
+			return true;
+		}
     }
 	private static class ByteClassLoader extends ClassLoader {
 		private final Map<String, byte[]> extraClassDefs;

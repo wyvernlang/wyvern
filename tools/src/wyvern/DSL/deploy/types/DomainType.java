@@ -32,4 +32,9 @@ public class DomainType implements Type {
 	public DomainProperty getDomain() {
 		return source;
 	}
+	@Override
+	public boolean isSimple() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

@@ -184,6 +184,11 @@ public class MethVisitor extends BaseASTVisitor {
 		public boolean subtype(Type other) {
 			return false;
 		}
+		@Override
+		public boolean isSimple() {
+			// TODO Auto-generated method stub
+			return true;
+		}
 	}
 	private class Frame {
 		private final Frame parent;

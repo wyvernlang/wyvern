@@ -41,4 +41,9 @@ public class ConnectionType implements Type {
 	public Arrow getArrow() {
 		return connSig;
 	}
+	@Override
+	public boolean isSimple() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
