@@ -170,13 +170,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		LineParser parser = first.getLineParser();
 		ExpressionSequence rest = node.getRest();
 		ctx.first = rest;
-		
-		if (ParseUtils.checkFirst(",", ctx)) {
-			FileLocation commaLine = ParseUtils.parseSymbol(",",ctx).getLocation();
-			TypedAST remaining = parseAtomicExpr(ctx);
-			first = new TupleObject(first, remaining, commaLine); // FIXME: should be: remaining.getLine());
-		}
-		
+
 		if (parser == null)
 			return first;
 		
@@ -286,6 +280,18 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		
 		return ast;
 	}
+
+	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx) {
+		TypedAST ast = parseEquals(ctx);
+
+		while (ctx.first != null && ParseUtils.checkFirst(",", ctx)) {
+			FileLocation commaLine = ParseUtils.parseSymbol(",",ctx).getLocation();
+			TypedAST remaining = parseTuple(ctx);
+			ast = new TupleObject(ast, remaining, commaLine);
+		}
+
+		return ast;
+	}
 	
 	private boolean isProductOperator(RawAST operatorNode) {
 		if (!(operatorNode instanceof Symbol))
@@ -339,7 +345,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
-		TypedAST result = parseEquals(ctx); // Start trying with the lowest precedence operator.
+		TypedAST result = parseTuple(ctx); // Start trying with the lowest precedence operator.
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.first.getFirst()!=null)?ctx.first.getFirst().toString():null, ctx.first);
 		return result;
