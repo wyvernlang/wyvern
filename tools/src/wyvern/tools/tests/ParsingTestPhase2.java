@@ -188,6 +188,23 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("IntegerConstant(3)", resultValue.toString());
 	}
 
+	@Test
+	public void testObjRefInTuple() {
+		Reader reader = new StringReader(
+				"class T\n" +
+						"	class meth create() : T = new\n" +
+						"	meth get1():Int = 1\n" +
+						"meth testTuple1(a:Int, b:Int, c:Int):Int = a+b+c\n"
+						+"testTuple1(3,T.create().get1(),1)\n");
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Type resultType = typedAST.typecheck(env);
+		Assert.assertEquals(Int.getInstance(), resultType);
+		Value resultValue = typedAST.evaluate(env);
+		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
+	}
+
 
 	@Test
 	public void testMutuallyRecursiveMethods() {
