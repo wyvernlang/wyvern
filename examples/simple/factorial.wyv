@@ -1,0 +1,9 @@
+meth factorial(n:Int):Int
+    if n==1
+        then
+            n
+        else
+            n * factorial(n-1)
+
+print("The factorial of 5 is:")			
+printInteger(factorial(5))

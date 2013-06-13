@@ -1,0 +1,54 @@
+/**
+ * A simple integer list abstraction, with functional abstractions for computation
+ */
+
+type IntList
+	meth isEmpty():Bool
+	meth forEach(f:Int -> Unit):Unit
+	meth reduce(identity:Int, f:Int -> (Int -> Int)):Int // hack: fix associativity
+	
+class Cons
+	implements IntList // do we want this to be indented?
+	
+	var v:Int
+	var n:IntList
+	
+	meth isEmpty():Bool = false
+	meth forEach(f:Int -> Unit):Unit =
+		f(this.v)
+		this.n.forEach(f)
+	meth reduce(identity:Int, f:Int -> (Int -> Int)):Int =
+		val nextResult : Int = this.n.reduce(identity,f)
+		f(this.v)(nextResult)
+	
+	class meth make(value:Int,next:IntList):IntList =
+		new
+			v = value
+			n = next
+	
+
+class Nil
+	implements IntList
+	meth isEmpty():Bool = true
+	meth forEach(f:Int -> Unit):Unit = ()
+	meth reduce(identity:Int, f:Int -> (Int -> Int)):Int = identity
+	class meth make():IntList = new
+	
+val nil : IntList = Nil.make()
+
+meth printBoolean(b:Bool):Unit =
+	if b
+		then
+			print("true")
+		else
+			print("false")
+	
+// Test code
+
+val noLink : IntList = Nil.make()
+val aLink : IntList = Cons.make(2, noLink)
+val aLink2 : IntList = Cons.make(1, aLink)
+aLink2.forEach(fn x:Int => printInteger(x))
+printInteger(aLink2.reduce(0,fn x:Int => fn y:Int => x+y))
+printBoolean(noLink.isEmpty())
+printBoolean(aLink2.isEmpty())
