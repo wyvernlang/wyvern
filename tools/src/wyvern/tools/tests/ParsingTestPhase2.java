@@ -539,4 +539,15 @@ public class ParsingTestPhase2 {
 		Assert.assertEquals("Int",result.typecheck(env).toString());
 		Assert.assertEquals("IntegerConstant(5)", result.evaluate(env).toString());
 	}
+
+	@Test
+	public void testArrow() {
+		Reader reader = new StringReader(
+				"meth m1(f:Int -> Int -> Int):Int = f(0)(0)");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		result.typecheck(env);
+	}
 }
