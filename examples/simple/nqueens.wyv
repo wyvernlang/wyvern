@@ -21,9 +21,7 @@ class Position
 type PositionList
 	meth isEmpty():Bool
 	meth forEach(f:Position -> Unit):Unit
-
-	// hack: fix associativity
-	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool
+	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> Bool -> Bool):Bool
 
 class Cons
 	implements PositionList // do we want this to be indented?
@@ -35,7 +33,7 @@ class Cons
 	meth forEach(f:Position -> Unit):Unit =
 		f(this.v)
 		this.n.forEach(f)
-	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool =
+	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> Bool -> Bool):Bool =
 		val nextResult : Bool = this.n.reduce(identity,f,c)
 		c(f(this.v))(nextResult)
 	
@@ -49,7 +47,7 @@ class Nil
 	
 	meth isEmpty():Bool = true
 	meth forEach(f:Position -> Unit):Unit = ()
-	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool = identity
+	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> Bool -> Bool):Bool = identity
 	class meth make():PositionList = new
 	
 val nil : PositionList = Nil.make()
@@ -74,9 +72,9 @@ meth isSafe(board:PositionList, row:Int, col:Int):Bool =
 		val isUnsafe : Bool = (row == pos.row) || (row == pos.row + delta) || (row == pos.row - delta)
 		not(isUnsafe)
 		
-	// TODO: refactor to a meth, and use a product type for the argument instead of currying
+	// TODO: refactor to a meth, and use a product type for the argument instead of currying?
 	// TODO: just use && as the function
-	val combine : Bool -> (Bool -> Bool) =
+	meth combine : Bool -> Bool -> Bool =
 		fn b1:Bool => fn b2:Bool => b1 && b2
 		
 	board.reduce(true, isSafeWith, combine)

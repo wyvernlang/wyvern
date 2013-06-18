@@ -4,6 +4,8 @@ View this document with tabs set to 4 characters.
 To compile Wyvern, use Java 7 and JUnit 4.  Eclipse version
 4.2 works, earlier versions may not.  
 
+To run Wyvern from the command line, make sure Java 7 is on your path.  Add wyvern\tools\bin to your CLASSPATH, and run "java wyvern.tools.interpreter.Interpreter filename.wyv"
+
 
 PACKAGE DESCRIPTIONS
 
