@@ -208,9 +208,14 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		super.visit(new1);
 		
 		if (new1.getArgs().isEmpty())
-			elemStack.push(new ASTElement(new1, "new "+new1.getClassDecl().getName()+"()"));
+			if (!new1.isGeneric())
+				elemStack.push(new ASTElement(new1, "new "+new1.getClassDecl().getName()+"()"));
+			else
+				elemStack.push(new ASTElement(new1, "{}"));
 		else {
-			StringBuilder body = new StringBuilder("\nthis.__proto__ = new "+new1.getClassDecl().getName()+"();");
+			StringBuilder body = new StringBuilder();
+			if (!new1.isGeneric())
+				body.append("\nthis.__proto__ = new "+new1.getClassDecl().getName()+"();");
 			
 			int setSize = new1.getArgs().size();
 			String[] reverser = new String[setSize];

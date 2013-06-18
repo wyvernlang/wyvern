@@ -32,6 +32,7 @@ import wyvern.tools.util.TreeWriter;
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
+	boolean isGeneric = false;
 
 	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
 	private static int generic_num = 0;
@@ -69,6 +70,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			return classVarType;
 		} else { // Standalone
+			isGeneric = true;
 			LinkedList<Declaration> decls = new LinkedList<>();
 
 			for (Map.Entry<String, TypedAST> elem : args.entrySet()) {
@@ -118,5 +120,9 @@ public class New extends CachingTypedAST implements CoreAST {
 	@Override
 	public FileLocation getLocation() {
 		return location; 
+	}
+
+	public boolean isGeneric() {
+		return isGeneric;
 	}
 }

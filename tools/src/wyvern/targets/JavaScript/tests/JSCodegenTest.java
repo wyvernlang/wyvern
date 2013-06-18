@@ -460,4 +460,38 @@ public class JSCodegenTest {
 
 		Assert.assertEquals(2680.0, wrapInvoke(result));
 	}
+
+	@Test
+	public void testGenericNew() {
+		String test = (
+				"val test = new");
+
+		TypedAST typedAST = doCompile(test);
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+	}
+
+	@Test
+	public void testGenericNew2() {
+		String test = (
+				"val test = new\n" +
+						"	x = 2\n");
+		TypedAST typedAST = doCompile(test);
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+	}
+	@Test
+	public void testGenericNew3() {
+		String test = (
+				"val test = new\n" +
+						"	x = 2\n" +
+						"test.x");
+		TypedAST typedAST = doCompile(test);
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)typedAST).accept(visitor);
+		String result = visitor.getCode();
+		Assert.assertEquals(2, wrapInvoke(result));
+	}
 }
