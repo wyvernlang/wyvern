@@ -20,7 +20,7 @@ public class Symbol implements RawAST {
 		if (!(other instanceof Symbol))
 			return false;
 		Symbol otherData = (Symbol) other; 
-		return otherData.name==name;
+		return otherData.name.equals(name);
 	}
 	
 	@Override

@@ -45,6 +45,8 @@ import wyvern.tools.types.extensions.Int;
 import wyvern.tools.util.Pair;
 
 public class JSCodegenVisitor extends BaseASTVisitor {
+	private boolean remapThis;
+
 	private class ASTElement {
 		public String generated;
 		public CoreAST elem;
@@ -69,7 +71,8 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	}
 	
 	Stack<ASTElement> elemStack = new Stack<ASTElement>();
-	boolean inClass = false, inBody = false;
+	Stack<Boolean> inClassStack = new Stack<>();
+	boolean inClass = false, inBody = false, inMeth = false;
 	String className = null;
 	
 	private boolean isInfix(String operator) {
@@ -83,6 +86,8 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 			case ">=":return true;
 			case "<=":return true;
 			case "==":return true;
+			case "&&":return true;
+			case "||":return true;
 			case "!=":return true;
 			default: return false;
 		}
@@ -225,14 +230,14 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(ClassDeclaration clsDeclaration) {
 		DeclSequence decls = clsDeclaration.getDecls();
-		
-		boolean lic = inClass;
+
 		String oldClassName = className;
+		inClassStack.push(inClass);
 		inClass = true;
 		className = clsDeclaration.getName();
 		((CoreAST)decls).accept(this);
 		className = oldClassName;
-		inClass = lic;
+		inClass = inClassStack.pop();
 		
 		
 		if (clsDeclaration.getNextDecl() != null)
@@ -271,20 +276,42 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 
 	@Override
 	public void visit(MethDeclaration meth) {
+		inClassStack.push(inClass);
+		boolean sInMeth = inMeth;
+		remapThis = sInMeth;
+		inMeth = true;
+		inClass = false;
 		super.visit(meth);
+		inClass = inClassStack.pop();
+		inMeth = sInMeth;
+		remapThis = sInMeth;
 		
 
 		ASTElement nextMethElem = (meth.getNextDecl() != null) ? elemStack.pop() : null;
 		
 		StringBuilder methodDecl = new StringBuilder();
-		if (!inClass)
-			methodDecl.append("function " + meth.getName() + "(");
-		else
-			if (!meth.isClassMeth())
-				methodDecl.append(className+".prototype."+meth.getName()+" = function(");
+		if (inMeth) {
+			methodDecl.append("var "+meth.getName() + " = (function (");
+			putMethBody(meth, methodDecl);
+			methodDecl.append(").bind(this);");
+		} else {
+
+			if (!inClass)
+				methodDecl.append("function " + meth.getName() + "(");
 			else
-				methodDecl.append(className+"."+meth.getName()+" = function(");
-		
+				if (!meth.isClassMeth())
+					methodDecl.append(className+".prototype."+meth.getName()+" = function(");
+				else
+					methodDecl.append(className+"."+meth.getName()+" = function(");
+
+			putMethBody(meth, methodDecl);
+		}
+
+		String nextMethText = (nextMethElem == null)? "" : "\n" + nextMethElem.generated;
+		elemStack.push(new ASTElement(meth, methodDecl.toString() + nextMethText));
+	}
+
+	private void putMethBody(MethDeclaration meth, StringBuilder methodDecl) {
 		boolean first = true;
 		for (NameBinding binding : meth.getArgBindings()) {
 			if (!first)
@@ -293,23 +320,20 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 			first = false;
 		}
 		methodDecl.append(") {");
-		ASTElement elem = elemStack.pop();
-		
-		
-		//TODO: Quick hack to get it working
-		if (elem.elem instanceof Sequence)
-			methodDecl.append(Indent("\n"+elem.generated));
-		else {
-			methodDecl.append(Indent("\n"+"return "+elem.generated + ";"));
-		}
-		
-		methodDecl.append("\n}");
-		
 
-		String nextMethText = (nextMethElem == null)? "" : "\n" + nextMethElem.generated;
-		elemStack.push(new ASTElement(meth, methodDecl.toString() + nextMethText));
+		ASTElement body = elemStack.pop();
+
+
+		//TODO: Quick hack to get it working
+		if (body.elem instanceof Sequence || body.elem instanceof IfExpr)
+			methodDecl.append(Indent("\n"+body.generated));
+		else {
+			methodDecl.append(Indent("\n"+"return "+body.generated + ";"));
+		}
+
+		methodDecl.append("\n}");
 	}
-	
+
 	@Override
 	public void visit(TupleObject tuple) {
 		super.visit(tuple);
@@ -398,25 +422,32 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		elemStack.push(new ASTElement(sequence, declString.toString()+"\n"));
 	}
 	
+	private String putReturn(ASTElement elem) {
+		if (elem.elem instanceof Sequence || elem.elem instanceof IfExpr)
+			return Indent("\n"+elem.generated);
+		else {
+			return Indent("\n"+"return "+elem.generated + ";");
+		}
+	}
 
 	@Override
 	public void visit(IfExpr ifExpr) {
 		super.visit(ifExpr);
 		
-		LinkedList<Pair<String,String>> generatedClauses = new LinkedList<Pair<String, String>>();
+		LinkedList<Pair<ASTElement,ASTElement>> generatedClauses = new LinkedList<Pair<ASTElement, ASTElement>>();
 		for (IfExpr.IfClause clause : ifExpr.getClauses()) {
-			generatedClauses.push(new Pair<String, String>(elemStack.pop().generated, elemStack.pop().generated));
+			generatedClauses.push(new Pair<ASTElement, ASTElement>(elemStack.pop(), elemStack.pop()));
 		}
 		
 		boolean isFirst = true;
 		StringBuilder out = new StringBuilder();
-		for (Pair<String, String> clause : generatedClauses) {
+		for (Pair<ASTElement, ASTElement> clause : generatedClauses) {
 			if (isFirst) { // Must be then clause
-				out.append("if (" + clause.first + ") {" + Indent("\n" + clause.second) + "\n}");
+				out.append("if (" + clause.first.generated + ") {" + putReturn(clause.second) + "\n}");
 				isFirst = false;
 				continue;
 			}
-			out.append(" else if (" + clause.first + ") {" + Indent("\n" + clause.second) + "\n}\n");
+			out.append(" else if (" + clause.first.generated + ") {" + putReturn(clause.second) + "\n}\n");
 		}
 		
 		elemStack.push(new ASTElement(ifExpr, out.toString()));

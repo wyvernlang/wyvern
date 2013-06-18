@@ -2,10 +2,7 @@ package wyvern.targets.Java.visitors;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -41,6 +38,7 @@ public class ClassVisitor extends BaseASTVisitor {
 	private int anonMethNum = 0;
 	private org.objectweb.asm.ClassVisitor cw = null;
 	private ClassWriter writer = null;
+	private HashSet<String> generatedMethodNames = new HashSet<>();
 
 	public ClassVisitor(String typePrefix, ClassStore store) {
 		this.typePrefix = typePrefix;
@@ -92,6 +90,8 @@ public class ClassVisitor extends BaseASTVisitor {
 			mv.visitFieldInsn(GETSTATIC, "java/lang/Void", "TYPE", "Ljava/lang/Class;");
 		} else if (descriptor.equals("I")) {
 			mv.visitFieldInsn(GETSTATIC, "java/lang/Integer", "TYPE", "Ljava/lang/Class;");
+		} else if (descriptor.equals("Z")) {
+				mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "TYPE", "Ljava/lang/Class;");
 		} else
 			mv.visitLdcInsn(org.objectweb.asm.Type.getType(descriptor));
 	}
@@ -327,9 +327,15 @@ public class ClassVisitor extends BaseASTVisitor {
 
 		meths.add(methDeclaration);
 
+		generatedMethodNames.add(methDeclaration.getName());
+
 		MethodVisitor mv = cw.visitMethod(access, methDeclaration.getName(),
 				getTypeName(methDeclaration.getType(), false), null, null);
 		new MethVisitor(this, mv, context.getExternalDecls()).visitInitial(methDeclaration);
+	}
+
+	public boolean hasMethod(String name) {
+		return generatedMethodNames.contains(name);
 	}
 
 	public String getCurrentTypeName() {

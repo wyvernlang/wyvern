@@ -20,7 +20,7 @@ public abstract class Sequence implements RawAST, Iterable<RawAST> {
 		if (!(other instanceof Sequence))
 			return false;
 		Sequence otherData = (Sequence) other; 
-		return otherData.children.equals(children) && getOpenChar() == otherData.getOpenChar();
+		return otherData.children.equals(children) && getOpenChar().equals(otherData.getOpenChar());
 	}
 	
 	@Override

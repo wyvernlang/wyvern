@@ -35,18 +35,11 @@ class Nil
 	class meth make():IntList = new
 	
 val nil : IntList = Nil.make()
-
-meth printBoolean(b:Bool):Unit =
-	if b
-		then
-			print("true")
-		else
-			print("false")
 	
 // Test code
 
 val noLink : IntList = Nil.make()
 val aLink : IntList = Cons.make(2, noLink)
 val aLink2 : IntList = Cons.make(1, aLink)
-aLink2.forEach(fn x:Int => printInteger(x))
+//aLink2.forEach(fn x:Int => printInteger(x))
 aLink2.reduce(0,fn x:Int => fn y:Int => x+y)

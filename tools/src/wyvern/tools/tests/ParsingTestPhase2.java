@@ -550,4 +550,40 @@ public class ParsingTestPhase2 {
 		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
 		result.typecheck(env);
 	}
+
+	@Test
+	public void testGenericNew() {
+		Reader reader = new StringReader(
+				"val test = new");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		result.typecheck(env);
+	}
+
+	@Test
+	public void testGenericNew2() {
+		Reader reader = new StringReader(
+				"val test = new\n" +
+				"	x = 2\n");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		result.typecheck(env);
+	}
+	@Test
+	public void testGenericNew3() {
+		Reader reader = new StringReader(
+				"val test = new\n" +
+				"	x = 2\n" +
+				"test.x");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		result.typecheck(env);
+		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
+	}
 }

@@ -1,4 +1,4 @@
-package wyvern.targets.Java.visitors;
+package wyvern.targets.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;

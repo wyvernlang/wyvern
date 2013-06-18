@@ -22,13 +22,16 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
+import wyvern.tools.types.extensions.Unit;
 
 public class JavaScript implements Target {
 	private static TypedAST doCompile(Reader reader, String filename, Environment ienv) {
 		RawAST parsedResult = Phase1Parser.parse(filename, reader);
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
+		env = env.extend(new ValueBinding("printInteger", new JSFunction(arrow(Int.getInstance(), Unit.getInstance()),"alert")));
 		env = env.extend(new KeywordNameBinding("load", new Keyword(new JSLoadParser())));
 		env = env.extend(new ValueBinding("asString", new JSFunction(arrow(JSObjectType.getInstance(),Str.getInstance()), "asString")));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));

@@ -1,11 +1,8 @@
 package wyvern.targets.Java.tests;
 
-import static wyvern.tools.types.TypeUtils.arrow;
-
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,36 +12,28 @@ import org.junit.Test;
 
 import wyvern.stdlib.Globals;
 import wyvern.targets.Java.visitors.JavaGenerator;
-import wyvern.targets.Java.visitors.VariableResolver;
-import wyvern.targets.JavaScript.parsers.JSLoadParser;
-import wyvern.targets.JavaScript.typedAST.JSFunction;
-import wyvern.targets.JavaScript.types.JSObjectType;
+import wyvern.targets.JavaScript.tests.JSCodegenTest;
+import wyvern.targets.util.VariableResolver;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
-import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Pair;
 
 @SuppressWarnings("unchecked")
 public class JavaTests {
 	
 	private TypedAST doCompile(String input) {
-		return doCompile(input, Environment.getEmptyEnvironment());
+		return doCompile(new StringReader(input), Environment.getEmptyEnvironment());
 	}
 
-	private TypedAST doCompile(String input, Environment ienv) {
-		Reader reader = new StringReader(input);
+	private TypedAST doCompile(Reader reader, Environment ienv) {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(ienv);
@@ -779,4 +768,43 @@ public class JavaTests {
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(5));
 	}
+
+	/*
+	TODO: Implement self-recursive functions (post ECOOP)
+
+	@Test
+	public void testRecursion() throws Exception {
+		String test =
+				"meth dummy():Int = 2\n" +
+				"meth a(i : Int):Int = \n" +
+				"	if (i > 0)\n" +
+				"		then\n" +
+				"			a(i-1)\n" +
+				"		else\n" +
+				"			i\n";
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+		Assert.assertEquals(returned, new Integer(5));
+	}
+
+
+	@Test
+	public void testNQueens() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		String testFileName;
+		URL url;
+
+		testFileName = "wyvern/targets/JavaScript/tests/files/nqueens.wyv";
+		url = JSCodegenTest.class.getClassLoader().getResource(testFileName);
+		if (url == null) {
+			Assert.fail("Unable to open " + testFileName + " file.");
+			return;
+		}
+		InputStream is = url.openStream();
+		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(new InputStreamReader(is), Environment.getEmptyEnvironment()));
+		is.close();
+		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Object returned = generated.getMethod("main").invoke(null);
+	}
+	 */
 }

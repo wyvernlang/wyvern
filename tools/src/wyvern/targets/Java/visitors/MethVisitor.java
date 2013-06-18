@@ -1,16 +1,20 @@
 package wyvern.targets.Java.visitors;
 
 import java.lang.invoke.CallSite;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import wyvern.targets.util.VariableResolver;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
@@ -36,12 +40,28 @@ import static org.objectweb.asm.Opcodes.*;
 
 //The names are getting pretty bad...
 public class MethVisitor extends BaseASTVisitor {
+
+	private class WrappedMethDeclaration extends MethDeclaration {
+
+		private Environment env;
+
+		public WrappedMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location, Environment env) {
+			super(name, args, returnType, body, isClassMeth, location);
+			this.env = env;
+		}
+
+
+		public Environment getEnv() {
+			return env;
+		}
+	}
+
 	private ClassVisitor jv;
 	private MethodVisitor mv;
 	private Frame frame;
 	private Handle bootstrap;
-	private Handle bootstrapVar;
-	private Handle bootstrapFun;
+	private Handle bootstrapMeth;
+	private Handle bootstrapField;
 	private Handle bootstrapVarSet;
 	
 	private Environment localEnv = Environment.getEmptyEnvironment();
@@ -62,8 +82,8 @@ public class MethVisitor extends BaseASTVisitor {
 	private class MethodExternalContext {
 		private HashMap<String, Pair<Type, Integer>> varMap = new HashMap<String, Pair<Type, Integer>>();
 		
-		public static final int STATIC = 0;
-		public static final int INTERFACE = 1;
+		public static final int ARGUMENT = 0;
+		public static final int CLASS_METH = 1;
 		
 		public void addExternal(Iterable<Pair<String, Type>> externalDecls, int type) {
 			for (Pair<String, Type> pair : externalDecls) {
@@ -96,7 +116,7 @@ public class MethVisitor extends BaseASTVisitor {
 			types.add(newt);
 			for (Type t : ((Tuple) argType).getTypes()) 
 				types.add(t);
-			return new Arrow(new Tuple((Type[])types.toArray()), input.getResult());
+			return new Arrow(new Tuple(types.toArray(new Type[0])), input.getResult());
 		}
 		if (argType instanceof Unit)
 			return new Arrow(newt, input.getResult());
@@ -316,10 +336,12 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 		
 		public Map<String, Type> getVars() {
-			Map<String, Type> map = new HashMap<String, Type>();
+			HashMap<String, Type> map = new HashMap<String, Type>();
 			for (Entry<String, VarInfo> entry : variableMap.entrySet()){
 				map.put(entry.getKey(), entry.getValue().getType());
 			}
+			if (parent != null)
+				map.putAll(parent.getVars());
 			return map;
 		}
 
@@ -343,20 +365,23 @@ public class MethVisitor extends BaseASTVisitor {
 			mv.visitVarInsn(ALOAD, varIdx);
 	}
 
-	public MethVisitor(ClassVisitor jv, MethodVisitor mv, Iterable<Pair<String, Type>> externals) {
+	public MethVisitor(ClassVisitor jv, MethodVisitor mv, Iterable<Pair<String, Type>> argVars) {
 		this.jv = jv;
 		this.mv = mv;
-		mec.addExternal(externals, MethodExternalContext.STATIC);
+		mec.addExternal(argVars, MethodExternalContext.ARGUMENT);
 
 		frame = new Frame();
 		MethodType mt = MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, Object[].class);
 		bootstrap = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrap", mt.toMethodDescriptorString());
-		bootstrapVar = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapMethHandle", mt.toMethodDescriptorString());
-		bootstrapFun = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapField", mt.toMethodDescriptorString());
+		bootstrapMeth = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapMethHandle", mt.toMethodDescriptorString());
+		bootstrapField = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapField", mt.toMethodDescriptorString());
 		bootstrapVarSet = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapSetField", mt.toMethodDescriptorString());
 	}
 
 	public void visitInitial(MethDeclaration md) {
+		if (md instanceof WrappedMethDeclaration)
+			localEnv = ((WrappedMethDeclaration) md).getEnv();
+
 		mv.visitCode();
 
 		Label startLabel = new Label();
@@ -409,9 +434,19 @@ public class MethVisitor extends BaseASTVisitor {
 	
 	@Override
 	public void visit(MethDeclaration md) {
-		VariableResolver visitor = new VariableResolver(frame.getVars());
+		HashMap<String, Type> externalVars = new HashMap<>();
+		externalVars.putAll(frame.getVars());
+		externalVars.put(md.getName(), md.getType());
+		VariableResolver visitor = new VariableResolver(externalVars);
 		md.accept(visitor);
 		List<Pair<String, Type>> usedVars = visitor.getUsedVars();
+
+		boolean selfRef = false;
+		for (Pair<String, Type> var : usedVars)
+			if (var.first.equals(md.getName())) {
+				selfRef = true;
+				break;
+			}
 
 		List<NameBinding> newArgs = new ArrayList<NameBinding>(md.getArgBindings().size() + usedVars.size());
 		for (Pair<String, Type> pair : usedVars) {
@@ -423,7 +458,8 @@ public class MethVisitor extends BaseASTVisitor {
 
 		Label defLoc = new Label();
 		MethDeclaration implMd =
-				new MethDeclaration(md.getName()+"$impl", newArgs, ((Arrow)md.getType()).getResult(), md.getBody(), true, md.getLocation());
+				new WrappedMethDeclaration(md.getName()+"$impl", newArgs,
+						((Arrow)md.getType()).getResult(), md.getBody(), true, md.getLocation(), this.localEnv);
 		jv.visit(implMd);
 
 		frame.registerVariable(md.getName(), md.getType(), defLoc);
@@ -461,17 +497,19 @@ public class MethVisitor extends BaseASTVisitor {
 	public void visit(Application app) {
 		//isReceiver = true;
 		((CoreAST)app.getFunction()).accept(this); //Assumed to have pushed a MethodHandle
+		Type iRC = receiverType;
+		receiverType = null;
 		boolean fnIsStatic = isStatic;
 		//isReceiver = false;
 		((CoreAST)app.getArgument()).accept(this); //Assumed to have pushed every argument
 
 		if (app.getFunction() instanceof Invocation) {
-			receiverType = ((Invocation)app.getFunction()).getReceiver().getType();
+			iRC = ((Invocation)app.getFunction()).getReceiver().getType();
 		}
 
 		Arrow fnType;
-		if (receiverType != null && !fnIsStatic)
-			fnType = addClassToArgs((Arrow) app.getFunction().getType(), receiverType);
+		if (iRC != null && !fnIsStatic)
+			fnType = addClassToArgs((Arrow) app.getFunction().getType(), iRC);
 		else {
 			fnType = (Arrow) app.getFunction().getType();
 		}
@@ -487,42 +525,6 @@ public class MethVisitor extends BaseASTVisitor {
 			isStatic = false;
 		else
 			isStatic = true;
-
-		/*
-		if (app.getFunction() instanceof Invocation && ((Invocation) app.getFunction()).getArgument() == null) {
-			Invocation funInv = (Invocation) app.getFunction();
-			//argument == null
-			//we now know that this is a method invocation directly on a class.
-			((CoreAST)funInv.getReceiver()).accept(this);
-			((CoreAST)app.getArgument()).accept(this);
-			Arrow arrow = (Arrow)app.getFunction().getType();
-			
-			if (arrow.getArgument() instanceof Tuple) {
-				for (int i = 0; i < ((Tuple)arrow.getArgument()).getTypes().length; i++) 
-					frame.popStackType();
-			} else if (!(arrow.getArgument() instanceof Unit))
-				frame.popStackType();
-			
-			
-			if (isStatic) { //Therefore, receiver is a Variable that set the isStatic flag
-				mv.visitMethodInsn(INVOKESTATIC, jv.getStore().getUnmangledClassName((ClassType) staticType), funInv.getOperationName(), jv.getStore().getTypeName(app.getFunction().getType(), true));
-				isStatic = false;
-			} else {
-                frame.popStackType();
-				mv.visitInvokeDynamicInsn(
-						funInv.getOperationName(), 
-						jv.getStore().getTypeName(
-								addClassToArgs((Arrow)app.getFunction().getType(), 
-										funInv.getReceiver().getType()), 
-										true), 
-						bootstrap); 
-			}
-
-			frame.pushStackType(app.getType());
-			return;
-		}
-		*/
-		//throw new RuntimeException("Not implemented");
 	}
 
 	@Override
@@ -574,10 +576,41 @@ public class MethVisitor extends BaseASTVisitor {
 
 		TypedAST argument = inv.getArgument();
 		TypedAST receiver = inv.getReceiver();
+
+		Label ssLabel = new Label();
+
 		if (receiver instanceof CoreAST)
 			((CoreAST) receiver).accept(this);
+
+		switch (inv.getOperationName()) {
+			case "||":
+				mv.visitJumpInsn(IFNE, ssLabel);
+				break;
+			case "&&":
+				mv.visitJumpInsn(IFEQ, ssLabel);
+				break;
+			default:
+				break;
+		}
+
 		if (argument instanceof CoreAST)
 			((CoreAST) argument).accept(this);
+		if (inv.getOperationName().equals("||") || inv.getOperationName().equals("&&")) {
+			Label resLabel = new Label();
+			mv.visitJumpInsn(GOTO, resLabel);
+			mv.visitLabel(ssLabel);
+			switch (inv.getOperationName()) {
+				case "||":
+					mv.visitInsn(ICONST_1);
+					break;
+				case "&&":
+					mv.visitInsn(ICONST_0);
+					break;
+				default:
+					break;
+			}
+			mv.visitLabel(resLabel);
+		}
 
 		if (!isStatic) {
 			if (!(receiver.getType() instanceof ClassType) && !(receiver.getType() instanceof TypeType)) {
@@ -620,6 +653,25 @@ public class MethVisitor extends BaseASTVisitor {
 				mv.visitInsn(ICONST_1);
 				mv.visitLabel(end);
 				frame.pushStackType(Bool.getInstance());
+			} else if (inv.getOperationName().equals("==") &&
+					((pair.first instanceof Int &&
+					pair.second instanceof Int) ||
+					(pair.first instanceof Bool &&
+					pair.second instanceof Bool))) {
+				Label truel = new Label();
+				Label end = new Label();
+				mv.visitJumpInsn(IF_ICMPEQ, truel);
+				mv.visitInsn(ICONST_0);
+				mv.visitJumpInsn(GOTO, end);
+				mv.visitLabel(truel);
+				mv.visitInsn(ICONST_1);
+				mv.visitLabel(end);
+				frame.pushStackType(Bool.getInstance());
+			} else if ((inv.getOperationName().equals("&&") || inv.getOperationName().equals("||")) &&
+					(pair.first instanceof Bool &&
+					pair.second instanceof Bool)) {
+				//Already done above
+				frame.pushStackType(Bool.getInstance());
 			} else if (inv.getOperationName().equals("+") &&
 					pair.first instanceof Str &&
 					pair.second instanceof Str) {
@@ -641,7 +693,7 @@ public class MethVisitor extends BaseASTVisitor {
 					Type old = frame.popStackType();
 					mv.visitInsn(DUP);
 					frame.pushStackType(old);
-					mv.visitInvokeDynamicInsn(inv.getOperationName(),"(Ljava/lang/Object;)Ljava/lang/invoke/MethodHandle;", bootstrapVar);
+					mv.visitInvokeDynamicInsn(inv.getOperationName(),"(Ljava/lang/Object;)Ljava/lang/invoke/MethodHandle;", bootstrapMeth);
 					frame.swap();
 					mv.visitInsn(SWAP);
 				}
@@ -659,7 +711,7 @@ public class MethVisitor extends BaseASTVisitor {
 						"("+
 								jv.getStore().getTypeName(convertClassType(receiver.getType()),true,true)+
 						"Ljava/lang/Class;)"+ invTypeName,
-						bootstrapFun);
+						bootstrapField);
 				frame.pushStackType(inv.getType());
 			} else {
 				//We need the receiver, the new value, and the type on the stack in that order
@@ -727,7 +779,7 @@ public class MethVisitor extends BaseASTVisitor {
 		if (!frame.containsVariable(name)) {
 			if (mec.isVarExternal(name)) {
 				Pair<Type, Integer> varInfo = mec.getExternalVar(name);
-				if (varInfo.second == MethodExternalContext.STATIC && frame.containsVariable("this")) {
+				if (varInfo.second == MethodExternalContext.ARGUMENT && frame.containsVariable("this")) {
 					mv.visitVarInsn(ALOAD, frame.getVariableIndex("this"));
 					mv.visitFieldInsn(GETFIELD, jv.getCurrentTypeName(), name+"$dyn", jv.getStore().getTypeName(type, true));
 					frame.pushStackType(type);
@@ -739,15 +791,10 @@ public class MethVisitor extends BaseASTVisitor {
 			throw new RuntimeException();
 		}
 		int varIdx= frame.getVariableIndex(name);
-		if (type instanceof Int) {
-			mv.visitVarInsn(ILOAD, varIdx);
-			frame.pushStackType(Int.getInstance());
-		} else {
-			mv.visitVarInsn(ALOAD, varIdx);
-			frame.pushStackType(type);
-		}
+		loadByType(type, varIdx);
+		frame.pushStackType(type);
 	}
-	
+
 	@Override
 	public void visit(IntegerConstant i) {
 		switch (i.getValue())  {

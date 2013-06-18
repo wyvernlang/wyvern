@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,9 +9,14 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.ClassObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -26,6 +32,9 @@ import wyvern.tools.util.TreeWriter;
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
+
+	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
+	private static int generic_num = 0;
 
 	public New(Map<String, TypedAST> args, FileLocation fileLocation) {
 		this.args = args;
@@ -46,17 +55,32 @@ public class New extends CachingTypedAST implements CoreAST {
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
 		
-		Type classVarType = env.lookupType("class").getType();
-		
-		if (!(classVarType instanceof ClassType)) {
-			// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
-			ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, classVarType.toString(), this);
+		TypeBinding classVarTypeBinding = env.lookupType("class");
+
+		if (classVarTypeBinding != null) { //In a class method
+			Type classVarType = classVarTypeBinding.getType();
+			if (!(classVarType instanceof ClassType)) {
+				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
+				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, classVarType.toString(), this);
+			}
+
+			// TODO SMELL: do I really need to store this?  Can get it any time from the type
+			cls = ((ClassType) classVarType).getDecl();
+
+			return classVarType;
+		} else { // Standalone
+			LinkedList<Declaration> decls = new LinkedList<>();
+
+			for (Map.Entry<String, TypedAST> elem : args.entrySet()) {
+				ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue());
+				e.typecheck(env);
+				decls.add(e);
+			}
+
+			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), getLocation());
+			cls = classDeclaration;
+			return classDeclaration.getType();
 		}
-		
-		// TODO SMELL: do I really need to store this?  Can get it any time from the type
-		cls = ((ClassType) classVarType).getDecl();
-		
-		return classVarType;
 	}
 
 	@Override
@@ -70,7 +94,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		//TODO vars
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argVals.put(elem.getKey(), elem.getValue().evaluate(env));
-		
+		cls.evalDecl(env, cls.extendWithValue(Environment.getEmptyEnvironment()));
 		ClassObject clsObject = cls.createObject();
 		return new Obj(clsObject, argVals);
 	}

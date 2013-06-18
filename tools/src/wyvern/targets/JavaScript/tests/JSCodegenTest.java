@@ -2,8 +2,8 @@ package wyvern.targets.JavaScript.tests;
 
 import static wyvern.tools.types.TypeUtils.arrow;
 
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.net.URL;
 
 import junit.framework.Assert;
 
@@ -41,9 +41,13 @@ public class JSCodegenTest {
 
 	private TypedAST doCompile(String input, Environment ienv) {
 		Reader reader = new StringReader(input);
+		return getTypedAST(reader, ienv);
+	}
+
+	private TypedAST getTypedAST(Reader reader, Environment ienv) {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
-		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(),JSObjectType.getInstance()),"require")));
+		env = env.extend(new ValueBinding("require", new JSFunction(arrow(Str.getInstance(), JSObjectType.getInstance()),"require")));
 		env = env.extend(new KeywordNameBinding("load", new Keyword(new JSLoadParser())));
 		env = env.extend(new KeywordNameBinding("cast", new Keyword(new JSCastParser())));
 		env = env.extend(new KeywordNameBinding("JSvar", new Keyword(new JSVarParser())));
@@ -65,8 +69,9 @@ public class JSCodegenTest {
 		Context cx = Context.enter();
 		try {
 			Scriptable scope = cx.initStandardObjects();
-			
-			return cx.evaluateString(scope, source, "", 1, null);
+
+			Object res = cx.evaluateString(scope, source, "", 1, null);
+			return res;
 		} finally {
 			Context.exit();
 		}
@@ -210,15 +215,16 @@ public class JSCodegenTest {
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 		Assert.assertEquals(
-				"function outer(n) {\n"+
-				"\tfunction nested(m) {\n"+
-        		"\t\treturn n + m;\n"+
-        		"\t}\n"+
-        		"\treturn function(x) { return (nested)(x + 1); };\n\t\n"+
-				"}\n"+
-				"var f1 = (outer)(1);\n" +
-				"var f2 = (outer)(2);\n" +
-				"return (f2)(6);\n", visitor.getCode());
+				"function outer(n) {\n" +
+						"\tvar nested = (function (m) {\n" +
+						"\t\treturn n + m;\n" +
+						"\t}).bind(this);\n" +
+						"\treturn function(x) { return (nested)(x + 1); };\n" +
+						"\t\n" +
+						"}\n" +
+						"var f1 = (outer)(1);\n" +
+						"var f2 = (outer)(2);\n" +
+						"return (f2)(6);\n", visitor.getCode());
 	}
 	
 	@Test
@@ -412,5 +418,46 @@ public class JSCodegenTest {
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
 		String result = visitor.getCode();
+	}
+
+	@Test
+	public void testIntList() throws IOException {
+		String testFileName;
+		URL url;
+
+		testFileName = "wyvern/targets/JavaScript/tests/files/IntList.wyv";
+		url = JSCodegenTest.class.getClassLoader().getResource(testFileName);
+		if (url == null) {
+			Assert.fail("Unable to open " + testFileName + " file.");
+			return;
+		}
+		InputStream is = url.openStream();
+		TypedAST parsed = getTypedAST(new InputStreamReader(is), Environment.getEmptyEnvironment());
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)parsed).accept(visitor);
+		String result = visitor.getCode();
+		is.close();
+		Assert.assertEquals(3.0, wrapInvoke(result));
+	}
+
+	@Test
+	public void testNQueens() throws IOException {
+		String testFileName;
+		URL url;
+
+		testFileName = "wyvern/targets/JavaScript/tests/files/nqueens.wyv";
+		url = JSCodegenTest.class.getClassLoader().getResource(testFileName);
+		if (url == null) {
+			Assert.fail("Unable to open " + testFileName + " file.");
+			return;
+		}
+		InputStream is = url.openStream();
+		TypedAST parsed = getTypedAST(new InputStreamReader(is), Environment.getEmptyEnvironment());
+		JSCodegenVisitor visitor = new JSCodegenVisitor();
+		((CoreAST)parsed).accept(visitor);
+		String result = visitor.getCode();
+		is.close();
+
+		Assert.assertEquals(2680.0, wrapInvoke(result));
 	}
 }
