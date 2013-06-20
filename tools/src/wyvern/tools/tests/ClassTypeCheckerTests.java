@@ -385,4 +385,54 @@ public class ClassTypeCheckerTests {
 
 		typedAST.typecheck(env);
 	}
+	
+	@Test
+	public void testNameConflict() {
+		Reader reader = new StringReader("\n"
+				+"type A\n"
+				+"    prop a : Int\n"
+				+"    meth b() : Int\n"
+				+"\n"
+				+"type B\n"
+				+"    prop b : Int\n"
+				+"    meth a() : Int\n"
+				+"\n"
+				+"class AImpl\n"
+				+"    implements A\n"
+				+"\n"
+				+"    class meth make() : A\n"
+				+"        new\n"
+				+"\n"
+				+"    var a : Int\n"
+				+"\n"
+				+"    meth b() : Int\n"
+				+"        this.a\n"
+				+"\n"
+				+"meth doIt() : Unit\n"
+				+"    val a1:A = AImpl.make()\n"
+				+"    val a2:B = AImpl.make()\n"
+				+"    val checkMe1:Int = a1.a\n"
+				+"    val checkMe2:Unit -> Int = a2.a\n"
+				+"    val checkMe3:Int = a2.a()\n"
+				
+				// What Would You Do?
+				+"    val a3:B = a1\n"
+				+"    val checkMe4:Int = a1.a\n"
+				+"    val checkMe5:Unit -> Int = a3.a\n"
+				+"    val checkMe6:Unit -> Int = a1.b\n"
+				+"    val checkMe7:Int = a3.b\n"
+                
+				+"    null\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L meth b () : Int $L} $I} $L} {$L type B {$I {$L prop b : Int $L} {$L meth a () : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class meth make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L meth b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L meth doIt () : Unit {$I {$L val a1 : A = AImpl . make () $L} {$L val a2 : B = AImpl . make () $L} {$L val checkMe1 : Int = a1 . a $L} {$L val checkMe2 : Unit -> Int = a2 . a $L} {$L val checkMe3 : Int = a2 . a () $L} {$L val a3 : B = a1 $L} {$L val checkMe4 : Int = a1 . a $L} {$L val checkMe5 : Unit -> Int = a3 . a $L} {$L val checkMe7 : Unit -> Int = a1 . b $L} {$L val checkMe8 : Int = a3 . b $L} {$L null $L} $I} $L} $I}",
+		 		parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MethDeclaration()]]", typedAST.toString());		
+
+		typedAST.typecheck(env);
+	}
 }

@@ -175,11 +175,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 							hasImplementingCandidate = true;
 							break;
 						}
-					}					
-					if (!hasImplementingCandidate) {
-						subset = false;
-						break;
-					}
+					}	
+				}
+				if (!hasImplementingCandidate) {
+					subset = false;
+					break;
 				}
 			}
 			if (subset) return true;

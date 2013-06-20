@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -62,22 +63,30 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		}
 		
 		if (other instanceof TypeType) {
-			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
+			// HashSet<Arrow> thisMeths = new HashSet<Arrow>();
+			HashSet<Type> thisMembers = new HashSet<Type>();
 			for (TypedAST d : this.decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
 					Arrow a = (Arrow) ((MethDeclaration) d).getType();
-					thisMeths.add(a);
+					thisMembers.add(a);
+				} else if (d instanceof PropDeclaration) {
+					Type t = (Type) ((PropDeclaration) d).getType();
+					thisMembers.add(t);
 				} else {
 					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
-			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
+			// HashSet<Arrow> otherMeths = new HashSet<Arrow>();
+			HashSet<Type> otherMembers = new HashSet<Type>();
 			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
 					Arrow a = (Arrow) ((MethDeclaration) d).getType();
-					otherMeths.add(a);
+					otherMembers.add(a);
+				} else if (d instanceof PropDeclaration) {
+					Type t = (Type) ((PropDeclaration) d).getType();
+					otherMembers.add(t);
 				} else {
 					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
@@ -87,9 +96,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 			// FIXME: Allows to have multiple methods that match to implement several methods
 			// from supertype - is this OK? Seems OK to me but not sure. :-)
 			boolean subset = true;
-			for (Arrow aOther : otherMeths) {
+			for (Type aOther : otherMembers) {
 				boolean hasImplementingCandidate = false;
-				for (Arrow aThis : thisMeths) {
+				for (Type aThis : thisMembers) {
 					// Apply S-Amber rule here!
 					SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
 					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
@@ -101,13 +110,14 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 							hasImplementingCandidate = true;
 							break;
 						}
-					}					
-					if (!hasImplementingCandidate) {
-						subset = false;
-						break;
-					}
+					}		
+				}
+				if (!hasImplementingCandidate) {
+					subset = false;
+					break;
 				}
 			}
+
 			if (subset) return true;
 		}
 		
