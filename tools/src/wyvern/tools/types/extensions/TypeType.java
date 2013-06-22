@@ -79,7 +79,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 				}
 			}
 			
-			// System.out.println("thisMembers = " + thisMembers);
+			System.out.println("thisMembers = " + thisMembers);
 			
 			HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
 			for (TypedAST d : ((TypeType) other).decl.getDecls()) {

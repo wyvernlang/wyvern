@@ -11,6 +11,8 @@ import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
@@ -62,10 +64,12 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		ClassDeclaration thisD = this.decl;
 		TypeDeclaration typeD = tt.getDecl();
 		
+		// FIXME: Ignores names right now!!!
+		
 		HashSet<String> thisDtypes = new HashSet<String>();
 		for (Declaration d : thisD.getDecls().getDeclIterator()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
-			if (d instanceof PropDeclaration) {
+			if (d instanceof PropDeclaration || d instanceof VarDeclaration || d instanceof ValDeclaration) {
 				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
 			} else {
 				thisDtypes.add(d.getType().toString());
@@ -93,6 +97,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 	public boolean checkImplementsClass(TypeType tt) {
 		ClassDeclaration thisD = this.decl;
 		TypeDeclaration typeD = tt.getDecl();
+		
+		// FIXME: Ignores names right now!!!
 		
 		HashSet<String> thisDtypes = new HashSet<String>();
 		for (Declaration d : thisD.getDecls().getDeclIterator()) {
