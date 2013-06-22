@@ -541,18 +541,18 @@ public class ClassTypeCheckerTests {
 				+"    var b : Unit -> Int\n"
 				+"\n"
 				+"meth doIt() : Unit\n"
-//				+"    val a1:A = AImpl.make()\n"
-//				+"    val a2:B = AImpl.make()\n"
-//				+"    val checkMe1:Unit -> Int = a1.a\n"
-//				+"    val checkMe2:Unit -> Int = a2.a\n"
-//				+"    val checkMe3:Int = a2.a()\n"
+				+"    val a1:A = AImpl.make()\n"
+				+"    val a2:B = AImpl.make()\n"
+				+"    val checkMe1:Unit -> Int = a1.a\n"
+				+"    val checkMe2:Unit -> Int = a2.a\n"
+				+"    val checkMe3:Int = a2.a()\n"
 				
 				// What Would You Do?
-//				+"    val a3:B = a1\n"
-//				+"    val checkMe4:Unit -> Int = a1.a\n"
-//				+"    val checkMe5:Unit -> Int = a3.a\n"
-//				+"    val checkMe6:Unit -> Int = a1.b\n"
-//				+"    val checkMe7:Unit -> Int = a3.b\n"
+				+"    val a3:B = a1\n"
+				+"    val checkMe4:Unit -> Int = a1.a\n"
+				+"    val checkMe5:Unit -> Int = a3.a\n"
+				+"    val checkMe6:Unit -> Int = a1.b\n"
+				+"    val checkMe7:Unit -> Int = a3.b\n"
                 
 				+"    null\n"
 				);
