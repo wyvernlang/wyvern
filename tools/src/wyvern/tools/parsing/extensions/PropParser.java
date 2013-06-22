@@ -30,16 +30,16 @@ public class PropParser implements DeclParser {
 		
 		if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
-			String typeName = ParseUtils.parseSymbol(ctx).name;
+			Type type = ParseUtils.parseType(ctx);
 			if (ParseUtils.checkFirst("?", ctx)) {
 				// typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
 				ParseUtils.parseSymbol("?", ctx); 
 			}
-			TypeBinding tb = ctx.second.lookupType(typeName);
-			if (tb == null) {
-				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
-			}
-			return new PropDeclaration(varName, tb, line);
+//			TypeBinding tb = ctx.second.lookupType(typeName);
+//			if (tb == null) {
+//				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
+//			}
+			return new PropDeclaration(varName, type, line);
 		} else {
 			throw new RuntimeException("Error parsing prop expression : expected.");
 		}
@@ -57,23 +57,23 @@ public class PropParser implements DeclParser {
 		if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
 			
-			String typeName = ParseUtils.parseSymbol(ctx).name;
+			type = ParseUtils.parseType(ctx); // parseSymbol(ctx).name;
 			if (ParseUtils.checkFirst("?", ctx)) {
 				// typeName = typeName + "?"; // FIXME: Just hack for now until NULL/NON-NULL types done.
 				ParseUtils.parseSymbol("?", ctx); 
 			}
-			tb = ctx.second.lookupType(typeName);
-			if (tb == null) {
-				tb = new TypeBinding(typeName, Unit.getInstance()); // TODO: Implement proper Type for "type"!
-			}
+//			tb = ctx.second.lookupType(type);
+//			if (tb == null) {
+//				tb = new TypeBinding(typeName, type);
+//			}
 			
 		} else {
 			throw new RuntimeException("Error parsing prop expression : expected.");
 		}
 		
-		final TypeBinding finalBinding = tb;
+//		final TypeBinding finalBinding = tb;
 		
-		PropDeclaration parsed = new PropDeclaration(varName, tb, line);
+		PropDeclaration parsed = new PropDeclaration(varName, type, line);
 		
 		return new Pair<Environment, ContParser>(parsed.extend(Environment.getEmptyEnvironment()), new ContParser.EmptyWithAST(parsed));
 		

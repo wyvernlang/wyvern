@@ -518,4 +518,65 @@ public class ClassTypeCheckerTests {
 		Assert.assertTrue(tAt.subtype(tBt, subtypes));
 		Assert.assertTrue(tBt.subtype(tAt, subtypes));
 	}
+
+	@Test
+	public void testNameConflict3() {
+		Reader reader = new StringReader("\n"
+				+"type A\n"
+				+"    meth a() : Int\n"
+				+"    prop b : Unit -> Int\n"
+				+"\n"
+				+"type B\n"
+				+"    prop a : Unit -> Int\n"
+				+"    meth b() : Int\n"
+				+"\n"
+				+"class AImpl\n"
+				+"    implements A\n"
+				+"\n"
+				+"    class meth make() : A\n"
+				+"        new\n"
+				+"\n"
+				+"    meth a() : Int\n"
+				+"\n"
+				+"    var b : Unit -> Int\n"
+				+"\n"
+				+"meth doIt() : Unit\n"
+//				+"    val a1:A = AImpl.make()\n"
+//				+"    val a2:B = AImpl.make()\n"
+//				+"    val checkMe1:Unit -> Int = a1.a\n"
+//				+"    val checkMe2:Unit -> Int = a2.a\n"
+//				+"    val checkMe3:Int = a2.a()\n"
+				
+				// What Would You Do?
+//				+"    val a3:B = a1\n"
+//				+"    val checkMe4:Unit -> Int = a1.a\n"
+//				+"    val checkMe5:Unit -> Int = a3.a\n"
+//				+"    val checkMe6:Unit -> Int = a1.b\n"
+//				+"    val checkMe7:Unit -> Int = a3.b\n"
+                
+				+"    null\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MethDeclaration()]]", typedAST.toString());		
+
+		typedAST.typecheck(env);
+
+		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+
+		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
+
+		Assert.assertTrue(tAt.subtype(tBt, subtypes));
+		Assert.assertTrue(tBt.subtype(tAt, subtypes));
+	}
 }

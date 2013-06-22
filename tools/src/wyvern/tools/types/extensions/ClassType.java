@@ -69,29 +69,30 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		HashSet<String> thisDtypes = new HashSet<String>();
 		for (Declaration d : thisD.getDecls().getDeclIterator()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
-			if (d instanceof PropDeclaration || d instanceof VarDeclaration || d instanceof ValDeclaration) {
-				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
-			} else {
-				thisDtypes.add(d.getType().toString());
-			}
+			thisDtypes.add(d.getType().toString());
 		}
 		
 		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
 		
 		HashSet<String> implDtypes = new HashSet<String>();
 		for (Declaration d : typeD.getDecls().getDeclIterator()) {
-			// System.out.println(d.getName() + " of type " + d.getType());
+			// System.out.println(d.getName() + " of type " + d.getType() + " that has class " + d.getClass());
 			if (d instanceof PropDeclaration) {
-				implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+				if (!(thisDtypes.contains(d.getType().toString()) ||
+					  thisDtypes.contains("Unit -> " + d.getType().toString()))) return false;
+				// implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
 			} else {
-				implDtypes.add(d.getType().toString());
+				if (!thisDtypes.contains(d.getType().toString())) return false;
+				// implDtypes.add(d.getType().toString());
 			}
 		}
 		
 		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
 
 		// System.out.println("This subtype of Implements: " + thisDtypes.containsAll(implDtypes) + "\n");
-		return thisDtypes.containsAll(implDtypes);
+		// return thisDtypes.containsAll(implDtypes);
+		
+		return true;
 	}
 
 	public boolean checkImplementsClass(TypeType tt) {
