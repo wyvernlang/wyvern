@@ -30,6 +30,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private String implementsName; // FIXME: Should be bindings with proper equals implementation?
 	private String implementsClassName;
 	
+	private NameBinding nameImplements;
+	
 	protected Environment declEvalEnv;
 	
 	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
@@ -58,6 +60,12 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public Type getType() {
 		return this.typeBinding.getType();
 	}
+	
+	public TypeType getTypeType() { // FIXME: Should this be really what getType returns?
+		if (this.nameImplements != null) {
+			return (TypeType) this.nameImplements.getType();
+		} else { return null; }
+	}
 
 	@Override
 	public Type doTypecheck(Environment env) {
@@ -78,7 +86,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		
 		// check the implements and class implements
 		if (!this.implementsName.equals("")) {
-			NameBinding nameImplements = env.lookup(this.implementsName);
+			this.nameImplements = env.lookup(this.implementsName);
 			if (nameImplements == null) {
 				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsName, this);
 			}

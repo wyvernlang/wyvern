@@ -1,18 +1,18 @@
 package wyvern.tools.tests;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Scanner;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ToolError;
@@ -20,9 +20,14 @@ import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 
 public class ClassTypeCheckerTests {
@@ -387,15 +392,79 @@ public class ClassTypeCheckerTests {
 	}
 	
 	@Test
-	public void testNameConflict() {
+	public void testNameConflict1() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
 				+"    prop a : Int\n"
 				+"    meth b() : Int\n"
 				+"\n"
 				+"type B\n"
-				+"    prop b : Int\n"
 				+"    meth a() : Int\n"
+				+"    prop b : Int\n"
+				+"\n"
+				+"class AImpl\n"
+				+"    implements A\n"
+				+"\n"
+				+"    class meth make() : A\n"
+				+"        new\n"
+				+"\n"
+				+"    var a : Int\n"
+				+"\n"
+				+"    meth b() : Int\n"
+				+"        this.a\n"
+				+"\n"
+				+"meth doIt() : Unit\n"
+//				+"    val a1:A = AImpl.make()\n"
+//				+"    val a2:B = AImpl.make()\n"
+//				+"    val checkMe1:Int = a1.a\n"
+//				+"    val checkMe2:Unit -> Int = a2.a\n"
+//				+"    val checkMe3:Int = a2.a()\n"
+				
+				// What Would You Do?
+//				+"    val a3:B = a1\n"
+//				+"    val checkMe4:Int = a1.a\n"
+//				+"    val checkMe5:Unit -> Int = a3.a\n"
+//				+"    val checkMe6:Unit -> Int = a1.b\n"
+//				+"    val checkMe7:Int = a3.b\n"
+                
+				+"    null\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L meth b () : Int $L} $I} $L} {$L type B {$I {$L meth a () : Int $L} {$L prop b : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class meth make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L meth b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L meth doIt () : Unit {$I {$L null $L} $I} $L} $I}",
+		 		parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MethDeclaration()]]", typedAST.toString());		
+
+		typedAST.typecheck(env);
+
+		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+
+		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
+
+		Assert.assertFalse(tAt.subtype(tBt, subtypes));
+		Assert.assertFalse(tBt.subtype(tAt, subtypes));
+	}
+	
+	@Test
+	public void testNameConflict2() {
+		Reader reader = new StringReader("\n"
+				+"type A\n"
+				+"    meth a() : Int\n"
+				+"    meth b() : Int\n"
+				+"\n"
+				+"type B\n"
+				+"    meth a() : Int\n"
+				+"    meth b() : Int\n"
 				+"\n"
 				+"class AImpl\n"
 				+"    implements A\n"
@@ -411,21 +480,21 @@ public class ClassTypeCheckerTests {
 				+"meth doIt() : Unit\n"
 				+"    val a1:A = AImpl.make()\n"
 				+"    val a2:B = AImpl.make()\n"
-				+"    val checkMe1:Int = a1.a\n"
+				+"    val checkMe1:Unit -> Int = a1.a\n"
 				+"    val checkMe2:Unit -> Int = a2.a\n"
 				+"    val checkMe3:Int = a2.a()\n"
 				
 				// What Would You Do?
 				+"    val a3:B = a1\n"
-				+"    val checkMe4:Int = a1.a\n"
+				+"    val checkMe4:Unit -> Int = a1.a\n"
 				+"    val checkMe5:Unit -> Int = a3.a\n"
 				+"    val checkMe6:Unit -> Int = a1.b\n"
-				+"    val checkMe7:Int = a3.b\n"
+				+"    val checkMe7:Unit -> Int = a3.b\n"
                 
 				+"    null\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L meth b () : Int $L} $I} $L} {$L type B {$I {$L prop b : Int $L} {$L meth a () : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class meth make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L meth b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L meth doIt () : Unit {$I {$L val a1 : A = AImpl . make () $L} {$L val a2 : B = AImpl . make () $L} {$L val checkMe1 : Int = a1 . a $L} {$L val checkMe2 : Unit -> Int = a2 . a $L} {$L val checkMe3 : Int = a2 . a () $L} {$L val a3 : B = a1 $L} {$L val checkMe4 : Int = a1 . a $L} {$L val checkMe5 : Unit -> Int = a3 . a $L} {$L val checkMe7 : Unit -> Int = a1 . b $L} {$L val checkMe8 : Int = a3 . b $L} {$L null $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L meth a () : Int $L} {$L meth b () : Int $L} $I} $L} {$L type B {$I {$L meth a () : Int $L} {$L meth b () : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class meth make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L meth b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L meth doIt () : Unit {$I {$L val a1 : A = AImpl . make () $L} {$L val a2 : B = AImpl . make () $L} {$L val checkMe1 : Unit -> Int = a1 . a $L} {$L val checkMe2 : Unit -> Int = a2 . a $L} {$L val checkMe3 : Int = a2 . a () $L} {$L val a3 : B = a1 $L} {$L val checkMe4 : Unit -> Int = a1 . a $L} {$L val checkMe5 : Unit -> Int = a3 . a $L} {$L val checkMe6 : Unit -> Int = a1 . b $L} {$L val checkMe7 : Unit -> Int = a3 . b $L} {$L null $L} $I} $L} $I}",
 		 		parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -434,5 +503,19 @@ public class ClassTypeCheckerTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MethDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
+
+		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+
+		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
+
+		Assert.assertTrue(tAt.subtype(tBt, subtypes));
+		Assert.assertTrue(tBt.subtype(tAt, subtypes));
 	}
 }

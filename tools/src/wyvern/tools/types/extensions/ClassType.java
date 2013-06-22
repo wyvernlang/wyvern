@@ -21,9 +21,11 @@ import wyvern.tools.util.TreeWriter;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType {
 	private ClassDeclaration decl;
+	private TypeType implementsType;
 	
 	public ClassType(ClassDeclaration decl) {
 		this.decl = decl;
+		this.implementsType = decl.getTypeType();
 	}
 	
 	@Override
@@ -136,6 +138,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		if (other instanceof TypeType) {
 			return this.checkImplements((TypeType) other);
 		} else if (other instanceof ClassType) {
+			// FIXME: The one in TypeType works, but this one NEEDS WORK.
+			// TODO: Does it even make sense to check subtype between two classes??? Maybe NOT!
+
 			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
 			for (TypedAST d : this.decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
