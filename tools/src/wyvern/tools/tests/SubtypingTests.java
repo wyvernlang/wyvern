@@ -369,9 +369,6 @@ public class SubtypingTests {
 				+"        new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L fun m1 (arg1 : Int , arg2 : Int) $L} {$L fun m2 (arg1 : Int , arg2 : Int , arg3 : Int) : Int $L} $I} $L} {$L type Bar {$I {$L fun Foo1 () : Foo $L} {$L fun Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L var pty : Int $L} {$L fun m1 (arg1 : Int , arg2 : Int) {$I {$L this . m1 (arg1 , arg2) $L} $I} $L} {$L fun m2 (arg1 : Int , arg2 : Int , arg3 : Int) : Int {$I {$L 42 $L} $I} $L} {$L fun m3 () : Foo {$I {$L new $L} $I} $L} {$L fun m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
-				parsedResult.toString());
-		
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);

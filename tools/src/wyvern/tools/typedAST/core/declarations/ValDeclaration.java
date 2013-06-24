@@ -20,14 +20,16 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	Type definitionType;
 	NameBinding binding;
 	
-	public ValDeclaration(String name, TypedAST definition) {
+	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
 		this.definition=definition;
 		binding = new NameBindingImpl(name, null);
+		this.location = location;
 	}
 	
-	public ValDeclaration(String name, Type type, TypedAST definition) {
+	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
 		this.definition=definition;
 		binding = new NameBindingImpl(name, type);
+		this.location = location;
 	}
 
 	@Override

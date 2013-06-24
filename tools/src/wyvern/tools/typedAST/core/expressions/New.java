@@ -74,7 +74,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			LinkedList<Declaration> decls = new LinkedList<>();
 
 			for (Map.Entry<String, TypedAST> elem : args.entrySet()) {
-				ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue());
+				ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
 				e.typecheck(env);
 				decls.add(e);
 			}

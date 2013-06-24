@@ -7,9 +7,7 @@ import java.util.HashSet;
 
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.FunDeclaration;
-import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -70,10 +68,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 					String n = ((FunDeclaration) d).getName();
 					Arrow t = (Arrow) ((FunDeclaration) d).getType();
 					thisMembers.add(new Pair<String, Type>(n, t));
-				} else if (d instanceof PropDeclaration) {
-					String n = ((PropDeclaration) d).getName();
-					Type t = ((PropDeclaration) d).getType();
-					thisMembers.add(new Pair<String, Type>(n, t));
 				} else {
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
@@ -87,45 +81,48 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 					String n = ((FunDeclaration) d).getName();
 					Arrow t = (Arrow) ((FunDeclaration) d).getType();
 					otherMembers.add(new Pair<String, Type>(n, t));
-				} else if (d instanceof PropDeclaration) {
-					String n = ((PropDeclaration) d).getName();
-					Type t = ((PropDeclaration) d).getType();
-					otherMembers.add(new Pair<String, Type>(n, t));
 				} else {
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
 			// System.out.println("otherMembers = " + otherMembers);
-
-			boolean subset = true;
-			for (Pair<String, Type> memberOther : otherMembers) {
-				boolean hasImplementingCandidate = false;
-				for (Pair<String, Type> memberThis : thisMembers) {
-					if (memberThis.first.equals(memberOther.first)) { // Name has to be equal! Duh! :-)
-						// Apply S-Amber rule here!
-						SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
-						if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
-							subtypes.add(sr);
-							boolean result = memberThis.second.subtype(memberOther.second, subtypes);
-							subtypes.remove(sr);
-									
-							if (result) {
-								hasImplementingCandidate = true;
-								break;
-							}
-						}
-					}
-				}
-				if (!hasImplementingCandidate) {
-					subset = false;
-					break;
-				}
-			}
-
-			if (subset) return true;
+			
+			if (checkSubtypeRecursively(this, other, thisMembers, otherMembers, subtypes)) return true;
 		}
 		
 		return false;
+	}
+	
+	public static boolean checkSubtypeRecursively(Type thisType, Type otherType,
+			HashSet<Pair<String, Type>> thisMembers, HashSet<Pair<String, Type>> otherMembers,
+			HashSet<SubtypeRelation> subtypes) {
+		
+		boolean subset = true;
+		for (Pair<String, Type> memberOther : otherMembers) {
+			boolean hasImplementingCandidate = false;
+			for (Pair<String, Type> memberThis : thisMembers) {
+				if (memberThis.first.equals(memberOther.first)) { // Name has to be equal! Duh! :-)
+					// Apply S-Amber rule here!
+					SubtypeRelation sr = new SubtypeRelation(thisType, otherType);
+					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+						subtypes.add(sr);
+						boolean result = memberThis.second.subtype(memberOther.second, subtypes);
+						subtypes.remove(sr);
+								
+						if (result) {
+							hasImplementingCandidate = true;
+							break;
+						}
+					}
+				}
+			}
+			if (!hasImplementingCandidate) {
+				subset = false;
+				break;
+			}
+		}
+
+		return subset;
 	}
 }

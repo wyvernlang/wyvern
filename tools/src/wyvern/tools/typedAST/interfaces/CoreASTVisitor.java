@@ -1,13 +1,11 @@
 package wyvern.tools.typedAST.interfaces;
 
-import wyvern.targets.JavaScript.typedAST.JSCast;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.FunDeclaration;
-import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -28,7 +26,6 @@ public interface CoreASTVisitor {
 	void visit(Fn fn);
 	void visit(Invocation invocation);
 	void visit(Application application);
-	void visit(PropDeclaration propDeclaration);
 	void visit(ValDeclaration valDeclaration);
 	void visit(VarDeclaration valDeclaration);
 	void visit(Variable variable);

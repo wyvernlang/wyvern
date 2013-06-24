@@ -11,6 +11,7 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.Unit;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.PartialDeclSequence;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -118,8 +119,58 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		return new Sequence(s);
 	}
 	
+	// FIXME: Hack. Flattens decl sequence. NEED TO REFACTOR!
 	public Iterable<Declaration> getDeclIterator() {
-		return getIterator();
+		final Iterator<TypedAST> inner = iterator();
+		return new Iterable<Declaration>() {
+
+			@Override
+			public Iterator<Declaration> iterator() {
+				return new Iterator<Declaration>() {
+					
+					Iterator<Declaration> ss = null;
+
+					@Override
+					public boolean hasNext() {
+						if (ss != null && ss.hasNext()) {
+							return ss.hasNext();
+						} else {
+							ss = null;
+							return inner.hasNext();
+						}
+					}
+
+					@Override
+					public Declaration next() {
+						if (ss != null && ss.hasNext()) {
+							return ss.next();
+						} else {
+							ss = null;
+							TypedAST next = inner.next();
+							if (next instanceof Declaration) {
+								return (Declaration) next;
+							} else if (next instanceof DeclSequence) {
+								ss = ((DeclSequence) next).getDeclIterator().iterator();
+								return ss.next();
+							} else {
+								return (Declaration) inner.next(); // Will cause a cast error.
+							}
+						}
+					}
+
+					@Override
+					public void remove() {
+						if (ss != null && ss.hasNext()) {
+							ss.remove();
+						} else {
+							ss = null;
+							inner.remove();
+						}
+					}
+				};
+			}
+
+		};
 	}
 
 	public Iterable<EnvironmentExtender> getEnvExts() {

@@ -8,7 +8,6 @@ import java.util.Stack;
 import wyvern.targets.JavaScript.typedAST.JSCast;
 import wyvern.targets.JavaScript.typedAST.JSFunction;
 import wyvern.targets.JavaScript.typedAST.JSVar;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
@@ -17,13 +16,11 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.FunDeclaration;
-import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.IfExpr;
-import wyvern.tools.typedAST.core.expressions.IfExpr.IfClause;
 import wyvern.tools.typedAST.core.expressions.LetExpr;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
@@ -35,13 +32,12 @@ import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
-import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Pair;
 
 public class JSCodegenVisitor extends BaseASTVisitor {
@@ -394,11 +390,6 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 	@Override
 	public void visit(TypeDeclaration interfaceDeclaration) {
 		elemStack.push(new ASTElement(interfaceDeclaration,""));
-	}
-	
-	@Override
-	public void visit(PropDeclaration propDeclaration) {
-		super.visit(propDeclaration);
 	}
 
 	@Override

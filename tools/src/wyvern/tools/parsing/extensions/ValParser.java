@@ -2,11 +2,13 @@ package wyvern.tools.parsing.extensions;
 
 import static wyvern.tools.parsing.ParseUtils.parseSymbol;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
+import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -22,32 +24,17 @@ public class ValParser implements DeclParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		String varName = ParseUtils.parseSymbol(ctx).name;
-		
-		if (!ParseUtils.checkFirst(":", ctx)) {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-			return null;
-		}
-		parseSymbol(":", ctx);
-		Type type = ParseUtils.parseType(ctx);
-		
-		if (ParseUtils.checkFirst("=", ctx)) {
-			parseSymbol("=", ctx);
-			TypedAST exp = ParseUtils.parseExpr(ctx);
-			return new ValDeclaration(varName, type, exp);	
-		} else if (ctx.first == null) {
-			return new ValDeclaration(varName, type, null);
-		} else {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-			return null;
-		}
+		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 
 
 	//@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			final Pair<ExpressionSequence, Environment> ctx) {
-		final String varName = ParseUtils.parseSymbol(ctx).name;
+		Symbol s = ParseUtils.parseSymbol(ctx);
+		final String valName = s.name;
+		final FileLocation valNameLocation = s.getLocation(); 
 		
 		if (ParseUtils.checkFirst("=", ctx)) {
 			//ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
@@ -64,14 +51,14 @@ public class ValParser implements DeclParser {
 
 		ValDeclaration nc = null;
 		if (restctx.first == null)
-			nc = new ValDeclaration(varName, type, null);
+			nc = new ValDeclaration(valName, type, null, valNameLocation);
 		else if (ParseUtils.checkFirst("=", restctx)) {
 			ParseUtils.parseSymbol("=", restctx);
 			Pair<ExpressionSequence,Environment> ctxi = new Pair<ExpressionSequence,Environment>(restctx.first, ctx.second);
 			TypedAST definition = ParseUtils.parseExpr(restctx);
 			if (type == null)
 				type = definition.typecheck(ctx.second);
-			nc = new ValDeclaration(varName, type, definition);
+			nc = new ValDeclaration(valName, type, definition, valNameLocation);
 		} else {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, restctx.first);
 			nc = null;
@@ -79,7 +66,7 @@ public class ValParser implements DeclParser {
 		final Type parsedType = type;
 
 		final ValDeclaration intermvd = nc;
-		return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(varName, parsedType)), new ContParser(){
+		return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(valName, parsedType)), new ContParser(){
 
 			@Override
 			public TypedAST parse(EnvironmentResolver r) {

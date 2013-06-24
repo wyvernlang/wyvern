@@ -116,5 +116,5 @@ fun place(board:PositionList, col:Int, maxCol:Int):Int
 fun nQueens(size:Int):Int =
 	place(nil,0,size)
 	
-nQueens(11)
+nQueens(9)
 	

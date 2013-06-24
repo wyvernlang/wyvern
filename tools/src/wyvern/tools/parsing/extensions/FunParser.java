@@ -33,12 +33,12 @@ public class FunParser implements DeclParser {
 	
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		return parse(first,ctx,null,false);
+		return parse(first,ctx,false);
 	}
 	
 	//REALLY HACKY (we don't have much of a choice, though)
-	private static class MutableMethDeclaration extends FunDeclaration {
-		public MutableMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation methNameLine) {
+	private static class MutableFunDeclaration extends FunDeclaration {
+		public MutableFunDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation methNameLine) {
 			super(name, args, returnType, body, isClassMeth, methNameLine);
 		}
 		
@@ -47,48 +47,15 @@ public class FunParser implements DeclParser {
 		}
 	}
 	
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx, Type returnType, boolean isClassMeth) {
-		Symbol s = ParseUtils.parseSymbol(ctx);
-		String methName = s.name;
-		FileLocation methNameLine = s.getLocation();
-
-		List<NameBinding> args = getNameBindings(ctx);
-		
-		if (ParseUtils.checkFirst(":", ctx)) {
-			if (returnType == null) {
-				returnType = parseReturnType(ctx);
-			}
-		} else {
-			returnType = wyvern.tools.types.extensions.Unit.getInstance();
-		}
-		
-		// Process body now.
-		TypedAST exp = null;
-		MutableMethDeclaration md = new MutableMethDeclaration(methName, args, returnType, null, isClassMeth, methNameLine);
-		
-		if (ctx.first == null) {
-			// Empty body is OK - say inside interface.
-			exp = null;
-		} else if (ParseUtils.checkFirst("=",ctx)) {
-			ParseUtils.parseSymbol("=",ctx);
-			exp = ctx.first.accept(BodyParser.getInstance(), md.extend(ctx.second));
-			ctx.first = null; // don't forget to reset!
-		} else {
-			exp = ctx.first.accept(BodyParser.getInstance(), md.extend(ctx.second));
-			ctx.first = null; // don't forget to reset!
-		}
-		
-		md.setBody(exp);
-
-		return new FunDeclaration(methName, args, returnType, exp, isClassMeth, methNameLine); // Discard mutable md... hack...
-		
+	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx, boolean isClassMeth) {
+		Pair<Environment, ContParser> p = parseDeferred(first,  ctx, isClassMeth);
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
 		return this.parseDeferred(first, ctx, false);
-		
 	}
 	
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
@@ -145,7 +112,7 @@ public class FunParser implements DeclParser {
 		
 		ctx.first = null; // don't forget to reset!
 		
-		final MutableMethDeclaration md = new MutableMethDeclaration(methName, args, returnType, null, isClassMeth, methNameLine);
+		final MutableFunDeclaration md = new MutableFunDeclaration(methName, args, returnType, null, isClassMeth, methNameLine);
 		
 		return new Pair<Environment, ContParser>(md.extend(Environment.getEmptyEnvironment()), new ContParser() {
 

@@ -8,9 +8,9 @@ import wyvern.tools.types.Environment;
 
 public interface ContParser {
 	public static class EmptyWithAST implements ContParser {
-		private Declaration elem;
+		private TypedAST elem;
 
-		public EmptyWithAST(Declaration elem) {
+		public EmptyWithAST(TypedAST elem) {
 			this.elem = elem;
 		}
 		

@@ -44,77 +44,12 @@ public class ClassParser implements DeclParser {
 		public void setDecls(DeclSequence decl) {
 			this.decls = decl;
 		}
-		
-		
 	}
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		if (ParseUtils.checkFirst("fun", ctx)) { // Parses "class fun". // FIXME: Should this connect to the keyword in Globals?
-			ParseUtils.parseSymbol(ctx);
-			return FunParser.getInstance().parse(first, ctx, null, true);
-		}
-		
-		Symbol s = ParseUtils.parseSymbol(ctx);
-		String clsName = s.name;
-		FileLocation clsNameLine = s.getLocation();
-
-		TypedAST declAST = null;
-		String implementsName = "";
-		String implementsClassName = "";
-		MutableClassDeclaration mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, clsNameLine);
-
-		if (ctx.first == null) {
-			return mutableDecl;
-		}
-		
-		LineSequence lines = ParseUtils.extractLines(ctx); // Get potential body.
-		
-		if (lines.getFirst() != null && lines.getFirst().getFirst() != null &&
-				lines.getFirst().getFirst().toString().equals("implements")) { // FIXME: hack, detected implements
-			implementsName = lines.getFirst().getRest().getFirst().toString();
-			lines.children.remove(0);
-		}
-
-		if (lines.getFirst() != null && lines.getFirst().getFirst() != null &&
-				lines.getFirst().getFirst().toString().equals("class")) { // FIXME: hack, detected class
-			if (lines.getFirst().getRest() != null && lines.getFirst().getRest().getFirst() != null &&
-					lines.getFirst().getRest().getFirst().toString().equals("implements")) { // FIXME: hack, detected implements
-				implementsClassName = lines.getFirst().getRest().getRest().getFirst().toString();
-				lines.children.remove(0);
-			}
-		}
-
-		// Process body.
-		if (ctx.first != null)
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-		
-		mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, clsNameLine);
-		
-		Environment newEnv = mutableDecl.extend(ctx.second); 
-		newEnv = newEnv.extend(new TypeBinding("class", mutableDecl.getType()));
-		final Pair<Environment,ContParser> declASTParser = lines.accept(DeclarationParser.getInstance(), newEnv);
-		
-		final Environment envs = newEnv;
-		final Environment envi = newEnv.extend(new NameBindingImpl("this", mutableDecl.getType()));
-		
-		declAST = declASTParser.second.parse(new EnvironmentResolver() {
-			@Override
-			public Environment getEnv(TypedAST elem) {
-				if (elem instanceof FunDeclaration && ((FunDeclaration) elem).isClassFun()) {
-						return envs;
-				}
-				return envi;
-			} 
-		});
-		
-		if (!(declAST instanceof Declaration) && !(declAST instanceof Sequence))
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-		
-		mutableDecl.setDecls(DeclSequence.getDeclSeq(declAST));
-		
-
-		return mutableDecl;
+		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 
 	@Override

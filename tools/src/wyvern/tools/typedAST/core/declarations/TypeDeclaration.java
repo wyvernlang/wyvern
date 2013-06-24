@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.Iterator;
+
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -9,6 +11,7 @@ import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -53,9 +56,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env);
+		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
-			decl = decl.getNextDecl();
 		}
 
 		return this.typeBinding.getType();

@@ -21,25 +21,8 @@ public class VarParser implements DeclParser {
 	
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		String varName = ParseUtils.parseSymbol(ctx).name;
-		
-		if (!ParseUtils.checkFirst(":", ctx)) {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-			return null;
-		}
-		parseSymbol(":", ctx);
-		Type type = ParseUtils.parseType(ctx);
-		
-		if (ParseUtils.checkFirst("=", ctx)) {
-			parseSymbol("=", ctx);
-			TypedAST exp = ParseUtils.parseExpr(ctx);
-			return new VarDeclaration(varName, type, exp);	
-		} else if (ctx.first == null) {
-			return new VarDeclaration(varName, type, null);
-		} else {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-			return null;
-		}
+		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 
 

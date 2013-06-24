@@ -6,7 +6,6 @@ import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.FunDeclaration;
-import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -46,11 +45,6 @@ public class PassThroughVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(Application application) {
 		next.visit(application);
-	}
-
-	@Override
-	public void visit(PropDeclaration propDeclaration) {
-		next.visit(propDeclaration);
 	}
 
 	@Override

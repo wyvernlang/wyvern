@@ -458,7 +458,7 @@ public class JSCodegenTest {
 		String result = visitor.getCode();
 		is.close();
 
-		Assert.assertEquals(2680.0, wrapInvoke(result));
+		Assert.assertEquals(352.0, wrapInvoke(result)); // Used to be 2680.0 for call with 11 size.
 	}
 
 	@Test

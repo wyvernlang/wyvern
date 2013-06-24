@@ -4,21 +4,21 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.FunDeclaration;
-import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
-import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType {
@@ -60,79 +60,80 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		return this.decl;
 	}
 
-	public boolean checkImplements(TypeType tt) {
-		ClassDeclaration thisD = this.decl;
-		TypeDeclaration typeD = tt.getDecl();
-		
-		// FIXME: Ignores names right now!!!
-		
-		HashSet<String> thisDtypes = new HashSet<String>();
-		for (Declaration d : thisD.getDecls().getDeclIterator()) {
-			// System.out.println(d.getName() + " of type " + d.getType());
-			thisDtypes.add(d.getType().toString());
-		}
-		
-		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
-		
-		HashSet<String> implDtypes = new HashSet<String>();
-		for (Declaration d : typeD.getDecls().getDeclIterator()) {
-			// System.out.println(d.getName() + " of type " + d.getType() + " that has class " + d.getClass());
-			if (d instanceof PropDeclaration) {
-				if (!(thisDtypes.contains(d.getType().toString()) ||
-					  thisDtypes.contains("Unit -> " + d.getType().toString()))) return false;
-				// implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+	public boolean checkImplements(TypeType other) {
+		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
+		for (TypedAST d : this.decl.getDecls()) {
+			if (d instanceof FunDeclaration) {
+				String n = ((FunDeclaration) d).getName();
+				Arrow t = (Arrow) ((FunDeclaration) d).getType();
+				thisMembers.add(new Pair<String, Type>(n, t));
 			} else {
-				if (!thisDtypes.contains(d.getType().toString())) return false;
-				// implDtypes.add(d.getType().toString());
+				System.out.println("Unsupported type member in checkImplements: " + d.getClass());
 			}
 		}
 		
-		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
-
-		// System.out.println("This subtype of Implements: " + thisDtypes.containsAll(implDtypes) + "\n");
-		// return thisDtypes.containsAll(implDtypes);
+		System.out.println("thisMembers (checkImplements) = " + thisMembers);
 		
-		return true;
+		HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
+		for (TypedAST d : other.getDecl().getDecls()) {
+			if (d instanceof FunDeclaration) {
+				String n = ((FunDeclaration) d).getName();
+				Arrow t = (Arrow) ((FunDeclaration) d).getType();
+				otherMembers.add(new Pair<String, Type>(n, t));
+			} else {
+				System.out.println("Unsupported type member in checkImplements: " + d.getClass());
+			}
+		}
+		
+		System.out.println("otherMembers (checkImplements) = " + otherMembers);
+		
+		return TypeType.checkSubtypeRecursively(this, other, thisMembers, otherMembers, new HashSet<SubtypeRelation>());
 	}
 
-	public boolean checkImplementsClass(TypeType tt) {
-		ClassDeclaration thisD = this.decl;
-		TypeDeclaration typeD = tt.getDecl();
-		
-		// FIXME: Ignores names right now!!!
-		
-		HashSet<String> thisDtypes = new HashSet<String>();
-		for (Declaration d : thisD.getDecls().getDeclIterator()) {
-			// System.out.println(d.getName() + " of type " + d.getType());
-			if (d instanceof PropDeclaration) {
-				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
-			} else if (d instanceof FunDeclaration) {
-				// Only interested in class methods.
-				FunDeclaration md = (FunDeclaration) d;
-				if (md.isClassFun()) {
-					thisDtypes.add(d.getType().toString());
-				}
+	public boolean checkImplementsClass(TypeType other) {
+		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
+		for (TypedAST d : this.decl.getDecls()) {
+			if (d instanceof FunDeclaration && ((FunDeclaration) d).isClassFun()) {
+				String n = ((FunDeclaration) d).getName();
+				Arrow t = (Arrow) ((FunDeclaration) d).getType();
+				thisMembers.add(new Pair<String, Type>(n, t));
 			} else {
-				thisDtypes.add(d.getType().toString());
+				System.out.println("Unsupported type member in checkImplementsClass: " + d.getClass());
 			}
 		}
 		
-		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
+		System.out.println("thisMembers (checkImplementsClass) = " + thisMembers);
 		
-		HashSet<String> implDtypes = new HashSet<String>();
-		for (Declaration d : typeD.getDecls().getDeclIterator()) {
-			// System.out.println(d.getName() + " of type " + d.getType());
-			if (d instanceof PropDeclaration) {
-				implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+		HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
+		for (TypedAST d : other.getDecl().getDecls()) {
+			if (d instanceof FunDeclaration) {
+				String n = ((FunDeclaration) d).getName();
+				Arrow t = (Arrow) ((FunDeclaration) d).getType();
+				otherMembers.add(new Pair<String, Type>(n, t));
 			} else {
-				implDtypes.add(d.getType().toString());
+				System.out.println("Unsupported type member in checkImplementsClass: " + d.getClass());
 			}
 		}
 		
-		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
-
-		// System.out.println("This subtype of Implements: " + thisDtypes.containsAll(implDtypes) + "\n");
-		return thisDtypes.containsAll(implDtypes);
+		System.out.println("otherMembers (checkImplementsClass) = " + otherMembers);
+		
+		return TypeType.checkSubtypeRecursively(this, other, thisMembers, otherMembers, new HashSet<SubtypeRelation>());
+	}
+	
+	public TypeType convertToType() {
+		LinkedList<Declaration> seq = new LinkedList<>();
+		
+		// Generate an appropriate type member for every class member.
+		for (Declaration d : decl.getDecls().getDeclIterator()) {
+			if (d instanceof FunDeclaration) {
+				// TODO:
+				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
+			} else {
+				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
+			}
+		}
+		
+		return new TypeType(new TypeDeclaration(decl.getName(), new DeclSequence(seq), decl.getLocation()));
 	}
 
 	// FIXME: Do something similar here to TypeType maybe and maybe try to integrate the above
@@ -142,59 +143,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		if (super.subtype(other, subtypes)) {
 			return true;
 		}
+
 		if (other instanceof TypeType) {
 			return this.checkImplements((TypeType) other);
 		} else if (other instanceof ClassType) {
-			// FIXME: The one in TypeType works, but this one NEEDS WORK.
-			// TODO: Does it even make sense to check subtype between two classes??? Maybe NOT!
-
-			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
-			for (TypedAST d : this.decl.getDecls()) {
-				if (d instanceof FunDeclaration) {
-					Arrow a = (Arrow) ((FunDeclaration) d).getType();
-					thisMeths.add(a);
-				} else {
-					// FIXME: Can class contains more than meth? Vars?
-					System.out.println("Unsupported class member in subtype: " + d.getClass());
-				}
-			}
-			
-			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
-			for (TypedAST d : ((ClassType) other).decl.getDecls()) {
-				if (d instanceof FunDeclaration) {
-					Arrow a = (Arrow) ((FunDeclaration) d).getType();
-					otherMeths.add(a);
-				} else {
-					// FIXME: Can class contains more than meth? Vars?
-					System.out.println("Unsupported class member in subtype: " + d.getClass());
-				}
-			}
-			
-			// FIXME: Allows to have multiple methods that match to implement several methods
-			// from supertype - is this OK? Seems OK to me but not sure. :-)
-			boolean subset = true;
-			for (Arrow aOther : otherMeths) {
-				boolean hasImplementingCandidate = false;
-				for (Arrow aThis : thisMeths) {
-					// Apply S-Amber rule here!
-					SubtypeRelation sr = new SubtypeRelation(this, (ClassType) other);
-					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
-						subtypes.add(sr);
-						boolean result = aThis.subtype(aOther, subtypes);
-						subtypes.remove(sr);
-								
-						if (result) {
-							hasImplementingCandidate = true;
-							break;
-						}
-					}	
-				}
-				if (!hasImplementingCandidate) {
-					subset = false;
-					break;
-				}
-			}
-			if (subset) return true;
+			return this.convertToType().subtype(((ClassType) other).convertToType());
 		}
 		
 		return false;

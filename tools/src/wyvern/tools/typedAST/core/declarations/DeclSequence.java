@@ -20,7 +20,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			public Iterator<TypedAST> iterator() {
 				final Iterator<EnvironmentExtender> iter = first.iterator();
 				return new Iterator<TypedAST>() {
-
 					@Override
 					public boolean hasNext() {
 						return iter.hasNext();
@@ -43,7 +42,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		
 	}
 
-
 	public DeclSequence(final Sequence declAST) {
 		super(new Iterable<TypedAST>() {
 
@@ -59,7 +57,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 
 					@Override
 					public TypedAST next() {
-						return (Declaration)iter.next();
+						return iter.next();
 					}
 
 					@Override
@@ -76,7 +74,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	public DeclSequence(Declaration decl) {
 		super(decl);
 	}
-
 
 	@Override
 	public Type typecheck(Environment env) {

@@ -2,7 +2,6 @@ package wyvern.tools.typedAST.visitors;
 
 import java.util.Map.Entry;
 
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
@@ -10,7 +9,6 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.FunDeclaration;
-import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -76,10 +74,6 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 		
 		if (definition instanceof CoreAST)
 			((CoreAST) definition).accept(this);
-	}
-
-	@Override
-	public void visit(PropDeclaration propDeclaration) {
 	}
 
 	@Override

@@ -52,6 +52,6 @@ class StackImpl
 fun stackClient()
 	val s : Stack = StackImpl.Stack()
 	s.push(5)
-	printInteger(s.top)
+	printInteger(s.top())
 	val addOne:Int->Int = fn x:Int => x+1
 	printInteger(addOne(s.pop()))

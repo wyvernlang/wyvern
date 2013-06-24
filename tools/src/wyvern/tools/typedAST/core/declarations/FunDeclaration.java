@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.tools.errors.ErrorMessage;
@@ -38,6 +39,7 @@ public class FunDeclaration extends Declaration implements CoreAST, BoundCode {
 	private boolean isClassFun;
 
 	public FunDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
+		if (args == null) { args = new LinkedList<NameBinding>(); }
 		type = getMethodType(args, returnType);
 		binding = new NameBindingImpl(name, type);
 		this.body = body;

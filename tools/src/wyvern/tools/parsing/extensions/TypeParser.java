@@ -37,23 +37,8 @@ public class TypeParser implements DeclParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		Symbol s = ParseUtils.parseSymbol(ctx);
-		String clsName = s.name;
-		FileLocation clsNameLine = s.getLocation();
-
-		TypedAST declAST = null;
-		if (ctx.first == null) {
-			// Empty body in the interface declaration is OK.
-		} else {
-			// Process body.
-			LineSequence lines = ParseUtils.extractLines(ctx);
-			if (ctx.first != null)
-				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-
-			declAST = lines.accept(BodyParser.getInstance(), ctx.second);
-		}
-
-		return new TypeDeclaration(clsName, DeclSequence.getDeclSeq(declAST), clsNameLine);
+		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 	
 	@Override
