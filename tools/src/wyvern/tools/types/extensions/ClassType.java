@@ -62,7 +62,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 
 	public boolean checkImplements(TypeType other) {
 		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : this.decl.getDecls()) {
+		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
 			if (d instanceof FunDeclaration) {
 				String n = ((FunDeclaration) d).getName();
 				Arrow t = (Arrow) ((FunDeclaration) d).getType();
@@ -92,7 +92,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 
 	public boolean checkImplementsClass(TypeType other) {
 		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : this.decl.getDecls()) {
+		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
 			if (d instanceof FunDeclaration && ((FunDeclaration) d).isClassFun()) {
 				String n = ((FunDeclaration) d).getName();
 				Arrow t = (Arrow) ((FunDeclaration) d).getType();

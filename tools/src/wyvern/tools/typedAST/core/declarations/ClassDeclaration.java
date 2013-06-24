@@ -22,7 +22,7 @@ import wyvern.tools.util.TreeWriter;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;
-	protected DeclSequence classDecls;
+	// protected DeclSequence classDecls;
 	
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;

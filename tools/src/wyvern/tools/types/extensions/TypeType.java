@@ -63,7 +63,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		
 		if (other instanceof TypeType) {
 			HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-			for (TypedAST d : this.decl.getDecls()) {
+			for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
 				if (d instanceof FunDeclaration) {
 					String n = ((FunDeclaration) d).getName();
 					Arrow t = (Arrow) ((FunDeclaration) d).getType();
@@ -76,7 +76,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 			// System.out.println("thisMembers = " + thisMembers);
 			
 			HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
-			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
+			for (TypedAST d : ((TypeType) other).decl.getDecls().getDeclIterator()) {
 				if (d instanceof FunDeclaration) {
 					String n = ((FunDeclaration) d).getName();
 					Arrow t = (Arrow) ((FunDeclaration) d).getType();
