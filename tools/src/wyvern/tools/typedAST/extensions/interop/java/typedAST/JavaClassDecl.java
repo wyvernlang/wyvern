@@ -4,7 +4,11 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.TypeType;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -15,6 +19,10 @@ import java.util.List;
 
 public class JavaClassDecl extends ClassDeclaration {
 	private Class clazz;
+
+	public Class getClazz() {
+		return clazz;
+	}
 
 	private static DeclSequence getDecls(Class clazz) {
 		List<Declaration> decls = new LinkedList<Declaration>();
@@ -29,15 +37,27 @@ public class JavaClassDecl extends ClassDeclaration {
 		return new DeclSequence(decls);
 	}
 
+
 	public JavaClassDecl(Class clazz) {
-		super(clazz.getName(), null, null, null, FileLocation.UNKNOWN);
+		super(clazz.getSimpleName(), "", "", null, FileLocation.UNKNOWN);
 		this.clazz = clazz;
+	}
+
+
+	@Override
+	protected Type getClassType() {
+		return new JavaClassType(this);
 	}
 
 	public void initalize() {
 		super.decls = getDecls(this.clazz);
 		super.declEvalEnv = Environment.getEmptyEnvironment();
 	}
+
+	public TypeDeclaration getEquivType() {
+		return new TypeDeclaration(getName(), getDecls(), getLocation());
+	}
+
 	private static Method findHighestMethod(Class cls,
 											String method) {
 		Class[] ifaces = cls.getInterfaces();

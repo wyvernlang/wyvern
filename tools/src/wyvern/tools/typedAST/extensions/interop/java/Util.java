@@ -120,13 +120,17 @@ public class Util {
 	public static Type javaToWyvTypeInternal(Class jType) {
 		if (jType.equals(int.class))
 			return Int.getInstance();
+		else if (jType.equals(Boolean.class) || jType.equals(boolean.class))
+			return Bool.getInstance();
 		else if (jType.equals(String.class))
 			return Str.getInstance();
+		else if (jType.equals(void.class))
+			return Unit.getInstance();
 		else {
-			JavaClassType jct = new JavaClassType(jType);
-			classCache.put(jType, jct); //Prevent infinite recursion
-			jct.initalize();
-			return jct;
+			JavaClassDecl jcd = new JavaClassDecl(jType);
+			classCache.put(jType, jcd.getType()); //Prevent infinite recursion
+			jcd.initalize();
+			return jcd.getType();
 		}
 	}
 

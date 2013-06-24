@@ -14,6 +14,7 @@ import wyvern.tools.util.TreeWriter;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,14 +51,17 @@ public class JavaInvocation implements TypedAST {
 		for (String argname : argNames) {
 			values[valIdx] = Util.toJavaObject(env.getValue(argname), parameterTypes[valIdx++]);
 		}
-		Object receiver = Util.toJavaObject(env.getValue("this"), reflected.getDeclaringClass());
+		Object receiver = null;
+		if (!Modifier.isStatic(reflected.getModifiers()))
+			receiver = Util.toJavaObject(env.getValue("this"), reflected.getDeclaringClass());
 
 
 		try {
-			Object[] args = new Object[values.length+1];
-			args[0] = receiver;
+			Object[] args = new Object[values.length+((receiver != null)?1:0)];
+			if (receiver != null)
+				args[0] = receiver;
 			for (int i = 0; i < values.length; i++)
-				args[i+1] = values[i];
+				args[i+((receiver != null)?1:0)] = values[i];
 
 			return Util.toWyvObj(input.invokeWithArguments(args));  //To change body of implemented methods use File | Settings | File Templates.
 		} catch (Throwable e) {
