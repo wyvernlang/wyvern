@@ -49,7 +49,7 @@ public class Closure extends AbstractValue implements ApplyableValue {
 		else if (bindings.size() != 0)
 			throw new RuntimeException("Something bad happened!");
 		
-		return function.getBody().evaluate(bodyEnv);
+		return function.getBody().evaluate(argEnv.extend(bodyEnv));
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

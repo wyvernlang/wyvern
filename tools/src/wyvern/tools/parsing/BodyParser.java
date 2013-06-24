@@ -29,6 +29,7 @@ import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
@@ -79,8 +80,8 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		}
 
 		TypedAST first = node.getFirst().accept(this, env);
-		if (first instanceof Declaration)
-			env = ((Declaration)first).extend(env);
+		if (first instanceof EnvironmentExtender)
+			env = ((EnvironmentExtender)first).extend(env);
 		LineSequenceParser parser = first.getLineSequenceParser();
 		LineSequence rest = node.getRest();
 		
@@ -122,8 +123,8 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 					continue;
 				}
 				
-				if (first instanceof Declaration)
-					env = ((Declaration)first).extend(env);
+				if (first instanceof EnvironmentExtender)
+					env = ((EnvironmentExtender)first).extend(env);
 				
 				// Make sure that we allow val's etc to parse their bodies/continuations properly!
 				LineSequenceParser bodyParser = first.getLineSequenceParser();

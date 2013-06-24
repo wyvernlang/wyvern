@@ -92,7 +92,7 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		}
 		if (body != null) {
 			Type bodyType = body.typecheck(extEnv); // Can be null for meth inside type!
-			if (!bodyType.subtype(((Arrow)type).getResult()))
+			if (bodyType != null && !bodyType.subtype(((Arrow)type).getResult()))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, bodyType.toString(), ((Arrow)type).getResult().toString(), this);
 		}
 		return type;

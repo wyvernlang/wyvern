@@ -34,13 +34,16 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	
 	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
-		Type objectType = new ClassType(this);
+		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
 		typeBinding = new TypeBinding(name, objectType);
 		nameBinding = new NameBindingImpl(name, classType);
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
 		this.location = location;
+	}
+	protected Type getClassType() {
+		return new ClassType(this);
 	}
 
 	@Override
@@ -135,7 +138,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		declEvalEnv = declEnv;
+		declEvalEnv = declEnv.extend(evalEnv);
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 		ClassObject classObj = new ClassObject(this);
 		
