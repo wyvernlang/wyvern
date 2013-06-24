@@ -16,7 +16,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -280,7 +280,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 
 
 	@Override
-	public void visit(MethDeclaration meth) {
+	public void visit(FunDeclaration meth) {
 		inClassStack.push(inClass);
 		boolean sInMeth = inMeth;
 		remapThis = sInMeth;
@@ -304,7 +304,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 			if (!inClass)
 				methodDecl.append("function " + meth.getName() + "(");
 			else
-				if (!meth.isClassMeth())
+				if (!meth.isClassFun())
 					methodDecl.append(className+".prototype."+meth.getName()+" = function(");
 				else
 					methodDecl.append(className+"."+meth.getName()+" = function(");
@@ -316,7 +316,7 @@ public class JSCodegenVisitor extends BaseASTVisitor {
 		elemStack.push(new ASTElement(meth, methodDecl.toString() + nextMethText));
 	}
 
-	private void putMethBody(MethDeclaration meth, StringBuilder methodDecl) {
+	private void putMethBody(FunDeclaration meth, StringBuilder methodDecl) {
 		boolean first = true;
 		for (NameBinding binding : meth.getArgBindings()) {
 			if (!first)

@@ -14,7 +14,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -33,7 +33,7 @@ public class ClassVisitor extends BaseASTVisitor {
 	private String typePrefix;
 	private ClassStore store = null;
 	private ExternalContext context = new ExternalContext();
-	private List<MethDeclaration> meths = new ArrayList<MethDeclaration>();
+	private List<FunDeclaration> meths = new ArrayList<FunDeclaration>();
 	private Map<String, TypedAST> initalizeFieldValues = new HashMap<String,TypedAST>();
 	private int anonMethNum = 0;
 	private org.objectweb.asm.ClassVisitor cw = null;
@@ -161,7 +161,7 @@ public class ClassVisitor extends BaseASTVisitor {
 
 		mv.visitLabel(exceptionBlock);
 
-		for (MethDeclaration md : meths) {
+		for (FunDeclaration md : meths) {
 			mv.visitVarInsn(ALOAD,0);
 			mv.visitVarInsn(ALOAD,1);
 			mv.visitLdcInsn(md.getName());
@@ -177,7 +177,7 @@ public class ClassVisitor extends BaseASTVisitor {
 			}
 			sb.append(")Ljava/lang/invoke/MethodType;");
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType","methodType",sb.toString());
-			if (!md.isClassMeth())
+			if (!md.isClassFun())
 				mv.visitMethodInsn(INVOKEVIRTUAL,
 						"java/lang/invoke/MethodHandles$Lookup",
 						"findVirtual",
@@ -198,7 +198,7 @@ public class ClassVisitor extends BaseASTVisitor {
 			sb = new StringBuilder("(Ljava/lang/Class;");// Construct the return type argument
 			pushClassType(mv, store.getTypeName(checkForClassType(arrow.getResult()), true, true)); // Return type
 
-			if (!md.isClassMeth()) {
+			if (!md.isClassFun()) {
 				sb.append("Ljava/lang/Class;"); //Append the receiver type
 				pushClassType(mv, store.getTypeName(store.getObjectType(), true, true)); // Push the receiver type
 			}
@@ -313,9 +313,9 @@ public class ClassVisitor extends BaseASTVisitor {
 	}
 	
 	@Override
-	public void visit(MethDeclaration methDeclaration) {
+	public void visit(FunDeclaration methDeclaration) {
 		int access = ACC_PUBLIC;
-		if (methDeclaration.isClassMeth())
+		if (methDeclaration.isClassFun())
 			access += ACC_STATIC;
 
 

@@ -30,19 +30,19 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
-public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
+public class FunDeclaration extends Declaration implements CoreAST, BoundCode {
 	protected TypedAST body; // HACK
 	private NameBinding binding;
 	private Type type;
 	private List<NameBinding> args;
-	private boolean isClassMeth;
+	private boolean isClassFun;
 
-	public MethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
+	public FunDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
 		type = getMethodType(args, returnType);
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
 		this.args = args;
-		this.isClassMeth = isClassMeth;
+		this.isClassFun = isClassMeth;
 		this.location = location;
 	}
 
@@ -60,8 +60,8 @@ public class MethDeclaration extends Declaration implements CoreAST, BoundCode {
 		}
 	}
 
-	public boolean isClassMeth() {
-		return isClassMeth;
+	public boolean isClassFun() {
+		return isClassFun;
 	}
 
 	@Override

@@ -5,7 +5,7 @@
 class Position
 	val row:Int
 	val col:Int
-	class meth make(r:Int, c:Int):Position =
+	class fun make(r:Int, c:Int):Position =
 		new
 			row = r
 			col = c
@@ -19,11 +19,11 @@ class Position
  */
 
 type PositionList
-	meth isEmpty():Bool
-	meth forEach(f:Position -> Unit):Unit
+	fun isEmpty():Bool
+	fun forEach(f:Position -> Unit):Unit
 
 	// hack: fix associativity
-	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool
+	fun reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool
 
 class Cons
 	implements PositionList // do we want this to be indented?
@@ -31,15 +31,15 @@ class Cons
 	var v:Position
 	var n:PositionList
 	
-	meth isEmpty():Bool = false
-	meth forEach(f:Position -> Unit):Unit =
+	fun isEmpty():Bool = false
+	fun forEach(f:Position -> Unit):Unit =
 		f(this.v)
 		this.n.forEach(f)
-	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool =
+	fun reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool =
 		val nextResult : Bool = this.n.reduce(identity,f,c)
 		c(f(this.v))(nextResult)
 	
-	class meth make(value:Position,next:PositionList):PositionList =
+	class fun make(value:Position,next:PositionList):PositionList =
 		new
 			v = value
 			n = next
@@ -47,22 +47,22 @@ class Cons
 class Nil
 	implements PositionList
 	
-	meth isEmpty():Bool = true
-	meth forEach(f:Position -> Unit):Unit = ()
-	meth reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool = identity
-	class meth make():PositionList = new
+	fun isEmpty():Bool = true
+	fun forEach(f:Position -> Unit):Unit = ()
+	fun reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool = identity
+	class fun make():PositionList = new
 	
 val nil : PositionList = Nil.make()
 	
-meth not(b:Bool):Bool =
+fun not(b:Bool):Bool =
 	if b
 		then
 			false
 		else
 			true
 	
-meth isSafe(board:PositionList, row:Int, col:Int):Bool =
-	meth isSafeWith(pos:Position):Bool =
+fun isSafe(board:PositionList, row:Int, col:Int):Bool =
+	fun isSafeWith(pos:Position):Bool =
 		val delta : Int = col - pos.col
 		val isUnsafe : Bool = (row == pos.row) || (row == pos.row + delta) || (row == pos.row - delta)
 		not(isUnsafe)
@@ -84,8 +84,8 @@ class Range
 	val low : Int
 	val high : Int
 	
-	meth reduce(identity:Int, f:Int -> Int, c:Int -> (Int -> Int)):Int =
-		meth helper(x:Int):Int =
+	fun reduce(identity:Int, f:Int -> Int, c:Int -> (Int -> Int)):Int =
+		fun helper(x:Int):Int =
 			if x == this.high
 				then
 					identity
@@ -94,17 +94,17 @@ class Range
 					c(nextAnswer)(f(x))
 		helper(this.low)
 		
-	class meth make(l:Int,h:Int):Range =
+	class fun make(l:Int,h:Int):Range =
 		new
 			low = l
 			high = h
 	
-meth place(board:PositionList, col:Int, maxCol:Int):Int
+fun place(board:PositionList, col:Int, maxCol:Int):Int
 	if (col == maxCol)
 		then
 			1
 		else
-			meth rowTest(row:Int):Int =
+			fun rowTest(row:Int):Int =
 				if isSafe(board, row, col)
 					then
 						val pos:Position = Position.make(row, col)
@@ -113,7 +113,7 @@ meth place(board:PositionList, col:Int, maxCol:Int):Int
 						0
 			Range.make(0,maxCol).reduce(0,rowTest,fn x:Int=>fn y:Int=>x+y)
 		
-meth nQueens(size:Int):Int =
+fun nQueens(size:Int):Int =
 	place(nil,0,size)
 	
 nQueens(11)

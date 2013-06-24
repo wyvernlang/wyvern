@@ -13,7 +13,7 @@ import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -21,15 +21,15 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
 /**
- * Parses "meth x : T => e"
+ * Parses "fun x : T => e"
  * 
- * Could specify as:   "meth" symbol ":" type "=>" exp
+ * Could specify as:   "fun" symbol ":" type "=>" exp
  */
 
-public class MethParser implements DeclParser {
-	private MethParser() { }
-	private static MethParser instance = new MethParser();
-	public static MethParser getInstance() { return instance; }
+public class FunParser implements DeclParser {
+	private FunParser() { }
+	private static FunParser instance = new FunParser();
+	public static FunParser getInstance() { return instance; }
 	
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
@@ -37,7 +37,7 @@ public class MethParser implements DeclParser {
 	}
 	
 	//REALLY HACKY (we don't have much of a choice, though)
-	private static class MutableMethDeclaration extends MethDeclaration {
+	private static class MutableMethDeclaration extends FunDeclaration {
 		public MutableMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation methNameLine) {
 			super(name, args, returnType, body, isClassMeth, methNameLine);
 		}
@@ -80,7 +80,7 @@ public class MethParser implements DeclParser {
 		
 		md.setBody(exp);
 
-		return new MethDeclaration(methName, args, returnType, exp, isClassMeth, methNameLine); // Discard mutable md... hack...
+		return new FunDeclaration(methName, args, returnType, exp, isClassMeth, methNameLine); // Discard mutable md... hack...
 		
 	}
 
@@ -153,7 +153,7 @@ public class MethParser implements DeclParser {
 			public TypedAST parse(EnvironmentResolver envR) {
 				Environment env = envR.getEnv(md);
 				TypedAST inExp;
-				MethDeclaration iMD = md;
+				FunDeclaration iMD = md;
 				if (exp == null) {
 					inExp = null;
 				} else {
@@ -161,7 +161,7 @@ public class MethParser implements DeclParser {
 				}
 				md.setBody(inExp);
 
-				return new MethDeclaration(methName, args, returnType, inExp, isClassMeth, methNameLine);
+				return new FunDeclaration(methName, args, returnType, inExp, isClassMeth, methNameLine);
 			}
 			
 		});

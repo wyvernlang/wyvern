@@ -9,7 +9,7 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -31,7 +31,7 @@ public class Connection extends Declaration {
 		this.args = args;
 		this.returnType = returnType;
 		this.modifiers = modifiers;
-		connectionType = new ConnectionType(name, MethDeclaration.getMethodType(args, returnType));
+		connectionType = new ConnectionType(name, FunDeclaration.getMethodType(args, returnType));
 	}
 
 	public void setModifiers(TypedAST newModifiers) {

@@ -7,12 +7,12 @@ type IntCell
 
 type Stack
 	prop top : Int?
-	meth push(element : Int)
-	meth pop() : Int?
+	fun push(element : Int)
+	fun pop() : Int?
 
 type StackFactory
-	meth Stack() : Stack
-	meth StackWithFirst(firstElement : Int) : Stack
+	fun Stack() : Stack
+	fun StackWithFirst(firstElement : Int) : Stack
 
 
 /** Private Implementation **/
@@ -20,7 +20,7 @@ class Link
 	val data : Int
 	val next : Link?
 
-	class meth Link(d:Int, n:Link?) : Link
+	class fun Link(d:Int, n:Link?) : Link
 		new
 			data=d
 			next=n
@@ -32,24 +32,24 @@ class StackImpl
 
 	var list : Link?
 
-	meth top() : Int? = this.list.data
+	fun top() : Int? = this.list.data
 
-	meth push(element : Int) : Unit
+	fun push(element : Int) : Unit
 		this.list = Link.Link(element, (this.list))
 
-	meth pop() : Int?
+	fun pop() : Int?
 		val result : Int = this.list.data
 		this.list = this.list.next
 		result
 
-	class meth Stack() : Stack = new
+	class fun Stack() : Stack = new
 	
-	class meth StackWithFirst(firstElement : Int) : Stack
+	class fun StackWithFirst(firstElement : Int) : Stack
 		new
 			list = Link(firstElement, null)
 
 
-meth stackClient()
+fun stackClient()
 	val s : Stack = StackImpl.Stack()
 	s.push(5)
 	printInteger(s.top)

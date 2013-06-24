@@ -8,7 +8,7 @@ import java.util.HashSet;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -66,9 +66,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		if (other instanceof TypeType) {
 			HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
 			for (TypedAST d : this.decl.getDecls()) {
-				if (d instanceof MethDeclaration) {
-					String n = ((MethDeclaration) d).getName();
-					Arrow t = (Arrow) ((MethDeclaration) d).getType();
+				if (d instanceof FunDeclaration) {
+					String n = ((FunDeclaration) d).getName();
+					Arrow t = (Arrow) ((FunDeclaration) d).getType();
 					thisMembers.add(new Pair<String, Type>(n, t));
 				} else if (d instanceof PropDeclaration) {
 					String n = ((PropDeclaration) d).getName();
@@ -83,9 +83,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 			
 			HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
 			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
-				if (d instanceof MethDeclaration) {
-					String n = ((MethDeclaration) d).getName();
-					Arrow t = (Arrow) ((MethDeclaration) d).getType();
+				if (d instanceof FunDeclaration) {
+					String n = ((FunDeclaration) d).getName();
+					Arrow t = (Arrow) ((FunDeclaration) d).getType();
 					otherMembers.add(new Pair<String, Type>(n, t));
 				} else if (d instanceof PropDeclaration) {
 					String n = ((PropDeclaration) d).getName();

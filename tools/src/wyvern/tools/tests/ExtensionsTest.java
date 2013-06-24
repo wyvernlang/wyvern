@@ -96,14 +96,14 @@ public class ExtensionsTest {
 	
 	@Test(expected=StackOverflowError.class)
 	public void testRecursiveFunction() {
-		Reader reader = new StringReader("meth m(n:Int):Int = 1 + m(n)\n"
+		Reader reader = new StringReader("fun m(n:Int):Int = 1 + m(n)\n"
 										+"m(5)");
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);		
-		Assert.assertEquals("{$I {$L meth m (n : Int) : Int = 1 + m (n) $L} {$L m (5) $L} $I}", parsedResult.toString());
+		Assert.assertEquals("{$I {$L fun m (n : Int) : Int = 1 + m (n) $L} {$L m (5) $L} $I}", parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MethDeclaration()], Application(Variable(\"m\"), IntegerConstant(5))]", typedAST.toString());		
+		Assert.assertEquals("[[FunDeclaration()], Application(Variable(\"m\"), IntegerConstant(5))]", typedAST.toString());		
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(Int.getInstance(), resultType);
 		

@@ -7,7 +7,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Invocation;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
@@ -149,7 +149,7 @@ public class Util {
 
 	}
 
-	private static String getMethodDescriptor(MethDeclaration md, Method candidate) {
+	private static String getMethodDescriptor(FunDeclaration md, Method candidate) {
 		if (candidate == null) {
 			Arrow methType = (Arrow) md.getType();
 			int nArgs = nArgs(methType);
@@ -186,7 +186,7 @@ public class Util {
 			return new Type[] { argType };
 	}
 
-	private static Method findCandidate(MethDeclaration md, Class javaType) {
+	private static Method findCandidate(FunDeclaration md, Class javaType) {
 		Arrow methType = (Arrow) md.getType();
 		int nArgs = nArgs(methType);
 		Type[] args = getArgTypes(methType);
@@ -261,10 +261,10 @@ public class Util {
 		mv.visitEnd();
 
 		for (Declaration d : toWrap.getDecl().getDecls().getDeclIterator()) {
-			if (!(d instanceof MethDeclaration) || ((MethDeclaration)d).isClassMeth())
+			if (!(d instanceof FunDeclaration) || ((FunDeclaration)d).isClassFun())
 				continue;
 
-			MethDeclaration m = (MethDeclaration)d;
+			FunDeclaration m = (FunDeclaration)d;
 			mv = cv.visitMethod(ACC_PUBLIC,
 					m.getName(),
 					getMethodDescriptor(m, findCandidate(m, javaType)),

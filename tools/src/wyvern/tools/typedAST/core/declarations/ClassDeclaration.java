@@ -80,7 +80,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		if (decls != null)
 			for (Declaration decl : decls.getDeclIterator()) {
-				if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth())
+				if (decl instanceof FunDeclaration && ((FunDeclaration) decl).isClassFun())
 					decl.typecheckSelf(genv);
 				else
 					decl.typecheckSelf(oenv);
@@ -169,7 +169,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment classEnv = Environment.getEmptyEnvironment();
 		
 		for (Declaration decl : decls.getDeclIterator()) {
-			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth()){
+			if (decl instanceof FunDeclaration && ((FunDeclaration) decl).isClassFun()){
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
 			decl = decl.getNextDecl();
@@ -179,7 +179,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment evalEnv = classEnv.extend(thisBinding);
 		
 		for (Declaration decl : decls.getDeclIterator())
-			if (decl instanceof MethDeclaration && ((MethDeclaration) decl).isClassMeth()){
+			if (decl instanceof FunDeclaration && ((FunDeclaration) decl).isClassFun()){
 				decl.bindDecl(evalEnv,classEnv);
 			}
 		

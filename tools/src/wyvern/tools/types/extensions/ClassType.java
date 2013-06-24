@@ -8,7 +8,7 @@ import java.util.HashSet;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -106,10 +106,10 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 			// System.out.println(d.getName() + " of type " + d.getType());
 			if (d instanceof PropDeclaration) {
 				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
-			} else if (d instanceof MethDeclaration) {
+			} else if (d instanceof FunDeclaration) {
 				// Only interested in class methods.
-				MethDeclaration md = (MethDeclaration) d;
-				if (md.isClassMeth()) {
+				FunDeclaration md = (FunDeclaration) d;
+				if (md.isClassFun()) {
 					thisDtypes.add(d.getType().toString());
 				}
 			} else {
@@ -150,8 +150,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 
 			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
 			for (TypedAST d : this.decl.getDecls()) {
-				if (d instanceof MethDeclaration) {
-					Arrow a = (Arrow) ((MethDeclaration) d).getType();
+				if (d instanceof FunDeclaration) {
+					Arrow a = (Arrow) ((FunDeclaration) d).getType();
 					thisMeths.add(a);
 				} else {
 					// FIXME: Can class contains more than meth? Vars?
@@ -161,8 +161,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 			
 			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
 			for (TypedAST d : ((ClassType) other).decl.getDecls()) {
-				if (d instanceof MethDeclaration) {
-					Arrow a = (Arrow) ((MethDeclaration) d).getType();
+				if (d instanceof FunDeclaration) {
+					Arrow a = (Arrow) ((FunDeclaration) d).getType();
 					otherMeths.add(a);
 				} else {
 					// FIXME: Can class contains more than meth? Vars?

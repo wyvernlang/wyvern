@@ -17,7 +17,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
@@ -50,9 +50,9 @@ public class ClassParser implements DeclParser {
 
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		if (ParseUtils.checkFirst("meth", ctx)) { // Parses "class meth".
+		if (ParseUtils.checkFirst("fun", ctx)) { // Parses "class fun". // FIXME: Should this connect to the keyword in Globals?
 			ParseUtils.parseSymbol(ctx);
-			return MethParser.getInstance().parse(first, ctx, null, true);
+			return FunParser.getInstance().parse(first, ctx, null, true);
 		}
 		
 		Symbol s = ParseUtils.parseSymbol(ctx);
@@ -101,7 +101,7 @@ public class ClassParser implements DeclParser {
 		declAST = declASTParser.second.parse(new EnvironmentResolver() {
 			@Override
 			public Environment getEnv(TypedAST elem) {
-				if (elem instanceof MethDeclaration && ((MethDeclaration) elem).isClassMeth()) {
+				if (elem instanceof FunDeclaration && ((FunDeclaration) elem).isClassFun()) {
 						return envs;
 				}
 				return envi;
@@ -120,9 +120,9 @@ public class ClassParser implements DeclParser {
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
-		if (ParseUtils.checkFirst("meth", ctx)) { // Parses "class meth".
+		if (ParseUtils.checkFirst("fun", ctx)) { // Parses "class meth". // FIXME: Should this connect to the keyword in Globals?
 			ParseUtils.parseSymbol(ctx);
-			return MethParser.getInstance().parseDeferred(first, ctx, true);
+			return FunParser.getInstance().parseDeferred(first, ctx, true);
 		}
 		
 		Symbol s = ParseUtils.parseSymbol(ctx);
@@ -186,7 +186,7 @@ public class ClassParser implements DeclParser {
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
 					@Override
 					public Environment getEnv(TypedAST elem) {
-						if (elem instanceof MethDeclaration && ((MethDeclaration) elem).isClassMeth()) {
+						if (elem instanceof FunDeclaration && ((FunDeclaration) elem).isClassFun()) {
 								return envs;
 						}
 						return envi;

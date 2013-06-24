@@ -3,9 +3,9 @@
  */
 
 type IntList
-	meth isEmpty():Bool
-	meth forEach(f:Int -> Unit):Unit
-	meth reduce(identity:Int, f:Int -> (Int -> Int)):Int // hack: fix associativity
+	fun isEmpty():Bool
+	fun forEach(f:Int -> Unit):Unit
+	fun reduce(identity:Int, f:Int -> (Int -> Int)):Int // hack: fix associativity
 	
 class Cons
 	implements IntList // do we want this to be indented?
@@ -13,15 +13,15 @@ class Cons
 	var v:Int
 	var n:IntList
 	
-	meth isEmpty():Bool = false
-	meth forEach(f:Int -> Unit):Unit =
+	fun isEmpty():Bool = false
+	fun forEach(f:Int -> Unit):Unit =
 		f(this.v)
 		this.n.forEach(f)
-	meth reduce(identity:Int, f:Int -> (Int -> Int)):Int =
+	fun reduce(identity:Int, f:Int -> (Int -> Int)):Int =
 		val nextResult : Int = this.n.reduce(identity,f)
 		f(this.v)(nextResult)
 	
-	class meth make(value:Int,next:IntList):IntList =
+	class fun make(value:Int,next:IntList):IntList =
 		new
 			v = value
 			n = next
@@ -29,10 +29,10 @@ class Cons
 
 class Nil
 	implements IntList
-	meth isEmpty():Bool = true
-	meth forEach(f:Int -> Unit):Unit = ()
-	meth reduce(identity:Int, f:Int -> (Int -> Int)):Int = identity
-	class meth make():IntList = new
+	fun isEmpty():Bool = true
+	fun forEach(f:Int -> Unit):Unit = ()
+	fun reduce(identity:Int, f:Int -> (Int -> Int)):Int = identity
+	class fun make():IntList = new
 	
 val nil : IntList = Nil.make()
 	

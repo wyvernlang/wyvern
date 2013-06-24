@@ -4,7 +4,7 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.FunDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JavaMeth extends MethDeclaration {
+public class JavaMeth extends FunDeclaration {
 	private static List<String> getNames(Method m) {
 		Class[] args = m.getParameterTypes();
 		ArrayList<String> output = new ArrayList<String>();
