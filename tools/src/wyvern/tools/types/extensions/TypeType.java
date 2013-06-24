@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
+import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -16,6 +17,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType {
@@ -62,52 +64,65 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		}
 		
 		if (other instanceof TypeType) {
-			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
+			HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
 			for (TypedAST d : this.decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
-					Arrow a = (Arrow) ((MethDeclaration) d).getType();
-					thisMeths.add(a);
+					String n = ((MethDeclaration) d).getName();
+					Arrow t = (Arrow) ((MethDeclaration) d).getType();
+					thisMembers.add(new Pair<String, Type>(n, t));
+				} else if (d instanceof PropDeclaration) {
+					String n = ((PropDeclaration) d).getName();
+					Type t = ((PropDeclaration) d).getType();
+					thisMembers.add(new Pair<String, Type>(n, t));
 				} else {
-					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
-			HashSet<Arrow> otherMeths = new HashSet<Arrow>();
+			// System.out.println("thisMembers = " + thisMembers);
+			
+			HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
 			for (TypedAST d : ((TypeType) other).decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
-					Arrow a = (Arrow) ((MethDeclaration) d).getType();
-					otherMeths.add(a);
+					String n = ((MethDeclaration) d).getName();
+					Arrow t = (Arrow) ((MethDeclaration) d).getType();
+					otherMembers.add(new Pair<String, Type>(n, t));
+				} else if (d instanceof PropDeclaration) {
+					String n = ((PropDeclaration) d).getName();
+					Type t = ((PropDeclaration) d).getType();
+					otherMembers.add(new Pair<String, Type>(n, t));
 				} else {
-					// FIXME: Can type contains more than meth? Props?
 					System.out.println("Unsupported type member in subtype: " + d.getClass());
 				}
 			}
 			
-			// FIXME: Allows to have multiple methods that match to implement several methods
-			// from supertype - is this OK? Seems OK to me but not sure. :-)
+			// System.out.println("otherMembers = " + otherMembers);
+
 			boolean subset = true;
-			for (Arrow aOther : otherMeths) {
+			for (Pair<String, Type> memberOther : otherMembers) {
 				boolean hasImplementingCandidate = false;
-				for (Arrow aThis : thisMeths) {
-					// Apply S-Amber rule here!
-					SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
-					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
-						subtypes.add(sr);
-						boolean result = aThis.subtype(aOther, subtypes);
-						subtypes.remove(sr);
-								
-						if (result) {
-							hasImplementingCandidate = true;
-							break;
+				for (Pair<String, Type> memberThis : thisMembers) {
+					if (memberThis.first.equals(memberOther.first)) { // Name has to be equal! Duh! :-)
+						// Apply S-Amber rule here!
+						SubtypeRelation sr = new SubtypeRelation(this, (TypeType) other);
+						if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+							subtypes.add(sr);
+							boolean result = memberThis.second.subtype(memberOther.second, subtypes);
+							subtypes.remove(sr);
+									
+							if (result) {
+								hasImplementingCandidate = true;
+								break;
+							}
 						}
-					}					
-					if (!hasImplementingCandidate) {
-						subset = false;
-						break;
 					}
 				}
+				if (!hasImplementingCandidate) {
+					subset = false;
+					break;
+				}
 			}
+
 			if (subset) return true;
 		}
 		

@@ -11,6 +11,8 @@ import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.MethDeclaration;
 import wyvern.tools.typedAST.core.declarations.PropDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
@@ -21,9 +23,11 @@ import wyvern.tools.util.TreeWriter;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType {
 	private ClassDeclaration decl;
+	private TypeType implementsType;
 	
 	public ClassType(ClassDeclaration decl) {
 		this.decl = decl;
+		this.implementsType = decl.getTypeType();
 	}
 	
 	@Override
@@ -60,37 +64,42 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		ClassDeclaration thisD = this.decl;
 		TypeDeclaration typeD = tt.getDecl();
 		
+		// FIXME: Ignores names right now!!!
+		
 		HashSet<String> thisDtypes = new HashSet<String>();
 		for (Declaration d : thisD.getDecls().getDeclIterator()) {
 			// System.out.println(d.getName() + " of type " + d.getType());
-			if (d instanceof PropDeclaration) {
-				thisDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
-			} else {
-				thisDtypes.add(d.getType().toString());
-			}
+			thisDtypes.add(d.getType().toString());
 		}
 		
 		// System.out.println("This (" + thisD.getName() + ")" + thisDtypes);
 		
 		HashSet<String> implDtypes = new HashSet<String>();
 		for (Declaration d : typeD.getDecls().getDeclIterator()) {
-			// System.out.println(d.getName() + " of type " + d.getType());
+			// System.out.println(d.getName() + " of type " + d.getType() + " that has class " + d.getClass());
 			if (d instanceof PropDeclaration) {
-				implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
+				if (!(thisDtypes.contains(d.getType().toString()) ||
+					  thisDtypes.contains("Unit -> " + d.getType().toString()))) return false;
+				// implDtypes.add("Unit -> " + d.getType().toString()); // Hack to allow overwriting by meths for now! :)
 			} else {
-				implDtypes.add(d.getType().toString());
+				if (!thisDtypes.contains(d.getType().toString())) return false;
+				// implDtypes.add(d.getType().toString());
 			}
 		}
 		
 		// System.out.println("Class Implements (" + typeD.getName() + ")" + implDtypes);
 
 		// System.out.println("This subtype of Implements: " + thisDtypes.containsAll(implDtypes) + "\n");
-		return thisDtypes.containsAll(implDtypes);
+		// return thisDtypes.containsAll(implDtypes);
+		
+		return true;
 	}
 
 	public boolean checkImplementsClass(TypeType tt) {
 		ClassDeclaration thisD = this.decl;
 		TypeDeclaration typeD = tt.getDecl();
+		
+		// FIXME: Ignores names right now!!!
 		
 		HashSet<String> thisDtypes = new HashSet<String>();
 		for (Declaration d : thisD.getDecls().getDeclIterator()) {
@@ -136,6 +145,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		if (other instanceof TypeType) {
 			return this.checkImplements((TypeType) other);
 		} else if (other instanceof ClassType) {
+			// FIXME: The one in TypeType works, but this one NEEDS WORK.
+			// TODO: Does it even make sense to check subtype between two classes??? Maybe NOT!
+
 			HashSet<Arrow> thisMeths = new HashSet<Arrow>();
 			for (TypedAST d : this.decl.getDecls()) {
 				if (d instanceof MethDeclaration) {
@@ -175,11 +187,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 							hasImplementingCandidate = true;
 							break;
 						}
-					}					
-					if (!hasImplementingCandidate) {
-						subset = false;
-						break;
-					}
+					}	
+				}
+				if (!hasImplementingCandidate) {
+					subset = false;
+					break;
 				}
 			}
 			if (subset) return true;

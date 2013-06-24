@@ -15,27 +15,27 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 public class PropDeclaration extends Declaration implements CoreAST {
-	TypeBinding typeBinding;
+	Type type;
 	NameBinding nameBinding;
 	
-	public PropDeclaration(String name, TypeBinding typeBinding, FileLocation line2) {
-		this.typeBinding = typeBinding;
-		this.nameBinding = new NameBindingImpl(name, typeBinding.getType());
+	public PropDeclaration(String name, Type type, FileLocation line2) {
+		this.type = type;
+		this.nameBinding = new NameBindingImpl(name, type);
 		this.location = line2;
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(nameBinding.getName(), typeBinding);
+		writer.writeArgs(nameBinding.getName(), type);
 	}
 
 	@Override
 	protected Type doTypecheck(Environment env) {
 		if (nameBinding.getType() == null) {
 			// this.definitionType = this.definition.typecheck(env);
-			this.nameBinding = new NameBindingImpl(nameBinding.getName(), typeBinding.getType());
+			this.nameBinding = new NameBindingImpl(nameBinding.getName(), type);
 		}
-		return typeBinding.getType();
+		return type;
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class PropDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type getType() {
-		return typeBinding.getType();
+		return type;
 	}
 
 	@Override
@@ -59,12 +59,12 @@ public class PropDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old) {
-		return old.extend(typeBinding).extend(nameBinding);
+		return old.extend(nameBinding);
 	}
 
 	@Override
 	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), typeBinding.getType()));
+		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), type));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}

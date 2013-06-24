@@ -338,4 +338,51 @@ public class SubtypingTests {
 		
 		subtypes.clear();
 	}
+
+	@Test
+	public void testSimpleMultiArg() {
+		Reader reader = new StringReader("\n"
+				+"type Foo\n"
+				+"    prop p : Int\n"
+				+"    meth m1(arg1 : Int, arg2 : Int)\n"
+				+"    meth m2(arg1 : Int, arg2 : Int, arg3 : Int) : Int\n"
+				+"\n"
+				+"type Bar\n"
+				+"    meth Foo1() : Foo\n"
+				+"    meth Foo2(arg : Int) : Foo\n"
+				+"\n"
+				+"class SomeClass\n"
+				+"    implements Foo\n"
+				+"\n"
+				+"    var pty : Int\n"
+				+"\n"
+				+"    meth m1(arg1 : Int, arg2 : Int)\n"
+				+"        this.m1(arg1, arg2)\n"
+				+"\n"
+				+"    meth m2(arg1 : Int, arg2 : Int, arg3 : Int) : Int\n"
+				+"        42\n"
+				+"\n"
+				+"    meth m3() : Foo\n"
+				+"        new\n"
+				+"\n"
+				+"    meth m4(a : Int) : Foo\n"
+				+"        new\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L meth m1 (arg1 : Int , arg2 : Int) $L} {$L meth m2 (arg1 : Int , arg2 : Int , arg3 : Int) : Int $L} $I} $L} {$L type Bar {$I {$L meth Foo1 () : Foo $L} {$L meth Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L var pty : Int $L} {$L meth m1 (arg1 : Int , arg2 : Int) {$I {$L this . m1 (arg1 , arg2) $L} $I} $L} {$L meth m2 (arg1 : Int , arg2 : Int , arg3 : Int) : Int {$I {$L 42 $L} $I} $L} {$L meth m3 () : Foo {$I {$L new $L} $I} $L} {$L meth m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
+				parsedResult.toString());
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
+
+		// FIXME: Type checking Declarations is different!!!
+		if (typedAST instanceof Declaration) {
+			((Declaration) typedAST).typecheckAll(env);
+		} else {
+			Type resultType = typedAST.typecheck(env);
+			Assert.assertEquals(Unit.getInstance(), resultType);
+		}
+	}
 }
