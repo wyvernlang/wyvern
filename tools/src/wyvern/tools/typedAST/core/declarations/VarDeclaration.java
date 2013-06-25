@@ -20,6 +20,11 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	NameBinding binding;
 
+	private boolean isClass;
+	public boolean isClass() {
+		return isClass;
+	}
+
 	public VarDeclaration(String varName, Type parsedType, TypedAST definition) {
 		this.definition=definition;
 		binding = new NameBindingImpl(varName, parsedType);

@@ -34,8 +34,8 @@ public class JavaInteropTests {
 	@Test
 	public void testSimple() {
 		String test = "class Test\n" +
-				"	class fun create() : Test = new\n" +
-				"	fun a() : Int = 2\n" +
+				"	class def create() : Test = new\n" +
+				"	def a() : Int = 2\n" +
 				"Test.create()";
 		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
 		Tester cast = Util.toJavaClass((Obj) result, Tester.class);
@@ -49,8 +49,8 @@ public class JavaInteropTests {
 	@Test
 	public void testArgs() {
 		String test = "class Test\n" +
-				"	class fun create() : Test = new\n" +
-				"	fun a(x : Int) : Int = 2 + x\n" +
+				"	class def create() : Test = new\n" +
+				"	def a(x : Int) : Int = 2 + x\n" +
 				"Test.create()";
 		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
 		Tester2 cast = Util.toJavaClass((Obj)result, Tester2.class);
@@ -65,10 +65,10 @@ public class JavaInteropTests {
 	public void testArgObj() {
 		String test =
 				"type T\n" +
-				"	fun a(x : Int) : Int\n" +
+				"	def a(x : Int) : Int\n" +
 				"class Test\n" +
-				"	class fun create() : Test = new\n" +
-				"	fun a(x : T) : Int = 2 + x.a(2)\n" +
+				"	class def create() : Test = new\n" +
+				"	def a(x : T) : Int = 2 + x.a(2)\n" +
 				"Test.create()";
 		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
 		Tester3 cast = Util.toJavaClass((Obj)result, Tester3.class);
@@ -87,8 +87,8 @@ public class JavaInteropTests {
 	public void testMultiArgs() {
 		String test =
 				"class Test\n" +
-				"	class fun create() : Test = new\n" +
-				"	fun a(a : Int, b : Int) : Int = a + b\n" +
+				"	class def create() : Test = new\n" +
+				"	def a(a : Int, b : Int) : Int = a + b\n" +
 				"Test.create()";
 		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
 		Tester4 cast = Util.toJavaClass((Obj)result, Tester4.class);

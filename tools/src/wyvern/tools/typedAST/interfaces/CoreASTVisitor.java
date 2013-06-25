@@ -5,7 +5,7 @@ import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -36,7 +36,7 @@ public interface CoreASTVisitor {
 	void visit(ClassDeclaration clsDeclaration);
 	void visit(New new1);
 	void visit(LetExpr let);
-	void visit(FunDeclaration meth);
+	void visit(DefDeclaration meth);
 	void visit(TupleObject meth);
 	void visit(TypeInstance typeInstance);
 	void visit(Assignment assignment);

@@ -5,7 +5,7 @@
 class Position
 	val row:Int
 	val col:Int
-	class fun make(r:Int, c:Int):Position =
+	class def make(r:Int, c:Int):Position =
 		new
 			row = r
 			col = c
@@ -19,11 +19,11 @@ class Position
  */
 
 type PositionList
-	fun isEmpty():Bool
-	fun forEach(f:Position -> Unit):Unit
+	def isEmpty():Bool
+	def forEach(f:Position -> Unit):Unit
 
 	// hack: fix associativity
-	fun reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool
+	def reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool
 
 class Cons
 	implements PositionList // do we want this to be indented?
@@ -31,15 +31,15 @@ class Cons
 	var v:Position
 	var n:PositionList
 	
-	fun isEmpty():Bool = false
-	fun forEach(f:Position -> Unit):Unit =
+	def isEmpty():Bool = false
+	def forEach(f:Position -> Unit):Unit =
 		f(this.v)
 		this.n.forEach(f)
-	fun reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool =
+	def reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool =
 		val nextResult : Bool = this.n.reduce(identity,f,c)
 		c(f(this.v))(nextResult)
 	
-	class fun make(value:Position,next:PositionList):PositionList =
+	class def make(value:Position,next:PositionList):PositionList =
 		new
 			v = value
 			n = next
@@ -47,22 +47,22 @@ class Cons
 class Nil
 	implements PositionList
 	
-	fun isEmpty():Bool = true
-	fun forEach(f:Position -> Unit):Unit = ()
-	fun reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool = identity
-	class fun make():PositionList = new
+	def isEmpty():Bool = true
+	def forEach(f:Position -> Unit):Unit = ()
+	def reduce(identity:Bool, f:Position -> Bool, c:Bool -> (Bool -> Bool)):Bool = identity
+	class def make():PositionList = new
 	
 val nil : PositionList = Nil.make()
 	
-fun not(b:Bool):Bool =
+def not(b:Bool):Bool =
 	if b
 		then
 			false
 		else
 			true
 	
-fun isSafe(board:PositionList, row:Int, col:Int):Bool =
-	fun isSafeWith(pos:Position):Bool =
+def isSafe(board:PositionList, row:Int, col:Int):Bool =
+	def isSafeWith(pos:Position):Bool =
 		val delta : Int = col - pos.col
 		val isUnsafe : Bool = (row == pos.row) || (row == pos.row + delta) || (row == pos.row - delta)
 		not(isUnsafe)
@@ -84,8 +84,8 @@ class Range
 	val low : Int
 	val high : Int
 	
-	fun reduce(identity:Int, f:Int -> Int, c:Int -> (Int -> Int)):Int =
-		fun helper(x:Int):Int =
+	def reduce(identity:Int, f:Int -> Int, c:Int -> (Int -> Int)):Int =
+		def helper(x:Int):Int =
 			if x == this.high
 				then
 					identity
@@ -94,17 +94,17 @@ class Range
 					c(nextAnswer)(f(x))
 		helper(this.low)
 		
-	class fun make(l:Int,h:Int):Range =
+	class def make(l:Int,h:Int):Range =
 		new
 			low = l
 			high = h
 	
-fun place(board:PositionList, col:Int, maxCol:Int):Int
+def place(board:PositionList, col:Int, maxCol:Int):Int
 	if (col == maxCol)
 		then
 			1
 		else
-			fun rowTest(row:Int):Int =
+			def rowTest(row:Int):Int =
 				if isSafe(board, row, col)
 					then
 						val pos:Position = Position.make(row, col)
@@ -113,7 +113,7 @@ fun place(board:PositionList, col:Int, maxCol:Int):Int
 						0
 			Range.make(0,maxCol).reduce(0,rowTest,fn x:Int=>fn y:Int=>x+y)
 		
-fun nQueens(size:Int):Int =
+def nQueens(size:Int):Int =
 	place(nil,0,size)
 	
 nQueens(9)

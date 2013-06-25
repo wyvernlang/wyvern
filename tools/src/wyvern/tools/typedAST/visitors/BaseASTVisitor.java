@@ -8,7 +8,7 @@ import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -138,7 +138,7 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(FunDeclaration meth) {
+	public void visit(DefDeclaration meth) {
 		TypedAST body = meth.getBody();
 
 		if (!(body instanceof CoreAST))

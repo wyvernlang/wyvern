@@ -1,4 +1,4 @@
-fun foo()
+def foo()
 	val f:Int = 42
 	printInteger(f) // This line breaks.
 	val g:Int = 37

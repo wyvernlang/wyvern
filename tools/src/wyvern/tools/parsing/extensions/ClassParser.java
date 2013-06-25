@@ -17,7 +17,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
@@ -55,9 +55,9 @@ public class ClassParser implements DeclParser {
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
-		if (ParseUtils.checkFirst("fun", ctx)) { // Parses "class meth". // FIXME: Should this connect to the keyword in Globals?
+		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
 			ParseUtils.parseSymbol(ctx);
-			return FunParser.getInstance().parseDeferred(first, ctx, true);
+			return DefParser.getInstance().parseDeferred(first, ctx, true);
 		}
 		
 		Symbol s = ParseUtils.parseSymbol(ctx);
@@ -121,7 +121,7 @@ public class ClassParser implements DeclParser {
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
 					@Override
 					public Environment getEnv(TypedAST elem) {
-						if (elem instanceof FunDeclaration && ((FunDeclaration) elem).isClassFun()) {
+						if (elem instanceof DefDeclaration && ((DefDeclaration) elem).isClass()) {
 								return envs;
 						}
 						return envi;

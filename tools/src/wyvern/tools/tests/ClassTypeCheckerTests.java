@@ -57,7 +57,7 @@ public class ClassTypeCheckerTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), FunDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
 		
@@ -70,26 +70,26 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"type StackFactory\n"
-				+"    fun Stack() : Stack\n"
-				+"    fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    def Stack() : Stack\n"
+				+"    def StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    implements Stack\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    fun push(element : Int)\n"
+				+"    def push(element : Int)\n"
 				+"        print(\"test\")\n"
 				+"\n"
-				+"    fun pop() : Int?\n"
+				+"    def pop() : Int?\n"
 				+"        val result : Int = 42\n"
 				+"        result\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L fun Stack () : Stack $L} {$L fun StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L fun push (element : Int) {$I {$L print (\"test\") $L} $I} $L} {$L fun pop () : Int ? {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L def Stack () : Stack $L} {$L def StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L def push (element : Int) {$I {$L print (\"test\") $L} $I} $L} {$L def pop () : Int ? {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -111,23 +111,23 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"type StackFactory\n"
-				+"    fun Stack() : Stack\n"
-				+"    fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    def Stack() : Stack\n"
+				+"    def StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    implements Stack\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    fun pop() : Int\n"
+				+"    def pop() : Int\n"
 				+"        val result:Int = 42\n"
 				+"        result\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L fun Stack () : Stack $L} {$L fun StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L fun pop () : Int {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L def Stack () : Stack $L} {$L def StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L var top : Int ? $L} {$L def pop () : Int {$I {$L val result : Int = 42 $L} {$L result $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -150,19 +150,19 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"type StackFactory\n"
-				+"    fun Stack() : Stack\n"
-				+"    fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    def Stack() : Stack\n"
+				+"    def StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    implements StackBar\n"
 				+"    var top : Int?\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L fun Stack () : Stack $L} {$L fun StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements StackBar $L} {$L var top : Int ? $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L def Stack () : Stack $L} {$L def StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L implements StackBar $L} {$L var top : Int ? $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -184,18 +184,18 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"type StackFactory\n"
-				+"    fun Stack() : Stack\n"
-				+"    fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    def Stack() : Stack\n"
+				+"    def StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
 				+"class Link\n"
 				+"    val data : Int\n"
 				+"    val next : Link?\n"
 				+"\n"
-				+"    class fun Link(d:Int, n:Link?) : Link\n"
+				+"    class def Link(d:Int, n:Link?) : Link\n"
 				+"        new\n"
 				+"            data=d\n"
 				+"            next=n\n"
@@ -206,20 +206,20 @@ public class ClassTypeCheckerTests {
 				+"    var top : Int?\n"
 				+"    var list : Link?\n"
 				+"\n"
-				+"    class fun Stack() : Stack = new\n"
+				+"    class def Stack() : Stack = new\n"
 				+"\n"
-				+"    class fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    class def StackWithFirst(firstElement : Int) : Stack\n"
 				+"        new\n"
 				+"            list = Link.Link(firstElement, null)\n" +
-				"    fun push(el : Int) : Unit =\n" +
+				"    def push(el : Int) : Unit =\n" +
 				"        this.list = Link.Link(el, (this.list))\n" +
-				"    fun pop() : Int =\n" +
+				"    def pop() : Int =\n" +
 				"        val old : Link = this.list\n" +
 				"        this.list = this.list.next\n" +
 				"        old.data"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L fun Stack () : Stack $L} {$L fun StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class Link {$I {$L val data : Int $L} {$L val next : Link ? $L} {$L class fun Link (d : Int , n : Link ?) : Link {$I {$L new {$I {$L data = d $L} {$L next = n $L} $I} $L} $I} $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L var list : Link ? $L} {$L class fun Stack () : Stack = new $L} {$L class fun StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link . Link (firstElement , null) $L} $I} $L} $I} $L} {$L fun push (el : Int) : Unit = {$I {$L this . list = Link . Link (el , (this . list)) $L} $I} $L} {$L fun pop () : Int = {$I {$L val old : Link = this . list $L} {$L this . list = this . list . next $L} {$L old . data $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L def Stack () : Stack $L} {$L def StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class Link {$I {$L val data : Int $L} {$L val next : Link ? $L} {$L class def Link (d : Int , n : Link ?) : Link {$I {$L new {$I {$L data = d $L} {$L next = n $L} $I} $L} $I} $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L var list : Link ? $L} {$L class def Stack () : Stack = new $L} {$L class def StackWithFirst (firstElement : Int) : Stack {$I {$L new {$I {$L list = Link . Link (firstElement , null) $L} $I} $L} $I} $L} {$L def push (el : Int) : Unit = {$I {$L this . list = Link . Link (el , (this . list)) $L} $I} $L} {$L def pop () : Int = {$I {$L val old : Link = this . list $L} {$L this . list = this . list . next $L} {$L old . data $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -236,21 +236,21 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"type StackFactory\n"
-				+"    fun Stack() : Stack\n"
-				+"    fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    def Stack() : Stack\n"
+				+"    def StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    class implements StackFactory\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    class fun Stack() : StackImpl = new\n"
+				+"    class def Stack() : StackImpl = new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L fun Stack () : Stack $L} {$L fun StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L class fun Stack () : StackImpl = new $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L def Stack () : Stack $L} {$L def StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactory $L} {$L var top : Int ? $L} {$L class def Stack () : StackImpl = new $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -272,19 +272,19 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"type StackFactory\n"
-				+"    fun Stack() : Stack\n"
-				+"    fun StackWithFirst(firstElement : Int) : Stack\n"
+				+"    def Stack() : Stack\n"
+				+"    def StackWithFirst(firstElement : Int) : Stack\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    class implements StackFactoryFoo\n"
 				+"    var top : Int?\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L fun Stack () : Stack $L} {$L fun StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactoryFoo $L} {$L var top : Int ? $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L type StackFactory {$I {$L def Stack () : Stack $L} {$L def StackWithFirst (firstElement : Int) : Stack $L} $I} $L} {$L class StackImpl {$I {$L class implements StackFactoryFoo $L} {$L var top : Int ? $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -306,35 +306,35 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Int)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Int)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    implements Stack\n"
 				+"\n"
-				+"    class fun Stack() : Stack = new\n"
+				+"    class def Stack() : Stack = new\n"
 				+"\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    fun push(element : Int)\n"
+				+"    def push(element : Int)\n"
 				+"        this.top = element\n"
 				+"\n"
-				+"    fun pop() : Int?\n"
+				+"    def pop() : Int?\n"
 				+"        this.top\n"
 				+"\n"
-				+"fun doIt()\n"
+				+"def doIt()\n"
 				+"    val s : Stack = StackImpl.Stack()\n"
 				+"    s.push(42)\n"
 				+"    s.push(\"wrong type\")\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Int) $L} {$L fun pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class fun Stack () : Stack = new $L} {$L var top : Int ? $L} {$L fun push (element : Int) {$I {$L this . top = element $L} $I} $L} {$L fun pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L fun doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class def Stack () : Stack = new $L} {$L var top : Int ? $L} {$L def push (element : Int) {$I {$L this . top = element $L} $I} $L} {$L def pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L def doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (\"wrong type\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), FunDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		try {
 			typedAST.typecheck(env);
@@ -350,23 +350,23 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    fun push(element : Str)\n"
-				+"    fun pop() : Int?\n"
+				+"    def push(element : Str)\n"
+				+"    def pop() : Int?\n"
 				+"\n"
 				+"class StackImpl\n"
 				+"    implements Stack\n"
 				+"\n"
-				+"    class fun Stack() : Stack = new\n"
+				+"    class def Stack() : Stack = new\n"
 				+"\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    fun push(element : Str)\n"
+				+"    def push(element : Str)\n"
 				+"        this.top = element\n"
 				+"\n"
-				+"    fun pop() : Int?\n"
+				+"    def pop() : Int?\n"
 				+"        this.top\n"
 				+"\n"
-				+"fun doIt()\n"
+				+"def doIt()\n"
 				+"    val s:Stack = StackImpl.Stack()\n"
 				+"    s.push(\"42\")\n"
 				+"    s.push(\"42\")\n"
@@ -380,13 +380,13 @@ public class ClassTypeCheckerTests {
 				+"    s.push(\"42\")\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L fun push (element : Str) $L} {$L fun pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class fun Stack () : Stack = new $L} {$L var top : Int ? $L} {$L fun push (element : Str) {$I {$L this . top = element $L} $I} $L} {$L fun pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L fun doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Str) $L} {$L def pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class def Stack () : Stack = new $L} {$L var top : Int ? $L} {$L def push (element : Str) {$I {$L this . top = element $L} $I} $L} {$L def pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L def doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), FunDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
 	}
@@ -396,24 +396,24 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
 				+"    prop a : Int\n"
-				+"    fun b() : Int\n"
+				+"    def b() : Int\n"
 				+"\n"
 				+"type B\n"
-				+"    fun a() : Int\n"
+				+"    def a() : Int\n"
 				+"    prop b : Int\n"
 				+"\n"
 				+"class AImpl\n"
 				+"    implements A\n"
 				+"\n"
-				+"    class fun make() : A\n"
+				+"    class def make() : A\n"
 				+"        new\n"
 				+"\n"
 				+"    var a : Int\n"
 				+"\n"
-				+"    fun b() : Int\n"
+				+"    def b() : Int\n"
 				+"        this.a\n"
 				+"\n"
-				+"fun doIt() : Unit\n"
+				+"def doIt() : Unit\n"
 //				+"    val a1:A = AImpl.make()\n"
 //				+"    val a2:B = AImpl.make()\n"
 //				+"    val checkMe1:Int = a1.a\n"
@@ -430,13 +430,13 @@ public class ClassTypeCheckerTests {
 				+"    null\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L fun b () : Int $L} $I} $L} {$L type B {$I {$L fun a () : Int $L} {$L prop b : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class fun make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L fun b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L fun doIt () : Unit {$I {$L null $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L def b () : Int $L} $I} $L} {$L type B {$I {$L def a () : Int $L} {$L prop b : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class def make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L def b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L def doIt () : Unit {$I {$L null $L} $I} $L} $I}",
 		 		parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), FunDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
 
@@ -459,25 +459,25 @@ public class ClassTypeCheckerTests {
 	public void testNameConflict2() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun a() : Int\n"
-				+"    fun b() : Int\n"
+				+"    def a() : Int\n"
+				+"    def b() : Int\n"
 				+"\n"
 				+"type B\n"
-				+"    fun a() : Int\n"
-				+"    fun b() : Int\n"
+				+"    def a() : Int\n"
+				+"    def b() : Int\n"
 				+"\n"
 				+"class AImpl\n"
 // FIXME:				+"    implements A\n"
 				+"\n"
-// FIXME:				+"    class fun make() : A\n"
+// FIXME:				+"    class def make() : A\n"
 // FIXME:				+"        new\n"
 				+"\n"
 				+"    var a : Int\n"
 				+"\n"
-				+"    fun b() : Int\n"
+				+"    def b() : Int\n"
 				+"        this.a\n"
 				+"\n"
-				+"fun doIt() : Unit\n"
+				+"def doIt() : Unit\n"
 // FIXME:				+"    val a1:A = AImpl.make()\n"
 // FIXME:				+"    val a2:B = AImpl.make()\n"
 // FIXME:				+"    val checkMe1:Unit -> Int = a1.a\n"
@@ -498,7 +498,7 @@ public class ClassTypeCheckerTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), FunDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
 
@@ -521,24 +521,24 @@ public class ClassTypeCheckerTests {
 	public void testNameConflict3() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun a() : Int\n"
+				+"    def a() : Int\n"
 				+"    prop b : Unit -> Int\n"
 				+"\n"
 				+"type B\n"
 				+"    prop a : Unit -> Int\n"
-				+"    fun b() : Int\n"
+				+"    def b() : Int\n"
 				+"\n"
 				+"class AImpl\n"
 				+"    implements A\n"
 				+"\n"
-				+"    class fun make() : A\n"
+				+"    class def make() : A\n"
 				+"        new\n"
 				+"\n"
-				+"    fun a() : Int\n"
+				+"    def a() : Int\n"
 				+"\n"
 				+"    var b : Unit -> Int\n"
 				+"\n"
-				+"fun doIt() : Unit\n"
+				+"def doIt() : Unit\n"
 				+"    val a1:A = AImpl.make()\n"
 // FIXME:				+"    val a2:B = AImpl.make()\n"
 				+"    val checkMe1:Unit -> Int = a1.a\n"
@@ -559,7 +559,7 @@ public class ClassTypeCheckerTests {
 		Environment env = Globals.getStandardEnv();
 
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), FunDeclaration()]]", typedAST.toString());		
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
 

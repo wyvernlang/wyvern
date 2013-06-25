@@ -19,6 +19,11 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	Type definitionType;
 	NameBinding binding;
+
+	private boolean isClass;
+	public boolean isClass() {
+		return isClass;
+	}
 	
 	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
 		this.definition=definition;

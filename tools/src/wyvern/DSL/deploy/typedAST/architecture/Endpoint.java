@@ -7,7 +7,7 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -35,11 +35,11 @@ public class Endpoint extends Declaration {
 	}
 
 	public TypeDeclaration resolve() {
-		LinkedList<FunDeclaration> mds = new LinkedList<>();
+		LinkedList<DefDeclaration> mds = new LinkedList<>();
 
 		for (Connection connection : connections) {
 			mds.add(
-					new FunDeclaration(
+					new DefDeclaration(
 							connection.getName(),
 							connection.getArgs(),
 							connection.getReturnType(),

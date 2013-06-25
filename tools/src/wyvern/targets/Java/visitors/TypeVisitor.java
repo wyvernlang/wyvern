@@ -1,7 +1,7 @@
 package wyvern.targets.Java.visitors;
 
 import org.objectweb.asm.ClassWriter;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 
@@ -35,7 +35,7 @@ public class TypeVisitor extends BaseASTVisitor {
     }
 
     @Override
-    public void visit(FunDeclaration md) {
+    public void visit(DefDeclaration md) {
         cw.visitMethod(ACC_PUBLIC + ACC_ABSTRACT, md.getName(), store.getTypeName(md.getType(), true), null, null).visitEnd();
     }
 }

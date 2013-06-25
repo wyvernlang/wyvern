@@ -31,20 +31,19 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
-public class FunDeclaration extends Declaration implements CoreAST, BoundCode {
+public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	protected TypedAST body; // HACK
 	private NameBinding binding;
 	private Type type;
 	private List<NameBinding> args;
-	private boolean isClassFun;
 
-	public FunDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location) {
+	public DefDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassFun, FileLocation location) {
 		if (args == null) { args = new LinkedList<NameBinding>(); }
 		type = getMethodType(args, returnType);
 		binding = new NameBindingImpl(name, type);
 		this.body = body;
 		this.args = args;
-		this.isClassFun = isClassMeth;
+		this.isClass = isClassFun;
 		this.location = location;
 	}
 
@@ -62,8 +61,9 @@ public class FunDeclaration extends Declaration implements CoreAST, BoundCode {
 		}
 	}
 
-	public boolean isClassFun() {
-		return isClassFun;
+	private boolean isClass;
+	public boolean isClass() {
+		return isClass;
 	}
 
 	@Override

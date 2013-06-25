@@ -78,8 +78,8 @@ public class JavaTests {
 	@Test
 	public void testMethods() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s () : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s () : Int =\n" +
 					  "		1";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -92,8 +92,8 @@ public class JavaTests {
 	@Test
 	public void testMethods2() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s (a : Int) : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s (a : Int) : Int =\n" +
 					  "		1";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -106,8 +106,8 @@ public class JavaTests {
 	@Test
 	public void testMethods3() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s (a : Int, b : Int) : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s (a : Int, b : Int) : Int =\n" +
 					  "		1";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -122,8 +122,8 @@ public class JavaTests {
 	@Test
 	public void testMethods4() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s (a : Int, b : Int) : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s (a : Int, b : Int) : Int =\n" +
 					  "		a+b";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -136,8 +136,8 @@ public class JavaTests {
 	@Test
 	public void testPlus() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s () : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s () : Int =\n" +
 					  "		1+2";
 		
 
@@ -151,8 +151,8 @@ public class JavaTests {
 	@Test
 	public void testPlus2() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s () : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s () : Int =\n" +
 					  "		1+2+3";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -205,8 +205,8 @@ public class JavaTests {
 	@Test
 	public void testVals4() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s () : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s () : Int =\n" +
 					  "		val t : Int = 3\n" +
 					  "		t";
 
@@ -219,8 +219,8 @@ public class JavaTests {
 	@Test
 	public void testVals5() throws Exception {
 		String test = "class Test\n" +
-					  "	class fun create() : Test = new\n" +
-					  "	fun s (a : Int) : Int =\n" +
+					  "	class def create() : Test = new\n" +
+					  "	def s (a : Int) : Int =\n" +
 					  "		val t : Int = 3\n" +
 					  "		t+a";
 
@@ -233,8 +233,8 @@ public class JavaTests {
 	@Test
 	public void testMeths() throws Exception {
 		String test = "class Test6\n" +
-				  "	class fun create() : Test6 = new\n" +
-				  "	fun n() : Int = 1\n" +
+				  "	class def create() : Test6 = new\n" +
+				  "	def n() : Int = 1\n" +
 				  "val x : Test6 = Test6.create()\n" +
 				  "x.n()";
 
@@ -247,8 +247,8 @@ public class JavaTests {
 	@Test
 	public void testMeths2() throws Exception {
 		String test = "class Test7\n" +
-				  "	class fun create() : Test7 = new\n" +
-				  "	fun n(a : Int) : Int = a+1\n" +
+				  "	class def create() : Test7 = new\n" +
+				  "	def n(a : Int) : Int = a+1\n" +
 				  "val x : Test7 = Test7.create()\n" +
 				  "x.n(10)";
 
@@ -261,9 +261,9 @@ public class JavaTests {
 	@Test
 	public void testMeths3() throws Exception {
 		String test = "class Test8\n" +
-				  "	class fun create() : Test8 = new\n" +
-				  "	fun n(a : Int) : Int = a+1\n" +
-				  "	fun b(s : Int) : Int = this.n(s+1) + 2\n" +
+				  "	class def create() : Test8 = new\n" +
+				  "	def n(a : Int) : Int = a+1\n" +
+				  "	def b(s : Int) : Int = this.n(s+1) + 2\n" +
 				  "val x : Test8 = Test8.create()\n" +
 				  "x.b(10)";
 
@@ -276,9 +276,9 @@ public class JavaTests {
 	@Test
 	public void testMeths4() throws Exception {
 		String test = "class Test\n" +
-				"	class fun create() : Test = new\n" +
-				"	fun n(a : Int) : Int = a+1\n" +
-				"	fun b(s : Int) : Int = s+1\n" +
+				"	class def create() : Test = new\n" +
+				"	def n(a : Int) : Int = a+1\n" +
+				"	def b(s : Int) : Int = s+1\n" +
 				"val x : Test = Test.create()\n" +
 				"x.n(x.b(4))";
 
@@ -306,8 +306,8 @@ public class JavaTests {
 	public void testVarVisitor2() {
 		String test = "val x : Int = 2\n" +
 					  "class Test\n" +
-					  "	class fun create():Test = new\n" +
-					  "	fun s() : Int = x";
+					  "	class def create():Test = new\n" +
+					  "	def s() : Int = x";
 		CoreAST ast = (CoreAST) doCompile(test);
 		HashMap<String, Type> externalContext = new HashMap<String, Type>();
 		externalContext.put("x", Int.getInstance());
@@ -320,7 +320,7 @@ public class JavaTests {
 	@Test
 	public void testVarVisitor3() {
 		String test = "val x : Int = 2\n" +
-					  "fun Test() : Int = x";
+					  "def Test() : Int = x";
 		CoreAST ast = (CoreAST) doCompile(test);
 		HashMap<String, Type> externalContext = new HashMap<String, Type>();
 		externalContext.put("x", Int.getInstance());
@@ -347,8 +347,8 @@ public class JavaTests {
 	public void testClassClosure() throws Exception {
 		String test = "val n : Int = 2\n" +
 					  "class Test9\n" +
-					  "	class fun create():Test9 = new\n" +
-					  "	fun test():Int = n\n" +
+					  "	class def create():Test9 = new\n" +
+					  "	def test():Int = n\n" +
 					  "Test9.create().test()";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -362,8 +362,8 @@ public class JavaTests {
                 "val n : Int = 2\n" +
                 "val t : Int = 3\n" +
                 "class Test2\n" +
-                "	class fun create():Test2 = new\n" +
-                "	fun test():Int = n+t\n" +
+                "	class def create():Test2 = new\n" +
+                "	def test():Int = n+t\n" +
                 "Test2.create().test()";
 
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -376,14 +376,14 @@ public class JavaTests {
     public void testClassClosure3() throws Exception {
         String test =
                         "type T\n" +
-                        "	fun test():Int\n" +
+                        "	def test():Int\n" +
                         "class Tester\n" +
-                        "	class fun create():Tester = new\n" +
-						"	fun test(e : Int):T =\n" +
+                        "	class def create():Tester = new\n" +
+						"	def test(e : Int):T =\n" +
                         "		class Inner\n" +
                         "			implements T\n" +
-						"			class fun create():Inner = new\n" +
-                        "			fun test():Int = e\n" +
+						"			class def create():Inner = new\n" +
+                        "			def test():Int = e\n" +
 						"		Inner.create()\n" +
                         "Tester.create().test(2).test() + Tester.create().test(3).test()";
 
@@ -410,12 +410,12 @@ public class JavaTests {
     public void testClassShadowing() throws Exception {
         String test =
                 "class Test4\n" +
-                "   class fun create():Test4 = new\n" +
-                "   fun a() : Int = 1\n" +
+                "   class def create():Test4 = new\n" +
+                "   def a() : Int = 1\n" +
                 "val y : Test4 = Test4.create()\n"+
                 "class Test4\n" +
-                "   class fun create():Test4 = new\n" +
-                "   fun a(x : Int):Int = 2+x\n" +
+                "   class def create():Test4 = new\n" +
+                "   def a(x : Int):Int = 2+x\n" +
                 "val x : Test4 = Test4.create()\n" +
                 "x.a(2) + y.a()";
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -429,11 +429,11 @@ public class JavaTests {
         String test =
                 "val x : Int = 1\n" +
                 "class Test\n" +
-                "   class fun create():Test = new\n" +
-                "   fun a(i : Int) : Int =\n" +
+                "   class def create():Test = new\n" +
+                "   def a(i : Int) : Int =\n" +
                 "       class Inner\n" +
-                "           class fun create() : Test = new\n" +
-                "           fun a() : Int = i\n" +
+                "           class def create() : Test = new\n" +
+                "           def a() : Int = i\n" +
                 "Test.create().a()";
     }
 
@@ -441,12 +441,12 @@ public class JavaTests {
 	public void testTypeMeths1() throws Throwable {
 		String test = 
 				  "type T\n" +
-				  "	fun b(s:Int):Int\n" +
+				  "	def b(s:Int):Int\n" +
 				  "class Test3\n" +
 				  "	implements T\n" +
-				  "	class fun create() : Test3 = new\n" +
-				  "	fun n(a : Int) : Int = a+1\n" +
-				  "	fun b(s : Int) : Int = this.n(s+1) + 2\n" +
+				  "	class def create() : Test3 = new\n" +
+				  "	def n(a : Int) : Int = a+1\n" +
+				  "	def b(s : Int) : Int = this.n(s+1) + 2\n" +
 				  "val x : T = Test3.create()\n" +
 				  "x.b(10)";
 
@@ -461,7 +461,7 @@ public class JavaTests {
 	public void testFields1() throws Exception {
 		String test =
 				"class Test\n" +
-				"	class fun create():Test = new\n" +
+				"	class def create():Test = new\n" +
 				"	val x : Int = 2\n" +
 				"val t : Test = Test.create()\n" +
 				"t.x";
@@ -487,7 +487,7 @@ public class JavaTests {
 	@Test
 	public void testInlineMeths() throws Exception {
 		String test = 
-				"fun a (s : Int) :Int = s\n" +
+				"def a (s : Int) :Int = s\n" +
 				"a(0)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -499,7 +499,7 @@ public class JavaTests {
 	public void testInlineMeths2() throws Exception {
 		String test =
 				"val y : Int = 2\n" +
-				"fun a (s : Int) :Int = s + y\n" +
+				"def a (s : Int) :Int = s + y\n" +
 				"a(0)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -524,7 +524,7 @@ public class JavaTests {
 		String test =
 				"class Test\n" +
 				"	val t : Int\n" +
-				"	class fun create(n : Int) : Test =\n" +
+				"	class def create(n : Int) : Test =\n" +
 				"		new\n" +
 				"			t=n\n" +
 				"val ins : Test = Test.create(10)\n" +
@@ -540,9 +540,9 @@ public class JavaTests {
 		String test =
 				"class Test\n" +
 						"	val t : Int\n" +
-						"	fun getFn() : Int -> Int =\n" +
+						"	def getFn() : Int -> Int =\n" +
 						"		fn x : Int => x + this.t\n" +
-						"	class fun create(n : Int) : Test =\n" +
+						"	class def create(n : Int) : Test =\n" +
 						"		new\n" +
 						"			t=n\n" +
 						"val ins : Test = Test.create(10)\n" +
@@ -556,7 +556,7 @@ public class JavaTests {
 	@Test
 	public void testMeths5() throws Exception {
 		String test =
-				"fun mult(n:Int,m:Int):Int = n+5*m\n"
+				"def mult(n:Int,m:Int):Int = n+5*m\n"
 						+"mult(3,2)\n";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
@@ -567,8 +567,8 @@ public class JavaTests {
 	@Test
 	public void testMeths6() throws Exception {
 		String test =
-				"fun double(n:Int):Int = n*2\n"
-						+"fun doublePlusOne(n:Int):Int = double(n) + 1\n"
+				"def double(n:Int):Int = n*2\n"
+						+"def doublePlusOne(n:Int):Int = double(n) + 1\n"
 						+"doublePlusOne(5)\n";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 		Class generated = generatedLoader.loadClass("CLASSwycCode");
@@ -580,7 +580,7 @@ public class JavaTests {
 	public void testClassAndField() throws Exception {
 		String test =
 				"class Hello\n"
-						+"    class fun make():Hello\n"
+						+"    class def make():Hello\n"
 						+"    \tnew\n"
 						+"    val hiString : Str = \"hello\"\n"
 						+"\n"
@@ -595,8 +595,8 @@ public class JavaTests {
 	@Test
 	public void testMethodClosures() throws Exception {
 		String test =
-				"fun outer(n:Int):Int -> Int\n"
-						+"    fun nested(m:Int):Int = n+m\n"
+				"def outer(n:Int):Int -> Int\n"
+						+"    def nested(m:Int):Int = n+m\n"
 						+"    fn x : Int => nested(x+1)\n"
 						+"val f1 : Int -> Int = outer(1)\n"
 						+"val f2 : Int -> Int = outer(2)\n"
@@ -611,8 +611,8 @@ public class JavaTests {
 	public void testClassAndMethods() throws Exception {
 		String test =
 				"class Hello\n"
-						+"    class fun make():Hello = new\n"
-						+"    fun get5():Int = 5\n"
+						+"    class def make():Hello = new\n"
+						+"    def get5():Int = 5\n"
 						+"\n"
 						+"val h:Hello = Hello.make()\n"
 						+"h.get5()";
@@ -626,10 +626,10 @@ public class JavaTests {
 	public void testClassAndMethods2() throws Exception {
 		String test =
 				"class Hello\n"
-						+"	class fun make():Hello = new\n"
-						+"	fun get4():Int = 4\n"
-						+"	fun get5():Int = 5\n"
-						+"	fun getP():Int = this.get4()+this.get5()\n"
+						+"	class def make():Hello = new\n"
+						+"	def get4():Int = 4\n"
+						+"	def get5():Int = 5\n"
+						+"	def getP():Int = this.get4()+this.get5()\n"
 						+"\n"
 						+"val h:Hello = Hello.make()\n"
 						+"h.getP()";
@@ -643,10 +643,10 @@ public class JavaTests {
 	public void testClassMethodsVals() throws Exception {
 		String test =
 				"class Hello\n"
-						+"	class fun make():Hello = new\n"
+						+"	class def make():Hello = new\n"
 						+"	val testVal:Int = 5\n"
-						+"	fun getVal():Int = this.testVal\n"
-						+"	fun getP():Int = this.getVal()\n"
+						+"	def getVal():Int = this.testVal\n"
+						+"	def getP():Int = this.getVal()\n"
 						+"\n"
 						+"val h:Hello = Hello.make()\n"
 						+"h.getP()";
@@ -660,12 +660,12 @@ public class JavaTests {
 	public void testClassMethodsVals2() throws Exception {
 		String test =
 				"class Hello\n"
-						+"	class fun make():Hello = new\n"
+						+"	class def make():Hello = new\n"
 						+"	val testVal:Int = 5\n"
 						+"	val testVal2:Int = 15\n"
 						+"	val testVal3:Int = 25\n"
-						+"	fun getVal():Int = this.testVal + this.testVal3/this.testVal2\n"
-						+"	fun getP():Int = this.getVal()\n"
+						+"	def getVal():Int = this.testVal + this.testVal3/this.testVal2\n"
+						+"	def getP():Int = this.getVal()\n"
 						+"\n"
 						+"val h : Hello = Hello.make()\n"
 						+"h.getP()";
@@ -709,10 +709,10 @@ public class JavaTests {
 	public void testVarAssignmentInClass() throws Exception {
 		String test =
 				"class Hello\n"
-						+"	class fun make():Hello = new\n"
+						+"	class def make():Hello = new\n"
 						+"	var testVal:Int = 5\n"
-						+"	fun setV(n : Int):Unit = this.testVal = n\n"
-						+"	fun getV():Int = this.testVal\n"
+						+"	def setV(n : Int):Unit = this.testVal = n\n"
+						+"	def getV():Int = this.testVal\n"
 						+"val h:Hello = Hello.make()\n"
 						+"h.setV(10)\n"
 						+"h.getV()";
@@ -727,11 +727,11 @@ public class JavaTests {
 		String test =
 				"class Hello\n" +
 						"   val testVal:Int\n" +
-						"   class fun NewHello(v:Int):Hello = \n" +
+						"   class def NewHello(v:Int):Hello = \n" +
 						"       val output:Hello = new\n" +
 						"           testVal = v\n" +
 						"       output\n" +
-						"   fun getTest():Int = this.testVal\n" +
+						"   def getTest():Int = this.testVal\n" +
 						"val h:Hello = Hello.NewHello(10)\n" +
 						"h.getTest()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
@@ -775,8 +775,8 @@ public class JavaTests {
 	@Test
 	public void testRecursion() throws Exception {
 		String test =
-				"fun dummy():Int = 2\n" +
-				"fun a(i : Int):Int = \n" +
+				"def dummy():Int = 2\n" +
+				"def a(i : Int):Int = \n" +
 				"	if (i > 0)\n" +
 				"		then\n" +
 				"			a(i-1)\n" +

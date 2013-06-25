@@ -33,32 +33,32 @@ public class SubtypingTests {
 		Reader reader = new StringReader("\n"
 				+"type Foo\n"
 				+"    prop p : Int\n"
-				+"    fun m1(arg : Int)\n"
-				+"    fun m2() : Int\n"
+				+"    def m1(arg : Int)\n"
+				+"    def m2() : Int\n"
 				+"\n"
 				+"type Bar\n"
-				+"    fun Foo1() : Foo\n"
-				+"    fun Foo2(arg : Int) : Foo\n"
+				+"    def Foo1() : Foo\n"
+				+"    def Foo2(arg : Int) : Foo\n"
 				+"\n"
 				+"class SomeClass\n"
 				+"    implements Foo\n"
 				+"\n"
-				+"    var pty : Int\n"
+				+"    var p : Int\n"
 				+"\n"
-				+"    fun m1(arg : Int)\n"
+				+"    def m1(arg : Int)\n"
 				+"        this.m1(arg)\n"
 				+"\n"
-				+"    fun m2() : Int\n"
+				+"    def m2() : Int\n"
 				+"        42\n"
 				+"\n"
-				+"    fun m3() : Foo\n"
+				+"    def m3() : Foo\n"
 				+"        new\n"
 				+"\n"
-				+"    fun m4(a : Int) : Foo\n"
+				+"    def m4(a : Int) : Foo\n"
 				+"        new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L fun m1 (arg : Int) $L} {$L fun m2 () : Int $L} $I} $L} {$L type Bar {$I {$L fun Foo1 () : Foo $L} {$L fun Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L var pty : Int $L} {$L fun m1 (arg : Int) {$I {$L this . m1 (arg) $L} $I} $L} {$L fun m2 () : Int {$I {$L 42 $L} $I} $L} {$L fun m3 () : Foo {$I {$L new $L} $I} $L} {$L fun m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L def m1 (arg : Int) $L} {$L def m2 () : Int $L} $I} $L} {$L type Bar {$I {$L def Foo1 () : Foo $L} {$L def Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L var p : Int $L} {$L def m1 (arg : Int) {$I {$L this . m1 (arg) $L} $I} $L} {$L def m2 () : Int {$I {$L 42 $L} $I} $L} {$L def m3 () : Foo {$I {$L new $L} $I} $L} {$L def m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -81,33 +81,33 @@ public class SubtypingTests {
 		Reader reader = new StringReader("\n"
 				+"type Foo\n"
 				+"    prop p : Int\n"
-				+"    fun m1(arg : Int)\n"
-				+"    fun m2() : Int\n"
+				+"    def m1(arg : Int)\n"
+				+"    def m2() : Int\n"
 				+"\n"
 				+"type Bar\n"
-				+"    fun Foo1() : Foo\n"
-				+"    fun Foo2(arg : Int) : Foo\n"
+				+"    def Foo1() : Foo\n"
+				+"    def Foo2(arg : Int) : Foo\n"
 				+"\n"
 				+"class SomeClass\n"
 				+"    implements Foo\n"
 				+"    class implements Bar\n"
 				+"\n"
-				+"    var pty : Int\n"
+				+"    var p : Int\n"
 				+"\n"
-				+"    fun m1(arg : Int)\n"
+				+"    def m1(arg : Int)\n"
 				+"        this.m1(arg)\n"
 				+"\n"
-				+"    fun m2() : Int\n"
+				+"    def m2() : Int\n"
 				+"        42\n"
 				+"\n"
-				+"    fun m3() : Foo\n"
+				+"    def m3() : Foo\n"
 				+"        new\n"
 				+"\n"
-				+"    fun m4(a : Int) : Foo\n"
+				+"    def m4(a : Int) : Foo\n"
 				+"        new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L fun m1 (arg : Int) $L} {$L fun m2 () : Int $L} $I} $L} {$L type Bar {$I {$L fun Foo1 () : Foo $L} {$L fun Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L class implements Bar $L} {$L var pty : Int $L} {$L fun m1 (arg : Int) {$I {$L this . m1 (arg) $L} $I} $L} {$L fun m2 () : Int {$I {$L 42 $L} $I} $L} {$L fun m3 () : Foo {$I {$L new $L} $I} $L} {$L fun m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Foo {$I {$L prop p : Int $L} {$L def m1 (arg : Int) $L} {$L def m2 () : Int $L} $I} $L} {$L type Bar {$I {$L def Foo1 () : Foo $L} {$L def Foo2 (arg : Int) : Foo $L} $I} $L} {$L class SomeClass {$I {$L implements Foo $L} {$L class implements Bar $L} {$L var p : Int $L} {$L def m1 (arg : Int) {$I {$L this . m1 (arg) $L} $I} $L} {$L def m2 () : Int {$I {$L 42 $L} $I} $L} {$L def m3 () : Foo {$I {$L new $L} $I} $L} {$L def m4 (a : Int) : Foo {$I {$L new $L} $I} $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -135,14 +135,14 @@ public class SubtypingTests {
 	public void testRecursiveSubtype1() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun m(arg : A)\n"
+				+"    def m(arg : A)\n"
 				+"\n"
 				+"type B\n"
-				+"    fun m(arg : B)\n"
+				+"    def m(arg : B)\n"
 				+"\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L fun m (arg : A) $L} $I} $L} {$L type B {$I {$L fun m (arg : B) $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L def m (arg : A) $L} $I} $L} {$L type B {$I {$L def m (arg : B) $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -170,14 +170,14 @@ public class SubtypingTests {
 	public void testRecursiveSubtype2() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun m() : A\n"
+				+"    def m() : A\n"
 				+"\n"
 				+"type B\n"
-				+"    fun m() : B\n"
+				+"    def m() : B\n"
 				+"\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L fun m () : A $L} $I} $L} {$L type B {$I {$L fun m () : B $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L def m () : A $L} $I} $L} {$L type B {$I {$L def m () : B $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -205,14 +205,14 @@ public class SubtypingTests {
 	public void testRecursiveSubtype3() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun m(arg : B)\n"
+				+"    def m(arg : B)\n"
 				+"\n"
 				+"type B\n"
-				+"    fun m(arg : A)\n"
+				+"    def m(arg : A)\n"
 				+"\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L fun m (arg : B) $L} $I} $L} {$L type B {$I {$L fun m (arg : A) $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L def m (arg : B) $L} $I} $L} {$L type B {$I {$L def m (arg : A) $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -240,14 +240,14 @@ public class SubtypingTests {
 	public void testRecursiveSubtype4() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun m() : B\n"
+				+"    def m() : B\n"
 				+"\n"
 				+"type B\n"
-				+"    fun m() : A\n"
+				+"    def m() : A\n"
 				+"\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L fun m () : B $L} $I} $L} {$L type B {$I {$L fun m () : A $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L def m () : B $L} $I} $L} {$L type B {$I {$L def m () : A $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -275,20 +275,20 @@ public class SubtypingTests {
 	public void testSubtypeRelation() {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
-				+"    fun m() : Bool\n"
+				+"    def m() : Bool\n"
 				+"\n"
 				+"type B\n"
-				+"    fun m() : Unit\n"
+				+"    def m() : Unit\n"
 				+"\n"
 				+"type C\n"
-				+"    fun m() : Int\n"
+				+"    def m() : Int\n"
 				+"\n"
 				+"type D\n"
-				+"    fun m() : Str\n"
+				+"    def m() : Str\n"
 				+"\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L fun m () : Bool $L} $I} $L} {$L type B {$I {$L fun m () : Unit $L} $I} $L} {$L type C {$I {$L fun m () : Int $L} $I} $L} {$L type D {$I {$L fun m () : Str $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type A {$I {$L def m () : Bool $L} $I} $L} {$L type B {$I {$L def m () : Unit $L} $I} $L} {$L type C {$I {$L def m () : Int $L} $I} $L} {$L type D {$I {$L def m () : Str $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
@@ -344,28 +344,28 @@ public class SubtypingTests {
 		Reader reader = new StringReader("\n"
 				+"type Foo\n"
 				+"    prop p : Int\n"
-				+"    fun m1(arg1 : Int, arg2 : Int)\n"
-				+"    fun m2(arg1 : Int, arg2 : Int, arg3 : Int) : Int\n"
+				+"    def m1(arg1 : Int, arg2 : Int)\n"
+				+"    def m2(arg1 : Int, arg2 : Int, arg3 : Int) : Int\n"
 				+"\n"
 				+"type Bar\n"
-				+"    fun Foo1() : Foo\n"
-				+"    fun Foo2(arg : Int) : Foo\n"
+				+"    def Foo1() : Foo\n"
+				+"    def Foo2(arg : Int) : Foo\n"
 				+"\n"
 				+"class SomeClass\n"
 				+"    implements Foo\n"
 				+"\n"
-				+"    var pty : Int\n"
+				+"    var p : Int\n"
 				+"\n"
-				+"    fun m1(arg1 : Int, arg2 : Int)\n"
+				+"    def m1(arg1 : Int, arg2 : Int)\n"
 				+"        this.m1(arg1, arg2)\n"
 				+"\n"
-				+"    fun m2(arg1 : Int, arg2 : Int, arg3 : Int) : Int\n"
+				+"    def m2(arg1 : Int, arg2 : Int, arg3 : Int) : Int\n"
 				+"        42\n"
 				+"\n"
-				+"    fun m3() : Foo\n"
+				+"    def m3() : Foo\n"
 				+"        new\n"
 				+"\n"
-				+"    fun m4(a : Int) : Foo\n"
+				+"    def m4(a : Int) : Foo\n"
 				+"        new\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);

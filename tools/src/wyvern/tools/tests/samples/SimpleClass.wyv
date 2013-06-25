@@ -6,13 +6,13 @@ type IntCell
 	var contents : Int
 
 type Stack
-	prop top : Int?
-	fun push(element : Int)
-	fun pop() : Int?
+	def top() : Int?
+	def push(element : Int)
+	def pop() : Int?
 
 type StackFactory
-	fun Stack() : Stack
-	fun StackWithFirst(firstElement : Int) : Stack
+	def Stack() : Stack
+	def StackWithFirst(firstElement : Int) : Stack
 
 
 /** Private Implementation **/
@@ -20,7 +20,7 @@ class Link
 	val data : Int
 	val next : Link?
 
-	class fun Link(d:Int, n:Link?) : Link
+	class def Link(d:Int, n:Link?) : Link
 		new
 			data=d
 			next=n
@@ -32,24 +32,24 @@ class StackImpl
 
 	var list : Link?
 
-	fun top() : Int? = this.list.data
+	def top() : Int? = this.list.data
 
-	fun push(element : Int) : Unit
+	def push(element : Int) : Unit
 		this.list = Link.Link(element, (this.list))
 
-	fun pop() : Int?
+	def pop() : Int?
 		val result : Int = this.list.data
 		this.list = this.list.next
 		result
 
-	class fun Stack() : Stack = new
+	class def Stack() : Stack = new
 	
-	class fun StackWithFirst(firstElement : Int) : Stack
+	class def StackWithFirst(firstElement : Int) : Stack
 		new
 			list = Link(firstElement, null)
 
 
-fun stackClient()
+def stackClient()
 	val s : Stack = StackImpl.Stack()
 	s.push(5)
 	printInteger(s.top())

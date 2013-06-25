@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -50,9 +50,19 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		// TODO Auto-generated method stub
 		return m.getType();
 	}
-
-	public TypeDeclaration getDecl() {
-		return this.decl;
+	
+	public HashSet<Pair<String, Type>> getMembers() {
+		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
+		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
+			if (d instanceof DefDeclaration) {
+				String n = ((DefDeclaration) d).getName();
+				Arrow t = (Arrow) ((DefDeclaration) d).getType();
+				thisMembers.add(new Pair<String, Type>(n, t));
+			} else {
+				System.out.println("Unsupported type member in TypeType.getMembers: " + d.getClass());
+			}
+		}
+		return thisMembers;
 	}
 
 	@Override
@@ -62,33 +72,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		}
 		
 		if (other instanceof TypeType) {
-			HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-			for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
-				if (d instanceof FunDeclaration) {
-					String n = ((FunDeclaration) d).getName();
-					Arrow t = (Arrow) ((FunDeclaration) d).getType();
-					thisMembers.add(new Pair<String, Type>(n, t));
-				} else {
-					System.out.println("Unsupported type member in subtype: " + d.getClass());
-				}
-			}
-			
-			// System.out.println("thisMembers = " + thisMembers);
-			
-			HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
-			for (TypedAST d : ((TypeType) other).decl.getDecls().getDeclIterator()) {
-				if (d instanceof FunDeclaration) {
-					String n = ((FunDeclaration) d).getName();
-					Arrow t = (Arrow) ((FunDeclaration) d).getType();
-					otherMembers.add(new Pair<String, Type>(n, t));
-				} else {
-					System.out.println("Unsupported type member in subtype: " + d.getClass());
-				}
-			}
-			
-			// System.out.println("otherMembers = " + otherMembers);
-			
-			if (checkSubtypeRecursively(this, other, thisMembers, otherMembers, subtypes)) return true;
+			HashSet<Pair<String, Type>> thisMembers = this.getMembers();			
+			HashSet<Pair<String, Type>> otherMembers = ((TypeType) other).getMembers();
+			return checkSubtypeRecursively(this, other, thisMembers, otherMembers, subtypes);
 		}
 		
 		return false;

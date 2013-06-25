@@ -5,7 +5,7 @@ import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -98,7 +98,7 @@ public class PassThroughVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(FunDeclaration meth) {
+	public void visit(DefDeclaration meth) {
 		next.visit(meth);
 	}
 

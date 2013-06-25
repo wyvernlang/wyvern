@@ -8,7 +8,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.extensions.ClassParser;
 import wyvern.tools.parsing.extensions.FnParser;
 import wyvern.tools.parsing.extensions.IfParser;
-import wyvern.tools.parsing.extensions.FunParser;
+import wyvern.tools.parsing.extensions.DefParser;
 import wyvern.tools.parsing.extensions.NewParser;
 import wyvern.tools.parsing.extensions.PropParser;
 import wyvern.tools.parsing.extensions.TypeParser;
@@ -37,7 +37,7 @@ public class Globals {
 		Environment env = Environment.getEmptyEnvironment();
 		env = env.extend(new KeywordNameBinding("type", new Keyword(TypeParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("prop", new Keyword(PropParser.getInstance())));
-		env = env.extend(new KeywordNameBinding("fun", new Keyword(FunParser.getInstance())));
+		env = env.extend(new KeywordNameBinding("def", new Keyword(DefParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("fn", new Keyword(FnParser.getInstance()))); // Potentially going away soon?
 		env = env.extend(new KeywordNameBinding("class", new Keyword(ClassParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("val", new Keyword(ValParser.getInstance())));

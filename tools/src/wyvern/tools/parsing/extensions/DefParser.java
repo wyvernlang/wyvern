@@ -13,7 +13,7 @@ import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -21,15 +21,15 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
 /**
- * Parses "fun x : T => e"
+ * Parses "def x : T => e"
  * 
- * Could specify as:   "fun" symbol ":" type "=>" exp
+ * Could specify as:   "def" symbol ":" type "=>" exp
  */
 
-public class FunParser implements DeclParser {
-	private FunParser() { }
-	private static FunParser instance = new FunParser();
-	public static FunParser getInstance() { return instance; }
+public class DefParser implements DeclParser {
+	private DefParser() { }
+	private static DefParser instance = new DefParser();
+	public static DefParser getInstance() { return instance; }
 	
 	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
@@ -37,7 +37,7 @@ public class FunParser implements DeclParser {
 	}
 	
 	//REALLY HACKY (we don't have much of a choice, though)
-	private static class MutableFunDeclaration extends FunDeclaration {
+	private static class MutableFunDeclaration extends DefDeclaration {
 		public MutableFunDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation methNameLine) {
 			super(name, args, returnType, body, isClassMeth, methNameLine);
 		}
@@ -58,6 +58,7 @@ public class FunParser implements DeclParser {
 		return this.parseDeferred(first, ctx, false);
 	}
 	
+	// FIXME: Should convert all functions: f (A, B) : C into f : A*B -> C and thus convert f() : C into f : Unit -> C!
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx, final boolean isClassMeth) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
@@ -120,7 +121,7 @@ public class FunParser implements DeclParser {
 			public TypedAST parse(EnvironmentResolver envR) {
 				Environment env = envR.getEnv(md);
 				TypedAST inExp;
-				FunDeclaration iMD = md;
+				DefDeclaration iMD = md;
 				if (exp == null) {
 					inExp = null;
 				} else {
@@ -128,7 +129,7 @@ public class FunParser implements DeclParser {
 				}
 				md.setBody(inExp);
 
-				return new FunDeclaration(methName, args, returnType, inExp, isClassMeth, methNameLine);
+				return new DefDeclaration(methName, args, returnType, inExp, isClassMeth, methNameLine);
 			}
 			
 		});

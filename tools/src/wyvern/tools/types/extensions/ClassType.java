@@ -3,15 +3,22 @@ package wyvern.tools.types.extensions;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
@@ -59,75 +66,47 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 	public ClassDeclaration getDecl() {
 		return this.decl;
 	}
-
-	public boolean checkImplements(TypeType other) {
-		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
-			if (d instanceof FunDeclaration) {
-				String n = ((FunDeclaration) d).getName();
-				Arrow t = (Arrow) ((FunDeclaration) d).getType();
-				thisMembers.add(new Pair<String, Type>(n, t));
-			} else {
-				System.out.println("Unsupported type member in checkImplements: " + d.getClass());
-			}
-		}
-		
-		System.out.println("thisMembers (checkImplements) = " + thisMembers);
-		
-		HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : other.getDecl().getDecls()) {
-			if (d instanceof FunDeclaration) {
-				String n = ((FunDeclaration) d).getName();
-				Arrow t = (Arrow) ((FunDeclaration) d).getType();
-				otherMembers.add(new Pair<String, Type>(n, t));
-			} else {
-				System.out.println("Unsupported type member in checkImplements: " + d.getClass());
-			}
-		}
-		
-		System.out.println("otherMembers (checkImplements) = " + otherMembers);
-		
-		return TypeType.checkSubtypeRecursively(this, other, thisMembers, otherMembers, new HashSet<SubtypeRelation>());
-	}
-
-	public boolean checkImplementsClass(TypeType other) {
-		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
-			if (d instanceof FunDeclaration && ((FunDeclaration) d).isClassFun()) {
-				String n = ((FunDeclaration) d).getName();
-				Arrow t = (Arrow) ((FunDeclaration) d).getType();
-				thisMembers.add(new Pair<String, Type>(n, t));
-			} else {
-				System.out.println("Unsupported type member in checkImplementsClass: " + d.getClass());
-			}
-		}
-		
-		System.out.println("thisMembers (checkImplementsClass) = " + thisMembers);
-		
-		HashSet<Pair<String, Type>> otherMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : other.getDecl().getDecls()) {
-			if (d instanceof FunDeclaration) {
-				String n = ((FunDeclaration) d).getName();
-				Arrow t = (Arrow) ((FunDeclaration) d).getType();
-				otherMembers.add(new Pair<String, Type>(n, t));
-			} else {
-				System.out.println("Unsupported type member in checkImplementsClass: " + d.getClass());
-			}
-		}
-		
-		System.out.println("otherMembers (checkImplementsClass) = " + otherMembers);
-		
-		return TypeType.checkSubtypeRecursively(this, other, thisMembers, otherMembers, new HashSet<SubtypeRelation>());
-	}
 	
-	public TypeType convertToType() {
+	public TypeType convertToType(boolean useClassMembers) {
 		LinkedList<Declaration> seq = new LinkedList<>();
 		
 		// Generate an appropriate type member for every class member.
 		for (Declaration d : decl.getDecls().getDeclIterator()) {
-			if (d instanceof FunDeclaration) {
-				// TODO:
-				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
+			if (d instanceof DefDeclaration) {
+				if (((DefDeclaration) d).isClass() != useClassMembers)
+					continue;
+				
+				seq.add(d);
+			} else if (d instanceof VarDeclaration) {
+				if (((VarDeclaration) d).isClass() != useClassMembers)
+					continue;
+					
+				VarDeclaration vd = (VarDeclaration) d;
+				String propName = vd.getName();
+				Type type = vd.getType();
+				FileLocation line = vd.getLocation();
+				
+				DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+				
+				List<NameBinding> args = new ArrayList<NameBinding>();
+				args.add(new NameBindingImpl("new" + propName.substring(0,1).toUpperCase() + propName.substring(1), type));
+				DefDeclaration setter = new DefDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
+					args, Unit.getInstance(), null, false, line);
+				
+				seq.add(getter);
+				seq.add(setter);
+			} else if (d instanceof ValDeclaration) {
+				if (((ValDeclaration) d).isClass() != useClassMembers)
+					continue;
+				
+				ValDeclaration vd = (ValDeclaration) d;
+				String propName = vd.getName();
+				Type type = vd.getType();
+				FileLocation line = vd.getLocation();
+				
+				DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+
+				seq.add(getter);
 			} else {
 				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
 			}
@@ -145,9 +124,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		}
 
 		if (other instanceof TypeType) {
-			return this.checkImplements((TypeType) other);
+			return this.convertToType(false).subtype(other);
 		} else if (other instanceof ClassType) {
-			return this.convertToType().subtype(((ClassType) other).convertToType());
+			return this.convertToType(false).subtype(((ClassType) other).convertToType(false));
 		}
 		
 		return false;

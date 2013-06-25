@@ -16,7 +16,7 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.FunDeclaration;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -59,14 +59,14 @@ public class PropParser implements DeclParser {
 		}
 		
 		// Need to return a DeclSequence with two FunDeclaration's.
-		FunDeclaration getter = new FunDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+		DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
 		
 		List<NameBinding> args = new ArrayList<NameBinding>();
 		args.add(new NameBindingImpl("new" + propName.substring(0,1).toUpperCase() + propName.substring(1), type));
-		FunDeclaration setter = new FunDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
+		DefDeclaration setter = new DefDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
 			args, Unit.getInstance(), null, false, line);
 		
-		LinkedList<FunDeclaration> seq = new LinkedList<>();
+		LinkedList<DefDeclaration> seq = new LinkedList<>();
 		seq.add(getter);
 		seq.add(setter);
 		

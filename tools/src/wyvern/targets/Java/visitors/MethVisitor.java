@@ -41,7 +41,7 @@ import static org.objectweb.asm.Opcodes.*;
 //The names are getting pretty bad...
 public class MethVisitor extends BaseASTVisitor {
 
-	private class WrappedMethDeclaration extends FunDeclaration {
+	private class WrappedMethDeclaration extends DefDeclaration {
 
 		private Environment env;
 
@@ -378,7 +378,7 @@ public class MethVisitor extends BaseASTVisitor {
 		bootstrapVarSet = new Handle(Opcodes.H_INVOKESTATIC, "wyvern/targets/Java/runtime/Runtime", "bootstrapSetField", mt.toMethodDescriptorString());
 	}
 
-	public void visitInitial(FunDeclaration md) {
+	public void visitInitial(DefDeclaration md) {
 		if (md instanceof WrappedMethDeclaration)
 			localEnv = ((WrappedMethDeclaration) md).getEnv();
 
@@ -387,7 +387,7 @@ public class MethVisitor extends BaseASTVisitor {
 		Label startLabel = new Label();
 		mv.visitLabel(startLabel);
 
-		if (!md.isClassFun())
+		if (!md.isClass())
 			frame.registerVariable("this", jv.getCurrentType(), startLabel);
 
 		for (NameBinding nb : md.getArgBindings()) {
@@ -433,7 +433,7 @@ public class MethVisitor extends BaseASTVisitor {
     }
 	
 	@Override
-	public void visit(FunDeclaration md) {
+	public void visit(DefDeclaration md) {
 		HashMap<String, Type> externalVars = new HashMap<>();
 		externalVars.putAll(frame.getVars());
 		externalVars.put(md.getName(), md.getType());
@@ -457,7 +457,7 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 
 		Label defLoc = new Label();
-		FunDeclaration implMd =
+		DefDeclaration implMd =
 				new WrappedMethDeclaration(md.getName()+"$impl", newArgs,
 						((Arrow)md.getType()).getResult(), md.getBody(), true, md.getLocation(), this.localEnv);
 		jv.visit(implMd);
@@ -864,7 +864,7 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 
 		String anonFnName = jv.getAnonMethodName();
-		FunDeclaration anonMeth = new FunDeclaration(anonFnName, newArgs, ((Arrow)fnDef.getType()).getResult(), fnDef.getBody(), true, fnDef.getLocation());
+		DefDeclaration anonMeth = new DefDeclaration(anonFnName, newArgs, ((Arrow)fnDef.getType()).getResult(), fnDef.getBody(), true, fnDef.getLocation());
 		jv.visit(anonMeth);
 		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), anonFnName + "$handle", "Ljava/lang/invoke/MethodHandle;");
 		fillClosure(usedVars);

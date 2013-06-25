@@ -80,7 +80,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		if (decls != null)
 			for (Declaration decl : decls.getDeclIterator()) {
-				if (decl instanceof FunDeclaration && ((FunDeclaration) decl).isClassFun())
+				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
 					decl.typecheckSelf(genv);
 				else
 					decl.typecheckSelf(oenv);
@@ -88,6 +88,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 		
 		// check the implements and class implements
+		// FIXME: Should support multiple implements statements!
 		if (!this.implementsName.equals("")) {
 			this.nameImplements = env.lookup(this.implementsName);
 			if (nameImplements == null) {
@@ -98,7 +99,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
 			TypeType implementsTT = (TypeType) nameImplements.getType();
 			
-			if (!currentCT.checkImplements(implementsTT)) {
+			if (!currentCT.convertToType(false).subtype(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this.nameBinding.getName(),
 						nameImplements.getName(),
@@ -116,7 +117,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
 			TypeType implementsCT = (TypeType) nameImplementsClass.getType();
 			
-			if (!currentCT.checkImplementsClass(implementsCT)) {
+			if (!currentCT.convertToType(true).subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this.nameBinding.getName(),
 						nameImplementsClass.getName(),
@@ -169,7 +170,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment classEnv = Environment.getEmptyEnvironment();
 		
 		for (Declaration decl : decls.getDeclIterator()) {
-			if (decl instanceof FunDeclaration && ((FunDeclaration) decl).isClassFun()){
+			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()){
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
 			decl = decl.getNextDecl();
@@ -179,7 +180,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment evalEnv = classEnv.extend(thisBinding);
 		
 		for (Declaration decl : decls.getDeclIterator())
-			if (decl instanceof FunDeclaration && ((FunDeclaration) decl).isClassFun()){
+			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()){
 				decl.bindDecl(evalEnv,classEnv);
 			}
 		

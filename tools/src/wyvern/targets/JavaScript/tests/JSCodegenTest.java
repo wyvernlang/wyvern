@@ -147,7 +147,7 @@ public class JSCodegenTest {
 
 	@Test
 	public void testMethod() {
-		TypedAST typedAST = doCompile("fun double(n:Int):Int = n*2\n"
+		TypedAST typedAST = doCompile("def double(n:Int):Int = n*2\n"
 									 +"double(5)\n");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -160,7 +160,7 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testMethod2() {
-		TypedAST typedAST = doCompile("fun num():Int = 5\n"
+		TypedAST typedAST = doCompile("def num():Int = 5\n"
 									 +"num()\n");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -171,8 +171,8 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testMutuallyRecursiveMethods() {
-		TypedAST typedAST = doCompile("fun double(n:Int):Int = n*2\n"
-										+"fun doublePlusOne(n:Int):Int = double(n) + 1\n"
+		TypedAST typedAST = doCompile("def double(n:Int):Int = n*2\n"
+										+"def doublePlusOne(n:Int):Int = double(n) + 1\n"
 										+"doublePlusOne(5)\n");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -187,7 +187,7 @@ public class JSCodegenTest {
 	@Test
 	public void testClassAndField() {
 		TypedAST typedAST = doCompile("class Hello\n"
-										+"	class fun NewHello():Hello = new\n"
+										+"	class def NewHello():Hello = new\n"
 										+"	val hiString : Str= \"hello\"\n"
 										+"\n"
 										+"val h : Hello = Hello.NewHello()\n"//hiString: \"hi\")\n"
@@ -206,8 +206,8 @@ public class JSCodegenTest {
 	@Test
 	public void testNestedMethods() {
 		TypedAST typedAST = doCompile(
-				"fun outer(n:Int):Int -> Int\n"
-				+"    fun nested(m:Int):Int = n+m\n"
+				"def outer(n:Int):Int -> Int\n"
+				+"    def nested(m:Int):Int = n+m\n"
 				+"    fn x : Int => nested(x + 1)\n"
 				+"val f1 : Int->Int = outer(1)\n"
 				+"val f2 : Int->Int = outer(2)\n"
@@ -229,7 +229,7 @@ public class JSCodegenTest {
 	
 	@Test
 	public void testTupleMethodCalls() {
-		TypedAST typedAST = doCompile("fun mult(n:Int,m:Int):Int = n+5*m\n"
+		TypedAST typedAST = doCompile("def mult(n:Int,m:Int):Int = n+5*m\n"
 				+"mult(3,2)\n");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -240,8 +240,8 @@ public class JSCodegenTest {
 	public void testClassAndMethods() {
 		TypedAST typedAST = doCompile(
 				"class Hello\n"
-				+"	class fun make() : Hello = new\n"
-				+"	fun get5():Int = 5\n"
+				+"	class def make() : Hello = new\n"
+				+"	def get5():Int = 5\n"
 				+"\n"
 				+"val h : Hello = Hello.make()\n"
 				+"h.get5()");
@@ -262,7 +262,7 @@ public class JSCodegenTest {
 	@Test
 	public void testExternalMethodGeneration() {
 		TypedAST typedAST = doCompile("val http : JSObject = require(\"http\")\n" +
-									  "fun doServer(req : JSObject, resp : JSObject):JSObject = resp.write(\"test\")\n" +
+									  "def doServer(req : JSObject, resp : JSObject):JSObject = resp.write(\"test\")\n" +
 									  "http.createServer(doServer)");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
 		((CoreAST)typedAST).accept(visitor);
@@ -272,10 +272,10 @@ public class JSCodegenTest {
 	@Test
 	public void testClassAndMethods2() {
 		TypedAST typedAST = doCompile("class Hello\n"
-										+"	class fun make():Hello = new\n"
-										+"	fun get4():Int = 4\n"
-										+"	fun get5():Int = 5\n"
-										+"	fun getP():Int = this.get4()+this.get5()\n"
+										+"	class def make():Hello = new\n"
+										+"	def get4():Int = 4\n"
+										+"	def get5():Int = 5\n"
+										+"	def getP():Int = this.get4()+this.get5()\n"
 										+"\n"
 										+"val h:Hello = Hello.make()\n"
 										+"h.getP()");
@@ -288,9 +288,9 @@ public class JSCodegenTest {
 	public void testClassMethodsVals() {
 		TypedAST typedAST = doCompile("class Hello\n"
 										+"	val testVal:Int = 5\n"
-										+"	class fun make():Hello = new\n"
-										+"	fun getVal():Int = this.testVal\n"
-										+"	fun getP():Int = this.getVal()\n"
+										+"	class def make():Hello = new\n"
+										+"	def getVal():Int = this.testVal\n"
+										+"	def getP():Int = this.getVal()\n"
 										+"\n"
 										+"val h:Hello = Hello.make()\n"
 										+"h.getP()");
@@ -324,10 +324,10 @@ public class JSCodegenTest {
 		TypedAST typedAST = doCompile("class Hello\n"
 				+"	val testVa:Int\n"
 				+"	var testVr:Int\n"
-				+"	class fun make(n : Int):Hello = new\n" +
+				+"	class def make(n : Int):Hello = new\n" +
 				"		testVa = n\n" +
 				"		testVr = n+1\n"
-				+"	fun getVa():Int = this.testVa\n"
+				+"	def getVa():Int = this.testVa\n"
 				+"val h:Hello = Hello.make(10)\n"
 				+"h.getVa()");
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
@@ -349,7 +349,7 @@ public class JSCodegenTest {
 				 "			button\n" +
 				 "				\"Press me!\"\n" +
 				 "val http : JSObject = require(\"http\")\n" +
-				 "fun doServer(req : JSObject, resp : JSObject):JSObject = resp.end(htmlv)\n" +
+				 "def doServer(req : JSObject, resp : JSObject):JSObject = resp.end(htmlv)\n" +
 				 "http.createServer(doServer).listen(8081, \"127.0.0.1\")";
 		
 		TypedAST typedAST = doCompile(testStr, Html.extend(Environment.getEmptyEnvironment()));
@@ -361,7 +361,7 @@ public class JSCodegenTest {
 	@Test
 	public void testLoad() {
 		String test = "type T\n" +
-					  "\tfun asString(from:JSObject):Str\n" +
+					  "\tdef asString(from:JSObject):Str\n" +
 					  "val t : T = load T in \"./test.js\"\n";
 		TypedAST typedAST = doCompile(test, Html.extend(Environment.getEmptyEnvironment()));
 		JSCodegenVisitor visitor = new JSCodegenVisitor();
@@ -398,7 +398,7 @@ public class JSCodegenTest {
 	public void testCast() {
 		String test =
 				"type T\n" +
-				"	fun a(i : Int) : Int\n" +
+				"	def a(i : Int) : Int\n" +
 				"val t : T = cast T in require(\"test\")\n" +
 				"t.a(15)";
 		TypedAST typedAST = doCompile(test);
@@ -411,7 +411,7 @@ public class JSCodegenTest {
 	public void testCastAndVar() {
 		String test =
 				"type T\n" +
-						"	fun a(i : Int) : Int\n" +
+						"	def a(i : Int) : Int\n" +
 						"val t : T = cast T in JSvar external\n" +
 						"t.a(15)";
 		TypedAST typedAST = doCompile(test);
