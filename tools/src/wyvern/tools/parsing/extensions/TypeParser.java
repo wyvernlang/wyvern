@@ -83,6 +83,7 @@ public class TypeParser implements DeclParser {
 				// Make sure that all members have unique names.
 				HashSet<String> names = new HashSet<>();
 				for (Declaration d : DeclSequence.getDeclSeq(innerAST).getDeclIterator()) {
+					// System.out.println("Name " + d.getName() + " detected!");
 					if (names.contains(d.getName())) {
 						ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, mtd.getName(), d.getName(), mtd);
 					}

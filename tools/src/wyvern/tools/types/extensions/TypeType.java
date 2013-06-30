@@ -25,6 +25,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		this.decl = decl;
 	}
 	
+	public TypeDeclaration getDecl() {
+		return this.decl;
+	}
+	
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write		
@@ -57,6 +61,11 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 			if (d instanceof DefDeclaration) {
 				String n = ((DefDeclaration) d).getName();
 				Type t = ((DefDeclaration) d).getType();
+				thisMembers.add(new Pair<String, Type>(n, t));
+			} else if (d instanceof TypeDeclaration) {
+				TypeDeclaration td = (TypeDeclaration) d;
+				String n = td.getName();
+				Type t = td.getType();
 				thisMembers.add(new Pair<String, Type>(n, t));
 			} else {
 				System.out.println("Unsupported type member in TypeType.getMembers: " + d.getClass());
