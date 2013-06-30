@@ -56,7 +56,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
 			if (d instanceof DefDeclaration) {
 				String n = ((DefDeclaration) d).getName();
-				Arrow t = (Arrow) ((DefDeclaration) d).getType();
+				Type t = ((DefDeclaration) d).getType();
 				thisMembers.add(new Pair<String, Type>(n, t));
 			} else {
 				System.out.println("Unsupported type member in TypeType.getMembers: " + d.getClass());
@@ -72,8 +72,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		}
 		
 		if (other instanceof TypeType) {
-			HashSet<Pair<String, Type>> thisMembers = this.getMembers();			
+			HashSet<Pair<String, Type>> thisMembers = this.getMembers();
+			// System.out.println("this (" + this + ") : " + thisMembers);
 			HashSet<Pair<String, Type>> otherMembers = ((TypeType) other).getMembers();
+			// System.out.println("other (" + other + ") : " + otherMembers);
 			return checkSubtypeRecursively(this, other, thisMembers, otherMembers, subtypes);
 		}
 		

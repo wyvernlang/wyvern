@@ -20,6 +20,7 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 
@@ -59,12 +60,12 @@ public class PropParser implements DeclParser {
 		}
 		
 		// Need to return a DeclSequence with two FunDeclaration's.
-		DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+		DefDeclaration getter = new DefDeclaration(propName, type, new LinkedList<NameBinding>(), null, false, line);
 		
 		List<NameBinding> args = new ArrayList<NameBinding>();
 		args.add(new NameBindingImpl("new" + propName.substring(0,1).toUpperCase() + propName.substring(1), type));
 		DefDeclaration setter = new DefDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
-			args, Unit.getInstance(), null, false, line);
+			new Arrow(type, Unit.getInstance()), args, null, false, line);
 		
 		LinkedList<DefDeclaration> seq = new LinkedList<>();
 		seq.add(getter);

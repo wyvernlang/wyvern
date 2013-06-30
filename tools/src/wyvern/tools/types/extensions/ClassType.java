@@ -86,12 +86,13 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 				Type type = vd.getType();
 				FileLocation line = vd.getLocation();
 				
-				DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+				DefDeclaration getter = new DefDeclaration(propName, type,
+						new LinkedList<NameBinding>(), null, false, line);
 				
 				List<NameBinding> args = new ArrayList<NameBinding>();
 				args.add(new NameBindingImpl("new" + propName.substring(0,1).toUpperCase() + propName.substring(1), type));
 				DefDeclaration setter = new DefDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
-					args, Unit.getInstance(), null, false, line);
+					new Arrow(type, Unit.getInstance()), args, null, false, line);
 				
 				seq.add(getter);
 				seq.add(setter);
@@ -104,7 +105,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 				Type type = vd.getType();
 				FileLocation line = vd.getLocation();
 				
-				DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+				DefDeclaration getter = new DefDeclaration(propName, type,
+						new LinkedList<NameBinding>(), null, false, line);
 
 				seq.add(getter);
 			} else {

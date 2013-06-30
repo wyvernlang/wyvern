@@ -49,7 +49,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		if (binding.getType() == null) {
 			this.binding = new NameBindingImpl(binding.getName(), definitionType);
 		} else if (this.definitionType != null && !this.definitionType.subtype(binding.getType())){
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, this);
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this.definitionType.toString(), binding.getType().toString(), this);
 		}
 		
 		return binding.getType();

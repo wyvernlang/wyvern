@@ -40,8 +40,9 @@ public class JavaMeth extends DefDeclaration {
 
 	public JavaMeth(MethodHandle mh, Method m) {
 		super(m.getName(),
+				DefDeclaration.getMethodType(getNameBindings(m), Util.javaToWyvType(m.getReturnType())),
 				getNameBindings(m),
-				Util.javaToWyvType(m.getReturnType()),
+				// Util.javaToWyvType(m.getReturnType()),
 				new JavaInvocation(mh, m, getNames(m)),
 				Modifier.isStatic(m.getModifiers()), FileLocation.UNKNOWN);
 	}

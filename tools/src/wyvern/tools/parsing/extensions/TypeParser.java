@@ -1,5 +1,7 @@
 package wyvern.tools.parsing.extensions;
 
+import java.util.HashSet;
+
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -77,6 +79,15 @@ public class TypeParser implements DeclParser {
 
 				if (!(innerAST instanceof Declaration) && !(innerAST instanceof Sequence))
 					ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, innerAST);
+				
+				// Make sure that all members have unique names.
+				HashSet<String> names = new HashSet<>();
+				for (Declaration d : DeclSequence.getDeclSeq(innerAST).getDeclIterator()) {
+					if (names.contains(d.getName())) {
+						ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, mtd.getName(), d.getName(), mtd);
+					}
+					names.add(d.getName());
+				}
 				
 				mtd.setDecls(DeclSequence.getDeclSeq(innerAST));
 				return mtd;

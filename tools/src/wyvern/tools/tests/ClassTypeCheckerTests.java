@@ -396,29 +396,35 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
 				+"    prop a : Int\n"
-				+"    def b() : Int\n"
+				+"    def b : Int\n"
 				+"\n"
 				+"type B\n"
-				+"    def a() : Int\n"
+				+"    def a : Int\n"
 				+"    prop b : Int\n"
 				+"\n"
 				+"class AImpl\n"
 				+"    implements A\n"
 				+"\n"
-				+"    class def make() : A\n"
+				+"    class def make() : AImpl\n"
 				+"        new\n"
 				+"\n"
 				+"    var a : Int\n"
 				+"\n"
-				+"    def b() : Int\n"
+				+"    def aa() : Int\n"
 				+"        this.a\n"
 				+"\n"
+				+"    def b : Int\n"
+				+"        this.a\n"
+				+"\n"
+				+"    def setB (bbb : Int)\n"
+				+"        this.a = bbb\n"
+				+"\n"
 				+"def doIt() : Unit\n"
-//				+"    val a1:A = AImpl.make()\n"
-//				+"    val a2:B = AImpl.make()\n"
-//				+"    val checkMe1:Int = a1.a\n"
-//				+"    val checkMe2:Unit -> Int = a2.a\n"
-//				+"    val checkMe3:Int = a2.a()\n"
+				+"    val a1:A = AImpl.make()\n"
+				+"    val a2:B = AImpl.make()\n"
+				+"    val checkMe1:Int = a1.a\n"
+				+"    val checkMe2:Int = a2.a\n"
+				+"    val checkMe3:Int = a2.a\n"
 				
 				// What Would You Do?
 //				+"    val a3:B = a1\n"
@@ -430,8 +436,6 @@ public class ClassTypeCheckerTests {
 				+"    null\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L def b () : Int $L} $I} $L} {$L type B {$I {$L def a () : Int $L} {$L prop b : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class def make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L def b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L def doIt () : Unit {$I {$L null $L} $I} $L} $I}",
-		 		parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 
