@@ -54,7 +54,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
-		Declaration m = decl.getDecl(opName);
+		NameBinding m = decl.lookupDecl(opName);
 
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);

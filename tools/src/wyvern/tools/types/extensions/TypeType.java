@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -42,7 +43,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
-		Declaration m = decl.getDecl(opName);
+		NameBinding m = decl.lookupDecl(opName);
 
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);

@@ -3,6 +3,7 @@ package wyvern.tools.types;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.util.TreeWriter;
 
 public class KeywordType extends AbstractTypeImpl {
@@ -19,4 +20,9 @@ public class KeywordType extends AbstractTypeImpl {
 	public String toString() {
 		return "Keyword";
 	}
+
+    @Override
+    public LineParser getParser() {
+        return null;
+    }
 }

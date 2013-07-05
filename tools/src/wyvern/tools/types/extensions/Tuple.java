@@ -26,6 +26,21 @@ public class Tuple extends AbstractTypeImpl {
 	public Type[] getTypes() {
 		return types;
 	}
+
+    public Type getFirst() {
+        return types[0];
+    }
+
+    public boolean isEmpty() {
+        return types.length > 0;
+    }
+
+    public Tuple getRest() {
+        Type[] newT = new Type[types.length-1];
+        for (int i = 1; i < types.length; i++)
+            newT[i-1] = types[i];
+        return new Tuple(newT);
+    }
 	
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
@@ -80,9 +95,29 @@ public class Tuple extends AbstractTypeImpl {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		// FIXME: Implement S-RcdWidth, S-RcdDepth, and S-RcdPerm I suppose. :)
-		
-		return super.subtype(other, subtypes);
+		// FIXME: Implement S-RcdWidth, S-RcdDepth, and S-RcdPerm I suppose. (Ben: This is factually wrong)
+        if (other == this)
+            return true;
+
+        if (!(other instanceof Tuple))
+            return false;
+
+        Tuple otherTuple = (Tuple)other;
+
+        //n+k = types.length
+        //n = otherTuple.types.length
+        if (types.length != otherTuple.types.length) // n+k != n
+            return false;
+        //=>k=0=>n+k=n
+
+        boolean sat = true;
+        for (int i = 0; i < otherTuple.types.length && sat; i++) {
+            Type Si = types[i];
+            Type Ti = otherTuple.types[i];
+            if (!Si.subtype(Ti)) // S_i <: T_i
+                sat = false;
+        }
+        return sat;
 	}
 	
 	@Override

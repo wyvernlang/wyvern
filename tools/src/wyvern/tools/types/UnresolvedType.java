@@ -5,6 +5,7 @@ import java.util.HashSet;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.util.TreeWriter;
 
 public class UnresolvedType implements Type {
@@ -40,7 +41,12 @@ public class UnresolvedType implements Type {
 		return this.subtype(other, new HashSet<SubtypeRelation>());
 	}
 
-	@Override
+    @Override
+    public LineParser getParser() {
+        return null;
+    }
+
+    @Override
 	public boolean isSimple() {
 		return true;
 	}
