@@ -15,8 +15,7 @@ public class VarValue extends AbstractValue {
 	}
 	
 	public void setValue(Value newV) {
-		if (innerValue.getType() != newV.getType())
-			throw new RuntimeException("Typecheck error causing problems at runtime");
+        //Assume typecheck alright
 		innerValue = newV;
 	}
 
