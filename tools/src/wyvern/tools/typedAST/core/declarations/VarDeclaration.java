@@ -88,6 +88,8 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		}
 		
 		if (definition == null) {
+            ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
+            vb.setValue(new VarValue(null));
 			return;
 		}
 		Value defValue = definition.evaluate(evalEnv);
