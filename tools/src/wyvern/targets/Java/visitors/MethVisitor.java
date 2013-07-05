@@ -15,6 +15,7 @@ import org.objectweb.asm.Opcodes;
 
 import wyvern.targets.util.VariableResolver;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
@@ -204,7 +205,13 @@ public class MethVisitor extends BaseASTVisitor {
 		public boolean subtype(Type other) {
 			return false;
 		}
-		@Override
+
+        @Override
+        public LineParser getParser() {
+            return null;
+        }
+
+        @Override
 		public boolean isSimple() {
 			// TODO Auto-generated method stub
 			return true;

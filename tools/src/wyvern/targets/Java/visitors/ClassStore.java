@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
@@ -25,7 +26,12 @@ public class ClassStore {
 			return false;  //To change body of implemented methods use File | Settings | File Templates.
 		}
 
-		@Override
+        @Override
+        public LineParser getParser() {
+            return null;
+        }
+
+        @Override
 		public void writeArgsToTree(TreeWriter writer) {
 			//To change body of implemented methods use File | Settings | File Templates.
 		}
@@ -53,6 +59,11 @@ public class ClassStore {
         @Override
         public boolean subtype(Type other) {
             return false;
+        }
+
+        @Override
+        public LineParser getParser() {
+            return null;
         }
 
         @Override
