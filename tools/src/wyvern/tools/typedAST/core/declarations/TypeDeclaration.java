@@ -25,8 +25,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
-	
-	public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
+    protected Environment declEnv;
+
+    public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
 		this.decls = decls;
 		Type objectType = new TypeType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -125,4 +126,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public FileLocation getLocation() {
 		return location; 
 	}
+
+    public NameBinding lookupDecl(String name) {
+        return declEnv.lookup(name);
+    }
 }

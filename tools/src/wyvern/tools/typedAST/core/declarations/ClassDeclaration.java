@@ -33,8 +33,14 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private NameBinding nameImplements;
 	
 	protected Environment declEvalEnv;
+    protected Environment declEnv;
 	
-	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
+	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, Environment declEnv, FileLocation location) {
+        this(name, implementsName, implementsClassName, decls, location);
+        this.declEnv = declEnv;
+    }
+
+    public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
 		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -43,6 +49,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
 		this.location = location;
+        declEnv = null;
 	}
 	protected Type getClassType() {
 		return new ClassType(this);
@@ -216,4 +223,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public ClassObject createObject() {
 		return new ClassObject(this);
 	}
+
+    public NameBinding lookupDecl(String name) {
+        return declEnv.lookup(name);
+    }
 }
