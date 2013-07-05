@@ -45,7 +45,12 @@ public class VarParser implements DeclParser {
 			
 			return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(varName, parsedType)), new ContParser(){
 
-				@Override
+                @Override
+                public void parseInner(EnvironmentResolver r) {
+
+                }
+
+                @Override
 				public TypedAST parse(EnvironmentResolver r) {
 					if (restctx.first == null)
 						return new VarDeclaration(varName, parsedType, null);

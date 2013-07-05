@@ -117,7 +117,12 @@ public class DefParser implements DeclParser {
 		
 		return new Pair<Environment, ContParser>(md.extend(Environment.getEmptyEnvironment()), new ContParser() {
 
-			@Override
+            @Override
+            public void parseInner(EnvironmentResolver r) {
+
+            }
+
+            @Override
 			public TypedAST parse(EnvironmentResolver envR) {
 				Environment env = envR.getEnv(md);
 				TypedAST inExp;

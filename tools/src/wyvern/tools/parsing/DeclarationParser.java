@@ -52,7 +52,13 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		}
 		
 		return new Pair<Environment, ContParser>(newEnv, new ContParser() {
-			@Override
+            @Override
+            public void parseInner(EnvironmentResolver r) {
+                for (ContParser parser : contParsers)
+                    parser.parseInner(r);
+            }
+
+            @Override
 			public TypedAST parse(EnvironmentResolver env) {
 				LinkedList<TypedAST> seqBody = new LinkedList<TypedAST>();
 				boolean isExtender = true;

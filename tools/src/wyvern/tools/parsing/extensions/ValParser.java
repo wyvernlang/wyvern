@@ -1,9 +1,11 @@
 package wyvern.tools.parsing.extensions;
 
 import static wyvern.tools.parsing.ParseUtils.parseSymbol;
+
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
@@ -14,63 +16,82 @@ import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.Pair;
 
 public class ValParser implements DeclParser {
-	private ValParser() { }
-	private static ValParser instance = new ValParser();
-	public static ValParser getInstance() { return instance; }
-	
+    private ValParser() {
+    }
 
-	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
-		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
-	}
+    private static ValParser instance = new ValParser();
+
+    public static ValParser getInstance() {
+        return instance;
+    }
 
 
-	//@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			final Pair<ExpressionSequence, Environment> ctx) {
-		Symbol s = ParseUtils.parseSymbol(ctx);
-		final String valName = s.name;
-		final FileLocation valNameLocation = s.getLocation(); 
-		
-		if (ParseUtils.checkFirst("=", ctx)) {
-			//ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
-			//return null;
-		}
-		Type type = null;
-		if (ParseUtils.checkFirst(":", ctx)) {
-			parseSymbol(":", ctx);
-			type = ParseUtils.parseType(ctx);
-		}
-			
-		final Pair<ExpressionSequence, Environment> restctx = new Pair<ExpressionSequence,Environment>(ctx.first,ctx.second);
-		ctx.first = null;
+    @Override
+    public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+        Pair<Environment, ContParser> p = parseDeferred(first, ctx);
+        return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+    }
 
-		ValDeclaration nc = null;
-		if (restctx.first == null)
-			nc = new ValDeclaration(valName, type, null, valNameLocation);
-		else if (ParseUtils.checkFirst("=", restctx)) {
-			ParseUtils.parseSymbol("=", restctx);
-			Pair<ExpressionSequence,Environment> ctxi = new Pair<ExpressionSequence,Environment>(restctx.first, ctx.second);
-			TypedAST definition = ParseUtils.parseExpr(restctx);
-			if (type == null)
-				type = definition.typecheck(ctx.second);
-			nc = new ValDeclaration(valName, type, definition, valNameLocation);
-		} else {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, restctx.first);
-			nc = null;
-		}
-		final Type parsedType = type;
 
-		final ValDeclaration intermvd = nc;
-		return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(valName, parsedType)), new ContParser(){
+    //@Override
+    public Pair<Environment, ContParser> parseDeferred(TypedAST first,
+                                                       final Pair<ExpressionSequence, Environment> ctx) {
+        Symbol s = ParseUtils.parseSymbol(ctx);
+        final String valName = s.name;
+        final FileLocation valNameLocation = s.getLocation();
 
-			@Override
-			public TypedAST parse(EnvironmentResolver r) {
-				return intermvd;
-			}});
-	}
+        if (ParseUtils.checkFirst("=", ctx)) {
+            //ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+            //return null;
+        }
+        Type type = null;
+        if (ParseUtils.checkFirst(":", ctx)) {
+            parseSymbol(":", ctx);
+            type = ParseUtils.parseType(ctx);
+        }
+
+        BodyParser.getInstance().setExpected(type);
+
+        final Pair<ExpressionSequence, Environment> restctx = new Pair<ExpressionSequence, Environment>(ctx.first, ctx.second);
+        ctx.first = null;
+
+        ValDeclaration nc = null;
+        if (restctx.first == null)
+            nc = new ValDeclaration(valName, type, null, valNameLocation);
+        else if (ParseUtils.checkFirst("=", restctx)) {
+            ParseUtils.parseSymbol("=", restctx);
+            nc = new ValDeclaration(valName, new UnresolvedType("Dummy"), null, valNameLocation);
+        } else {
+            ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, restctx.first);
+            nc = null;
+        }
+        final Type parsedType = type;
+
+        final ValDeclaration intermvd = nc;
+        return new Pair<Environment, ContParser>(
+                Environment.getEmptyEnvironment().extend(new NameBindingImpl(valName, parsedType)),
+                new ContParser() {
+                    @Override
+                    public void parseInner(EnvironmentResolver r) {
+
+                    }
+
+                    @Override
+                    public TypedAST parse(EnvironmentResolver r) {
+                        TypedAST definition = null;
+                        Type type = null;
+                        if (restctx.first != null) {
+                            definition = ParseUtils.parseExpr(restctx);
+                            type = definition.typecheck(ctx.second);
+                        } else {
+                            type = parsedType;
+                        }
+                        return new ValDeclaration(valName, type, definition, valNameLocation);
+                    }
+                });
+    }
 }

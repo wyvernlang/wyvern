@@ -33,6 +33,10 @@ public class TypeParser implements DeclParser {
 		public void setDecls(DeclSequence declSequence) {
 			super.decls = declSequence;
 		}
+
+        public void setDeclEnv(Environment env) {
+            super.declEnv = env;
+        }
 	}
 
 	@Override
@@ -56,15 +60,26 @@ public class TypeParser implements DeclParser {
 		
 		return new Pair<Environment,ContParser>(mtd.extend(Environment.getEmptyEnvironment()), new ContParser() {
 
-			@Override
+            private Environment envin;
+            private Environment envs;
+            private Pair<Environment,ContParser> declAST;
+
+            @Override
+            public void parseInner(EnvironmentResolver r) {
+
+                Environment eEnv = r.getEnv(mtd);
+
+                envin = mtd.extend(eEnv);
+                envs = envin.extend(new TypeBinding("class", mtd.getType()));
+
+                declAST = body.accept(DeclarationParser.getInstance(), envs);
+                mtd.setDeclEnv(declAST.first);
+            }
+
+            @Override
 			public TypedAST parse(EnvironmentResolver r) {
-				Environment eEnv = r.getEnv(mtd);
-
-				Environment envin = mtd.extend(eEnv); 
-				final Environment envs = envin.extend(new TypeBinding("class", mtd.getType()));
-
-				final Pair<Environment,ContParser> declAST = body.accept(DeclarationParser.getInstance(), envs);
-				
+				if (envin == null)
+                    parseInner(r);
 				final Environment envsf = envs.extend(declAST.first);
 				
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {

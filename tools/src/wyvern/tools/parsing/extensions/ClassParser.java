@@ -37,9 +37,13 @@ public class ClassParser implements DeclParser {
 	//REALLY HACKY
 	private static class MutableClassDeclaration extends ClassDeclaration {
 		public MutableClassDeclaration(String name, String implementsName,
-				String implementsClassName, FileLocation clsNameLine) {
-			super(name, implementsName, implementsClassName, null, clsNameLine);
+				String implementsClassName, Environment declEnv, FileLocation clsNameLine) {
+			super(name, implementsName, implementsClassName, null, declEnv, clsNameLine);
 		}
+
+        public void setDeclEnv(Environment nd) {
+            super.declEnv = nd;
+        }
 
 		public void setDecls(DeclSequence decl) {
 			this.decls = decl;
@@ -67,11 +71,16 @@ public class ClassParser implements DeclParser {
 		String implementsName = "";
 		String implementsClassName = "";
 
-		final MutableClassDeclaration mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, clsNameLine);
-		
+		final MutableClassDeclaration mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, clsNameLine);
+
 		if (ctx.first == null) {
 			return new Pair<Environment,ContParser>(mutableDecl.extend(Environment.getEmptyEnvironment()),new ContParser() {
-				@Override
+                @Override
+                public void parseInner(EnvironmentResolver r) {
+
+                }
+
+                @Override
 				public TypedAST parse(EnvironmentResolver env) {
 					return mutableDecl;
 				}
@@ -99,7 +108,7 @@ public class ClassParser implements DeclParser {
 		if (ctx.first != null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		
-		final MutableClassDeclaration mutableDeclf = new MutableClassDeclaration(clsName, implementsName, implementsClassName, clsNameLine);
+		final MutableClassDeclaration mutableDeclf = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, clsNameLine);
 		
 		Environment newEnv = mutableDeclf.extend(Environment.getEmptyEnvironment()); 
 		
@@ -109,15 +118,25 @@ public class ClassParser implements DeclParser {
 		
 		return new Pair<Environment,ContParser>(newEnv, new ContParser() {
 
-			@Override
-			public TypedAST parse(EnvironmentResolver envR) {
-				Environment external = envR.getEnv(mutableDeclf);
+            private Environment envs = null;
+            private Environment envi;
+            private Pair<Environment,ContParser> declAST;
 
-				Environment envin = mutableDeclf.extend(external); 
-				final Environment envs = envin.extend(new TypeBinding("class", mutableDeclf.getType()));
-				final Pair<Environment,ContParser> declAST = lines.accept(DeclarationParser.getInstance(), envs);
-				final Environment envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
-				
+            @Override
+            public void parseInner(EnvironmentResolver envR) {
+                Environment external = envR.getEnv(mutableDeclf);
+
+                Environment envin = mutableDeclf.extend(external);
+                envs = envin.extend(new TypeBinding("class", mutableDeclf.getType()));
+                declAST = lines.accept(DeclarationParser.getInstance(), envs);
+                envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
+                mutableDeclf.setDeclEnv(declAST.first);
+            }
+
+            @Override
+			public TypedAST parse(EnvironmentResolver envR) {
+                if (envs == null)
+                    parseInner(envR);
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
 					@Override
 					public Environment getEnv(TypedAST elem) {
@@ -125,7 +144,7 @@ public class ClassParser implements DeclParser {
 								return envs;
 						}
 						return envi;
-					} 
+					}
 				});
 				
 				if (!(innerAST instanceof Declaration) && !(innerAST instanceof Sequence))

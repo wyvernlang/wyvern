@@ -221,13 +221,17 @@ public class ParseUtils {
 	}
 	
 	public static TypedAST parseCond(Pair<ExpressionSequence, Environment> ctx) {
-		ArrayList<RawAST> condRaw = new ArrayList<RawAST>();
-		while (ctx.first != null && !(ctx.first.getFirst() instanceof LineSequence)) {
-			condRaw.add(ctx.first.getFirst());
-			ctx.first = ctx.first.getRest();
-		}
-		return new Line(condRaw, FileLocation.UNKNOWN).accept(BodyParser.getInstance(), ctx.second);
+        return getLine(ctx).accept(BodyParser.getInstance(), ctx.second);
 	}
+
+    public static ExpressionSequence getLine(Pair<ExpressionSequence, Environment> ctx) {
+        ArrayList<RawAST> condRaw = new ArrayList<RawAST>();
+        while (ctx.first != null && !(ctx.first.getFirst() instanceof LineSequence)) {
+            condRaw.add(ctx.first.getFirst());
+            ctx.first = ctx.first.getRest();
+        }
+        return new Line(condRaw, FileLocation.UNKNOWN);
+    }
 
 	public static Pair<Environment, ContParser> parseCondPartial(Pair<ExpressionSequence, Environment> ctx) {
 		ArrayList<RawAST> condRaw = new ArrayList<RawAST>();

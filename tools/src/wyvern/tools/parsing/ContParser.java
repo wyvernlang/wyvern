@@ -13,8 +13,13 @@ public interface ContParser {
 		public EmptyWithAST(TypedAST elem) {
 			this.elem = elem;
 		}
-		
-		@Override
+
+        @Override
+        public void parseInner(EnvironmentResolver r) {
+            return;
+        }
+
+        @Override
 		public TypedAST parse(EnvironmentResolver r) {
 			return elem;
 		}
@@ -32,7 +37,6 @@ public interface ContParser {
 			return env;
 		}
 	}
-
 	public static class ExtensionResolver implements EnvironmentResolver {
 		private EnvironmentResolver env;
 		private Binding binding;
@@ -52,6 +56,7 @@ public interface ContParser {
 		public Environment getEnv(TypedAST elem);
 	}
 
+    public void parseInner(EnvironmentResolver r);
 	public TypedAST parse(EnvironmentResolver r);
 
 }
