@@ -73,13 +73,16 @@ public class New extends CachingTypedAST implements CoreAST {
 			isGeneric = true;
 			LinkedList<Declaration> decls = new LinkedList<>();
 
+            Environment mockEnv = Environment.getEmptyEnvironment();
+
 			for (Map.Entry<String, TypedAST> elem : args.entrySet()) {
 				ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
 				e.typecheck(env);
+                mockEnv = e.extend(mockEnv);
 				decls.add(e);
 			}
 
-			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), getLocation());
+			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, getLocation());
 			cls = classDeclaration;
 			return classDeclaration.getType();
 		}
