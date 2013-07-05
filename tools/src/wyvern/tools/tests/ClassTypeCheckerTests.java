@@ -21,12 +21,14 @@ import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 
@@ -396,29 +398,35 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type A\n"
 				+"    prop a : Int\n"
-				+"    def b() : Int\n"
+				+"    def b : Int\n"
 				+"\n"
 				+"type B\n"
-				+"    def a() : Int\n"
+				+"    def a : Int\n"
 				+"    prop b : Int\n"
 				+"\n"
 				+"class AImpl\n"
 				+"    implements A\n"
 				+"\n"
-				+"    class def make() : A\n"
+				+"    class def make() : AImpl\n"
 				+"        new\n"
 				+"\n"
 				+"    var a : Int\n"
 				+"\n"
-				+"    def b() : Int\n"
+				+"    def aa() : Int\n"
 				+"        this.a\n"
 				+"\n"
+				+"    def b : Int\n"
+				+"        this.a\n"
+				+"\n"
+				+"    def setB (bbb : Int)\n"
+				+"        this.a = bbb\n"
+				+"\n"
 				+"def doIt() : Unit\n"
-//				+"    val a1:A = AImpl.make()\n"
-//				+"    val a2:B = AImpl.make()\n"
-//				+"    val checkMe1:Int = a1.a\n"
-//				+"    val checkMe2:Unit -> Int = a2.a\n"
-//				+"    val checkMe3:Int = a2.a()\n"
+				+"    val a1:A = AImpl.make()\n"
+				+"    val a2:B = AImpl.make()\n"
+				+"    val checkMe1:Int = a1.a\n"
+				+"    val checkMe2:Int = a2.a\n"
+				+"    val checkMe3:Int = a2.a\n"
 				
 				// What Would You Do?
 //				+"    val a3:B = a1\n"
@@ -430,8 +438,6 @@ public class ClassTypeCheckerTests {
 				+"    null\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type A {$I {$L prop a : Int $L} {$L def b () : Int $L} $I} $L} {$L type B {$I {$L def a () : Int $L} {$L prop b : Int $L} $I} $L} {$L class AImpl {$I {$L implements A $L} {$L class def make () : A {$I {$L new $L} $I} $L} {$L var a : Int $L} {$L def b () : Int {$I {$L this . a $L} $I} $L} $I} $L} {$L def doIt () : Unit {$I {$L null $L} $I} $L} $I}",
-		 		parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();
 
@@ -576,5 +582,70 @@ public class ClassTypeCheckerTests {
 
 //		Assert.assertTrue(tAt.subtype(tBt, subtypes)); // FIXME:
 //		Assert.assertTrue(tBt.subtype(tAt, subtypes)); // FIXME:
+	}
+
+	@Test
+	public void testNestedTypes1() {
+		Reader reader = new StringReader("\n"
+				+"type A\n"
+				+"    def a : Int\n"
+				+"    def b : Int\n"
+				+"    type AInner\n"
+				+"        def a : Int\n"
+				+"\n"
+				+"type B\n"
+				+"    def a : Int\n"
+				+"    def b : Int\n"
+				+"    type AInner\n"
+				+"        prop a : Int\n"
+				+"\n"
+				+"class AImpl\n"
+				+"    def a : Int\n"				
+				+"    def b : Int\n"
+				+"    type ABC\n"
+				+"        def t : Int\n"
+				+"    class DEF\n"
+				+"        def t : Int\n"
+				+"\n"
+				+"class BImpl\n"
+//				+"    implements B\n"
+				+"    def a : Int\n"				
+				+"    def b : Int\n"
+				+"    type ABC\n"
+				+"        def t : Int\n"
+				+"    class DEF\n"
+				+"        prop t : Int\n"
+				+"\n"
+				+"def doIt() : Unit\n"
+				+"    null\n"
+				);
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		
+		Environment env = Globals.getStandardEnv();
+
+		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
+
+		typedAST.typecheck(env);
+
+		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
+		
+		Iterator<Declaration> i = ds.getDeclIterator().iterator();
+		TypeDeclaration tA = (TypeDeclaration) i.next();
+		TypeDeclaration tB = (TypeDeclaration) i.next();
+		ClassDeclaration cAImpl = (ClassDeclaration) i.next();
+		ClassDeclaration cBImpl = (ClassDeclaration) i.next();
+		
+		TypeType tAt = (TypeType) tA.getType();
+		TypeType tBt = (TypeType) tB.getType();
+		ClassType cAImplt = (ClassType) cAImpl.getType();
+		ClassType cBImplt = (ClassType) cBImpl.getType();
+
+		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
+
+		Assert.assertFalse(tAt.subtype(tBt, subtypes));
+		Assert.assertTrue(tBt.subtype(tAt, subtypes));
+		Assert.assertFalse(cAImplt.subtype(cBImplt, subtypes));
+		Assert.assertTrue(cBImplt.subtype(cAImplt, subtypes));
 	}
 }

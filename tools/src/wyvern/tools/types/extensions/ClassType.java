@@ -86,12 +86,13 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 				Type type = vd.getType();
 				FileLocation line = vd.getLocation();
 				
-				DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+				DefDeclaration getter = new DefDeclaration(propName, type,
+						new LinkedList<NameBinding>(), null, false, line);
 				
 				List<NameBinding> args = new ArrayList<NameBinding>();
 				args.add(new NameBindingImpl("new" + propName.substring(0,1).toUpperCase() + propName.substring(1), type));
 				DefDeclaration setter = new DefDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
-					args, Unit.getInstance(), null, false, line);
+					new Arrow(type, Unit.getInstance()), args, null, false, line);
 				
 				seq.add(getter);
 				seq.add(setter);
@@ -104,9 +105,28 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 				Type type = vd.getType();
 				FileLocation line = vd.getLocation();
 				
-				DefDeclaration getter = new DefDeclaration(propName, new LinkedList<NameBinding>(), type, null, false, line);
+				DefDeclaration getter = new DefDeclaration(propName, type,
+						new LinkedList<NameBinding>(), null, false, line);
 
 				seq.add(getter);
+			} else if (d instanceof TypeDeclaration) {
+				seq.add(d);
+			} else if (d instanceof ClassDeclaration) {
+				ClassDeclaration cd = (ClassDeclaration) d;
+				TypeType tt = ((ClassType) cd.getType()).convertToType(useClassMembers);
+				HashSet<Pair<String, Type>> mems = tt.getMembers();
+				
+				LinkedList<Declaration> ds = new LinkedList<>();
+				for (Pair<String, Type> p : mems) {
+					if (p.second instanceof TypeType) {
+						ds.add(((TypeType) p.second).getDecl());
+					} else { // Must be def.
+						ds.add(new DefDeclaration(p.first, p.second, new LinkedList<NameBinding>(), null, false, cd.getLocation()));
+					}
+				}
+				
+				TypeDeclaration td = new TypeDeclaration(cd.getName(), new DeclSequence(ds), cd.getLocation());
+				seq.add(td);
 			} else {
 				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
 			}

@@ -41,8 +41,9 @@ public class Endpoint extends Declaration {
 			mds.add(
 					new DefDeclaration(
 							connection.getName(),
+							DefDeclaration.getMethodType(connection.getArgs(), connection.getReturnType()),
 							connection.getArgs(),
-							connection.getReturnType(),
+							// connection.getReturnType(),
 							null,
 							false,
 							FileLocation.UNKNOWN));

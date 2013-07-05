@@ -46,8 +46,8 @@ public class MethVisitor extends BaseASTVisitor {
 
 		private Environment env;
 
-		public WrappedMethDeclaration(String name, List<NameBinding> args, Type returnType, TypedAST body, boolean isClassMeth, FileLocation location, Environment env) {
-			super(name, args, returnType, body, isClassMeth, location);
+		public WrappedMethDeclaration(String name, Type type, List<NameBinding> args, TypedAST body, boolean isClassMeth, FileLocation location, Environment env) {
+			super(name, type, args, body, isClassMeth, location);
 			this.env = env;
 		}
 
@@ -465,8 +465,10 @@ public class MethVisitor extends BaseASTVisitor {
 
 		Label defLoc = new Label();
 		DefDeclaration implMd =
-				new WrappedMethDeclaration(md.getName()+"$impl", newArgs,
-						((Arrow)md.getType()).getResult(), md.getBody(), true, md.getLocation(), this.localEnv);
+				new WrappedMethDeclaration(md.getName()+"$impl",
+						DefDeclaration.getMethodType(newArgs, ((Arrow)md.getType()).getResult()),
+						newArgs,
+						md.getBody(), true, md.getLocation(), this.localEnv);
 		jv.visit(implMd);
 
 		frame.registerVariable(md.getName(), md.getType(), defLoc);
@@ -871,7 +873,9 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 
 		String anonFnName = jv.getAnonMethodName();
-		DefDeclaration anonMeth = new DefDeclaration(anonFnName, newArgs, ((Arrow)fnDef.getType()).getResult(), fnDef.getBody(), true, fnDef.getLocation());
+		DefDeclaration anonMeth = new DefDeclaration(anonFnName,
+				DefDeclaration.getMethodType(newArgs, ((Arrow)fnDef.getType()).getResult()),
+				newArgs, fnDef.getBody(), true, fnDef.getLocation());
 		jv.visit(anonMeth);
 		mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), anonFnName + "$handle", "Ljava/lang/invoke/MethodHandle;");
 		fillClosure(usedVars);

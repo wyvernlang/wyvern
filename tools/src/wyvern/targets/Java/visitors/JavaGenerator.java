@@ -20,6 +20,7 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 
 public class JavaGenerator {
@@ -28,7 +29,8 @@ public class JavaGenerator {
 		ClassStore cs = new ClassStore();
 		ClassVisitor cv = new ClassVisitor("", cs);
 		ArrayList<Declaration> decls = new ArrayList<Declaration>();
-		decls.add(new DefDeclaration("main", new ArrayList<NameBinding>(), input.getType(), input, true, FileLocation.UNKNOWN));
+		decls.add(new DefDeclaration("main", new Arrow(Unit.getInstance(), input.getType()),
+				new ArrayList<NameBinding>(), input, true, FileLocation.UNKNOWN));
 		cv.visit(new ClassDeclaration("wycCode", null, null, new DeclSequence(decls), FileLocation.UNKNOWN));
 		return cs;
 	}
