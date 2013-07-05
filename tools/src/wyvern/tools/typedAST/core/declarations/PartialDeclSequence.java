@@ -35,12 +35,16 @@ public class PartialDeclSequence {
 	}
 	
 	public Pair<TypedAST,Environment> resolve(Environment env) {
-		for (PartialDecl decl : decls) {
+        LinkedList<PartialDecl> declsI = (LinkedList<PartialDecl>)decls.clone();
+        decls = null;
+        for (PartialDecl decl : declsI) {
+            decl.preParse(env);
+        }
+		for (PartialDecl decl : declsI) {
 			TypedAST ast = decl.getAST(env);
 			fullDecls.addFirst((EnvironmentExtender) ast);
 		}
 		DeclSequence declseq = new DeclSequence(fullDecls);
-		decls = null;
 		
 		return new Pair<TypedAST, Environment>(declseq,env);
 	}

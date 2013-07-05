@@ -18,6 +18,7 @@ import wyvern.tools.util.TreeWriter;
 public class PartialDecl implements TypedAST {
 
 	private Pair<Environment, ContParser> pair;
+    private boolean preParsed = false;
 
 	public PartialDecl(Pair<Environment, ContParser> pair) {
 		this.pair = pair;
@@ -26,8 +27,22 @@ public class PartialDecl implements TypedAST {
 	public Environment extend(Environment env) {
 		return env.extend(pair.first);
 	}
-	
+
+    public void preParse(final Environment env) {
+        preParsed = true;
+        pair.second.parseInner(new EnvironmentResolver() {
+
+            @Override
+            public Environment getEnv(TypedAST elem) {
+                return env;
+            }
+
+        });
+    }
+
 	public TypedAST getAST(final Environment env) {
+        if (!preParsed)
+            preParse(env);
 		return pair.second.parse(new EnvironmentResolver() {
 
 			@Override
