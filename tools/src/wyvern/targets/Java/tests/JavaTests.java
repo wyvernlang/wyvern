@@ -415,7 +415,7 @@ public class JavaTests {
                 "val y : Test4 = Test4.create()\n"+
                 "class Test4\n" +
                 "   class def create():Test4 = new\n" +
-                "   def a(x : Int):Int = 2+x\n" +
+        "   def a(x : Int):Int = 2+x\n" +
                 "val x : Test4 = Test4.create()\n" +
                 "x.a(2) + y.a()";
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));

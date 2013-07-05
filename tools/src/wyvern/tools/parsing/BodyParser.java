@@ -29,17 +29,37 @@ import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.extensions.DSLDummy;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.Pair;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 // NB! See: http://en.cppreference.com/w/cpp/language/operator_precedence
 
 public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
-	private BodyParser() { }
+    private DSLDummy dslToken;
+    private Tuple tuple;
+
+    private BodyParser() { }
 	private static BodyParser instance = new BodyParser();
 	public static BodyParser getInstance() { return instance; }
+
+    private interface Resolver {
+        public void resolve();
+        public Resolver getPrev();
+    }
+
+    private Resolver resolver = null;
+    private Type expected = null;
+    public void setExpected(Type expected) {
+        this.expected = expected;
+    }
 
 	@Override
 	public TypedAST visit(IntLiteral node, Environment env) {
@@ -98,33 +118,45 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		} else {
 			
 			PartialDeclSequence pds = new PartialDeclSequence();
-			Sequence s = new Sequence();
+			final Sequence s = new Sequence();
 			
 			if (first instanceof PartialDecl) {
 				env = pds.add((PartialDecl) first, env);
 			} else {
 				s.append(first);
 			}
-			
-			while (rest != null) {
-				first = rest.getFirst().accept(this, env);
-				if (first instanceof PartialDecl && pds != null) {
-					env = pds.add((PartialDecl)first, env);
-					rest = rest.getRest();
-					continue;
-				} else if (!(first instanceof PartialDecl) && !pds.isEmpty()) {
-					Pair<TypedAST, Environment> pair = pds.resolve(env);
-					pds = new PartialDeclSequence();
-					s.append(pair.first);
-				} else if (first instanceof PartialDecl && pds.isEmpty()) {
-					pds = new PartialDeclSequence();
-					env = pds.add((PartialDecl)first, env);
-					rest = rest.getRest();
-					continue;
-				}
-				
-				if (first instanceof EnvironmentExtender)
-					env = ((EnvironmentExtender)first).extend(env);
+            final AtomicReference<PartialDeclSequence> pdsRef = new AtomicReference<>(pds);
+            final AtomicReference<Environment> envRef = new AtomicReference<>(env);
+            resolver = new Resolver() {
+                Resolver saved = resolver;
+                @Override
+                public void resolve() {
+                    PartialDeclSequence pds = pdsRef.get();
+                    if (!pds.isResolved() && !pds.isEmpty()) {
+                        Pair<TypedAST, Environment> pair = pds.resolve(envRef.get());
+                        pdsRef.set(new PartialDeclSequence());
+                        s.append(pair.first);
+                    }
+                }
+
+                @Override
+                public Resolver getPrev() {
+                    return saved;
+            }
+        };
+
+        while (rest != null) {
+            first = rest.getFirst().accept(this, envRef.get());
+            if (first instanceof PartialDecl) {
+                envRef.set(pdsRef.get().add((PartialDecl) first, envRef.get()));
+                rest = rest.getRest();
+                continue;
+            } else if (!pdsRef.get().isResolved() && !pdsRef.get().isEmpty()) {
+                resolver.resolve();
+            }
+
+            if (first instanceof EnvironmentExtender)
+                envRef.set(((EnvironmentExtender) first).extend(envRef.get()));
 				
 				// Make sure that we allow val's etc to parse their bodies/continuations properly!
 				LineSequenceParser bodyParser = first.getLineSequenceParser();
@@ -132,18 +164,17 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 					s.append(first);
 				} else {
 					// Has to eat the rest of the LineSequence!!!
-					s.append(bodyParser.parse(first, rest.getRest(), env));
+					s.append(bodyParser.parse(first, rest.getRest(), envRef.get()));
 					return s;
 				}
 				
 				rest = rest.getRest();
 			}
-			
-			if (pds != null && !pds.isResolved() && !pds.isEmpty()) {
-				Pair<TypedAST, Environment> pair = pds.resolve(env);
-				env = pair.second;
-				s.append(pair.first);
-			}
+
+			if (resolver != null) {
+                resolver.resolve();
+                resolver = resolver.getPrev();
+            }
 			
 			return s;
 		}
@@ -154,7 +185,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return visit((ExpressionSequence)node, env);
 	}
 	
-	private TypedAST parseAtomicExpr(Pair<ExpressionSequence,Environment> ctx) {
+	private TypedAST parseAtomicExpr(Pair<ExpressionSequence,Environment> ctx, Type expected) {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check
@@ -167,31 +198,48 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 				throw new RuntimeException("cannot parse an empty list");
 		}
 
+        if (ParseUtils.checkFirst("~", ctx)) {
+            ParseUtils.parseSymbol("~", ctx);
+            dslToken = new DSLDummy();
+            return dslToken;
+        }
+
 		TypedAST first = node.getFirst().accept(this, env);
 		LineParser parser = first.getLineParser();
 		ExpressionSequence rest = node.getRest();
 		ctx.first = rest;
 
-		if (parser == null)
+		if (parser == null) {
+            if (resolver != null)
+                resolver.resolve();
 			return first;
+        }
 		
 		if (parser instanceof DeclParser) {
 			return new PartialDecl(((DeclParser) parser).parseDeferred(first, ctx));
 		}
+        if (resolver != null)
+            resolver.resolve();
 		// if first is a special form, get the expression continuation parser and use it to parse the rest
 		return parser.parse(first, ctx);
 	}
 	
-	private TypedAST parseApplication(Pair<ExpressionSequence,Environment> ctx) {
-		TypedAST ast = parseAtomicExpr(ctx);
+	private TypedAST parseApplication(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+		TypedAST ast = parseAtomicExpr(ctx, expected);
 		
 		while (ctx.first != null && (ctx.first.getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
 			if (ParseUtils.checkFirst(".",ctx)) {
 				ParseUtils.parseSymbol(".", ctx);
-				Symbol sym = ParseUtils.parseSymbol(ctx);
-				ast = new Invocation(ast, sym.name, null, sym.getLocation());
-			} else {
-				TypedAST argument = parseAtomicExpr(ctx);
+                Symbol sym = ParseUtils.parseSymbol(ctx);
+                ast = new Invocation(ast, sym.name, null, sym.getLocation());
+            } else {
+                Type type = ast.typecheck(ctx.second);
+                if (type instanceof Arrow) {
+                    expected = ((Arrow) type).getArgument();
+                } else {
+                    expected = null;
+                }
+				TypedAST argument = parseAtomicExpr(ctx, expected);
 				ast = new Application(ast, argument, argument.getLocation());
 			}
 		}
@@ -200,100 +248,116 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	}
 
 	// TODO: refactor to reuse code between parseProduct and parseSum 
-	private TypedAST parseProduct(Pair<ExpressionSequence,Environment> ctx) {
-		TypedAST ast = parseApplication(ctx);
+	private TypedAST parseProduct(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+		TypedAST ast = parseApplication(ctx, expected);
 		
 		while (ctx.first != null && isProductOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();
 			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
-			TypedAST argument = parseApplication(ctx);
+			TypedAST argument = parseApplication(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
 		
 		return ast;
 	}
 	
-	private TypedAST parseSum(Pair<ExpressionSequence,Environment> ctx) {
-		TypedAST ast = parseProduct(ctx);
+	private TypedAST parseSum(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+		TypedAST ast = parseProduct(ctx, expected);
 		
 		while (ctx.first != null && isSumOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();
 			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
-			TypedAST argument = parseProduct(ctx);
+			TypedAST argument = parseProduct(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
 		
 		return ast;
 	}
 
-	private TypedAST parseRelationalOps(Pair<ExpressionSequence, Environment> ctx) {
-		TypedAST ast = parseSum(ctx);
+	private TypedAST parseRelationalOps(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+		TypedAST ast = parseSum(ctx, expected);
 		
 		while (ctx.first != null && isRelationalOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();
 			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
-			TypedAST argument = parseSum(ctx);
+			TypedAST argument = parseSum(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
 		
 		return ast;
 	}
 	
-	private TypedAST parseAnd(Pair<ExpressionSequence,Environment> ctx) {
-		TypedAST ast = parseRelationalOps(ctx);
+	private TypedAST parseAnd(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+		TypedAST ast = parseRelationalOps(ctx, expected);
 		
 		while (ctx.first != null && isAndOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();
 			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
-			TypedAST argument = parseRelationalOps(ctx);
+			TypedAST argument = parseRelationalOps(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
 		
 		return ast;
 	}
 	
-	private TypedAST parseOr(Pair<ExpressionSequence,Environment> ctx) {
-		TypedAST ast = parseAnd(ctx);
+	private TypedAST parseOr(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+		TypedAST ast = parseAnd(ctx, expected);
 		
 		while (ctx.first != null && isOrOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();
 			String operatorName = s.name;
 			ctx.first = ctx.first.getRest();
-			TypedAST argument = parseAnd(ctx);
+			TypedAST argument = parseAnd(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
 		
 		return ast;
 	}
 	
-	private TypedAST parseEquals(Pair<ExpressionSequence,Environment> ctx) {
-		TypedAST ast = parseOr(ctx);
+	private TypedAST parseEquals(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+		TypedAST ast = parseOr(ctx, expected);
 		while (ctx.first != null && isEqualsOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();			
 			ctx.first = ctx.first.getRest();
-			TypedAST value = parseOr(ctx);
+			TypedAST value = parseOr(ctx, expected);
 			ast = new Assignment(ast, value, s.getLocation());
 		}
 		
 		return ast;
 	}
 
-	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx) {
-		TypedAST ast = parseEquals(ctx);
+	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+		TypedAST ast = parseEquals(ctx, expected);
 
 		while (ctx.first != null && ParseUtils.checkFirst(",", ctx)) {
 			FileLocation commaLine = ParseUtils.parseSymbol(",",ctx).getLocation();
-			TypedAST remaining = parseTuple(ctx);
+            if (expected != null && expected instanceof Tuple) {
+                if (tuple == null)
+                    tuple = (Tuple) expected;
+                expected = tuple.getFirst();
+                tuple = tuple.getRest();
+            }
+			TypedAST remaining = parseTuple(ctx, expected);
 			ast = new TupleObject(ast, remaining, commaLine);
 		}
-
+        tuple = null;
 		return ast;
 	}
-	
+
+    private TypedAST parseDSL(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+        TypedAST ast = parseTuple(ctx, expected);
+
+        if (this.dslToken != null && ctx.first != null) {
+            dslToken.setDef(expected.getParser().parse(ast, ctx));
+        }
+
+        return ast;
+    }
+
 	private boolean isProductOperator(RawAST operatorNode) {
 		if (!(operatorNode instanceof Symbol))
 			return false;
@@ -346,7 +410,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
-		TypedAST result = parseTuple(ctx); // Start trying with the lowest precedence operator.
+		TypedAST result = parseDSL(ctx, expected); // Start trying with the lowest precedence operator.
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.first.getFirst()!=null)?ctx.first.getFirst().toString():null, ctx.first);
 		return result;
