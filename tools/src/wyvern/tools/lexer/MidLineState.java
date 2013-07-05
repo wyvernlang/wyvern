@@ -48,6 +48,11 @@ public class MidLineState implements LexerState {
 			lexer.read();
 			return StringState.getInstance().getToken(lexer);
 		}
+
+        if (ch == '~') {
+            lexer.read();
+            return Token.getIdentifier("~");
+        }
 		
 		if (lexer.isSymbol(ch)) {
 			return SymbolState.getInstance().getToken(lexer);			
