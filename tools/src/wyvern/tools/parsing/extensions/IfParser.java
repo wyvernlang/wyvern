@@ -107,11 +107,13 @@ public class IfParser implements LineParser {
 		public TypedAST parse(TypedAST first,
 							  Pair<ExpressionSequence, Environment> ctx) {
 			TypedAST clause = new BooleanConstant(true);
-			if (ParseUtils.checkFirst("if",ctx)) {
-				ParseUtils.parseSymbol("if", ctx);
-				clause =  ParseUtils.parseCond(ctx);
+            Pair<ExpressionSequence, Environment> ictx = new Pair<>(ctx.first, ctx.second.getExternalEnv());
+			if (ParseUtils.checkFirst("if",ictx)) {
+				ParseUtils.parseSymbol("if", ictx);
+				clause = ParseUtils.parseCond(ictx);
 			}
-			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), env);
+			TypedAST body = ParseUtils.extractLines(ictx).accept(BodyParser.getInstance(), env);
+            ctx.first = ictx.first;
 			return new IfClause(clause,body,false);
 		}
 	}
@@ -125,7 +127,7 @@ public class IfParser implements LineParser {
 		bodyEnv = bodyEnv.extend(new KeywordNameBinding("then", new Keyword(new ThenParser(thenClause,ctx.second))));
 		bodyEnv = bodyEnv.extend(new KeywordNameBinding("else", new Keyword(new ElseParser(ctx.second))));
 		
-		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), bodyEnv);
+		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.second.setInternalEnv(bodyEnv));
 		LinkedList<IfExpr.IfClause> result = new LinkedList<IfExpr.IfClause>();
 		if (body instanceof IfClause) {
 			if (!((IfClause)body).getIsThen())
