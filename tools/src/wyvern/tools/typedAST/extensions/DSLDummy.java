@@ -12,8 +12,15 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 public class DSLDummy implements TypedAST {
-    private TypedAST dslDef = null;
-    public DSLDummy() {}
+	private final Type expected;
+	private TypedAST dslDef = null;
+    public DSLDummy(Type expected) {
+		this.expected = expected;
+	}
+
+	public Type getExpected() {
+		return expected;
+	}
 
     public void setDef(TypedAST ast) {
         dslDef = ast;

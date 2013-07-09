@@ -200,7 +200,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 
         if (ParseUtils.checkFirst("~", ctx)) {
             ParseUtils.parseSymbol("~", ctx);
-            dslToken = new DSLDummy();
+            dslToken = new DSLDummy(expected);
             return dslToken;
         }
 
@@ -352,7 +352,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
         TypedAST ast = parseTuple(ctx, expected);
 
         if (this.dslToken != null && ctx.first != null) {
-            dslToken.setDef(expected.getParser().parse(ast, ctx));
+            dslToken.setDef(dslToken.getExpected().getParser().parse(ast, ctx));
         }
 
         return ast;
