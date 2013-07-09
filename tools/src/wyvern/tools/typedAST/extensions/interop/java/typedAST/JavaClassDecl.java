@@ -34,7 +34,8 @@ public class JavaClassDecl extends ClassDeclaration {
 				throw new RuntimeException(e);
 			}
 		}
-		return new DeclSequence(decls);
+		DeclSequence ds = new DeclSequence(decls);
+		return ds;
 	}
 
 
@@ -51,6 +52,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public void initalize() {
 		super.decls = getDecls(this.clazz);
+		super.declEnv = super.decls.extend(Environment.getEmptyEnvironment());
 		super.declEvalEnv = Environment.getEmptyEnvironment();
 	}
 
