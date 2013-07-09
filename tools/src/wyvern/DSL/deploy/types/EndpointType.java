@@ -1,6 +1,7 @@
 package wyvern.DSL.deploy.types;
 
 import wyvern.DSL.deploy.typedAST.architecture.Endpoint;
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -25,7 +26,12 @@ public class EndpointType implements Type {
 		return false;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
-	@Override
+    @Override
+    public LineParser getParser() {
+        return null;
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		//To change body of implemented methods use File | Settings | File Templates.
 	}

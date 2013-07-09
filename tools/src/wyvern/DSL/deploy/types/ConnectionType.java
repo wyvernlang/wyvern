@@ -1,5 +1,6 @@
 package wyvern.DSL.deploy.types;
 
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
@@ -34,7 +35,12 @@ public class ConnectionType implements Type {
 		return false;
 	}
 
-	@Override
+    @Override
+    public LineParser getParser() {
+        return null;
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 	}
 

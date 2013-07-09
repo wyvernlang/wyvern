@@ -26,7 +26,12 @@ public class ViaParser extends ConnectionPropertyParser {
 		return new Pair<Environment, ContParser>(
 				vp.extend(Environment.getEmptyEnvironment()),
 				new ContParser() {
-					@Override
+                    @Override
+                    public void parseInner(EnvironmentResolver r) {
+
+                    }
+
+                    @Override
 					public TypedAST parse(EnvironmentResolver r) {
 						Type connType = preType.eval(r.getEnv(vp).getExternalEnv());
 						TypedAST body = preBody.second.parse(new ExtensionResolver(r, vp.getBinding()));

@@ -34,7 +34,12 @@ public class ConnectionParser implements DeclParser {
 
 		return new Pair<Environment, ContParser>(conn.extend(ctx.second),
 				new ContParser() {
-					@Override
+                    @Override
+                    public void parseInner(EnvironmentResolver r) {
+
+                    }
+
+                    @Override
 					public TypedAST parse(EnvironmentResolver r) {
 						Environment intEnv = r.getEnv(conn);
 

@@ -1,6 +1,7 @@
 package wyvern.DSL.deploy.types;
 
 import wyvern.DSL.deploy.typedAST.architecture.properties.RequiresProperty;
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -25,7 +26,12 @@ public class RequiresType implements Type {
 		return false;
 	}
 
-	@Override
+    @Override
+    public LineParser getParser() {
+        return null;
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 
 	}

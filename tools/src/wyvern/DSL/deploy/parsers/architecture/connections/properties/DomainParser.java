@@ -34,7 +34,12 @@ public class DomainParser extends ConnectionPropertyParser {
 		return new Pair<Environment, ContParser>(
 			body.first.extend(Environment.getEmptyEnvironment()),
 			new ContParser() {
-				@Override
+                @Override
+                public void parseInner(EnvironmentResolver r) {
+
+                }
+
+                @Override
 				public TypedAST parse(EnvironmentResolver r) {
 					Environment iEnv = r.getEnv(dp);
 					Arrow domain = (Arrow)lazyType.eval(iEnv);
