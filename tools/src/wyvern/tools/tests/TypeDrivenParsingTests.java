@@ -149,4 +149,14 @@ public class TypeDrivenParsingTests {
                         "   expected";
         doCompile(test);
     }
+
+	@Test
+	public void testFunctionTypeParsing5() {
+		String test =
+				"class IC\n" +
+				"	class def test(a : Int, b : TestType) : Int = 5\n" +
+				"IC.test(1,~)\n" +
+				"   expected";
+		doCompile(test);
+	}
 }

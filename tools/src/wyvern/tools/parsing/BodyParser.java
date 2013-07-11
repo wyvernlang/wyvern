@@ -204,6 +204,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
             return dslToken;
         }
 
+		setExpected(expected);
 		TypedAST first = node.getFirst().accept(this, env);
 		LineParser parser = first.getLineParser();
 		ExpressionSequence rest = node.getRest();
@@ -331,17 +332,19 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	}
 
 	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+
+		if (expected != null && expected instanceof Tuple) {
+			if (tuple == null)
+				tuple = (Tuple) expected;
+			expected = tuple.getFirst();
+			tuple = tuple.getRest();
+		}
+
 		TypedAST ast = parseEquals(ctx, expected);
 
 		while (ctx.first != null && ParseUtils.checkFirst(",", ctx)) {
 			FileLocation commaLine = ParseUtils.parseSymbol(",",ctx).getLocation();
-            if (expected != null && expected instanceof Tuple) {
-                if (tuple == null)
-                    tuple = (Tuple) expected;
-                expected = tuple.getFirst();
-                tuple = tuple.getRest();
-            }
-			TypedAST remaining = parseTuple(ctx, expected);
+			TypedAST remaining = parseTuple(ctx, tuple);
 			ast = new TupleObject(ast, remaining, commaLine);
 		}
         tuple = null;
