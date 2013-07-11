@@ -115,7 +115,7 @@ public class ExtensionsTest {
 		InputStream is = LexingTest.class.getClassLoader().getResource("wyvern/tools/tests/samples/arithmetic-test.wyv").openStream();
 		Reader reader = new InputStreamReader(is);
 		
-		Value resultValue = new Interpreter().interpret(reader);
+		Value resultValue = new Interpreter().interpret(reader,  "arithmetic-test.wyv");
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
 	}
 }

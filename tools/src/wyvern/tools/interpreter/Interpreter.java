@@ -3,8 +3,11 @@ package wyvern.tools.interpreter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.ArrayList;
 
+import wyvern.DSL.DSL;
 import wyvern.stdlib.Globals;
+import wyvern.stdlib.Util;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
@@ -23,7 +26,7 @@ public class Interpreter {
 		try {
 			Reader reader = new FileReader(args[0]);
 			
-			Value resultValue = new Interpreter().interpret(reader);
+			Value resultValue = new Interpreter().interpret(reader, args[0]);
 			
 			System.out.println(resultValue);
 			
@@ -37,14 +40,9 @@ public class Interpreter {
 		}
 	}
 
-	public Value interpret(Reader reader) {
-		RawAST parsedResult = Phase1Parser.parse("stdin", reader);
-		
-		Environment env = Globals.getStandardEnv();
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
-		
-		typedAST.typecheck(env);
-		
-		return typedAST.evaluate(env);		
+	public Value interpret(Reader reader, String filename) {
+		return Util
+				.doCompile(reader, filename, new ArrayList<DSL>())
+				.evaluate(Environment.getEmptyEnvironment());
 	}
 }
