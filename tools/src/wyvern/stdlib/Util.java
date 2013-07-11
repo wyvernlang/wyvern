@@ -14,8 +14,15 @@ import java.util.List;
 
 public class Util {
 	public static TypedAST doCompile(String input, List<DSL> dsls) {
-		Reader reader = new StringReader(input);
-		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		return doCompile(input, "Test", dsls);
+	}
+
+	public static TypedAST doCompile(String input, String name, List<DSL> dsls) {
+		return doCompile(new StringReader(input), name, dsls);
+	}
+
+	public static TypedAST doCompile(Reader reader, String name, List<DSL> dsls) {
+		RawAST parsedResult = Phase1Parser.parse(name, reader);
 		Environment env = Globals.getStandardEnv();
 		for (DSL dsl : dsls)
 			env = dsl.addToEnv(env);
