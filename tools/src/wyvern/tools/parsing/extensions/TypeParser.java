@@ -37,7 +37,7 @@ public class TypeParser implements DeclParser {
 		}
 
         public void setDeclEnv(Environment env) {
-            super.declEnv = env;
+            super.declEnv.set(env);
         }
 	}
 

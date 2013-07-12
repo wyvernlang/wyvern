@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -25,14 +26,17 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
-    protected Environment declEnv;
+    protected AtomicReference<Environment> declEnv;
 
     public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
 		this.decls = decls;
+		nameBinding = new NameBindingImpl(name, null);
+		typeBinding = new TypeBinding(name, null);
+		declEnv = new AtomicReference<>(null);
 		Type objectType = new TypeType(this);
 		Type classType = objectType; // TODO set this to a class type that has the class members
-		typeBinding = new TypeBinding(name, objectType);
-		nameBinding = new NameBindingImpl(name, classType);
+		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
+		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
 		this.location = clsNameLine;
 	}
 
@@ -54,7 +58,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type doTypecheck(Environment env) {
-		
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env);
 		
@@ -128,6 +131,11 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 
     public NameBinding lookupDecl(String name) {
-        return declEnv.lookup(name);
+        return declEnv.get().lookup(name);
     }
+
+
+	public AtomicReference<Environment> getDeclEnv() {
+		return declEnv;
+	}
 }

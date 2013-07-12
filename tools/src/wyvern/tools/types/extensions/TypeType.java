@@ -4,9 +4,12 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
@@ -20,10 +23,18 @@ import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType {
+	private String name;
 	private TypeDeclaration decl;
-	
+	private AtomicReference<Environment> declEnv;
+
 	public TypeType(TypeDeclaration decl) {
-		this.decl = decl;
+		declEnv = decl.getDeclEnv();
+		name = decl.getName();
+	}
+
+	public TypeType(String name, Environment declEnv) {
+		this.declEnv = new AtomicReference<>(declEnv);
+		this.name = name;
 	}
 	
 	public TypeDeclaration getDecl() {
@@ -37,7 +48,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 	
 	@Override
 	public String toString() {
-		return /*"TYPE " +*/ decl.getName();
+		return /*"TYPE " +*/ name;
 	}
 
 	@Override
@@ -47,7 +58,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
-		NameBinding m = decl.lookupDecl(opName);
+		NameBinding m = declEnv.get().lookup(opName);
 
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
@@ -58,19 +69,12 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 	
 	public HashSet<Pair<String, Type>> getMembers() {
 		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-		for (TypedAST d : this.decl.getDecls().getDeclIterator()) {
-			if (d instanceof DefDeclaration) {
-				String n = ((DefDeclaration) d).getName();
-				Type t = ((DefDeclaration) d).getType();
-				thisMembers.add(new Pair<String, Type>(n, t));
-			} else if (d instanceof TypeDeclaration) {
-				TypeDeclaration td = (TypeDeclaration) d;
-				String n = td.getName();
-				Type t = td.getType();
-				thisMembers.add(new Pair<String, Type>(n, t));
-			} else {
-				System.out.println("Unsupported type member in TypeType.getMembers: " + d.getClass());
-			}
+		for (Binding b : declEnv.get().getBindings()) {
+			if (!(b instanceof NameBinding))
+				continue;
+			String name = b.getName();
+			Type type = b.getType();
+			thisMembers.add(new Pair<>(name, type));
 		}
 		return thisMembers;
 	}

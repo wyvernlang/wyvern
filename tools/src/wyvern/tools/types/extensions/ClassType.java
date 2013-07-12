@@ -69,14 +69,14 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 	
 	public TypeType convertToType(boolean useClassMembers) {
 		LinkedList<Declaration> seq = new LinkedList<>();
-		
+
+		Environment newEnv = Environment.getEmptyEnvironment();
 		// Generate an appropriate type member for every class member.
 		for (Declaration d : decl.getDecls().getDeclIterator()) {
 			if (d instanceof DefDeclaration) {
 				if (((DefDeclaration) d).isClass() != useClassMembers)
 					continue;
-				
-				seq.add(d);
+				newEnv = d.extend(newEnv);
 			} else if (d instanceof VarDeclaration) {
 				if (((VarDeclaration) d).isClass() != useClassMembers)
 					continue;
@@ -85,17 +85,13 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 				String propName = vd.getName();
 				Type type = vd.getType();
 				FileLocation line = vd.getLocation();
-				
-				DefDeclaration getter = new DefDeclaration(propName, type,
-						new LinkedList<NameBinding>(), null, false, line);
-				
-				List<NameBinding> args = new ArrayList<NameBinding>();
-				args.add(new NameBindingImpl("new" + propName.substring(0,1).toUpperCase() + propName.substring(1), type));
-				DefDeclaration setter = new DefDeclaration("set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
-					new Arrow(type, Unit.getInstance()), args, null, false, line);
-				
-				seq.add(getter);
-				seq.add(setter);
+
+
+				newEnv = newEnv.extend(new NameBindingImpl(propName, type));
+				newEnv = newEnv.extend(
+						new NameBindingImpl(
+								"set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
+								new Arrow(type, Unit.getInstance())));
 			} else if (d instanceof ValDeclaration) {
 				if (((ValDeclaration) d).isClass() != useClassMembers)
 					continue;
@@ -108,31 +104,19 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 				DefDeclaration getter = new DefDeclaration(propName, type,
 						new LinkedList<NameBinding>(), null, false, line);
 
-				seq.add(getter);
+				newEnv = getter.extend(newEnv);
 			} else if (d instanceof TypeDeclaration) {
-				seq.add(d);
+				newEnv = d.extend(newEnv);
 			} else if (d instanceof ClassDeclaration) {
 				ClassDeclaration cd = (ClassDeclaration) d;
 				TypeType tt = ((ClassType) cd.getType()).convertToType(useClassMembers);
 				HashSet<Pair<String, Type>> mems = tt.getMembers();
-				
-				LinkedList<Declaration> ds = new LinkedList<>();
-				for (Pair<String, Type> p : mems) {
-					if (p.second instanceof TypeType) {
-						ds.add(((TypeType) p.second).getDecl());
-					} else { // Must be def.
-						ds.add(new DefDeclaration(p.first, p.second, new LinkedList<NameBinding>(), null, false, cd.getLocation()));
-					}
-				}
-				
-				TypeDeclaration td = new TypeDeclaration(cd.getName(), new DeclSequence(ds), cd.getLocation());
-				seq.add(td);
+				newEnv = newEnv.extend(new NameBindingImpl(cd.getName(), tt));
 			} else {
 				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
 			}
 		}
-		
-		return new TypeType(new TypeDeclaration(decl.getName(), new DeclSequence(seq), decl.getLocation()));
+		return new TypeType(decl.getName(), newEnv); //new TypeType(new TypeDeclaration(decl.getName(), new DeclSequence(seq), decl.getLocation()));
 	}
 
 	// FIXME: Do something similar here to TypeType maybe and maybe try to integrate the above

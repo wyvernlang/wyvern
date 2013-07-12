@@ -8,6 +8,9 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Environment implements TreeWritable {
 	private Environment parentEnvironment;
 	private Environment extEnv = null;
@@ -83,5 +86,17 @@ public class Environment implements TreeWritable {
 
 	public Environment getExternalEnv() {
 		return extEnv;
+	}
+
+	public List<Binding> getBindings() {
+		LinkedList<Binding> bindings = new LinkedList<>();
+		writeBinding(bindings);
+		return bindings;
+	}
+
+	private void writeBinding(List<Binding> binding) {
+		binding.add(this.binding);
+		if (parentEnvironment != null)
+			parentEnvironment.writeBinding(binding);
 	}
 }
