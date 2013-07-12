@@ -224,7 +224,7 @@ public class Util {
 			}
 		}
 		ClassWriter cv = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-		String name = toWrap.getDecl().getName() + "$imp$" + javaType.getSimpleName();
+		String name = toWrap.getName() + "$imp$" + javaType.getSimpleName();
 		if (!javaType.isInterface())
 			cv.visit(V1_7,
 					ACC_PUBLIC,

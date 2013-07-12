@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -11,6 +12,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Assignment;
+import wyvern.tools.typedAST.core.binding.ClassBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
@@ -56,7 +58,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
 		
-		TypeBinding classVarTypeBinding = env.lookupType("class");
+		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class);
 
 		if (classVarTypeBinding != null) { //In a class method
 			Type classVarType = classVarTypeBinding.getType();
@@ -66,7 +68,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			}
 
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
-			cls = ((ClassType) classVarType).getDecl();
+			cls = classVarTypeBinding.getClassDecl();
 
 			return classVarType;
 		} else { // Standalone
@@ -84,7 +86,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, getLocation());
 			cls = classDeclaration;
-			return classDeclaration.getType();
+			return new ClassType("generic" + generic_num++, new AtomicReference<>(mockEnv), new AtomicReference<>(mockEnv), null);
 		}
 	}
 

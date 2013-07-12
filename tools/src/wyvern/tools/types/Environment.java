@@ -70,6 +70,14 @@ public class Environment implements TreeWritable {
 		return parentEnvironment.getValue(name);
 	}
 
+	public Binding lookupBinding(String name, Class bindingType) {
+		if (this.name == null)
+			return null;
+		if (this.name.equals(name) && bindingType.isAssignableFrom(this.binding.getClass()))
+			return binding;
+		return parentEnvironment.lookupBinding(name, bindingType);
+	}
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		/*Environment env = this;

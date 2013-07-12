@@ -52,7 +52,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public void initalize() {
 		super.decls = getDecls(this.clazz);
-		super.declEnv = super.decls.extend(Environment.getEmptyEnvironment());
+		super.declEnvRef.set(super.decls.extend(Environment.getEmptyEnvironment()));
 		super.declEvalEnv = Environment.getEmptyEnvironment();
 	}
 

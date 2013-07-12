@@ -7,15 +7,13 @@ import wyvern.tools.types.extensions.TypeType;
 
 public class JavaClassType extends ClassType {
 	private final Class clazz;
+	private final JavaClassDecl decl;
 
-	public JavaClassType(Class clazz) {
-		super(new JavaClassDecl(clazz));
-		this.clazz = clazz;
-	}
 
 	public JavaClassType(JavaClassDecl cd) {
 		super(cd);
 		this.clazz = cd.getClazz();
+		decl = cd;
 	}
 
 	public void initalize() {
@@ -24,5 +22,15 @@ public class JavaClassType extends ClassType {
 
 	public Class getInnerClass() {
 		return clazz;
+	}
+
+	@Override
+	public ClassDeclaration getDecl() {
+		return decl;
+	}
+
+	@Override
+	public TypeType getEquivType() {
+		return new TypeType(getName(), decl.getDeclEnv());
 	}
 }

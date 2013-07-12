@@ -4,21 +4,23 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.values.ClassObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;
@@ -33,15 +35,22 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private NameBinding nameImplements;
 	
 	protected Environment declEvalEnv;
-    protected Environment declEnv;
-	
+
+	private TypeType equivalentType = null;
+	private TypeType equivalentClassType = null;
+	private AtomicReference<Environment> typeEquivalentEnvironmentRef;
+	protected AtomicReference<Environment> declEnvRef;
+
 	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, Environment declEnv, FileLocation location) {
         this(name, implementsName, implementsClassName, decls, location);
-        this.declEnv = declEnv;
+		declEnvRef.set(declEnv);
     }
 
     public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
+		typeEquivalentEnvironmentRef = new AtomicReference<>();
+		declEnvRef = new AtomicReference<>();
+		nameBinding = new NameBindingImpl(name, null);
 		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
 		typeBinding = new TypeBinding(name, objectType);
@@ -49,8 +58,70 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
 		this.location = location;
-        declEnv = null;
 	}
+
+	protected void updateEnv() {
+		typeEquivalentEnvironmentRef.set(getTypeEquivalentEnvironment(false));
+	}
+
+	public TypeType getEquivalentType() {
+		if (equivalentType == null)
+			equivalentType = new TypeType(getName(), getTypeEquivalentEnvironment(false));
+		return equivalentType;
+	}
+
+	public Environment getTypeEquivalentEnvironment(boolean useClassMembers) {
+		LinkedList<Declaration> seq = new LinkedList<>();
+
+		Environment newEnv = Environment.getEmptyEnvironment();
+		// Generate an appropriate type member for every class member.
+		for (Declaration d : getDecls().getDeclIterator()) {
+			if (d instanceof DefDeclaration) {
+				if (((DefDeclaration) d).isClass() != useClassMembers)
+					continue;
+				newEnv = d.extend(newEnv);
+			} else if (d instanceof VarDeclaration) {
+				if (((VarDeclaration) d).isClass() != useClassMembers)
+					continue;
+
+				VarDeclaration vd = (VarDeclaration) d;
+				String propName = vd.getName();
+				Type type = vd.getType();
+				FileLocation line = vd.getLocation();
+
+
+				newEnv = newEnv.extend(new NameBindingImpl(propName, type));
+				newEnv = newEnv.extend(
+						new NameBindingImpl(
+								"set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
+								new Arrow(type, Unit.getInstance())));
+			} else if (d instanceof ValDeclaration) {
+				if (((ValDeclaration) d).isClass() != useClassMembers)
+					continue;
+
+				ValDeclaration vd = (ValDeclaration) d;
+				String propName = vd.getName();
+				Type type = vd.getType();
+				FileLocation line = vd.getLocation();
+
+				DefDeclaration getter = new DefDeclaration(propName, type,
+						new LinkedList<NameBinding>(), null, false, line);
+
+				newEnv = getter.extend(newEnv);
+			} else if (d instanceof TypeDeclaration) {
+				newEnv = d.extend(newEnv);
+			} else if (d instanceof ClassDeclaration) {
+				ClassDeclaration cd = (ClassDeclaration) d;
+				TypeType tt = ((ClassType) cd.getType()).getEquivType();
+				HashSet<Pair<String, Type>> mems = tt.getMembers();
+				newEnv = newEnv.extend(new NameBindingImpl(cd.getName(), tt));
+			} else {
+				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
+			}
+		}
+		return newEnv;
+	}
+
 	protected Type getClassType() {
 		return new ClassType(this);
 	}
@@ -80,9 +151,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type doTypecheck(Environment env) {
 
+
 		// FIXME: Currently allow this and class in both class and object methods. :(
-		
-		Environment genv = env.extend(new TypeBinding("class", typeBinding.getType()));
+
+
+		Environment genv = env.extend(new ClassBinding("class", this));
 		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
 
 		if (decls != null)
@@ -106,7 +179,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
 			TypeType implementsTT = (TypeType) nameImplements.getType();
 			
-			if (!currentCT.convertToType(false).subtype(implementsTT)) {
+			if (!getEquivalentType().subtype(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this.nameBinding.getName(),
 						nameImplements.getName(),
@@ -124,7 +197,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
 			TypeType implementsCT = (TypeType) nameImplementsClass.getType();
 			
-			if (!currentCT.convertToType(true).subtype(implementsCT)) {
+			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this.nameBinding.getName(),
 						nameImplementsClass.getName(),
@@ -183,7 +256,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			decl = decl.getNextDecl();
 		}
 
-		TypeBinding thisBinding = new TypeBinding("class", typeBinding.getType());
+		ClassBinding thisBinding = new ClassBinding("class", this);
 		Environment evalEnv = classEnv.extend(thisBinding);
 		
 		for (Declaration decl : decls.getDeclIterator())
@@ -225,6 +298,28 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
     public NameBinding lookupDecl(String name) {
-        return declEnv.lookup(name);
+        return declEnvRef.get().lookup(name);
     }
+
+	public Environment getDeclEnv() {
+		return declEnvRef.get();
+	}
+
+	public TypeType getImplementsType() {
+		return getTypeType();
+	}
+
+	public AtomicReference<Environment> getTypeEquivalentEnvironmentReference() {
+		return typeEquivalentEnvironmentRef;
+	}
+
+	public AtomicReference<Environment> getDeclEnvRef() {
+		return declEnvRef;
+	}
+
+	public Type getEquivalentClassType() {
+		if (equivalentClassType == null)
+			equivalentClassType = new TypeType(getName(), getTypeEquivalentEnvironment(true));
+		return equivalentClassType;
+	}
 }
