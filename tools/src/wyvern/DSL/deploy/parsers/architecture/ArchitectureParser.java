@@ -70,11 +70,6 @@ public class ArchitectureParser implements DeclParser {
 		}
 
         @Override
-        public void parseInner(EnvironmentResolver r) {
-            
-        }
-
-        @Override
 		public TypedAST parse(EnvironmentResolver r) {
 			Environment inner = r.getEnv(innerArch);
 			TypedAST body = null;

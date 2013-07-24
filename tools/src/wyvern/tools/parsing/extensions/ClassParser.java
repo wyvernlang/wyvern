@@ -6,11 +6,8 @@ import java.util.LinkedList;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.*;
 import wyvern.tools.parsing.ContParser.EnvironmentResolver;
-import wyvern.tools.parsing.DeclParser;
-import wyvern.tools.parsing.DeclarationParser;
-import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.parsing.ContParser;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
@@ -37,7 +34,7 @@ import wyvern.tools.util.Pair;
  * 		DELCARATION*
  */
 
-public class ClassParser implements DeclParser {
+public class ClassParser implements DeclParser, TypeExtensionParser {
 	private ClassParser() { }
 	private static ClassParser instance = new ClassParser();
 	public static ClassParser getInstance() { return instance; }
@@ -66,6 +63,13 @@ public class ClassParser implements DeclParser {
 	}
 
 	@Override
+	public Pair<Environment, RecordTypeParser> parseRecord(TypedAST first,
+														   Pair<ExpressionSequence, Environment> ctx) {
+		Pair<Environment, ContParser> pair = parseDeferred(first, ctx);
+		return new Pair<>(pair.first, (RecordTypeParser)pair.second);
+	}
+
+	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
@@ -84,10 +88,6 @@ public class ClassParser implements DeclParser {
 
 		if (ctx.first == null) {
 			return new Pair<Environment,ContParser>(mutableDecl.extend(Environment.getEmptyEnvironment()),new ContParser() {
-                @Override
-                public void parseInner(EnvironmentResolver r) {
-
-                }
 
                 @Override
 				public TypedAST parse(EnvironmentResolver env) {
@@ -125,21 +125,30 @@ public class ClassParser implements DeclParser {
 		typecheckEnv = typecheckEnv.extend(new ClassBinding("class", mutableDeclf));
 		
 		
-		return new Pair<Environment,ContParser>(newEnv, new ContParser() {
+		return new Pair<Environment,ContParser>(newEnv, new RecordTypeParser() {
 
             private Environment envs = null;
             private Environment envi;
             private Pair<Environment,ContParser> declAST;
 
-            @Override
-            public void parseInner(EnvironmentResolver envR) {
-                Environment external = envR.getEnv(mutableDeclf);
+			@Override
+			public void parseTypes(EnvironmentResolver r) {
+				Environment external = r.getEnv(mutableDeclf);
 
-                Environment envin = mutableDeclf.extend(external);
-                envs = envin.extend(new ClassBinding("class", mutableDeclf));
-                declAST = lines.accept(DeclarationParser.getInstance(), envs);
-                envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
-                mutableDeclf.setDeclEnv(declAST.first);
+				Environment envin = mutableDeclf.extend(external);
+				envs = envin.extend(new ClassBinding("class", mutableDeclf));
+				declAST = lines.accept(ClassBodyParser.getInstance(), envs);
+				envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
+				if (declAST.second instanceof RecordTypeParser)
+					((RecordTypeParser)declAST.second).parseTypes(new SimpleResolver(envs));
+				mutableDeclf.setDeclEnv(declAST.first);
+			}
+
+			@Override
+            public void parseInner(EnvironmentResolver envR) {
+				if (declAST.second instanceof RecordTypeParser)
+					((RecordTypeParser)declAST.second).parseInner(new SimpleResolver(envs));
+				mutableDeclf.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).getInternalEnv());
             }
 
             @Override

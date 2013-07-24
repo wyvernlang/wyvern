@@ -51,11 +51,19 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 			contParsers.add(partiallyParsed.second);
 		}
 		
-		return new Pair<Environment, ContParser>(newEnv, new ContParser() {
-            @Override
+		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser() {
+			@Override
+			public void parseTypes(EnvironmentResolver r) {
+				for (ContParser parser : contParsers)
+					if (parser instanceof RecordTypeParser)
+						((RecordTypeParser)parser).parseTypes(r);
+			}
+
+			@Override
             public void parseInner(EnvironmentResolver r) {
                 for (ContParser parser : contParsers)
-                    parser.parseInner(r);
+					if (parser instanceof RecordTypeParser)
+						((RecordTypeParser)parser).parseInner(r);
             }
 
             @Override

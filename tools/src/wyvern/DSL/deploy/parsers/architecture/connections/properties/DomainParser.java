@@ -1,11 +1,11 @@
 package wyvern.DSL.deploy.parsers.architecture.connections.properties;
 
-import wyvern.DSL.deploy.parsers.architecture.ArchitectureParser;
 import wyvern.DSL.deploy.parsers.architecture.connections.ConnectionPropertyParser;
 import wyvern.DSL.deploy.typedAST.architecture.properties.DomainProperty;
 import wyvern.DSL.deploy.types.EndpointType;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.ParseUtils;
+import wyvern.tools.parsing.TypeParser;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -27,17 +27,13 @@ public class DomainParser extends ConnectionPropertyParser {
 				new Pair<>(ctx.first, dp.extend(ctx.second));
 
 		//final Arrow domainT = (Arrow) ParseUtils.parseType(ctx);
-		final ParseUtils.LazyEval<Type> lazyType = ParseUtils.parsePartialType(ctx);
+		final ParseUtils.LazyEval<Type> lazyType = TypeParser.parsePartialType(ctx);
 		final Pair<Environment, ContParser> body = DomainParser.super.iParse(ctx);
 
 		ctx.first = null;
 		return new Pair<Environment, ContParser>(
 			body.first.extend(Environment.getEmptyEnvironment()),
 			new ContParser() {
-                @Override
-                public void parseInner(EnvironmentResolver r) {
-
-                }
 
                 @Override
 				public TypedAST parse(EnvironmentResolver r) {

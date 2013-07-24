@@ -5,8 +5,7 @@ import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.ContParser.EnvironmentResolver;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.parsing.RecordTypeParser;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -28,21 +27,41 @@ public class PartialDecl implements TypedAST {
 		return env.extend(pair.first);
 	}
 
-    public void preParse(final Environment env) {
+	public void preParseTypes(final Environment env) {
+		preParsed = true;
+		if (pair.second instanceof RecordTypeParser) {
+			EnvironmentResolver r = new EnvironmentResolver() {
+
+				@Override
+				public Environment getEnv(TypedAST elem) {
+					return env;
+				}
+
+			};
+			((RecordTypeParser)pair.second).parseTypes(r);
+		}
+	}
+
+    public void preParseDecls(final Environment env) {
         preParsed = true;
-        pair.second.parseInner(new EnvironmentResolver() {
+		if (pair.second instanceof RecordTypeParser) {
+			EnvironmentResolver r = new EnvironmentResolver() {
 
-            @Override
-            public Environment getEnv(TypedAST elem) {
-                return env;
-            }
+				@Override
+				public Environment getEnv(TypedAST elem) {
+					return env;
+				}
 
-        });
+			};
+			((RecordTypeParser)pair.second).parseInner(r);
+		}
     }
 
 	public TypedAST getAST(final Environment env) {
-        if (!preParsed)
-            preParse(env);
+        if (!preParsed) {
+			preParseTypes(env);
+            preParseDecls(env);
+		}
 		return pair.second.parse(new EnvironmentResolver() {
 
 			@Override

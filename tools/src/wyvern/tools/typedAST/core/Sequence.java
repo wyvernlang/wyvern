@@ -26,6 +26,22 @@ import wyvern.tools.util.TreeWriter;
 public class Sequence implements CoreAST, Iterable<TypedAST> {
 	private LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
 	private Type retType = null;
+
+	public static interface MapCallback {
+		public void map(TypedAST elem);
+	}
+	public static void tryMap(TypedAST potential, MapCallback callback) {
+		if (!(potential instanceof Sequence))
+			return;
+		Sequence seq = (Sequence)potential;
+		for (TypedAST elem : seq) {
+			if (elem instanceof Sequence) {
+				tryMap(elem, callback);
+				continue;
+			}
+			callback.map(elem);
+		}
+	}
 	
 	public Sequence(TypedAST first) {
 		exps.add(first);

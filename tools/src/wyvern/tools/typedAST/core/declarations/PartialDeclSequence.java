@@ -1,21 +1,11 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.management.RuntimeErrorException;
-
-import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.TreeWriter;
 
 public class PartialDeclSequence {
 	
@@ -37,8 +27,11 @@ public class PartialDeclSequence {
 	public Pair<TypedAST,Environment> resolve(Environment env) {
         LinkedList<PartialDecl> declsI = (LinkedList<PartialDecl>)decls.clone();
         decls = null;
+		for (PartialDecl decl : declsI) {
+			decl.preParseTypes(env);
+		}
         for (PartialDecl decl : declsI) {
-            decl.preParse(env);
+            decl.preParseDecls(env);
         }
 		for (PartialDecl decl : declsI) {
 			TypedAST ast = decl.getAST(env);

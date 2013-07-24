@@ -15,11 +15,6 @@ public interface ContParser {
 		}
 
         @Override
-        public void parseInner(EnvironmentResolver r) {
-            return;
-        }
-
-        @Override
 		public TypedAST parse(EnvironmentResolver r) {
 			return elem;
 		}
@@ -56,7 +51,6 @@ public interface ContParser {
 		public Environment getEnv(TypedAST elem);
 	}
 
-    public void parseInner(EnvironmentResolver r);
 	public TypedAST parse(EnvironmentResolver r);
 
 }

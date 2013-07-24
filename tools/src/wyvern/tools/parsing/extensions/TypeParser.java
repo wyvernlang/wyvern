@@ -5,11 +5,7 @@ import java.util.HashSet;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.ContParser;
-import wyvern.tools.parsing.DeclParser;
-import wyvern.tools.parsing.DeclarationParser;
-import wyvern.tools.parsing.ParseUtils;
+import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
@@ -19,10 +15,13 @@ import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.TreeWriter;
 
-public class TypeParser implements DeclParser {
+public class TypeParser implements DeclParser, TypeExtensionParser {
 	private TypeParser() { }
 	private static TypeParser instance = new TypeParser();
 	public static TypeParser getInstance() { return instance; }
@@ -39,6 +38,13 @@ public class TypeParser implements DeclParser {
         public void setDeclEnv(Environment env) {
             super.declEnv.set(env);
         }
+	}
+
+	@Override
+	public Pair<Environment, RecordTypeParser> parseRecord(TypedAST first,
+														   Pair<ExpressionSequence, Environment> ctx) {
+		Pair<Environment, ContParser> pair = parseDeferred(first, ctx);
+		return new Pair<>(pair.first, (RecordTypeParser)pair.second);
 	}
 
 	@Override
@@ -60,22 +66,31 @@ public class TypeParser implements DeclParser {
 		
 		final LineSequence body = ParseUtils.extractLines(ctx);
 		
-		return new Pair<Environment,ContParser>(mtd.extend(Environment.getEmptyEnvironment()), new ContParser() {
+		return new Pair<Environment,ContParser>(mtd.extend(Environment.getEmptyEnvironment()), new RecordTypeParser() {
 
             private Environment envin;
             private Environment envs;
             private Pair<Environment,ContParser> declAST;
 
-            @Override
+			@Override
+			public void parseTypes(EnvironmentResolver r) {
+				Environment eEnv = r.getEnv(mtd);
+
+				envin = mtd.extend(eEnv);
+				envs = envin.extend(new TypeBinding("class", mtd.getType()));
+
+
+				declAST = body.accept(ClassBodyParser.getInstance(), envs);
+				mtd.setDeclEnv(declAST.first);
+				if (declAST.second instanceof RecordTypeParser)
+					((RecordTypeParser) declAST.second).parseTypes(r);
+			}
+
+			@Override
             public void parseInner(EnvironmentResolver r) {
-
-                Environment eEnv = r.getEnv(mtd);
-
-                envin = mtd.extend(eEnv);
-                envs = envin.extend(new TypeBinding("class", mtd.getType()));
-
-                declAST = body.accept(DeclarationParser.getInstance(), envs);
-                mtd.setDeclEnv(declAST.first);
+				if (declAST.second instanceof RecordTypeParser)
+					((RecordTypeParser) declAST.second).parseInner(r);
+				mtd.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).internalEnv);
             }
 
             @Override

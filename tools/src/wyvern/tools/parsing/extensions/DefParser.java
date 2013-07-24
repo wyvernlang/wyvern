@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.ContParser;
-import wyvern.tools.parsing.DeclParser;
-import wyvern.tools.parsing.ParseUtils;
+import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.Symbol;
@@ -132,12 +129,6 @@ public class DefParser implements DeclParser {
 				args, null, isClassMeth, methNameLine);
 		
 		return new Pair<Environment, ContParser>(md.extend(Environment.getEmptyEnvironment()), new ContParser() {
-
-            @Override
-            public void parseInner(EnvironmentResolver r) {
-
-            }
-
             @Override
 			public TypedAST parse(EnvironmentResolver envR) {
 				Environment env = envR.getEnv(md);

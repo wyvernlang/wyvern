@@ -29,10 +29,6 @@ public class RequiresParser extends ConnectionPropertyParser {
 		return new Pair<Environment, ContParser>(
 			body.first.extend(rp.extend(Environment.getEmptyEnvironment())),
 			new ContParser() {
-                @Override
-                public void parseInner(EnvironmentResolver r) {
-
-                }
 
                 @Override
 				public TypedAST parse(EnvironmentResolver r) {

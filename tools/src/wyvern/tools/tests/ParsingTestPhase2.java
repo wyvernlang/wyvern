@@ -586,4 +586,40 @@ public class ParsingTestPhase2 {
 		result.typecheck(env);
 		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
 	}
+
+	@Test
+	public void testInnerTypes() {
+		Reader reader = new StringReader("" +
+				"class A\n" +
+				"	class B\n" +
+				"		val x : C.D\n" +
+				"class C\n" +
+				"	class D\n" +
+				"		val y : A.B\n");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		result.typecheck(env);
+
+	}
+
+	@Test
+	public void testInnerTypes2() {
+		Reader reader = new StringReader("" +
+				"class A\n" +
+				"	class B\n" +
+				"		class C\n" +
+				"			val x : D.E.F\n" +
+				"class D\n" +
+				"	class E\n" +
+				"		class F\n" +
+				"			val y : A.B.C\n");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(BodyParser.getInstance(), env);
+		result.typecheck(env);
+
+	}
 }

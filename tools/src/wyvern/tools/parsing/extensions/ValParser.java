@@ -76,11 +76,6 @@ public class ValParser implements DeclParser {
                 Environment.getEmptyEnvironment().extend(new NameBindingImpl(valName, parsedType)),
                 new ContParser() {
                     @Override
-                    public void parseInner(EnvironmentResolver r) {
-
-                    }
-
-                    @Override
                     public TypedAST parse(EnvironmentResolver r) {
                         TypedAST definition = null;
                         Type type = null;

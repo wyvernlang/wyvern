@@ -2,11 +2,14 @@ package wyvern.stdlib;
 
 import wyvern.DSL.DSL;
 import wyvern.tools.parsing.BodyParser;
+import wyvern.tools.parsing.ContParser;
+import wyvern.tools.parsing.DeclarationParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.Pair;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -29,5 +32,17 @@ public class Util {
 		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
+	}
+
+	public static Pair<Environment, ContParser> doPartialCompile(Reader reader, String name, List<DSL> dsls) {
+		RawAST parsedResult = Phase1Parser.parse(name, reader);
+		Environment env = Globals.getStandardEnv();
+		for (DSL dsl : dsls)
+			env = dsl.addToEnv(env);
+		return parsedResult.accept(DeclarationParser.getInstance(), env);
+	}
+
+	public static Pair<Environment, ContParser> doPartialCompile(String input, String name, List<DSL> dsls) {
+		return doPartialCompile(new StringReader(input), name, dsls);
 	}
 }

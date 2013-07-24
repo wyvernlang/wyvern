@@ -9,14 +9,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.types.AbstractTypeImpl;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.OperatableType;
-import wyvern.tools.types.SubtypeRelation;
-import wyvern.tools.types.Type;
+import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
-public class ClassType extends AbstractTypeImpl implements OperatableType {
+public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private ClassDeclaration decl = null;
 	private String name;
 	private AtomicReference<Environment> declEnv;
@@ -96,5 +92,10 @@ public class ClassType extends AbstractTypeImpl implements OperatableType {
 
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public Type getInnerType(String name) {
+		return declEnv.get().lookup(name).getType();
 	}
 }

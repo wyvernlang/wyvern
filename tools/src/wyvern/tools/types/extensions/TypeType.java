@@ -14,15 +14,11 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.AbstractTypeImpl;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.OperatableType;
-import wyvern.tools.types.SubtypeRelation;
-import wyvern.tools.types.Type;
+import wyvern.tools.types.*;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
-public class TypeType extends AbstractTypeImpl implements OperatableType {
+public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private String name;
 	private TypeDeclaration decl;
 	private AtomicReference<Environment> declEnv;
@@ -126,5 +122,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType {
 		}
 
 		return subset;
+	}
+
+	@Override
+	public Type getInnerType(String name) {
+		return declEnv.get().lookup(name).getType();
 	}
 }
