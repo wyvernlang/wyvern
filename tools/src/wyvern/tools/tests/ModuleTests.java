@@ -1,11 +1,22 @@
 package wyvern.tools.tests;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ben Chung
- * Date: 7/11/13
- * Time: 1:07 PM
- * To change this template use File | Settings | File Templates.
- */
+import org.junit.Test;
+
+import java.io.Reader;
+import java.io.StringReader;
+
 public class ModuleTests {
+	@Test
+	public void testSimpleModule() {
+		Reader in1 = new StringReader(
+				"module M1\n" +
+				"	import input://arg/2\n" +
+				"	class C1\n" +
+				"		class meth t() : M2.C2 = M2.C2.create()");
+		Reader in2 = new StringReader("" +
+				"module M2\n" +
+				"	class C2\n" +
+				"		class meth create() : C2 = new\n");
+
+	}
 }

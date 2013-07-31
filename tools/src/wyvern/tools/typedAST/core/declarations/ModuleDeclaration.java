@@ -14,15 +14,24 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeUtils;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class ModuleDeclaration extends Declaration implements CoreAST {
+	protected String name;
 	protected DeclSequence decls;
 	protected Environment declEvalEnv;
-	protected Environment declEnv;
+	protected AtomicReference<Environment> declEnv;
+	protected AtomicReference<Environment> typeEquivalentEnvironment;
+	protected TypeType asc;
+	protected List<ImportDeclaration> imports;
 
 	public static class ImportDeclaration {
 		private String src;
@@ -33,10 +42,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		}
 	}
 
-	public ModuleDeclaration(String name, DeclSequence decls, FileLocation location) {
+	protected ModuleDeclaration(String name, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
 		this.location = location;
-		declEnv = null;
+		typeEquivalentEnvironment = new AtomicReference<>();
+		declEnv = new AtomicReference<>();
 	}
 
 	@Override
@@ -48,9 +58,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		//TODO
 	}
 
+	public Type getClassType() {
+		return new ClassType(name, declEnv, typeEquivalentEnvironment, asc);//this.typeBinding.getType();
+	}
+
 	@Override
 	public Type getType() {
-		return null;//this.typeBinding.getType();
+		return getClassType();
 	}
 
 
@@ -68,13 +82,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old) {
-		Environment newEnv = old;//old.extend(nameBinding).extend(typeBinding);
-
-		// FIXME: Currently allow this and class in both class and object methods. :(
-		//newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
-		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
-
-		return newEnv;
+		Type classType = getClassType();
+		return old.extend(new TypeBinding(name, classType)).extend(new NameBindingImpl(name, classType));
 	}
 
 	@Override
@@ -114,6 +123,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	public NameBinding lookupDecl(String name) {
-		return declEnv.lookup(name);
+		return declEnv.get().lookup(name);
 	}
 }
