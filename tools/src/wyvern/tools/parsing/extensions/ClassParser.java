@@ -153,8 +153,10 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 
             @Override
 			public TypedAST parse(EnvironmentResolver envR) {
-                if (envs == null)
+                if (envs == null) {
+                	parseTypes(envR);
                     parseInner(envR);
+				}
 				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
 					@Override
 					public Environment getEnv(TypedAST elem) {
