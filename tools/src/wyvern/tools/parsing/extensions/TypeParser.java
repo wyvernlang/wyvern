@@ -71,14 +71,14 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 		
 		final LineSequence body = ParseUtils.extractLines(ctx);
 		
-		return new Pair<Environment,ContParser>(mtd.extend(Environment.getEmptyEnvironment()), new RecordTypeParser() {
+		return new Pair<Environment,ContParser>(mtd.extend(Environment.getEmptyEnvironment()), new RecordTypeParser.RecordTypeParserBase() {
 
             private Environment envin;
             private Environment envs;
             private Pair<Environment,ContParser> declAST;
 
 			@Override
-			public void parseTypes(EnvironmentResolver r) {
+			public void doParseTypes(EnvironmentResolver r) {
 				Environment eEnv = r.getEnv(mtd);
 
 				envin = mtd.extend(eEnv);
@@ -92,7 +92,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 			}
 
 			@Override
-            public void parseInner(EnvironmentResolver r) {
+            public void doParseInner(EnvironmentResolver r) {
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser) declAST.second).parseInner(r);
 				mtd.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).internalEnv);

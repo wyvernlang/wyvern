@@ -133,14 +133,14 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 		typecheckEnv = typecheckEnv.extend(new ClassBinding("class", mutableDeclf));
 		
 		
-		return new Pair<Environment,ContParser>(newEnv, new RecordTypeParser() {
+		return new Pair<Environment,ContParser>(newEnv, new RecordTypeParser.RecordTypeParserBase() {
 
             private Environment envs = null;
             private Environment envi;
             private Pair<Environment,ContParser> declAST;
 
 			@Override
-			public void parseTypes(EnvironmentResolver r) {
+			public void doParseTypes(EnvironmentResolver r) {
 				Environment external = r.getEnv(mutableDeclf);
 
 				Environment envin = mutableDeclf.extend(external);
@@ -153,7 +153,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 			}
 
 			@Override
-            public void parseInner(EnvironmentResolver envR) {
+            public void doParseInner(EnvironmentResolver envR) {
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseInner(new SimpleResolver(envs));
 				mutableDeclf.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).getInternalEnv());

@@ -150,13 +150,13 @@ public class ModuleParser implements DeclParser {
 			};
 		}
 
-        result.second = new RecordTypeParser() {
+        result.second = new RecordTypeParser.RecordTypeParserBase() {
 			public Pair<Environment, ContParser> declAST;
 			public Environment env;
 			private Pair<Environment, RecordTypeParser> imported;
 
 			@Override
-			public void parseTypes(EnvironmentResolver r) {
+			public void doParseTypes(EnvironmentResolver r) {
 				if (mutableDecl.getDeclEnv() != null)
 					return;
 				imported = getImportedEnvironment(imports);
@@ -169,7 +169,7 @@ public class ModuleParser implements DeclParser {
 			}
 
 			@Override
-			public void parseInner(EnvironmentResolver r) {
+			public void doParseInner(EnvironmentResolver r) {
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseInner(new SimpleResolver(env));
 				mutableDecl.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).getInternalEnv());

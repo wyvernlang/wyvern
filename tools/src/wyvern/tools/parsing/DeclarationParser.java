@@ -47,36 +47,21 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
-		
-		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser() {
-			private HashSet<Integer> parseTypesCalled = new HashSet<>();
+
+		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser.RecordTypeParserBase() {
 			private HashSet<Integer> parseInnerCalled = new HashSet<>();
 			@Override
-			public void parseTypes(EnvironmentResolver r) {
-				ListIterator<ContParser> iterator = contParsers.listIterator(0);
-				int idx = 0;
-				while (iterator.hasNext()) {
-					final ContParser parser = iterator.next();
-					if (parser instanceof RecordTypeParser && !parseTypesCalled.contains(idx)) {
-						parseTypesCalled.add(idx);
+			public void doParseTypes(EnvironmentResolver r) {
+				for (ContParser parser : contParsers)
+					if (parser instanceof RecordTypeParser)
 						((RecordTypeParser) parser).parseTypes(r);
-					}
-					idx++;
-				}
 			}
 
 			@Override
-            public void parseInner(EnvironmentResolver r) {
-				ListIterator<ContParser> iterator = contParsers.listIterator(0);
-				int idx = 0;
-				while (iterator.hasNext()) {
-					final ContParser parser = iterator.next();
-					if (parser instanceof RecordTypeParser && !parseInnerCalled.contains(idx)) {
-						parseInnerCalled.add(idx);
+            public void doParseInner(EnvironmentResolver r) {
+				for (ContParser parser : contParsers)
+					if (parser instanceof RecordTypeParser)
 						((RecordTypeParser)parser).parseInner(r);
-					}
-					idx++;
-				}
             }
 
             @Override
