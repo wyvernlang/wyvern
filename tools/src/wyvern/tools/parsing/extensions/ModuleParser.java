@@ -1,5 +1,6 @@
 package wyvern.tools.parsing.extensions;
 
+import wyvern.DSL.DSL;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -17,21 +18,35 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.Pair;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ModuleParser implements DeclParser {
+    private static Dictionary<String, Pair<Environment, ContParser>> resolved = new Hashtable<>();
+    private static LineParser instance;
 
-	private ModuleDeclaration.ImportDeclaration parseImport(Line line) {
+    public static LineParser getInstance() {
+        if (instance == null)
+            instance = new ModuleParser();
+        return instance;
+    }
+    private ModuleParser() {}
+
+    private ModuleDeclaration.ImportDeclaration parseImport(Line line) {
 		String importName = "";
 		while (line != null) {
 			RawAST elem = line.getFirst();
-			if (!(elem instanceof Symbol))
-				break;
-
-			importName += ((Symbol) elem).name;
+			if (elem instanceof Symbol)
+			    importName += ((Symbol) elem).name;
+            else if (elem instanceof IntLiteral)
+                importName += ((IntLiteral) elem).data;
+            else
+                break;
+            line = line.getRest();
 		}
 		return new ModuleDeclaration.ImportDeclaration(importName);
 	}
@@ -50,14 +65,58 @@ public class ModuleParser implements DeclParser {
 
 			if (!firstSym.name.equals("import"))
 				break;
+            line = line.getRest();
 
-			out.add(parseImport(lines.get().getFirst()));
+			out.add(parseImport(line));
 
 			lines.set(lines.get().getRest());
 		}
 
 		return out;
 	}
+
+    private Pair<Environment,RecordTypeParser> getImportedEnvironment(List<ModuleDeclaration.ImportDeclaration> imports) {
+        Environment start = Environment.getEmptyEnvironment();
+        final List<ContParser> imported = new LinkedList<>();
+        for (ModuleDeclaration.ImportDeclaration importDeclaration : imports) {
+            if (resolved.get(importDeclaration.getSrc()) == null) {
+                try {
+                    Pair<Environment, ContParser> pair = wyvern.stdlib.Compiler
+                            .compilePartial(new URI(importDeclaration.getSrc()), new ArrayList<DSL>());
+                    resolved.put(importDeclaration.getSrc(), pair);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+            Pair<Environment, ContParser> environmentContParserPair = resolved.get(importDeclaration.getSrc());
+            start = start.extend(environmentContParserPair.first);
+            imported.add(environmentContParserPair.second);
+        }
+
+        return new Pair<Environment, RecordTypeParser>(start, new RecordTypeParser() {
+
+            @Override
+            public void parseTypes(EnvironmentResolver r) {
+                for (ContParser parser : imported)
+                    if (parser instanceof RecordTypeParser)
+                        ((RecordTypeParser) parser).parseTypes(r);
+            }
+
+            @Override
+            public void parseInner(EnvironmentResolver r) {
+                for (ContParser parser : imported)
+                    if (parser instanceof RecordTypeParser)
+                        ((RecordTypeParser) parser).parseInner(r);
+            }
+
+            @Override
+            public TypedAST parse(EnvironmentResolver r) {
+                throw new RuntimeException("Invalid operation");
+            }
+        });
+    }
 
 	//parses "module name : t i d
 	@Override
@@ -71,33 +130,42 @@ public class ModuleParser implements DeclParser {
 			asc = TypeParser.parsePartialType(ctx);
 		}
 		final AtomicReference<LineSequence> lines = new AtomicReference<>(ParseUtils.extractLines(ctx));
-		List<ModuleDeclaration.ImportDeclaration> imports = parseImports(lines);
+		final List<ModuleDeclaration.ImportDeclaration> imports = parseImports(lines);
 
 
 		final MutableModuleDeclaration mutableDecl =
 				new MutableModuleDeclaration(name, imports, s.getLocation());
 
-		if (ctx.first == null) {
-			return new Pair<Environment,ContParser>(mutableDecl.extend(Environment.getEmptyEnvironment()),new ContParser() {
+        Environment newEnv = mutableDecl.extend(Environment.getEmptyEnvironment());
+        Pair<Environment,ContParser> result = new Pair<>(newEnv, null);
+        resolved.put(name, result);
+
+        if (ctx.first == null) {
+            result.second = new ContParser() {
 
 				@Override
 				public TypedAST parse(EnvironmentResolver env) {
 					return mutableDecl;
 				}
-			});
+			};
 		}
 
-		return new Pair<Environment,ContParser>(mutableDecl.extend(Environment.getEmptyEnvironment()), new RecordTypeParser() {
+        result.second = new RecordTypeParser() {
 			public Pair<Environment, ContParser> declAST;
 			public Environment env;
+			private Pair<Environment, RecordTypeParser> imported;
 
 			@Override
 			public void parseTypes(EnvironmentResolver r) {
-				env = r.getEnv(mutableDecl);
+				if (mutableDecl.getDeclEnv() != null)
+					return;
+				imported = getImportedEnvironment(imports);
+				env = imported.first.extend(r.getEnv(mutableDecl));
 				declAST = lines.get().accept(ClassBodyParser.getInstance(), env);
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseTypes(new SimpleResolver(env));
 				mutableDecl.setDeclEnv(declAST.first);
+				imported.second.parseTypes(r);
 			}
 
 			@Override
@@ -105,6 +173,7 @@ public class ModuleParser implements DeclParser {
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseInner(new SimpleResolver(env));
 				mutableDecl.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).getInternalEnv());
+				imported.second.parseInner(r);
 			}
 
 			@Override
@@ -131,7 +200,8 @@ public class ModuleParser implements DeclParser {
 				mutableDecl.setDecls(DeclSequence.getDeclSeq(innerAST));
 				return mutableDecl;
 			}
-		});
+		};
+        return result;
 	}
 
 	@Override
@@ -143,6 +213,10 @@ public class ModuleParser implements DeclParser {
 	public static class MutableModuleDeclaration extends ModuleDeclaration {
 		public MutableModuleDeclaration(String name, List<ImportDeclaration> imports, FileLocation location) {
 			super(name, null, location);
+		}
+
+		public Environment getDeclEnv() {
+			return super.declEnv.get();
 		}
 
 		public void setDeclEnv(Environment nd) {

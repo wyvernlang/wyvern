@@ -52,7 +52,8 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 			if (!(fetched.second instanceof DeclParser))
 				throw new RuntimeException();
 
-			if (!(fetched.second instanceof TypeExtensionParser)) {
+			if (!(fetched.second instanceof TypeExtensionParser) ||
+					((TypeExtensionParser) fetched.second).typeRequiredPartialParse(ctx)) {
 				unparsed.add(new Pair<>(new Pair<>(fetched.first, (DeclParser)fetched.second),ctx));
 				continue;
 			}

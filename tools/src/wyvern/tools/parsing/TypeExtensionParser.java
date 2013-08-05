@@ -8,4 +8,5 @@ import wyvern.tools.util.Pair;
 public interface TypeExtensionParser {
 	Pair<Environment, RecordTypeParser> parseRecord(TypedAST first,
 													Pair<ExpressionSequence, Environment> ctx);
+	boolean typeRequiredPartialParse(Pair<ExpressionSequence, Environment> seq);
 }

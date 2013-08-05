@@ -40,11 +40,16 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 			this.src = src;
 		}
+
+        public String getSrc() {
+            return src;
+        }
 	}
 
 	protected ModuleDeclaration(String name, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
 		this.location = location;
+        this.name = name;
 		typeEquivalentEnvironment = new AtomicReference<>();
 		declEnv = new AtomicReference<>();
 	}

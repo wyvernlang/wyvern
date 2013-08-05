@@ -5,16 +5,7 @@ import static wyvern.tools.types.TypeUtils.integer;
 import static wyvern.tools.types.TypeUtils.unit;
 import static wyvern.tools.types.TypeUtils.str;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.extensions.ClassParser;
-import wyvern.tools.parsing.extensions.FnParser;
-import wyvern.tools.parsing.extensions.IfParser;
-import wyvern.tools.parsing.extensions.DefParser;
-import wyvern.tools.parsing.extensions.NewParser;
-import wyvern.tools.parsing.extensions.PropParser;
-import wyvern.tools.parsing.extensions.TypeParser;
-import wyvern.tools.parsing.extensions.ValParser;
-import wyvern.tools.parsing.extensions.VarParser;
-import wyvern.tools.parsing.extensions.WhileParser;
+import wyvern.tools.parsing.extensions.*;
 import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
@@ -45,6 +36,7 @@ public class Globals {
 		env = env.extend(new KeywordNameBinding("new", new Keyword(NewParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("if", new Keyword(IfParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("while", new Keyword(WhileParser.getInstance())));
+        env = env.extend(new KeywordNameBinding("module", new Keyword(ModuleParser.getInstance())));
 		
 		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));

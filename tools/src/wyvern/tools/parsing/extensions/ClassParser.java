@@ -70,6 +70,14 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 	}
 
 	@Override
+	public boolean typeRequiredPartialParse(Pair<ExpressionSequence, Environment> ctx) {
+		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
 			Pair<ExpressionSequence, Environment> ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?

@@ -48,6 +48,11 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 	}
 
 	@Override
+	public boolean typeRequiredPartialParse(Pair<ExpressionSequence, Environment> ctx) {
+		return false;
+	}
+
+	@Override
 	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
 		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));

@@ -1,11 +1,11 @@
 package wyvern.tools.parsing;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.ContParser;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.IntLiteral;
 import wyvern.tools.rawAST.Line;
@@ -18,12 +18,9 @@ import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.rawAST.Unit;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
@@ -52,18 +49,34 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		}
 		
 		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser() {
+			private HashSet<Integer> parseTypesCalled = new HashSet<>();
+			private HashSet<Integer> parseInnerCalled = new HashSet<>();
 			@Override
 			public void parseTypes(EnvironmentResolver r) {
-				for (ContParser parser : contParsers)
-					if (parser instanceof RecordTypeParser)
-						((RecordTypeParser)parser).parseTypes(r);
+				ListIterator<ContParser> iterator = contParsers.listIterator(0);
+				int idx = 0;
+				while (iterator.hasNext()) {
+					final ContParser parser = iterator.next();
+					if (parser instanceof RecordTypeParser && !parseTypesCalled.contains(idx)) {
+						parseTypesCalled.add(idx);
+						((RecordTypeParser) parser).parseTypes(r);
+					}
+					idx++;
+				}
 			}
 
 			@Override
             public void parseInner(EnvironmentResolver r) {
-                for (ContParser parser : contParsers)
-					if (parser instanceof RecordTypeParser)
+				ListIterator<ContParser> iterator = contParsers.listIterator(0);
+				int idx = 0;
+				while (iterator.hasNext()) {
+					final ContParser parser = iterator.next();
+					if (parser instanceof RecordTypeParser && !parseInnerCalled.contains(idx)) {
+						parseInnerCalled.add(idx);
 						((RecordTypeParser)parser).parseInner(r);
+					}
+					idx++;
+				}
             }
 
             @Override
