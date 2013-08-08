@@ -36,6 +36,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -185,7 +186,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return visit((ExpressionSequence)node, env);
 	}
 	
-	private TypedAST parseAtomicExpr(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseAtomicExpr(CompilationContext ctx, Type expected) {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check
@@ -225,7 +226,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return parser.parse(first, ctx);
 	}
 	
-	private TypedAST parseApplication(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseApplication(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseAtomicExpr(ctx, expected);
 		
 		while (ctx.first != null && (ctx.first.getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
@@ -249,7 +250,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	}
 
 	// TODO: refactor to reuse code between parseProduct and parseSum 
-	private TypedAST parseProduct(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseProduct(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseApplication(ctx, expected);
 		
 		while (ctx.first != null && isProductOperator(ctx.first.getFirst())) {
@@ -263,7 +264,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
-	private TypedAST parseSum(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseSum(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseProduct(ctx, expected);
 		
 		while (ctx.first != null && isSumOperator(ctx.first.getFirst())) {
@@ -277,7 +278,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 
-	private TypedAST parseRelationalOps(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+	private TypedAST parseRelationalOps(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseSum(ctx, expected);
 		
 		while (ctx.first != null && isRelationalOperator(ctx.first.getFirst())) {
@@ -291,7 +292,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
-	private TypedAST parseAnd(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseAnd(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseRelationalOps(ctx, expected);
 		
 		while (ctx.first != null && isAndOperator(ctx.first.getFirst())) {
@@ -305,7 +306,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
-	private TypedAST parseOr(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseOr(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseAnd(ctx, expected);
 		
 		while (ctx.first != null && isOrOperator(ctx.first.getFirst())) {
@@ -319,7 +320,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 	
-	private TypedAST parseEquals(Pair<ExpressionSequence,Environment> ctx, Type expected) {
+	private TypedAST parseEquals(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseOr(ctx, expected);
 		while (ctx.first != null && isEqualsOperator(ctx.first.getFirst())) {
 			Symbol s = (Symbol) ctx.first.getFirst();			
@@ -331,7 +332,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 
-	private TypedAST parseTuple(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+	private TypedAST parseTuple(CompilationContext ctx, Type expected) {
 
 		if (expected != null && expected instanceof Tuple) {
 			if (tuple == null)
@@ -351,7 +352,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		return ast;
 	}
 
-    private TypedAST parseDSL(Pair<ExpressionSequence, Environment> ctx, Type expected) {
+    private TypedAST parseDSL(CompilationContext ctx, Type expected) {
         TypedAST ast = parseTuple(ctx, expected);
 
         if (this.dslToken != null && ctx.first != null) {
@@ -412,7 +413,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	}
 
 	public TypedAST visit(ExpressionSequence node, Environment env) {
-		Pair<ExpressionSequence,Environment> ctx = new Pair<ExpressionSequence,Environment>(node, env); 
+		CompilationContext ctx = new CompilationContext(node, env);
 		TypedAST result = parseDSL(ctx, expected); // Start trying with the lowest precedence operator.
 		if (ctx.first != null)
 			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.first.getFirst()!=null)?ctx.first.getFirst().toString():null, ctx.first);

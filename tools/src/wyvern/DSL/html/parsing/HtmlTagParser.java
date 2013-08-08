@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class HtmlTagParser implements LineParser {
@@ -51,7 +52,7 @@ public class HtmlTagParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first,
-						  Pair<ExpressionSequence, Environment> ctx) {
+						  CompilationContext ctx) {
 		if (prefs.empty)
 			return new StringConstant(String.format("</%s>\n",prefs.tag));
 		if (ctx.first == null)
@@ -114,7 +115,7 @@ public class HtmlTagParser implements LineParser {
 			return reduce2(concat(insert,attrs,first.getLocation(),true));
 	}
 	
-	private HashMap<String,TypedAST> parseAttrs(Pair<ExpressionSequence, Environment> ctx) {
+	private HashMap<String,TypedAST> parseAttrs(CompilationContext ctx) {
 		HashMap<String,TypedAST> output = new HashMap<String,TypedAST>();
 		
 		while (ctx.first != null) {

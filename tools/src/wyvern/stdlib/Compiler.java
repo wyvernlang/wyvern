@@ -32,6 +32,7 @@ public class Compiler {
     }
 
     private static HashMap<String, Pair<Environment, ContParser>> parseCache = new HashMap<>();
+	private static HashMap<String, TypedAST> parsedASTs = new HashMap<>();
 
     private static Environment getParseEnv(List<DSL> dsls) {
         Environment parseEnv = Globals.getStandardEnv();
@@ -86,7 +87,10 @@ public class Compiler {
 
         Pair<Environment, ContParser> pair = parsedResult.accept(DeclarationParser.getInstance(), parseEnv);
         parseCache.put(md5, pair);
-        return resolvePair(parseEnv, pair);
+        TypedAST result = resolvePair(parseEnv, pair);
+		if (!parsedASTs.containsKey(md5))
+			parsedASTs.put(md5, result);
+		return result;
     }
 
     public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls) {

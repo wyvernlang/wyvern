@@ -18,6 +18,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Str;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
@@ -39,7 +40,7 @@ public class TypeDrivenParsingTests {
 
         private class TestTypeParser implements LineParser {
             @Override
-            public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+            public TypedAST parse(TypedAST first, CompilationContext ctx) {
                 LineSequence seq = ParseUtils.extractLines(ctx);
 
                 return new ExampleAST("Hi!");

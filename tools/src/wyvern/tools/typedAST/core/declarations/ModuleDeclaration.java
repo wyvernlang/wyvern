@@ -1,22 +1,15 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.values.ClassObject;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
@@ -32,19 +25,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	protected AtomicReference<Environment> typeEquivalentEnvironment;
 	protected TypeType asc;
 	protected List<ImportDeclaration> imports;
-
-	public static class ImportDeclaration {
-		private String src;
-
-		public ImportDeclaration(String src) {
-
-			this.src = src;
-		}
-
-        public String getSrc() {
-            return src;
-        }
-	}
 
 	protected ModuleDeclaration(String name, DeclSequence decls, FileLocation location) {
 		this.decls = decls;

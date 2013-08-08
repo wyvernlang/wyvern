@@ -25,6 +25,7 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 /**
@@ -57,20 +58,20 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
 		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 
 	@Override
 	public Pair<Environment, RecordTypeParser> parseRecord(TypedAST first,
-														   Pair<ExpressionSequence, Environment> ctx) {
+														   CompilationContext ctx) {
 		Pair<Environment, ContParser> pair = parseDeferred(first, ctx);
 		return new Pair<>(pair.first, (RecordTypeParser)pair.second);
 	}
 
 	@Override
-	public boolean typeRequiredPartialParse(Pair<ExpressionSequence, Environment> ctx) {
+	public boolean typeRequiredPartialParse(CompilationContext ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
 			return true;
 		}
@@ -79,7 +80,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+			CompilationContext ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
 			ParseUtils.parseSymbol(ctx);
 			return DefParser.getInstance().parseDeferred(first, ctx, true);

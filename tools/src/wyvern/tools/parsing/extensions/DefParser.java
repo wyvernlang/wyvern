@@ -16,6 +16,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
@@ -31,7 +32,7 @@ public class DefParser implements DeclParser {
 	public static DefParser getInstance() { return instance; }
 	
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		return parse(first,ctx,false);
 	}
 	
@@ -46,20 +47,20 @@ public class DefParser implements DeclParser {
 		}
 	}
 	
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence,Environment> ctx, boolean isClassMeth) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx, boolean isClassMeth) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx, isClassMeth);
 		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+			CompilationContext ctx) {
 		return this.parseDeferred(first, ctx, false);
 	}
 	
 	// FIXME: Should convert all functions: f (A, B) : C into f : A*B -> C and thus convert f() : C into f : Unit -> C!
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx, final boolean isClassMeth) {
+			CompilationContext ctx, final boolean isClassMeth) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		final String defName = s.name;
 		final FileLocation methNameLine = s.getLocation();
@@ -74,7 +75,7 @@ public class DefParser implements DeclParser {
 			
 			argumentsPresent = true;
 			Parenthesis paren = ParseUtils.extractParen(ctx);
-			Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second); 
+			CompilationContext newCtx = new CompilationContext(paren, ctx.second);
 
 			while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
 				if (args.size() > 0)

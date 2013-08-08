@@ -7,21 +7,23 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
 import wyvern.tools.parsing.TypeParser;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.*;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.rawAST.*;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,23 +38,18 @@ public class ModuleParser implements DeclParser {
     }
     private ModuleParser() {}
 
-    private ModuleDeclaration.ImportDeclaration parseImport(Line line) {
-		String importName = "";
-		while (line != null) {
-			RawAST elem = line.getFirst();
-			if (elem instanceof Symbol)
-			    importName += ((Symbol) elem).name;
-            else if (elem instanceof IntLiteral)
-                importName += ((IntLiteral) elem).data;
-            else
-                break;
-            line = line.getRest();
-		}
-		return new ModuleDeclaration.ImportDeclaration(importName);
+    private ImportDeclaration parseImport(Line line) {
+		String importName = ((StringLiteral)line.getFirst()).data;
+		line = line.getRest();
+		if (!(line.getFirst() instanceof Symbol) && !((StringLiteral) line.getFirst()).data.equals("as"))
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, line);
+		line = line.getRest();
+		String equivName = ((Symbol)line.getFirst()).name;
+		return new ImportDeclaration(importName, equivName);
 	}
 
-	private List<ModuleDeclaration.ImportDeclaration> parseImports(AtomicReference<LineSequence> lines) {
-		LinkedList<ModuleDeclaration.ImportDeclaration> out = new LinkedList<>();
+	private List<ImportDeclaration> parseImports(AtomicReference<LineSequence> lines) {
+		LinkedList<ImportDeclaration> out = new LinkedList<>();
 		while (lines.get() != null) {
 			Line line = lines.get().getFirst();
 
@@ -75,10 +72,10 @@ public class ModuleParser implements DeclParser {
 		return out;
 	}
 
-    private Pair<Environment,RecordTypeParser> getImportedEnvironment(List<ModuleDeclaration.ImportDeclaration> imports) {
+    private Pair<Environment,RecordTypeParser> getImportedEnvironment(List<ImportDeclaration> imports) {
         Environment start = Environment.getEmptyEnvironment();
         final List<ContParser> imported = new LinkedList<>();
-        for (ModuleDeclaration.ImportDeclaration importDeclaration : imports) {
+        for (ImportDeclaration importDeclaration : imports) {
             if (resolved.get(importDeclaration.getSrc()) == null) {
                 try {
                     Pair<Environment, ContParser> pair = wyvern.stdlib.Compiler
@@ -91,7 +88,11 @@ public class ModuleParser implements DeclParser {
                 }
             }
             Pair<Environment, ContParser> environmentContParserPair = resolved.get(importDeclaration.getSrc());
-            start = start.extend(environmentContParserPair.first);
+			ClassType type = new ClassType(importDeclaration.getEquivName(),
+					new AtomicReference<>(environmentContParserPair.first),
+					null, null);
+			start = start.extend(new TypeBinding(importDeclaration.getEquivName(), type))
+					     .extend(new NameBindingImpl(importDeclaration.getEquivName(), type));
             imported.add(environmentContParserPair.second);
         }
 
@@ -120,7 +121,7 @@ public class ModuleParser implements DeclParser {
 
 	//parses "module name : t i d
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String name = s.name;
@@ -130,7 +131,7 @@ public class ModuleParser implements DeclParser {
 			asc = TypeParser.parsePartialType(ctx);
 		}
 		final AtomicReference<LineSequence> lines = new AtomicReference<>(ParseUtils.extractLines(ctx));
-		final List<ModuleDeclaration.ImportDeclaration> imports = parseImports(lines);
+		final List<ImportDeclaration> imports = parseImports(lines);
 
 
 		final MutableModuleDeclaration mutableDecl =
@@ -205,7 +206,7 @@ public class ModuleParser implements DeclParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> ret = parseDeferred(first, ctx);
 		return ret.second.parse(new ContParser.SimpleResolver(ret.first.extend(ctx.second)));
 	}

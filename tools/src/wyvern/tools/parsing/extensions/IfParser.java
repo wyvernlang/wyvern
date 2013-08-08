@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
@@ -91,7 +92,7 @@ public class IfParser implements LineParser {
 
 		@Override
 		public TypedAST parse(TypedAST first,
-							  Pair<ExpressionSequence, Environment> ctx) {
+							  CompilationContext ctx) {
 			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), env);
 			return new IfClause(clause,body,true);
 		}
@@ -105,9 +106,9 @@ public class IfParser implements LineParser {
 
 		@Override
 		public TypedAST parse(TypedAST first,
-							  Pair<ExpressionSequence, Environment> ctx) {
+							  CompilationContext ctx) {
 			TypedAST clause = new BooleanConstant(true);
-            Pair<ExpressionSequence, Environment> ictx = new Pair<>(ctx.first, ctx.second.getExternalEnv());
+            CompilationContext ictx = new CompilationContext(ctx.first, ctx.second.getExternalEnv());
 			if (ParseUtils.checkFirst("if",ictx)) {
 				ParseUtils.parseSymbol("if", ictx);
 				clause = ParseUtils.parseCond(ictx);
@@ -120,7 +121,7 @@ public class IfParser implements LineParser {
 	
 	@Override
 	public TypedAST parse(TypedAST first,
-						  Pair<ExpressionSequence, Environment> ctx) {
+						  CompilationContext ctx) {
 		TypedAST thenClause = ParseUtils.parseCond(ctx);
 		
 		Environment bodyEnv = Environment.getEmptyEnvironment();

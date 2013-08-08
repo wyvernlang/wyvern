@@ -20,23 +20,24 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class ParseUtils {
 
-	public static RawAST peekFirst(Pair<ExpressionSequence, Environment> ctx) {
+	public static RawAST peekFirst(CompilationContext ctx) {
 		if (ctx.first == null)
 			return null;
 			
 		return ctx.first.getFirst();
 	}
 	
-	public static boolean checkFirst(String string, Pair<ExpressionSequence, Environment> ctx) {
+	public static boolean checkFirst(String string, CompilationContext ctx) {
 		RawAST first = peekFirst(ctx);
 		return first != null && first instanceof Symbol && ((Symbol)first).name.equals(string);
 	}
 
-	public static Symbol parseSymbol(Pair<ExpressionSequence, Environment> ctx) {
+	public static Symbol parseSymbol(CompilationContext ctx) {
 		if (ctx.first == null) {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		}
@@ -52,7 +53,7 @@ public class ParseUtils {
 		}
 	}
 
-	public static Parenthesis extractParen(Pair<ExpressionSequence, Environment> ctx) {
+	public static Parenthesis extractParen(CompilationContext ctx) {
 		if (ctx.first == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			
@@ -67,7 +68,7 @@ public class ParseUtils {
 		}
 	}
 
-	public static LineSequence extractLines(Pair<ExpressionSequence, Environment> ctx) {
+	public static LineSequence extractLines(CompilationContext ctx) {
 		if (ctx.first == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			
@@ -83,7 +84,7 @@ public class ParseUtils {
 	}
 
 	public static Symbol parseSymbol(String string,
-			Pair<ExpressionSequence, Environment> ctx) {
+			CompilationContext ctx) {
 		Symbol symbol = parseSymbol(ctx);
 		if (symbol.name.equals(string)) {
 			return symbol;
@@ -93,9 +94,9 @@ public class ParseUtils {
 		}
 	}
 
-	public static List<NameBinding> getNameBindings(Pair<ExpressionSequence, Environment> ctx) {
+	public static List<NameBinding> getNameBindings(CompilationContext ctx) {
 		Parenthesis paren = ParseUtils.extractParen(ctx);
-		Pair<ExpressionSequence,Environment> newCtx = new Pair<ExpressionSequence,Environment>(paren, ctx.second);
+		CompilationContext newCtx = new CompilationContext(paren, ctx.second);
 		List<NameBinding> args = new ArrayList<NameBinding>();
 
 		while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
@@ -118,7 +119,7 @@ public class ParseUtils {
 		return args;
 	}
 
-	public static Type parseReturnType(Pair<ExpressionSequence, Environment> ctx) {
+	public static Type parseReturnType(CompilationContext ctx) {
 		Type returnType;
 		ParseUtils.parseSymbol(":", ctx);
 		returnType = ParseUtils.parseType(ctx);
@@ -129,7 +130,7 @@ public class ParseUtils {
 		T eval(Environment env);
 	}
 
-	public static Type parseType(Pair<ExpressionSequence, Environment> ctx) {
+	public static Type parseType(CompilationContext ctx) {
 		return TypeParser.parsePartialType(ctx).eval(ctx.second);
 		/*
 		Type type = parseSimpleType(ctx);
@@ -152,22 +153,22 @@ public class ParseUtils {
 		return operatorName.equals("->");
 	}
 
-	public static Type parseSimpleType(Pair<ExpressionSequence, Environment> ctx) {
+	public static Type parseSimpleType(CompilationContext ctx) {
 		return TypeParser.parsePartialSimpleType(ctx).eval(ctx.second);
 	}
 
 	// I do not think this method is needed!? (Alex) Why not use accept directly?
-	public static TypedAST parseExpr(Pair<ExpressionSequence, Environment> ctx) {
+	public static TypedAST parseExpr(CompilationContext ctx) {
 		TypedAST result = ctx.first.accept(BodyParser.getInstance(), ctx.second);
 		ctx.first = null;	// previous line by definition read everything
 		return result;
 	}
 	
-	public static TypedAST parseCond(Pair<ExpressionSequence, Environment> ctx) {
+	public static TypedAST parseCond(CompilationContext ctx) {
         return getLine(ctx).accept(BodyParser.getInstance(), ctx.second);
 	}
 
-    public static ExpressionSequence getLine(Pair<ExpressionSequence, Environment> ctx) {
+    public static ExpressionSequence getLine(CompilationContext ctx) {
         ArrayList<RawAST> condRaw = new ArrayList<RawAST>();
         while (ctx.first != null && !(ctx.first.getFirst() instanceof LineSequence)) {
             condRaw.add(ctx.first.getFirst());
@@ -176,7 +177,7 @@ public class ParseUtils {
         return new Line(condRaw, FileLocation.UNKNOWN);
     }
 
-	public static Pair<Environment, ContParser> parseCondPartial(Pair<ExpressionSequence, Environment> ctx) {
+	public static Pair<Environment, ContParser> parseCondPartial(CompilationContext ctx) {
 		ArrayList<RawAST> condRaw = new ArrayList<RawAST>();
 		while (ctx.first != null && !(ctx.first.getFirst() instanceof LineSequence)) {
 			condRaw.add(ctx.first.getFirst());
@@ -185,7 +186,7 @@ public class ParseUtils {
 		return new Line(condRaw, FileLocation.UNKNOWN).accept(DeclarationParser.getInstance(), ctx.second);
 	}
 
-	public static Variable parseVariable(Pair<ExpressionSequence, Environment> ctx) {
+	public static Variable parseVariable(CompilationContext ctx) {
 		Symbol sym = parseSymbol(ctx);
 		TypedAST var = sym.accept(BodyParser.getInstance(), ctx.second);
 		if (!(var instanceof Variable))
@@ -193,7 +194,7 @@ public class ParseUtils {
 		return (Variable) var;
 	}
 
-	public static TypedAST parseExprList(Pair<ExpressionSequence, Environment> ctx) {
+	public static TypedAST parseExprList(CompilationContext ctx) {
 		if (ctx.first == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 		

@@ -11,10 +11,11 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class TypeParser {
-	public static ParseUtils.LazyEval<Type> parsePartialType(Pair<ExpressionSequence, Environment> ctx) {
+	public static ParseUtils.LazyEval<Type> parsePartialType(CompilationContext ctx) {
 		ParseUtils.LazyEval<Type> type = parseCompositeType(ctx);
 		while (ctx.first != null && ParseUtils.isArrowOperator(ctx.first.getFirst())) {
 			ctx.first = ctx.first.getRest();
@@ -33,7 +34,7 @@ public class TypeParser {
 		return type;
 	}
 
-	private static ParseUtils.LazyEval<Type> parseCompositeType(Pair<ExpressionSequence, Environment> ctx) {
+	private static ParseUtils.LazyEval<Type> parseCompositeType(CompilationContext ctx) {
 		ParseUtils.LazyEval<Type> type = parsePartialSimpleType(ctx);
 		while (ctx.first != null && ParseUtils.checkFirst(".", ctx)) {
 			final RawAST elem = ctx.first;
@@ -56,7 +57,7 @@ public class TypeParser {
 		return type;
 	}
 
-	public static ParseUtils.LazyEval<Type> parsePartialSimpleType(final Pair<ExpressionSequence, Environment> ctx) {
+	public static ParseUtils.LazyEval<Type> parsePartialSimpleType(final CompilationContext ctx) {
 		if (ctx.first == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 
@@ -87,7 +88,7 @@ public class TypeParser {
 
 			};
 		} else if (first instanceof Parenthesis) {
-			return parsePartialType(new Pair<ExpressionSequence, Environment>((Parenthesis) first, ctx.second));
+			return parsePartialType(new CompilationContext((Parenthesis) first, ctx.second));
 		} else {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
 			return null; // Unreachable.

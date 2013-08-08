@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 import java.util.HashSet;
@@ -27,7 +28,7 @@ public class ArchitectureParser implements DeclParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
 		TypedAST body = null;
 
@@ -37,7 +38,7 @@ public class ArchitectureParser implements DeclParser {
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 		endpoints = new LinkedList<>();
 		String name = ParseUtils.parseSymbol(ctx).name;
 		final Architecture innerArch = new Architecture(name, null);

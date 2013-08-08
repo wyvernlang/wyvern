@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class ValParser implements DeclParser {
@@ -31,7 +32,7 @@ public class ValParser implements DeclParser {
 
 
     @Override
-    public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+    public TypedAST parse(TypedAST first, CompilationContext ctx) {
         Pair<Environment, ContParser> p = parseDeferred(first, ctx);
         return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
     }
@@ -39,7 +40,7 @@ public class ValParser implements DeclParser {
 
     //@Override
     public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-                                                       final Pair<ExpressionSequence, Environment> ctx) {
+                                                       final CompilationContext ctx) {
         Symbol s = ParseUtils.parseSymbol(ctx);
         final String valName = s.name;
         final FileLocation valNameLocation = s.getLocation();
@@ -56,7 +57,7 @@ public class ValParser implements DeclParser {
 
         BodyParser.getInstance().setExpected(type);
 
-        final Pair<ExpressionSequence, Environment> restctx = new Pair<ExpressionSequence, Environment>(ctx.first, ctx.second);
+        final CompilationContext restctx = new CompilationContext(ctx.first, ctx.second);
         ctx.first = null;
 
         ValDeclaration nc = null;

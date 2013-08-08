@@ -10,25 +10,25 @@ import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 import java.util.List;
 
 public class ConnectionParser implements DeclParser {
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		return null;
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
-		Pair<ExpressionSequence, Environment> innerCtx = new Pair<>(ctx.first,ctx.second.getExternalEnv());
+		CompilationContext innerCtx = new CompilationContext(ctx.first,ctx.second.getExternalEnv());
 		List<NameBinding> args = ParseUtils.getNameBindings(innerCtx);
 		Type returnType = ParseUtils.parseReturnType(innerCtx);
 		ctx.first = innerCtx.first;
 		final Connection conn = new Connection(name, args, returnType, null);
-
 		final ExpressionSequence modiferExprs = ctx.first;
 		ctx.first = null;
 

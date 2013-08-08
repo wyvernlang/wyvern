@@ -12,6 +12,7 @@ import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
 
@@ -27,7 +28,7 @@ public class FnParser implements LineParser {
 	public static FnParser getInstance() { return instance; }
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		String varName = ParseUtils.parseSymbol(ctx).name;
 		ParseUtils.parseSymbol(":", ctx);
 		Type type = ParseUtils.parseType(ctx);

@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
@@ -42,25 +43,25 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 
 	@Override
 	public Pair<Environment, RecordTypeParser> parseRecord(TypedAST first,
-														   Pair<ExpressionSequence, Environment> ctx) {
+														   CompilationContext ctx) {
 		Pair<Environment, ContParser> pair = parseDeferred(first, ctx);
 		return new Pair<>(pair.first, (RecordTypeParser)pair.second);
 	}
 
 	@Override
-	public boolean typeRequiredPartialParse(Pair<ExpressionSequence, Environment> ctx) {
+	public boolean typeRequiredPartialParse(CompilationContext ctx) {
 		return false;
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
 		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
 	}
 	
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+			CompilationContext ctx) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String clsName = s.name;
 		FileLocation clsNameLine = s.getLocation();

@@ -24,6 +24,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
@@ -39,14 +40,14 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		}
 
 		final LinkedList<ContParser> contParsers = new LinkedList<>();
-		final LinkedList<Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>>> unparsed = new LinkedList<>();
+		final LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed = new LinkedList<>();
 		Environment newEnv = Environment.getEmptyEnvironment();
 
 		for (RawAST line : node.children) {
 			if (!(line instanceof ExpressionSequence))
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 
-			Pair<ExpressionSequence, Environment> ctx = new Pair<>((ExpressionSequence) line, env);
+			CompilationContext ctx = new CompilationContext((ExpressionSequence) line, env);
 			Pair<TypedAST, LineParser> fetched = getParser(ctx);
 
 			if (!(fetched.second instanceof DeclParser))
@@ -59,7 +60,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 			}
 
 			Pair<Environment,ContParser> partiallyParsed =
-					parseLineInt(new Pair<>((ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext((ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
@@ -68,7 +69,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		return new Pair<Environment, ContParser>(newEnv, new ClassBodyContParser(finalNewEnv, contParsers, unparsed));
 	}
 
-	private Pair<TypedAST, LineParser> getParser(Pair<ExpressionSequence,Environment> ctx) {
+	private Pair<TypedAST, LineParser> getParser(CompilationContext ctx) {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check
@@ -82,7 +83,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		return new Pair<>(first, first.getLineParser());
 	}
 
-	private Pair<Environment,ContParser> parseLineInt(Pair<ExpressionSequence,Environment> ctx) {
+	private Pair<Environment,ContParser> parseLineInt(CompilationContext ctx) {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check
@@ -148,10 +149,10 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 	public static class ClassBodyContParser implements RecordTypeParser {
 		private final Environment finalNewEnv;
 		private final LinkedList<ContParser> contParsers;
-		private final LinkedList<Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>>> unparsed;
+		private final LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed;
 		public Environment internalEnv;
 
-		public ClassBodyContParser(Environment finalNewEnv, LinkedList<ContParser> contParsers, LinkedList<Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>>> unparsed) {
+		public ClassBodyContParser(Environment finalNewEnv, LinkedList<ContParser> contParsers, LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed) {
 			this.finalNewEnv = finalNewEnv;
 			this.contParsers = contParsers;
 			this.unparsed = unparsed;
@@ -171,7 +172,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 
 		@Override
 		public void parseInner(EnvironmentResolver r) {
-			for (Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>> toParse : unparsed) {
+			for (Pair<Pair<TypedAST, DeclParser>, CompilationContext> toParse : unparsed) {
 				Pair<Environment, ContParser> ret = toParse.first.second.parseDeferred(toParse.first.first, toParse.second);
 				internalEnv = internalEnv.extend(ret.first);
 				contParsers.add(ret.second);

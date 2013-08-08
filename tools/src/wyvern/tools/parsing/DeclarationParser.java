@@ -21,6 +21,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
@@ -43,7 +44,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 			
 			Pair<Environment,ContParser> partiallyParsed = 
-					parseLineInt(new Pair<>((ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext((ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
@@ -85,7 +86,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		});
 	}
 	
-	private Pair<Environment,ContParser> parseLineInt(Pair<ExpressionSequence,Environment> ctx) {
+	private Pair<Environment,ContParser> parseLineInt(CompilationContext ctx) {
 		ExpressionSequence node = ctx.first;
 		Environment env = ctx.second;
 		// TODO: should not be necessary, but a useful sanity check

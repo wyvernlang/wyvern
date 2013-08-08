@@ -9,16 +9,17 @@ import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class ViaParser extends ConnectionPropertyParser {
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		return null;
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final CompilationContext ctx) {
 		final ViaProperty vp = new ViaProperty(null, null);
 		final ParseUtils.LazyEval<Type> preType = TypeParser.parsePartialType(ctx);
 		ctx.second = vp.extend(ctx.second);
