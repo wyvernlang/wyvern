@@ -24,15 +24,15 @@ public class ConnectionParser implements DeclParser {
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
-		CompilationContext innerCtx = new CompilationContext(ctx.first,ctx.second.getExternalEnv());
+		CompilationContext innerCtx = new CompilationContext(ctx.getTokens(), ctx.getEnv().getExternalEnv());
 		List<NameBinding> args = ParseUtils.getNameBindings(innerCtx);
 		Type returnType = ParseUtils.parseReturnType(innerCtx);
-		ctx.first = innerCtx.first;
+		ctx.setTokens(innerCtx.getTokens());
 		final Connection conn = new Connection(name, args, returnType, null);
-		final ExpressionSequence modiferExprs = ctx.first;
-		ctx.first = null;
+		final ExpressionSequence modiferExprs = ctx.getTokens();
+		ctx.setTokens(null);
 
-		return new Pair<Environment, ContParser>(conn.extend(ctx.second),
+		return new Pair<Environment, ContParser>(conn.extend(ctx.getEnv()),
 				new ContParser() {
                     @Override
 					public TypedAST parse(EnvironmentResolver r) {

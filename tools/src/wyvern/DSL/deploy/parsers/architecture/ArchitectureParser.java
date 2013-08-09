@@ -4,8 +4,6 @@ import wyvern.DSL.deploy.Deploy;
 import wyvern.DSL.deploy.typedAST.architecture.Architecture;
 import wyvern.DSL.deploy.typedAST.architecture.Endpoint;
 import wyvern.tools.parsing.*;
-import wyvern.tools.parsing.extensions.TypeParser;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
@@ -14,11 +12,8 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import static wyvern.tools.parsing.extensions.TypeParser.*;
 
 public class ArchitectureParser implements DeclParser {
 	private LinkedList<Endpoint> endpoints = new LinkedList<>();
@@ -32,8 +27,8 @@ public class ArchitectureParser implements DeclParser {
 		String name = ParseUtils.parseSymbol(ctx).name;
 		TypedAST body = null;
 
-		if (ctx.first != null)
-			body = BodyParser.getInstance().visit(ctx.first, Deploy.getArchInnerEnv(this));
+		if (ctx.getTokens() != null)
+			body = BodyParser.getInstance().visit(ctx.getTokens(), Deploy.getArchInnerEnv(this));
 		return new Architecture(name, body);
 	}
 
@@ -45,14 +40,14 @@ public class ArchitectureParser implements DeclParser {
 
 		Pair<Environment, ContParser> parsePartialI = null;
 
-		if (ctx.first != null) {
-			parsePartialI = ParseUtils.extractLines(ctx).accept(DeclarationParser.getInstance(), ctx.second.setInternalEnv(Deploy.getArchInnerEnv(this)));
+		if (ctx.getTokens() != null) {
+			parsePartialI = ParseUtils.extractLines(ctx).accept(DeclarationParser.getInstance(), ctx.getEnv().setInternalEnv(Deploy.getArchInnerEnv(this)));
 		}
 
 		final Pair<Environment, ContParser> parsePartial = parsePartialI;
 
 
-		Environment output = ctx.second;
+		Environment output = ctx.getEnv();
 		for (Endpoint endpoint : endpoints) {
 			output = endpoint.getDecl().extend(output);
 		}

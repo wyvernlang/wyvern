@@ -15,17 +15,14 @@ import wyvern.tools.rawAST.RawASTVisitor;
 import wyvern.tools.rawAST.StringLiteral;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.rawAST.Unit;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.PartialDecl;
 import wyvern.tools.typedAST.core.declarations.PartialDeclSequence;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -187,13 +184,13 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	}
 	
 	private TypedAST parseAtomicExpr(CompilationContext ctx, Type expected) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
 			if (node instanceof Parenthesis) {
-				ctx.first = null;
+				ctx.setTokens(null);
 				return UnitVal.getInstance(node.getLocation());
 			} else
 				throw new RuntimeException("cannot parse an empty list");
@@ -209,7 +206,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST first = node.getFirst().accept(this, env);
 		LineParser parser = first.getLineParser();
 		ExpressionSequence rest = node.getRest();
-		ctx.first = rest;
+		ctx.setTokens(rest);
 
 		if (parser == null) {
             if (resolver != null)
@@ -229,13 +226,13 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseApplication(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseAtomicExpr(ctx, expected);
 		
-		while (ctx.first != null && (ctx.first.getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
+		while (ctx.getTokens() != null && (ctx.getTokens().getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
 			if (ParseUtils.checkFirst(".",ctx)) {
 				ParseUtils.parseSymbol(".", ctx);
                 Symbol sym = ParseUtils.parseSymbol(ctx);
                 ast = new Invocation(ast, sym.name, null, sym.getLocation());
             } else {
-                Type type = ast.typecheck(ctx.second);
+                Type type = ast.typecheck(ctx.getEnv());
                 if (type instanceof Arrow) {
                     expected = ((Arrow) type).getArgument();
                 } else {
@@ -253,10 +250,10 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseProduct(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseApplication(ctx, expected);
 		
-		while (ctx.first != null && isProductOperator(ctx.first.getFirst())) {
-			Symbol s = (Symbol) ctx.first.getFirst();
+		while (ctx.getTokens() != null && isProductOperator(ctx.getTokens().getFirst())) {
+			Symbol s = (Symbol) ctx.getTokens().getFirst();
 			String operatorName = s.name;
-			ctx.first = ctx.first.getRest();
+			ctx.setTokens(ctx.getTokens().getRest());
 			TypedAST argument = parseApplication(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
@@ -267,10 +264,10 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseSum(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseProduct(ctx, expected);
 		
-		while (ctx.first != null && isSumOperator(ctx.first.getFirst())) {
-			Symbol s = (Symbol) ctx.first.getFirst();
+		while (ctx.getTokens() != null && isSumOperator(ctx.getTokens().getFirst())) {
+			Symbol s = (Symbol) ctx.getTokens().getFirst();
 			String operatorName = s.name;
-			ctx.first = ctx.first.getRest();
+			ctx.setTokens(ctx.getTokens().getRest());
 			TypedAST argument = parseProduct(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
@@ -281,10 +278,10 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseRelationalOps(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseSum(ctx, expected);
 		
-		while (ctx.first != null && isRelationalOperator(ctx.first.getFirst())) {
-			Symbol s = (Symbol) ctx.first.getFirst();
+		while (ctx.getTokens() != null && isRelationalOperator(ctx.getTokens().getFirst())) {
+			Symbol s = (Symbol) ctx.getTokens().getFirst();
 			String operatorName = s.name;
-			ctx.first = ctx.first.getRest();
+			ctx.setTokens(ctx.getTokens().getRest());
 			TypedAST argument = parseSum(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
@@ -295,10 +292,10 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseAnd(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseRelationalOps(ctx, expected);
 		
-		while (ctx.first != null && isAndOperator(ctx.first.getFirst())) {
-			Symbol s = (Symbol) ctx.first.getFirst();
+		while (ctx.getTokens() != null && isAndOperator(ctx.getTokens().getFirst())) {
+			Symbol s = (Symbol) ctx.getTokens().getFirst();
 			String operatorName = s.name;
-			ctx.first = ctx.first.getRest();
+			ctx.setTokens(ctx.getTokens().getRest());
 			TypedAST argument = parseRelationalOps(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
@@ -309,10 +306,10 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	private TypedAST parseOr(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseAnd(ctx, expected);
 		
-		while (ctx.first != null && isOrOperator(ctx.first.getFirst())) {
-			Symbol s = (Symbol) ctx.first.getFirst();
+		while (ctx.getTokens() != null && isOrOperator(ctx.getTokens().getFirst())) {
+			Symbol s = (Symbol) ctx.getTokens().getFirst();
 			String operatorName = s.name;
-			ctx.first = ctx.first.getRest();
+			ctx.setTokens(ctx.getTokens().getRest());
 			TypedAST argument = parseAnd(ctx, expected);
 			ast = new Invocation(ast, operatorName, argument, s.getLocation());
 		}
@@ -322,9 +319,9 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	
 	private TypedAST parseEquals(CompilationContext ctx, Type expected) {
 		TypedAST ast = parseOr(ctx, expected);
-		while (ctx.first != null && isEqualsOperator(ctx.first.getFirst())) {
-			Symbol s = (Symbol) ctx.first.getFirst();			
-			ctx.first = ctx.first.getRest();
+		while (ctx.getTokens() != null && isEqualsOperator(ctx.getTokens().getFirst())) {
+			Symbol s = (Symbol) ctx.getTokens().getFirst();
+			ctx.setTokens(ctx.getTokens().getRest());
 			TypedAST value = parseOr(ctx, expected);
 			ast = new Assignment(ast, value, s.getLocation());
 		}
@@ -343,7 +340,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 
 		TypedAST ast = parseEquals(ctx, expected);
 
-		while (ctx.first != null && ParseUtils.checkFirst(",", ctx)) {
+		while (ctx.getTokens() != null && ParseUtils.checkFirst(",", ctx)) {
 			FileLocation commaLine = ParseUtils.parseSymbol(",",ctx).getLocation();
 			TypedAST remaining = parseTuple(ctx, tuple);
 			ast = new TupleObject(ast, remaining, commaLine);
@@ -355,7 +352,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
     private TypedAST parseDSL(CompilationContext ctx, Type expected) {
         TypedAST ast = parseTuple(ctx, expected);
 
-        if (this.dslToken != null && ctx.first != null) {
+        if (this.dslToken != null && ctx.getTokens() != null) {
             dslToken.setDef(dslToken.getExpected().getParser().parse(ast, ctx));
         }
 
@@ -415,8 +412,8 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 	public TypedAST visit(ExpressionSequence node, Environment env) {
 		CompilationContext ctx = new CompilationContext(node, env);
 		TypedAST result = parseDSL(ctx, expected); // Start trying with the lowest precedence operator.
-		if (ctx.first != null)
-			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.first.getFirst()!=null)?ctx.first.getFirst().toString():null, ctx.first);
+		if (ctx.getTokens() != null)
+			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.getTokens().getFirst()!=null)? ctx.getTokens().getFirst().toString():null, ctx.getTokens());
 		return result;
 	}
 

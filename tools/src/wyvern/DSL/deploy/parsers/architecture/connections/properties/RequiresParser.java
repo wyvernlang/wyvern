@@ -19,14 +19,14 @@ public class RequiresParser extends ConnectionPropertyParser {
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final CompilationContext ctx) {
 		final RequiresProperty rp = new RequiresProperty(null, null);
-		final ExpressionSequence es = ctx.first;
+		final ExpressionSequence es = ctx.getTokens();
 
-		ctx.second = rp.extend(ctx.second);
+		ctx.setEnv(rp.extend(ctx.getEnv()));
 
 		final Pair<Environment, ContParser> predicate = ParseUtils.parseCondPartial(ctx);
 		final Pair<Environment, ContParser> body = RequiresParser.super.iParse(ctx);
 
-		ctx.first = null;
+		ctx.setTokens(null);
 		return new Pair<Environment, ContParser>(
 			body.first.extend(rp.extend(Environment.getEmptyEnvironment())),
 			new ContParser() {

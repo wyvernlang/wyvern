@@ -6,7 +6,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -23,7 +22,7 @@ public class VarParser implements DeclParser {
 	@Override
 	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
 	}
 
 
@@ -33,33 +32,33 @@ public class VarParser implements DeclParser {
 		final String varName = ParseUtils.parseSymbol(ctx).name;
 		
 		if (ParseUtils.checkFirst("=", ctx)) {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 			return null;	
 		} else if (ParseUtils.checkFirst(":", ctx)) {
 			parseSymbol(":", ctx);
 			final Type parsedType = ParseUtils.parseType(ctx);
 			
-			final CompilationContext restctx = new CompilationContext(ctx.first,ctx.second);
-			ctx.first = null;
+			final CompilationContext restctx = new CompilationContext(ctx.getTokens(), ctx.getEnv());
+			ctx.setTokens(null);
 			
 			final VarDeclaration intermvd = new VarDeclaration(varName, parsedType, null);
 			
 			return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment().extend(new NameBindingImpl(varName, parsedType)), new ContParser(){
                 @Override
 				public TypedAST parse(EnvironmentResolver r) {
-					if (restctx.first == null)
+					if (restctx.getTokens() == null)
 						return new VarDeclaration(varName, parsedType, null);
 					else if (ParseUtils.checkFirst("=", restctx)) {
 						ParseUtils.parseSymbol("=", restctx);
-						CompilationContext ctxi = new CompilationContext(restctx.first, r.getEnv(intermvd));
+						CompilationContext ctxi = new CompilationContext(restctx.getTokens(), r.getEnv(intermvd));
 						return new VarDeclaration(varName, parsedType, ParseUtils.parseExpr(restctx));
 					} else {
-						ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+						ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 						return null;
 					}
 				}});
 		} else {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 			return null;
 		}
 	}

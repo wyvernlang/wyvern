@@ -2,7 +2,6 @@ package wyvern.tools.parsing;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
@@ -87,8 +86,8 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 	}
 	
 	private Pair<Environment,ContParser> parseLineInt(CompilationContext ctx) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
@@ -103,7 +102,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		DeclParser dp = (DeclParser)parser;
 		
 		ExpressionSequence rest = node.getRest();
-		ctx.first = rest;
+		ctx.setTokens(rest);
 		
 		if (parser == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);

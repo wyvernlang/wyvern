@@ -6,7 +6,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -15,12 +14,9 @@ import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.TreeWriter;
 
 public class TypeParser implements DeclParser, TypeExtensionParser {
 	private TypeParser() { }
@@ -56,7 +52,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 	@Override
 	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
 	}
 	
 	@Override
@@ -67,7 +63,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 		FileLocation clsNameLine = s.getLocation();
 		
 		final MutableTypeDeclaration mtd = new MutableTypeDeclaration(clsName, clsNameLine);
-		Environment newEnv = mtd.extend(ctx.second);
+		Environment newEnv = mtd.extend(ctx.getEnv());
 		newEnv = newEnv.extend(new TypeBinding("class", mtd.getType()));
 		
 		final LineSequence body = ParseUtils.extractLines(ctx);

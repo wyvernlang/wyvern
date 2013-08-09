@@ -3,7 +3,6 @@ package wyvern.tools.parsing.extensions;
 import java.util.LinkedList;
 
 import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -18,12 +17,9 @@ import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.rawAST.Unit;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
@@ -70,22 +66,22 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 	}
 
 	private Pair<TypedAST, LineParser> getParser(CompilationContext ctx) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
 		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
-		ctx.first = ctx.first.getRest();
+		ctx.setTokens(ctx.getTokens().getRest());
 
 		return new Pair<>(first, first.getLineParser());
 	}
 
 	private Pair<Environment,ContParser> parseLineInt(CompilationContext ctx) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
@@ -100,7 +96,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		DeclParser dp = (DeclParser)parser;
 
 		ExpressionSequence rest = node.getRest();
-		ctx.first = rest;
+		ctx.setTokens(rest);
 
 		if (parser == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);

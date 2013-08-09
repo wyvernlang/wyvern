@@ -141,7 +141,7 @@ public class JavaInteropTests {
 				"JImport wyvern.tools.rawAST.ExpressionSequence as ExpressionSequence\n" +
 				"JImport wyvern.tools.typedAST.interfaces.TypedAST as TypedAST\n" +
 				"JImport wyvern.tools.types.Environment as Environment\n" +
-				"JImport wyvern.tools.util.Pair as Pair\n" +
+				"JImport wyvern.tools.util.CompilationContext as CompilationContext\n" +
 				"JImport wyvern.tools.parsing.ParseUtils as ParseUtils\n" +
 				"JImport wyvern.tools.types.Type as Type\n" +
 				"JImport wyvern.tools.typedAST.interfaces.Value as Value\n" +
@@ -165,7 +165,7 @@ public class JavaInteropTests {
 				"			env = env\n" +
 				"class LazyParser\n" +
 				"	class def create() : LazyParser = new\n" +
-				"	def parse(first : TypedAST, ctx : Pair) : TypedAST =\n" +
+				"	def parse(first : TypedAST, ctx : CompilationContext) : TypedAST =\n" +
 				"		ParseUtils.parseExpr(ctx)\n" +
 				"LazyParser.create()";
 		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());

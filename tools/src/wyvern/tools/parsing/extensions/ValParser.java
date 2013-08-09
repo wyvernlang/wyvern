@@ -9,7 +9,6 @@ import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -34,7 +33,7 @@ public class ValParser implements DeclParser {
     @Override
     public TypedAST parse(TypedAST first, CompilationContext ctx) {
         Pair<Environment, ContParser> p = parseDeferred(first, ctx);
-        return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+        return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
     }
 
 
@@ -57,17 +56,17 @@ public class ValParser implements DeclParser {
 
         BodyParser.getInstance().setExpected(type);
 
-        final CompilationContext restctx = new CompilationContext(ctx.first, ctx.second);
-        ctx.first = null;
+        final CompilationContext restctx = new CompilationContext(ctx.getTokens(), ctx.getEnv());
+        ctx.setTokens(null);
 
         ValDeclaration nc = null;
-        if (restctx.first == null)
+        if (restctx.getTokens() == null)
             nc = new ValDeclaration(valName, type, null, valNameLocation);
         else if (ParseUtils.checkFirst("=", restctx)) {
             ParseUtils.parseSymbol("=", restctx);
             nc = new ValDeclaration(valName, new UnresolvedType("Dummy"), null, valNameLocation);
         } else {
-            ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, restctx.first);
+            ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, restctx.getTokens());
             nc = null;
         }
         final Type parsedType = type;
@@ -80,9 +79,9 @@ public class ValParser implements DeclParser {
                     public TypedAST parse(EnvironmentResolver r) {
                         TypedAST definition = null;
                         Type type = null;
-                        if (restctx.first != null) {
+                        if (restctx.getTokens() != null) {
                             definition = ParseUtils.parseExpr(restctx);
-                            type = definition.typecheck(ctx.second);
+                            type = definition.typecheck(ctx.getEnv());
                         } else {
                             type = parsedType;
                         }

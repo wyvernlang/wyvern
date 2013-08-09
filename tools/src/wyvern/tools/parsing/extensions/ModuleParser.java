@@ -141,7 +141,7 @@ public class ModuleParser implements DeclParser {
         Pair<Environment,ContParser> result = new Pair<>(newEnv, null);
         resolved.put(name, result);
 
-        if (ctx.first == null) {
+        if (ctx.getTokens() == null) {
             result.second = new ContParser() {
 
 				@Override
@@ -208,7 +208,7 @@ public class ModuleParser implements DeclParser {
 	@Override
 	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> ret = parseDeferred(first, ctx);
-		return ret.second.parse(new ContParser.SimpleResolver(ret.first.extend(ctx.second)));
+		return ret.second.parse(new ContParser.SimpleResolver(ret.first.extend(ctx.getEnv())));
 	}
 
 	public static class MutableModuleDeclaration extends ModuleDeclaration {

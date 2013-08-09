@@ -6,7 +6,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.Sequence;
@@ -19,7 +18,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.util.CompilationContext;
-import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class IfParser implements LineParser {
@@ -108,13 +106,13 @@ public class IfParser implements LineParser {
 		public TypedAST parse(TypedAST first,
 							  CompilationContext ctx) {
 			TypedAST clause = new BooleanConstant(true);
-            CompilationContext ictx = new CompilationContext(ctx.first, ctx.second.getExternalEnv());
+            CompilationContext ictx = new CompilationContext(ctx.getTokens(), ctx.getEnv().getExternalEnv());
 			if (ParseUtils.checkFirst("if",ictx)) {
 				ParseUtils.parseSymbol("if", ictx);
 				clause = ParseUtils.parseCond(ictx);
 			}
 			TypedAST body = ParseUtils.extractLines(ictx).accept(BodyParser.getInstance(), env);
-            ctx.first = ictx.first;
+            ctx.setTokens(ictx.getTokens());
 			return new IfClause(clause,body,false);
 		}
 	}
@@ -125,10 +123,10 @@ public class IfParser implements LineParser {
 		TypedAST thenClause = ParseUtils.parseCond(ctx);
 		
 		Environment bodyEnv = Environment.getEmptyEnvironment();
-		bodyEnv = bodyEnv.extend(new KeywordNameBinding("then", new Keyword(new ThenParser(thenClause,ctx.second))));
-		bodyEnv = bodyEnv.extend(new KeywordNameBinding("else", new Keyword(new ElseParser(ctx.second))));
+		bodyEnv = bodyEnv.extend(new KeywordNameBinding("then", new Keyword(new ThenParser(thenClause, ctx.getEnv()))));
+		bodyEnv = bodyEnv.extend(new KeywordNameBinding("else", new Keyword(new ElseParser(ctx.getEnv()))));
 		
-		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.second.setInternalEnv(bodyEnv));
+		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.getEnv().setInternalEnv(bodyEnv));
 		LinkedList<IfExpr.IfClause> result = new LinkedList<IfExpr.IfClause>();
 		if (body instanceof IfClause) {
 			if (!((IfClause)body).getIsThen())

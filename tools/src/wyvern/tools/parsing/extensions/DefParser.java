@@ -8,14 +8,12 @@ import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.Parenthesis;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.parsing.ParseUtils.*;
@@ -49,7 +47,7 @@ public class DefParser implements DeclParser {
 	
 	public TypedAST parse(TypedAST first, CompilationContext ctx, boolean isClassMeth) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx, isClassMeth);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
 	}
 
 	@Override
@@ -75,9 +73,9 @@ public class DefParser implements DeclParser {
 			
 			argumentsPresent = true;
 			Parenthesis paren = ParseUtils.extractParen(ctx);
-			CompilationContext newCtx = new CompilationContext(paren, ctx.second);
+			CompilationContext newCtx = new CompilationContext(paren, ctx.getEnv());
 
-			while (newCtx.first != null && !newCtx.first.children.isEmpty()) {
+			while (newCtx.getTokens() != null && !newCtx.getTokens().children.isEmpty()) {
 				if (args.size() > 0)
 					ParseUtils.parseSymbol(",", newCtx);
 					
@@ -107,18 +105,18 @@ public class DefParser implements DeclParser {
 		final ExpressionSequence exp;
 		int type = 0;
 		
-		if (ctx.first == null) {
+		if (ctx.getTokens() == null) {
 			// Empty body is OK - say inside type.
 			exp = null;
 		} else if (ParseUtils.checkFirst("=",ctx)) {
 			ParseUtils.parseSymbol("=",ctx);
-			exp = ctx.first;
+			exp = ctx.getTokens();
 		} else {
-			exp = ctx.first;
+			exp = ctx.getTokens();
 		}
 		
 		
-		ctx.first = null; // don't forget to reset!
+		ctx.setTokens(null); // don't forget to reset!
 		
 		final Type defType;
 		if (argumentsPresent) {

@@ -6,7 +6,6 @@ import wyvern.DSL.deploy.types.EndpointType;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.parsing.TypeParser;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -25,13 +24,13 @@ public class DomainParser extends ConnectionPropertyParser {
 	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final CompilationContext ctx) {
 		final DomainProperty dp = new DomainProperty(null, null, null);
 		final CompilationContext ext =
-				new CompilationContext(ctx.first, dp.extend(ctx.second));
+				new CompilationContext(ctx.getTokens(), dp.extend(ctx.getEnv()));
 
 		//final Arrow domainT = (Arrow) ParseUtils.parseType(ctx);
 		final ParseUtils.LazyEval<Type> lazyType = TypeParser.parsePartialType(ctx);
 		final Pair<Environment, ContParser> body = DomainParser.super.iParse(ctx);
 
-		ctx.first = null;
+		ctx.setTokens(null);
 		return new Pair<Environment, ContParser>(
 			body.first.extend(Environment.getEmptyEnvironment()),
 			new ContParser() {

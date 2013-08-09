@@ -10,11 +10,9 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -38,7 +36,7 @@ public class PropParser implements DeclParser {
 	@Override
 	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
 	}
 
 	@Override

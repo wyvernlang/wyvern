@@ -8,14 +8,30 @@ import wyvern.tools.types.Environment;
  */
 public class CompilationContext {
 	public CompilationContext(ExpressionSequence f, Environment s) {
-		first = f;
-		second = s;
+		setTokens(f);
+		setEnv(s);
 	}
 
-	public ExpressionSequence first;
-	public Environment second;
+	private ExpressionSequence tokens;
+	private Environment env;
 
 	public String toString() {
-		return "<" + first + "," + second + ">";
+		return "<" + getTokens() + "," + getEnv() + ">";
+	}
+
+	public ExpressionSequence getTokens() {
+		return tokens;
+	}
+
+	public void setTokens(ExpressionSequence tokens) {
+		this.tokens = tokens;
+	}
+
+	public Environment getEnv() {
+		return env;
+	}
+
+	public void setEnv(Environment env) {
+		this.env = env;
 	}
 }
