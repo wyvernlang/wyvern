@@ -6,12 +6,7 @@ import java.util.List;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.rawAST.ExpressionSequence;
-import wyvern.tools.rawAST.Line;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.rawAST.Parenthesis;
-import wyvern.tools.rawAST.RawAST;
-import wyvern.tools.rawAST.Symbol;
+import wyvern.tools.rawAST.*;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.expressions.Variable;
@@ -123,6 +118,13 @@ public class ParseUtils {
 		ParseUtils.parseSymbol(":", ctx);
 		returnType = ParseUtils.parseType(ctx);
 		return returnType;
+	}
+
+	public static String parseStringLiteral(CompilationContext ctx) {
+		RawAST elem = peekFirst(ctx);
+		if (!(elem instanceof StringLiteral))
+			return null;
+		return ((StringLiteral) elem).data;
 	}
 
 	public interface LazyEval<T> {

@@ -56,8 +56,7 @@ public class ValParser implements DeclParser {
 
         BodyParser.getInstance().setExpected(type);
 
-        final CompilationContext restctx = new CompilationContext(ctx.getTokens(), ctx.getEnv());
-        ctx.setTokens(null);
+        final CompilationContext restctx = ctx.copyAndClear();
 
         ValDeclaration nc = null;
         if (restctx.getTokens() == null)

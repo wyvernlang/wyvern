@@ -34,4 +34,10 @@ public class CompilationContext {
 	public void setEnv(Environment env) {
 		this.env = env;
 	}
+
+	public CompilationContext copyAndClear() {
+		CompilationContext newCtx = new CompilationContext(tokens, env);
+		tokens = null;
+		return newCtx;
+	}
 }

@@ -38,8 +38,7 @@ public class VarParser implements DeclParser {
 			parseSymbol(":", ctx);
 			final Type parsedType = ParseUtils.parseType(ctx);
 			
-			final CompilationContext restctx = new CompilationContext(ctx.getTokens(), ctx.getEnv());
-			ctx.setTokens(null);
+			final CompilationContext restctx = ctx.copyAndClear();
 			
 			final VarDeclaration intermvd = new VarDeclaration(varName, parsedType, null);
 			
