@@ -20,15 +20,13 @@ public class ModuleTests {
 
 		ArrayList<String> strs = new ArrayList<>();
         strs.add(
-				"module M1\n" +
-				"	import \"input:1\" as MI2\n" +
-				"	class C1\n" +
-				"		class def t() : MI2.M2.C2 = MI2.M2.C2.create()");
+				"import \"input:1\" as MI2\n" +
+				"class C1\n" +
+				"	class def t() : MI2.M2.C2 = MI2.M2.C2.create()");
         strs.add("" +
-				"module M2\n" +
-				"	class C2\n" +
-				"		class def create() : C2 = new\n" +
-                "		def n():Int = 3\n");
+				"class C2\n" +
+				"	class def create() : C2 = new\n" +
+                "	def n():Int = 3\n");
         TypedAST pair = Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		pair.typecheck(Environment.getEmptyEnvironment());
 	}

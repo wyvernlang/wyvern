@@ -36,7 +36,6 @@ public class Globals {
 		env = env.extend(new KeywordNameBinding("new", new Keyword(NewParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("if", new Keyword(IfParser.getInstance())));
 		env = env.extend(new KeywordNameBinding("while", new Keyword(WhileParser.getInstance())));
-        env = env.extend(new KeywordNameBinding("module", new Keyword(ModuleParser.getInstance())));
 		
 		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
