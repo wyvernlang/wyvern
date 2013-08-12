@@ -32,6 +32,11 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		this.declEnv = new AtomicReference<>(declEnv);
 		this.name = name;
 	}
+
+	public TypeType(String name, AtomicReference<Environment> declEnv) {
+		this.declEnv = declEnv;
+		this.name = name;
+	}
 	
 	public TypeDeclaration getDecl() {
 		return this.decl;

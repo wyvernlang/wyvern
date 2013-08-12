@@ -17,13 +17,28 @@ import wyvern.tools.util.Pair;
 public class ModuleTests {
 	@Test
 	public void testSimpleModule() {
-
 		ArrayList<String> strs = new ArrayList<>();
         strs.add(
 				"import \"input:1\" as MI2\n" +
 				"class C1\n" +
 				"	class def t() : MI2.C2 = MI2.C2.create()");
         strs.add("" +
+				"class C2\n" +
+				"	class def create() : C2 = new\n" +
+                "	def n():Int = 3\n");
+        TypedAST pair = Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		pair.typecheck(Environment.getEmptyEnvironment());
+	}
+
+	@Test
+	public void testMutualRecusionFail() {
+		ArrayList<String> strs = new ArrayList<>();
+        strs.add(
+				"import \"input:1\" as MI2\n" +
+				"class C1\n" +
+				"	class def t() : MI2.C2 = MI2.C2.create()");
+        strs.add("" +
+				"import \"input:0\" as MI1\n" +
 				"class C2\n" +
 				"	class def create() : C2 = new\n" +
                 "	def n():Int = 3\n");

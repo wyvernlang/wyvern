@@ -19,13 +19,19 @@ public class ImportDeclaration extends Declaration {
 	private String equivName;
 	private FileLocation location;
 	private TypeType equivType;
+	private AtomicReference<Environment> declEnv = new AtomicReference<>();
 	private TypedAST ref;
 
 	public ImportDeclaration(String src, String equivName, Environment externalEnv, FileLocation location) {
 		this.src = src;
 		this.equivName = equivName;
 		this.location = location;
-		equivType = new TypeType(equivName, externalEnv);
+		declEnv = new AtomicReference<>(externalEnv);
+		equivType = new TypeType(equivName, declEnv);
+	}
+
+	protected void setDeclEnv(Environment env) {
+		declEnv.set(env);
 	}
 
 	public void setAST(TypedAST ref) {
@@ -80,5 +86,9 @@ public class ImportDeclaration extends Declaration {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	public TypedAST getAST() {
+		return ref;
 	}
 }

@@ -1,9 +1,13 @@
 package wyvern.stdlib;
 
+import com.sun.org.apache.xpath.internal.functions.FuncExtFunction;
 import wyvern.DSL.DSL;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclarationParser;
 import wyvern.tools.parsing.RecordTypeParser;
+import wyvern.tools.parsing.transformers.TypedASTTransformer;
+import wyvern.tools.parsing.transformers.stdlib.IdentityTranformer;
+import wyvern.tools.parsing.transformers.stdlib.ImportChecker;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -59,13 +63,25 @@ public class Compiler {
         String name = url.getPath();
         String source = ImportCompileResolver.getInstance().lookupReader(url);
 		final Pair<Environment, ContParser> parserPair = compileSourcePartial(name, source, dsls);
-		return new Pair<Environment, ContParser>(parserPair.first, new ContParser() {
+		return new Pair<Environment, ContParser>(parserPair.first, new RecordTypeParser() {
 			private TypedAST cached = null;
 			@Override
 			public TypedAST parse(EnvironmentResolver r) {
 				if (cached == null)
 					cached = parserPair.second.parse(r);
 				return cached;
+			}
+
+			@Override
+			public void parseTypes(EnvironmentResolver r) {
+				if (parserPair.second instanceof RecordTypeParser)
+					((RecordTypeParser) parserPair.second).parseTypes(r);
+			}
+
+			@Override
+			public void parseInner(EnvironmentResolver r) {
+				if (parserPair.second instanceof RecordTypeParser)
+					((RecordTypeParser) parserPair.second).parseInner(r);
 			}
 		});
     }
@@ -102,10 +118,15 @@ public class Compiler {
 		return result;
     }
 
-    public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls) {
+    public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls, TypedASTTransformer xformer) {
         ImportCompileResolver.getInstance().setCommandRefs(files);
-        return compileSource(startupname, files.get(0), dsls);
+        return new ImportChecker(xformer).transform(compileSource(startupname, files.get(0), dsls));
     }
+
+	public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls) {
+		return compileSources(startupname, files, dsls, new IdentityTranformer());
+	}
+
 
 
 
