@@ -106,7 +106,7 @@ public class IfParser implements LineParser {
 		public TypedAST parse(TypedAST first,
 							  CompilationContext ctx) {
 			TypedAST clause = new BooleanConstant(true);
-            CompilationContext ictx = new CompilationContext(ctx.getTokens(), ctx.getEnv().getExternalEnv());
+            CompilationContext ictx = ctx.copyTokens(ctx.getEnv().getExternalEnv());
 			if (ParseUtils.checkFirst("if",ictx)) {
 				ParseUtils.parseSymbol("if", ictx);
 				clause = ParseUtils.parseCond(ictx);

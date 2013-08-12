@@ -73,7 +73,7 @@ public class DefParser implements DeclParser {
 			
 			argumentsPresent = true;
 			Parenthesis paren = ParseUtils.extractParen(ctx);
-			CompilationContext newCtx = new CompilationContext(paren, ctx.getEnv());
+			CompilationContext newCtx = ctx.copyEnv(paren);
 
 			while (newCtx.getTokens() != null && !newCtx.getTokens().children.isEmpty()) {
 				if (args.size() > 0)

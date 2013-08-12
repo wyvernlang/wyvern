@@ -90,7 +90,7 @@ public class ParseUtils {
 
 	public static List<NameBinding> getNameBindings(CompilationContext ctx) {
 		Parenthesis paren = ParseUtils.extractParen(ctx);
-		CompilationContext newCtx = new CompilationContext(paren, ctx.getEnv());
+		CompilationContext newCtx = ctx.copyEnv(paren);
 		List<NameBinding> args = new ArrayList<NameBinding>();
 
 		while (newCtx.getTokens() != null && !newCtx.getTokens().children.isEmpty()) {

@@ -24,7 +24,7 @@ public class ConnectionParser implements DeclParser {
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
-		CompilationContext innerCtx = new CompilationContext(ctx.getTokens(), ctx.getEnv().getExternalEnv());
+		CompilationContext innerCtx = ctx.copyTokens(ctx.getEnv().getExternalEnv());
 		List<NameBinding> args = ParseUtils.getNameBindings(innerCtx);
 		Type returnType = ParseUtils.parseReturnType(innerCtx);
 		ctx.setTokens(innerCtx.getTokens());

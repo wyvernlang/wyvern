@@ -23,7 +23,7 @@ public class AttributeParser implements LineParser {
 			if (ctx.getTokens().getFirst() instanceof LineSequence) { // All args on individual lines.
 				LineSequence lines = ParseUtils.extractLines(ctx);
 				for (RawAST line : lines) {
-					CompilationContext ctxl = new CompilationContext((ExpressionSequence)line, ctx.getEnv());
+					CompilationContext ctxl = ctx.copyEnv((ExpressionSequence)line);
 					String name = ParseUtils.parseSymbol(ctxl).name;
 					ParseUtils.parseSymbol("=", ctxl);
 					TypedAST value = ParseUtils.parseExpr(ctxl);

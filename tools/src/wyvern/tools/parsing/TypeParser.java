@@ -87,7 +87,7 @@ public class TypeParser {
 
 			};
 		} else if (first instanceof Parenthesis) {
-			return parsePartialType(new CompilationContext((Parenthesis) first, ctx.getEnv()));
+			return parsePartialType(ctx.copyEnv((Parenthesis) first));
 		} else {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 			return null; // Unreachable.

@@ -1,6 +1,8 @@
 package wyvern.tools.util;
 
 import wyvern.tools.rawAST.ExpressionSequence;
+import wyvern.tools.rawAST.RawAST;
+import wyvern.tools.rawAST.StringLiteral;
 import wyvern.tools.types.Environment;
 
 /**
@@ -39,5 +41,19 @@ public class CompilationContext {
 		CompilationContext newCtx = new CompilationContext(tokens, env);
 		tokens = null;
 		return newCtx;
+	}
+
+	public CompilationContext copyTokens(Environment newEnvironment) {
+		return new CompilationContext(tokens, newEnvironment);
+	}
+
+	public CompilationContext copyEnv(ExpressionSequence tokens) {
+		return new CompilationContext(tokens, env);
+	}
+
+	public RawAST popToken() {
+		RawAST result = tokens.getFirst();
+		tokens = tokens.getRest();
+		return result;
 	}
 }

@@ -24,7 +24,7 @@ public class DomainParser extends ConnectionPropertyParser {
 	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final CompilationContext ctx) {
 		final DomainProperty dp = new DomainProperty(null, null, null);
 		final CompilationContext ext =
-				new CompilationContext(ctx.getTokens(), dp.extend(ctx.getEnv()));
+				ctx.copyTokens(dp.extend(ctx.getEnv()));
 
 		//final Arrow domainT = (Arrow) ParseUtils.parseType(ctx);
 		final ParseUtils.LazyEval<Type> lazyType = TypeParser.parsePartialType(ctx);

@@ -49,7 +49,7 @@ public class VarParser implements DeclParser {
 						return new VarDeclaration(varName, parsedType, null);
 					else if (ParseUtils.checkFirst("=", restctx)) {
 						ParseUtils.parseSymbol("=", restctx);
-						CompilationContext ctxi = new CompilationContext(restctx.getTokens(), r.getEnv(intermvd));
+						CompilationContext ctxi = restctx.copyTokens(r.getEnv(intermvd));
 						return new VarDeclaration(varName, parsedType, ParseUtils.parseExpr(restctx));
 					} else {
 						ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
