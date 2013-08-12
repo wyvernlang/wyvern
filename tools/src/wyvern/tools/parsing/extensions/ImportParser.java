@@ -23,6 +23,15 @@ import java.util.ArrayList;
  */
 public class ImportParser implements DeclParser {
 
+	private static LineParser instance;
+
+	public static LineParser getInstance() {
+		if (instance == null)
+			instance = new ImportParser();
+		return instance;
+	}
+	private ImportParser() {}
+
 	@Override
 	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		throw new RuntimeException();

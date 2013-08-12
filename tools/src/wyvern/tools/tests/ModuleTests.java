@@ -22,7 +22,7 @@ public class ModuleTests {
         strs.add(
 				"import \"input:1\" as MI2\n" +
 				"class C1\n" +
-				"	class def t() : MI2.M2.C2 = MI2.M2.C2.create()");
+				"	class def t() : MI2.C2 = MI2.C2.create()");
         strs.add("" +
 				"class C2\n" +
 				"	class def create() : C2 = new\n" +

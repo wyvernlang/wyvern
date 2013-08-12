@@ -58,7 +58,16 @@ public class Compiler {
     public static Pair<Environment, ContParser> compilePartial(URI url, List<DSL> dsls) throws IOException {
         String name = url.getPath();
         String source = ImportCompileResolver.getInstance().lookupReader(url);
-        return compileSourcePartial(name, source, dsls);
+		final Pair<Environment, ContParser> parserPair = compileSourcePartial(name, source, dsls);
+		return new Pair<Environment, ContParser>(parserPair.first, new ContParser() {
+			private TypedAST cached = null;
+			@Override
+			public TypedAST parse(EnvironmentResolver r) {
+				if (cached == null)
+					cached = parserPair.second.parse(r);
+				return cached;
+			}
+		});
     }
 
     public static Pair<Environment, ContParser> compileSourcePartial(String startupname, List<String> files, List<DSL> dsls) {
