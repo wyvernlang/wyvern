@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Compiler;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.RecordTypeParser;
 import wyvern.tools.typedAST.interfaces.TypedAST;

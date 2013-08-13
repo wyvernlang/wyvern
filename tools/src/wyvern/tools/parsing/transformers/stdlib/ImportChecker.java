@@ -19,11 +19,20 @@ public class ImportChecker extends TransformerBase<TypedAST> {
 	}
 
 	private HashSet<TypedAST> visited = new HashSet<>();
+	private static class Node {
+		private LinkedList<Node> links;
+		private TypedAST ast;
+
+		private Node(TypedAST ast, LinkedList<Node> links) {
+			this.links = links;
+			this.ast = ast;
+		}
+	}
 
 	@Override
 	protected TypedAST doTransform(TypedAST transform) {
 		if (visited.contains(transform))
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, transform);
+			ToolError.reportError(ErrorMessage.MUTUALLY_RECURSIVE_IMPORTS, transform.toString(), transform);
 		visited.add(transform);
 		findDeclarations(transform);
 		return transform;
