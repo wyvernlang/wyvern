@@ -28,10 +28,11 @@ public class ModuleTests {
 				"	class def create() : C2 = new\n" +
                 "	def n():Int = 3\n");
         TypedAST pair = Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		Compiler.flush();
 		pair.typecheck(Environment.getEmptyEnvironment());
 	}
 
-	@Test
+	@Test(expected = ToolError.class)
 	public void testMutualRecusionFail() {
 		ArrayList<String> strs = new ArrayList<>();
         strs.add(
@@ -44,6 +45,7 @@ public class ModuleTests {
 				"	class def create() : C2 = new\n" +
                 "	def n():Int = 3\n");
         TypedAST pair = Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		Compiler.flush();
 		pair.typecheck(Environment.getEmptyEnvironment());
 	}
 

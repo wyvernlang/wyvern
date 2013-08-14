@@ -39,6 +39,11 @@ public class Compiler {
     private static HashMap<String, Pair<Environment, ContParser>> parseCache = new HashMap<>();
 	private static HashMap<String, TypedAST> parsedASTs = new HashMap<>();
 
+	public static void flush() {
+		parseCache.clear();
+		parsedASTs.clear();
+	}
+
     private static Environment getParseEnv(List<DSL> dsls) {
         Environment parseEnv = Globals.getStandardEnv();
         for (DSL dsl : dsls)
@@ -85,7 +90,8 @@ public class Compiler {
             ((RecordTypeParser) pair.second).parseTypes(r);
             ((RecordTypeParser)pair.second).parseInner(r);
         }
-        return pair.second.parse(r);
+		TypedAST parsed = pair.second.parse(r);
+		return parsed;
     }
 
     public static TypedAST compileSource(String name, String source, List<DSL> dsls) {

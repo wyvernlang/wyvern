@@ -28,7 +28,7 @@ public enum ErrorMessage {
 	CANNOT_INVOKE("Cannot invoke operations on the value %ARG", 1),
 
 	//Verification errors
-	MUTUALLY_RECURSIVE_IMPORTS("Structure %ARG is mutually recursive", 1),
+	IMPORT_CYCLE("Import cycles have been found, with cycles\n%ARG", 1),
 	
 	;// end of error list
 	
