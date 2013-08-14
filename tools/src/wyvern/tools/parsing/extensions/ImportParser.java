@@ -1,6 +1,8 @@
 package wyvern.tools.parsing.extensions;
 
 import wyvern.DSL.DSL;
+import wyvern.stdlib.*;
+import wyvern.stdlib.Compiler;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -15,6 +17,7 @@ import wyvern.tools.util.Pair;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by Ben Chung on 8/9/13.
@@ -67,8 +70,18 @@ public class ImportParser implements DeclParser {
 				if (parsed)
 					return declaration;
 				parsed = true;
+
+				//Check for recursive call
+				if (parserPair.second instanceof Compiler.CachingParser) {
+					Compiler.CachingParser cachingParser = (Compiler.CachingParser) parserPair.second;
+					if (cachingParser.recursiveCall()) {
+						declaration.setASTRef(cachingParser.getRef());
+						return declaration;
+					}
+				}
+
 				TypedAST result = parserPair.second.parse(r);
-				declaration.setAST(result);
+				declaration.setASTRef(new AtomicReference<TypedAST>(result));
 				return declaration;
 			}
 

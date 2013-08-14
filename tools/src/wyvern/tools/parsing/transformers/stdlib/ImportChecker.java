@@ -19,6 +19,8 @@ public class ImportChecker extends TransformerBase<TypedAST> {
 	}
 
 	private HashSet<TypedAST> visited = new HashSet<>();
+	private HashMap<TypedAST, Node> graph = new HashMap<>();
+
 	private static class Node {
 		private LinkedList<Node> links;
 		private TypedAST ast;
@@ -31,20 +33,35 @@ public class ImportChecker extends TransformerBase<TypedAST> {
 
 	@Override
 	protected TypedAST doTransform(TypedAST transform) {
-		if (visited.contains(transform))
-			ToolError.reportError(ErrorMessage.MUTUALLY_RECURSIVE_IMPORTS, transform.toString(), transform);
-		visited.add(transform);
-		findDeclarations(transform);
+		Node ret = searchFile(transform);
 		return transform;
 	}
 
-	private void findDeclarations(TypedAST root) {
+	private Node searchFile(TypedAST file) {
+		LinkedList<Node> links = new LinkedList<>();
+		Node node = new Node(file, links);
+		graph.put(file, node);
+		searchImports(file, links);
+		return node;
+	}
+
+	private TypedAST searchImports(TypedAST transform, List<Node> imports) {
+		findDeclarations(transform, imports);
+		return transform;
+	}
+
+	private void findDeclarations(TypedAST root, List<Node> imports) {
 		if (root instanceof Sequence) {
 			for (TypedAST ast : (Sequence)root)
-				findDeclarations(ast);
+				searchImports(ast, imports);
 		}
 		if (root instanceof ImportDeclaration) {
-			doTransform(((ImportDeclaration) root).getAST());
+			TypedAST ast = ((ImportDeclaration) root).getAST().get();
+			if (graph.containsKey(ast)) {
+				imports.add(graph.get(ast));
+				return;
+			}
+			imports.add(searchFile(ast));
 		}
 	}
 }

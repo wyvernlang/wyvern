@@ -21,6 +21,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Compiler {
     private static String getMD5(String input) {
@@ -55,35 +56,21 @@ public class Compiler {
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
         Pair<Environment, ContParser> pair = parsedResult.accept(DeclarationParser.getInstance(), parseEnv);
+		final Pair<Environment, ContParser> finalPair = pair;
+		pair = wrapParser(finalPair);
         parseCache.put(md5, pair);
         return pair;
     }
 
-    public static Pair<Environment, ContParser> compilePartial(URI url, List<DSL> dsls) throws IOException {
+	private static Pair<Environment, ContParser> wrapParser(final Pair<Environment, ContParser> finalPair) {
+		return new Pair<Environment, ContParser>(finalPair.first, new CachingParser(finalPair));
+	}
+
+	public static Pair<Environment, ContParser> compilePartial(URI url, List<DSL> dsls) throws IOException {
         String name = url.getPath();
         String source = ImportCompileResolver.getInstance().lookupReader(url);
 		final Pair<Environment, ContParser> parserPair = compileSourcePartial(name, source, dsls);
-		return new Pair<Environment, ContParser>(parserPair.first, new RecordTypeParser() {
-			private TypedAST cached = null;
-			@Override
-			public TypedAST parse(EnvironmentResolver r) {
-				if (cached == null)
-					cached = parserPair.second.parse(r);
-				return cached;
-			}
-
-			@Override
-			public void parseTypes(EnvironmentResolver r) {
-				if (parserPair.second instanceof RecordTypeParser)
-					((RecordTypeParser) parserPair.second).parseTypes(r);
-			}
-
-			@Override
-			public void parseInner(EnvironmentResolver r) {
-				if (parserPair.second instanceof RecordTypeParser)
-					((RecordTypeParser) parserPair.second).parseInner(r);
-			}
-		});
+		return parserPair;
     }
 
     public static Pair<Environment, ContParser> compileSourcePartial(String startupname, List<String> files, List<DSL> dsls) {
@@ -110,7 +97,7 @@ public class Compiler {
 
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
-        Pair<Environment, ContParser> pair = parsedResult.accept(DeclarationParser.getInstance(), parseEnv);
+        Pair<Environment, ContParser> pair = wrapParser(parsedResult.accept(DeclarationParser.getInstance(), parseEnv));
         parseCache.put(md5, pair);
         TypedAST result = resolvePair(parseEnv, pair);
 		if (!parsedASTs.containsKey(md5))
@@ -118,9 +105,9 @@ public class Compiler {
 		return result;
     }
 
-    public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls, TypedASTTransformer xformer) {
+    public static <T extends TypedAST> T compileSources(String startupname, List<String> files, List<DSL> dsls, TypedASTTransformer<T> xformer) {
         ImportCompileResolver.getInstance().setCommandRefs(files);
-        return new ImportChecker(xformer).transform(compileSource(startupname, files.get(0), dsls));
+        return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(compileSource(startupname, files.get(0), dsls)));
     }
 
 	public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls) {
@@ -158,4 +145,44 @@ public class Compiler {
             return readers.get(Integer.parseInt(path));
         }
     }
+
+	public static class CachingParser implements RecordTypeParser {
+		private final Pair<Environment, ContParser> finalPair;
+		private AtomicReference<TypedAST> cached = new AtomicReference<>();
+		private boolean entered = false;
+
+		public CachingParser(Pair<Environment, ContParser> finalPair) {
+			this.finalPair = finalPair;
+		}
+
+		public AtomicReference<TypedAST> getRef() {
+			return cached;
+		}
+
+		public boolean recursiveCall() {
+			return entered;
+		}
+
+		@Override
+		public TypedAST parse(EnvironmentResolver r) {
+			if (cached.get() == null && !entered) {
+				entered = true;
+				cached.set(finalPair.second.parse(r));
+			} else if (cached.get() == null && entered)
+				return null; //In case of recursive call without cached value, use getRef to resolve recursively
+			return cached.get();
+		}
+
+		@Override
+		public void parseTypes(EnvironmentResolver r) {
+			if (finalPair.second instanceof RecordTypeParser)
+				((RecordTypeParser) finalPair.second).parseTypes(r);
+		}
+
+		@Override
+		public void parseInner(EnvironmentResolver r) {
+			if (finalPair.second instanceof RecordTypeParser)
+				((RecordTypeParser) finalPair.second).parseInner(r);
+		}
+	}
 }

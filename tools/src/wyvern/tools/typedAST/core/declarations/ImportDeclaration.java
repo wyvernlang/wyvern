@@ -20,7 +20,7 @@ public class ImportDeclaration extends Declaration {
 	private FileLocation location;
 	private TypeType equivType;
 	private AtomicReference<Environment> declEnv = new AtomicReference<>();
-	private TypedAST ref;
+	private AtomicReference<TypedAST> ref = new AtomicReference<>();
 
 	public ImportDeclaration(String src, String equivName, Environment externalEnv, FileLocation location) {
 		this.src = src;
@@ -34,7 +34,7 @@ public class ImportDeclaration extends Declaration {
 		declEnv.set(env);
 	}
 
-	public void setAST(TypedAST ref) {
+	public void setASTRef(AtomicReference<TypedAST> ref) {
 		this.ref = ref;
 	}
 
@@ -88,7 +88,7 @@ public class ImportDeclaration extends Declaration {
 
 	}
 
-	public TypedAST getAST() {
+	public AtomicReference<TypedAST> getAST() {
 		return ref;
 	}
 }
