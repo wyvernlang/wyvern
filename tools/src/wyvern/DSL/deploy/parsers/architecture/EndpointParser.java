@@ -12,6 +12,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ public class EndpointParser implements DeclParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
 		Endpoint endpoint = new Endpoint(name);
 		arch.addEndpoint(endpoint);
@@ -34,7 +35,7 @@ public class EndpointParser implements DeclParser {
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 		Declaration elem = (Declaration) parse(first, ctx);
 		return new Pair<Environment, ContParser>(elem.extend(Environment.getEmptyEnvironment()), new ContParser.EmptyWithAST(elem));
 	}

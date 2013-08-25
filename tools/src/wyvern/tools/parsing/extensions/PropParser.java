@@ -10,11 +10,9 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -22,6 +20,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 /**
@@ -35,14 +34,14 @@ public class PropParser implements DeclParser {
 	public static PropParser getInstance() { return instance; }
 	
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
 	}
 
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+			CompilationContext ctx) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		final String propName = s.name;
 		FileLocation line = s.getLocation();

@@ -23,7 +23,7 @@ public class ParsingTests {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		env = Html.extend(env);
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}

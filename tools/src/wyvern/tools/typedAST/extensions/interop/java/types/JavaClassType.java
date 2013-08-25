@@ -31,6 +31,6 @@ public class JavaClassType extends ClassType {
 
 	@Override
 	public TypeType getEquivType() {
-		return new TypeType(getName(), decl.getDeclEnv());
+		return new TypeType(decl.getDeclEnv());
 	}
 }

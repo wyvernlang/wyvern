@@ -36,7 +36,7 @@ public class JavaScript implements Target {
 		env = env.extend(new ValueBinding("asString", new JSFunction(arrow(JSObjectType.getInstance(),Str.getInstance()), "asString")));
 		env = env.extend(new TypeBinding("JSObject", JSObjectType.getInstance()));
 		env = env.extend(ienv);
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}

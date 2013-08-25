@@ -6,14 +6,21 @@ import org.objectweb.asm.MethodVisitor;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
+import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
+import wyvern.tools.typedAST.interfaces.ApplyableValue;
+import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
@@ -100,7 +107,7 @@ public class Util {
 		return toJavaClass((Obj)arg, hint);
 	}
 	public static <T> T toJavaClass(Obj obj, Class<T> cast) {
-		Class wrapperClass = generateJavaWrapper((ClassType) obj.getType(), cast);
+		Class wrapperClass = generateJavaWrapper(obj.getIntEnv(), cast);
 		try {
 			return (T) wrapperClass.getConstructor(Obj.class).newInstance(obj);
 		} catch (Exception e) {
@@ -149,9 +156,8 @@ public class Util {
 
 	}
 
-	private static String getMethodDescriptor(DefDeclaration md, Method candidate) {
+	private static String getMethodDescriptor(Arrow methType, Method candidate) {
 		if (candidate == null) {
-			Arrow methType = (Arrow) md.getType();
 			int nArgs = nArgs(methType);
 			org.objectweb.asm.Type[] args = new org.objectweb.asm.Type[nArgs];
 			org.objectweb.asm.Type objType = org.objectweb.asm.Type.getType(Object.class);
@@ -186,15 +192,14 @@ public class Util {
 			return new Type[] { argType };
 	}
 
-	private static Method findCandidate(DefDeclaration md, Class javaType) {
-		Arrow methType = (Arrow) md.getType();
+	private static Method findCandidate(String name, Arrow methType, Class javaType) {
 		int nArgs = nArgs(methType);
 		Type[] args = getArgTypes(methType);
 
 		for (Method m : javaType.getMethods()) {
 			if (m.getParameterTypes().length != nArgs)
 				continue;
-			if (!m.getName().equals(md.getName()))
+			if (!m.getName().equals(name))
 				continue;
 
 			if (!methType.getResult().subtype(javaToWyvType(m.getReturnType())))
@@ -216,7 +221,8 @@ public class Util {
 		return null;
 	}
 
-	private static Class<?> generateJavaWrapper(ClassType toWrap, Class javaType) {
+	private static volatile int n = 0; //How many classes have been generated
+	private static Class<?> generateJavaWrapper(Environment toWrap, Class javaType) {
 		if (typeCache.containsKey(toWrap)) {
 			Map<Class,Class> innerMap = typeCache.get(toWrap);
 			if (innerMap.containsKey(javaType)) {
@@ -224,7 +230,7 @@ public class Util {
 			}
 		}
 		ClassWriter cv = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-		String name = toWrap.getName() + "$imp$" + javaType.getSimpleName();
+		String name = "autogen$" + n++ + "$imp$" + javaType.getSimpleName();
 		if (!javaType.isInterface())
 			cv.visit(V1_7,
 					ACC_PUBLIC,
@@ -259,24 +265,27 @@ public class Util {
 		mv.visitInsn(ARETURN);
 		mv.visitMaxs(2,1);
 		mv.visitEnd();
-
-		for (Declaration d : toWrap.getDecl().getDecls().getDeclIterator()) {
-			if (!(d instanceof DefDeclaration) || ((DefDeclaration)d).isClass())
+		for (Binding b : toWrap.getBindings()) {
+			if (!(b instanceof ValueBinding))
+				continue;
+			if (!(((ValueBinding) b).getValue(null) instanceof ApplyableValue))
 				continue;
 
-			DefDeclaration m = (DefDeclaration)d;
+			Arrow methType = (Arrow) b.getType();
+			String methName = b.getName();
 			mv = cv.visitMethod(ACC_PUBLIC,
-					m.getName(),
-					getMethodDescriptor(m, findCandidate(m, javaType)),
+					methName,
+					getMethodDescriptor(methType, findCandidate(methName, methType, javaType)),
 					null,
 					null);
-			Type returnType = ((Arrow)m.getType()).getResult();
-			Type[] parameterTypes = getArgTypes((Arrow) m.getType());
+
+			Type returnType = methType.getResult();
+			Type[] parameterTypes = getArgTypes(methType);
 
 			mv.visitCode();
 			mv.visitVarInsn(ALOAD, 0);
 			mv.visitFieldInsn(GETFIELD, name, "objref$wyv", "Lwyvern/tools/typedAST/core/values/Obj;");
-			mv.visitLdcInsn(m.getName());
+			mv.visitLdcInsn(methName);
 			mv.visitLdcInsn(parameterTypes.length);
 			mv.visitTypeInsn(ANEWARRAY, org.objectweb.asm.Type.getType(Object.class).getInternalName());
 			for (int i = 0; i < parameterTypes.length; i++) {

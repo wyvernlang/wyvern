@@ -9,11 +9,12 @@ import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class JImportParser implements LineParser {
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		StringBuilder canonicalClassName = new StringBuilder();
 		while (!ParseUtils.checkFirst("as", ctx)) {
 			canonicalClassName.append(ParseUtils.parseSymbol(ctx).name);

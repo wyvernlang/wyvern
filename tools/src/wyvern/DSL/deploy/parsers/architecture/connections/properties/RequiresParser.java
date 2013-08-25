@@ -7,25 +7,26 @@ import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class RequiresParser extends ConnectionPropertyParser {
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		return null;
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(final TypedAST first, final CompilationContext ctx) {
 		final RequiresProperty rp = new RequiresProperty(null, null);
-		final ExpressionSequence es = ctx.first;
+		final ExpressionSequence es = ctx.getTokens();
 
-		ctx.second = rp.extend(ctx.second);
+		ctx.setEnv(rp.extend(ctx.getEnv()));
 
 		final Pair<Environment, ContParser> predicate = ParseUtils.parseCondPartial(ctx);
 		final Pair<Environment, ContParser> body = RequiresParser.super.iParse(ctx);
 
-		ctx.first = null;
+		ctx.setTokens(null);
 		return new Pair<Environment, ContParser>(
 			body.first.extend(rp.extend(Environment.getEmptyEnvironment())),
 			new ContParser() {

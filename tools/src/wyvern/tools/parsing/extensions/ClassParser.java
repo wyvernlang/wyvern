@@ -1,30 +1,21 @@
 package wyvern.tools.parsing.extensions;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
-import wyvern.tools.parsing.ContParser.EnvironmentResolver;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.ClassBinding;
-import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeType;
-import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 /**
@@ -57,20 +48,20 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		Pair<Environment, ContParser> p = parseDeferred(first,  ctx);
-		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.second)));
+		return p.second.parse(new ContParser.SimpleResolver(p.first.extend(ctx.getEnv())));
 	}
 
 	@Override
 	public Pair<Environment, RecordTypeParser> parseRecord(TypedAST first,
-														   Pair<ExpressionSequence, Environment> ctx) {
+														   CompilationContext ctx) {
 		Pair<Environment, ContParser> pair = parseDeferred(first, ctx);
 		return new Pair<>(pair.first, (RecordTypeParser)pair.second);
 	}
 
 	@Override
-	public boolean typeRequiredPartialParse(Pair<ExpressionSequence, Environment> ctx) {
+	public boolean typeRequiredPartialParse(CompilationContext ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
 			return true;
 		}
@@ -79,7 +70,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			Pair<ExpressionSequence, Environment> ctx) {
+			final CompilationContext ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
 			ParseUtils.parseSymbol(ctx);
 			return DefParser.getInstance().parseDeferred(first, ctx, true);
@@ -94,7 +85,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 
 		final MutableClassDeclaration mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, clsNameLine);
 
-		if (ctx.first == null) {
+		if (ctx.getTokens() == null) {
 			return new Pair<Environment,ContParser>(mutableDecl.extend(Environment.getEmptyEnvironment()),new ContParser() {
 
                 @Override
@@ -122,30 +113,30 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 		}
 
 		// Process body.
-		if (ctx.first != null)
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+		if (ctx.getTokens() != null)
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 		
 		final MutableClassDeclaration mutableDeclf = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, clsNameLine);
 		
 		Environment newEnv = mutableDeclf.extend(Environment.getEmptyEnvironment()); 
 		
-		Environment typecheckEnv = ctx.second.extend(newEnv);
+		Environment typecheckEnv = ctx.getEnv().extend(newEnv);
 		typecheckEnv = typecheckEnv.extend(new ClassBinding("class", mutableDeclf));
 		
 		
-		return new Pair<Environment,ContParser>(newEnv, new RecordTypeParser() {
+		return new Pair<Environment,ContParser>(newEnv, new RecordTypeParser.RecordTypeParserBase() {
 
             private Environment envs = null;
             private Environment envi;
             private Pair<Environment,ContParser> declAST;
 
 			@Override
-			public void parseTypes(EnvironmentResolver r) {
+			public void doParseTypes(EnvironmentResolver r) {
 				Environment external = r.getEnv(mutableDeclf);
 
 				Environment envin = mutableDeclf.extend(external);
 				envs = envin.extend(new ClassBinding("class", mutableDeclf));
-				declAST = lines.accept(ClassBodyParser.getInstance(), envs);
+				declAST = lines.accept(new ClassBodyParser(ctx), envs);
 				envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseTypes(new SimpleResolver(envs));
@@ -153,7 +144,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 			}
 
 			@Override
-            public void parseInner(EnvironmentResolver envR) {
+            public void doParseInner(EnvironmentResolver envR) {
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseInner(new SimpleResolver(envs));
 				mutableDeclf.setDeclEnv(((ClassBodyParser.ClassBodyContParser)declAST.second).getInternalEnv());

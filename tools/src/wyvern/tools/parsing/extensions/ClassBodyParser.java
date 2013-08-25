@@ -3,7 +3,6 @@ package wyvern.tools.parsing.extensions;
 import java.util.LinkedList;
 
 import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.ExpressionSequence;
@@ -18,19 +17,19 @@ import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.rawAST.Unit;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environment, ContParser>> {
-	private ClassBodyParser() { }
-	private static ClassBodyParser instance = new ClassBodyParser();
-	public static ClassBodyParser getInstance() { return instance; }
+	private final CompilationContext globalCtx;
+
+	public ClassBodyParser(CompilationContext globalCtx) {
+		this.globalCtx = globalCtx;
+	}
 
 	@Override
 	public Pair<Environment, ContParser> visit(LineSequence node, Environment env) {
@@ -39,14 +38,14 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		}
 
 		final LinkedList<ContParser> contParsers = new LinkedList<>();
-		final LinkedList<Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>>> unparsed = new LinkedList<>();
+		final LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed = new LinkedList<>();
 		Environment newEnv = Environment.getEmptyEnvironment();
 
 		for (RawAST line : node.children) {
 			if (!(line instanceof ExpressionSequence))
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 
-			Pair<ExpressionSequence, Environment> ctx = new Pair<>((ExpressionSequence) line, env);
+			CompilationContext ctx = new CompilationContext(globalCtx, (ExpressionSequence) line, env);
 			Pair<TypedAST, LineParser> fetched = getParser(ctx);
 
 			if (!(fetched.second instanceof DeclParser))
@@ -59,7 +58,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 			}
 
 			Pair<Environment,ContParser> partiallyParsed =
-					parseLineInt(new Pair<>((ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext(globalCtx, (ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
@@ -68,30 +67,30 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		return new Pair<Environment, ContParser>(newEnv, new ClassBodyContParser(finalNewEnv, contParsers, unparsed));
 	}
 
-	private Pair<TypedAST, LineParser> getParser(Pair<ExpressionSequence,Environment> ctx) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+	private Pair<TypedAST, LineParser> getParser(CompilationContext ctx) {
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
-		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
-		ctx.first = ctx.first.getRest();
+		TypedAST first = node.getFirst().accept(new BodyParser(ctx), env);
+		ctx.setTokens(ctx.getTokens().getRest());
 
 		return new Pair<>(first, first.getLineParser());
 	}
 
-	private Pair<Environment,ContParser> parseLineInt(Pair<ExpressionSequence,Environment> ctx) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+	private Pair<Environment,ContParser> parseLineInt(CompilationContext ctx) {
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
 
-		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
+		TypedAST first = node.getFirst().accept(new BodyParser(ctx), env);
 		LineParser parser = first.getLineParser();
 
 		if (!(parser instanceof DeclParser))
@@ -99,7 +98,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		DeclParser dp = (DeclParser)parser;
 
 		ExpressionSequence rest = node.getRest();
-		ctx.first = rest;
+		ctx.setTokens(rest);
 
 		if (parser == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
@@ -148,10 +147,10 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 	public static class ClassBodyContParser implements RecordTypeParser {
 		private final Environment finalNewEnv;
 		private final LinkedList<ContParser> contParsers;
-		private final LinkedList<Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>>> unparsed;
+		private final LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed;
 		public Environment internalEnv;
 
-		public ClassBodyContParser(Environment finalNewEnv, LinkedList<ContParser> contParsers, LinkedList<Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>>> unparsed) {
+		public ClassBodyContParser(Environment finalNewEnv, LinkedList<ContParser> contParsers, LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed) {
 			this.finalNewEnv = finalNewEnv;
 			this.contParsers = contParsers;
 			this.unparsed = unparsed;
@@ -171,7 +170,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 
 		@Override
 		public void parseInner(EnvironmentResolver r) {
-			for (Pair<Pair<TypedAST, DeclParser>, Pair<ExpressionSequence, Environment>> toParse : unparsed) {
+			for (Pair<Pair<TypedAST, DeclParser>, CompilationContext> toParse : unparsed) {
 				Pair<Environment, ContParser> ret = toParse.first.second.parseDeferred(toParse.first.first, toParse.second);
 				internalEnv = internalEnv.extend(ret.first);
 				contParsers.add(ret.second);

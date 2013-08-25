@@ -14,25 +14,23 @@ import wyvern.tools.util.TreeWriter;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private ClassDeclaration decl = null;
-	private String name;
 	private AtomicReference<Environment> declEnv;
 	private AtomicReference<Environment> typeEquivalentEnv;
 	private TypeType implementsType;
 
 
 	public ClassType(ClassDeclaration td) {
-		this(td.getName(), td.getDeclEnvRef(),
+		this(td.getDeclEnvRef(),
 				td.getTypeEquivalentEnvironmentReference(), td.getImplementsType());
 		this.decl = td;
 	}
 
-	public ClassType(String name, AtomicReference<Environment> declEnv, AtomicReference<Environment> typeEquivalentEnv, TypeType implementsType) {
-		this.name = name;
+	public ClassType(AtomicReference<Environment> declEnv, AtomicReference<Environment> typeEquivalentEnv, TypeType implementsType) {
 		this.declEnv = declEnv;
 		this.typeEquivalentEnv = typeEquivalentEnv;
 		this.implementsType = implementsType;
 	}
-	
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write		
@@ -40,7 +38,10 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	
 	@Override
 	public String toString() {
-		return "CLASS " + name;
+		if (declEnv.get() != null)
+			return "CLASS(" + declEnv.get().toString() + ")";
+		else
+			return "CLASS()";
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 			throw new RuntimeException();
 
 		if (equivType == null)
-			equivType = new TypeType(name, typeEquivalentEnv.get());
+			equivType = new TypeType(typeEquivalentEnv.get());
 		return equivType;
 	}
 
@@ -88,10 +89,6 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		}
 		
 		return false;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	@Override

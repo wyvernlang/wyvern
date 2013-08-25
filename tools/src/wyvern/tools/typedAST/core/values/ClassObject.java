@@ -47,10 +47,6 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 		return receiver.getIntEnv().getValue(operation);
 	}
 
-	public Environment getObjEnv(Obj obj) {
-		return decl.evaluateDeclarations(obj);
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
@@ -60,5 +56,9 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 	public Value evaluateInvocation(Invocation exp, Environment env) {
 		String operation = exp.getOperationName();
 		return classEnv.getValue(operation);
+	}
+
+	public Environment getIntEnv() {
+		return classEnv;
 	}
 }

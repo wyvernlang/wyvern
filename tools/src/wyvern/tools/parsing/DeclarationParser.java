@@ -2,7 +2,6 @@ package wyvern.tools.parsing;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
@@ -21,13 +20,20 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class DeclarationParser implements RawASTVisitor<Environment, Pair<Environment, ContParser>> {
-	private DeclarationParser() { }
-	private static DeclarationParser instance = new DeclarationParser();
-	public static DeclarationParser getInstance() { return instance; }
+	private final CompilationContext globalCtx;
+
+	public DeclarationParser(CompilationContext ctx) {
+		this.globalCtx = ctx;
+	}
+
+	public DeclarationParser() {
+		globalCtx = null;
+	}
 
 	@Override
 	public Pair<Environment, ContParser> visit(LineSequence node, Environment env) {
@@ -43,40 +49,25 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 			
 			Pair<Environment,ContParser> partiallyParsed = 
-					parseLineInt(new Pair<>((ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext(globalCtx, (ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
-		
-		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser() {
-			private HashSet<Integer> parseTypesCalled = new HashSet<>();
+
+		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser.RecordTypeParserBase() {
 			private HashSet<Integer> parseInnerCalled = new HashSet<>();
 			@Override
-			public void parseTypes(EnvironmentResolver r) {
-				ListIterator<ContParser> iterator = contParsers.listIterator(0);
-				int idx = 0;
-				while (iterator.hasNext()) {
-					final ContParser parser = iterator.next();
-					if (parser instanceof RecordTypeParser && !parseTypesCalled.contains(idx)) {
-						parseTypesCalled.add(idx);
+			public void doParseTypes(EnvironmentResolver r) {
+				for (ContParser parser : contParsers)
+					if (parser instanceof RecordTypeParser)
 						((RecordTypeParser) parser).parseTypes(r);
-					}
-					idx++;
-				}
 			}
 
 			@Override
-            public void parseInner(EnvironmentResolver r) {
-				ListIterator<ContParser> iterator = contParsers.listIterator(0);
-				int idx = 0;
-				while (iterator.hasNext()) {
-					final ContParser parser = iterator.next();
-					if (parser instanceof RecordTypeParser && !parseInnerCalled.contains(idx)) {
-						parseInnerCalled.add(idx);
+            public void doParseInner(EnvironmentResolver r) {
+				for (ContParser parser : contParsers)
+					if (parser instanceof RecordTypeParser)
 						((RecordTypeParser)parser).parseInner(r);
-					}
-					idx++;
-				}
             }
 
             @Override
@@ -100,16 +91,16 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		});
 	}
 	
-	private Pair<Environment,ContParser> parseLineInt(Pair<ExpressionSequence,Environment> ctx) {
-		ExpressionSequence node = ctx.first;
-		Environment env = ctx.second;
+	private Pair<Environment,ContParser> parseLineInt(CompilationContext ctx) {
+		ExpressionSequence node = ctx.getTokens();
+		Environment env = ctx.getEnv();
 		// TODO: should not be necessary, but a useful sanity check
 		// FIXME: gets stuck on atomics like {$L $L} which were sometimes leftover by lexer from comments.
 		if (node.children.size() == 0) {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
 
-		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
+		TypedAST first = node.getFirst().accept(new BodyParser(ctx), env);
 		LineParser parser = first.getLineParser();
 		
 		if (!(parser instanceof DeclParser))
@@ -117,7 +108,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 		DeclParser dp = (DeclParser)parser;
 		
 		ExpressionSequence rest = node.getRest();
-		ctx.first = rest;
+		ctx.setTokens(rest);
 		
 		if (parser == null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);

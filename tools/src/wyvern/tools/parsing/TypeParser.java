@@ -11,13 +11,13 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.util.Pair;
+import wyvern.tools.util.CompilationContext;
 
 public class TypeParser {
-	public static ParseUtils.LazyEval<Type> parsePartialType(Pair<ExpressionSequence, Environment> ctx) {
+	public static ParseUtils.LazyEval<Type> parsePartialType(CompilationContext ctx) {
 		ParseUtils.LazyEval<Type> type = parseCompositeType(ctx);
-		while (ctx.first != null && ParseUtils.isArrowOperator(ctx.first.getFirst())) {
-			ctx.first = ctx.first.getRest();
+		while (ctx.getTokens() != null && ParseUtils.isArrowOperator(ctx.getTokens().getFirst())) {
+			ctx.setTokens(ctx.getTokens().getRest());
 			final ParseUtils.LazyEval<Type> ctype = type;
 			final ParseUtils.LazyEval<Type> argument = parsePartialType(ctx);
 			type = new ParseUtils.LazyEval<Type>() {
@@ -33,11 +33,11 @@ public class TypeParser {
 		return type;
 	}
 
-	private static ParseUtils.LazyEval<Type> parseCompositeType(Pair<ExpressionSequence, Environment> ctx) {
+	private static ParseUtils.LazyEval<Type> parseCompositeType(CompilationContext ctx) {
 		ParseUtils.LazyEval<Type> type = parsePartialSimpleType(ctx);
-		while (ctx.first != null && ParseUtils.checkFirst(".", ctx)) {
-			final RawAST elem = ctx.first;
-			ctx.first = ctx.first.getRest();
+		while (ctx.getTokens() != null && ParseUtils.checkFirst(".", ctx)) {
+			final RawAST elem = ctx.getTokens();
+			ctx.setTokens(ctx.getTokens().getRest());
 			final ParseUtils.LazyEval<Type> ptype = type;
 			final String prop = ParseUtils.parseSymbol(ctx).name;
 			type = new ParseUtils.LazyEval<Type>() {
@@ -56,13 +56,13 @@ public class TypeParser {
 		return type;
 	}
 
-	public static ParseUtils.LazyEval<Type> parsePartialSimpleType(final Pair<ExpressionSequence, Environment> ctx) {
-		if (ctx.first == null)
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+	public static ParseUtils.LazyEval<Type> parsePartialSimpleType(final CompilationContext ctx) {
+		if (ctx.getTokens() == null)
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 
-		final RawAST first = ctx.first.getFirst();
-		ExpressionSequence rest = ctx.first.getRest();
-		ctx.first = rest;
+		final RawAST first = ctx.getTokens().getFirst();
+		ExpressionSequence rest = ctx.getTokens().getRest();
+		ctx.setTokens(rest);
 		if (first instanceof Symbol) {
 			return new ParseUtils.LazyEval<Type>() {
 
@@ -87,9 +87,9 @@ public class TypeParser {
 
 			};
 		} else if (first instanceof Parenthesis) {
-			return parsePartialType(new Pair<ExpressionSequence, Environment>((Parenthesis) first, ctx.second));
+			return parsePartialType(ctx.copyEnv((Parenthesis) first));
 		} else {
-			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.first);
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 			return null; // Unreachable.
 		}
 	}

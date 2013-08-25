@@ -7,7 +7,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.ParseUtils;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.Invocation;
@@ -17,6 +16,7 @@ import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 public class HtmlTagParser implements LineParser {
@@ -51,15 +51,15 @@ public class HtmlTagParser implements LineParser {
 
 	@Override
 	public TypedAST parse(TypedAST first,
-						  Pair<ExpressionSequence, Environment> ctx) {
+						  CompilationContext ctx) {
 		if (prefs.empty)
 			return new StringConstant(String.format("</%s>\n",prefs.tag));
-		if (ctx.first == null)
+		if (ctx.getTokens() == null)
 			return new StringConstant(String.format("<%s>\n</%s>\n",prefs.tag, prefs.tag));
 		
-		if (!(ctx.first.getFirst() instanceof LineSequence)) {
-			TypedAST ir = BodyParser.getInstance().visit(ctx.first, ctx.second);
-			ctx.first = ctx.first.getRest();
+		if (!(ctx.getTokens().getFirst() instanceof LineSequence)) {
+			TypedAST ir = new BodyParser(ctx).visit(ctx.getTokens(), ctx.getEnv());
+			ctx.setTokens(ctx.getTokens().getRest());
 			return concat(ir, first.getLocation(),false);
 		}
 		
@@ -67,7 +67,7 @@ public class HtmlTagParser implements LineParser {
 		
 		Environment htmlBodyEnv;
 		if (prefs.injectEnv) {
-			htmlBodyEnv = ctx.second;
+			htmlBodyEnv = ctx.getEnv();
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("body", new Keyword(new HtmlTagParser(new ParsingPrefs("body")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("head", new Keyword(new HtmlTagParser(new ParsingPrefs("head")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("title", new Keyword(new HtmlTagParser(new ParsingPrefs("title")))));
@@ -78,10 +78,10 @@ public class HtmlTagParser implements LineParser {
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("input", new Keyword(new HtmlTagParser(new ParsingPrefs("input")))));
 			htmlBodyEnv = htmlBodyEnv.extend(new KeywordNameBinding("attrs", new Keyword(new AttributeParser())));
 		} else {
-			htmlBodyEnv = ctx.second;
+			htmlBodyEnv = ctx.getEnv();
 		}
 		
-		TypedAST result = BodyParser.getInstance().visit(lines, htmlBodyEnv);
+		TypedAST result = new BodyParser(ctx).visit(lines, htmlBodyEnv);
 
 		TypedAST insert = null;
 		TypedAST attrs = null;
@@ -114,10 +114,10 @@ public class HtmlTagParser implements LineParser {
 			return reduce2(concat(insert,attrs,first.getLocation(),true));
 	}
 	
-	private HashMap<String,TypedAST> parseAttrs(Pair<ExpressionSequence, Environment> ctx) {
+	private HashMap<String,TypedAST> parseAttrs(CompilationContext ctx) {
 		HashMap<String,TypedAST> output = new HashMap<String,TypedAST>();
 		
-		while (ctx.first != null) {
+		while (ctx.getTokens() != null) {
 			Symbol name = ParseUtils.parseSymbol(ctx);
 			ParseUtils.parseSymbol("=", ctx);
 			TypedAST value = ParseUtils.parseExpr(ctx);

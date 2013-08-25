@@ -1,12 +1,14 @@
 package wyvern.targets.Java.visitors;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
 import wyvern.tools.parsing.LineParser;
+import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
@@ -14,6 +16,7 @@ import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassStore {
+
 	private class ObjectType implements Type {
 
 		@Override
@@ -93,15 +96,20 @@ public class ClassStore {
 		}
 
 	}
-	private Hashtable<Type, Pair<String, byte[]>> classes = new Hashtable<Type, Pair<String, byte[]>>();
+	private Hashtable<Declaration, Pair<String, byte[]>> classes = new Hashtable<>(); //Only Class or TypeDeclaration
+	private Hashtable<Type, String> registeredTypes = new Hashtable<>();
     private HashSet<String> classNames = new HashSet<String>();
 
     public String mangleTypeName(Type type) {
         return type.toString().replace(" ", "");
     }
 
-    public String getRawTypeName(Type type) {
-        return classes.get(type).first;
+	public String getRawTypeName(Type type) {
+		return registeredTypes.get(type);
+	}
+
+    public String getRawTypeName(ClassDeclaration decl) {
+        return classes.get(decl).first;
     }
 
     public String getNewTypeName(Type type, String postfix) {
@@ -112,8 +120,19 @@ public class ClassStore {
         return output;
     }
 
+	public String getNewTypeName(Declaration decl, String postfix) {
+		String output = decl.getName().replace(" ", "") + postfix;
+		while (classNames.contains(output))
+			output += "$";
+		classNames.add(output);
+		return output;
+	}
+
 	public String getNewTypeName(Type type) {
         return getNewTypeName(type, "");
+	}
+	public String getNewTypeName(Declaration decl) {
+		return getNewTypeName(decl, "");
 	}
 
 	Type getObjectType() {
@@ -149,8 +168,8 @@ public class ClassStore {
 			return "Ljava/lang/invoke/MethodHandle;";
         } else if (type instanceof TypeType || type instanceof ObjectType) {
             return "Ljava/lang/Object;";
-		} else if (classes.containsKey(type)) {
-			return "L"+classes.get(type).first+";";
+		} else if (registeredTypes.containsKey(type)) {
+			return "L"+registeredTypes.get(type)+";";
 		}
 		return "L"+mangleTypeName(type)+";";
 	}
@@ -159,24 +178,39 @@ public class ClassStore {
 		return classes.get(type).first;
 	}
 	
-	public void registerClass(Type type) {
-		classes.put(type, new Pair<String, byte[]>(getNewTypeName(type), null));
-		
+	public void registerClass(ClassDeclaration decl) {
+		if (!classes.containsKey(decl)) {
+			String typeName = getNewTypeName(decl);
+			classes.put(decl, new Pair<String, byte[]>(typeName, null));
+			registeredTypes.put(decl.getType(), typeName);
+		}
 	}
 
-	public void registerClass(Type type, byte[] bytecode) {
-        if (classes.containsKey(type) && classes.get(type).second == null)
-		    classes.put(type, new Pair<String, byte[]>(classes.get(type).first, bytecode));
-        else
-            throw new RuntimeException("Tried to create a second identical class");
+	public void registerClass(ClassDeclaration decl, byte[] bytecode) {
+		if (classes.containsKey(decl) && classes.get(decl).second == null) {
+			classes.put(decl, new Pair<String, byte[]>(classes.get(decl).first, bytecode));
+			registeredTypes.put(decl.getType(), classes.get(decl).first);
+		} else
+			throw new RuntimeException("Tried to create a second identical class");
 	}
 
-    public Type registerGenericClass(Type type, int n) {
-        Type gct = new GenericClassType(type, n);
-        classes.put(gct, new Pair<String, byte[]>(getNewTypeName(type, "$"+n), null));
-        return gct;
-    }
 
+
+	public void registerClass(TypeDeclaration decl) {
+		if (!classes.containsKey(decl)) {
+			String typeName = getNewTypeName(decl.getType());
+			classes.put(decl, new Pair<String, byte[]>(typeName, null));
+			registeredTypes.put(decl.getType(), typeName);
+		}
+	}
+
+	public void registerClass(TypeDeclaration decl, byte[] bytecode) {
+		if (classes.containsKey(decl) && classes.get(decl).second == null) {
+			classes.put(decl, new Pair<String, byte[]>(classes.get(decl).first, bytecode));
+			registeredTypes.put(decl.getType(), classes.get(decl).first);
+		} else
+			throw new RuntimeException("Tried to create a second identical class");
+	}
 	
 	public ClassLoader getLoader() {
 		Hashtable<String, byte[]> nc = new Hashtable<String, byte[]>();

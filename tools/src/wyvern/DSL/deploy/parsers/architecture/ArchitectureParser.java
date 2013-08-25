@@ -4,20 +4,16 @@ import wyvern.DSL.deploy.Deploy;
 import wyvern.DSL.deploy.typedAST.architecture.Architecture;
 import wyvern.DSL.deploy.typedAST.architecture.Endpoint;
 import wyvern.tools.parsing.*;
-import wyvern.tools.parsing.extensions.TypeParser;
-import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import static wyvern.tools.parsing.extensions.TypeParser.*;
 
 public class ArchitectureParser implements DeclParser {
 	private LinkedList<Endpoint> endpoints = new LinkedList<>();
@@ -27,31 +23,31 @@ public class ArchitectureParser implements DeclParser {
 	}
 
 	@Override
-	public TypedAST parse(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public TypedAST parse(TypedAST first, CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
 		TypedAST body = null;
 
-		if (ctx.first != null)
-			body = BodyParser.getInstance().visit(ctx.first, Deploy.getArchInnerEnv(this));
+		if (ctx.getTokens() != null)
+			body = new BodyParser(ctx).visit(ctx.getTokens(), Deploy.getArchInnerEnv(this));
 		return new Architecture(name, body);
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, Pair<ExpressionSequence, Environment> ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
 		endpoints = new LinkedList<>();
 		String name = ParseUtils.parseSymbol(ctx).name;
 		final Architecture innerArch = new Architecture(name, null);
 
 		Pair<Environment, ContParser> parsePartialI = null;
 
-		if (ctx.first != null) {
-			parsePartialI = ParseUtils.extractLines(ctx).accept(DeclarationParser.getInstance(), ctx.second.setInternalEnv(Deploy.getArchInnerEnv(this)));
+		if (ctx.getTokens() != null) {
+			parsePartialI = ParseUtils.extractLines(ctx).accept(new DeclarationParser(ctx), ctx.getEnv().setInternalEnv(Deploy.getArchInnerEnv(this)));
 		}
 
 		final Pair<Environment, ContParser> parsePartial = parsePartialI;
 
 
-		Environment output = ctx.second;
+		Environment output = ctx.getEnv();
 		for (Endpoint endpoint : endpoints) {
 			output = endpoint.getDecl().extend(output);
 		}

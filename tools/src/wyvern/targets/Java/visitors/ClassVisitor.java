@@ -70,12 +70,12 @@ public class ClassVisitor extends BaseASTVisitor {
 		return store.getTypeName(type, isUnitVoid);
 	}
 	
-	private void registerClass(Type type) {
-		store.registerClass(type);
+	private void registerClass(ClassDeclaration decl) {
+		store.registerClass(decl);
 	}
 	
-	private void registerClass(Type type, byte[] bytecode) {
-		store.registerClass(type, bytecode);
+	private void registerClass(ClassDeclaration decl, byte[] bytecode) {
+		store.registerClass(decl, bytecode);
 	}
 
 	private Type checkForClassType(Type type) {
@@ -101,24 +101,25 @@ public class ClassVisitor extends BaseASTVisitor {
 
 	@Override
 	public void visit(ClassDeclaration classDecl) {
+		classDecl.accept(new ClassDiscoveryVisitor(store));
 		// No support for inner classes (yet)
 		for (Declaration decl : classDecl.getDecls().getDeclIterator()) {
 			context.setVariable(decl.getName(), decl.getType(), ExternalContext.INTERNAL);
 		}
 
-        registerClass(classDecl.getType());
+        registerClass(classDecl);
 
 		writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES); // Makes it a LOT slower. Easier, though. TODO: Actually implement own stack/var size determination.
 		cw = new CheckClassAdapter(writer, false);
 		cw.visit(V1_7,
 				ACC_PUBLIC,
-                store.getRawTypeName(classDecl.getType()),
+                store.getRawTypeName(classDecl),
 				null, 
 				"java/lang/Object", 
 				null);
 		
 		currentType = classDecl.getType();
-		currentTypeName = store.getRawTypeName(classDecl.getType());
+		currentTypeName = store.getRawTypeName(classDecl);
 
 		super.visit(classDecl);
 
@@ -138,7 +139,7 @@ public class ClassVisitor extends BaseASTVisitor {
 		}
 		initializeMethodHandles();
 		cw.visitEnd();
-		registerClass(classDecl.getType(), writer.toByteArray());
+		registerClass(classDecl, writer.toByteArray());
 	}
 
 	private void initializeMethodHandles() {
@@ -284,7 +285,7 @@ public class ClassVisitor extends BaseASTVisitor {
 		if (sequence instanceof DeclSequence)
 			for (Declaration decl : ((DeclSequence)sequence).getDeclIterator()) {
 				if (decl instanceof ClassDeclaration)
-					store.registerClass(decl.getType());
+					store.registerClass((ClassDeclaration) decl);
 			}
 		
 		super.visit(sequence);

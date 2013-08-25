@@ -19,18 +19,19 @@ import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
-	private String name;
 	private TypeDeclaration decl;
 	private AtomicReference<Environment> declEnv;
 
 	public TypeType(TypeDeclaration decl) {
 		declEnv = decl.getDeclEnv();
-		name = decl.getName();
 	}
 
-	public TypeType(String name, Environment declEnv) {
+	public TypeType(Environment declEnv) {
 		this.declEnv = new AtomicReference<>(declEnv);
-		this.name = name;
+	}
+
+	public TypeType(AtomicReference<Environment> declEnv) {
+		this.declEnv = declEnv;
 	}
 	
 	public TypeDeclaration getDecl() {
@@ -44,7 +45,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	
 	@Override
 	public String toString() {
-		return /*"TYPE " +*/ name;
+		return "TYPE(" + declEnv.get().toString() + ")";
 	}
 
 	@Override
