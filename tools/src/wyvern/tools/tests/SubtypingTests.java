@@ -63,7 +63,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		// FIXME: Type checking Declarations is different!!!
@@ -112,7 +112,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
@@ -147,7 +147,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
@@ -182,7 +182,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
@@ -217,7 +217,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
@@ -252,7 +252,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
@@ -293,7 +293,7 @@ public class SubtypingTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
@@ -371,7 +371,7 @@ public class SubtypingTests {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		// FIXME: Type checking Declarations is different!!!

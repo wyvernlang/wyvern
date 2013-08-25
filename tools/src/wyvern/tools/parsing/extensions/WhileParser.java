@@ -16,7 +16,7 @@ public class WhileParser implements LineParser {
 	public TypedAST parse(TypedAST first,
 						  CompilationContext ctx) {
 		TypedAST conditional = ParseUtils.parseCond(ctx);
-		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.getEnv());
+		TypedAST body = ParseUtils.extractLines(ctx).accept(new BodyParser(ctx), ctx.getEnv());
 		
 		return new WhileStatement(conditional,body,first.getLocation());
 	}

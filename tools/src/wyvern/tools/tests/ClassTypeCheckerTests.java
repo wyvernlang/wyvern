@@ -58,7 +58,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
@@ -96,7 +96,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		// FIXME: Type checking Declarations is different!!!
@@ -134,7 +134,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
@@ -169,7 +169,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
@@ -226,7 +226,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		Type resultType = typedAST.typecheck(env);
@@ -257,7 +257,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
@@ -291,7 +291,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		
@@ -335,7 +335,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		try {
@@ -387,7 +387,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
@@ -441,7 +441,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
@@ -503,7 +503,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
@@ -564,7 +564,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);
@@ -623,7 +623,7 @@ public class ClassTypeCheckerTests {
 		
 		Environment env = Globals.getStandardEnv();
 
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		typedAST.typecheck(env);

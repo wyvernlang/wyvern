@@ -58,7 +58,7 @@ public class HtmlTagParser implements LineParser {
 			return new StringConstant(String.format("<%s>\n</%s>\n",prefs.tag, prefs.tag));
 		
 		if (!(ctx.getTokens().getFirst() instanceof LineSequence)) {
-			TypedAST ir = BodyParser.getInstance().visit(ctx.getTokens(), ctx.getEnv());
+			TypedAST ir = new BodyParser(ctx).visit(ctx.getTokens(), ctx.getEnv());
 			ctx.setTokens(ctx.getTokens().getRest());
 			return concat(ir, first.getLocation(),false);
 		}
@@ -81,7 +81,7 @@ public class HtmlTagParser implements LineParser {
 			htmlBodyEnv = ctx.getEnv();
 		}
 		
-		TypedAST result = BodyParser.getInstance().visit(lines, htmlBodyEnv);
+		TypedAST result = new BodyParser(ctx).visit(lines, htmlBodyEnv);
 
 		TypedAST insert = null;
 		TypedAST attrs = null;

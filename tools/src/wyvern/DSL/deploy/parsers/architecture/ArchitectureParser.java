@@ -28,7 +28,7 @@ public class ArchitectureParser implements DeclParser {
 		TypedAST body = null;
 
 		if (ctx.getTokens() != null)
-			body = BodyParser.getInstance().visit(ctx.getTokens(), Deploy.getArchInnerEnv(this));
+			body = new BodyParser(ctx).visit(ctx.getTokens(), Deploy.getArchInnerEnv(this));
 		return new Architecture(name, body);
 	}
 
@@ -41,7 +41,7 @@ public class ArchitectureParser implements DeclParser {
 		Pair<Environment, ContParser> parsePartialI = null;
 
 		if (ctx.getTokens() != null) {
-			parsePartialI = ParseUtils.extractLines(ctx).accept(DeclarationParser.getInstance(), ctx.getEnv().setInternalEnv(Deploy.getArchInnerEnv(this)));
+			parsePartialI = ParseUtils.extractLines(ctx).accept(new DeclarationParser(ctx), ctx.getEnv().setInternalEnv(Deploy.getArchInnerEnv(this)));
 		}
 
 		final Pair<Environment, ContParser> parsePartial = parsePartialI;

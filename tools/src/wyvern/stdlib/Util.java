@@ -29,7 +29,7 @@ public class Util {
 		Environment env = Globals.getStandardEnv();
 		for (DSL dsl : dsls)
 			env = dsl.addToEnv(env);
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}
@@ -39,7 +39,7 @@ public class Util {
 		Environment env = Globals.getStandardEnv();
 		for (DSL dsl : dsls)
 			env = dsl.addToEnv(env);
-		return parsedResult.accept(DeclarationParser.getInstance(), env);
+		return parsedResult.accept(new DeclarationParser(null), env);
 	}
 
 	public static Pair<Environment, ContParser> doPartialCompile(String input, String name, List<DSL> dsls) {

@@ -54,7 +54,7 @@ public class ValParser implements DeclParser {
             type = ParseUtils.parseType(ctx);
         }
 
-        BodyParser.getInstance().setExpected(type);
+        ctx.setExpected(type);
 
         final CompilationContext restctx = ctx.copyAndClear();
 

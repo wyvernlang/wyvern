@@ -2,20 +2,33 @@ package wyvern.tools.util;
 
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.RawAST;
-import wyvern.tools.rawAST.StringLiteral;
+import wyvern.tools.typedAST.extensions.DSLDummy;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Tuple;
 
 /**
  * Created by Ben Chung on 8/8/13.
  */
 public class CompilationContext {
-	public CompilationContext(ExpressionSequence f, Environment s) {
-		setTokens(f);
-		setEnv(s);
-	}
-
+	private DSLDummy DSLToken;
+	private CompilationContext globalCtx;
 	private ExpressionSequence tokens;
 	private Environment env;
+
+	private Type expected = null;
+	private Tuple expectedTuple = null;
+
+	public CompilationContext(CompilationContext globalCtx, ExpressionSequence f, Environment s) {
+		setTokens(f);
+		setEnv(s);
+		this.globalCtx = globalCtx;
+		if (globalCtx != null) {
+			setExpected(globalCtx.expected);
+			setExpectedTuple(globalCtx.getExpectedTuple());
+		}
+	}
+
 
 	public String toString() {
 		return "<" + getTokens() + "," + getEnv() + ">";
@@ -38,22 +51,48 @@ public class CompilationContext {
 	}
 
 	public CompilationContext copyAndClear() {
-		CompilationContext newCtx = new CompilationContext(tokens, env);
+		CompilationContext newCtx = new CompilationContext(this, tokens, env);
 		tokens = null;
 		return newCtx;
 	}
 
 	public CompilationContext copyTokens(Environment newEnvironment) {
-		return new CompilationContext(tokens, newEnvironment);
+		return new CompilationContext(this, tokens, newEnvironment);
 	}
 
 	public CompilationContext copyEnv(ExpressionSequence tokens) {
-		return new CompilationContext(tokens, env);
+		return new CompilationContext(this, tokens, env);
 	}
 
 	public RawAST popToken() {
 		RawAST result = tokens.getFirst();
 		tokens = tokens.getRest();
 		return result;
+	}
+
+	public Type getExpected() {
+		return expected;
+	}
+
+	public void setExpected(Type expected) {
+		this.expected = expected;
+	}
+
+	public void setDSLToken(DSLDummy DSLToken) {
+		this.DSLToken = DSLToken;
+		if (globalCtx != null)
+			globalCtx.setDSLToken(DSLToken);
+	}
+
+	public DSLDummy getDSLToken() {
+		return DSLToken;
+	}
+
+	public Tuple getExpectedTuple() {
+		return expectedTuple;
+	}
+
+	public void setExpectedTuple(Tuple expectedTuple) {
+		this.expectedTuple = expectedTuple;
 	}
 }

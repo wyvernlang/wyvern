@@ -37,7 +37,7 @@ public class JavaTests {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		env = env.extend(ienv);
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}

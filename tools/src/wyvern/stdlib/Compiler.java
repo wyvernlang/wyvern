@@ -62,7 +62,7 @@ public class Compiler {
 
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
-        Pair<Environment, ContParser> pair = parsedResult.accept(DeclarationParser.getInstance(), parseEnv);
+        Pair<Environment, ContParser> pair = parsedResult.accept(new DeclarationParser(null), parseEnv);
 		final Pair<Environment, ContParser> finalPair = pair;
 		pair = wrapParser(finalPair);
         parseCache.put(md5, pair);
@@ -105,7 +105,7 @@ public class Compiler {
 
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
-		final TypedAST result = parsedResult.accept(BodyParser.getInstance(), parseEnv);
+		final TypedAST result = parsedResult.accept(new BodyParser(), parseEnv);
 
 		Pair<Environment, ContParser> pair = wrapParser(
 			new Pair<Environment, ContParser>(

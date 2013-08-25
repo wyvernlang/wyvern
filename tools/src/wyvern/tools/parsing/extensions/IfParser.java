@@ -91,7 +91,7 @@ public class IfParser implements LineParser {
 		@Override
 		public TypedAST parse(TypedAST first,
 							  CompilationContext ctx) {
-			TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), env);
+			TypedAST body = ParseUtils.extractLines(ctx).accept(new BodyParser(ctx), env);
 			return new IfClause(clause,body,true);
 		}
 	}
@@ -111,7 +111,7 @@ public class IfParser implements LineParser {
 				ParseUtils.parseSymbol("if", ictx);
 				clause = ParseUtils.parseCond(ictx);
 			}
-			TypedAST body = ParseUtils.extractLines(ictx).accept(BodyParser.getInstance(), env);
+			TypedAST body = ParseUtils.extractLines(ictx).accept(new BodyParser(ctx), env);
             ctx.setTokens(ictx.getTokens());
 			return new IfClause(clause,body,false);
 		}
@@ -126,7 +126,7 @@ public class IfParser implements LineParser {
 		bodyEnv = bodyEnv.extend(new KeywordNameBinding("then", new Keyword(new ThenParser(thenClause, ctx.getEnv()))));
 		bodyEnv = bodyEnv.extend(new KeywordNameBinding("else", new Keyword(new ElseParser(ctx.getEnv()))));
 		
-		TypedAST body = ParseUtils.extractLines(ctx).accept(BodyParser.getInstance(), ctx.getEnv().setInternalEnv(bodyEnv));
+		TypedAST body = ParseUtils.extractLines(ctx).accept(new BodyParser(ctx), ctx.getEnv().setInternalEnv(bodyEnv));
 		LinkedList<IfExpr.IfClause> result = new LinkedList<IfExpr.IfClause>();
 		if (body instanceof IfClause) {
 			if (!((IfClause)body).getIsThen())

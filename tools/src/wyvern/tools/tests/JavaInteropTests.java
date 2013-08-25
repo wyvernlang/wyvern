@@ -33,7 +33,7 @@ public class JavaInteropTests {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		env = env.extend(new KeywordNameBinding("JImport", new Keyword(new JImportParser())));
 		env = env.extend(new KeywordNameBinding("JNull", new Keyword(new JNullParser())));
-		TypedAST typedAST = parsedResult.accept(BodyParser.getInstance(), env);
+		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Type resultType = typedAST.typecheck(env);
 		return typedAST;
 	}

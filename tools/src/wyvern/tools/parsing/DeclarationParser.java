@@ -25,9 +25,15 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class DeclarationParser implements RawASTVisitor<Environment, Pair<Environment, ContParser>> {
-	private DeclarationParser() { }
-	private static DeclarationParser instance = new DeclarationParser();
-	public static DeclarationParser getInstance() { return instance; }
+	private final CompilationContext globalCtx;
+
+	public DeclarationParser(CompilationContext ctx) {
+		this.globalCtx = ctx;
+	}
+
+	public DeclarationParser() {
+		globalCtx = null;
+	}
 
 	@Override
 	public Pair<Environment, ContParser> visit(LineSequence node, Environment env) {
@@ -43,7 +49,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 			
 			Pair<Environment,ContParser> partiallyParsed = 
-					parseLineInt(new CompilationContext((ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext(null, (ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
@@ -94,7 +100,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
 
-		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
+		TypedAST first = node.getFirst().accept(new BodyParser(ctx), env);
 		LineParser parser = first.getLineParser();
 		
 		if (!(parser instanceof DeclParser))

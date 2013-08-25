@@ -160,13 +160,13 @@ public class ParseUtils {
 
 	// I do not think this method is needed!? (Alex) Why not use accept directly?
 	public static TypedAST parseExpr(CompilationContext ctx) {
-		TypedAST result = ctx.getTokens().accept(BodyParser.getInstance(), ctx.getEnv());
+		TypedAST result = ctx.getTokens().accept(new BodyParser(ctx), ctx.getEnv());
 		ctx.setTokens(null);	// previous line by definition read everything
 		return result;
 	}
 	
 	public static TypedAST parseCond(CompilationContext ctx) {
-        return getLine(ctx).accept(BodyParser.getInstance(), ctx.getEnv());
+        return getLine(ctx).accept(new BodyParser(ctx), ctx.getEnv());
 	}
 
     public static ExpressionSequence getLine(CompilationContext ctx) {
@@ -184,12 +184,12 @@ public class ParseUtils {
 			condRaw.add(ctx.getTokens().getFirst());
 			ctx.setTokens(ctx.getTokens().getRest());
 		}
-		return new Line(condRaw, FileLocation.UNKNOWN).accept(DeclarationParser.getInstance(), ctx.getEnv());
+		return new Line(condRaw, FileLocation.UNKNOWN).accept(new DeclarationParser(ctx), ctx.getEnv());
 	}
 
 	public static Variable parseVariable(CompilationContext ctx) {
 		Symbol sym = parseSymbol(ctx);
-		TypedAST var = sym.accept(BodyParser.getInstance(), ctx.getEnv());
+		TypedAST var = sym.accept(new BodyParser(ctx), ctx.getEnv());
 		if (!(var instanceof Variable))
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 		return (Variable) var;

@@ -58,7 +58,7 @@ public class DefParser implements DeclParser {
 	
 	// FIXME: Should convert all functions: f (A, B) : C into f : A*B -> C and thus convert f() : C into f : Unit -> C!
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			CompilationContext ctx, final boolean isClassMeth) {
+			final CompilationContext ctx, final boolean isClassMeth) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		final String defName = s.name;
 		final FileLocation methNameLine = s.getLocation();
@@ -137,7 +137,7 @@ public class DefParser implements DeclParser {
 				if (exp == null) {
 					inExp = null;
 				} else {
-					inExp = exp.accept(BodyParser.getInstance(), env.extend(savedArgsEnv));
+					inExp = exp.accept(new BodyParser(ctx), env.extend(savedArgsEnv));
 				}
 				md.setBody(inExp);
 

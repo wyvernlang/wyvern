@@ -22,7 +22,7 @@ public class ConnectionParser implements DeclParser {
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, final CompilationContext ctx) {
 		String name = ParseUtils.parseSymbol(ctx).name;
 		CompilationContext innerCtx = ctx.copyTokens(ctx.getEnv().getExternalEnv());
 		List<NameBinding> args = ParseUtils.getNameBindings(innerCtx);
@@ -48,7 +48,7 @@ public class ConnectionParser implements DeclParser {
 						conn.setProperties((DomainType)domainBinding.getType(), (ViaType)viaBinding.getType());
 
 						if (modiferExprs != null)
-							conn.setModifiers(BodyParser.getInstance().visit(modiferExprs, intEnv));
+							conn.setModifiers(new BodyParser(ctx).visit(modiferExprs, intEnv));
 
 						((DomainType)domainBinding.getType())
 								.getDomain().getFinalEndpoint().getEndpoint().addConnection(conn);

@@ -57,7 +57,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 	
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			CompilationContext ctx) {
+			final CompilationContext ctx) {
 		Symbol s = ParseUtils.parseSymbol(ctx);
 		String clsName = s.name;
 		FileLocation clsNameLine = s.getLocation();
@@ -82,7 +82,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 				envs = envin.extend(new TypeBinding("class", mtd.getType()));
 
 
-				declAST = body.accept(ClassBodyParser.getInstance(), envs);
+				declAST = body.accept(new ClassBodyParser(ctx), envs);
 				mtd.setDeclEnv(declAST.first);
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser) declAST.second).parseTypes(r);

@@ -70,7 +70,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 
 	@Override
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first,
-			CompilationContext ctx) {
+			final CompilationContext ctx) {
 		if (ParseUtils.checkFirst("def", ctx)) { // Parses "class def". // FIXME: Should this connect to the keyword in Globals?
 			ParseUtils.parseSymbol(ctx);
 			return DefParser.getInstance().parseDeferred(first, ctx, true);
@@ -136,7 +136,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 
 				Environment envin = mutableDeclf.extend(external);
 				envs = envin.extend(new ClassBinding("class", mutableDeclf));
-				declAST = lines.accept(ClassBodyParser.getInstance(), envs);
+				declAST = lines.accept(new ClassBodyParser(ctx), envs);
 				envi = envs.extend(new NameBindingImpl("this", mutableDeclf.getType()));
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser)declAST.second).parseTypes(new SimpleResolver(envs));

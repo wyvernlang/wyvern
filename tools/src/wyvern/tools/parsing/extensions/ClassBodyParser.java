@@ -25,9 +25,11 @@ import wyvern.tools.util.Pair;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environment, ContParser>> {
-	private ClassBodyParser() { }
-	private static ClassBodyParser instance = new ClassBodyParser();
-	public static ClassBodyParser getInstance() { return instance; }
+	private final CompilationContext globalCtx;
+
+	public ClassBodyParser(CompilationContext globalCtx) {
+		this.globalCtx = globalCtx;
+	}
 
 	@Override
 	public Pair<Environment, ContParser> visit(LineSequence node, Environment env) {
@@ -43,7 +45,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 			if (!(line instanceof ExpressionSequence))
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 
-			CompilationContext ctx = new CompilationContext((ExpressionSequence) line, env);
+			CompilationContext ctx = new CompilationContext(globalCtx, (ExpressionSequence) line, env);
 			Pair<TypedAST, LineParser> fetched = getParser(ctx);
 
 			if (!(fetched.second instanceof DeclParser))
@@ -56,7 +58,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 			}
 
 			Pair<Environment,ContParser> partiallyParsed =
-					parseLineInt(new CompilationContext((ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext(globalCtx, (ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
@@ -73,7 +75,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		if (node.children.size() == 0) {
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
-		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
+		TypedAST first = node.getFirst().accept(new BodyParser(ctx), env);
 		ctx.setTokens(ctx.getTokens().getRest());
 
 		return new Pair<>(first, first.getLineParser());
@@ -88,7 +90,7 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, node);
 		}
 
-		TypedAST first = node.getFirst().accept(BodyParser.getInstance(), env);
+		TypedAST first = node.getFirst().accept(new BodyParser(ctx), env);
 		LineParser parser = first.getLineParser();
 
 		if (!(parser instanceof DeclParser))
