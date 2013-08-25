@@ -216,7 +216,7 @@ public class ClassStore {
 		Hashtable<String, byte[]> nc = new Hashtable<String, byte[]>();
 		for (Pair<String, byte[]> pair : classes.values()) {
 			nc.put(pair.first, pair.second);
-
+			/*
 			try {
 				FileOutputStream fso = new FileOutputStream(pair.first+".class");
 				fso.write(pair.second);
@@ -224,7 +224,7 @@ public class ClassStore {
 			} catch (Exception e) {
 
 			}
-
+			*/
 		}
 
 		ByteClassLoader byteClassLoader = new ByteClassLoader(nc, ClassStore.class.getClassLoader());
