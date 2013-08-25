@@ -50,7 +50,7 @@ public class ImportParser implements DeclParser {
 	}
 
 	@Override
-	public Pair<Environment, ContParser> parseDeferred(TypedAST first, CompilationContext ctx) {
+	public Pair<Environment, ContParser> parseDeferred(TypedAST first, final CompilationContext ctx) {
 		final StringLiteral importLiteral = (StringLiteral)ctx.popToken();
 		final String importName = importLiteral.data;
 		ParseUtils.parseSymbol("as", ctx);
@@ -88,7 +88,7 @@ public class ImportParser implements DeclParser {
 			@Override
 			public void parseTypes(EnvironmentResolver r) {
 				try {
-					parserPair = wyvern.stdlib.Compiler.compilePartial(URI.create(importName), new ArrayList<DSL>());
+					parserPair = wyvern.stdlib.Compiler.compilePartial(URI.create(importName), ctx, new ArrayList<DSL>());
 				} catch (IOException e) {
 					ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, importLiteral);
 				}

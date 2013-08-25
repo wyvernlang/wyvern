@@ -1,5 +1,7 @@
 package wyvern.tools.util;
 
+import wyvern.stdlib.*;
+import wyvern.stdlib.Compiler;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.typedAST.extensions.DSLDummy;
@@ -18,6 +20,7 @@ public class CompilationContext {
 
 	private Type expected = null;
 	private Tuple expectedTuple = null;
+	private Compiler.ImportCompileResolver resolver;
 
 	public CompilationContext(CompilationContext globalCtx, ExpressionSequence f, Environment s) {
 		setTokens(f);
@@ -26,6 +29,9 @@ public class CompilationContext {
 		if (globalCtx != null) {
 			setExpected(globalCtx.expected);
 			setExpectedTuple(globalCtx.getExpectedTuple());
+			resolver = globalCtx.getResolver();
+		} else {
+			resolver = new Compiler.ImportCompileResolver();
 		}
 	}
 
@@ -94,5 +100,9 @@ public class CompilationContext {
 
 	public void setExpectedTuple(Tuple expectedTuple) {
 		this.expectedTuple = expectedTuple;
+	}
+
+	public Compiler.ImportCompileResolver getResolver() {
+		return resolver;
 	}
 }

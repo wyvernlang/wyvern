@@ -14,6 +14,7 @@ import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class Compiler {
         return parseEnv;
     }
 
-    public static Pair<Environment, ContParser> compileSourcePartial(String name, String source, List<DSL> dsls) {
+    public static Pair<Environment, ContParser> compileSourcePartial(String name, String source, List<DSL> dsls, CompilationContext ctx) {
         String md5 = getMD5(source);
         if (parseCache.containsKey(md5))
             return parseCache.get(md5);
@@ -62,7 +63,7 @@ public class Compiler {
 
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
-        Pair<Environment, ContParser> pair = parsedResult.accept(new DeclarationParser(null), parseEnv);
+        Pair<Environment, ContParser> pair = parsedResult.accept(new DeclarationParser(ctx), parseEnv);
 		final Pair<Environment, ContParser> finalPair = pair;
 		pair = wrapParser(finalPair);
         parseCache.put(md5, pair);
@@ -73,17 +74,11 @@ public class Compiler {
 		return new Pair<Environment, ContParser>(finalPair.first, new CachingParser(finalPair));
 	}
 
-	public static Pair<Environment, ContParser> compilePartial(URI url, List<DSL> dsls) throws IOException {
+	public static Pair<Environment, ContParser> compilePartial(URI url, CompilationContext ctx, List<DSL> dsls) throws IOException {
         String name = url.getPath();
-        String source = ImportCompileResolver.getInstance().lookupReader(url);
-		final Pair<Environment, ContParser> parserPair = compileSourcePartial(name, source, dsls);
+        String source = ctx.getResolver().lookupReader(url);
+		final Pair<Environment, ContParser> parserPair = compileSourcePartial(name, source, dsls, ctx);
 		return parserPair;
-    }
-
-    public static Pair<Environment, ContParser> compileSourcePartial(String startupname, List<String> files, List<DSL> dsls) {
-        ImportCompileResolver.getInstance().setCommandRefs(files);
-        Pair<Environment, ContParser> pair = compileSourcePartial(startupname, files.get(0), dsls);
-        return pair;
     }
 
     private static TypedAST resolvePair(Environment parseEnv, Pair<Environment, ContParser> pair) {
@@ -96,7 +91,7 @@ public class Compiler {
 		return parsed;
     }
 
-    public static TypedAST compileSource(String name, String source, List<DSL> dsls) {
+    public static TypedAST compileSource(String name, String source, List<DSL> dsls, CompilationContext context) {
         String md5 = getMD5(source);
         if (parseCache.containsKey(md5))
             return resolvePair(getParseEnv(dsls), parseCache.get(md5));
@@ -105,7 +100,7 @@ public class Compiler {
 
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
-		final TypedAST result = parsedResult.accept(new BodyParser(), parseEnv);
+		final TypedAST result = parsedResult.accept(new BodyParser(context), parseEnv);
 
 		Pair<Environment, ContParser> pair = wrapParser(
 			new Pair<Environment, ContParser>(
@@ -126,8 +121,9 @@ public class Compiler {
     }
 
     public static <T extends TypedAST> T compileSources(String startupname, List<String> files, List<DSL> dsls, TypedASTTransformer<T> xformer) {
-        ImportCompileResolver.getInstance().setCommandRefs(files);
-        return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(compileSource(startupname, files.get(0), dsls)));
+		CompilationContext newCtx = new CompilationContext(null, null, null);
+		newCtx.getResolver().setCommandRefs(files);
+        return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(compileSource(startupname, files.get(0), dsls, newCtx)));
     }
 
 	public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls) {

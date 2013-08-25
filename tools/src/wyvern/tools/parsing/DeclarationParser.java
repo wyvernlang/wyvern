@@ -49,7 +49,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, node);
 			
 			Pair<Environment,ContParser> partiallyParsed = 
-					parseLineInt(new CompilationContext(null, (ExpressionSequence)line,env));
+					parseLineInt(new CompilationContext(globalCtx, (ExpressionSequence)line,env));
 			newEnv = newEnv.extend(partiallyParsed.first);
 			contParsers.add(partiallyParsed.second);
 		}
