@@ -27,16 +27,17 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		this.fields = fields;
 
 		this.intEnv = declEnv;
-		for (Map.Entry<String, Value> elem : fields.entrySet()) {
-            if (intEnv.getValue(elem.getKey()) != null &&
-                    intEnv.getValue(elem.getKey()) instanceof VarValue) {
-                ((VarValue)this.intEnv.getValue(elem.getKey())).setValue(elem.getValue());
-                continue;
-            }
+		if (fields != null)
+			for (Map.Entry<String, Value> elem : fields.entrySet()) {
+				if (intEnv.getValue(elem.getKey()) != null &&
+						intEnv.getValue(elem.getKey()) instanceof VarValue) {
+					((VarValue)this.intEnv.getValue(elem.getKey())).setValue(elem.getValue());
+					continue;
+				}
 
-			this.intEnv = 
-				this.intEnv.extend(new ValueBinding(elem.getKey(), elem.getValue()));
-        }
+				this.intEnv =
+					this.intEnv.extend(new ValueBinding(elem.getKey(), elem.getValue()));
+			}
 
 	}
 

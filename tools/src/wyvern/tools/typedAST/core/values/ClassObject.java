@@ -57,4 +57,8 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 		String operation = exp.getOperationName();
 		return classEnv.getValue(operation);
 	}
+
+	public Environment getIntEnv() {
+		return classEnv;
+	}
 }
