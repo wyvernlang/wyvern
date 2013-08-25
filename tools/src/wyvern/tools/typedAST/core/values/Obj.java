@@ -11,9 +11,11 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	//private ObjectType type;
@@ -40,7 +42,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 
 	@Override
 	public Type getType() {
-		return cls.getInstanceType();
+		return new ClassType(new AtomicReference<>(intEnv), null, null);
 	}
 	
 	@Override

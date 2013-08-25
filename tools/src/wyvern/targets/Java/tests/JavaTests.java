@@ -211,7 +211,7 @@ public class JavaTests {
 					  "		t";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("wycCode");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s").invoke(testObj);
 		Assert.assertEquals(returned, new Integer(3));
