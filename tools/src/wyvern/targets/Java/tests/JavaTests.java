@@ -83,7 +83,7 @@ public class JavaTests {
 					  "		1";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s").invoke(testObj);
 		Assert.assertEquals(returned, new Integer(1));
@@ -97,7 +97,7 @@ public class JavaTests {
 					  "		1";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s", int.class).invoke(testObj, 1);
 		Assert.assertEquals(returned, new Integer(1));
@@ -111,7 +111,7 @@ public class JavaTests {
 					  "		1";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s", int.class, int.class).invoke(testObj, 1, 2);
 		Assert.assertEquals(returned, new Integer(1));
@@ -127,7 +127,7 @@ public class JavaTests {
 					  "		a+b";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s", int.class, int.class).invoke(testObj, 1, 2);
 		Assert.assertEquals(returned, new Integer(3));
@@ -142,7 +142,7 @@ public class JavaTests {
 		
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s").invoke(testObj);
@@ -156,7 +156,7 @@ public class JavaTests {
 					  "		1+2+3";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s").invoke(testObj);
 		Assert.assertEquals(returned, new Integer(6));
@@ -166,7 +166,7 @@ public class JavaTests {
 	public void testExecution() throws Exception {
 		String test = "1+2+3";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(6));
 		
@@ -177,7 +177,7 @@ public class JavaTests {
 		String test = "val t : Int = 2\n" +
 					  "t";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(2));
 		
@@ -188,7 +188,7 @@ public class JavaTests {
 				      "val s : Int = 2\n" +
 					  "t+s";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(4));
 	}
@@ -198,7 +198,7 @@ public class JavaTests {
 				      "val s : Int = 2\n" +
 					  "t+s+4";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(8));
 	}
@@ -211,7 +211,7 @@ public class JavaTests {
 					  "		t";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s").invoke(testObj);
 		Assert.assertEquals(returned, new Integer(3));
@@ -225,7 +225,7 @@ public class JavaTests {
 					  "		t+a";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSTest");
+		Class generated = generatedLoader.loadClass("Test");
 		Object testObj = generated.getMethod("create").invoke(null);
 		Object returned = generated.getMethod("s", int.class).invoke(testObj,3);
 		Assert.assertEquals(returned, new Integer(6));
@@ -239,7 +239,7 @@ public class JavaTests {
 				  "x.n()";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(1));
 	}
@@ -253,7 +253,7 @@ public class JavaTests {
 				  "x.n(10)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(11));
 	}
@@ -268,7 +268,7 @@ public class JavaTests {
 				  "x.b(10)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));
 	}
@@ -283,7 +283,7 @@ public class JavaTests {
 				"x.n(x.b(4))";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(6));
 	}
@@ -352,7 +352,7 @@ public class JavaTests {
 					  "Test9.create().test()";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
         Object returned = generated.getMethod("main").invoke(null);
         Assert.assertEquals(returned, new Integer(2));
     }
@@ -367,7 +367,7 @@ public class JavaTests {
                 "Test2.create().test()";
 
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Class generated = generatedLoader.loadClass("wycCode");
         Object returned = generated.getMethod("main").invoke(null);
         Assert.assertEquals(returned, new Integer(5));
     }
@@ -388,7 +388,7 @@ public class JavaTests {
                         "Tester.create().test(2).test() + Tester.create().test(3).test()";
 
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Class generated = generatedLoader.loadClass("wycCode");
         Object returned = generated.getMethod("main").invoke(null);
         Assert.assertEquals(returned, new Integer(5));
     }
@@ -401,7 +401,7 @@ public class JavaTests {
                 "n";
 
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Class generated = generatedLoader.loadClass("wycCode");
         Object returned = generated.getMethod("main").invoke(null);
         Assert.assertEquals(returned, new Integer(3));
     }
@@ -415,11 +415,11 @@ public class JavaTests {
                 "val y : Test4 = Test4.create()\n"+
                 "class Test4\n" +
                 "   class def create():Test4 = new\n" +
-        "   def a(x : Int):Int = 2+x\n" +
+        		"   def a(x : Int):Int = 2+x\n" +
                 "val x : Test4 = Test4.create()\n" +
                 "x.a(2) + y.a()";
         ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-        Class generated = generatedLoader.loadClass("CLASSwycCode");
+        Class generated = generatedLoader.loadClass("wycCode");
         Object returned = generated.getMethod("main").invoke(null);
         Assert.assertEquals(returned, 5);
     }
@@ -452,7 +452,7 @@ public class JavaTests {
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
 
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(14));
 	}
@@ -466,7 +466,7 @@ public class JavaTests {
 				"val t : Test = Test.create()\n" +
 				"t.x";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(2));
 	}
@@ -478,7 +478,7 @@ public class JavaTests {
 				"x";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(4));
 	}
@@ -491,7 +491,7 @@ public class JavaTests {
 				"a(0)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(0));
 	}
@@ -503,7 +503,7 @@ public class JavaTests {
 				"a(0)";
 
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(2));
 	}
@@ -514,7 +514,7 @@ public class JavaTests {
 				+"val addOne : Int -> Int = fn x : Int => x + 1\n"
 				+"applyTwice(addOne)(1)";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(3));
 	}
@@ -530,7 +530,7 @@ public class JavaTests {
 				"val ins : Test = Test.create(10)\n" +
 				"ins.t";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(10));
 	}
@@ -548,7 +548,7 @@ public class JavaTests {
 						"val ins : Test = Test.create(10)\n" +
 						"ins.getFn()(5)";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(15));
 	}
@@ -559,7 +559,7 @@ public class JavaTests {
 				"def mult(n:Int,m:Int):Int = n+5*m\n"
 						+"mult(3,2)\n";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(13));
 	}
@@ -571,7 +571,7 @@ public class JavaTests {
 						+"def doublePlusOne(n:Int):Int = double(n) + 1\n"
 						+"doublePlusOne(5)\n";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(11));
 	}
@@ -587,7 +587,7 @@ public class JavaTests {
 						+"val h : Hello = Hello.make()\n"//hiString: \"hi\")\n"
 						+"h.hiString";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, "hello");
 	}
@@ -602,7 +602,7 @@ public class JavaTests {
 						+"val f2 : Int -> Int = outer(2)\n"
 						+"f2(6)";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(9));
 	}
@@ -617,7 +617,7 @@ public class JavaTests {
 						+"val h:Hello = Hello.make()\n"
 						+"h.get5()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(5));
 	}
@@ -634,7 +634,7 @@ public class JavaTests {
 						+"val h:Hello = Hello.make()\n"
 						+"h.getP()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(9));
 	}
@@ -651,7 +651,7 @@ public class JavaTests {
 						+"val h:Hello = Hello.make()\n"
 						+"h.getP()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(5));
 	}
@@ -670,7 +670,7 @@ public class JavaTests {
 						+"val h : Hello = Hello.make()\n"
 						+"h.getP()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(6));
 	}
@@ -680,7 +680,7 @@ public class JavaTests {
 		String test =
 				"var x : Int = 1\nx";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(1));
 	}
@@ -690,7 +690,7 @@ public class JavaTests {
 		String test =
 				"var x:Int = 1\nx=2\nx";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(2));
 	}
@@ -700,7 +700,7 @@ public class JavaTests {
 		String test =
 				"var x:Int = 1\nx=2\nvar y:Int = 3\ny=4\nx=y\nx";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(4));
 	}
@@ -717,7 +717,7 @@ public class JavaTests {
 						+"h.setV(10)\n"
 						+"h.getV()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(10));
 	}
@@ -735,7 +735,7 @@ public class JavaTests {
 						"val h:Hello = Hello.NewHello(10)\n" +
 						"h.getTest()";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(10));
 	}
@@ -749,7 +749,7 @@ public class JavaTests {
 				"	else\n" +
 				"		2\n";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(1));
 	}
@@ -764,7 +764,7 @@ public class JavaTests {
 				"	y = y+1\n" +
 				"y";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 		Assert.assertEquals(returned, new Integer(5));
 	}

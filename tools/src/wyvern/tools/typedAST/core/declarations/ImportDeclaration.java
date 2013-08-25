@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -27,7 +28,7 @@ public class ImportDeclaration extends Declaration {
 		this.equivName = equivName;
 		this.location = location;
 		declEnv = new AtomicReference<>(externalEnv);
-		equivType = new TypeType(equivName, declEnv);
+		equivType = new TypeType(declEnv);
 	}
 
 	protected void setDeclEnv(Environment env) {
@@ -70,7 +71,9 @@ public class ImportDeclaration extends Declaration {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		return;//TODO: Think about this more
+		if (ref.get() instanceof EnvironmentExtender)
+			((EnvironmentExtender) ref.get()).evalDecl(evalEnv);
+		return;
 	}
 
 	@Override

@@ -141,6 +141,9 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	public void visit(DefDeclaration meth) {
 		TypedAST body = meth.getBody();
 
+		if (body == null)
+			return;
+
 		if (!(body instanceof CoreAST))
 			throw new RuntimeException("Codegenerated elements must implement CoreAST");
 		

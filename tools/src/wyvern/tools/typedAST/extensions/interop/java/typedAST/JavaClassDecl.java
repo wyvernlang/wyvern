@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 
 import java.lang.invoke.MethodHandle;
@@ -46,7 +47,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 
 	@Override
-	protected Type getClassType() {
+	public ClassType getClassType() {
 		return new JavaClassType(this);
 	}
 

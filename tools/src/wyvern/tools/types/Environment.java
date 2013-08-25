@@ -107,4 +107,11 @@ public class Environment implements TreeWritable {
 		if (parentEnvironment != null)
 			parentEnvironment.writeBinding(binding);
 	}
+
+	public String toString() {
+		if (parentEnvironment == null || parentEnvironment.binding == null)
+			return this.binding.toString();
+		else
+			return this.binding.toString() + ", " + parentEnvironment.toString();
+	}
 }

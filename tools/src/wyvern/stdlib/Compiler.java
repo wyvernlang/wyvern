@@ -2,6 +2,7 @@ package wyvern.stdlib;
 
 import com.sun.org.apache.xpath.internal.functions.FuncExtFunction;
 import wyvern.DSL.DSL;
+import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclarationParser;
 import wyvern.tools.parsing.RecordTypeParser;
@@ -10,6 +11,7 @@ import wyvern.tools.parsing.transformers.stdlib.IdentityTranformer;
 import wyvern.tools.parsing.transformers.stdlib.ImportChecker;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.Pair;
@@ -103,9 +105,21 @@ public class Compiler {
 
         RawAST parsedResult = Phase1Parser.parse(name, new StringReader(source));
 
-        Pair<Environment, ContParser> pair = wrapParser(parsedResult.accept(DeclarationParser.getInstance(), parseEnv));
-        parseCache.put(md5, pair);
-        TypedAST result = resolvePair(parseEnv, pair);
+		final TypedAST result = parsedResult.accept(BodyParser.getInstance(), parseEnv);
+
+		Pair<Environment, ContParser> pair = wrapParser(
+			new Pair<Environment, ContParser>(
+				(result instanceof EnvironmentExtender) ?
+						((EnvironmentExtender) result).extend(Environment.getEmptyEnvironment())
+					  : Environment.getEmptyEnvironment(),
+				new ContParser() {
+					@Override
+					public TypedAST parse(EnvironmentResolver r) {
+						return result;
+					}
+				}
+		));
+		parseCache.put(md5, pair);
 		if (!parsedASTs.containsKey(md5))
 			parsedASTs.put(md5, result);
 		return result;

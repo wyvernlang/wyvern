@@ -12,10 +12,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Assignment;
-import wyvern.tools.typedAST.core.binding.ClassBinding;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
+import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -86,7 +83,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, getLocation());
 			cls = classDeclaration;
-			return new ClassType("generic" + generic_num++, new AtomicReference<>(mockEnv), new AtomicReference<>(mockEnv), null);
+			return new ClassType(new AtomicReference<>(mockEnv), new AtomicReference<>(mockEnv), null);
 		}
 	}
 
@@ -103,7 +100,14 @@ public class New extends CachingTypedAST implements CoreAST {
 			argVals.put(elem.getKey(), elem.getValue().evaluate(env));
 		cls.evalDecl(env, cls.extendWithValue(Environment.getEmptyEnvironment()));
 		ClassObject clsObject = cls.createObject();
-		return new Obj(clsObject, argVals);
+		AtomicReference<Value> objRef = new AtomicReference<>();
+		objRef.set(new Obj(
+				cls.evaluateDeclarations(
+						Environment
+								.getEmptyEnvironment()
+								.extend(new LateValueBinding("this", objRef, cls.getType()))),
+				argVals));
+		return objRef.get();
 	}
 	
 	public ClassDeclaration getClassDecl() {

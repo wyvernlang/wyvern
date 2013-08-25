@@ -44,7 +44,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	public Type getClassType() {
-		return new ClassType(name, declEnv, typeEquivalentEnvironment, asc);//this.typeBinding.getType();
+		return new ClassType(declEnv, typeEquivalentEnvironment, asc);//this.typeBinding.getType();
 	}
 
 	@Override

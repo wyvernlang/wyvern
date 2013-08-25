@@ -63,7 +63,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	public TypeType getEquivalentType() {
 		if (equivalentType == null)
-			equivalentType = new TypeType(getName(), TypeDeclUtils.getTypeEquivalentEnvironment(getDecls(), false));
+			equivalentType = new TypeType(TypeDeclUtils.getTypeEquivalentEnvironment(getDecls(), false));
 		return equivalentType;
 	}
 
@@ -180,12 +180,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		vb.setValue(classObj);
 	}
 	
-	public Environment evaluateDeclarations(Obj obj) {
+	public Environment evaluateDeclarations(Environment addtlEnv) {
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		
-		ValueBinding thisBinding = new ValueBinding("this", obj);
-		Environment intEnv = declEvalEnv.extend(thisBinding);
-		decls.bindDecls(intEnv, thisEnv);
+		decls.bindDecls(declEvalEnv.extend(addtlEnv), thisEnv);
 		
 		return thisEnv;
 	}
@@ -264,7 +261,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	public Type getEquivalentClassType() {
 		if (equivalentClassType == null)
-			equivalentClassType = new TypeType(getName(), TypeDeclUtils.getTypeEquivalentEnvironment(decls, true));
+			equivalentClassType = new TypeType(TypeDeclUtils.getTypeEquivalentEnvironment(decls, true));
 		return equivalentClassType;
 	}
 }

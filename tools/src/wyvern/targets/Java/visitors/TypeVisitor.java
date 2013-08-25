@@ -21,7 +21,7 @@ public class TypeVisitor extends BaseASTVisitor {
 
     @Override
     public void visit(TypeDeclaration td) {
-        store.registerClass(td.getType());
+        store.registerClass(td);
         cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         cw.visit(V1_7,
                 ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE,
@@ -31,7 +31,7 @@ public class TypeVisitor extends BaseASTVisitor {
                 null);
         super.visit(td);
         cw.visitEnd();
-        store.registerClass(td.getType(), cw.toByteArray());
+        store.registerClass(td, cw.toByteArray());
     }
 
     @Override
