@@ -4,34 +4,32 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.*;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
-	private AtomicReference<Environment> declEnv;
+	private AtomicReference<Environment> typeDeclEnv;
+	private AtomicReference<Environment> attrEnv;
 
 	public TypeType(TypeDeclaration decl) {
-		declEnv = decl.getDeclEnv();
+		typeDeclEnv = decl.getDeclEnv();
+		attrEnv = decl.getAttrEnvRef();
 	}
 
 	public TypeType(Environment declEnv) {
-		this.declEnv = new AtomicReference<>(declEnv);
+		this.typeDeclEnv = new AtomicReference<>(declEnv);
 	}
 
 	public TypeType(AtomicReference<Environment> declEnv) {
-		this.declEnv = declEnv;
+		this.typeDeclEnv = declEnv;
 	}
 	
 	public TypeDeclaration getDecl() {
@@ -45,7 +43,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	
 	@Override
 	public String toString() {
-		return "TYPE(" + declEnv.get().toString() + ")";
+		return "TYPE(" + typeDeclEnv.get().toString() + ")";
 	}
 
 	@Override
@@ -55,7 +53,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
-		NameBinding m = declEnv.get().lookup(opName);
+		NameBinding m = attrEnv.get().lookup(opName);
 
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
@@ -66,7 +64,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	
 	public HashSet<Pair<String, Type>> getMembers() {
 		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
-		for (Binding b : declEnv.get().getBindings()) {
+		for (Binding b : typeDeclEnv.get().getBindings()) {
 			if (!(b instanceof NameBinding))
 				continue;
 			String name = b.getName();
@@ -127,6 +125,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 
 	@Override
 	public Type getInnerType(String name) {
-		return declEnv.get().lookup(name).getType();
+		return typeDeclEnv.get().lookup(name).getType();
 	}
 }

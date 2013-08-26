@@ -76,4 +76,13 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	public FileLocation getLocation() {
 		return this.location;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof IntegerConstant))
+			return false;
+		if (((IntegerConstant) o).getValue() != this.getValue())
+			return false;
+		return true;
+	}
 }

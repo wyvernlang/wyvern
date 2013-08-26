@@ -9,7 +9,9 @@ import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
@@ -22,7 +24,61 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 	private TypeParser() { }
 	private static TypeParser instance = new TypeParser();
 	public static TypeParser getInstance() { return instance; }
-	
+
+	/**
+	 * Parses
+	 * attributes
+	 * 	[decls]
+	 */
+	private static class AttributeParser implements DeclParser {
+
+		private final MutableTypeDeclaration decl;
+
+		public AttributeParser(MutableTypeDeclaration decl) {
+			this.decl = decl;
+		}
+
+		@Override
+		public Pair<Environment, ContParser> parseDeferred(TypedAST first, final CompilationContext ctx) {
+			return new Pair<Environment, ContParser>(Environment.getEmptyEnvironment(),
+					new RecordTypeParser.RecordTypeParserBase() {
+						Pair<Environment, ContParser> pair;
+
+						@Override
+						protected void doParseTypes(ContParser.EnvironmentResolver r) {
+							LineSequence lines = ParseUtils.extractLines(ctx);
+							pair = lines.accept(new ClassBodyParser(ctx), ctx.getEnv());
+							decl.setAttrEnv(decl.getAttrEnv().extend(pair.first));
+							if (pair.second instanceof RecordTypeParser)
+								((RecordTypeParser) pair.second).parseTypes(r);
+						}
+
+						@Override
+						protected void doParseInner(ContParser.EnvironmentResolver r) {
+							if (pair == null)
+								parseTypes(r);
+							if (pair.second instanceof RecordTypeParser) {
+								((RecordTypeParser) pair.second).parseInner(r);
+								decl.setAttrEnv(((ClassBodyParser.ClassBodyContParser)pair.second).internalEnv);
+							}
+						}
+
+						@Override
+						public TypedAST parse(ContParser.EnvironmentResolver r) {
+							return new TypeDeclaration.AttributeDeclaration(pair.second.parse(r));
+						}
+					});
+		}
+
+		@Override
+		public TypedAST parse(TypedAST first, CompilationContext ctx) {
+			Pair<Environment, ContParser> parserPair =
+					ParseUtils.extractLines(ctx).accept(new DeclarationParser(ctx), ctx.getEnv());
+			TypedAST body = wyvern.stdlib.Compiler.resolvePair(ctx.getEnv(), parserPair);
+			return new TypeDeclaration.AttributeDeclaration(body);
+		}
+	}
+
 	public static class MutableTypeDeclaration extends TypeDeclaration {
 		public MutableTypeDeclaration(String name, FileLocation location) {
 			super(name, null, location);
@@ -35,6 +91,10 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
         public void setDeclEnv(Environment env) {
             super.declEnv.set(env);
         }
+
+		public void setAttrEnv(Environment env) {
+			super.attrEnv.set(env);
+		}
 	}
 
 	@Override
@@ -82,7 +142,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 				envs = envin.extend(new TypeBinding("class", mtd.getType()));
 
 
-				declAST = body.accept(new ClassBodyParser(ctx), envs);
+				declAST = body.accept(new ClassBodyParser(ctx), envs.extend(new KeywordNameBinding("attributes", new Keyword(new AttributeParser(mtd)))));
 				mtd.setDeclEnv(declAST.first);
 				if (declAST.second instanceof RecordTypeParser)
 					((RecordTypeParser) declAST.second).parseTypes(r);

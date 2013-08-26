@@ -27,6 +27,65 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	
 	private Environment declEvalEnv;
     protected AtomicReference<Environment> declEnv;
+	protected AtomicReference<Environment> attrEnv = new AtomicReference<>(Environment.getEmptyEnvironment());
+
+	public Environment getAttrEnv() {
+		return attrEnv.get();
+	}
+
+	public AtomicReference<Environment> getAttrEnvRef() {
+		return attrEnv;
+	}
+
+	public static class AttributeDeclaration extends Declaration {
+		private final TypedAST body;
+
+		public AttributeDeclaration(TypedAST body) {
+			this.body = body;
+		}
+
+		@Override
+		public String getName() {
+			return "";
+		}
+
+		@Override
+		protected Type doTypecheck(Environment env) {
+			return null;
+		}
+
+		@Override
+		protected Environment doExtend(Environment old) {
+			return old;
+		}
+
+		@Override
+		public Environment extendWithValue(Environment old) {
+			return old;
+		}
+
+		@Override
+		public void evalDecl(Environment evalEnv, Environment declEnv) {
+		}
+
+		@Override
+		public Type getType() {
+			return null;
+		}
+
+		@Override
+		public FileLocation getLocation() {
+			return null;
+		}
+
+		@Override
+		public void writeArgsToTree(TreeWriter writer) {
+		}
+
+		public TypedAST getBody() {
+			return body;
+		}
+	}
 
     public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
 		this.decls = decls;
@@ -85,33 +144,17 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		
-		// TODO: 
-		
-		// ClassObject classObj = new ClassObject(this);
-		
-		// ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
-		// vb.setValue(classObj);
-	}
-	
-	public Environment evaluateDeclarations(Obj obj) {
-		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		
-		ValueBinding thisBinding = new ValueBinding("this", obj);
-		Environment intEnv = declEvalEnv.extend(thisBinding);
-		decls.bindDecls(intEnv, thisEnv);
-		
-		return thisEnv;
-	}
 
-	public Declaration getDecl(String opName) {
-
-		for (Declaration d : decls.getDeclIterator()) {
-			// TODO: handle fields too
-			if (d.getName().equals(opName))
-				return d;
+		Environment attrEnv = Environment.getEmptyEnvironment();
+		for (Declaration decl : decls.getDeclIterator()) {
+			if (decl instanceof AttributeDeclaration) {
+				attrEnv = ((DeclSequence)((AttributeDeclaration) decl).getBody()).evalDecls(attrEnv);
+			}
 		}
-		return null;	// can't find it
+		Obj typeAttrObj = new Obj(attrEnv);
+		
+		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		vb.setValue(typeAttrObj);
 	}
 	
 	public DeclSequence getDecls() {

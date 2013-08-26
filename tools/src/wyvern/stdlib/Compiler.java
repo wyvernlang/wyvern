@@ -81,7 +81,7 @@ public class Compiler {
 		return parserPair;
     }
 
-    private static TypedAST resolvePair(Environment parseEnv, Pair<Environment, ContParser> pair) {
+    public static TypedAST resolvePair(Environment parseEnv, Pair<Environment, ContParser> pair) {
         ContParser.EnvironmentResolver r = new ContParser.SimpleResolver(pair.first.extend(parseEnv));
         if (pair.second instanceof RecordTypeParser) {
             ((RecordTypeParser) pair.second).parseTypes(r);
