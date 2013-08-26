@@ -175,7 +175,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv.extend(evalEnv);
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		ClassObject classObj = new ClassObject(this, getClassEnv());
+		ClassObject classObj = new ClassObject(getClassEnv());
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);
@@ -237,7 +237,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	public ClassObject createObject() {
-		return new ClassObject(this, getClassEnv());
+		return new ClassObject(getClassEnv());
 	}
 
     public NameBinding lookupDecl(String name) {

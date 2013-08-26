@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.values;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
@@ -13,20 +14,19 @@ import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassObject extends AbstractValue implements InvokableValue, Value {
-	private ClassDeclaration decl;
 	private Environment classEnv;
 	
-	public ClassObject(ClassDeclaration decl, Environment classEnv) {
-		this.decl = decl;
+	public ClassObject(Environment classEnv) {
 		this.classEnv = classEnv;
 	}
 
 	@Override
 	public Type getType() {
-		return decl.getType();
+		return new ClassType(new AtomicReference<>(classEnv), null, null);
 	}
 
 	@Override
