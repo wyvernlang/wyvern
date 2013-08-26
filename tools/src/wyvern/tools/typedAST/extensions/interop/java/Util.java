@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -87,7 +88,12 @@ public class Util {
 			return new IntegerConstant((Integer) arg);
 		JavaClassDecl decl = new JavaClassDecl(arg.getClass());
 		decl.initalize();
-		return new JavaObj(new ClassObject(decl),arg);
+
+
+		AtomicReference<Value> thisRef = new AtomicReference<>();
+		JavaObj newObj = new JavaObj(decl.getFilledBody(thisRef),arg);
+		thisRef.set(newObj);
+		return newObj;
 	}
 
 	public static Object toJavaObject(Value arg, Class hint) {

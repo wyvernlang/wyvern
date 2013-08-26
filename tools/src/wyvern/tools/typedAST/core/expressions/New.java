@@ -11,7 +11,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
@@ -24,7 +23,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
 
@@ -101,15 +99,10 @@ public class New extends CachingTypedAST implements CoreAST {
 		cls.evalDecl(env, cls.extendWithValue(Environment.getEmptyEnvironment()));
 		ClassObject clsObject = cls.createObject();
 		AtomicReference<Value> objRef = new AtomicReference<>();
-		objRef.set(new Obj(
-				cls.evaluateDeclarations(
-						Environment
-								.getEmptyEnvironment()
-								.extend(new LateValueBinding("this", objRef, cls.getType()))),
-				argVals));
+		objRef.set(new Obj(cls.getFilledBody(objRef), argVals));
 		return objRef.get();
 	}
-	
+
 	public ClassDeclaration getClassDecl() {
 		return cls;
 	}

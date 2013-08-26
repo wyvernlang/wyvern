@@ -19,13 +19,9 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 	private ClassDeclaration decl;
 	private Environment classEnv;
 	
-	public ClassObject(ClassDeclaration decl) {
+	public ClassObject(ClassDeclaration decl, Environment classEnv) {
 		this.decl = decl;
-		this.classEnv = decl.getClassEnv();
-	}
-
-	public ClassDeclaration getClassDecl() {
-		return decl;
+		this.classEnv = classEnv;
 	}
 
 	@Override
@@ -37,10 +33,6 @@ public class ClassObject extends AbstractValue implements InvokableValue, Value 
 	public void writeArgsToTree(TreeWriter writer) {
 		// TODO Auto-generated method stub
 
-	}
-
-	public Type getInstanceType() {
-		return decl.getType();
 	}
 
 	public Value getValue(String operation, Obj receiver) {

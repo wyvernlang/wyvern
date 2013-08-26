@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.core.values.ClassObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -174,7 +175,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv.extend(evalEnv);
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		ClassObject classObj = new ClassObject(this);
+		ClassObject classObj = new ClassObject(this, getClassEnv());
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);
@@ -236,7 +237,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	public ClassObject createObject() {
-		return new ClassObject(this);
+		return new ClassObject(this, getClassEnv());
 	}
 
     public NameBinding lookupDecl(String name) {
@@ -263,5 +264,12 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		if (equivalentClassType == null)
 			equivalentClassType = new TypeType(TypeDeclUtils.getTypeEquivalentEnvironment(decls, true));
 		return equivalentClassType;
+	}
+
+	public Environment getFilledBody(AtomicReference<Value> objRef) {
+		return evaluateDeclarations(
+				Environment
+						.getEmptyEnvironment()
+						.extend(new LateValueBinding("this", objRef, getType())));
 	}
 }

@@ -15,14 +15,8 @@ public class JavaObj extends Obj {
 
 	private final Object obj;
 
-	public JavaObj(ClassObject inObj, Object innerJavaObject) {
-		super(Environment.getEmptyEnvironment(), new HashMap<String,Value>());
-		super.intEnv = inObj
-				.getClassDecl()
-				.evaluateDeclarations(
-						Environment
-								.getEmptyEnvironment()
-								.extend(new ValueBinding("this", this)));
+	public JavaObj(Environment inRef, Object innerJavaObject) {
+		super(inRef, new HashMap<String,Value>());
 		this.obj = innerJavaObject;
 	}
 
