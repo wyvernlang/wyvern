@@ -5,7 +5,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
-import wyvern.tools.typedAST.core.values.ClassObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -175,7 +174,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv.extend(evalEnv);
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
-		ClassObject classObj = new ClassObject(getClassEnv());
+		Obj classObj = new Obj(getClassEnv());
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);
@@ -234,10 +233,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public FileLocation getLocation() {
 		return location; // TODO: NOT IMPLEMENTED YET.
-	}
-
-	public ClassObject createObject() {
-		return new ClassObject(getClassEnv());
 	}
 
     public NameBinding lookupDecl(String name) {
