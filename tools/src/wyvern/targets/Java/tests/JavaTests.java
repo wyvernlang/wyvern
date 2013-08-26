@@ -769,9 +769,6 @@ public class JavaTests {
 		Assert.assertEquals(returned, new Integer(5));
 	}
 
-	/*
-	TODO: Implement self-recursive functions (post ECOOP)
-
 	@Test
 	public void testRecursion() throws Exception {
 		String test =
@@ -781,14 +778,15 @@ public class JavaTests {
 				"		then\n" +
 				"			a(i-1)\n" +
 				"		else\n" +
-				"			i\n";
+				"			i\n" +
+				"a(5)";
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(test));
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
-		Assert.assertEquals(returned, new Integer(5));
+		Assert.assertEquals(returned, new Integer(0));
 	}
 
-
+	/*
 	@Test
 	public void testNQueens() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		String testFileName;
@@ -803,8 +801,8 @@ public class JavaTests {
 		InputStream is = url.openStream();
 		ClassLoader generatedLoader = JavaGenerator.GenerateBytecode(doCompile(new InputStreamReader(is), Environment.getEmptyEnvironment()));
 		is.close();
-		Class generated = generatedLoader.loadClass("CLASSwycCode");
+		Class generated = generatedLoader.loadClass("wycCode");
 		Object returned = generated.getMethod("main").invoke(null);
 	}
-	 */
+	*/
 }

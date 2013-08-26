@@ -42,18 +42,32 @@ import static org.objectweb.asm.Opcodes.*;
 //The names are getting pretty bad...
 public class MethVisitor extends BaseASTVisitor {
 
+	private String name;
+
 	private class WrappedMethDeclaration extends DefDeclaration {
 
+		private String realName;
 		private Environment env;
+		private HashSet<String> extMethods;
 
-		public WrappedMethDeclaration(String name, Type type, List<NameBinding> args, TypedAST body, boolean isClassMeth, FileLocation location, Environment env) {
+		public WrappedMethDeclaration(String name, Type type, List<NameBinding> args, TypedAST body, boolean isClassMeth, FileLocation location, String realName, Environment env, HashSet<String> extMethods) {
 			super(name, type, args, body, isClassMeth, location);
+			this.realName = realName;
 			this.env = env;
+			this.extMethods = extMethods;
 		}
 
 
 		public Environment getEnv() {
 			return env;
+		}
+
+		private String getRealName() {
+			return realName;
+		}
+
+		public HashSet<String> getExtMethods() {
+			return extMethods;
 		}
 	}
 
@@ -73,6 +87,7 @@ public class MethVisitor extends BaseASTVisitor {
 
 	private MethodExternalContext mec = new MethodExternalContext();
 	private boolean isAssignment;
+	private HashSet<String> scopeMethods = new HashSet<>();
 
 
 	private Type convertClassType(Type in) {
@@ -104,7 +119,7 @@ public class MethVisitor extends BaseASTVisitor {
 		if (retType == null)
 			mv.visitInsn(RETURN);
 		else {
-			if (retType instanceof Int)
+			if (retType instanceof Int || retType instanceof Bool)
 				mv.visitInsn(IRETURN);
 			else
 				mv.visitInsn(ARETURN);
@@ -173,7 +188,7 @@ public class MethVisitor extends BaseASTVisitor {
 			mv.visitLdcInsn(org.objectweb.asm.Type.getType(descriptor));
 	}
 	private void initalizeToDefault(int idx, Type type) {
-		if (type instanceof Int) {
+		if (type instanceof Int || type instanceof Bool) {
 			mv.visitInsn(ICONST_0);
 			mv.visitVarInsn(ISTORE, idx);
 	    } else {
@@ -357,16 +372,20 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 	}
 
+	private void storeAtIdx(Type type, int idx) {
+		if (type instanceof Int || type instanceof Bool)
+			mv.visitVarInsn(ISTORE, idx);
+		else
+			mv.visitVarInsn(ASTORE, idx);
+	}
+
 	private void storeTopOfStack(int varIdx) {
 		Type type = frame.popStackType();
-		if (type instanceof Int)
-			mv.visitVarInsn(ISTORE, varIdx);
-		else
-			mv.visitVarInsn(ASTORE, varIdx);
+		storeAtIdx(type, varIdx);
 	}
 
 	private void loadByType(Type type, int varIdx) {
-		if (type instanceof Int)
+		if (type instanceof Int || type instanceof Bool)
 			mv.visitVarInsn(ILOAD, varIdx);
 		else
 			mv.visitVarInsn(ALOAD, varIdx);
@@ -386,8 +405,11 @@ public class MethVisitor extends BaseASTVisitor {
 	}
 
 	public void visitInitial(DefDeclaration md) {
-		if (md instanceof WrappedMethDeclaration)
+		if (md instanceof WrappedMethDeclaration) {
 			localEnv = ((WrappedMethDeclaration) md).getEnv();
+			name = ((WrappedMethDeclaration) md).getRealName();
+			scopeMethods = ((WrappedMethDeclaration) md).getExtMethods();
+		}
 
 		mv.visitCode();
 
@@ -443,7 +465,7 @@ public class MethVisitor extends BaseASTVisitor {
 	public void visit(DefDeclaration md) {
 		HashMap<String, Type> externalVars = new HashMap<>();
 		externalVars.putAll(frame.getVars());
-		externalVars.put(md.getName(), md.getType());
+		//externalVars.put(md.getName(), md.getType());
 		VariableResolver visitor = new VariableResolver(externalVars);
 		md.accept(visitor);
 		List<Pair<String, Type>> usedVars = visitor.getUsedVars();
@@ -464,11 +486,14 @@ public class MethVisitor extends BaseASTVisitor {
 		}
 
 		Label defLoc = new Label();
+		HashSet<String> scopeMethodsClone = new HashSet<>(scopeMethods);
+		scopeMethodsClone.add(md.getName());
 		DefDeclaration implMd =
 				new WrappedMethDeclaration(md.getName()+"$impl",
 						DefDeclaration.getMethodType(newArgs, ((Arrow)md.getType()).getResult()),
 						newArgs,
-						md.getBody(), true, md.getLocation(), this.localEnv);
+						md.getBody(), true, md.getLocation(), md.getName(), this.localEnv, scopeMethodsClone);
+		scopeMethods.add(md.getName());
 		jv.visit(implMd);
 
 		frame.registerVariable(md.getName(), md.getType(), defLoc);
@@ -492,6 +517,9 @@ public class MethVisitor extends BaseASTVisitor {
 				if (frame.getVariableType(p.first) instanceof Int) {
 					mv.visitVarInsn(ILOAD, frame.getVariableIndex(p.first));
 					mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;");
+				} else if (frame.getVariableType(p.first) instanceof Bool) {
+					mv.visitVarInsn(ILOAD, frame.getVariableIndex(p.first));
+					mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;");
 				} else {
 					mv.visitVarInsn(ALOAD, frame.getVariableIndex(p.first));
 				}
@@ -544,11 +572,7 @@ public class MethVisitor extends BaseASTVisitor {
 		frame.registerVariable(vd.getName(), vd.getType(), defLoc);
 		Type type = frame.popStackType();
 		
-		
-		if (type instanceof Int)
-			mv.visitVarInsn(ISTORE, frame.getVariableIndex(vd.getName()));
-		else
-			mv.visitVarInsn(ASTORE, frame.getVariableIndex(vd.getName()));
+		storeAtIdx(type, frame.getVariableIndex(vd.getName()));
 		
 		Type outputType = vd.getType();
 		if (outputType instanceof ClassType)
@@ -565,13 +589,7 @@ public class MethVisitor extends BaseASTVisitor {
 		frame.registerVariable(vd.getName(), vd.getType(), defLoc);
 		Type type = frame.popStackType();
 
-
-		if (type instanceof Int)
-			mv.visitVarInsn(ISTORE, frame.getVariableIndex(vd.getName()));
-		else if (type instanceof ClassType)
-			mv.visitVarInsn(ASTORE, frame.getVariableIndex(vd.getName()));
-		else
-			throw new RuntimeException("Not implemented");
+		storeAtIdx(type, frame.getVariableIndex(vd.getName()));
 
 		Type outputType = vd.getType();
 		if (outputType instanceof ClassType)
@@ -797,6 +815,11 @@ public class MethVisitor extends BaseASTVisitor {
 					throw new RuntimeException();
 				}
 			}
+			if (scopeMethods.contains(name)) { //Self-ref
+				mv.visitFieldInsn(GETSTATIC, jv.getCurrentTypeName(), name+"$impl$handle", "Ljava/lang/invoke/MethodHandle;");
+				frame.pushStackType(type);
+				return;
+			}
 			throw new RuntimeException();
 		}
 		int varIdx= frame.getVariableIndex(name);
@@ -838,11 +861,7 @@ public class MethVisitor extends BaseASTVisitor {
 			int variableIndex = frame.getVariableIndex(((Variable) ass.getTarget()).getName());
 			if (frame.popStackType() != frame.getVariableType(((Variable) ass.getTarget()).getName()))
 				throw new RuntimeException();
-
-			if (ass.getValue().getType() instanceof Int)
-				mv.visitVarInsn(ISTORE, variableIndex);
-			else
-				mv.visitVarInsn(ASTORE, variableIndex);
+			storeAtIdx(ass.getValue().getType(), variableIndex);
 
 		} else if (ass.getTarget() instanceof Invocation) {
 			Type assType = ass.getValue().getType();

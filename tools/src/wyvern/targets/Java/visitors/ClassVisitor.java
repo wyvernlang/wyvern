@@ -325,6 +325,11 @@ public class ClassVisitor extends BaseASTVisitor {
 				org.objectweb.asm.Type.getType(MethodHandle.class).getDescriptor(),
 				null,
 				null).visitEnd();
+		cw.visitField(ACC_PUBLIC | ACC_STATIC,
+				methDeclaration.getName() + "$handle$ctx",
+				org.objectweb.asm.Type.getType(MethodHandle.class).getDescriptor(),
+				null,
+				null).visitEnd();
 
 		meths.add(methDeclaration);
 
