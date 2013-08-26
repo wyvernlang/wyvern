@@ -18,27 +18,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
-	//private ObjectType type;
-	private ClassObject cls;
-	private Map<String, Value> fields;
 	protected Environment intEnv;
 	
-	public Obj(Environment declEnv, Map<String, Value> fields) {
-		this.fields = fields;
-
+	public Obj(Environment declEnv) {
 		this.intEnv = declEnv;
-		if (fields != null)
-			for (Map.Entry<String, Value> elem : fields.entrySet()) {
-				if (intEnv.getValue(elem.getKey()) != null &&
-						intEnv.getValue(elem.getKey()) instanceof VarValue) {
-					((VarValue)this.intEnv.getValue(elem.getKey())).setValue(elem.getValue());
-					continue;
-				}
-
-				this.intEnv =
-					this.intEnv.extend(new ValueBinding(elem.getKey(), elem.getValue()));
-			}
-
 	}
 
 	@Override

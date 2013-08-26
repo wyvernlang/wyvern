@@ -79,7 +79,7 @@ public class ImportDeclaration extends Declaration {
 			intEnv = ((EnvironmentExtender) ref.get()).evalDecl(intEnv);
 
 		ValueBinding vb = (ValueBinding) declEnv.lookup(equivName);
-		vb.setValue(new Obj(intEnv, null));
+		vb.setValue(new Obj(intEnv));
 		return;
 	}
 

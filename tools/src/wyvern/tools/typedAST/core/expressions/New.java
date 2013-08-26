@@ -87,19 +87,12 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) {
-		//Value argVals = args.evaluate(env);
-		// TODO: evaluate args
-		
-		
-		Map<String, Value> argVals = new HashMap<String,Value>();
-		
-		//TODO vars
+		Environment argValEnv = Environment.getEmptyEnvironment();
 		for (Entry<String, TypedAST> elem : args.entrySet())
-			argVals.put(elem.getKey(), elem.getValue().evaluate(env));
+			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
 		cls.evalDecl(env, cls.extendWithValue(Environment.getEmptyEnvironment()));
-		ClassObject clsObject = cls.createObject();
 		AtomicReference<Value> objRef = new AtomicReference<>();
-		objRef.set(new Obj(cls.getFilledBody(objRef), argVals));
+		objRef.set(new Obj(cls.getFilledBody(objRef).extend(argValEnv)));
 		return objRef.get();
 	}
 

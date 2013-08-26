@@ -16,7 +16,7 @@ public class JavaObj extends Obj {
 	private final Object obj;
 
 	public JavaObj(Environment inRef, Object innerJavaObject) {
-		super(inRef, new HashMap<String,Value>());
+		super(inRef);
 		this.obj = innerJavaObject;
 	}
 
