@@ -30,4 +30,9 @@ public class ClassBinding implements Binding {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 	}
+
+	@Override
+	public String toString() {
+		return "{" + name + " as class  " + cd.getName() + "}";
+	}
 }

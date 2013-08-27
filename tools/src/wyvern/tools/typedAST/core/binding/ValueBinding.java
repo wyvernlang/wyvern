@@ -38,4 +38,9 @@ public class ValueBinding extends NameBindingImpl {
 		super.writeArgsToTree(writer);
 		writer.writeArgs(value);
 	}
+
+	@Override
+	public String toString() {
+		return "{" + getName() + " : " + getType() + " = " + getValue(null) + "}";
+	}
 }

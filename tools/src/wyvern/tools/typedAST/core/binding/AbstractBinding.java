@@ -24,4 +24,9 @@ public abstract class AbstractBinding implements Binding {
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(name, type);
 	}
+
+	@Override
+	public String toString() {
+		return "{" + name + " : " + type + "}";
+	}
 }

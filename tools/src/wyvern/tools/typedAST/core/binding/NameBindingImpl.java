@@ -24,5 +24,9 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 		assert bind instanceof ValueBinding;
 		return ((ValueBinding)bind).getValue(env);*/
 	}
+	@Override
+	public String toString() {
+		return "{" + getName() + " : " + getType() + "}";
+	}
 
 }
