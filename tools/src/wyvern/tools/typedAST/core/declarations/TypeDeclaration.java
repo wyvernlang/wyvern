@@ -5,10 +5,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -93,7 +90,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		typeBinding = new TypeBinding(name, null);
 		declEnv = new AtomicReference<>(null);
 		Type objectType = new TypeType(this);
-		Type classType = objectType; // TODO set this to a class type that has the class members
+		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
+		Type classType = new ClassType(attrEnv, attrEnv, null); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
 		this.location = clsNameLine;

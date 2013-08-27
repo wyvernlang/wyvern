@@ -2,12 +2,15 @@ package wyvern.tools.util;
 
 import wyvern.stdlib.*;
 import wyvern.stdlib.Compiler;
+import wyvern.tools.parsing.ImportResolver;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.typedAST.extensions.DSLDummy;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
+
+import java.util.ArrayList;
 
 /**
  * Created by Ben Chung on 8/8/13.
@@ -31,7 +34,18 @@ public class CompilationContext {
 			setExpectedTuple(globalCtx.getExpectedTuple());
 			resolver = globalCtx.getResolver();
 		} else {
-			resolver = new Compiler.ImportCompileResolver();
+			resolver = new Compiler.ImportCompileResolver(new ArrayList<ImportResolver>());
+		}
+	}
+
+	public CompilationContext(CompilationContext globalCtx, ExpressionSequence f, Environment s, Compiler.ImportCompileResolver resolver) {
+		setTokens(f);
+		setEnv(s);
+		this.globalCtx = globalCtx;
+		this.resolver = resolver;
+		if (globalCtx != null) {
+			setExpected(globalCtx.expected);
+			setExpectedTuple(globalCtx.getExpectedTuple());
 		}
 	}
 

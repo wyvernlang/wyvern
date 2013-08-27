@@ -16,7 +16,7 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 		// throw new RuntimeException("this method should not be needed!!!");
 		return new Variable(this, FileLocation.UNKNOWN); // FIXME: !!! Cannot replicate its use from outside!
 	}
-	
+
 	public Value getValue(Environment env) {
 		// TODO: code smell, leaving in to make sure I don't need it.  Refactor to move down to ValueBinding and eliminate env parameter
 		throw new RuntimeException("deprecated - to be removed");

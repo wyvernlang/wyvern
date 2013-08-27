@@ -643,7 +643,8 @@ public class ClassTypeCheckerTests {
 
 		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
 
-		Assert.assertFalse(tAt.subtype(tBt, subtypes));
+		//Should this work?
+		Assert.assertTrue(tAt.subtype(tBt, subtypes));
 		Assert.assertTrue(tBt.subtype(tAt, subtypes));
 		Assert.assertFalse(cAImplt.subtype(cBImplt, subtypes));
 		Assert.assertTrue(cBImplt.subtype(cAImplt, subtypes));

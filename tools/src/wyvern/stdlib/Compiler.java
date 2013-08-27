@@ -1,11 +1,8 @@
 package wyvern.stdlib;
 
-import com.sun.org.apache.xpath.internal.functions.FuncExtFunction;
 import wyvern.DSL.DSL;
-import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.ContParser;
-import wyvern.tools.parsing.DeclarationParser;
-import wyvern.tools.parsing.RecordTypeParser;
+import wyvern.tools.parsing.*;
+import wyvern.tools.parsing.resolvers.CompilerInputResolver;
 import wyvern.tools.parsing.transformers.TypedASTTransformer;
 import wyvern.tools.parsing.transformers.stdlib.IdentityTranformer;
 import wyvern.tools.parsing.transformers.stdlib.ImportChecker;
@@ -20,7 +17,6 @@ import wyvern.tools.util.Pair;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -75,9 +71,7 @@ public class Compiler {
 	}
 
 	public static Pair<Environment, ContParser> compilePartial(URI url, CompilationContext ctx, List<DSL> dsls) throws IOException {
-        String name = url.getPath();
-        String source = ctx.getResolver().lookupReader(url);
-		final Pair<Environment, ContParser> parserPair = compileSourcePartial(name, source, dsls, ctx);
+		final Pair<Environment, ContParser> parserPair = ctx.getResolver().lookupReader(url, dsls, ctx);
 		return parserPair;
     }
 
@@ -121,8 +115,8 @@ public class Compiler {
     }
 
     public static <T extends TypedAST> T compileSources(String startupname, List<String> files, List<DSL> dsls, TypedASTTransformer<T> xformer) {
-		CompilationContext newCtx = new CompilationContext(null, null, null);
-		newCtx.getResolver().setCommandRefs(files);
+		CompilationContext newCtx = new CompilationContext(null, null, null,
+				new ImportCompileResolver(Arrays.asList(new ImportResolver[] {new CompilerInputResolver(files)})));
         return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(compileSource(startupname, files.get(0), dsls, newCtx)));
     }
 
@@ -137,28 +131,17 @@ public class Compiler {
 
 
     public static class ImportCompileResolver {
-        private static ImportCompileResolver instance;
-        public static ImportCompileResolver getInstance() {
-            if (instance == null)
-                instance = new ImportCompileResolver();
-            return instance;
-        }
-        private List<String> readers = new ArrayList<>(0);
-        private void setCommandRefs(List<String> readers) {
-            this.readers = readers;
-        }
+		private List<ImportResolver> importResolvers;
 
-        public String lookupReader(URI uri) {
-            switch (uri.getScheme()) {
-                case "input":
-                    return handleInputRef(uri);
-            }
+		public ImportCompileResolver(List<ImportResolver> importResolvers) {
+
+			this.importResolvers = importResolvers;
+		}
+        public Pair<Environment, ContParser> lookupReader(URI uri, List<DSL> dsls, CompilationContext ctx) {
+			for (ImportResolver reader : importResolvers)
+				if (reader.checkURI(uri))
+					return reader.resolveImport(uri, dsls, ctx);
             throw new RuntimeException();
-        }
-
-        private String handleInputRef(URI uri) {
-            String path = uri.getSchemeSpecificPart();
-            return readers.get(Integer.parseInt(path));
         }
     }
 

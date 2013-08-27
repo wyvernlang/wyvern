@@ -109,7 +109,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 					decl.typecheckSelf(genv);
 				else
 					decl.typecheckSelf(oenv);
-
 			}
 		
 		// check the implements and class implements
@@ -122,7 +121,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			
 			// since there is a valid implements, check that all methods are indeed present
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
-			TypeType implementsTT = (TypeType) nameImplements.getType();
+			TypeType implementsTT = (TypeType) (
+					((ClassType)nameImplements.getType())
+							.getEnv()
+							.lookupBinding("type", TypeDeclBinding.class)).getType();
 			
 			if (!getEquivalentType().subtype(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
@@ -140,7 +142,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 			// since there is a valid class implements, check that all methods are indeed present
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
-			TypeType implementsCT = (TypeType) nameImplementsClass.getType();
+			TypeType implementsCT = (TypeType) (
+					((ClassType)nameImplementsClass.getType())
+							.getEnv()
+							.lookupBinding("type", TypeDeclBinding.class)).getType();
 			
 			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,

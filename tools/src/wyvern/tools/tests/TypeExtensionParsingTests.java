@@ -25,4 +25,20 @@ public class TypeExtensionParsingTests {
 		pair.typecheck(Environment.getEmptyEnvironment());
 		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(4));
 	}
+
+	@Test
+	public void testSimpleExtension2() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("" +
+				"type T\n" +
+				"	def x():Int\n" +
+				"	attributes\n" +
+				"		val t : Int = 4\n" +
+				"		def x(n : Int) : Int = n+2\n" +
+				"T.x(4)\n");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		Compiler.flush();
+		pair.typecheck(Environment.getEmptyEnvironment());
+		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(6));
+	}
 }

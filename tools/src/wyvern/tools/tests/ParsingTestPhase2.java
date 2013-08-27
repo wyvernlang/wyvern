@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclarationParser;
@@ -622,4 +623,23 @@ public class ParsingTestPhase2 {
 		result.typecheck(env);
 
 	}
+
+	/*
+	//Fails: instance methods show up in the static context
+	@Test(expected = ToolError.class)
+	public void testClassDefs() {
+		Reader reader = new StringReader("" +
+				"class Test\n" +
+				"	class def create() : Test = new\n" +
+				"	class def p(x:Int) : Int = x*2\n" +
+				"	def t(x : Int) : Int = x*3\n" +
+				"Test.create().p(1)\n" +
+				"Test.p(1)");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(new BodyParser(), env);
+		result.typecheck(env);
+	}
+	 */
 }

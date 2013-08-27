@@ -95,4 +95,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	public Type getInnerType(String name) {
 		return declEnv.get().lookup(name).getType();
 	}
+
+
+	public Environment getEnv() {
+		return declEnv.get();
+	}
 }

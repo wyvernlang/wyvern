@@ -1,16 +1,17 @@
 package wyvern.tools.typedAST.core.binding;
 
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ClassBinding implements Binding {
+public class TypeDeclBinding implements Binding {
 	private final String name;
-	private final ClassDeclaration cd;
+	private final TypeDeclaration td;
 
-	public ClassBinding(String name, ClassDeclaration cd) {
+	public TypeDeclBinding(String name, TypeDeclaration td) {
 		this.name = name;
-		this.cd = cd;
+		this.td = td;
 	}
 
 	@Override
@@ -20,11 +21,11 @@ public class ClassBinding implements Binding {
 
 	@Override
 	public Type getType() {
-		return cd.getType();
+		return td.getType();
 	}
 
-	public ClassDeclaration getClassDecl() {
-		return cd;
+	public TypeDeclaration getTypeDecl() {
+		return td;
 	}
 
 	@Override
@@ -33,6 +34,6 @@ public class ClassBinding implements Binding {
 
 	@Override
 	public String toString() {
-		return "{" + name + " as class  " + cd + "}";
+		return "{" + name + " as type  " + td + "}";
 	}
 }

@@ -53,7 +53,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
-		NameBinding m = attrEnv.get().lookup(opName);
+		NameBinding m = typeDeclEnv.get().lookup(opName);
 
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
