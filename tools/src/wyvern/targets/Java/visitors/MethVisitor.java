@@ -709,7 +709,6 @@ public class MethVisitor extends BaseASTVisitor {
 			}
 		} else { //variable or function as first class value
 			if (inv.getType() instanceof Arrow) {
-				//TODO: Make this work
 				if (isReceiver)
 					receiverType = receiver.getType();
 				//Method lookup, look in class for name$handle:MethodHande

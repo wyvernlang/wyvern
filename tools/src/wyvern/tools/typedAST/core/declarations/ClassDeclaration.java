@@ -26,7 +26,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
-	private String implementsName; // FIXME: Should be bindings with proper equals implementation?
+	private String implementsName;
 	private String implementsClassName;
 	
 	private NameBinding nameImplements;
