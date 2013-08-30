@@ -26,7 +26,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 
 	@Override
 	public Type getType() {
-		return new ClassType(new AtomicReference<>(intEnv), null, null);
+		return new ClassType(new AtomicReference<>(intEnv), new AtomicReference<>(typeEquivEnv));
 	}
 	
 	@Override

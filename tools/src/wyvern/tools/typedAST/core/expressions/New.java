@@ -80,7 +80,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, getLocation());
 			cls = classDeclaration;
-			return new ClassType(new AtomicReference<>(mockEnv), new AtomicReference<>(mockEnv), null);
+			return new ClassType(new AtomicReference<>(mockEnv), new AtomicReference<>(mockEnv));
 		}
 	}
 

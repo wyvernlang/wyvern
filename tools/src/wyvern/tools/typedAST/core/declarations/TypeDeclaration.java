@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.errors.FileLocation;
@@ -14,7 +13,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
@@ -23,15 +21,20 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
+	protected AtomicReference<Obj> attrObj = new AtomicReference<>();
     protected AtomicReference<Environment> declEnv;
 	protected AtomicReference<Environment> attrEnv = new AtomicReference<>(Environment.getEmptyEnvironment());
+
+	public AtomicReference<Obj> getAttrObjRef() {
+		return attrObj;
+	}
 
 	public Environment getAttrEnv() {
 		return attrEnv.get();
 	}
 
-	public AtomicReference<Environment> getAttrEnvRef() {
-		return attrEnv;
+	public ClassType getAttrType() {
+		return (ClassType) nameBinding.getType();
 	}
 
 	public static class AttributeDeclaration extends Declaration {
@@ -91,7 +94,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		declEnv = new AtomicReference<>(null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
-		Type classType = new ClassType(attrEnv, attrEnv, null); // TODO set this to a class type that has the class members
+		Type classType = new ClassType(attrEnv, attrEnv); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
 		this.location = clsNameLine;
@@ -152,6 +155,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		Obj typeAttrObj = new Obj(attrEnv);
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		attrObj.set(typeAttrObj);
 		vb.setValue(typeAttrObj);
 	}
 	

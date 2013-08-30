@@ -15,20 +15,18 @@ import wyvern.tools.util.TreeWriter;
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private ClassDeclaration decl = null;
 	private AtomicReference<Environment> declEnv;
-	private AtomicReference<Environment> typeEquivalentEnv;
-	private TypeType implementsType;
+	protected AtomicReference<Environment> typeEquivalentEnv;
 
 
 	public ClassType(ClassDeclaration td) {
 		this(td.getDeclEnvRef(),
-				td.getTypeEquivalentEnvironmentReference(), td.getImplementsType());
+				td.getTypeEquivalentEnvironmentReference());
 		this.decl = td;
 	}
 
-	public ClassType(AtomicReference<Environment> declEnv, AtomicReference<Environment> typeEquivalentEnv, TypeType implementsType) {
+	public ClassType(AtomicReference<Environment> declEnv, AtomicReference<Environment> typeEquivalentEnv) {
 		this.declEnv = declEnv;
 		this.typeEquivalentEnv = typeEquivalentEnv;
-		this.implementsType = implementsType;
 	}
 
 	@Override
@@ -66,7 +64,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 
 	private TypeType equivType = null;
 	public TypeType getEquivType() {
-		if (typeEquivalentEnv.get() == null)
+		if (typeEquivalentEnv == null || typeEquivalentEnv.get() == null)
 			throw new RuntimeException();
 
 		if (equivType == null)
