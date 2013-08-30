@@ -24,10 +24,12 @@ import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
+import wyvern.tools.util.Pair;
 
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -225,6 +227,12 @@ public class Util {
 			return m;
 		}
 		return null;
+	}
+
+	public static boolean checkCast(Obj ref, Class jClass) {
+		Type javaType = javaToWyvType(jClass);
+		Type wyvernType = ref.getType();
+		return wyvernType.subtype(javaType);
 	}
 
 	private static volatile int n = 0; //How many classes have been generated

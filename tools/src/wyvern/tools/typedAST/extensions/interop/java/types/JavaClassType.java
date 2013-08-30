@@ -5,6 +5,8 @@ import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public class JavaClassType extends ClassType {
 	private final Class clazz;
 	private final JavaClassDecl decl;
@@ -33,4 +35,6 @@ public class JavaClassType extends ClassType {
 	public TypeType getEquivType() {
 		return new TypeType(decl.getDeclEnv());
 	}
+
+
 }

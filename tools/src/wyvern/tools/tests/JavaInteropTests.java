@@ -177,4 +177,20 @@ public class JavaInteropTests {
 		result = getTypedAST(new StringReader(test), env).evaluate(Environment.getEmptyEnvironment());
 	}
 
+	@Test
+	public void testTestCast() {
+		String test = "class Test\n" +
+				"	class def create() : Test = new\n" +
+				"	def a() : Int = 2\n" +
+				"Test.create()";
+		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
+		Assert.assertTrue(Util.checkCast((Obj)result, Tester.class));
+		String test2 = "class Test\n" +
+				"	class def create() : Test = new\n" +
+				"	def b() : Int = 2\n" +
+				"Test.create()";
+		result = doCompile(test2).evaluate(Environment.getEmptyEnvironment());
+		Assert.assertFalse(Util.checkCast((Obj)result, Tester.class));
+	}
+
 }
