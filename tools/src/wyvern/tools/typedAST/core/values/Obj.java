@@ -4,24 +4,24 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	protected Environment intEnv;
+	private Environment typeEquivEnv;
 	
 	public Obj(Environment declEnv) {
 		this.intEnv = declEnv;
+		typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv);
 	}
 
 	@Override

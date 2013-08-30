@@ -6,22 +6,25 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicReference;
 
+import wyvern.tools.parsing.LineParser;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.types.*;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
+	private AtomicReference<Obj> attrObj;
 	private AtomicReference<Environment> typeDeclEnv;
-	private AtomicReference<Environment> attrEnv;
 
 	public TypeType(TypeDeclaration decl) {
 		typeDeclEnv = decl.getDeclEnv();
-		attrEnv = decl.getAttrEnvRef();
+		attrObj = decl.getAttrObjRef();
 	}
 
 	public TypeType(Environment declEnv) {
@@ -126,5 +129,18 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	@Override
 	public Type getInnerType(String name) {
 		return typeDeclEnv.get().lookup(name).getType();
+	}
+
+	private boolean isParserCheck = false;
+	private boolean isParserValid = false;
+	@Override
+	public LineParser getParser() {
+		if (!isParserCheck) {
+			isParserValid = Util.checkCast(attrObj.get(), LineParser.class);
+			isParserCheck = true;
+		}
+		if (isParserValid)
+			return Util.toJavaClass(attrObj.get(), LineParser.class);
+		return null;
 	}
 }

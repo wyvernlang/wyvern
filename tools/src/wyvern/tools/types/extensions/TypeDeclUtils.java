@@ -2,8 +2,7 @@ package wyvern.tools.types.extensions;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -16,6 +15,52 @@ import java.util.LinkedList;
  * Useful type functionality
  */
 public class TypeDeclUtils {
+	public static Environment getTypeEquivalentEnvironment(Environment src) {
+		Environment tev = Environment.getEmptyEnvironment();
+
+		for (Binding b : src.getBindings()) {
+			if (b instanceof VarBinding) {
+				//Indicates that there is a settable value
+				String name = b.getName();
+				Type type = b.getType();
+				tev = tev.extend(
+						new NameBindingImpl("set" + name.substring(0,1).toUpperCase() + name.substring(1),
+						new Arrow(type, Unit.getInstance())));
+				continue;
+			}
+
+			if (b instanceof TypeBinding) {
+				if (b.getType() instanceof TypeType) {
+					tev = tev.extend(b);
+					continue;
+				}
+				if (b.getType() instanceof ClassType) {
+					TypeType tt = ((ClassType) b.getType()).getEquivType();
+					tev = tev.extend(new NameBindingImpl(b.getName(), tt));
+					continue;
+				}
+				continue;
+			}
+
+			if (!(b instanceof NameBinding))
+				continue;
+
+			if (b.getType() instanceof Arrow) {
+				tev = tev.extend(b);
+				continue;
+			}
+
+			String propName = b.getName();
+			Type type = b.getType();
+
+			DefDeclaration getter = new DefDeclaration(propName, type,
+					new LinkedList<NameBinding>(), null, false, FileLocation.UNKNOWN);
+
+			tev = getter.extend(tev);
+		}
+		return tev;
+	}
+
 	public static Environment getTypeEquivalentEnvironment(DeclSequence decls, boolean useClassMembers) {
 		LinkedList<Declaration> seq = new LinkedList<>();
 
