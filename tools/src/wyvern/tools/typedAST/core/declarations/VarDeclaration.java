@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.VarBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -19,6 +20,7 @@ import wyvern.tools.util.TreeWriter;
 public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	NameBinding binding;
+	VarBinding varBinding;
 
 	private boolean isClass;
 	public boolean isClass() {
@@ -28,6 +30,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	public VarDeclaration(String varName, Type parsedType, TypedAST definition) {
 		this.definition=definition;
 		binding = new NameBindingImpl(varName, parsedType);
+		varBinding = new VarBinding(varName, parsedType);
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old) {
-		return old.extend(binding);
+		return old.extend(binding).extend(varBinding);
 	}
 
 	@Override
