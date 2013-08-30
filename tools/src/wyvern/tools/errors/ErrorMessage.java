@@ -29,8 +29,8 @@ public enum ErrorMessage {
 
 	//Verification errors
 	IMPORT_CYCLE("Import cycles have been found, with cycles\n%ARG", 1),
-	
-	;// end of error list
+
+	ReaderError("An error has occured in import resolution of URI %ARG", 1);// end of error list
 	
 	private ErrorMessage(String message, int numArgs) {
 		this.errorMessage = message;

@@ -1,6 +1,9 @@
 package wyvern.stdlib;
 
 import wyvern.DSL.DSL;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
 import wyvern.tools.parsing.resolvers.CompilerInputResolver;
 import wyvern.tools.parsing.transformers.TypedASTTransformer;
@@ -71,7 +74,7 @@ public class Compiler {
 	}
 
 	public static Pair<Environment, ContParser> compilePartial(URI url, CompilationContext ctx, List<DSL> dsls) throws IOException {
-		final Pair<Environment, ContParser> parserPair = ctx.getResolver().lookupReader(url, dsls, ctx);
+		final Pair<Environment, ContParser> parserPair = ctx.getResolver().lookupReader(url, dsls, ctx, null);
 		return parserPair;
     }
 
@@ -137,10 +140,14 @@ public class Compiler {
 
 			this.importResolvers = importResolvers;
 		}
-        public Pair<Environment, ContParser> lookupReader(URI uri, List<DSL> dsls, CompilationContext ctx) {
+        public Pair<Environment, ContParser> lookupReader(URI uri, List<DSL> dsls, CompilationContext ctx, HasLocation location) {
 			for (ImportResolver reader : importResolvers)
 				if (reader.checkURI(uri))
-					return reader.resolveImport(uri, dsls, ctx);
+					try {
+						return reader.resolveImport(uri, dsls, ctx);
+					} catch (Exception e) {
+						ToolError.reportError(ErrorMessage.ReaderError, uri.toString(), location);
+					}
             throw new RuntimeException();
         }
     }

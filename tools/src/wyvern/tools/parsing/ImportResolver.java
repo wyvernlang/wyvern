@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ImportResolver {
 	boolean checkURI(URI path);
-	Pair<Environment,ContParser> resolveImport(URI uri, List<DSL> dsls, CompilationContext ctx);
+	Pair<Environment,ContParser> resolveImport(URI uri, List<DSL> dsls, CompilationContext ctx) throws Exception;
 }
