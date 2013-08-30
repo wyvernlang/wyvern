@@ -145,7 +145,6 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 	}
 
 	public static class ClassBodyContParser implements RecordTypeParser {
-		private final Environment finalNewEnv;
 		private final LinkedList<ContParser> contParsers;
 		private final LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed;
 		public Environment internalEnv;
@@ -153,7 +152,6 @@ public class ClassBodyParser implements RawASTVisitor<Environment, Pair<Environm
 		public ClassBodyContParser(Environment finalNewEnv,
 								   LinkedList<ContParser> contParsers,
 								   LinkedList<Pair<Pair<TypedAST, DeclParser>, CompilationContext>> unparsed) {
-			this.finalNewEnv = finalNewEnv;
 			this.contParsers = contParsers;
 			this.unparsed = unparsed;
 			internalEnv = finalNewEnv;
