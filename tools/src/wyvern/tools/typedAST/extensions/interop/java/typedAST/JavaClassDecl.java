@@ -14,6 +14,7 @@ import wyvern.tools.types.extensions.TypeType;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,15 +29,29 @@ public class JavaClassDecl extends ClassDeclaration {
 	private static DeclSequence getDecls(Class clazz) {
 		List<Declaration> decls = new LinkedList<Declaration>();
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
-		for (Method m : clazz.getMethods()) {
-			try {
-				decls.add(new JavaMeth(lookup.unreflect(findHighestMethod(clazz, m.getName())), m));
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
+
+		try {
+			for (Constructor c : clazz.getConstructors()) {
+				Class[] parameterTypes = c.getParameterTypes();
+				String newName = "new" + getTypeAppendation(parameterTypes);
+				decls.add(new JavaMeth(newName, clazz, lookup.unreflectConstructor(c), c));
 			}
+			for (Method m : clazz.getMethods()) {
+				decls.add(new JavaMeth(m.getName() + getTypeAppendation(m.getParameterTypes()),
+						lookup.unreflect(findHighestMethod(clazz, m.getName())), m));
+			}
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 		DeclSequence ds = new DeclSequence(decls);
 		return ds;
+	}
+
+	private static String getTypeAppendation(Class[] parameterTypes) {
+		StringBuilder argNameAddons = new StringBuilder(parameterTypes.length);
+		for (Class arg : parameterTypes)
+			argNameAddons.append(arg.getSimpleName().substring(0,1));
+		return argNameAddons.toString();
 	}
 
 

@@ -2,6 +2,7 @@ package wyvern.tools.tests;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import wyvern.DSL.DSL;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineParser;
@@ -20,6 +21,9 @@ import wyvern.tools.types.Type;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class JavaInteropTests {
 
@@ -191,6 +195,19 @@ public class JavaInteropTests {
 				"Test.create()";
 		result = doCompile(test2).evaluate(Environment.getEmptyEnvironment());
 		Assert.assertFalse(Util.checkCast((Obj)result, Tester.class));
+	}
+
+	@Test
+	public void testJavaImportInterop() {
+		List<String> testFiles  = new ArrayList<>();
+		testFiles.add(
+			"import \"java:java.lang.Integer\" as JInt\n" +
+			"class Test\n" +
+			"	class def create() : Test = new\n" +
+			"	def a() : JInt.Integer = JInt.Integer.valueOfi(10)\n" +
+			"Test.create().a()");
+		TypedAST result = wyvern.stdlib.Compiler.compileSources("test", testFiles, new LinkedList<DSL>());
+		Value output = result.evaluate(Environment.getEmptyEnvironment());
 	}
 
 }
