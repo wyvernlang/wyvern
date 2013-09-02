@@ -10,6 +10,7 @@ import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
@@ -130,6 +131,14 @@ public class Util {
 		Type newType = javaToWyvTypeInternal(jType);
 		classCache.put(jType, newType);
 		return newType;
+	}
+
+	public static ClassDeclaration javaToWyvDecl(Class jClass) {
+
+		JavaClassDecl jcd = new JavaClassDecl(jClass);
+		classCache.put(jClass, jcd.getType()); //Prevent infinite recursion
+		jcd.initalize();
+		return jcd;
 	}
 
 	public static Type javaToWyvTypeInternal(Class jType) {
