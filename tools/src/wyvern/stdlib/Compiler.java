@@ -6,6 +6,7 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
 import wyvern.tools.parsing.resolvers.CompilerInputResolver;
+import wyvern.tools.parsing.resolvers.JavaImportResolver;
 import wyvern.tools.parsing.transformers.TypedASTTransformer;
 import wyvern.tools.parsing.transformers.stdlib.IdentityTranformer;
 import wyvern.tools.parsing.transformers.stdlib.ImportChecker;
@@ -119,8 +120,10 @@ public class Compiler {
 
     public static <T extends TypedAST> T compileSources(String startupname, List<String> files, List<DSL> dsls, TypedASTTransformer<T> xformer) {
 		CompilationContext newCtx = new CompilationContext(null, null, null,
-				new ImportCompileResolver(Arrays.asList(new ImportResolver[] {new CompilerInputResolver(files)})));
-        return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(compileSource(startupname, files.get(0), dsls, newCtx)));
+				new ImportCompileResolver(Arrays.asList(new CompilerInputResolver(files), new JavaImportResolver())));
+		TypedAST root = compileSource(startupname, files.get(0), dsls, newCtx);
+		root.typecheck(Environment.getEmptyEnvironment());
+		return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(root));
     }
 
 	public static TypedAST compileSources(String startupname, List<String> files, List<DSL> dsls) {
