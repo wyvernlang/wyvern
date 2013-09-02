@@ -37,7 +37,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	@Override
 	public String toString() {
 		if (declEnv.get() != null)
-			return "CLASS(" + declEnv.get().toString() + ")";
+			return "CLASS(" + "" + ")";
 		else
 			return "CLASS()";
 	}
