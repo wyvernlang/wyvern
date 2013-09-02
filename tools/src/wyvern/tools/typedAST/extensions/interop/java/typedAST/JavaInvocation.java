@@ -12,6 +12,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -21,17 +22,32 @@ import java.util.List;
 public class JavaInvocation implements TypedAST {
 	private final List<String> argNames;
 	private final MethodHandle input;
-	private final Method reflected;
+	private Type type;
+	private Class<?>[] parameterTypes;
+	private boolean aStatic;
+	private Class<?> declaringClass;
 
 	public JavaInvocation(MethodHandle input, Method reflected, List<String> argNames) {
 		this.argNames = argNames;
 		this.input = input;
-		this.reflected = reflected;
+		type = Util.javaToWyvType(reflected.getReturnType());
+		parameterTypes = reflected.getParameterTypes();
+		aStatic = Modifier.isStatic(reflected.getModifiers());
+		declaringClass = reflected.getDeclaringClass();
+	}
+
+	public JavaInvocation(MethodHandle mh, Constructor c, List<String> names) {
+		this.argNames = names;
+		this.input = mh;
+		type = Util.javaToWyvType(c.getDeclaringClass());
+		parameterTypes = c.getParameterTypes();
+		aStatic = Modifier.isStatic(c.getModifiers());
+		declaringClass = c.getDeclaringClass();
 	}
 
 	@Override
 	public Type getType() {
-		return Util.javaToWyvType(reflected.getReturnType());
+		return type;
 	}
 
 	@Override
@@ -47,13 +63,13 @@ public class JavaInvocation implements TypedAST {
 	public Value evaluate(Environment env) {
 		Object[] values = new Object[argNames.size()];
 		int valIdx = 0;
-		Class<?>[] parameterTypes = reflected.getParameterTypes();
 		for (String argname : argNames) {
 			values[valIdx] = Util.toJavaObject(env.getValue(argname), parameterTypes[valIdx++]);
 		}
 		Object receiver = null;
-		if (!Modifier.isStatic(reflected.getModifiers()))
-			receiver = Util.toJavaObject(env.getValue("this"), reflected.getDeclaringClass());
+		if (!aStatic) {
+			receiver = Util.toJavaObject(env.getValue("this"), declaringClass);
+		}
 
 
 		try {
