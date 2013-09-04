@@ -23,6 +23,7 @@ public class ImportDeclaration extends Declaration {
 	private TypeType equivType;
 	private AtomicReference<Environment> declEnv = new AtomicReference<>();
 	private AtomicReference<TypedAST> ref = new AtomicReference<>();
+	private boolean typechecking = false;
 
 	public ImportDeclaration(String src, String equivName, Environment externalEnv, FileLocation location) {
 		this.src = src;
@@ -55,7 +56,11 @@ public class ImportDeclaration extends Declaration {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (typechecking)
+			return Unit.getInstance();
+		typechecking = true;
 		ref.get().typecheck(env);
+		typechecking = false;
 		return Unit.getInstance();
 	}
 
