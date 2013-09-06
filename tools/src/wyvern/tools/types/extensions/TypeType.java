@@ -3,7 +3,9 @@ package wyvern.tools.types.extensions;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.parsing.LineParser;
@@ -65,14 +67,14 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		return m.getType();
 	}
 	
-	public HashSet<Pair<String, Type>> getMembers() {
-		HashSet<Pair<String, Type>> thisMembers = new HashSet<Pair<String, Type>>();
+	public Map<String, Type> getMembers() {
+		HashMap<String, Type> thisMembers = new HashMap<>();
 		for (Binding b : typeDeclEnv.get().getBindings()) {
 			if (!(b instanceof NameBinding))
 				continue;
 			String name = b.getName();
 			Type type = b.getType();
-			thisMembers.add(new Pair<>(name, type));
+			thisMembers.put(name, type);
 		}
 		return thisMembers;
 	}
@@ -84,9 +86,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		}
 		
 		if (other instanceof TypeType) {
-			HashSet<Pair<String, Type>> thisMembers = this.getMembers();
+			Map<String, Type> thisMembers = this.getMembers();
 			// System.out.println("this (" + this + ") : " + thisMembers);
-			HashSet<Pair<String, Type>> otherMembers = ((TypeType) other).getMembers();
+			Map<String, Type> otherMembers = ((TypeType) other).getMembers();
 			// System.out.println("other (" + other + ") : " + otherMembers);
 			return checkSubtypeRecursively(this, other, thisMembers, otherMembers, subtypes);
 		}
@@ -95,26 +97,26 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	}
 	
 	public static boolean checkSubtypeRecursively(Type thisType, Type otherType,
-			HashSet<Pair<String, Type>> thisMembers, HashSet<Pair<String, Type>> otherMembers,
+			Map<String, Type> thisMembers, Map<String, Type> otherMembers,
 			HashSet<SubtypeRelation> subtypes) {
 		
 		boolean subset = true;
-		for (Pair<String, Type> memberOther : otherMembers) {
+		for (Map.Entry<String, Type> memberOther : otherMembers.entrySet()) {
 			boolean hasImplementingCandidate = false;
-			for (Pair<String, Type> memberThis : thisMembers) {
-				if (memberThis.first.equals(memberOther.first)) { // Name has to be equal! Duh! :-)
-					// Apply S-Amber rule here!
-					SubtypeRelation sr = new SubtypeRelation(thisType, otherType);
-					if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
-						subtypes.add(sr);
-						boolean result = memberThis.second.subtype(memberOther.second, subtypes);
-						subtypes.remove(sr);
-								
-						if (result) {
-							hasImplementingCandidate = true;
-							break;
-						}
-					}
+			Type entryType = thisMembers.get(memberOther.getKey());
+			if (entryType == null) {
+				subset = false;
+				break;
+			}
+
+			SubtypeRelation sr = new SubtypeRelation(thisType, otherType);
+			if (!subtypes.contains(sr)) { // Avoid infinite recursion! :)
+				subtypes.add(sr);
+				boolean result = entryType.subtype(memberOther.getValue(), subtypes);
+				subtypes.remove(sr);
+
+				if (result) {
+					hasImplementingCandidate = true;
 				}
 			}
 			if (!hasImplementingCandidate) {
