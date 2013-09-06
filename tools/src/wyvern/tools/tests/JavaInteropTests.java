@@ -87,12 +87,7 @@ public class JavaInteropTests {
 				"Test.create()";
 		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
 		Tester3 cast = Util.toJavaClass((Obj)result, Tester3.class);
-		Assert.assertEquals(cast.a(new Tester2() {
-			@Override
-			public int a(int x) {
-				return x;
-			}
-		}), 4);
+		Assert.assertEquals(cast.a(new MyTester2()), 4);
 	}
 
 	public interface Tester4 {
@@ -204,10 +199,16 @@ public class JavaInteropTests {
 			"import \"java:java.lang.Integer\" as JInt\n" +
 			"class Test\n" +
 			"	class def create() : Test = new\n" +
-			"	def a() : JInt.Integer = JInt.Integer.valueOfi(10)\n" +
+			"	def a() : JInt.Integer = JInt.Integer.valueOf(\"10\", 10)\n" +
 			"Test.create().a()");
 		TypedAST result = wyvern.stdlib.Compiler.compileSources("test", testFiles, new LinkedList<DSL>());
 		Value output = result.evaluate(Environment.getEmptyEnvironment());
 	}
 
+	private static class MyTester2 implements Tester2 {
+		@Override
+		public int a(int x) {
+			return x;
+		}
+	}
 }
