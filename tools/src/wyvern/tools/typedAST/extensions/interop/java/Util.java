@@ -244,6 +244,13 @@ public class Util {
 		return wyvernType.subtype(javaType);
 	}
 
+
+
+	public static boolean checkTypeCast(Type type, Class arg) {
+		Type javaType = javaToWyvType(arg);
+		return type.subtype(javaType);
+	}
+
 	private static volatile int n = 0; //How many classes have been generated
 	private static Class<?> generateJavaWrapper(Environment toWrap, Class javaType) {
 		if (typeCache.containsKey(toWrap)) {
