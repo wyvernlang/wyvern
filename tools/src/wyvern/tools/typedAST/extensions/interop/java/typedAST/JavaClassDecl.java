@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
@@ -10,14 +11,15 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.util.Pair;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 public class JavaClassDecl extends ClassDeclaration {
 	private Class clazz;
@@ -31,14 +33,27 @@ public class JavaClassDecl extends ClassDeclaration {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 
 		try {
+			List<JClosure.JavaInvokableMethod> cstrs = new LinkedList<>();
 			for (Constructor c : clazz.getConstructors()) {
 				Class[] parameterTypes = c.getParameterTypes();
-				String newName = "new" + getTypeAppendation(parameterTypes);
-				decls.add(new JavaMeth(newName, clazz, lookup.unreflectConstructor(c), c));
+				cstrs.add(new JClosure.JavaInvokableMethod(parameterTypes, clazz,
+						lookup.unreflectConstructor(c), JavaMeth.getNames(c), true, clazz));
 			}
+			if (cstrs.size() > 0)
+				decls.add(new JavaMeth("new", cstrs));
+
+			HashMap<String, List<Pair<MethodHandle, Method>>> map = new HashMap<>();
 			for (Method m : clazz.getMethods()) {
-				decls.add(new JavaMeth(m.getName() + getTypeAppendation(m.getParameterTypes()),
-						lookup.unreflect(findHighestMethod(clazz, m.getName())), m));
+				if (map.containsKey(m.getName())) {
+					map.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
+					continue;
+				}
+				ArrayList<Pair<MethodHandle, Method>> list = new ArrayList<>();
+				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)), m));
+				map.put(m.getName(), list);
+			}
+			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : map.entrySet()) {
+				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -47,11 +62,18 @@ public class JavaClassDecl extends ClassDeclaration {
 		return ds;
 	}
 
-	private static String getTypeAppendation(Class[] parameterTypes) {
-		StringBuilder argNameAddons = new StringBuilder(parameterTypes.length);
-		for (Class arg : parameterTypes)
-			argNameAddons.append(arg.getSimpleName().substring(0,1));
-		return argNameAddons.toString();
+	private static LinkedList<JClosure.JavaInvokableMethod> getJavaInvokableMethods(Class clazz, Map.Entry<String, List<Pair<MethodHandle, Method>>> entry) {
+		LinkedList<JClosure.JavaInvokableMethod> overloaded = new LinkedList<>();
+		for (Pair<MethodHandle, Method> pair : entry.getValue()) {
+			overloaded.add(new JClosure.JavaInvokableMethod(
+					pair.second.getParameterTypes(),
+					pair.second.getReturnType(),
+					pair.first,
+					JavaMeth.getNames(pair.second),
+					Modifier.isStatic(pair.second.getModifiers()),
+					clazz));
+		}
+		return overloaded;
 	}
 
 
@@ -72,29 +94,21 @@ public class JavaClassDecl extends ClassDeclaration {
 		super.declEvalEnv = Environment.getEmptyEnvironment();
 	}
 
-	public TypeDeclaration getEquivType() {
-		return new TypeDeclaration(getName(), getDecls(), getLocation());
-	}
-
-	private static Method findHighestMethod(Class cls,
-											String method) {
-		Class[] ifaces = cls.getInterfaces();
+	private static Method findHighestMethod(Class c, Method m) {
+		Class[] ifaces = c.getInterfaces();
 		for (int i = 0; i < ifaces.length; i++) {
-			Method ifaceMethod = findHighestMethod(ifaces[i], method);
+			Method ifaceMethod = findHighestMethod(ifaces[i], m);
 			if (ifaceMethod != null) return ifaceMethod;
 		}
-		if (cls.getSuperclass() != null) {
+		if (c.getSuperclass() != null) {
 			Method parentMethod = findHighestMethod(
-					cls.getSuperclass(), method);
+					c.getSuperclass(), m);
 			if (parentMethod != null) return parentMethod;
 		}
-		Method[] methods  = cls.getMethods();
-		for (int i = 0; i < methods.length; i++) {
-			// we ignore parameter types for now - you need to add this
-			if (methods[i].getName().equals(method)) {
-				return methods[i];
-			}
+		try {
+			return c.getDeclaredMethod(m.getName(), m.getParameterTypes());
+		} catch (NoSuchMethodException e) {
+			return null;
 		}
-		return null;
 	}
 }

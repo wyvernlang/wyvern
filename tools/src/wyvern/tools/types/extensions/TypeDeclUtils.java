@@ -104,7 +104,6 @@ public class TypeDeclUtils {
 			} else if (d instanceof ClassDeclaration) {
 				ClassDeclaration cd = (ClassDeclaration) d;
 				TypeType tt = ((ClassType) cd.getType()).getEquivType();
-				HashSet<Pair<String, Type>> mems = tt.getMembers();
 				newEnv = newEnv.extend(new NameBindingImpl(cd.getName(), tt));
 			} else {
 				System.out.println("Unsupported class member in class to type converter: " + d.getClass());
