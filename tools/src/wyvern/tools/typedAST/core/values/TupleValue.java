@@ -33,6 +33,10 @@ public class TupleValue extends AbstractValue {
 		return values[index];
 	}
 
+	public Value[] getValues() {
+		return values;
+	}
+
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;

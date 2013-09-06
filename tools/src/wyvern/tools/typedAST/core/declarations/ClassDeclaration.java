@@ -213,16 +213,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		
 		return classEnv;
 	}
-
-	public Declaration getDecl(String opName) {
-		for (Declaration d : decls.getDeclIterator()) {
-			// TODO: handle fields too
-			if (d.getName().equals(opName))
-				return d;
-			d = d.getNextDecl();
-		}
-		return null;	// can't find it
-	}
 	
 	public DeclSequence getDecls() {
 		return decls;
@@ -240,16 +230,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return location; // TODO: NOT IMPLEMENTED YET.
 	}
 
-    public NameBinding lookupDecl(String name) {
-        return declEnvRef.get().lookup(name);
-    }
-
 	public Environment getDeclEnv() {
 		return declEnvRef.get();
-	}
-
-	public TypeType getImplementsType() {
-		return getTypeType();
 	}
 
 	public AtomicReference<Environment> getTypeEquivalentEnvironmentReference() {
