@@ -198,7 +198,7 @@ public class JSCodegenTest {
 							"Hello.NewHello = function() {\n"+
 							"	return new Hello();\n"+
 							"}\n"+
-							"Hello.prototype.hiString = \"hello\";\n"+
+							"Hello.prototype.hiString = \"hello\";\n\n"+
 							"var h = (Hello.NewHello)();\n"+
 							"return h.hiString;\n", visitor.getCode());
 	}
@@ -255,6 +255,7 @@ public class JSCodegenTest {
 				"Hello.prototype.get5 = function() {\n" +
 				"	return 5;\n" +
 				"}\n" +
+				"\n" +
 				"var h = (Hello.make)();\n" +
 				"return (h.get5)();\n", visitor.getCode());
 	}

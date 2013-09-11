@@ -136,7 +136,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Assert.assertEquals("[[ValDeclaration(\"applyTwice\", Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\")))))), ValDeclaration(\"addOne\", Fn([NameBindingImpl(\"x\", Int())], Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))))], Application(Application(Variable(\"applyTwice\"), Variable(\"addOne\")), IntegerConstant(1))]", typedAST.toString());		
+		Assert.assertEquals("[[ValDeclaration(\"applyTwice\", Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\"))))))], [ValDeclaration(\"addOne\", Fn([NameBindingImpl(\"x\", Int())], Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))))], Application(Application(Variable(\"applyTwice\"), Variable(\"addOne\")), IntegerConstant(1))]", typedAST.toString());
 		Type resultType = typedAST.typecheck(env);
 		Assert.assertEquals(integer, resultType);
 		Value resultValue = typedAST.evaluate(env);
@@ -622,6 +622,21 @@ public class ParsingTestPhase2 {
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
 		result.typecheck(env);
 
+	}
+
+	@Test(expected = ToolError.class)
+	public void testValRecursiveTypes() {
+		Reader reader = new StringReader("" +
+				"class A\n" +
+				"	val x : D\n" +
+				"val x : Int = 2\n" +
+				"class D\n" +
+				"	val y : A\n");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(new BodyParser(), env);
+		result.typecheck(env);
 	}
 
 	/*
