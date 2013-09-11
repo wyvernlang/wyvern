@@ -340,7 +340,10 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 			ctx.setExpectedTuple(tuple.getRest());
 		}
 
+		Tuple storeTuple = ctx.getExpectedTuple();
+		ctx.setExpectedTuple(null);
 		TypedAST ast = parseEquals(ctx);
+		ctx.setExpectedTuple(storeTuple);
 
 		while (ctx.getTokens() != null && ParseUtils.checkFirst(",", ctx)) {
 			FileLocation commaLine = ParseUtils.parseSymbol(",",ctx).getLocation();
