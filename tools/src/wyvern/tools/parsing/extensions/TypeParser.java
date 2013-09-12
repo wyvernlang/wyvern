@@ -183,6 +183,7 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 				}
 				
 				mtd.setDecls(DeclSequence.getDeclSeq(innerAST));
+				mtd.evalDecl(envsf);
 				return mtd;
 			}
 		

@@ -19,7 +19,24 @@ public interface ContParser {
 			return elem;
 		}
 
-	};
+	}
+
+	public static class EmptyWithDecl implements RecordTypeParser {
+
+		@Override
+		public void parseTypes(EnvironmentResolver r) {
+		}
+
+		@Override
+		public void parseInner(EnvironmentResolver r) {
+		}
+
+		@Override
+		public TypedAST parse(EnvironmentResolver r) {
+			return null;
+		}
+	}
+
 	public static class SimpleResolver implements EnvironmentResolver {
 		private Environment env;
 
