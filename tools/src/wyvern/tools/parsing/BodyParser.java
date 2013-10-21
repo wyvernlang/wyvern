@@ -232,10 +232,11 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseAtomicExpr(ctx);
 		
 		while (ctx.getTokens() != null && (ctx.getTokens().getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
+            RawAST first = ctx.getTokens().getFirst();
 			if (ParseUtils.checkFirst(".",ctx)) {
 				ParseUtils.parseSymbol(".", ctx);
                 Symbol sym = ParseUtils.parseSymbol(ctx);
-                ast = new Invocation(ast, sym.name, null, sym.getLocation());
+                ast = new Invocation(ast, sym.name, null, first.getLocation());
             } else {
                 Type type = ast.typecheck(ctx.getEnv());
                 if (type instanceof Arrow) {
@@ -244,7 +245,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 					ctx.setExpected(null);
                 }
 				TypedAST argument = parseAtomicExpr(ctx);
-				ast = new Application(ast, argument, argument.getLocation());
+				ast = new Application(ast, argument, first.getLocation());
 			}
 		}
 
