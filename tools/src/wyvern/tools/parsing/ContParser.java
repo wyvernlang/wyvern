@@ -50,17 +50,23 @@ public interface ContParser {
 		}
 	}
 	public static class ExtensionResolver implements EnvironmentResolver {
-		private EnvironmentResolver env;
+        private final Environment iEnv;
+        private EnvironmentResolver env;
 		private Binding binding;
 
 		public ExtensionResolver(EnvironmentResolver env, Binding binding) {
 			this.env = env;
-			this.binding = binding;
+            this.iEnv = Environment.getEmptyEnvironment().extend(binding);
 		}
+
+        public ExtensionResolver(EnvironmentResolver Oenv, Environment env) {
+            this.env = Oenv;
+            this.iEnv = env;
+        }
 
 		@Override
 		public Environment getEnv(TypedAST elem) {
-			return env.getEnv(elem).extend(binding);
+			return env.getEnv(elem).extend(iEnv);
 		}
 	}
 
