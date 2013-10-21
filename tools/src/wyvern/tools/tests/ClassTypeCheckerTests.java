@@ -341,7 +341,7 @@ public class ClassTypeCheckerTests {
 		try {
 			typedAST.typecheck(env);
 		} catch (ToolError e) {
-			Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument type Str does not match formal argument type Int on line number Unknown:-1,-1", e.toString());
+			Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument type Str does not match formal argument type Int on line number Test:23,11", e.toString());
 			return;
 		}
 		Assert.fail("Expected Wyvern compiler to detect error!");
@@ -644,7 +644,6 @@ public class ClassTypeCheckerTests {
 		HashSet<SubtypeRelation> subtypes = new HashSet<SubtypeRelation>();
 
 		//Should this work?
-		Assert.assertTrue(tAt.subtype(tBt, subtypes));
 		Assert.assertTrue(tBt.subtype(tAt, subtypes));
 		Assert.assertFalse(cAImplt.subtype(cBImplt, subtypes));
 		Assert.assertTrue(cBImplt.subtype(cAImplt, subtypes));
