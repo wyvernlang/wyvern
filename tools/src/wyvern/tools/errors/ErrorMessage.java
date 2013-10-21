@@ -26,6 +26,7 @@ public enum ErrorMessage {
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
 	CANNOT_INVOKE("Cannot invoke operations on the value %ARG", 1),
+    JAVA_INVOCATION_ERROR("Invocation of java method %ARG failed with message %ARG", 2),
 
 	//Verification errors
 	IMPORT_CYCLE("Import cycles have been found, with cycles\n%ARG", 1),
