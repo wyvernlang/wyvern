@@ -64,6 +64,8 @@ public class Util {
 		}
 
 	}
+	
+	/** Converts the Java objects passed as arguments to a tuple of Wyvern objects */
 	public static Value toWyvObjs(Object... args) {
 		if (args.length == 0) {
 			return UnitVal.getInstance(FileLocation.UNKNOWN);
@@ -81,7 +83,8 @@ public class Util {
 
 		}
 	}
-
+	
+	/** Converts a single Java object to a Wyvern object */
 	public static Value toWyvObj(Object arg) {
 		if (arg instanceof JavaWyvObject)
 			return ((JavaWyvObject) arg).getInnerObj();
@@ -98,7 +101,8 @@ public class Util {
 		thisRef.set(newObj);
 		return newObj;
 	}
-
+	
+	/** Converts a single Wyvern object to a Java object */ 
 	public static Object toJavaObject(Value arg, Class hint) {
 		if (arg instanceof StringConstant)
 			return ((StringConstant) arg).getValue();
