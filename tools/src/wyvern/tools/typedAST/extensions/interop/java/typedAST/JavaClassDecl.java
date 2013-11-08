@@ -17,6 +17,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -52,6 +53,11 @@ public class JavaClassDecl extends ClassDeclaration {
 				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)), m));
 				map.put(m.getName(), list);
 			}
+
+            for (Field f : clazz.getFields()) {
+                decls.add(new JavaField(f,null,null));//TODO pending upstream push of OpenJDK patch 8009222
+            }
+
 			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : map.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
@@ -111,4 +117,9 @@ public class JavaClassDecl extends ClassDeclaration {
 			return null;
 		}
 	}
+
+    @Override
+    public String toString() {
+        return "JavaClassDecl("+this.clazz.getName()+")";
+    }
 }
