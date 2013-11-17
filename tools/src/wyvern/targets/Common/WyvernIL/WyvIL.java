@@ -5,10 +5,13 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
 /**
  * O := Immediate
  * 	  | Var
+ * 	  | (O, ...)
+ *
  * Exn := O
  *    |   O op O
  *    |   O(O, ...)
  *    |   O.id
+ *    |   new id
  *
  * E := D
  * 	  | id = Exn
