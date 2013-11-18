@@ -37,6 +37,7 @@ public class TLFromAST implements CoreASTVisitor {
 		lambdaMeth.set(0);
 		ifRet.set(0);
 		tempIdx.set(0);
+		Label.flushIdx();
 	}
 
 
@@ -164,10 +165,10 @@ public class TLFromAST implements CoreASTVisitor {
 		ClassDeclaration decl = new1.getClassDecl();
 
 		for (Map.Entry<String, TypedAST> arg : args.entrySet()){
-			if(!(arg instanceof CoreAST))
+			if(!(arg.getValue() instanceof CoreAST))
 				throw new RuntimeException();
 			
-			CoreAST cArg = (CoreAST) arg;
+			CoreAST cArg = (CoreAST) arg.getValue();
 			TLFromAST argVisitor = new TLFromAST();
 			
 			cArg.accept(argVisitor);
