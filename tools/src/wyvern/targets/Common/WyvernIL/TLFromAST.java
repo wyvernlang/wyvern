@@ -1,10 +1,5 @@
 package wyvern.targets.Common.WyvernIL;
 
-import org.objectweb.asm.commons.StaticInitMerger;
-
-import wyvern.targets.Common.WyvernIL.Def.Def;
-import wyvern.targets.Common.WyvernIL.Def.Definition;
-import wyvern.targets.Common.WyvernIL.Def.ValDef;
 import wyvern.targets.Common.WyvernIL.Expr.*;
 import wyvern.targets.Common.WyvernIL.Imm.*;
 import wyvern.targets.Common.WyvernIL.Stmt.Assign;
@@ -25,9 +20,6 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-import javax.swing.plaf.nimbus.State;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +27,6 @@ import java.util.Map;
 public class TLFromAST implements CoreASTVisitor {
 	private List<Statement> statements = new LinkedList<Statement>();
 	private Expression expr = null;
-	private Statement stmt = null;
 	private Operand op = null;
 
 	@Override
@@ -220,8 +211,7 @@ public class TLFromAST implements CoreASTVisitor {
 		
 		this.statements.addAll(dstVisitor.getStatements());		
 		this.statements.addAll(srcVisitor.getStatements());
-				
-		this.stmt = new Assign(dstVisitor.getOp(), srcVisitor.getOp());
+		this.statements.add(new Assign(dstVisitor.getOp(), srcVisitor.getOp()));
 	}
 
 
@@ -296,9 +286,5 @@ public class TLFromAST implements CoreASTVisitor {
 	
 	public Expression getExpr(){
 		return expr;
-	}
-	
-	public Statement getStmt() {
-		return stmt;
 	}
 }
