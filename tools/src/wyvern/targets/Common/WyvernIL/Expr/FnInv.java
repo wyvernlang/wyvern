@@ -31,6 +31,10 @@ public class FnInv implements Expression {
 
 	@Override
 	public String toString() {
-		return fn.toString() + "(" + arg.toString() + ")";
+		if (arg != null)
+			return fn.toString() + "(" + arg + ")";
+		else
+			return fn.toString() + "()";
+
 	}
 }
