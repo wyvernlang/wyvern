@@ -8,11 +8,11 @@ import java.util.List;
 public class FnInv implements Expression {
 
 	private Operand fn;
-	private List<Operand> args;
+	private Operand arg;
 
-	public FnInv(Operand fn, List<Operand> args) {
+	public FnInv(Operand fn, Operand args) {
 		this.fn = fn;
-		this.args = args;
+		this.arg = arg;
 	}
 
 	@Override
@@ -20,8 +20,8 @@ public class FnInv implements Expression {
 		return visitor.visit(this);
 	}
 
-	public List<Operand> getArgs() {
-		return args;
+	public Operand getArg() {
+		return arg;
 	}
 
 	public Operand getFn() {
