@@ -5,6 +5,7 @@ import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Label implements Statement {
+	public static void flushIdx() { idx.set(0); }
 	private static AtomicInteger idx = new AtomicInteger(0);
 	private int num = idx.getAndIncrement();
 	@Override
