@@ -88,9 +88,19 @@ public class TLFromAST implements CoreASTVisitor {
 		
 		TLFromAST argVisitor = TLFromASTApply(arg);
 		TLFromAST recVisitor = TLFromASTApply(rec);
-		
-		this.statements.addAll(recVisitor.getStatements());
 		VarRef temp = getTemp(), invRes = getTemp(), argsRes = getTemp();
+		if (arg != null) {
+			VarRef res = getTemp();
+			this.statements.addAll(recVisitor.getStatements());
+			this.statements.add(new Assign(new Immediate(temp), recVisitor.getExpr()));
+			this.statements.addAll(argVisitor.getStatements());
+			this.statements.add(new Assign(new Immediate(argsRes), argVisitor.getExpr()));
+			this.statements.add(new Assign(new Immediate(res), new BinOp(temp, argsRes, name)));
+			this.expr = new Immediate(res);
+			return;
+		}
+
+		this.statements.addAll(recVisitor.getStatements());
 		this.statements.add(new Assign(new Immediate(temp), recVisitor.getExpr()));
 		this.statements.add(new Assign(new Immediate(invRes), new Inv(temp, name)));
 		this.statements.addAll(argVisitor.getStatements());
