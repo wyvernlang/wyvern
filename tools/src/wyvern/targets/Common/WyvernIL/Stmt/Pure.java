@@ -19,4 +19,11 @@ public class Pure implements Statement {
 	public Expression getExpression() {
 		return expression;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return expression.toString();
+	}
 }

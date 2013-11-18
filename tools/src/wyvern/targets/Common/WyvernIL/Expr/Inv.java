@@ -25,4 +25,8 @@ public class Inv implements Expression {
 	public String getId() {
 		return id;
 	}
+	@Override
+	public String toString() {
+		return source + "."+id;
+	}
 }

@@ -19,4 +19,9 @@ public class Defn implements Statement {
 	public Definition getDefinition() {
 		return definition;
 	}
+
+	@Override
+	public String toString() {
+		return definition.toString();
+	}
 }

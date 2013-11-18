@@ -27,4 +27,9 @@ public class Assign implements Statement {
 	public Expression getSrc() {
 		return src;
 	}
+
+	@Override
+	public String toString() {
+		return dest + " = " + src;
+	}
 }

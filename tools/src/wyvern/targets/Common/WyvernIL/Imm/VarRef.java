@@ -18,4 +18,8 @@ public class VarRef implements Operand {
 	public <R> R accept(OperandVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
+	@Override
+	public String toString() {
+		return name;
+	}
 }

@@ -2,6 +2,8 @@ package wyvern.targets.Common.WyvernIL;
 
 import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
 
+import java.util.List;
+
 /**
  * O := Immediate
  * 	  | Var
@@ -32,6 +34,22 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
  *    | class id { D, ... }
  *    | type id { D, ... }
  */
-public interface WyvIL {
-	public void accept(ILVisitor v);
+public class WyvIL {
+
+	public static String join(List<String> list, String delim) {
+
+		StringBuilder sb = new StringBuilder();
+
+		String loopDelim = "";
+
+		for(String s : list) {
+
+			sb.append(loopDelim);
+			sb.append(s);
+
+			loopDelim = delim;
+		}
+
+		return sb.toString();
+	}
 }

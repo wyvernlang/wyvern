@@ -27,4 +27,10 @@ public class FnInv implements Expression {
 	public Operand getFn() {
 		return fn;
 	}
+
+
+	@Override
+	public String toString() {
+		return fn.toString() + "(" + arg.toString() + ")";
+	}
 }

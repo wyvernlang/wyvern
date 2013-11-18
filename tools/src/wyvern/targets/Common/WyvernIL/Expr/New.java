@@ -20,4 +20,10 @@ public class New implements Expression {
 	public String getSrc() {
 		return src;
 	}
+
+
+	@Override
+	public String toString() {
+		return "new "+src;
+	}
 }

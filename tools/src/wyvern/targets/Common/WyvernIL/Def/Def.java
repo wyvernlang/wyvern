@@ -1,9 +1,11 @@
 package wyvern.targets.Common.WyvernIL.Def;
 
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
+import wyvern.targets.Common.WyvernIL.WyvIL;
 import wyvern.targets.Common.WyvernIL.visitor.DefVisitor;
 import wyvern.tools.types.Type;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Def implements Definition {
@@ -51,5 +53,20 @@ public class Def implements Definition {
 		public String getName() {
 			return name;
 		}
+	}
+
+
+	@Override
+	public String toString() {
+		List<String> sb = new LinkedList<>();
+		for (Statement def : body) {
+			sb.add(def.toString());
+		}
+		List<String> argsb = new LinkedList<>();
+		for (Param def : params) {
+			argsb.add(def.toString());
+		}
+
+		return "def "+name+"(" + WyvIL.join(argsb,",")+ ") {"+ WyvIL.join(sb, ",") +"}";
 	}
 }

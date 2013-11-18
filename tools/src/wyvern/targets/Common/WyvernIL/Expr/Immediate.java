@@ -19,4 +19,8 @@ public class Immediate implements Expression {
 	public Operand getInner() {
 		return inner;
 	}
+	@Override
+	public String toString() {
+		return ""+inner;
+	}
 }

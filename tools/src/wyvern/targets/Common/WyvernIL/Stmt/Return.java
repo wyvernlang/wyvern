@@ -19,4 +19,9 @@ public class Return implements Statement {
 	public Operand getExn() {
 		return exn;
 	}
+
+	@Override
+	public String toString() {
+		return "return "+exn;
+	}
 }

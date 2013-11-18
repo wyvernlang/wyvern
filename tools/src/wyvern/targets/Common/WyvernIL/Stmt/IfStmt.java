@@ -26,4 +26,10 @@ public class IfStmt implements Statement {
 	public Expression getCondition() {
 		return condition;
 	}
+
+
+	@Override
+	public String toString() {
+		return "if (" + condition + ") goto " + label;
+	}
 }

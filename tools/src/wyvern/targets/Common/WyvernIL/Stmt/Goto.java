@@ -18,4 +18,11 @@ public class Goto implements Statement {
 	public Label getLabel() {
 		return label;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "goto " + label;
+	}
 }

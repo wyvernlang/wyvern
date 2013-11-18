@@ -17,4 +17,8 @@ public class UnitValue implements Operand {
 	public Type getType() {
 		return Unit.getInstance();
 	}
+	@Override
+	public String toString() {
+		return "()";
+	}
 }

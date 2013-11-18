@@ -30,4 +30,8 @@ public class BinOp implements Expression {
 	public Operand getR() {
 		return r;
 	}
+	@Override
+	public String toString() {
+		return l +" " + op + " " + r;
+	}
 }

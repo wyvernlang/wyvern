@@ -18,4 +18,8 @@ public class BoolValue implements Operand {
 	public boolean isValue() {
 		return value;
 	}
+	@Override
+	public String toString() {
+		return ""+value;
+	}
 }

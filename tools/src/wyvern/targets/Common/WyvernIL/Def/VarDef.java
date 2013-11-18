@@ -27,4 +27,8 @@ public class VarDef implements Definition {
 	public String getName() {
 		return name;
 	}
+	@Override
+	public String toString() {
+		return "var "+name+" = " + exn;
+	}
 }
