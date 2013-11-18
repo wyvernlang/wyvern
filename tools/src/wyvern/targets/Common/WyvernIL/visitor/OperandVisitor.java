@@ -8,4 +8,6 @@ public interface OperandVisitor<R> {
 	R visit(VarRef varRef);
 	R visit(StringValue stringValue);
 	R visit(TupleValue tupleValue);
+	R visit(UnitValue unitValue);
+	R visit(FnValue fnValue);
 }

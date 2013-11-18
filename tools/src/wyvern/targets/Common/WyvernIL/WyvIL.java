@@ -6,6 +6,8 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
  * O := Immediate
  * 	  | Var
  * 	  | (O, ...)
+ *    | () 
+ *    | Fn
  *
  * Exn := O
  *    |   O op O
