@@ -9,4 +9,5 @@ public interface StatementVisitor<T> {
 	T visit(Label label);
 	T visit(Pure pure);
 	T visit(Return aReturn);
+	T visit(IfStmt ifStmt);
 }

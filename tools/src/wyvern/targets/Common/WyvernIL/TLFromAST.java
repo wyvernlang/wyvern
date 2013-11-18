@@ -3,9 +3,7 @@ package wyvern.targets.Common.WyvernIL;
 import wyvern.targets.Common.WyvernIL.Def.Def;
 import wyvern.targets.Common.WyvernIL.Expr.*;
 import wyvern.targets.Common.WyvernIL.Imm.*;
-import wyvern.targets.Common.WyvernIL.Stmt.Assign;
-import wyvern.targets.Common.WyvernIL.Stmt.Defn;
-import wyvern.targets.Common.WyvernIL.Stmt.Statement;
+import wyvern.targets.Common.WyvernIL.Stmt.*;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
@@ -211,6 +209,45 @@ public class TLFromAST implements CoreASTVisitor {
 		this.statements.add(new Assign(dstVisitor.getOp(), srcVisitor.getOp()));
 	}
 
+	private TLFromAST TLFromASTApply(TypedAST in) {
+		if (!(in instanceof CoreAST))
+			throw new RuntimeException();
+		CoreAST ast = (CoreAST) in;
+		TLFromAST t = new TLFromAST();
+		ast.accept(t);
+		return t;
+	}
+	private List<Statement> getBodyAST(TypedAST in) {
+		if (!(in instanceof CoreAST))
+			throw new RuntimeException();
+		CoreAST ast = (CoreAST) in;
+		ExnFromAST t = new ExnFromAST();
+		ast.accept(t);
+		return t.getStatments();
+	}
+
+	@Override
+	public void visit(IfExpr ifExpr) {
+		Label end = new Label();
+		Label next = new Label();
+		for(IfExpr.IfClause clause : ifExpr.getClauses()) {
+			TLFromAST tl = TLFromASTApply(clause.getClause());
+			Label ifT = new Label();
+			statements.add(next);
+			next = new Label();
+			statements.addAll(tl.getStatements());
+			statements.add(new IfStmt(tl.getOp(),ifT));
+			statements.add(new Goto(next));
+			statements.add(ifT);
+			statements.addAll(getBodyAST(clause.getBody()));
+			statements.add(new Goto(end));
+		}
+		statements.add(next);
+		statements.add(new Goto(end));
+		statements.add(end);
+
+	}
+
 
 
 
@@ -249,11 +286,6 @@ public class TLFromAST implements CoreASTVisitor {
 
 	@Override
 	public void visit(LetExpr let) {
-
-	}
-
-	@Override
-	public void visit(IfExpr ifExpr) {
 
 	}
 
