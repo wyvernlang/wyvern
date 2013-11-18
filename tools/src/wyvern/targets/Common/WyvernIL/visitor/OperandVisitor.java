@@ -9,5 +9,4 @@ public interface OperandVisitor<R> {
 	R visit(StringValue stringValue);
 	R visit(TupleValue tupleValue);
 	R visit(UnitValue unitValue);
-	R visit(FnValue fnValue);
 }

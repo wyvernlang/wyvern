@@ -1,8 +1,10 @@
 package wyvern.targets.Common.WyvernIL;
 
+import wyvern.targets.Common.WyvernIL.Def.Def;
 import wyvern.targets.Common.WyvernIL.Expr.*;
 import wyvern.targets.Common.WyvernIL.Imm.*;
 import wyvern.targets.Common.WyvernIL.Stmt.Assign;
+import wyvern.targets.Common.WyvernIL.Stmt.Defn;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
@@ -23,11 +25,13 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TLFromAST implements CoreASTVisitor {
 	private List<Statement> statements = new LinkedList<Statement>();
 	private Expression expr = null;
 	private Operand op = null;
+	private static AtomicInteger lambdaMeth = new AtomicInteger(0);
 
 	@Override
 	public void visit(Fn fn) {
@@ -35,21 +39,8 @@ public class TLFromAST implements CoreASTVisitor {
 		TypedAST body = fn.getBody();
 		
 		List<Operand> args = new LinkedList<Operand>();
-		
-		for (NameBinding binding : bindings){
-			TypedAST ast = binding.getUse();
-			
-			if(!(ast instanceof CoreAST))
-				throw new RuntimeException();
-			
-			CoreAST cAst = (CoreAST) ast;
-			TLFromAST visitor = new TLFromAST();
-			
-			cAst.accept(visitor);
-			
-			statements.addAll(visitor.getStatements());
-			args.add(visitor.getOp());
-		}
+		List<Statement> innerStatements = new LinkedList<>();
+
 
 		if (!(body instanceof CoreAST))
 			throw new RuntimeException();
@@ -58,9 +49,15 @@ public class TLFromAST implements CoreASTVisitor {
 		ExnFromAST visitor = new ExnFromAST();
 		
 		cBody.accept(visitor);
-		this.statements.addAll(visitor.getStatments());
-		
-		this.op = new FnValue(args, statements);
+		innerStatements.addAll(visitor.getStatments());
+		LinkedList<Def.Param> params = new LinkedList<>();
+		for (NameBinding binding : bindings) {
+			params.add(new Def.Param(binding.getName(), binding.getType()));
+		}
+
+		String mName = lambdaMeth.getAndIncrement() + "$lambda";
+		this.statements.add(new Defn(new Def(mName, params, innerStatements)));
+		this.op = new VarRef(mName);
 	}
 
 	@Override
