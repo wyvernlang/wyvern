@@ -33,6 +33,12 @@ public class TLFromAST implements CoreASTVisitor {
 	private static AtomicInteger ifRet = new AtomicInteger(0);
 	private static AtomicInteger tempIdx = new AtomicInteger(0);
 
+	public static void flushInts() {
+		lambdaMeth.set(0);
+		ifRet.set(0);
+		tempIdx.set(0);
+	}
+
 
 	private TLFromAST TLFromASTApply(TypedAST in) {
 		if (in == null)
@@ -102,10 +108,7 @@ public class TLFromAST implements CoreASTVisitor {
 
 		this.statements.addAll(recVisitor.getStatements());
 		this.statements.add(new Assign(new Immediate(temp), recVisitor.getExpr()));
-		this.statements.add(new Assign(new Immediate(invRes), new Inv(temp, name)));
-		this.statements.addAll(argVisitor.getStatements());
-		this.statements.add(new Assign(new Immediate(argsRes), argVisitor.getExpr()));
-		this.expr = new FnInv(invRes, argsRes);
+		this.expr = new Inv(temp, name);
 	}
 
 	private VarRef getTemp() {
@@ -159,16 +162,7 @@ public class TLFromAST implements CoreASTVisitor {
 	public void visit(New new1) {
 		Map<String, TypedAST> args = new1.getArgs();
 		ClassDeclaration decl = new1.getClassDecl();
-		
-		if(!(decl instanceof CoreAST))
-			throw new RuntimeException();
-		
-		CoreAST cDecl = (CoreAST) decl;
-		ExnFromAST visitor = new ExnFromAST();
-		
-		cDecl.accept(visitor);
-		this.statements.addAll(visitor.getStatments());
-		
+
 		for (Map.Entry<String, TypedAST> arg : args.entrySet()){
 			if(!(arg instanceof CoreAST))
 				throw new RuntimeException();

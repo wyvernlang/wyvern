@@ -12,7 +12,7 @@ public class FnInv implements Expression {
 
 	public FnInv(Operand fn, Operand args) {
 		this.fn = fn;
-		this.arg = arg;
+		this.arg = args;
 	}
 
 	@Override
