@@ -10,7 +10,7 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
  *
  * Exn := O
  *    |   O op O
- *    |   O(O, ...)
+ *    |   O(O)
  *    |   O.id
  *    |   new id
  *
