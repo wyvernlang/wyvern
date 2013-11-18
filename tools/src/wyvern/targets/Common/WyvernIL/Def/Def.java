@@ -35,8 +35,21 @@ public class Def implements Definition {
 		return body;
 	}
 
-	public class Param {
-		public String name;
-		public Type type;
+	public static class Param {
+		private String name;
+		private Type type;
+
+		public Param(String name, Type type) {
+			this.name = name;
+			this.type = type;
+		}
+
+		public Type getType() {
+			return type;
+		}
+
+		public String getName() {
+			return name;
+		}
 	}
 }
