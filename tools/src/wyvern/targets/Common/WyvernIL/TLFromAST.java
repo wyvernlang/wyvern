@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.extensions.Unit;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class TLFromAST implements CoreASTVisitor {
 	private Expression expr = null;
 	private Operand op = null;
 	private static AtomicInteger lambdaMeth = new AtomicInteger(0);
+	private static AtomicInteger ifRet = new AtomicInteger(0);
 
 	@Override
 	public void visit(Fn fn) {
@@ -131,7 +133,7 @@ public class TLFromAST implements CoreASTVisitor {
 
 	@Override
 	public void visit(UnitVal unitVal) {
-		this.op = new UnitValue(unitVal.getType());
+		this.op = new UnitValue();
 	}
 
 	@Override
@@ -206,7 +208,7 @@ public class TLFromAST implements CoreASTVisitor {
 		
 		this.statements.addAll(dstVisitor.getStatements());		
 		this.statements.addAll(srcVisitor.getStatements());
-		this.statements.add(new Assign(dstVisitor.getOp(), srcVisitor.getOp()));
+		this.statements.add(new Assign(dstVisitor.getOp(), new Immediate(srcVisitor.getOp())));
 	}
 
 	private TLFromAST TLFromASTApply(TypedAST in) {
@@ -230,6 +232,7 @@ public class TLFromAST implements CoreASTVisitor {
 	public void visit(IfExpr ifExpr) {
 		Label end = new Label();
 		Label next = new Label();
+		VarRef result = new VarRef("ifRet$"+ifRet.getAndIncrement());
 		for(IfExpr.IfClause clause : ifExpr.getClauses()) {
 			TLFromAST tl = TLFromASTApply(clause.getClause());
 			Label ifT = new Label();
@@ -239,7 +242,17 @@ public class TLFromAST implements CoreASTVisitor {
 			statements.add(new IfStmt(tl.getOp(),ifT));
 			statements.add(new Goto(next));
 			statements.add(ifT);
-			statements.addAll(getBodyAST(clause.getBody()));
+			List<Statement> bodyAST = getBodyAST(clause.getBody());
+			if (bodyAST.size() == 0) {
+				statements.add(new Assign(result, new Immediate(new UnitValue())));
+			} else {
+				Statement last = bodyAST.get(bodyAST.size()-1);
+				List<Statement> notLast = bodyAST.subList(0,bodyAST.size()-1);
+				statements.addAll(notLast);
+				if (!(last instanceof Pure))
+					throw new RuntimeException();
+				statements.add(new Assign(result, ((Pure)last).getExpression()));
+			}
 			statements.add(new Goto(end));
 		}
 		statements.add(next);

@@ -2,12 +2,11 @@ package wyvern.targets.Common.WyvernIL.Imm;
 
 import wyvern.targets.Common.WyvernIL.visitor.OperandVisitor;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 
 public class UnitValue implements Operand {
-	private Type type;
 	
-	public UnitValue(Type type) {
-		this.type = type;
+	public UnitValue() {
 	}
 
 	@Override
@@ -16,6 +15,6 @@ public class UnitValue implements Operand {
 	}
 	
 	public Type getType() {
-		return this.type;
+		return Unit.getInstance();
 	}
 }

@@ -8,9 +8,9 @@ import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 public class Assign implements Statement {
 
 	private Operand dest;
-	private Operand src;
+	private Expression src;
 
-	public Assign(Operand dest, Operand src) {
+	public Assign(Operand dest, Expression src) {
 		this.dest = dest;
 		this.src = src;
 	}
@@ -24,7 +24,7 @@ public class Assign implements Statement {
 		return dest;
 	}
 
-	public Operand getSrc() {
+	public Expression getSrc() {
 		return src;
 	}
 }

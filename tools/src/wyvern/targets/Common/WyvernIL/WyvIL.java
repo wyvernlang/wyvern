@@ -6,8 +6,7 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
  * O := Immediate
  * 	  | Var
  * 	  | (O, ...)
- *    | () 
- *    | Fn
+ *    | ()
  *
  * Exn := O
  *    |   O op O
@@ -26,7 +25,8 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
  * L := Label
  * P := id : type
  *
- * D := def id(P, ...) { E ... }
+ * D := E
+ * 	  | def id(P, ...) { E ... }
  *    | val id = Exn
  *    | var id = Exn
  *    | class id { D, ... }
