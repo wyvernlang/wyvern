@@ -7,10 +7,10 @@ import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 
 public class Assign implements Statement {
 
-	private Operand dest;
+	private Expression dest;
 	private Expression src;
 
-	public Assign(Operand dest, Expression src) {
+	public Assign(Expression dest, Expression src) {
 		this.dest = dest;
 		this.src = src;
 	}
@@ -20,7 +20,7 @@ public class Assign implements Statement {
 		return visitor.visit(this);
 	}
 
-	public Operand getDest() {
+	public Expression getDest() {
 		return dest;
 	}
 

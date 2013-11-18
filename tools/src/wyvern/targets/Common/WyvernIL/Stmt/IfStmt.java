@@ -1,14 +1,15 @@
 package wyvern.targets.Common.WyvernIL.Stmt;
 
+import wyvern.targets.Common.WyvernIL.Expr.Expression;
 import wyvern.targets.Common.WyvernIL.Imm.Operand;
 import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 
 public class IfStmt implements Statement {
 
-	private Operand condition;
+	private Expression condition;
 	private Label label;
 
-	public IfStmt(Operand condition, Label label) {
+	public IfStmt(Expression condition, Label label) {
 		this.condition = condition;
 		this.label = label;
 	}
@@ -22,7 +23,7 @@ public class IfStmt implements Statement {
 		return label;
 	}
 
-	public Operand getCondition() {
+	public Expression getCondition() {
 		return condition;
 	}
 }
