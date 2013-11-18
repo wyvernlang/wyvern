@@ -18,6 +18,7 @@ import wyvern.targets.Common.WyvernIL.visitor.ILVisitor;
  * 	  | Exn
  *    | L
  *    | Goto L
+ *    | if O goto L
  *    | return O
  *
  * L := Label
