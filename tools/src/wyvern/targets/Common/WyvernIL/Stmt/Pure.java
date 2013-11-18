@@ -20,10 +20,8 @@ public class Pure implements Statement {
 		return expression;
 	}
 
-
-
 	@Override
 	public String toString() {
-		return expression.toString();
+		return (expression != null)?expression.toString():"";
 	}
 }
