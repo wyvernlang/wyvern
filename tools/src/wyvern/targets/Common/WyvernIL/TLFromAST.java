@@ -29,9 +29,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TLFromAST implements CoreASTVisitor {
 	private List<Statement> statements = new LinkedList<Statement>();
 	private Expression expr = null;
-	private Operand op = null;
 	private static AtomicInteger lambdaMeth = new AtomicInteger(0);
 	private static AtomicInteger ifRet = new AtomicInteger(0);
+	private static AtomicInteger tempIdx = new AtomicInteger(0);
+
+
+	private TLFromAST TLFromASTApply(TypedAST in) {
+		if (in == null)
+			return null;
+		if (!(in instanceof CoreAST))
+			throw new RuntimeException();
+		CoreAST ast = (CoreAST) in;
+		TLFromAST t = new TLFromAST();
+		ast.accept(t);
+		return t;
+	}
+	private List<Statement> getBodyAST(TypedAST in) {
+		if (!(in instanceof CoreAST))
+			throw new RuntimeException();
+		CoreAST ast = (CoreAST) in;
+		ExnFromAST t = new ExnFromAST();
+		ast.accept(t);
+		return t.getStatments();
+	}
 
 	@Override
 	public void visit(Fn fn) {
@@ -57,7 +77,7 @@ public class TLFromAST implements CoreASTVisitor {
 
 		String mName = lambdaMeth.getAndIncrement() + "$lambda";
 		this.statements.add(new Defn(new Def(mName, params, innerStatements)));
-		this.op = new VarRef(mName);
+		this.expr = new Immediate(new VarRef(mName));
 	}
 
 	@Override
@@ -65,75 +85,64 @@ public class TLFromAST implements CoreASTVisitor {
 		TypedAST arg = invocation.getArgument();
 		TypedAST rec = invocation.getReceiver();
 		String name = invocation.getOperationName();
-
-		if(!(arg instanceof CoreAST) || !(rec instanceof CoreAST))
-			throw new RuntimeException();
 		
-		CoreAST cArg = (CoreAST) arg;
-		CoreAST cRec = (CoreAST) rec;
+		TLFromAST argVisitor = TLFromASTApply(arg);
+		TLFromAST recVisitor = TLFromASTApply(rec);
 		
-		TLFromAST argVisitor = new TLFromAST();
-		cArg.accept(argVisitor);
-		
-		TLFromAST recVisitor = new TLFromAST();
-		cRec.accept(recVisitor);
-		
-		this.statements.addAll(recVisitor.getStatements());		
+		this.statements.addAll(recVisitor.getStatements());
+		VarRef temp = getTemp(), invRes = getTemp(), argsRes = getTemp();
+		this.statements.add(new Assign(new Immediate(temp), recVisitor.getExpr()));
+		this.statements.add(new Assign(new Immediate(invRes), new Inv(temp, name)));
 		this.statements.addAll(argVisitor.getStatements());
-		
-		this.op = recVisitor.getOp();
-		this.expr = new Inv(op, name);
+		this.statements.add(new Assign(new Immediate(argsRes), argVisitor.getExpr()));
+		this.expr = new FnInv(invRes, argsRes);
+	}
+
+	private VarRef getTemp() {
+		return new VarRef("temp$" + tempIdx.getAndIncrement());
 	}
 
 	@Override
 	public void visit(Application application) {
 		TypedAST arg = application.getArgument();
 		TypedAST func = application.getFunction();
-				
-		List<Operand> args = new LinkedList<Operand>();
-		
-		if(!(arg instanceof CoreAST) || !(func instanceof CoreAST))
-			throw new RuntimeException();
-		
-		CoreAST cArg = (CoreAST) arg;
-		CoreAST cFunc = (CoreAST) func;
-		
-		TLFromAST argVisitor = new TLFromAST();
-		cArg.accept(argVisitor);
-		this.statements.addAll(argVisitor.getStatements());
-		
-		args.add(argVisitor.getOp());
-		
-		TLFromAST funcVisitor = new TLFromAST();
-		cFunc.accept(funcVisitor);
+
+		VarRef funv = getTemp();
+		TLFromAST funcVisitor = TLFromASTApply(func);
 		this.statements.addAll(funcVisitor.getStatements());
+		this.statements.add(new Assign(new Immediate(funv), funcVisitor.getExpr()));
+
+		TLFromAST argVisitor = TLFromASTApply(arg);
+		this.statements.addAll(argVisitor.getStatements());
+		VarRef argv = getTemp();
+		this.statements.add(new Assign(new Immediate(argv), argVisitor.getExpr()));
 		
-		this.expr = new FnInv (funcVisitor.getOp(), args);
+		this.expr = new FnInv (funv, argv);
 	}
 
 	@Override
 	public void visit(Variable variable) {
-		this.op = new VarRef(variable.getName());
+		this.expr = new Immediate(new VarRef(variable.getName()));
 	}
 
 	@Override
 	public void visit(IntegerConstant integerConstant) {
-		this.op = new IntValue (integerConstant.getValue());
+		this.expr = new Immediate(new IntValue (integerConstant.getValue()));
 	}
 
 	@Override
 	public void visit(StringConstant stringConstant) {
-		this.op = new StringValue( stringConstant.getValue());
+		this.expr = new Immediate(new StringValue( stringConstant.getValue()));
 	}
 
 	@Override
 	public void visit(BooleanConstant booleanConstant) {
-		this.op = new BoolValue(booleanConstant.getValue());
+		this.expr = new Immediate(new BoolValue(booleanConstant.getValue()));
 	}
 
 	@Override
 	public void visit(UnitVal unitVal) {
-		this.op = new UnitValue();
+		this.expr = new Immediate(new UnitValue());
 	}
 
 	@Override
@@ -182,11 +191,13 @@ public class TLFromAST implements CoreASTVisitor {
 			cast.accept(visitor);
 
 			stmts.addAll(visitor.getStatements());
-			ops.add(visitor.getOp());
+			VarRef tempRef = getTemp();
+			stmts.add(new Assign(new Immediate(tempRef), visitor.getExpr()));
+			ops.add(tempRef);
 		}
 
 		this.statements = stmts;
-		this.op = new TupleValue(ops);
+		this.expr = new Immediate(new TupleValue(ops));
 	}
 
 	@Override
@@ -208,24 +219,7 @@ public class TLFromAST implements CoreASTVisitor {
 		
 		this.statements.addAll(dstVisitor.getStatements());		
 		this.statements.addAll(srcVisitor.getStatements());
-		this.statements.add(new Assign(dstVisitor.getOp(), new Immediate(srcVisitor.getOp())));
-	}
-
-	private TLFromAST TLFromASTApply(TypedAST in) {
-		if (!(in instanceof CoreAST))
-			throw new RuntimeException();
-		CoreAST ast = (CoreAST) in;
-		TLFromAST t = new TLFromAST();
-		ast.accept(t);
-		return t;
-	}
-	private List<Statement> getBodyAST(TypedAST in) {
-		if (!(in instanceof CoreAST))
-			throw new RuntimeException();
-		CoreAST ast = (CoreAST) in;
-		ExnFromAST t = new ExnFromAST();
-		ast.accept(t);
-		return t.getStatments();
+		this.statements.add(new Assign(dstVisitor.getExpr(), srcVisitor.getExpr()));
 	}
 
 	@Override
@@ -239,19 +233,19 @@ public class TLFromAST implements CoreASTVisitor {
 			statements.add(next);
 			next = new Label();
 			statements.addAll(tl.getStatements());
-			statements.add(new IfStmt(tl.getOp(),ifT));
+			statements.add(new IfStmt(tl.getExpr(),ifT));
 			statements.add(new Goto(next));
 			statements.add(ifT);
 			List<Statement> bodyAST = getBodyAST(clause.getBody());
 			if (bodyAST.size() == 0) {
-				statements.add(new Assign(result, new Immediate(new UnitValue())));
+				statements.add(new Assign(new Immediate(result), new Immediate(new UnitValue())));
 			} else {
 				Statement last = bodyAST.get(bodyAST.size()-1);
 				List<Statement> notLast = bodyAST.subList(0,bodyAST.size()-1);
 				statements.addAll(notLast);
 				if (!(last instanceof Pure))
 					throw new RuntimeException();
-				statements.add(new Assign(result, ((Pure)last).getExpression()));
+				statements.add(new Assign(new Immediate(result), ((Pure)last).getExpression()));
 			}
 			statements.add(new Goto(end));
 		}
@@ -315,11 +309,6 @@ public class TLFromAST implements CoreASTVisitor {
 	@Override
 	public void visit(Sequence sequence) {
 
-	}
-
-
-	public Operand getOp() {
-		return op;
 	}
 
 	public List<Statement> getStatements() {

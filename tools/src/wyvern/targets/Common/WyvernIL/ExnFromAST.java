@@ -1,11 +1,17 @@
 package wyvern.targets.Common.WyvernIL;
 
 import org.objectweb.asm.commons.StaticInitMerger;
-import wyvern.targets.Common.WyvernIL.Stmt.Statement;
+import wyvern.targets.Common.WyvernIL.Def.*;
+import wyvern.targets.Common.WyvernIL.Expr.Immediate;
+import wyvern.targets.Common.WyvernIL.Expr.Inv;
+import wyvern.targets.Common.WyvernIL.Imm.VarRef;
+import wyvern.targets.Common.WyvernIL.Stmt.*;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.core.expressions.*;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
@@ -16,8 +22,11 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
+import javax.lang.model.element.Name;
+import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -29,97 +38,121 @@ public class ExnFromAST implements CoreASTVisitor {
 	public List<Statement> getStatments() {
 		return statements;
 	}
-
-
-
-	@Override
-	public void visit(Fn fn) {
-		
+	private TLFromAST TLFromASTApply(TypedAST in) {
+		if (!(in instanceof CoreAST))
+			throw new RuntimeException();
+		CoreAST ast = (CoreAST) in;
+		TLFromAST t = new TLFromAST();
+		ast.accept(t);
+		return t;
+	}
+	private List<Statement> getBodyAST(TypedAST in) {
+		if (!(in instanceof CoreAST))
+			throw new RuntimeException();
+		CoreAST ast = (CoreAST) in;
+		ExnFromAST t = new ExnFromAST();
+		ast.accept(t);
+		return t.statements;
 	}
 
-	@Override
-	public void visit(Invocation invocation) {
 
-	}
 
-	@Override
-	public void visit(Application application) {
-
-	}
 
 	@Override
 	public void visit(ValDeclaration valDeclaration) {
-
+		TLFromAST tlator = TLFromASTApply(valDeclaration.getDefinition());
+		statements.addAll(tlator.getStatements());
+		statements.add(new Defn(new ValDef(valDeclaration.getName(), tlator.getExpr())));
 	}
 
 	@Override
 	public void visit(VarDeclaration valDeclaration) {
-
+		TLFromAST tlator = TLFromASTApply(valDeclaration.getDefinition());
+		statements.addAll(tlator.getStatements());
+		statements.add(new Defn(new VarDef(valDeclaration.getName(), tlator.getExpr())));
 	}
-
-	@Override
-	public void visit(Variable variable) {
-
-	}
-
-	@Override
-	public void visit(IntegerConstant booleanConstant) {
-
-	}
-
-	@Override
-	public void visit(StringConstant booleanConstant) {
-
-	}
-
-	@Override
-	public void visit(BooleanConstant booleanConstant) {
-
-	}
-
-	@Override
-	public void visit(UnitVal unitVal) {
-
-	}
-
 	@Override
 	public void visit(ClassDeclaration clsDeclaration) {
-
-	}
-
-	@Override
-	public void visit(New new1) {
-
-	}
-
-	@Override
-	public void visit(LetExpr let) {
-
+		ClassDef def = getClassDef(clsDeclaration);
+		statements.add(new Defn(def));
 	}
 
 	@Override
 	public void visit(DefDeclaration meth) {
-
+		List<Statement> stmts = getBodyAST(meth.getBody());
+		List<NameBinding> argBindings = meth.getArgBindings();
+		List<Def.Param> params = getParams(argBindings);
+		statements.add(new Defn(new Def(meth.getName(), params, stmts)));
 	}
 
-	@Override
-	public void visit(TupleObject meth) {
-
+	private List<Def.Param> getParams(List<NameBinding> argBindings) {
+		List<Def.Param> params = new LinkedList<>();
+		for (NameBinding arg : argBindings) {
+			params.add(new Def.Param(arg.getName(), arg.getType()));
+		}
+		return params;
 	}
 
-	@Override
-	public void visit(TypeInstance typeInstance) {
-
-	}
 
 	@Override
 	public void visit(Assignment assignment) {
-
+		TLFromAST tgt = TLFromASTApply(assignment.getTarget());
+		TLFromAST val = TLFromASTApply(assignment.getValue());
+		statements.addAll(tgt.getStatements());
+		statements.addAll(val.getStatements());
+		statements.add(new Assign(tgt.getExpr(), val.getExpr()));
 	}
 
 	@Override
 	public void visit(TypeDeclaration interfaceDeclaration) {
+		DeclSequence decls = interfaceDeclaration.getDecls();
+		TypeDef def = getTypeDecl(interfaceDeclaration, decls);
+		statements.add(new Defn(def));
+	}
 
+	private ClassDef getClassDef(ClassDeclaration cd) {
+		List<Definition> definitions = new LinkedList<>();
+		List<Statement> inializer = new LinkedList<>();
+		for (Declaration decl : cd.getDecls().getDeclIterator()) {
+			if (decl instanceof DefDeclaration) {
+				List<Statement> bodyAST = getBodyAST(((DefDeclaration) decl).getBody());
+				definitions.add(new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), bodyAST));
+			} else if (decl instanceof ValDeclaration) {
+				TLFromAST gen = TLFromASTApply(((ValDeclaration) decl).getDefinition());
+				inializer.addAll(gen.getStatements());
+				inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
+				definitions.add(new ValDef(decl.getName(), null));
+			} else if (decl instanceof VarDeclaration) {
+				TLFromAST gen = TLFromASTApply(((VarDeclaration) decl).getDefinition());
+				inializer.addAll(gen.getStatements());
+				inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
+				definitions.add(new VarDef(decl.getName(), null));
+			} else if (decl instanceof TypeDeclaration) {
+				definitions.add(getTypeDecl((TypeDeclaration) decl, ((TypeDeclaration) decl).getDecls()));
+			} else if (decl instanceof ClassDeclaration) {
+				definitions.add(getClassDef((ClassDeclaration) decl));
+			}
+		}
+		definitions.add(new Def("$init", new LinkedList<Def.Param>(), inializer));
+		return new ClassDef(cd.getName(), definitions);
+	}
+
+	private TypeDef getTypeDecl(TypeDeclaration interfaceDeclaration, DeclSequence decls) {
+		List<Definition> definitions = new LinkedList<>();
+		for (Declaration decl : decls.getDeclIterator()) {
+			if (decl instanceof DefDeclaration) {
+				definitions.add(new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), null));
+			} else if (decl instanceof ValDeclaration) {
+				definitions.add(new ValDef(decl.getName(), null));
+			} else if (decl instanceof VarDeclaration) {
+				definitions.add(new VarDef(decl.getName(), null));
+			} else if (decl instanceof TypeDeclaration) {
+				definitions.add(getTypeDecl((TypeDeclaration) decl, ((TypeDeclaration) decl).getDecls()));
+			} else if (decl instanceof ClassDeclaration) {
+
+			}
+		}
+		return new TypeDef(interfaceDeclaration.getName(), definitions);
 	}
 
 	@Override
@@ -144,13 +177,99 @@ public class ExnFromAST implements CoreASTVisitor {
 		this.statements = foo;
 	}
 
-	@Override
-	public void visit(IfExpr ifExpr) {
-
-	}
 
 	@Override
 	public void visit(WhileStatement whileStatement) {
+		Label start = new Label();
+		Label inner = new Label();
+		Label end = new Label();
+		statements.add(start);
+		TLFromAST tlFromAST = TLFromASTApply(whileStatement.getConditional());
+		statements.addAll(tlFromAST.getStatements());
+		statements.add(new IfStmt(tlFromAST.getExpr(), inner));
+		statements.add(new Goto(end));
+		statements.add(inner);
+		List<Statement> bodyAST = getBodyAST(whileStatement.getBody());
+		statements.addAll(bodyAST);
+		statements.add(new Goto(start));
+		statements.add(end);
+	}
+
+
+	//UNUSED
+
+	@Override
+	public void visit(LetExpr let) {
 
 	}
+
+	@Override
+	public void visit(TypeInstance typeInstance) {
+
+	}
+
+	//END UNUSED
+
+	//DELEGATE TO TLFromAST
+	private void getSimp(CoreAST in) {
+		TLFromAST apply = TLFromASTApply(in);
+		statements.addAll(apply.getStatements());
+		statements.add(new Pure(apply.getExpr()));
+	}
+
+	@Override
+	public void visit(IfExpr ifExpr) {
+		getSimp(ifExpr);
+	}
+
+	@Override
+	public void visit(Fn fn) {
+		getSimp(fn);
+	}
+
+	@Override
+	public void visit(UnitVal unitVal) {
+		getSimp(unitVal);
+	}
+
+	@Override
+	public void visit(New new1) {
+		getSimp(new1);
+	}
+
+	@Override
+	public void visit(TupleObject meth) {
+		getSimp(meth);
+	}
+
+	@Override
+	public void visit(Invocation invocation) {
+		getSimp(invocation);
+	}
+
+	@Override
+	public void visit(Application application) {
+		getSimp(application);
+	}
+
+	@Override
+	public void visit(Variable variable) {
+		getSimp(variable);
+	}
+
+	@Override
+	public void visit(IntegerConstant booleanConstant) {
+		getSimp(booleanConstant);
+	}
+
+	@Override
+	public void visit(StringConstant booleanConstant) {
+		getSimp(booleanConstant);
+	}
+
+	@Override
+	public void visit(BooleanConstant booleanConstant) {
+		getSimp(booleanConstant);
+	}
+
 }
