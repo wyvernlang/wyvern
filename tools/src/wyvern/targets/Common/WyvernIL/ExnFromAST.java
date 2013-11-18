@@ -39,6 +39,8 @@ public class ExnFromAST implements CoreASTVisitor {
 		return statements;
 	}
 	private TLFromAST TLFromASTApply(TypedAST in) {
+		if (in == null)
+			return null;
 		if (!(in instanceof CoreAST))
 			throw new RuntimeException();
 		CoreAST ast = (CoreAST) in;
@@ -119,8 +121,10 @@ public class ExnFromAST implements CoreASTVisitor {
 				definitions.add(new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), bodyAST));
 			} else if (decl instanceof ValDeclaration) {
 				TLFromAST gen = TLFromASTApply(((ValDeclaration) decl).getDefinition());
-				inializer.addAll(gen.getStatements());
-				inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
+				if (gen != null) {
+					inializer.addAll(gen.getStatements());
+					inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
+				}
 				definitions.add(new ValDef(decl.getName(), null));
 			} else if (decl instanceof VarDeclaration) {
 				TLFromAST gen = TLFromASTApply(((VarDeclaration) decl).getDefinition());
