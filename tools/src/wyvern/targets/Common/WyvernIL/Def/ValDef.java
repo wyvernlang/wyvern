@@ -7,9 +7,9 @@ import wyvern.targets.Common.WyvernIL.visitor.DefVisitor;
 
 public class ValDef implements Definition {
 	private String name;
-	private Operand exn;
+	private Expression exn;
 
-	public ValDef(String name, Operand exn) {
+	public ValDef(String name, Expression exn) {
 		this.name = name;
 		this.exn = exn;
 	}
@@ -23,7 +23,7 @@ public class ValDef implements Definition {
 		return name;
 	}
 
-	public Operand getExn() {
+	public Expression getExn() {
 		return exn;
 	}
 }

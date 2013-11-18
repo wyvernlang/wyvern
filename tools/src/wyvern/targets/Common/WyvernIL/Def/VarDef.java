@@ -8,9 +8,9 @@ import wyvern.targets.Common.WyvernIL.visitor.DefVisitor;
 public class VarDef implements Definition {
 
 	private String name;
-	private Operand exn;
+	private Expression exn;
 
-	public VarDef(String name, Operand exn) {
+	public VarDef(String name, Expression exn) {
 		this.name = name;
 		this.exn = exn;
 	}
@@ -20,7 +20,7 @@ public class VarDef implements Definition {
 		return visitor.visit(this);
 	}
 
-	public Operand getExn() {
+	public Expression getExn() {
 		return exn;
 	}
 
