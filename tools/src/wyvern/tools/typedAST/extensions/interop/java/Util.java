@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -39,6 +40,9 @@ import static org.objectweb.asm.Opcodes.*;
 public class Util {
 	private static HashMap<Class, Type> classCache = new HashMap<Class, Type>();
 	private static HashMap<Type, Map<Class, Class>> typeCache = new HashMap<>();
+	private static HashMap<Class, JavaClassDecl> declCache = new HashMap<>();
+	private static WeakHashMap<Object, JavaObj> pregenerated = new WeakHashMap<>();
+
 	private static ByteClassLoader loader = new ByteClassLoader(Util.class.getClassLoader());
 	private org.objectweb.asm.Type type;
 
@@ -82,6 +86,16 @@ public class Util {
 		}
 	}
 
+	private static JavaClassDecl getDecl(Class toGet) {
+		if (declCache.containsKey(toGet))
+			return declCache.get(toGet);
+
+		JavaClassDecl decl = new JavaClassDecl(toGet);
+		declCache.put(toGet, decl);
+		decl.initalize();
+		return decl;
+	}
+
 	public static Value toWyvObj(Object arg) {
 		if (arg instanceof JavaWyvObject)
 			return ((JavaWyvObject) arg).getInnerObj();
@@ -89,14 +103,28 @@ public class Util {
 			return new StringConstant((String) arg);
 		if (arg instanceof Integer)
 			return new IntegerConstant((Integer) arg);
-		JavaClassDecl decl = new JavaClassDecl(arg.getClass());
-		decl.initalize();
+		JavaClassDecl decl = getDecl(arg.getClass());
 
 
 		AtomicReference<Value> thisRef = new AtomicReference<>();
+		if (pregenerated.containsKey(arg)) {
+			return pregenerated.get(arg);
+		}
 		JavaObj newObj = new JavaObj(decl.getFilledBody(thisRef),arg);
+		pregenerated.put(arg, newObj);
 		thisRef.set(newObj);
 		return newObj;
+	}
+
+
+	private static HashSet<ValueBinding> bindings = new HashSet<>();
+	public static void setValueBinding(Object arg, ValueBinding b) {
+		if (bindings.contains(b))
+			return;
+		bindings.add(b);
+		Value toSet = toWyvObj(arg);
+		b.setValue(toSet);
+		bindings.remove(b);
 	}
 
 	public static Object toJavaObject(Value arg, Class hint) {
@@ -135,7 +163,7 @@ public class Util {
 
 	public static ClassDeclaration javaToWyvDecl(Class jClass) {
 
-		JavaClassDecl jcd = new JavaClassDecl(jClass);
+		JavaClassDecl jcd = getDecl(jClass);
 		classCache.put(jClass, jcd.getType()); //Prevent infinite recursion
 		jcd.initalize();
 		return jcd;
@@ -151,7 +179,7 @@ public class Util {
 		else if (jType.equals(void.class))
 			return Unit.getInstance();
 		else {
-			JavaClassDecl jcd = new JavaClassDecl(jType);
+			JavaClassDecl jcd = getDecl(jType);
 			classCache.put(jType, jcd.getType()); //Prevent infinite recursion
 			jcd.initalize();
 			return jcd.getType();

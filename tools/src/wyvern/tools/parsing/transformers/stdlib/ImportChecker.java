@@ -54,7 +54,7 @@ public class ImportChecker extends TransformerBase<TypedAST> {
 				sccBuilder.append(scc.get(0).getName() + "\n");
 				allSCCs.append(sccBuilder.toString());
 			}
-			ToolError.reportError(ErrorMessage.IMPORT_CYCLE, allSCCs.toString(), transform);
+			ToolError.reportError(ErrorMessage.IMPORT_CYCLE, transform, allSCCs.toString());
 		}
 		return transform;
 	}

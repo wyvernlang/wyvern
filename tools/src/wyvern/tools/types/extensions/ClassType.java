@@ -52,7 +52,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		NameBinding m = declEnv.get().lookup(opName);
 
 		if (m == null)
-			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
+			reportError(OPERATOR_DOES_NOT_APPLY, opExp, opName, this.toString());
 		
 		// TODO Auto-generated method stub
 		return m.getType();

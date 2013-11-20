@@ -173,7 +173,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 				HashSet<String> names = new HashSet<>();
 				for (Declaration d : DeclSequence.getDeclSeq(innerAST).getDeclIterator()) {
 					if (names.contains(d.getName())) {
-						ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, mutableDeclf.getName(), d.getName(), mutableDeclf);
+						ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, mutableDeclf, mutableDeclf.getName(), d.getName());
 					}
 					names.add(d.getName());
 				}

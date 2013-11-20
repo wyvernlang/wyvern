@@ -1,5 +1,8 @@
 package wyvern.tools.errors;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public enum ErrorMessage {
 	// Type errors
 	ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument type %ARG does not match formal argument type %ARG", 2),
@@ -37,29 +40,16 @@ public enum ErrorMessage {
 		this.errorMessage = message;
 		this.numArgs = numArgs;
 	}
-	
-	public String getErrorMessage() {
-		assert numArgs == 0;
-		return errorMessage;
-	}
-	
-	public String getErrorMessage(String argument) {
-		assert numArgs == 1;
-		return errorMessage.replaceFirst("%ARG", argument);
-	}
-	
-	public String getErrorMessage(String arg1, String arg2) {
-		assert numArgs == 2;
-		String str = errorMessage.replaceFirst("%ARG", arg1);
-		return str.replaceFirst("%ARG", arg2);
-	}
-	
-	public String getErrorMessage(String arg1, String arg2, String arg3) {
-		assert numArgs == 3;
-		String str = errorMessage.replaceFirst("%ARG", arg1);
-		str = str.replaceFirst("%ARG", arg2);
-		return str.replaceFirst("%ARG", arg3);
-	}
+
+    public String getErrorMessage(String... args) {
+        assert numArgs == args.length;
+
+        String str = errorMessage;
+        for (String arg : args) {
+            str = str.replaceFirst("%ARG", Matcher.quoteReplacement(arg) );
+        }
+        return str;
+    }
 	
 	public int numberOfArguments() {
 		return numArgs;

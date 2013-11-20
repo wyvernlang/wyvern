@@ -63,7 +63,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		if (m == null) {
             NameBinding n = attrObj.get().getIntEnv().lookup(opName);
             if (n == null)
-			    reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
+			    reportError(OPERATOR_DOES_NOT_APPLY, opExp, opName, this.toString());
             return n.getType();
         }
 		

@@ -118,7 +118,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		if (!this.implementsName.equals("")) {
 			this.nameImplements = env.lookupType(this.implementsName);
 			if (nameImplements == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsName, this);
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, this.implementsName);
 			}
 			
 			// since there is a valid implements, check that all methods are indeed present
@@ -127,16 +127,16 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			
 			if (!getEquivalentType().subtype(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
-						this.nameBinding.getName(),
-						nameImplements.getName(),
-						this); 
+						this,
+                        this.nameBinding.getName(),
+                        nameImplements.getName());
 			}
 		}
 		
 		if (!this.implementsClassName.equals("")) {
 			NameBinding nameImplementsClass = env.lookup(this.implementsClassName);
 			if (nameImplementsClass == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsClassName, this);
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, this.implementsClassName);
 			}
 
 			// since there is a valid class implements, check that all methods are indeed present
@@ -148,9 +148,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			
 			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
-						this.nameBinding.getName(),
-						nameImplementsClass.getName(),
-						this); 
+						this,
+                        this.nameBinding.getName(),
+                        nameImplementsClass.getName());
 			}
 		}
 

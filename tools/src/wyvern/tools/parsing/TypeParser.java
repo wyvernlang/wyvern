@@ -78,7 +78,7 @@ public class TypeParser {
 
 					if (typeBinding == null) {
 						// This should be picked up by symbol resolution in statically checked language!
-						ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, symbol.name, symbol);
+						ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, symbol, symbol.name);
 						//typeBinding = new TypeBinding(symbol.name, null); // TODO: Create proper type representation.
 					}
 

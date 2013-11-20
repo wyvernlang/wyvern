@@ -41,7 +41,7 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 			String name = binding.getName();
 			binding = env.lookupType(name);
 			if (binding == null)
-				reportError(TYPE_NOT_DECLARED, name, this);
+				reportError(TYPE_NOT_DECLARED, this, name);
 			else
 				type = binding.getType();
 		}

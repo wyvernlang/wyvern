@@ -58,8 +58,14 @@ public class JavaField extends Declaration {
         return newEnv;
     }
 
+
+	private boolean binding = false;
     @Override
     public void evalDecl(Environment evalEnv, Environment declEnv) {
+		if (!binding)
+			binding = true;
+		else
+			return;
         ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
         try {
             Object value = null;
@@ -68,9 +74,10 @@ public class JavaField extends Declaration {
             } else {
                 value = src.get(((JavaObj)evalEnv.lookup("this").getValue(evalEnv)).getObj());
             }
-            vb.setValue(Util.toWyvObj(value));
+			Util.setValueBinding(value, vb);
+			binding = false;
         } catch (Throwable t) {
-            ToolError.reportError(ErrorMessage.JAVA_INVOCATION_ERROR, src.getName(), t.toString(), this);
+            ToolError.reportError(ErrorMessage.JAVA_INVOCATION_ERROR, this, src.getName(), t.toString());
         }
     }
 

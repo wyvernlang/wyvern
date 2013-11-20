@@ -89,7 +89,7 @@ public class InitialState implements LexerState {
 			token = Token.getDEDENT();
 		} else {
 			// This is commonly caused by inconsistent indentation (i.e. tabs vs spaces)! I suggest use tabs everywhere.
-			ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
+			ToolError.reportError(ErrorMessage.LEXER_ERROR, lexer.getLocation());
 		}
 		
 		if (start.equals(lexer.getCurrentPrefix()))

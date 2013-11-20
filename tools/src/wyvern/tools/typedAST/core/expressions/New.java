@@ -58,7 +58,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			Type classVarType = classVarTypeBinding.getType();
 			if (!(classVarType instanceof ClassType)) {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
-				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, classVarType.toString(), this);
+				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
 			}
 
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
