@@ -135,48 +135,6 @@ public class JavaInteropTests {
 	}
 
 	@Test
-	public void testSelfExn() {
-		String test =
-				"JImport wyvern.tools.rawAST.ExpressionSequence as ExpressionSequence\n" +
-				"JImport wyvern.tools.typedAST.interfaces.TypedAST as TypedAST\n" +
-				"JImport wyvern.tools.types.Environment as Environment\n" +
-				"JImport wyvern.tools.util.CompilationContext as CompilationContext\n" +
-				"JImport wyvern.tools.parsing.ParseUtils as ParseUtils\n" +
-				"JImport wyvern.tools.types.Type as Type\n" +
-				"JImport wyvern.tools.typedAST.interfaces.Value as Value\n" +
-				"JImport wyvern.tools.parsing.LineParser as LineParser\n" +
-				"JImport wyvern.tools.parsing.LineSequenceParser as LineSequenceParser\n" +
-				"class LazyValue\n" +
-				"	val exp : TypedAST\n" +
-				"	val env : Environment\n" +
-				"" +
-				"	def getType() : Type =\n" +
-				"		this.typecheck(this.env)\n" +
-				"	def typecheck(env : Environment) : Type =\n" +
-				"		this.exp.typecheck(this.env)\n" +
-				"	def evaluate(env : Environment) : Value = this.exp.evaluate(env)\n" +
-				"	def getLineParser() : LineParser = JNull\n" +
-				"	def getLineSequenceParser() : LineSequenceParser = JNull\n" +
-				"" +
-				"	class def create(exp : TypedAST, env : Environment) : LazyValue =\n" +
-				"		new\n" +
-				"			exp = exp\n" +
-				"			env = env\n" +
-				"class LazyParser\n" +
-				"	class def create() : LazyParser = new\n" +
-				"	def parse(first : TypedAST, ctx : CompilationContext) : TypedAST =\n" +
-				"		ParseUtils.parseExpr(ctx)\n" +
-				"LazyParser.create()";
-		Value result = doCompile(test).evaluate(Environment.getEmptyEnvironment());
-		LineParser val = Util.toJavaClass((Obj)result, LineParser.class);
-
-		Environment env = Globals.getStandardEnv().extend(new KeywordNameBinding("lazy", new Keyword(val)));
-		test = "val x : Int = lazy 2\n" +
-		"x";
-		result = getTypedAST(new StringReader(test), env).evaluate(Environment.getEmptyEnvironment());
-	}
-
-	@Test
 	public void testTestCast() {
 		String test = "class Test\n" +
 				"	class def create() : Test = new\n" +

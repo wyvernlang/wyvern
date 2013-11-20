@@ -32,10 +32,10 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 		String operatorName = opExp.getOperationName();
 		
 		if (!(legalOperators.contains(operatorName)))
-			reportError(OPERATOR_DOES_NOT_APPLY, operatorName, this.toString(), opExp);
+			reportError(OPERATOR_DOES_NOT_APPLY, opExp, operatorName, this.toString());
 		
 		if (!(type2 instanceof Bool))
-			reportError(OPERATOR_DOES_NOT_APPLY2, operatorName, this.toString(), type2.toString(), opExp);
+			reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
 		
 		return this;
 	}

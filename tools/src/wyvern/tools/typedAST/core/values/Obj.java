@@ -16,17 +16,25 @@ import wyvern.tools.util.TreeWriter;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
-	protected Environment intEnv;
+	protected AtomicReference<Environment> intEnv;
 	private Environment typeEquivEnv;
 	
 	public Obj(Environment declEnv) {
-		this.intEnv = declEnv;
-		typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv);
+		this.intEnv = new AtomicReference<>(declEnv);
 	}
+
+    public Obj(AtomicReference<Environment> declEnv) {
+        intEnv = declEnv;
+    }
+
+    private void updateTee() {
+        typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv.get());
+    }
 
 	@Override
 	public Type getType() {
-		return new ClassType(new AtomicReference<>(intEnv), new AtomicReference<>(typeEquivEnv));
+        updateTee();
+		return new ClassType(intEnv, new AtomicReference<>(typeEquivEnv));
 	}
 	
 	@Override
@@ -40,7 +48,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	}
 	
 	public Environment getIntEnv() {
-		return intEnv;
+		return intEnv.get();
 	}
 
 	@Override
@@ -49,7 +57,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 			throw new RuntimeException("Something really, really weird happened.");
 		String operation = ((Invocation) ass.getTarget()).getOperationName();
 		
-		Value value = intEnv.getValue(operation);
+		Value value = intEnv.get().getValue(operation);
 		if (!(value instanceof VarValue)) {
 			throw new RuntimeException("Trying to assign a non-var");
 		}

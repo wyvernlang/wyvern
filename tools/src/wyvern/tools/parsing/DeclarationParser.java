@@ -54,20 +54,24 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 			contParsers.add(partiallyParsed.second);
 		}
 
+        final Environment iEnv = newEnv;
 		return new Pair<Environment, ContParser>(newEnv, new RecordTypeParser.RecordTypeParserBase() {
 			private HashSet<Integer> parseInnerCalled = new HashSet<>();
 			@Override
 			public void doParseTypes(EnvironmentResolver r) {
 				for (ContParser parser : contParsers)
 					if (parser instanceof RecordTypeParser)
-						((RecordTypeParser) parser).parseTypes(r);
+						((RecordTypeParser) parser).parseTypes(new ContParser.ExtensionResolver(r,iEnv));
 			}
 
 			@Override
             public void doParseInner(EnvironmentResolver r) {
+                if (iEnv == null) {
+
+                }
 				for (ContParser parser : contParsers)
 					if (parser instanceof RecordTypeParser)
-						((RecordTypeParser)parser).parseInner(r);
+						((RecordTypeParser)parser).parseInner(new ContParser.ExtensionResolver(r,iEnv));
             }
 
             @Override
@@ -75,7 +79,7 @@ public class DeclarationParser implements RawASTVisitor<Environment, Pair<Enviro
 				LinkedList<TypedAST> seqBody = new LinkedList<TypedAST>();
 				boolean isExtender = true;
 				for (ContParser cp : contParsers) {
-					TypedAST parsed = cp.parse(env);
+					TypedAST parsed = cp.parse(new ContParser.ExtensionResolver(env,iEnv));
 					seqBody.add(parsed);
 					if (!(parsed instanceof EnvironmentExtender))
 						isExtender = false;

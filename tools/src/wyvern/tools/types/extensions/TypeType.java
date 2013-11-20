@@ -60,8 +60,12 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		String opName = opExp.getOperationName();
 		NameBinding m = typeDeclEnv.get().lookup(opName);
 
-		if (m == null)
-			reportError(OPERATOR_DOES_NOT_APPLY, opName, this.toString(), opExp);
+		if (m == null) {
+            NameBinding n = attrObj.get().getIntEnv().lookup(opName);
+            if (n == null)
+			    reportError(OPERATOR_DOES_NOT_APPLY, opExp, opName, this.toString());
+            return n.getType();
+        }
 		
 		// TODO Auto-generated method stub
 		return m.getType();
@@ -130,7 +134,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 
 	@Override
 	public Type getInnerType(String name) {
-		return typeDeclEnv.get().lookup(name).getType();
+		return typeDeclEnv.get().lookupType(name).getType();
 	}
 
 	private boolean isParserCheck = false;

@@ -1,11 +1,19 @@
 package wyvern.tools.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Compiler;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.parsing.ParseUtils;
+import wyvern.tools.parsing.extensions.VerbParser;
+import wyvern.tools.typedAST.core.Keyword;
+import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 
 import java.util.ArrayList;
@@ -40,5 +48,53 @@ public class TypeExtensionParsingTests {
 		Compiler.flush();
 		pair.typecheck(Environment.getEmptyEnvironment());
 		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(6));
+	}
+
+	@Test
+	public void testSelfExn() throws InterruptedException {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("import \"input:1\" as In\n" +
+				"val test : In.T = ~ \n" +
+				"	4\n" +
+				"test.x()");
+		strs.add("" +
+				"import \"java:wyvern.tools.typedAST.interfaces.TypedAST\" as AST\n" +
+				"import \"java:wyvern.tools.typedAST.core.Application\" as App\n" +
+				"import \"java:wyvern.tools.typedAST.core.Invocation\" as Inv\n" +
+				"import \"java:wyvern.tools.typedAST.core.expressions.Variable\" as Var\n" +
+				"import \"java:wyvern.tools.errors.FileLocation\" as FL\n" +
+				"import \"java:wyvern.tools.parsing.ParseUtils\" as PU\n" +
+                "import \"java:wyvern.tools.util.CompilationContext\" as CC\n" +
+                "import \"java:wyvern.tools.typedAST.core.binding.NameBinding\" as NB\n" +
+                "import \"java:wyvern.tools.typedAST.core.binding.NameBindingImpl\" as NBI\n" +
+				"class TImpl\n" +
+				"	implements T\n" +
+				"	val xi : Int\n" +
+				"	class def create(v : Int):TImpl\n" +
+				"		new\n" +
+				"			xi = v\n" +
+				"	def x():Int\n" +
+				"		this.xi\n" +
+				"type T\n" +
+				"	def x():Int\n" +
+				"	attributes\n" +
+				"		def parse(first : AST.TypedAST, ctx : CC.CompilationContext) : AST.TypedAST\n" +
+				"			val value = PU.ParseUtils.parseExpr(ctx)\n" +
+                "			verbatim\n" +
+				"				import \"input:1\" as In\n" +
+				"				In.TImpl.create(4)\n");
+        DSL verb = new DSL() {
+            @Override
+            public Environment addToEnv(Environment in) {
+                return in.extend(new KeywordNameBinding("verbatim", new Keyword(new VerbParser())));
+            }
+        };
+		//Thread.sleep(10000);
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, Arrays.asList(new DSL[] { verb }));
+		Compiler.flush();
+		pair.typecheck(Environment.getEmptyEnvironment());
+		Value evaluate = pair.evaluate(Environment.getEmptyEnvironment());
+		Assert.assertEquals(evaluate, new IntegerConstant(4));
+
 	}
 }

@@ -51,7 +51,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		protected Type doTypecheck(Environment env) {
-			return null;
+			return body.typecheck(env);
 		}
 
 		@Override
@@ -146,7 +146,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 
-		Environment attrEnv = Environment.getEmptyEnvironment();
+		Environment attrEnv = evalEnv;
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof AttributeDeclaration) {
 				attrEnv = ((DeclSequence)((AttributeDeclaration) decl).getBody()).evalDecls(attrEnv);

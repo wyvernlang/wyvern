@@ -17,6 +17,8 @@ import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
@@ -29,7 +31,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private String implementsName;
 	private String implementsClassName;
 	
-	private NameBinding nameImplements;
+	private TypeBinding nameImplements;
 	
 	protected Environment declEvalEnv;
 
@@ -114,44 +116,41 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		// check the implements and class implements
 		// FIXME: Should support multiple implements statements!
 		if (!this.implementsName.equals("")) {
-			this.nameImplements = env.lookup(this.implementsName);
+			this.nameImplements = env.lookupType(this.implementsName);
 			if (nameImplements == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsName, this);
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, this.implementsName);
 			}
 			
 			// since there is a valid implements, check that all methods are indeed present
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
-			TypeType implementsTT = (TypeType) (
-					((ClassType)nameImplements.getType())
-							.getEnv()
-							.lookupBinding("type", TypeDeclBinding.class)).getType();
+            TypeType implementsTT = (TypeType)nameImplements.getType();
 			
 			if (!getEquivalentType().subtype(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
-						this.nameBinding.getName(),
-						nameImplements.getName(),
-						this); 
+						this,
+                        this.nameBinding.getName(),
+                        nameImplements.getName());
 			}
 		}
 		
 		if (!this.implementsClassName.equals("")) {
 			NameBinding nameImplementsClass = env.lookup(this.implementsClassName);
 			if (nameImplementsClass == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this.implementsClassName, this);
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, this.implementsClassName);
 			}
 
 			// since there is a valid class implements, check that all methods are indeed present
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
-			TypeType implementsCT = (TypeType) (
+            TypeType implementsCT = (TypeType) (
 					((ClassType)nameImplementsClass.getType())
 							.getEnv()
 							.lookupBinding("type", TypeDeclBinding.class)).getType();
 			
 			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
-						this.nameBinding.getName(),
-						nameImplementsClass.getName(),
-						this); 
+						this,
+                        this.nameBinding.getName(),
+                        nameImplementsClass.getName());
 			}
 		}
 
@@ -243,8 +242,16 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	public Type getEquivalentClassType() {
-		if (equivalentClassType == null)
-			equivalentClassType = new TypeType(TypeDeclUtils.getTypeEquivalentEnvironment(decls, true));
+		if (equivalentClassType == null) {
+            List<Declaration> declsi = new LinkedList<>();
+            for (Declaration d : decls.getDeclIterator()) {
+                if (d instanceof DefDeclaration && ((DefDeclaration) d).isClass())
+                    declsi.add(d);
+                if (d instanceof ValDeclaration && ((ValDeclaration) d).isClass())
+                    declsi.add(d);
+            }
+			equivalentClassType = new TypeType(TypeDeclUtils.getTypeEquivalentEnvironment(new DeclSequence(declsi), true));
+        }
 		return equivalentClassType;
 	}
 

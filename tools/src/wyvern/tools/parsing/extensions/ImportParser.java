@@ -82,6 +82,8 @@ public class ImportParser implements DeclParser {
 
 				TypedAST result = parserPair.second.parse(r);
 				declaration.setASTRef(new AtomicReference<TypedAST>(result));
+                declaration.typecheck(Globals.getStandardEnv());
+                declaration.evalDecl(Environment.getEmptyEnvironment());
 				return declaration;
 			}
 
@@ -93,7 +95,7 @@ public class ImportParser implements DeclParser {
 					ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, importLiteral);
 				}
 				if (parserPair.second instanceof RecordTypeParser)
-					((RecordTypeParser) parserPair.second).parseTypes(r);
+					((RecordTypeParser) parserPair.second).parseTypes(new SimpleResolver(Globals.getStandardEnv()));
 				declaration.setEnv(parserPair.first);
 
 			}
@@ -101,7 +103,7 @@ public class ImportParser implements DeclParser {
 			@Override
 			public void parseInner(EnvironmentResolver r) {
 				if (parserPair.second instanceof RecordTypeParser)
-					((RecordTypeParser) parserPair.second).parseInner(r);
+					((RecordTypeParser) parserPair.second).parseInner(new SimpleResolver(Globals.getStandardEnv()));
 			}
 		});
 	}

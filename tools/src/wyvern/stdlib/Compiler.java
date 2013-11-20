@@ -149,7 +149,7 @@ public class Compiler {
 					try {
 						return reader.resolveImport(uri, dsls, ctx);
 					} catch (Exception e) {
-						ToolError.reportError(ErrorMessage.ReaderError, uri.toString(), e.toString(), location);
+						ToolError.reportError(ErrorMessage.ReaderError, location, uri.toString(), e.toString());
 					}
             throw new RuntimeException();
         }

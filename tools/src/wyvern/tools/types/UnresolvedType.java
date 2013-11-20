@@ -31,8 +31,8 @@ public class UnresolvedType implements Type {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this.toString(), other.toString(),
-				HasLocation.UNKNOWN);
+		ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
+				HasLocation.UNKNOWN, this.toString(), other.toString());
 		return false; // Unreachable.
 	}
 	

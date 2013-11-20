@@ -160,13 +160,9 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 				if (envin == null)
                     parseInner(r);
 				final Environment envsf = envs.extend(declAST.first);
-				
-				TypedAST innerAST = declAST.second.parse(new EnvironmentResolver() {
-					@Override
-					public Environment getEnv(TypedAST elem) {
-						return envsf;
-					} 
-				});
+
+
+				TypedAST innerAST = declAST.second.parse(new ExtensionResolver(r, envsf));
 				
 
 				if (!(innerAST instanceof Declaration) && !(innerAST instanceof Sequence))
@@ -177,12 +173,13 @@ public class TypeParser implements DeclParser, TypeExtensionParser {
 				for (Declaration d : DeclSequence.getDeclSeq(innerAST).getDeclIterator()) {
 					// System.out.println("Name " + d.getName() + " detected!");
 					if (names.contains(d.getName())) {
-						ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, mtd.getName(), d.getName(), mtd);
+						ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, mtd, mtd.getName(), d.getName());
 					}
 					names.add(d.getName());
 				}
 				
 				mtd.setDecls(DeclSequence.getDeclSeq(innerAST));
+				mtd.evalDecl(envsf);
 				return mtd;
 			}
 		

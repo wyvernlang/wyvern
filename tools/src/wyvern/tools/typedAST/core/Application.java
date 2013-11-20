@@ -39,7 +39,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 			this.argument.typecheck(env);
 		
 		if (!(fnType instanceof ApplyableType))
-			reportError(TYPE_CANNOT_BE_APPLIED, fnType.toString(), this);
+			reportError(TYPE_CANNOT_BE_APPLIED, this, fnType.toString());
 		
 		return ((ApplyableType)fnType).checkApplication(this, env);
 	}

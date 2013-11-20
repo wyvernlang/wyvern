@@ -46,7 +46,7 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 			String name = binding.getName();
 			binding = env.lookup(name);
 			if (binding == null)
-				reportError(VARIABLE_NOT_DECLARED, name, this);
+				reportError(VARIABLE_NOT_DECLARED, this, name);
 			else
 				type = binding.getType();
 		}

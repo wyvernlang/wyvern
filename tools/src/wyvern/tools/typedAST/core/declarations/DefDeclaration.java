@@ -98,7 +98,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 			}
 			
 			if (bodyType != null && !bodyType.subtype(retType))
-				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, bodyType.toString(), ((Arrow)type).getResult().toString(), this);
+				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
 		}
 		return type;
 	}

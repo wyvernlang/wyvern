@@ -76,7 +76,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		NameBinding binding = env.lookup(node.name);
 		if (binding == null) {
 			// return new Variable(new NameBindingImpl(node.name, null), node.getLine());
-			reportError(ErrorMessage.VARIABLE_NOT_DECLARED, node.name, node);
+			reportError(ErrorMessage.VARIABLE_NOT_DECLARED, node, node.name);
 		}
 		
 		return binding.getUse();
@@ -232,10 +232,11 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		TypedAST ast = parseAtomicExpr(ctx);
 		
 		while (ctx.getTokens() != null && (ctx.getTokens().getFirst() instanceof Parenthesis || ParseUtils.checkFirst(".",ctx))) {
+            RawAST first = ctx.getTokens().getFirst();
 			if (ParseUtils.checkFirst(".",ctx)) {
 				ParseUtils.parseSymbol(".", ctx);
                 Symbol sym = ParseUtils.parseSymbol(ctx);
-                ast = new Invocation(ast, sym.name, null, sym.getLocation());
+                ast = new Invocation(ast, sym.name, null, first.getLocation());
             } else {
                 Type type = ast.typecheck(ctx.getEnv());
                 if (type instanceof Arrow) {
@@ -244,7 +245,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 					ctx.setExpected(null);
                 }
 				TypedAST argument = parseAtomicExpr(ctx);
-				ast = new Application(ast, argument, argument.getLocation());
+				ast = new Application(ast, argument, first.getLocation());
 			}
 		}
 
@@ -424,7 +425,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 		CompilationContext ctx = new CompilationContext(globalCtx, node, env);
 		TypedAST result = parseDSL(ctx); // Start trying with the lowest precedence operator.
 		if (ctx.getTokens() != null)
-			reportError(UNEXPECTED_INPUT_WITH_ARGS, (ctx.getTokens().getFirst()!=null)? ctx.getTokens().getFirst().toString():null, ctx.getTokens());
+			reportError(UNEXPECTED_INPUT_WITH_ARGS, ctx.getTokens(), (ctx.getTokens().getFirst()!=null)? ctx.getTokens().getFirst().toString():null);
 		return result;
 	}
 
