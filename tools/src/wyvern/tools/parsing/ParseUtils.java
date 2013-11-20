@@ -17,6 +17,8 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
+import javax.swing.plaf.synth.SynthButtonUI;
+
 public class ParseUtils {
 
 	public static RawAST peekFirst(CompilationContext ctx) {
@@ -215,4 +217,15 @@ public class ParseUtils {
 		}
 	}
 
+	public static TypedAST parseUntil(CompilationContext ctx, Symbol until) {
+		RawAST first = null;
+		ArrayList<RawAST> nl = new ArrayList<>();
+		while (first == null || (!(first instanceof Symbol) && ((Symbol)first).name.equals(until.name))) {
+ 			first = ctx.getTokens().getFirst();
+			nl.add(first);
+			ExpressionSequence rest = ctx.getTokens().getRest();
+			ctx.setTokens(rest);
+		}
+		return parseExpr(ctx.copyEnv(new Line(nl, first.getLocation())));
+	}
 }
