@@ -7,6 +7,7 @@ import wyvern.stdlib.*;
 import wyvern.targets.Common.WyvernIL.ExnFromAST;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.targets.Common.WyvernIL.TLFromAST;
+import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
@@ -22,6 +23,7 @@ public class TestIL {
 			throw new RuntimeException();
 		CoreAST cast = (CoreAST) input;
 		TLFromAST.flushInts();
+		New.resetGenNum();
 		ExnFromAST visitor = new ExnFromAST();
 		cast.accept(visitor);
 		return visitor.getStatments();

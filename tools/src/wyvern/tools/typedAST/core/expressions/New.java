@@ -33,6 +33,10 @@ public class New extends CachingTypedAST implements CoreAST {
 	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
 	private static int generic_num = 0;
 
+	public static void resetGenNum() {
+		generic_num = 0;
+	}
+
 	public New(Map<String, TypedAST> args, FileLocation fileLocation) {
 		this.args = args;
 		this.location = fileLocation;
