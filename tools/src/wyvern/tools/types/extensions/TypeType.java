@@ -45,10 +45,16 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write		
 	}
-	
+
+	private boolean toStringing = false;
 	@Override
 	public String toString() {
-		return "TYPE(" + typeDeclEnv.get().toString() + ")";
+		if (toStringing)
+			return "TYPE(Repeated)";
+		toStringing = true;
+		String res = "TYPE(" + typeDeclEnv.get().toString() + ")";
+		toStringing = false;
+		return res;
 	}
 
 	@Override
