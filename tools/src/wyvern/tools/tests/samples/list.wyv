@@ -1,0 +1,65 @@
+type Option
+	def hasValue() : Bool
+
+class Some
+	implements Option
+	val value : IntList
+	class def create(val : IntList) : Option =
+		new
+			value = val
+
+	def hasValue() : Bool = true	
+	def getValue() : IntList = this.value
+
+class None
+	implements Option
+	def hasValue() : Bool = false
+	class def create() : Option = new
+
+type IntList
+	def hasNext() : Bool
+	def next() : Option
+	def value() : Int
+	def foldL(fn : (Int * Int) -> Int, base : Int) : Int 
+	attributes
+		def createS(val : Int) : IntList =
+			EmptyIntList.create(val)
+		def createL(val : Int, rest : IntList) : IntList =
+			NonEmptyIntList.create(val, rest)
+
+class EmptyIntList
+	implements IntList
+
+	val innerVal : Int
+
+	class def create(n : Int) : IntList = 
+		new
+			innerVal = n
+
+	def foldL(fn : (Int * Int) -> Int, base : Int) : Int = fn(base,this.innerVal)
+	def hasNext() : Bool = false
+	def next() : Option = None.create()
+	def value() : Int = this.innerVal
+
+class NonEmptyIntList
+	implements IntList
+
+	val innerVal : Int
+	val nextE : IntList
+
+	class def create(n : Int, nextV : IntList) : IntList = 
+		new
+			innerVal = n
+			nextE = nextV
+
+	def foldL(fn : (Int * Int) -> Int, base : Int) : Int = this.nextE.foldL(fn, fn(base, this.innerVal))
+	def hasNext() : Bool = true
+	def next() : Option = Some.create(this.nextE)
+	def value() : Int = this.innerVal
+
+var lst : IntList = IntList.createS(1)
+var val : Int = 2
+while (val < 100)
+	lst = IntList.createL(val, lst)
+	val = val + 1
+lst.foldL((fn t : Int * Int => t.n0 + t.n1), 0)
