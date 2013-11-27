@@ -578,8 +578,22 @@ public class ParsingTestPhase2 {
 	public void testGenericNew3() {
 		Reader reader = new StringReader(
 				"val test = new\n" +
-				"	x = 2\n" +
-				"test.x");
+						"	x = 2\n" +
+						"test.x");
+
+		RawAST parsedResult = Phase1Parser.parse("Test", reader);
+		Environment env = Globals.getStandardEnv();
+		TypedAST result = parsedResult.accept(new BodyParser(), env);
+		result.typecheck(env);
+		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
+	}
+	@Test
+	public void testGenericNew4() {
+		Reader reader = new StringReader(
+				"val test = new\n" +
+						"	x = 2\n" +
+						"	y = 5\n" +
+						"test.x");
 
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
