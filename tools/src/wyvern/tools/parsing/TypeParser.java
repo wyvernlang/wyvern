@@ -11,11 +11,12 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.CompilationContext;
 
 public class TypeParser {
 	public static ParseUtils.LazyEval<Type> parsePartialType(CompilationContext ctx) {
-		ParseUtils.LazyEval<Type> type = parseCompositeType(ctx);
+		ParseUtils.LazyEval<Type> type = parseTupleType(ctx);
 		while (ctx.getTokens() != null && ParseUtils.isArrowOperator(ctx.getTokens().getFirst())) {
 			ctx.setTokens(ctx.getTokens().getRest());
 			final ParseUtils.LazyEval<Type> ctype = type;
@@ -30,6 +31,35 @@ public class TypeParser {
 			};
 		}
 
+		return type;
+	}
+
+	private static ParseUtils.LazyEval<Type> parseTupleType(CompilationContext ctx) {
+		ParseUtils.LazyEval<Type> type = parseCompositeType(ctx);
+		while (ctx.getTokens() != null && ParseUtils.checkFirst("*", ctx)) {
+			final RawAST elem = ctx.getTokens();
+			ctx.setTokens(ctx.getTokens().getRest());
+			final ParseUtils.LazyEval<Type> ptype = type;
+			final ParseUtils.LazyEval<Type> ntype = parseCompositeType(ctx);
+			type = new ParseUtils.LazyEval<Type>() {
+
+				@Override
+				public Type eval(Environment env) {
+					Type iptype = ptype.eval(env);
+					Type intype = ntype.eval(env);
+
+					Type[] nt;
+					if (iptype instanceof Tuple) {
+						nt = new Type[((Tuple) iptype).getTypes().length + 1];
+						System.arraycopy(((Tuple) iptype).getTypes(),0,nt,0,((Tuple) iptype).getTypes().length);
+					} else {
+						nt = new Type[] { iptype, intype };
+					}
+					return new Tuple(nt);
+				}
+
+			};
+		}
 		return type;
 	}
 
