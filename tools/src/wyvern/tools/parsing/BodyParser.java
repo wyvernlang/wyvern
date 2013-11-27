@@ -6,6 +6,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.extensions.ValParser;
+import wyvern.tools.parsing.extensions.VarParser;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.IntLiteral;
 import wyvern.tools.rawAST.Line;
@@ -216,7 +217,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
 			return first;
         }
 
-		if (parser instanceof ValParser)
+		if (parser instanceof ValParser || parser instanceof VarParser)
 			if (resolver != null)
 				resolver.resolve();
 		if (parser instanceof DeclParser) {
