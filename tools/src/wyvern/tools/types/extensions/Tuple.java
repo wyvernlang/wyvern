@@ -3,13 +3,14 @@ package wyvern.tools.types.extensions;
 import java.util.HashSet;
 import java.util.List;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.types.AbstractTypeImpl;
-import wyvern.tools.types.SubtypeRelation;
-import wyvern.tools.types.Type;
+import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
-public class Tuple extends AbstractTypeImpl {
+public class Tuple extends AbstractTypeImpl implements OperatableType {
 	private Type[] types;
 	
 	public Tuple(Type[] types) {
@@ -125,4 +126,16 @@ public class Tuple extends AbstractTypeImpl {
 		return false;
 	}
 
+	@Override
+	public Type checkOperator(Invocation opExp, Environment env) {
+		String name = opExp.getOperationName();
+		if (name.length() < 2)
+			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, opExp.getLocation());
+		if (!name.startsWith("n"))
+			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, opExp.getLocation());
+		int num = Integer.valueOf(name.substring(1));
+		if (num >= types.length)
+			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, opExp.getLocation());
+		return types[num];
+	}
 }
