@@ -83,7 +83,6 @@ public class TypeExtensionParsingTests {
 				"	attributes\n" +
 				"		def parse(first : AST.TypedAST, ctx : CC.CompilationContext) : AST.TypedAST\n" +
 				"			val value = PU.ParseUtils.parseExpr(ctx)\n" +
-				"				import \"input:1\" as In\n" +
                 "			quote\n" +
 				"				In.TImpl.create(4)\n");
         DSL verb = new DSL() {
