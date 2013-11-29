@@ -83,13 +83,13 @@ public class TypeExtensionParsingTests {
 				"	attributes\n" +
 				"		def parse(first : AST.TypedAST, ctx : CC.CompilationContext) : AST.TypedAST\n" +
 				"			val value = PU.ParseUtils.parseExpr(ctx)\n" +
-                "			verbatim\n" +
 				"				import \"input:1\" as In\n" +
+                "			quote\n" +
 				"				In.TImpl.create(4)\n");
         DSL verb = new DSL() {
             @Override
             public Environment addToEnv(Environment in) {
-                return in.extend(new KeywordNameBinding("verbatim", new Keyword(new VerbParser())));
+                return in.extend(new KeywordNameBinding("quote", new Keyword(new VerbParser())));
             }
         };
 		//Thread.sleep(10000);
