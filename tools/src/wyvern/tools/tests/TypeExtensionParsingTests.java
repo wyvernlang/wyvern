@@ -62,14 +62,8 @@ public class TypeExtensionParsingTests {
 				"test.x()");
 		strs.add("" +
 				"import \"java:wyvern.tools.typedAST.interfaces.TypedAST\" as AST\n" +
-				"import \"java:wyvern.tools.typedAST.core.Application\" as App\n" +
-				"import \"java:wyvern.tools.typedAST.core.Invocation\" as Inv\n" +
-				"import \"java:wyvern.tools.typedAST.core.expressions.Variable\" as Var\n" +
-				"import \"java:wyvern.tools.errors.FileLocation\" as FL\n" +
 				"import \"java:wyvern.tools.parsing.ParseUtils\" as PU\n" +
                 "import \"java:wyvern.tools.util.CompilationContext\" as CC\n" +
-                "import \"java:wyvern.tools.typedAST.core.binding.NameBinding\" as NB\n" +
-                "import \"java:wyvern.tools.typedAST.core.binding.NameBindingImpl\" as NBI\n" +
 				"class TImpl\n" +
 				"	implements T\n" +
 				"	val xi : Int\n" +

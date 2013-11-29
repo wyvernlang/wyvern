@@ -68,13 +68,6 @@ public class VerbParser implements LineParser {
 		}
 	}
 
-	private class GreedyBinding extends TypeBinding {
-
-		public GreedyBinding(String name, Type type) {
-			super(name, type);
-		}
-	}
-
     @Override
     public TypedAST parse(TypedAST first, CompilationContext ctx) {
         TypedAST exprAST = ParseUtils.parseExpr(ctx);
