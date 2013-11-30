@@ -12,6 +12,8 @@ import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
+import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -113,6 +115,35 @@ public class TypeExtensionParsingTests {
 		Compiler.flush();
 		pair.typecheck(Environment.getEmptyEnvironment());
 		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(4950));
+		is.close();
+	}
+
+	@Test
+	public void testGetType() throws IOException {
+		String testFileName;
+		URL url;
+
+		testFileName = "wyvern/tools/tests/samples/getType.wyv";
+		url = TypeExtensionParsingTests.class.getClassLoader().getResource(testFileName);
+		if (url == null) {
+			Assert.fail("Unable to open " + testFileName + " file.");
+			return;
+		}
+
+		InputStream is = url.openStream();
+		Scanner reader = new Scanner(new InputStreamReader(is));
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add(reader.useDelimiter("\\A").next());
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		Compiler.flush();
+		pair.typecheck(Environment.getEmptyEnvironment());
+		Value evaluate = pair.evaluate(Environment.getEmptyEnvironment());
+		if (!(evaluate instanceof JavaObj))
+			Assert.assertTrue(false);
+		Object obj = ((JavaObj) evaluate).getObj();
+		if (!(obj instanceof JavaClassType))
+			Assert.assertTrue(false);
+		Assert.assertEquals(((JavaClassType) obj).getInnerClass(), Integer.class);
 		is.close();
 	}
 }
