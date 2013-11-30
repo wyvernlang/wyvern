@@ -1,26 +1,22 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Pair;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class JavaClassDecl extends ClassDeclaration {
 	private Class clazz;
@@ -98,6 +94,29 @@ public class JavaClassDecl extends ClassDeclaration {
 		super.decls = getDecls(this.clazz);
 		super.declEnvRef.set(super.decls.extend(Environment.getEmptyEnvironment()));
 		super.declEvalEnv = Environment.getEmptyEnvironment();
+		updateEnv();
+	}
+
+	@Override
+	public void updateEnv() {
+		AtomicReference<Environment> ref = getTypeEquivalentEnvironmentReference();
+		Environment env = ref.get();
+		if (env == null)
+			env = Environment.getEmptyEnvironment();
+		for (Declaration decl : this.getDecls().getDeclIterator()) {
+			if (decl instanceof JavaMeth) {
+				if (((JavaMeth) decl).isClass())
+					continue;
+				env = decl.extend(env);
+			} else if (decl instanceof JavaField) {
+				if (((JavaField) decl).isClass())
+					continue;
+				env = decl.extend(env);
+			} else {
+				throw new RuntimeException();
+			}
+		}
+		ref.set(env);
 	}
 
 	private static Method findHighestMethod(Class c, Method m) {
