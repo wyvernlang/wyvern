@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
@@ -72,6 +74,8 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
+		if (other instanceof JavaClassType)
+			return Util.javaToWyvType(Integer.class).subtype(other, subtypes);
 		return super.subtype(other, subtypes);
 	}
 }
