@@ -26,13 +26,15 @@ public class JavaField extends Declaration {
     private final Field src;
     private final MethodHandle getter;
     private final MethodHandle setter;
+	private boolean isClass;
 
     public JavaField(Field src, MethodHandle getter, MethodHandle setter) {
         this.src = src;
         this.getter = getter;
         this.setter = setter;
+		this.isClass = Modifier.isStatic(src.getModifiers());
 
-        //Wyvern specific
+		//Wyvern specific
         nameBinding = new NameBindingImpl(src.getName(), Util.javaToWyvType(src.getType()));
     }
 
@@ -95,4 +97,8 @@ public class JavaField extends Declaration {
     public void writeArgsToTree(TreeWriter writer) {
 
     }
+
+	public boolean isClass() {
+		return isClass;
+	}
 }
