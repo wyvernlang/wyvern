@@ -4,6 +4,7 @@ import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -24,17 +25,12 @@ public class JavaClassType extends ClassType {
 	}
 
 	public Class getInnerClass() {
-		return clazz;
+		return decl.getClazz();
 	}
 
 	@Override
 	public ClassDeclaration getDecl() {
 		return decl;
-	}
-
-	@Override
-	public TypeType getEquivType() {
-		return new TypeType(decl.getDeclEnv());
 	}
 
 	@Override
