@@ -24,6 +24,11 @@ public class CompilerInputResolver implements ImportResolver {
 	}
 
 	@Override
+	public String getDefaultName(URI ref) {
+		return null;
+	}
+
+	@Override
 	public Pair<Environment, ContParser> resolveImport(URI uri, List<DSL> dsls, CompilationContext ctx) {
 		String path = uri.getSchemeSpecificPart();
 		String source = readers.get(Integer.parseInt(path));
