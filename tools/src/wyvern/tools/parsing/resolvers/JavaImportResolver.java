@@ -45,4 +45,40 @@ public class JavaImportResolver implements ImportEnvResolver {
 		resolved.put(path, javaClassDecl);
 		return new Pair<Environment, ContParser>(javaClassDecl.extend(Environment.getEmptyEnvironment()), new ContParser.EmptyWithAST(javaClassDecl));
 	}
+
+	@Override
+	public Environment doExtend(Environment old, String src, final Reference<TypedAST> typedAST) {
+		if (typedAST.get() == null) {
+			LateBinder<Type> binder = new LateBinder<Type>() {
+				@Override
+				public Type get() {
+					if (!(typedAST.get() instanceof JavaClassDecl))
+						throw new RuntimeException();
+					JavaClassDecl jcd = (JavaClassDecl) typedAST.get();
+					return jcd.getClassType();
+				}
+			};
+			return old.extend(new LateNameBinding(src, binder)).extend(new LateTypeBinding(src, binder));
+		}
+		if (!(typedAST.get() instanceof JavaClassDecl))
+			throw new RuntimeException();
+		JavaClassDecl jcd = (JavaClassDecl) typedAST.get();
+		return jcd.extend(old);
+	}
+
+	@Override
+	public Environment extendWithValue(Environment old, TypedAST typedAST) {
+		if (!(typedAST instanceof JavaClassDecl))
+			throw new RuntimeException();
+		JavaClassDecl jcd = (JavaClassDecl) typedAST;
+		return jcd.extendWithValue(old);
+	}
+
+	@Override
+	public void evalDecl(Environment evalEnv, Environment declEnv, TypedAST typedAST) {
+		if (!(typedAST instanceof JavaClassDecl))
+			throw new RuntimeException();
+		JavaClassDecl jcd = (JavaClassDecl) typedAST;
+		jcd.evalDecl(evalEnv, declEnv);
+	}
 }
