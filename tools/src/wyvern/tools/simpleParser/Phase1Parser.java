@@ -63,6 +63,13 @@ public class Phase1Parser {
 				reportError(MISMATCHED_PARENTHESES, openParen);
 			}
 		}
+
+		if (token.kind == LBRACE) {
+			return new Symbol(token.text, token.getLocation());
+		}
+		if (token.kind == RBRACE) {
+			return new Symbol(token.text, token.getLocation());
+		}
 		
 		// TODO: other forms
 		
