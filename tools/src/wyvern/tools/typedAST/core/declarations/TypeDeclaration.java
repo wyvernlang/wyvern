@@ -13,6 +13,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
@@ -21,11 +22,11 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
-	protected AtomicReference<Obj> attrObj = new AtomicReference<>();
-    protected AtomicReference<Environment> declEnv;
-	protected AtomicReference<Environment> attrEnv = new AtomicReference<>(Environment.getEmptyEnvironment());
+	protected Reference<Obj> attrObj = new Reference<>();
+    protected Reference<Environment> declEnv;
+	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 
-	public AtomicReference<Obj> getAttrObjRef() {
+	public Reference<Obj> getAttrObjRef() {
 		return attrObj;
 	}
 
@@ -91,7 +92,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null);
-		declEnv = new AtomicReference<>(null);
+		declEnv = new Reference<>(null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		Type classType = new ClassType(attrEnv, attrEnv); // TODO set this to a class type that has the class members
@@ -180,7 +181,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     }
 
 
-	public AtomicReference<Environment> getDeclEnv() {
+	public Reference<Environment> getDeclEnv() {
 		return declEnv;
 	}
 }

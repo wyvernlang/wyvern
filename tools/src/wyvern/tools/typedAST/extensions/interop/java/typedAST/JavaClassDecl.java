@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -99,7 +100,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	@Override
 	public void updateEnv() {
-		AtomicReference<Environment> ref = getTypeEquivalentEnvironmentReference();
+		Reference<Environment> ref = getTypeEquivalentEnvironmentReference();
 		Environment env = ref.get();
 		if (env == null)
 			env = Environment.getEmptyEnvironment();

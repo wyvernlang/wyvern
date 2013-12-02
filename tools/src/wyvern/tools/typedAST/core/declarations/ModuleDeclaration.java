@@ -12,6 +12,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.List;
@@ -21,8 +22,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	protected String name;
 	protected DeclSequence decls;
 	protected Environment declEvalEnv;
-	protected AtomicReference<Environment> declEnv;
-	protected AtomicReference<Environment> typeEquivalentEnvironment;
+	protected Reference<Environment> declEnv;
+	protected Reference<Environment> typeEquivalentEnvironment;
 	protected TypeType asc;
 	protected List<ImportDeclaration> imports;
 
@@ -30,8 +31,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		this.decls = decls;
 		this.location = location;
         this.name = name;
-		typeEquivalentEnvironment = new AtomicReference<>();
-		declEnv = new AtomicReference<>();
+		typeEquivalentEnvironment = new Reference<>();
+		declEnv = new Reference<>();
 	}
 
 	@Override

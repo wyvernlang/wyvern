@@ -10,12 +10,13 @@ import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.types.*;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private ClassDeclaration decl = null;
-	private AtomicReference<Environment> declEnv;
-	protected AtomicReference<Environment> typeEquivalentEnv;
+	private Reference<Environment> declEnv;
+	protected Reference<Environment> typeEquivalentEnv;
 
 
 	public ClassType(ClassDeclaration td) {
@@ -24,7 +25,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		this.decl = td;
 	}
 
-	public ClassType(AtomicReference<Environment> declEnv, AtomicReference<Environment> typeEquivalentEnv) {
+	public ClassType(Reference<Environment> declEnv, Reference<Environment> typeEquivalentEnv) {
 		this.declEnv = declEnv;
 		this.typeEquivalentEnv = typeEquivalentEnv;
 	}

@@ -23,6 +23,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 public class New extends CachingTypedAST implements CoreAST {
@@ -84,7 +85,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, getLocation());
 			cls = classDeclaration;
-			return new ClassType(new AtomicReference<>(mockEnv), new AtomicReference<>(mockEnv));
+			return new ClassType(new Reference<>(mockEnv), new Reference<>(mockEnv));
 		}
 	}
 

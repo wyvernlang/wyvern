@@ -11,19 +11,20 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
-	protected AtomicReference<Environment> intEnv;
+	protected Reference<Environment> intEnv;
 	private Environment typeEquivEnv;
 	
 	public Obj(Environment declEnv) {
-		this.intEnv = new AtomicReference<>(declEnv);
+		this.intEnv = new Reference<>(declEnv);
 	}
 
-    public Obj(AtomicReference<Environment> declEnv) {
+    public Obj(Reference<Environment> declEnv) {
         intEnv = declEnv;
     }
 
@@ -34,7 +35,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	@Override
 	public Type getType() {
         updateTee();
-		return new ClassType(intEnv, new AtomicReference<>(typeEquivEnv));
+		return new ClassType(intEnv, new Reference<>(typeEquivEnv));
 	}
 	
 	@Override

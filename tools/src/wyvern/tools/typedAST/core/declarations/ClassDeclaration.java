@@ -15,6 +15,7 @@ import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.LinkedList;
@@ -37,8 +38,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	private TypeType equivalentType = null;
 	private TypeType equivalentClassType = null;
-	private AtomicReference<Environment> typeEquivalentEnvironmentRef;
-	protected AtomicReference<Environment> declEnvRef;
+	private Reference<Environment> typeEquivalentEnvironmentRef;
+	protected Reference<Environment> declEnvRef;
 
 	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, Environment declEnv, FileLocation location) {
         this(name, implementsName, implementsClassName, decls, location);
@@ -47,8 +48,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
     public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
 		this.decls = decls;
-		typeEquivalentEnvironmentRef = new AtomicReference<>();
-		declEnvRef = new AtomicReference<>();
+		typeEquivalentEnvironmentRef = new Reference<>();
+		declEnvRef = new Reference<>();
 		nameBinding = new NameBindingImpl(name, null);
 		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
@@ -177,7 +178,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv.extend(evalEnv);
-		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 		Obj classObj = new Obj(getClassEnv());
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
@@ -233,11 +233,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return declEnvRef.get();
 	}
 
-	public AtomicReference<Environment> getTypeEquivalentEnvironmentReference() {
+	public Reference<Environment> getTypeEquivalentEnvironmentReference() {
 		return typeEquivalentEnvironmentRef;
 	}
 
-	public AtomicReference<Environment> getDeclEnvRef() {
+	public Reference<Environment> getDeclEnvRef() {
 		return declEnvRef;
 	}
 

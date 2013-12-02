@@ -17,12 +17,13 @@ import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.types.*;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
-	private AtomicReference<Obj> attrObj;
-	private AtomicReference<Environment> typeDeclEnv;
+	private Reference<Obj> attrObj;
+	private Reference<Environment> typeDeclEnv;
 
 	public TypeType(TypeDeclaration decl) {
 		typeDeclEnv = decl.getDeclEnv();
@@ -30,10 +31,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	}
 
 	public TypeType(Environment declEnv) {
-		this.typeDeclEnv = new AtomicReference<>(declEnv);
+		this.typeDeclEnv = new Reference<>(declEnv);
 	}
 
-	public TypeType(AtomicReference<Environment> declEnv) {
+	public TypeType(Reference<Environment> declEnv) {
 		this.typeDeclEnv = declEnv;
 	}
 	
