@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.Reference;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -74,8 +75,8 @@ public class Compiler {
 		return new Pair<Environment, ContParser>(finalPair.first, new CachingParser(finalPair));
 	}
 
-	public static Pair<Environment, ContParser> compilePartial(URI url, CompilationContext ctx, List<DSL> dsls) throws IOException {
-		final Pair<Environment, ContParser> parserPair = ctx.getResolver().lookupReader(url, dsls, ctx, null);
+	public static Pair<Environment, ContParser> compilePartial(URI url, CompilationContext ctx, List<DSL> dsls) throws Exception {
+		final Pair<Environment, ContParser> parserPair = ctx.getResolver().lookupReader(url, dsls, ctx, null).resolveImport(url, dsls, ctx);
 		return parserPair;
     }
 
@@ -143,11 +144,11 @@ public class Compiler {
 
 			this.importResolvers = importResolvers;
 		}
-        public Pair<Environment, ContParser> lookupReader(URI uri, List<DSL> dsls, CompilationContext ctx, HasLocation location) {
+        public ImportResolver lookupReader(URI uri, List<DSL> dsls, CompilationContext ctx, HasLocation location) {
 			for (ImportResolver reader : importResolvers)
 				if (reader.checkURI(uri))
 					try {
-						return reader.resolveImport(uri, dsls, ctx);
+						return reader;
 					} catch (Exception e) {
 						ToolError.reportError(ErrorMessage.ReaderError, location, uri.toString(), e.toString());
 					}
@@ -157,14 +158,14 @@ public class Compiler {
 
 	public static class CachingParser implements RecordTypeParser {
 		private final Pair<Environment, ContParser> finalPair;
-		private AtomicReference<TypedAST> cached = new AtomicReference<>();
+		private Reference<TypedAST> cached = new Reference<>();
 		private boolean entered = false;
 
 		public CachingParser(Pair<Environment, ContParser> finalPair) {
 			this.finalPair = finalPair;
 		}
 
-		public AtomicReference<TypedAST> getRef() {
+		public Reference<TypedAST> getRef() {
 			return cached;
 		}
 
