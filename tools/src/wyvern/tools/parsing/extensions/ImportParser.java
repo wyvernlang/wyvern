@@ -40,8 +40,8 @@ public class ImportParser implements DeclParser {
 
 	private static class MutableImportDeclaration extends ImportDeclaration {
 
-		public MutableImportDeclaration(String src, String equivName, FileLocation location) {
-			super(src, equivName, null, location);
+		public MutableImportDeclaration(String src, String equivName, ImportResolver res, FileLocation location) {
+			super(src, equivName, null, res, location);
 		}
 
 		public void setEnv(Environment env) {
@@ -53,9 +53,17 @@ public class ImportParser implements DeclParser {
 	public Pair<Environment, ContParser> parseDeferred(TypedAST first, final CompilationContext ctx) {
 		final StringLiteral importLiteral = (StringLiteral)ctx.popToken();
 		final String importName = importLiteral.data;
-		ParseUtils.parseSymbol("as", ctx);
-		String alias = ParseUtils.parseSymbol(ctx).name;
-		final MutableImportDeclaration declaration = new MutableImportDeclaration(importName, alias, importLiteral.getLocation());
+		final URI uri = URI.create(importName);
+		final ImportResolver resolver =
+				ctx.getResolver().lookupReader(uri, new ArrayList<DSL>(), ctx, first);
+
+		String alias = null;
+		if (ParseUtils.checkFirst("as",ctx)) {
+			ParseUtils.parseSymbol("as", ctx);
+			alias = ParseUtils.parseSymbol(ctx).name;
+		}
+		final MutableImportDeclaration declaration = new MutableImportDeclaration(importName, alias, resolver, importLiteral.getLocation());
+
 		return new Pair<Environment, ContParser>(declaration.extend(Environment.getEmptyEnvironment()), new RecordTypeParser() {
 
 			private Pair<Environment,ContParser> parserPair;
@@ -90,9 +98,10 @@ public class ImportParser implements DeclParser {
 			@Override
 			public void parseTypes(EnvironmentResolver r) {
 				try {
-					parserPair = wyvern.stdlib.Compiler.compilePartial(URI.create(importName), ctx, new ArrayList<DSL>());
-				} catch (IOException e) {
+					parserPair = resolver.resolveImport(uri, new ArrayList<DSL>(), ctx);
+				} catch (Exception e) {
 					ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, importLiteral);
+					throw new RuntimeException(e);
 				}
 				if (parserPair.second instanceof RecordTypeParser)
 					((RecordTypeParser) parserPair.second).parseTypes(new SimpleResolver(Globals.getStandardEnv()));
