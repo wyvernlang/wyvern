@@ -1,6 +1,10 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.ImportResolver;
+import wyvern.tools.parsing.resolvers.ImportEnvResolver;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
@@ -13,27 +17,38 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ImportDeclaration extends Declaration {
 	private String src;
 	private String equivName;
+	private ImportResolver res;
 	private FileLocation location;
 	private TypeType equivType;
-	private AtomicReference<Environment> declEnv = new AtomicReference<>();
-	private AtomicReference<TypedAST> ref = new AtomicReference<>();
-    private AtomicReference<Environment> internalEnv = new AtomicReference<>();
+	private Reference<Environment> declEnv = new Reference<>();
+	private Reference<TypedAST> ref = new Reference<>();
+    private Reference<Environment> internalEnv = new Reference<>();
     private ValueBinding vb;
 	private boolean typechecking = false;
     private boolean typechecked = false;
+	private boolean defaultN = false;
 
-	public ImportDeclaration(String src, String equivName, Environment externalEnv, FileLocation location) {
+	public ImportDeclaration(String src, String equivName, Environment externalEnv, ImportResolver res, FileLocation location) {
 		this.src = src;
 		this.equivName = equivName;
+		this.res = res;
 		this.location = location;
-		declEnv = new AtomicReference<>(externalEnv);
+		if (equivName == null) {
+			this.equivName = res.getDefaultName(URI.create(src));
+				if (this.equivName == null)
+					ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, this);
+			defaultN = true;
+		}
+		declEnv = new Reference<>(externalEnv);
 		equivType = new TypeType(declEnv);
         vb = new ValueBinding(equivName, equivType);
 	}
@@ -42,8 +57,22 @@ public class ImportDeclaration extends Declaration {
 		declEnv.set(env);
 	}
 
-	public void setASTRef(AtomicReference<TypedAST> ref) {
-		this.ref = ref;
+	public void setASTRef(final Reference<TypedAST> ref) {
+		final Reference<TypedAST> oRef = this.ref;
+		Reference<TypedAST> nRef = new Reference<TypedAST>() {
+			@Override
+			public void set(TypedAST nAst) {
+				ref.set(nAst);
+				oRef.set(nAst);
+			}
+
+			@Override
+			public TypedAST get() {
+				return ref.get();
+			}
+		};
+		oRef.set(nRef.get());
+		this.ref = nRef;
 	}
 
 	public String getSrc() {
@@ -72,6 +101,9 @@ public class ImportDeclaration extends Declaration {
 
 	@Override
 	protected Environment doExtend(Environment old) {
+		if (res instanceof ImportEnvResolver && defaultN) {
+			return ((ImportEnvResolver) res).doExtend(old, equivName, ref);
+		}
 		return old
 				.extend(new TypeBinding(equivName, equivType))
                 .extend(vb)
@@ -80,6 +112,9 @@ public class ImportDeclaration extends Declaration {
 
 	@Override
 	public Environment extendWithValue(Environment old) {
+		if (res instanceof ImportEnvResolver && defaultN) {
+			return ((ImportEnvResolver) res).extendWithValue(old, ref.get());
+		}
 		return old.extend(new ValueBinding(equivName, equivType));
 	}
 
@@ -87,6 +122,10 @@ public class ImportDeclaration extends Declaration {
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
         typecheck(evalEnv);
+		if (res instanceof ImportEnvResolver && defaultN) {
+			((ImportEnvResolver) res).evalDecl(evalEnv, declEnv, ref.get());
+			return;
+		}
 		Environment intEnv = Environment.getEmptyEnvironment();
         if (!evaluating) {
             evaluating = true;
@@ -116,7 +155,7 @@ public class ImportDeclaration extends Declaration {
 
 	}
 
-	public AtomicReference<TypedAST> getAST() {
+	public Reference<TypedAST> getAST() {
 		return ref;
 	}
 }
