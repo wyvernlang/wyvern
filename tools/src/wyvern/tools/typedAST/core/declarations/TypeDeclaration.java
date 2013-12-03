@@ -147,10 +147,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 
-		Environment attrEnv = evalEnv;
+		Environment attrEnv = Environment.getEmptyEnvironment();
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof AttributeDeclaration) {
-				attrEnv = ((DeclSequence)((AttributeDeclaration) decl).getBody()).evalDecls(attrEnv);
+				for (Declaration idecl : ((DeclSequence)((AttributeDeclaration) decl).getBody()).getDeclIterator()) {
+					attrEnv = idecl.doExtendWithValue(attrEnv);
+					idecl.bindDecl(evalEnv, attrEnv);
+				}
 			}
 		}
 		Obj typeAttrObj = new Obj(attrEnv);
