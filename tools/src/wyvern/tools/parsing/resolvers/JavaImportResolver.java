@@ -15,6 +15,7 @@ import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,6 +45,22 @@ public class JavaImportResolver implements ImportEnvResolver {
 		ClassDeclaration javaClassDecl = Util.javaToWyvDecl(toImport);
 		resolved.put(path, javaClassDecl);
 		return new Pair<Environment, ContParser>(javaClassDecl.extend(Environment.getEmptyEnvironment()), new ContParser.EmptyWithAST(javaClassDecl));
+	}
+
+	@Override
+	public TypedAST initalize(URI uri, ArrayList<DSL> dsls, CompilationContext ctx) {
+		String path = uri.getSchemeSpecificPart();
+		if (resolved.containsKey(path)) {
+			ClassDeclaration declaration = resolved.get(path);
+			return declaration;
+		}
+		Pair<Environment, ContParser> resolve = null;
+		try {
+			resolve = resolveImport(uri,dsls,ctx);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		return resolve.second.parse(new ContParser.SimpleResolver(ctx.getEnv()));
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
+import wyvern.tools.parsing.resolvers.ImportEnvResolver;
 import wyvern.tools.rawAST.StringLiteral;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -65,6 +66,9 @@ public class ImportParser implements DeclParser {
 			alias = ParseUtils.parseSymbol(ctx).name;
 		}
 		final MutableImportDeclaration declaration = new MutableImportDeclaration(importName, alias, resolver, importLiteral.getLocation());
+		if (resolver instanceof ImportEnvResolver) {
+			declaration.setASTRef(new Reference<TypedAST>(((ImportEnvResolver)resolver).initalize(uri, new ArrayList<DSL>(), ctx)));
+		}
 
 		return new Pair<Environment, ContParser>(declaration.extend(Environment.getEmptyEnvironment()), new RecordTypeParser() {
 
