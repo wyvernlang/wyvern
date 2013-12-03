@@ -144,6 +144,10 @@ public class Util {
 		return toJavaClass((Obj)arg, hint);
 	}
 	public static <T> T toJavaClass(Obj obj, Class<T> cast) {
+		if (obj instanceof JavaObj) {
+			return (T) ((JavaObj) obj).getObj();
+		}
+
 		Class wrapperClass = generateJavaWrapper(obj.getIntEnv(), cast);
 		try {
 			return (T) wrapperClass.getConstructor(Obj.class).newInstance(obj);
