@@ -13,6 +13,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
@@ -135,6 +136,9 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 			Value evaluate = app.getArgument().evaluate(iEnv);
 			Value[] args = values;
 			Type[] sig = fromValue(evaluate);
+			if (sig.length == 1 && sig[0] instanceof Unit) {
+				sig = new Type[] {};
+			}
 			if (sig.length != wyvTypes.length)
 				continue;
 
