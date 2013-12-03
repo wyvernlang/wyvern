@@ -21,7 +21,26 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		return subtype(other);
+		if (other instanceof Intersection) {
+			if (((Intersection)other).types.size() > types.size())
+				return false;
+			for (int i = 0; i < types.size(); i++)
+				if (!((Intersection)other).subtype(types.get(i), subtypes))
+					return false;
+			return true;
+		}
+		for (Type type : types) {
+
+			SubtypeRelation sr = new SubtypeRelation(type, other);
+			if (subtypes.contains(sr)) {
+				continue;
+			}
+			subtypes.add(sr);
+			if (type.subtype(other, subtypes))
+				return true;
+			subtypes.remove(sr);
+		}
+		return false;
 	}
 
 	@Override
@@ -54,18 +73,7 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 	 */
 	@Override
 	public boolean subtype(Type other) {
-		if (other instanceof Intersection) {
-			if (((Intersection)other).types.size() != types.size())
-				return false;
-			for (int i = 0; i < types.size(); i++)
-				if (!((Intersection)other).subtype(types.get(i)))
-					return false;
-			return true;
-		}
-		for (Type type : types)
-			if (type.subtype(other))
-				return true;
-		return false;
+		return subtype(other, new HashSet<SubtypeRelation>());
 	}
 
 	@Override
