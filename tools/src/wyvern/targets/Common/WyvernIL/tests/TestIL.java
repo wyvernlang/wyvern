@@ -106,7 +106,7 @@ public class TestIL {
 				+"    \tnew\n"
 				+"    val hiString : Str = \"hello\"\n"
 				+"\n"
-				+"val h : Hello = Hello.make()\n"//hiString: \"hi\")\n"
+				+"val h : Hello = Hello.make()\n" //hiString: \"hi\")\n"
 				+"h.hiString");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; val hiString = null; def $init() {this.hiString = \"hello\"}},temp$1 = Hello,temp$0 = temp$1.make,temp$4 = (),val h = temp$0(temp$4),temp$5 = h,temp$5.hiString");
