@@ -7,10 +7,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import wyvern.DSL.DSL;
 import wyvern.targets.Common.WyvernIL.ExnFromAST;
 import wyvern.targets.Common.WyvernIL.TLFromAST;
 import wyvern.targets.Common.WyvernIL.Def.ValDef;
+import wyvern.targets.Common.WyvernIL.Def.VarDef;
 import wyvern.targets.Common.WyvernIL.Expr.BinOp;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
 import wyvern.targets.Common.WyvernIL.Imm.IntValue;
@@ -65,8 +65,8 @@ public class TestBC {
 		
 		List<Statement> statements = new ArrayList<Statement>();
 		Immediate imm = new Immediate(new IntValue(2));
-		ValDef valdef = new ValDef("temp$0", imm);
-		Defn two = new Defn(valdef);
+		VarDef vardef = new VarDef("temp$0", imm);
+		Defn two = new Defn(vardef);
 		statements.add(two);
 		Immediate imm2 = new Immediate(new VarRef("temp$0"));
 		ValDef valdef2 = new ValDef("temp$2", imm2);
@@ -78,7 +78,7 @@ public class TestBC {
 		statements.add(op);
 		
 		imm = new Immediate(new StringValue("Hello "));
-		valdef = new ValDef("temp$0", imm);
+		ValDef valdef = new ValDef("temp$0", imm);
 		two = new Defn(valdef);
 		statements.add(two);
 		imm2 = new Immediate(new StringValue("World"));
@@ -89,6 +89,7 @@ public class TestBC {
 		valdef3 = new ValDef("temp$3", bin);
 		op = new Defn(valdef3);
 		statements.add(op);
+		
 		interperter = new Interperter(statements);
 		for (Statement statement : statements) {
 			System.out.println(statement.getClass().getSimpleName() + " : "

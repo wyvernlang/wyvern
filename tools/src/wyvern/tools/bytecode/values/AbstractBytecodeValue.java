@@ -27,9 +27,4 @@ public abstract class AbstractBytecodeValue<T> implements BytecodeValue {
 
 	@Override
 	public abstract BytecodeValue doInvoke(BytecodeValue operand, String op);
-	
-	@Override
-	public BytecodeValue doInvoke(BytecodeRef operand, String op) {
-		return doInvoke(operand.getValue(),op);
-	}
 }

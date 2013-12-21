@@ -6,9 +6,9 @@ import wyvern.targets.Common.WyvernIL.Def.TypeDef;
 import wyvern.targets.Common.WyvernIL.Def.ValDef;
 import wyvern.targets.Common.WyvernIL.Def.VarDef;
 import wyvern.targets.Common.WyvernIL.visitor.DefVisitor;
-import wyvern.targets.Common.WyvernIL.visitor.ExprVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.BytecodeContextImpl;
+import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
@@ -24,7 +24,9 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		String name = varDef.getName();
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
 		BytecodeValue value = varDef.getExn().accept(visitor);
-		return new BytecodeContextImpl(value, name, context);
+		// turning it into a reference
+		BytecodeValue refValue = new BytecodeRef(value);
+		return new BytecodeContextImpl(refValue, name, context);
 	}
 
 	@Override

@@ -5,11 +5,9 @@ import wyvern.targets.Common.WyvernIL.Expr.FnInv;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
 import wyvern.targets.Common.WyvernIL.Expr.Inv;
 import wyvern.targets.Common.WyvernIL.Expr.New;
-import wyvern.targets.Common.WyvernIL.Imm.IntValue;
 import wyvern.targets.Common.WyvernIL.Imm.Operand;
 import wyvern.targets.Common.WyvernIL.visitor.ExprVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
-import wyvern.tools.bytecode.values.BytecodeInt;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
@@ -31,8 +29,9 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 		Operand l = binOp.getL();
 		Operand r = binOp.getR();
 		String op = binOp.getOp();
-		BytecodeValue val = l.accept(new BytecodeOperandVisitor(context));
-		return val.doInvoke(r.accept(new BytecodeOperandVisitor(context)), op);
+		BytecodeValue left = l.accept(new BytecodeOperandVisitor(context));
+		BytecodeValue right = r.accept(new BytecodeOperandVisitor(context));
+		return left.doInvoke(right, op);
 	}
 
 	@Override

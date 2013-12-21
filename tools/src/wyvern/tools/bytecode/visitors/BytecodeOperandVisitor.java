@@ -39,8 +39,13 @@ public class BytecodeOperandVisitor implements OperandVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(VarRef varRef) {
-		// dereferencing the name varRef.getName() from the context
-		return context.getValue(varRef.getName());
+		// this whole instanceof thing is temporary, will be changed
+		// after i get a better understanding of how vars works in this system
+		BytecodeValue value = context.getValue(varRef.getName());
+		if (value instanceof BytecodeRef) {
+			value = ((BytecodeRef) value).getValue();
+		}
+		return value;
 	}
 
 	@Override
