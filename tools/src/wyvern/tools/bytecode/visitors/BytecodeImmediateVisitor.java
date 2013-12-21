@@ -14,14 +14,12 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
 
-	private final String name;
 	private final BytecodeContext context;
 	private final BytecodeOperandVisitor visitor;
 	
-	public BytecodeImmediateVisitor(BytecodeContext c, String n) {
-		name = n;
+	public BytecodeImmediateVisitor(BytecodeContext c) {
 		context = c;
-		visitor = new BytecodeOperandVisitor(context, name);
+		visitor = new BytecodeOperandVisitor(context);
 	}
 	
 	@Override

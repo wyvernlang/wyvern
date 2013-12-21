@@ -14,11 +14,9 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
-	private final String name;
 	private final BytecodeContext context;
 	
-	public BytecodeExnVisitor(BytecodeContext c, String n) {
-		name = n;
+	public BytecodeExnVisitor(BytecodeContext c) {
 		context = c;
 	}
 
@@ -33,8 +31,8 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 		Operand l = binOp.getL();
 		Operand r = binOp.getR();
 		String op = binOp.getOp();
-		BytecodeValue val = l.accept(new BytecodeOperandVisitor(context,name));
-		return val.doInvoke(r.accept(new BytecodeOperandVisitor(context,name)), op);
+		BytecodeValue val = l.accept(new BytecodeOperandVisitor(context));
+		return val.doInvoke(r.accept(new BytecodeOperandVisitor(context)), op);
 	}
 
 	@Override
@@ -46,7 +44,7 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	@Override
 	public BytecodeValue visit(Immediate immediate) {
 		Operand inner = immediate.getInner();
-		return inner.accept(new BytecodeImmediateVisitor(context,name));
+		return inner.accept(new BytecodeImmediateVisitor(context));
 	}
 
 	@Override

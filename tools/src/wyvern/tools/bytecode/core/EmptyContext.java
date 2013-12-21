@@ -5,11 +5,6 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 public class EmptyContext implements BytecodeContext {
 
 	@Override
-	public boolean existsInContext(BytecodeValue val) {
-		return false;
-	}
-
-	@Override
 	public boolean existsInContext(String val) {
 		return false;
 	}
@@ -28,6 +23,11 @@ public class EmptyContext implements BytecodeContext {
 	public BytecodeValue getValue(String val) {
 		//TODO rework this
 		throw new RuntimeException("Value not found");
+	}
+
+	@Override
+	public String getLastEnteredName() {
+		return "";
 	}
 
 }

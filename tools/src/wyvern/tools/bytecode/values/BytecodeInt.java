@@ -2,8 +2,8 @@ package wyvern.tools.bytecode.values;
 
 public class BytecodeInt extends AbstractBytecodeValue<Integer> {
 
-	public BytecodeInt(int v, String n) {
-		super(v, n);
+	public BytecodeInt(int v) {
+		super(v);
 	}
 
 	@Override
@@ -12,7 +12,7 @@ public class BytecodeInt extends AbstractBytecodeValue<Integer> {
 			return false;
 		}
 		BytecodeInt bci = (BytecodeInt) obj;
-		return name.equals(bci.getName());
+		return value.equals(bci.value);
 	}
 
 	@Override
@@ -20,13 +20,13 @@ public class BytecodeInt extends AbstractBytecodeValue<Integer> {
 		BytecodeInt operand = (BytecodeInt) o;
 		switch (op) {
 		case "+":
-			return new BytecodeInt(value + operand.value, name);
+			return new BytecodeInt(value + operand.value);
 		case "-":
-			return new BytecodeInt(value - operand.value, name);
+			return new BytecodeInt(value - operand.value);
 		case "*":
-			return new BytecodeInt(value * operand.value, name);
+			return new BytecodeInt(value * operand.value);
 		case "/":
-			return new BytecodeInt(value / operand.value, name);
+			return new BytecodeInt(value / operand.value);
 		
 		// TODO temporary line: to be rewritten
 		default: throw new RuntimeException("Bad arithmetic operation " + op);

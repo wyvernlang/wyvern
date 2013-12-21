@@ -21,16 +21,18 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	
 	@Override
 	public BytecodeContext visit(VarDef varDef) {
-		// TODO Auto-generated method stub
-		return null;
+		String name = varDef.getName();
+		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
+		BytecodeValue value = varDef.getExn().accept(visitor);
+		return new BytecodeContextImpl(value, name, context);
 	}
 
 	@Override
 	public BytecodeContext visit(ValDef valDef) {
 		String name = valDef.getName();
-		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context,name);
+		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
 		BytecodeValue value = valDef.getExn().accept(visitor);
-		return new BytecodeContextImpl(value, context);
+		return new BytecodeContextImpl(value, name, context);
 	}
 
 	@Override

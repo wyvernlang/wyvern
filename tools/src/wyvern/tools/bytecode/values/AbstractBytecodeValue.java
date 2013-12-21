@@ -3,31 +3,33 @@ package wyvern.tools.bytecode.values;
 public abstract class AbstractBytecodeValue<T> implements BytecodeValue {
 	
 	protected final T value;
-	protected final String name;
 	
-	public AbstractBytecodeValue(T v, String n) {
+	public AbstractBytecodeValue(T v) {
 		value = v;
-		name = new String(n);
 	}
 	
 	public T getValue() {
 		return value;
 	}
 	
-	public String getName() {
-		return new String(name);
-	}
+	@Override
+	public abstract boolean equals(Object obj);
 	
 	@Override
 	public int hashCode() {
-		return name.hashCode();
+		return value.hashCode();
 	}
 	
 	@Override
 	public String toString() {
-		return name + " = " + value;
+		return "" + value;
 	}
 
 	@Override
 	public abstract BytecodeValue doInvoke(BytecodeValue operand, String op);
+	
+	@Override
+	public BytecodeValue doInvoke(BytecodeRef operand, String op) {
+		return doInvoke(operand.getValue(),op);
+	}
 }

@@ -2,8 +2,8 @@ package wyvern.tools.bytecode.values;
 
 public class BytecodeString extends AbstractBytecodeValue<String> {
 
-	public BytecodeString(String v, String n) {
-		super(v,n);
+	public BytecodeString(String v) {
+		super(v);
 	}
 	
 	@Override
@@ -12,7 +12,7 @@ public class BytecodeString extends AbstractBytecodeValue<String> {
 			return false;
 		}
 		BytecodeString bci = (BytecodeString) obj;
-		return name.equals(bci.getName());
+		return value.equals(bci.value);
 	}
 
 	@Override
@@ -20,7 +20,7 @@ public class BytecodeString extends AbstractBytecodeValue<String> {
 		BytecodeString operand = (BytecodeString) o;
 		switch (op) {
 		case "+":
-			return new BytecodeString(operand.value + value, name);
+			return new BytecodeString(value + operand.value);
 		
 		// TODO temporary line: to be rewritten
 		default: throw new RuntimeException("Bad string operation " + op);

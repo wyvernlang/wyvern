@@ -2,8 +2,8 @@ package wyvern.tools.bytecode.values;
 
 public class BytecodeBoolean extends AbstractBytecodeValue<Boolean> {
 
-	public BytecodeBoolean(Boolean v, String n) {
-		super(v,n);
+	public BytecodeBoolean(Boolean v) {
+		super(v);
 	}
 	
 	@Override
@@ -12,7 +12,7 @@ public class BytecodeBoolean extends AbstractBytecodeValue<Boolean> {
 			return false;
 		}
 		BytecodeBoolean bci = (BytecodeBoolean) obj;
-		return name.equals(bci.getName());
+		return value.equals(bci.value);
 	}
 
 	@Override
@@ -20,9 +20,9 @@ public class BytecodeBoolean extends AbstractBytecodeValue<Boolean> {
 		BytecodeBoolean operand = (BytecodeBoolean) o;
 		switch (op) {
 		case "||":
-			return new BytecodeBoolean(operand.value || value, name);
+			return new BytecodeBoolean(operand.value || value);
 		case "&&":
-			return new BytecodeBoolean(operand.value && value, name);
+			return new BytecodeBoolean(operand.value && value);
 		
 		// TODO temporary line: to be rewritten
 		default: throw new RuntimeException("Bad boolean operation " + op);
