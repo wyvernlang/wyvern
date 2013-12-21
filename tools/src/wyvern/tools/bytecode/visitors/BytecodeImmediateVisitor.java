@@ -15,9 +15,13 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
 
 	private final String name;
+	private final BytecodeContext context;
+	private final BytecodeOperandVisitor visitor;
 	
-	public BytecodeImmediateVisitor(String n) {
+	public BytecodeImmediateVisitor(BytecodeContext c, String n) {
 		name = n;
+		context = c;
+		visitor = new BytecodeOperandVisitor(context, name);
 	}
 	
 	@Override
@@ -28,18 +32,17 @@ public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(IntValue intValue) {
-		return new BytecodeInt(intValue.getValue(),name);
+		return intValue.accept(visitor);
 	}
 
 	@Override
 	public BytecodeValue visit(VarRef varRef) {
-		// TODO Auto-generated method stub
-		return null;
+		return varRef.accept(visitor);
 	}
 
 	@Override
 	public BytecodeValue visit(StringValue stringValue) {
-		return new BytecodeString(stringValue.isValue(),name);
+		return stringValue.accept(visitor);
 	}
 
 	@Override

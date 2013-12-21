@@ -31,12 +31,20 @@ public class BytecodeContextImpl implements BytecodeContext {
 	}
 	
 	@Override
-	public BytecodeValue getValue() {
+	public BytecodeValue getLastEnteredValue() {
 		return value;
 	}
 	
 	@Override
 	public String toString() {
 		return value.toString() + "\n" + inner.toString();
+	}
+
+	@Override
+	public BytecodeValue getValue(String val) {
+		if(value.getName().equals(val)) {
+			return value;
+		} 
+		return inner.getValue(val);
 	}
 }

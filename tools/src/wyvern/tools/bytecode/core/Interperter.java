@@ -26,7 +26,7 @@ public class Interperter {
 	}
 	
 	public void printContext() {
-		System.out.println("Final result: " + currentContext.getValue().toString());
+		System.out.println("Final result: " + currentContext.getLastEnteredValue().toString());
 		System.out.println("\nEntire context:");
 		System.out.println(currentContext.toString());
 	}

@@ -10,6 +10,8 @@ public interface BytecodeContext {
 	
 	public boolean existsInContext(String val);
 	
-	public BytecodeValue getValue();
+	public BytecodeValue getValue(String val);
+	
+	public BytecodeValue getLastEnteredValue();
 	
 }

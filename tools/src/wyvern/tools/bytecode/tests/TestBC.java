@@ -14,6 +14,7 @@ import wyvern.targets.Common.WyvernIL.Def.ValDef;
 import wyvern.targets.Common.WyvernIL.Expr.BinOp;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
 import wyvern.targets.Common.WyvernIL.Imm.IntValue;
+import wyvern.targets.Common.WyvernIL.Imm.VarRef;
 import wyvern.targets.Common.WyvernIL.Stmt.Defn;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.bytecode.core.Interperter;
@@ -66,26 +67,30 @@ public class TestBC {
 		ValDef valdef = new ValDef("temp$0", imm);
 		Defn two = new Defn(valdef);
 		statements.add(two);
-		Immediate imm2 = new Immediate(new IntValue(3));
+		Immediate imm2 = new Immediate(new VarRef("temp$0"));
 		ValDef valdef2 = new ValDef("temp$2", imm2);
 		Defn three = new Defn(valdef2);
 		statements.add(three);
-		BinOp bin = new BinOp(imm.getInner(),imm2.getInner(),"+");
+		BinOp bin = new BinOp(imm.getInner(),imm2.getInner(),"*");
 		ValDef valdef3 = new ValDef("temp$3", bin);
 		Defn op = new Defn(valdef3);
 		statements.add(op);
 		interperter = new Interperter(statements);
+		for (Statement statement : statements) {
+			System.out.println(statement.getClass().getSimpleName() + " : "
+					+ statement.toString());
+		}
 	}
 
 	@After
 	public void tearDown() throws Exception {
 	}
 
-	
-/*	@Test
+	/*
+	@Test
 	public void testSimple() {
 		ArrayList<String> strs = new ArrayList<>();
-		strs.add("val x = 1 + 2");
+		strs.add("val x = 1\nval y = x");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs,
 				new ArrayList<DSL>());
 		List<Statement> statements = getResult(pair);

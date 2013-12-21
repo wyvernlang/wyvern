@@ -15,13 +15,19 @@ public class EmptyContext implements BytecodeContext {
 	}
 
 	@Override
-	public BytecodeValue getValue() {
+	public BytecodeValue getLastEnteredValue() {
 		return null; // maybe switch this to an exception
 	}
 	
 	@Override
 	public String toString() {
 		return "";
+	}
+
+	@Override
+	public BytecodeValue getValue(String val) {
+		//TODO rework this
+		throw new RuntimeException("Value not found");
 	}
 
 }

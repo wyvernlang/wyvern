@@ -1,6 +1,6 @@
 package wyvern.tools.bytecode.values;
 
-public class AbstractBytecodeValue<T> implements BytecodeValue {
+public abstract class AbstractBytecodeValue<T> implements BytecodeValue {
 	
 	protected final T value;
 	protected final String name;
@@ -27,4 +27,7 @@ public class AbstractBytecodeValue<T> implements BytecodeValue {
 	public String toString() {
 		return name + " = " + value;
 	}
+
+	@Override
+	public abstract BytecodeValue doInvoke(BytecodeValue operand, String op);
 }

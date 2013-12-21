@@ -8,15 +8,18 @@ import wyvern.targets.Common.WyvernIL.Expr.New;
 import wyvern.targets.Common.WyvernIL.Imm.IntValue;
 import wyvern.targets.Common.WyvernIL.Imm.Operand;
 import wyvern.targets.Common.WyvernIL.visitor.ExprVisitor;
+import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.values.BytecodeInt;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
 	private final String name;
-
-	public BytecodeExnVisitor(String n) {
+	private final BytecodeContext context;
+	
+	public BytecodeExnVisitor(BytecodeContext c, String n) {
 		name = n;
+		context = c;
 	}
 
 	@Override
@@ -30,15 +33,8 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 		Operand l = binOp.getL();
 		Operand r = binOp.getR();
 		String op = binOp.getOp();
-		// for now:
-		IntValue lv = (IntValue) l;
-		IntValue rv = (IntValue) r;
-		switch (op) {
-		case "+":
-			return new BytecodeInt(lv.getValue() + rv.getValue(), name);
-		}
-		System.out.println("nope");
-		return null;
+		BytecodeValue val = l.accept(new BytecodeOperandVisitor(context,name));
+		return val.doInvoke(r.accept(new BytecodeOperandVisitor(context,name)), op);
 	}
 
 	@Override
@@ -50,7 +46,7 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	@Override
 	public BytecodeValue visit(Immediate immediate) {
 		Operand inner = immediate.getInner();
-		return inner.accept(new BytecodeImmediateVisitor(name));
+		return inner.accept(new BytecodeImmediateVisitor(context,name));
 	}
 
 	@Override

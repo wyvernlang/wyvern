@@ -28,7 +28,7 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	@Override
 	public BytecodeContext visit(ValDef valDef) {
 		String name = valDef.getName();
-		BytecodeExnVisitor visitor = new BytecodeExnVisitor(name);
+		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context,name);
 		BytecodeValue value = valDef.getExn().accept(visitor);
 		return new BytecodeContextImpl(value, context);
 	}
