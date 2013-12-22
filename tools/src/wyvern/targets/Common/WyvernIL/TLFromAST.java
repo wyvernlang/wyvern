@@ -1,6 +1,7 @@
 package wyvern.targets.Common.WyvernIL;
 
 import wyvern.targets.Common.WyvernIL.Def.Def;
+import wyvern.targets.Common.WyvernIL.Def.ValDef;
 import wyvern.targets.Common.WyvernIL.Expr.*;
 import wyvern.targets.Common.WyvernIL.Imm.*;
 import wyvern.targets.Common.WyvernIL.Stmt.*;
@@ -99,10 +100,10 @@ public class TLFromAST implements CoreASTVisitor {
 		if (arg != null) {
 			VarRef res = getTemp();
 			this.statements.addAll(recVisitor.getStatements());
-			this.statements.add(new Assign(new Immediate(temp), recVisitor.getExpr()));
+			this.statements.add(new Defn(new ValDef(temp.getName(), recVisitor.getExpr())));
 			this.statements.addAll(argVisitor.getStatements());
-			this.statements.add(new Assign(new Immediate(argsRes), argVisitor.getExpr()));
-			this.statements.add(new Assign(new Immediate(res), new BinOp(temp, argsRes, name)));
+			this.statements.add(new Defn(new ValDef(argsRes.getName(), argVisitor.getExpr())));
+			this.statements.add(new Defn(new ValDef(res.getName(), new BinOp(temp, argsRes, name))));
 			this.expr = new Immediate(res);
 			return;
 		}
@@ -124,12 +125,12 @@ public class TLFromAST implements CoreASTVisitor {
 		VarRef funv = getTemp();
 		TLFromAST funcVisitor = TLFromASTApply(func);
 		this.statements.addAll(funcVisitor.getStatements());
-		this.statements.add(new Assign(new Immediate(funv), funcVisitor.getExpr()));
+		this.statements.add(new Defn(new ValDef(funv.getName(), funcVisitor.getExpr())));
 
 		TLFromAST argVisitor = TLFromASTApply(arg);
 		this.statements.addAll(argVisitor.getStatements());
 		VarRef argv = getTemp();
-		this.statements.add(new Assign(new Immediate(argv), argVisitor.getExpr()));
+		this.statements.add(new Defn(new ValDef(argv.getName(), argVisitor.getExpr())));
 		
 		this.expr = new FnInv (funv, argv);
 	}
@@ -197,7 +198,7 @@ public class TLFromAST implements CoreASTVisitor {
 
 			stmts.addAll(visitor.getStatements());
 			VarRef tempRef = getTemp();
-			stmts.add(new Assign(new Immediate(tempRef), visitor.getExpr()));
+			stmts.add(new Defn(new ValDef(tempRef.getName(), visitor.getExpr())));
 			ops.add(tempRef);
 		}
 
@@ -231,7 +232,7 @@ public class TLFromAST implements CoreASTVisitor {
 	public void visit(IfExpr ifExpr) {
 		Label end = new Label();
 		Label next = new Label();
-		VarRef result = new VarRef("ifRet$"+ifRet.getAndIncrement());
+		String result = ("ifRet$"+ifRet.getAndIncrement());
 		for(IfExpr.IfClause clause : ifExpr.getClauses()) {
 			TLFromAST tl = TLFromASTApply(clause.getClause());
 			Label ifT = new Label();
@@ -243,14 +244,14 @@ public class TLFromAST implements CoreASTVisitor {
 			statements.add(ifT);
 			List<Statement> bodyAST = getBodyAST(clause.getBody());
 			if (bodyAST.size() == 0) {
-				statements.add(new Assign(new Immediate(result), new Immediate(new UnitValue())));
+				statements.add(new Defn(new ValDef(result, new Immediate(new UnitValue()))));
 			} else {
 				Statement last = bodyAST.get(bodyAST.size()-1);
 				List<Statement> notLast = bodyAST.subList(0,bodyAST.size()-1);
 				statements.addAll(notLast);
 				if (!(last instanceof Pure))
 					throw new RuntimeException();
-				statements.add(new Assign(new Immediate(result), ((Pure)last).getExpression()));
+				statements.add(new Defn(new ValDef(result, ((Pure)last).getExpression())));
 			}
 			statements.add(new Goto(end));
 		}

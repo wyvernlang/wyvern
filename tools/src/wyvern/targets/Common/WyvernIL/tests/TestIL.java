@@ -49,7 +49,7 @@ public class TestIL {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("2+2");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"temp$0 = 2,temp$2 = 2,temp$3 = temp$0 + temp$2,temp$3");;
+		Assert.assertEquals(join(getResult(pair)),"val temp$0 = 2,val temp$2 = 2,val temp$3 = temp$0 + temp$2,temp$3");;
 	}
 	@Test
 	public void testVal() {
@@ -64,21 +64,21 @@ public class TestIL {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("(fn x : Int => x)(1)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {x},temp$0 = 0$lambda,temp$1 = 1,temp$0(temp$1)");;
+		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {x},val temp$0 = 0$lambda,val temp$1 = 1,temp$0(temp$1)");;
 	}
 	@Test
 	public void testLambdaCallWithAdd() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("(fn x : Int => x + 1)(3)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {temp$1 = x,temp$3 = 1,temp$4 = temp$1 + temp$3,temp$4},temp$0 = 0$lambda,temp$5 = 3,temp$0(temp$5)");;
+		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {val temp$1 = x,val temp$3 = 1,val temp$4 = temp$1 + temp$3,temp$4},val temp$0 = 0$lambda,val temp$5 = 3,temp$0(temp$5)");;
 	}
 	@Test
 	public void testArithmetic() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("3*4+5*6");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"temp$4 = 3,temp$6 = 4,temp$7 = temp$4 * temp$6,temp$8 = temp$7,temp$0 = 5,temp$2 = 6,temp$3 = temp$0 * temp$2,temp$10 = temp$3,temp$11 = temp$8 + temp$10,temp$11");
+		Assert.assertEquals(join(getResult(pair)),"val temp$4 = 3,val temp$6 = 4,val temp$7 = temp$4 * temp$6,val temp$8 = temp$7,val temp$0 = 5,val temp$2 = 6,val temp$3 = temp$0 * temp$2,val temp$10 = temp$3,val temp$11 = temp$8 + temp$10,temp$11");
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public class TestIL {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("fn f : Int -> Int => fn x : Int => f(f(x))");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"def 1$lambda(f : Int -> Int) {def 0$lambda(x : Int) {temp$0 = f,temp$1 = f,temp$2 = x,temp$3 = temp$1(temp$2),temp$0(temp$3)},0$lambda},1$lambda");
+		Assert.assertEquals(join(getResult(pair)),"def 1$lambda(f : Int -> Int) {def 0$lambda(x : Int) {val temp$0 = f,val temp$1 = f,val temp$2 = x,val temp$3 = temp$1(temp$2),temp$0(temp$3)},0$lambda},1$lambda");
 	}
 	@Test
 	public void testTupleMethodCalls() {
@@ -94,7 +94,7 @@ public class TestIL {
 		strs.add("def mult(n:Int,m:Int):Int = n+5*m\n"
 				+"mult(3,2)\n");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"def mult(n : Int,m : Int) {temp$4 = n,temp$0 = 5,temp$2 = m,temp$3 = temp$0 * temp$2,temp$6 = temp$3,temp$7 = temp$4 + temp$6,temp$7},temp$8 = mult,temp$9 = 3,temp$10 = 2,temp$11 = (temp$9,temp$10),temp$8(temp$11)");
+		Assert.assertEquals(join(getResult(pair)),"def mult(n : Int,m : Int) {val temp$4 = n,val temp$0 = 5,val temp$2 = m,val temp$3 = temp$0 * temp$2,val temp$6 = temp$3,val temp$7 = temp$4 + temp$6,temp$7},val temp$8 = mult,val temp$9 = 3,val temp$10 = 2,val temp$11 = (temp$9,temp$10),temp$8(temp$11)");
 	}
 
 
@@ -109,7 +109,7 @@ public class TestIL {
 				+"val h : Hello = Hello.make()\n"//hiString: \"hi\")\n"
 				+"h.hiString");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; val hiString = null; def $init() {this.hiString = \"hello\"}},temp$1 = Hello,temp$0 = temp$1.make,temp$4 = (),val h = temp$0(temp$4),temp$5 = h,temp$5.hiString");
+		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; val hiString = null; def $init() {this.hiString = \"hello\"}},temp$1 = Hello,val temp$0 = temp$1.make,val temp$4 = (),val h = temp$0(temp$4),temp$5 = h,temp$5.hiString");
 	}
 
 
@@ -125,7 +125,7 @@ public class TestIL {
 				+"val h:Hello = Hello.make()\n"
 				+"h.getP()");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; def get4() {4}; def get5() {5}; def getP() {temp$6 = this,temp$5 = temp$6.get4,temp$9 = (),temp$10 = temp$5(temp$9),temp$1 = this,temp$0 = temp$1.get5,temp$4 = (),temp$12 = temp$0(temp$4),temp$13 = temp$10 + temp$12,temp$13}; def $init() {}},temp$15 = Hello,temp$14 = temp$15.make,temp$18 = (),val h = temp$14(temp$18),temp$20 = h,temp$19 = temp$20.getP,temp$23 = (),temp$19(temp$23)");
+		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; def get4() {4}; def get5() {5}; def getP() {temp$6 = this,val temp$5 = temp$6.get4,val temp$9 = (),val temp$10 = temp$5(temp$9),temp$1 = this,val temp$0 = temp$1.get5,val temp$4 = (),val temp$12 = temp$0(temp$4),val temp$13 = temp$10 + temp$12,temp$13}; def $init() {}},temp$15 = Hello,val temp$14 = temp$15.make,val temp$18 = (),val h = temp$14(temp$18),temp$20 = h,val temp$19 = temp$20.getP,val temp$23 = (),temp$19(temp$23)");
 	}
 
 	@Test
@@ -149,7 +149,7 @@ public class TestIL {
 				+"h.setV(10)\n"
 				+"h.getV()");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; var testVal = null; def setV(n : Int) {temp$0 = this,temp$0.testVal = n}; def getV() {temp$3 = this,temp$3.testVal}; def $init() {this.testVal = 5}},temp$7 = Hello,temp$6 = temp$7.make,temp$10 = (),val h = temp$6(temp$10),temp$12 = h,temp$11 = temp$12.setV,temp$15 = 10,temp$11(temp$15),temp$17 = h,temp$16 = temp$17.getV,temp$20 = (),temp$16(temp$20)");
+		Assert.assertEquals(join(getResult(pair)),"class Hello {def make() {new Hello}; var testVal = null; def setV(n : Int) {temp$0 = this,temp$0.testVal = n}; def getV() {temp$3 = this,temp$3.testVal}; def $init() {this.testVal = 5}},temp$7 = Hello,val temp$6 = temp$7.make,val temp$10 = (),val h = temp$6(temp$10),temp$12 = h,val temp$11 = temp$12.setV,val temp$15 = 10,temp$11(temp$15),temp$17 = h,val temp$16 = temp$17.getV,val temp$20 = (),temp$16(temp$20)");
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class TestIL {
 				"		2\n");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		List<Statement> result = getResult(pair);
-		Assert.assertEquals(join(result),"label 1,if (true) goto label 2,goto label 3,label 2,ifRet$0 = 1,goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,ifRet$0 = 2,goto label 0,label 5,goto label 0,label 0,");
+		Assert.assertEquals(join(result),"label 1,if (true) goto label 2,goto label 3,label 2,val ifRet$0 = 1,goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,val ifRet$0 = 2,goto label 0,label 5,goto label 0,label 0,");
 	}
 	@Test
 	public void testWhile() {
@@ -175,7 +175,7 @@ public class TestIL {
 				"y");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		List<Statement> result = getResult(pair);
-		Assert.assertEquals(join(result),"var x = 5,var y = 0,label 0,temp$0 = x,temp$2 = 0,temp$3 = temp$0 > temp$2,if (temp$3) goto label 1,goto label 2,label 1,temp$4 = x,temp$6 = 1,temp$7 = temp$4 - temp$6,x = temp$7,temp$8 = y,temp$10 = 1,temp$11 = temp$8 + temp$10,y = temp$11,goto label 0,label 2,y");
+		Assert.assertEquals(join(result),"var x = 5,var y = 0,label 0,val temp$0 = x,val temp$2 = 0,val temp$3 = temp$0 > temp$2,if (temp$3) goto label 1,goto label 2,label 1,val temp$4 = x,val temp$6 = 1,val temp$7 = temp$4 - temp$6,x = temp$7,val temp$8 = y,val temp$10 = 1,val temp$11 = temp$8 + temp$10,y = temp$11,goto label 0,label 2,y");
 	}
 
 	//TODO: have new autogenerate a correct class to instanciate.
