@@ -4,7 +4,10 @@ import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_ASSIGNED;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
+
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.rawAST.LineSequence;
@@ -42,8 +45,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		if (nextExpr == null) {
-			target.typecheck(env);
-			value.typecheck(env);
+			Type tT = target.typecheck(env);
+			Type vT = value.typecheck(env);
+			if (!vT.subtype(tT))
+				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
 		} else {
 			nextExpr.typecheck(env);
 		}
