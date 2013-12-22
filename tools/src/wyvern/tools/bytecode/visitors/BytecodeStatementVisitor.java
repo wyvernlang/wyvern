@@ -1,5 +1,7 @@
 package wyvern.tools.bytecode.visitors;
 
+import wyvern.targets.Common.WyvernIL.Expr.Immediate;
+import wyvern.targets.Common.WyvernIL.Imm.VarRef;
 import wyvern.targets.Common.WyvernIL.Stmt.Assign;
 import wyvern.targets.Common.WyvernIL.Stmt.Defn;
 import wyvern.targets.Common.WyvernIL.Stmt.Goto;
@@ -9,19 +11,35 @@ import wyvern.targets.Common.WyvernIL.Stmt.Pure;
 import wyvern.targets.Common.WyvernIL.Stmt.Return;
 import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
+import wyvern.tools.bytecode.core.BytecodeContextImpl;
+import wyvern.tools.bytecode.core.Interperter;
+import wyvern.tools.bytecode.values.BytecodeLabel;
+import wyvern.tools.bytecode.values.BytecodeRef;
+import wyvern.tools.bytecode.values.BytecodeValue;
 
-public class BytecodeStatementVisitor implements StatementVisitor<BytecodeContext> {
+public class BytecodeStatementVisitor implements
+		StatementVisitor<BytecodeContext> {
 
 	private final BytecodeContext context;
-	
-	public BytecodeStatementVisitor(BytecodeContext c) {
+	private final BytecodeExnVisitor visitor;
+	private final Interperter interperter;
+
+	public BytecodeStatementVisitor(BytecodeContext c, Interperter i) {
 		context = c;
+		interperter = i;
+		visitor = new BytecodeExnVisitor(context);
 	}
-	
+
+	// assumption: 
+	// dest will always be an Immediate with expression of type VarRef
 	@Override
 	public BytecodeContext visit(Assign assign) {
-		// TODO Auto-generated method stub
-		return null;
+		Immediate imm = (Immediate) assign.getDest();
+		VarRef ref = (VarRef) imm.getInner();
+		BytecodeRef dst = (BytecodeRef) context.getValue(ref.getName());
+		BytecodeValue src = assign.getSrc().accept(visitor);
+		dst.setValue(src);
+		return context;
 	}
 
 	@Override

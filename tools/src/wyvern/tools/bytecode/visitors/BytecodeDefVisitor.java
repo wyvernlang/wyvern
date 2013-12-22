@@ -24,7 +24,6 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		String name = varDef.getName();
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
 		BytecodeValue value = varDef.getExn().accept(visitor);
-		// turning it into a reference
 		BytecodeValue refValue = new BytecodeRef(value);
 		return new BytecodeContextImpl(refValue, name, context);
 	}

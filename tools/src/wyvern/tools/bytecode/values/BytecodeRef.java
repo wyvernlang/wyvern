@@ -22,4 +22,13 @@ public class BytecodeRef extends AbstractBytecodeValue<BytecodeValue> {
 	public BytecodeValue doInvoke(BytecodeValue operand, String op) {
 		return value.doInvoke(operand, op);
 	}
+	
+	public void setValue(BytecodeValue newValue) {
+		value = newValue;
+	}
+	
+	@Override
+	public BytecodeValue dereference() {
+		return value.dereference();
+	}
 }

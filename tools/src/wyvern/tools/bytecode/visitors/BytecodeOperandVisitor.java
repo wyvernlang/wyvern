@@ -14,7 +14,6 @@ import wyvern.targets.Common.WyvernIL.visitor.OperandVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.values.BytecodeBoolean;
 import wyvern.tools.bytecode.values.BytecodeInt;
-import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeString;
 import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
@@ -39,12 +38,8 @@ public class BytecodeOperandVisitor implements OperandVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(VarRef varRef) {
-		// this whole instanceof thing is temporary, will be changed
-		// after i get a better understanding of how vars works in this system
-		BytecodeValue value = context.getValue(varRef.getName());
-		if (value instanceof BytecodeRef) {
-			value = ((BytecodeRef) value).getValue();
-		}
+		// probably going to rework this after i understand the system better
+		BytecodeValue value = context.getValue(varRef.getName()).dereference();
 		return value;
 	}
 

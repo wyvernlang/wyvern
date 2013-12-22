@@ -2,7 +2,7 @@ package wyvern.tools.bytecode.values;
 
 public abstract class AbstractBytecodeValue<T> implements BytecodeValue {
 	
-	protected final T value;
+	protected T value;
 	
 	public AbstractBytecodeValue(T v) {
 		value = v;
@@ -27,4 +27,9 @@ public abstract class AbstractBytecodeValue<T> implements BytecodeValue {
 
 	@Override
 	public abstract BytecodeValue doInvoke(BytecodeValue operand, String op);
+	
+	@Override
+	public BytecodeValue dereference() {
+		return this;
+	}
 }

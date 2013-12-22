@@ -9,19 +9,19 @@ public class Interperter {
 
 	private BytecodeContext currentContext;
 	private List<Statement> statements;
-	private int nextStatement;
+	private int pc;
 
 	public Interperter(List<Statement> s) {
 		currentContext = new EmptyContext();
 		statements = s;
-		nextStatement = 0;
+		pc = 0;
 	}
 
 	public void execute() {
-		for (; nextStatement < statements.size(); nextStatement++) {
-			Statement statement = statements.get(nextStatement);
-			BytecodeStatementVisitor visitor = new BytecodeStatementVisitor(
-					currentContext);
+		for (; pc < statements.size(); pc++) {
+			Statement statement = statements.get(pc);
+			BytecodeStatementVisitor visitor;
+			visitor = new BytecodeStatementVisitor(currentContext,this);
 			currentContext = statement.accept(visitor);
 		}
 	}
@@ -32,5 +32,13 @@ public class Interperter {
 				+ currentContext.getLastEnteredValue().toString());
 		System.out.println("\nEntire context:");
 		System.out.println(currentContext.toString());
+	}
+	
+	public void setProgramCounter(int newPc) {
+		pc = newPc;
+	}
+	
+	public int getProgramCounter() {
+		return pc;
 	}
 }

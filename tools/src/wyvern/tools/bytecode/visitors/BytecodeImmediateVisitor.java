@@ -24,8 +24,7 @@ public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
 	
 	@Override
 	public BytecodeValue visit(BoolValue boolValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return boolValue.accept(visitor);
 	}
 
 	@Override
@@ -45,14 +44,12 @@ public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(TupleValue tupleValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return tupleValue.accept(visitor);
 	}
 
 	@Override
 	public BytecodeValue visit(UnitValue unitValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return unitValue.accept(visitor);
 	}
 
 }
