@@ -27,6 +27,16 @@ public class BytecodeInt extends AbstractBytecodeValue<Integer> {
 			return new BytecodeInt(value * operand.value);
 		case "/":
 			return new BytecodeInt(value / operand.value);
+		case ">":
+			return new BytecodeBoolean(value > operand.value);
+		case "<":
+			return new BytecodeBoolean(value < operand.value);
+		case ">=":
+			return new BytecodeBoolean(value >= operand.value);
+		case "<=":
+			return new BytecodeBoolean(value <= operand.value);
+		case "==":
+			return new BytecodeBoolean(value == operand.value);
 		
 		// TODO temporary line: to be rewritten
 		default: throw new RuntimeException("Bad arithmetic operation " + op);

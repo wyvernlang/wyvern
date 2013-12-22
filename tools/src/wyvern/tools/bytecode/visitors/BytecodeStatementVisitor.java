@@ -1,5 +1,6 @@
 package wyvern.tools.bytecode.visitors;
 
+import wyvern.targets.Common.WyvernIL.Expr.Expression;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
 import wyvern.targets.Common.WyvernIL.Imm.VarRef;
 import wyvern.targets.Common.WyvernIL.Stmt.Assign;
@@ -11,9 +12,8 @@ import wyvern.targets.Common.WyvernIL.Stmt.Pure;
 import wyvern.targets.Common.WyvernIL.Stmt.Return;
 import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
-import wyvern.tools.bytecode.core.BytecodeContextImpl;
 import wyvern.tools.bytecode.core.Interperter;
-import wyvern.tools.bytecode.values.BytecodeLabel;
+import wyvern.tools.bytecode.values.BytecodeBoolean;
 import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
@@ -49,20 +49,24 @@ public class BytecodeStatementVisitor implements
 
 	@Override
 	public BytecodeContext visit(Goto aGoto) {
-		// TODO Auto-generated method stub
-		return null;
+		int id = aGoto.getLabel().getIdx();
+		interperter.setProgramCounter(interperter.getLabelPC(id));
+		return context;
 	}
 
 	@Override
 	public BytecodeContext visit(Label label) {
-		// TODO Auto-generated method stub
-		return null;
+		return context;
 	}
 
 	@Override
 	public BytecodeContext visit(Pure pure) {
-		// TODO Auto-generated method stub
-		return null;
+		// evaluate the expression but don't save it anywhere right now
+		Expression expression = pure.getExpression();
+		if(expression != null) {
+			expression.accept(new BytecodeExnVisitor(context));
+		}
+		return context;
 	}
 
 	@Override
@@ -73,8 +77,14 @@ public class BytecodeStatementVisitor implements
 
 	@Override
 	public BytecodeContext visit(IfStmt ifStmt) {
-		// TODO Auto-generated method stub
-		return null;
+		BytecodeValue val = ifStmt.getCondition().accept(visitor);
+		BytecodeBoolean bool = (BytecodeBoolean) val;
+		if(bool.getValue()) {
+			int id = ifStmt.getLabel().getIdx();
+			int newPC = interperter.getLabelPC(id);
+			interperter.setProgramCounter(newPC);
+		}
+		return context;
 	}
 
 }

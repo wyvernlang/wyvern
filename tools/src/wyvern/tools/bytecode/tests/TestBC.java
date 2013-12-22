@@ -45,61 +45,65 @@ public class TestBC {
 
 	@After
 	public void tearDown() throws Exception {
-		System.out.println("\n ================================ \n");
+		System.out.println("\n ================================= \n");
 	}
 
 	@Test
 	public void assignTest() {
-		ArrayList<String> strs = new ArrayList<>();
-		strs.add("var x:Int = 1\nx = 3\nval y = 5");
-		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs,
-				new ArrayList<DSL>());
-		List<Statement> statements = getResult(pair);
-
-		System.out.println("Instructions:\n");
-		for (Statement statement : statements) {
-			System.out.println(statement.getClass().getSimpleName() + " : "
-					+ statement.toString());
-		}
-
-		interperter = new Interperter(statements);
-		interperter.execute();
-		interperter.printContext();
+				
+		String s = 	"var x : Int = 1 \n"
+				+ 	"x = 3 \n"
+				+ 	"val y = 5";
 		
-		System.out.println("		DONE");
+		runTest(s);
+		
+	}
+	
+	@Test
+	public void defnTest() {
+
+		String s = 	"val x : Int = 2 + 2 \n"
+				+ 	"val y : Int = 2 * x \n"
+				+ 	"val z : Str = \"Hello \" + \"World\"\n"
+				+	"val w = (1,2,3,4,5,6)";
+
+		runTest(s);
+		
 	}
 
 	@Test
-	public void defTest() {
+	public void gotoLabelIfstmtTest() {
+		
+		String s =	"var x:Int = 5 \n" 
+				+	"var y:Int = 0 \n" 
+				+ 	"while x > 0 \n" 
+				+ 	"	x = x-1 \n"
+				+	"	y = y+1 \n";
+		
+		runTest(s);
+		
+	}
+	
+	@Test
+	public void gotoLabelIfstmtTest2() {
+		
+		String s =	"if true \n" 
+				+ 	"	then \n" 
+				+	"		1 \n" 
+				+	"	else \n" 
+				+	"		2 \n";
 
-		List<Statement> statements = new ArrayList<Statement>();
-		Immediate imm = new Immediate(new IntValue(2));
-		VarDef vardef = new VarDef("temp$0", imm);
-		Defn two = new Defn(vardef);
-		statements.add(two);
-		Immediate imm2 = new Immediate(new VarRef("temp$0"));
-		ValDef valdef2 = new ValDef("temp$1", imm2);
-		Defn three = new Defn(valdef2);
-		statements.add(three);
-		BinOp bin = new BinOp(imm.getInner(), imm2.getInner(), "*");
-		ValDef valdef3 = new ValDef("temp$2", bin);
-		Defn op = new Defn(valdef3);
-		statements.add(op);
-
-		imm = new Immediate(new StringValue("Hello "));
-		ValDef valdef = new ValDef("temp$3", imm);
-		two = new Defn(valdef);
-		statements.add(two);
-		imm2 = new Immediate(new StringValue("World"));
-		valdef2 = new ValDef("temp$4", imm2);
-		three = new Defn(valdef2);
-		statements.add(three);
-		bin = new BinOp(imm.getInner(), imm2.getInner(), "+");
-		valdef3 = new ValDef("temp$5", bin);
-		op = new Defn(valdef3);
-		statements.add(op);
-
-		System.out.println("Instructions:\n");
+		runTest(s);
+		
+	}
+	
+	private void runTest(String s) {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add(s);
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs,
+				new ArrayList<DSL>());
+		List<Statement> statements = getResult(pair);;
+		System.out.println("Instructions:");
 		for (Statement statement : statements) {
 			System.out.println(statement.getClass().getSimpleName() + " : "
 					+ statement.toString());
@@ -111,5 +115,4 @@ public class TestBC {
 
 		System.out.println("		DONE");
 	}
-
 }

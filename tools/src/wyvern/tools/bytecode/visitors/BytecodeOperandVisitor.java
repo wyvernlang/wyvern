@@ -58,10 +58,10 @@ public class BytecodeOperandVisitor implements OperandVisitor<BytecodeValue> {
 		return new BytecodeTuple(values);
 	}
 
+	// unit value represented as an empty tuple
 	@Override
 	public BytecodeValue visit(UnitValue unitValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return new BytecodeTuple(new ArrayList<BytecodeValue>());
 	}
 
 }

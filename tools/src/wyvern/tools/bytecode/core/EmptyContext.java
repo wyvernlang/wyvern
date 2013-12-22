@@ -1,5 +1,6 @@
 package wyvern.tools.bytecode.core;
 
+import wyvern.tools.bytecode.values.BytecodeEmptyVal;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class EmptyContext implements BytecodeContext {
@@ -11,7 +12,7 @@ public class EmptyContext implements BytecodeContext {
 
 	@Override
 	public BytecodeValue getLastEnteredValue() {
-		return null; // maybe switch this to an exception
+		return new BytecodeEmptyVal();
 	}
 	
 	@Override
