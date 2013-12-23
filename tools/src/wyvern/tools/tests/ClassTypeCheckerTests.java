@@ -352,7 +352,7 @@ public class ClassTypeCheckerTests {
 		Reader reader = new StringReader("\n"
 				+"type Stack\n"
 				+"    prop top : Int?\n"
-				+"    def push(element : Str)\n"
+				+"    def push(element : Int)\n"
 				+"    def pop() : Int?\n"
 				+"\n"
 				+"class StackImpl\n"
@@ -362,7 +362,7 @@ public class ClassTypeCheckerTests {
 				+"\n"
 				+"    var top : Int?\n"
 				+"\n"
-				+"    def push(element : Str)\n"
+				+"    def push(element : Int)\n"
 				+"        this.top = element\n"
 				+"\n"
 				+"    def pop() : Int?\n"
@@ -370,19 +370,19 @@ public class ClassTypeCheckerTests {
 				+"\n"
 				+"def doIt()\n"
 				+"    val s:Stack = StackImpl.Stack()\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
-				+"    s.push(\"42\")\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
+				+"    s.push(42)\n"
 				);
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
-		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Str) $L} {$L def pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class def Stack () : Stack = new $L} {$L var top : Int ? $L} {$L def push (element : Str) {$I {$L this . top = element $L} $I} $L} {$L def pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L def doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} {$L s . push (\"42\") $L} $I} $L} $I}",
+		Assert.assertEquals("{$I {$L type Stack {$I {$L prop top : Int ? $L} {$L def push (element : Int) $L} {$L def pop () : Int ? $L} $I} $L} {$L class StackImpl {$I {$L implements Stack $L} {$L class def Stack () : Stack = new $L} {$L var top : Int ? $L} {$L def push (element : Int) {$I {$L this . top = element $L} $I} $L} {$L def pop () : Int ? {$I {$L this . top $L} $I} $L} $I} $L} {$L def doIt () {$I {$L val s : Stack = StackImpl . Stack () $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} {$L s . push (42) $L} $I} $L} $I}",
 				parsedResult.toString());
 		
 		Environment env = Globals.getStandardEnv();

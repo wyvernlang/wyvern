@@ -164,6 +164,21 @@ public class TestIL {
 		List<Statement> result = getResult(pair);
 		Assert.assertEquals(join(result),"label 1,if (true) goto label 2,goto label 3,label 2,val ifRet$0 = 1,goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,val ifRet$0 = 2,goto label 0,label 5,goto label 0,label 0,");
 	}
+
+	@Test
+	public void testIf2() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("var x : Int = 0\n" +
+				"if true\n" +
+				"	then\n" +
+				"		x = 1\n" +
+				"	else\n" +
+				"		x = 2\n" +
+				"x");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		List<Statement> result = getResult(pair);
+		Assert.assertEquals(join(result),"label 1,if (true) goto label 2,goto label 3,label 2,val ifRet$0 = 1,goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,val ifRet$0 = 2,goto label 0,label 5,goto label 0,label 0,");
+	}
 	@Test
 	public void testWhile() {
 		ArrayList<String> strs = new ArrayList<>();
@@ -201,5 +216,17 @@ public class TestIL {
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		List<Statement> result = getResult(pair);
 		Assert.assertEquals(join(result),"class A {class B {val x = null; def $init() {}}; def $init() {}},class C {class D {val y = null; def $init() {}}; def $init() {}}");
+	}
+	@Test
+	public void tIf() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("val x = if true \n"
+				+  " then \n"
+				+ "  1 \n"
+				+ " else \n"
+				+ "  2 \n");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		List<Statement> result = getResult(pair);
+		Assert.assertEquals("label 1,if (true) goto label 2,goto label 3,label 2,val ifRet$0 = 1,goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,val ifRet$0 = 2,goto label 0,label 5,goto label 0,label 0,val x = ifRet$0", join(result));
 	}
 }
