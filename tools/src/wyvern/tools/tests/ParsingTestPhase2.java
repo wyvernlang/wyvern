@@ -7,6 +7,8 @@ import java.io.Reader;
 
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -14,7 +16,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import wyvern.DSL.DSL;
 import wyvern.stdlib.Globals;
+import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
@@ -653,6 +657,18 @@ public class ParsingTestPhase2 {
 		result.typecheck(env);
 	}
 
+	@Test
+	public void tVals() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("def factorial(n:Int):Int \n"
+				+ " if n==1 \n"
+				+ "  then \n"
+				+ "   n \n"
+				+ "  else \n"
+				+ "   n * factorial(n-1)");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		pair.typecheck(Environment.getEmptyEnvironment());
+	}
 	/*
 	//Fails: instance methods show up in the static context
 	@Test(expected = ToolError.class)

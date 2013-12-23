@@ -137,7 +137,7 @@ public class DefParser implements DeclParser {
 				if (exp == null) {
 					inExp = null;
 				} else {
-					inExp = exp.accept(new BodyParser(ctx), env.extend(savedArgsEnv));
+					inExp = exp.accept(new BodyParser(ctx), (md.extend(env)).extend(savedArgsEnv));
 				}
 				md.setBody(inExp);
 
