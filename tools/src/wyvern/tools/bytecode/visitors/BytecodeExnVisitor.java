@@ -1,5 +1,8 @@
 package wyvern.tools.bytecode.visitors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import wyvern.targets.Common.WyvernIL.Expr.BinOp;
 import wyvern.targets.Common.WyvernIL.Expr.FnInv;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
@@ -8,14 +11,18 @@ import wyvern.targets.Common.WyvernIL.Expr.New;
 import wyvern.targets.Common.WyvernIL.Imm.Operand;
 import wyvern.targets.Common.WyvernIL.visitor.ExprVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
+import wyvern.tools.bytecode.values.BytecodeFunction;
+import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
 	private final BytecodeContext context;
+	private final BytecodeOperandVisitor opVisitor;
 	
 	public BytecodeExnVisitor(BytecodeContext c) {
 		context = c;
+		opVisitor = new BytecodeOperandVisitor(context);
 	}
 
 	@Override
@@ -29,15 +36,24 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 		Operand l = binOp.getL();
 		Operand r = binOp.getR();
 		String op = binOp.getOp();
-		BytecodeValue left = l.accept(new BytecodeOperandVisitor(context));
-		BytecodeValue right = r.accept(new BytecodeOperandVisitor(context));
+		BytecodeValue left = l.accept(opVisitor);
+		BytecodeValue right = r.accept(opVisitor);
 		return left.doInvoke(right, op);
 	}
 
 	@Override
 	public BytecodeValue visit(FnInv fnInv) {
-		// TODO Auto-generated method stub
-		return null;
+		BytecodeFunction fun;
+		List<BytecodeValue> unpacked;
+		fun = (BytecodeFunction) fnInv.getFn().accept(opVisitor);
+		BytecodeValue arguments = fnInv.getArg().accept(opVisitor);
+		if(arguments instanceof BytecodeTuple) {
+			unpacked = ((BytecodeTuple) arguments).getValue();
+		} else {
+			unpacked = new ArrayList<BytecodeValue>();
+			unpacked.add(arguments);
+		}
+		return fun.run(unpacked);
 	}
 
 	@Override

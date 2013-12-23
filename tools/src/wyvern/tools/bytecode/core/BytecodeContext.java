@@ -12,4 +12,9 @@ public interface BytecodeContext {
 	
 	public BytecodeValue getLastEnteredValue();
 	
+	public BytecodeContext clone();
+
+	// for testing purposes only
+	public String toSimpleString();
+	
 }

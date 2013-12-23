@@ -14,7 +14,7 @@ public class BytecodeEmptyVal implements BytecodeValue {
 	
 	@Override
 	public String toString() {
-		return new String("Empty variable");
+		return new String("context is empty");
 	}
 
 }

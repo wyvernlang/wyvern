@@ -30,5 +30,16 @@ public class EmptyContext implements BytecodeContext {
 	public String getLastEnteredName() {
 		return "";
 	}
+	
+	@Override
+	public EmptyContext clone() {
+		return new EmptyContext();
+	}
+
+	@Override
+	public String toSimpleString() {
+		return "";
+	}
+	
 
 }

@@ -15,6 +15,7 @@ import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.Interperter;
 import wyvern.tools.bytecode.values.BytecodeBoolean;
 import wyvern.tools.bytecode.values.BytecodeRef;
+import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeStatementVisitor implements
@@ -23,6 +24,7 @@ public class BytecodeStatementVisitor implements
 	private final BytecodeContext context;
 	private final BytecodeExnVisitor visitor;
 	private final Interperter interperter;
+	private static final String UNSAVED_MESSAGE = "unsaved in context"; 
 
 	public BytecodeStatementVisitor(BytecodeContext c, Interperter i) {
 		context = c;
@@ -64,15 +66,21 @@ public class BytecodeStatementVisitor implements
 		// evaluate the expression but don't save it anywhere right now
 		Expression expression = pure.getExpression();
 		if(expression != null) {
-			expression.accept(new BytecodeExnVisitor(context));
+			interperter.setFinalVals(expression.accept(visitor),UNSAVED_MESSAGE);
 		}
 		return context;
 	}
 
 	@Override
 	public BytecodeContext visit(Return aReturn) {
-		// TODO Auto-generated method stub
-		return null;
+		//
+		//	currently unused 
+		//
+		interperter.endExecution();
+		BytecodeOperandVisitor opVisitor = new BytecodeOperandVisitor(context);
+		BytecodeValue val = aReturn.getExn().accept(opVisitor);
+		interperter.setFinalVals(val, UNSAVED_MESSAGE);
+		return context;
 	}
 
 	@Override

@@ -31,6 +31,13 @@ public class BytecodeContextImpl implements BytecodeContext {
 	public String toString() {
 		return name + ": " + value.toString() + "\n" + inner.toString();
 	}
+	
+	public String toSimpleString() {
+		if(name.startsWith("temp$")) {
+			return inner.toSimpleString();
+		}
+		return name + ": " + value.toString() + "\n" + inner.toSimpleString();
+	}
 
 	@Override
 	public BytecodeValue getValue(String val) {
@@ -43,5 +50,11 @@ public class BytecodeContextImpl implements BytecodeContext {
 	@Override
 	public String getLastEnteredName() {
 		return name;
+	}
+	
+	@Override
+	public BytecodeContextImpl clone() {
+		BytecodeContext newInner = inner.clone();
+		return new BytecodeContextImpl(value,name,newInner);
 	}
 }
