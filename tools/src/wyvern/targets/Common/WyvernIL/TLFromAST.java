@@ -258,6 +258,7 @@ public class TLFromAST implements CoreASTVisitor {
 		statements.add(next);
 		statements.add(new Goto(end));
 		statements.add(end);
+		this.expr = new Immediate(new VarRef(result));
 
 	}
 
