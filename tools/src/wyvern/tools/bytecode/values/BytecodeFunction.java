@@ -16,13 +16,13 @@ public class BytecodeFunction implements BytecodeValue {
 	private final List<Statement> body;
 
 	public BytecodeFunction(List<Param> parameters, List<Statement> b,
-			BytecodeContext c) {
+			BytecodeContext c, String name) {
 		body = b;
-		coreContext = c.clone();
 		params = new ArrayList<String>();
 		for (Param param : parameters) {
 			params.add(param.getName());
 		}
+		coreContext = new BytecodeContextImpl(this,name,c.clone());
 	}
 
 	public List<String> getParams() {

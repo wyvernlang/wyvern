@@ -65,7 +65,7 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	@Override
 	public BytecodeValue visit(New aNew) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("trying to use New");
 	}
 
 }
