@@ -10,10 +10,12 @@ import java.util.List;
 public class ClassDef implements Definition {
 	private String name;
 	private List<Definition> definitions;
+	private List<Definition> classDefinitions;
 
-	public ClassDef(String name, List<Definition> definitions) {
+	public ClassDef(String name, List<Definition> definitions, List<Definition> classDefinitions) {
 		this.name = name;
 		this.definitions = definitions;
+		this.classDefinitions = classDefinitions;
 	}
 
 	@Override
@@ -27,6 +29,10 @@ public class ClassDef implements Definition {
 
 	public List<Definition> getDefinitions() {
 		return definitions;
+	}
+
+	public List<Definition> getClassDefinitions() {
+		return classDefinitions;
 	}
 
 

@@ -1,15 +1,20 @@
 package wyvern.targets.Common.WyvernIL.Expr;
 
+import wyvern.targets.Common.WyvernIL.Def.Def;
+import wyvern.targets.Common.WyvernIL.Def.Definition;
 import wyvern.targets.Common.WyvernIL.visitor.ExprVisitor;
+
+import java.util.List;
 
 /**
  * Created by Ben Chung on 11/11/13.
  */
 public class New implements Expression {
-	private String src;
 
-	public New(String src) {
-		this.src = src;
+	private List<Definition> defs;
+
+	public New(List<Definition> defs) {
+		this.defs = defs;
 	}
 
 	@Override
@@ -17,13 +22,14 @@ public class New implements Expression {
 		return visitor.visit(this);
 	}
 
-	public String getSrc() {
-		return src;
-	}
 
 
 	@Override
 	public String toString() {
-		return "new "+src;
+		return "new ";
+	}
+
+	public List<Definition> getDefs() {
+		return defs;
 	}
 }
