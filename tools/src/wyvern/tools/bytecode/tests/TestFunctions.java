@@ -8,6 +8,12 @@ import org.junit.Test;
 import wyvern.tools.bytecode.values.BytecodeInt;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * a test for the function related elements of the interpreter
+ * see TestUtil for setup teardown and helper functions
+ * @author Tal Man
+ *
+ */
 public class TestFunctions extends TestUtil {
 	
 	@Test
@@ -23,7 +29,7 @@ public class TestFunctions extends TestUtil {
 		String[] names = { "fun1", "fun2", "fun3" };
 		BytecodeValue[] vals = { func, func, func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");	 
+		assertEquals(res.toString(), "()");	 
 	}
 	
 	@Test
@@ -40,7 +46,7 @@ public class TestFunctions extends TestUtil {
 		BytecodeValue[] vals = { new BytecodeInt(13), new BytecodeInt(29),
 								 new BytecodeInt(6), func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");		
+		assertEquals(res.toString(), "()");		
 	}
 	
 	@Test
@@ -53,7 +59,7 @@ public class TestFunctions extends TestUtil {
 		String[] names = { "x" };
 		BytecodeValue[] vals = { new BytecodeInt(4) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");	
+		assertEquals(res.toString(), "()");	
 	}
 	
 	@Test

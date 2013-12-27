@@ -12,10 +12,9 @@ import wyvern.targets.Common.WyvernIL.Stmt.Pure;
 import wyvern.targets.Common.WyvernIL.Stmt.Return;
 import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
-import wyvern.tools.bytecode.core.Interperter;
+import wyvern.tools.bytecode.core.Interpreter;
 import wyvern.tools.bytecode.values.BytecodeBoolean;
 import wyvern.tools.bytecode.values.BytecodeRef;
-import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeStatementVisitor implements
@@ -23,17 +22,26 @@ public class BytecodeStatementVisitor implements
 
 	private final BytecodeContext context;
 	private final BytecodeExnVisitor visitor;
-	private final Interperter interperter;
+	private final Interpreter interperter;
 	private static final String UNSAVED_MESSAGE = "unsaved in context"; 
 
-	public BytecodeStatementVisitor(BytecodeContext c, Interperter i) {
-		context = c;
-		interperter = i;
+	/**
+	 * sets up the visitor with a context to work with
+	 * @param visContext
+	 * 		the context of the program at this point
+	 * @param visInterperter
+	 * 		the interpreter that is currently being executed
+	 */
+	public BytecodeStatementVisitor(BytecodeContext visContext, Interpreter visInterperter) {
+		context = visContext;
+		interperter = visInterperter;
 		visitor = new BytecodeExnVisitor(context);
 	}
 
-	// assumption: 
-	// dest will always be an Immediate with expression of type VarRef
+	/*
+	 * assumption: 
+	 * dest will always be an Immediate with expression of type VarRef
+	 */
 	@Override
 	public BytecodeContext visit(Assign assign) {
 		Immediate imm = (Immediate) assign.getDest();
@@ -71,11 +79,11 @@ public class BytecodeStatementVisitor implements
 		return context;
 	}
 
+	/*
+	 * currently unused in implementation
+	 */
 	@Override
 	public BytecodeContext visit(Return aReturn) {
-		//
-		//	currently unused 
-		//
 		interperter.endExecution();
 		BytecodeOperandVisitor opVisitor = new BytecodeOperandVisitor(context);
 		BytecodeValue val = aReturn.getExn().accept(opVisitor);

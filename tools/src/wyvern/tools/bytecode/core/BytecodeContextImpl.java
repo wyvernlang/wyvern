@@ -1,60 +1,83 @@
 package wyvern.tools.bytecode.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * implementation of the BytecodeContext interface
+ * @author Tal
+ *
+ */
 public class BytecodeContextImpl implements BytecodeContext {
+
+	private final Map<String, BytecodeValue> context;
+
+	public BytecodeContextImpl() {
+		context = new HashMap<String, BytecodeValue>();
+	}
 	
-	private final String name;
-	private final BytecodeValue value;
-	private final BytecodeContext inner;
-	
-	public BytecodeContextImpl(BytecodeValue v, String n, BytecodeContext i) {
-		name = n;
-		value = v;
-		inner = i;
+	/**
+	 * copy constructor for the context
+	 * @param c
+	 * 		the context to be copied
+	 */
+	public BytecodeContextImpl(BytecodeContext c) {
+		this();
+		context.putAll(((BytecodeContextImpl)c).context);
 	}
 
 	@Override
-	public boolean existsInContext(String val) {
-		if(name.equals(val)) {
-			return true;
+	public boolean existsInContext(String valName) {
+		return context.containsKey(valName);
+	}
+
+	@Override
+	public BytecodeValue getValue(String valName) {
+		if (!context.containsKey(valName)) {
+			String msg = "searching for value that doesn't exist in context";
+			throw new RuntimeException(msg);
 		}
-		return inner.existsInContext(val);
+		return context.get(valName);
 	}
 	
 	@Override
-	public BytecodeValue getLastEnteredValue() {
-		return value;
+	public void addToContext(String name, BytecodeValue val) {
+		context.put(name,val);
 	}
 	
 	@Override
 	public String toString() {
-		return name + ": " + value.toString() + "\n" + inner.toString();
+		return contextToString(false);
 	}
 	
+	@Override
 	public String toSimpleString() {
-		if(name.startsWith("temp$")) {
-			return inner.toSimpleString();
-		}
-		return name + ": " + value.toString() + "\n" + inner.toSimpleString();
-	}
-
-	@Override
-	public BytecodeValue getValue(String val) {
-		if(name.equals(val)) {
-			return value;
-		} 
-		return inner.getValue(val);
-	}
-
-	@Override
-	public String getLastEnteredName() {
-		return name;
+		return contextToString(true);
 	}
 	
-	@Override
-	public BytecodeContextImpl clone() {
-		BytecodeContext newInner = inner.clone();
-		return new BytecodeContextImpl(value,name,newInner);
+	/**
+	 * helper method for prints
+	 * @param simple
+	 * 		whether we require a simplified version of the context or not
+	 * @return
+	 * 		a string representing the contents of the context
+	 */
+	private String contextToString(boolean simple) {
+		StringBuilder sb = new StringBuilder();
+		for(String s : context.keySet()) {
+			if(simple && s.contains("$")) {
+				continue;
+			}
+			BytecodeValue val = context.get(s);
+			if(val instanceof BytecodeFunction) {
+				sb.append(s + val + "\n");
+			} else {
+				sb.append(s + " = " + val + "\n");
+			}
+		}
+		return sb.toString();
 	}
 }

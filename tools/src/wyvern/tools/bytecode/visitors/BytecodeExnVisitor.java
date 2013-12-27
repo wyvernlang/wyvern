@@ -20,8 +20,13 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	private final BytecodeContext context;
 	private final BytecodeOperandVisitor opVisitor;
 	
-	public BytecodeExnVisitor(BytecodeContext c) {
-		context = c;
+	/**
+	 * sets up the visitor with a context to work with
+	 * @param visContext
+	 * 		the context of the program at this point
+	 */
+	public BytecodeExnVisitor(BytecodeContext visContext) {
+		context = visContext;
 		opVisitor = new BytecodeOperandVisitor(context);
 	}
 
@@ -64,8 +69,7 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(New aNew) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("trying to use New");
+		return null;
 	}
 
 }

@@ -8,16 +8,16 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class TestClass extends TestUtil {
 
-/*	@Test
+	@Test
 	public void defineSimpleClass() {
 		
 		PRINTS_ON = true;
 				
-		String s =	"class Hello\n"
-				+	"	class def make():Hello = new\n"
+		String s =	"class Hello\n";
+/*				+	"	class def make():Hello = new\n"
 				+	"	var testVal:Int = 5\n"
 				+	"	def setV(n : Int):Unit = this.testVal = n\n"
-				+	"	def getV():Int = this.testVal\n";
+				+	"	def getV():Int = this.testVal\n";*/
 
 		BytecodeValue res = runTest(s);
 		
@@ -26,5 +26,5 @@ public class TestClass extends TestUtil {
 		assertTrue(isInContext(names,vals));
 		assertEquals(res.toString(), "No");	
 	}	
-*/
+
 }

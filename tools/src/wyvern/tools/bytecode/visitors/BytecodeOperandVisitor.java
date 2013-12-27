@@ -22,8 +22,13 @@ public class BytecodeOperandVisitor implements OperandVisitor<BytecodeValue> {
 
 	private final BytecodeContext context;
 	
-	public BytecodeOperandVisitor(BytecodeContext c) {
-		context = c;
+	/**
+	 * sets up the visitor with a context to work with
+	 * @param visContext
+	 * 		the context of the program at this point
+	 */
+	public BytecodeOperandVisitor(BytecodeContext visContext) {
+		context = visContext;
 	}
 	
 	@Override
@@ -57,7 +62,9 @@ public class BytecodeOperandVisitor implements OperandVisitor<BytecodeValue> {
 		return new BytecodeTuple(values);
 	}
 
-	// unit value represented as an empty tuple
+	/*
+	 *  unit value represented as an empty tuple
+	 */
 	@Override
 	public BytecodeValue visit(UnitValue unitValue) {
 		return new BytecodeTuple(new ArrayList<BytecodeValue>());

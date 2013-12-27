@@ -13,6 +13,12 @@ import wyvern.tools.bytecode.values.BytecodeString;
 import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * a test for the basic elements of the interpreter
+ * see TestUtil for setup teardown and helper functions
+ * @author Tal Man
+ *
+ */
 public class TestBasics extends TestUtil {
 
 	@Test
@@ -27,7 +33,7 @@ public class TestBasics extends TestUtil {
 		String[] names = { "x", "y" };
 		BytecodeValue[] vals = { new BytecodeInt(3), new BytecodeInt(5) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");
+		assertEquals(res.toString(), "()");
 	}
 	
 	@Test
@@ -49,7 +55,7 @@ public class TestBasics extends TestUtil {
 							     new BytecodeString("Hello World"), 
 								 new BytecodeTuple(tuple)};
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");	
+		assertEquals(res.toString(), "()");	
 	}
 
 	@Test
@@ -66,7 +72,7 @@ public class TestBasics extends TestUtil {
 		String[] names = { "x", "y" };
 		BytecodeValue[] vals = { new BytecodeInt(0), new BytecodeInt(5) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");	
+		assertEquals(res.toString(), "()");	
 	}
 	
 	@Test
@@ -83,7 +89,7 @@ public class TestBasics extends TestUtil {
 		String[] names = { "x" };
 		BytecodeValue[] vals = { new BytecodeInt(1) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "[]");	
+		assertEquals(res.toString(), "()");	
 	}	
 	
 	@Test

@@ -22,8 +22,13 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 
 	private final BytecodeContext context;
 	
-	public BytecodeDefVisitor(BytecodeContext c) {
-		context = c;
+	/**
+	 * sets up the visitor with a context to work with
+	 * @param visContext
+	 * 		the context of the program at this point
+	 */
+	public BytecodeDefVisitor(BytecodeContext visContext) {
+		context = visContext;
 	}
 	
 	@Override
@@ -32,7 +37,8 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
 		BytecodeValue value = varDef.getExn().accept(visitor);
 		BytecodeValue refValue = new BytecodeRef(value);
-		return new BytecodeContextImpl(refValue, name, context);
+		context.addToContext(name, refValue);
+		return context;
 	}
 
 	@Override
@@ -40,13 +46,16 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		String name = valDef.getName();
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
 		BytecodeValue value = valDef.getExn().accept(visitor);
-		return new BytecodeContextImpl(value, name, context);
+		context.addToContext(name, value);
+		return context;
 	}
 
 	@Override
 	public BytecodeContext visit(TypeDef typeDef) {
-		// TODO Auto-generated method stub
-		return null;
+		/*
+		 *  currently unused
+		 */
+		throw new RuntimeException("got a TypeDef in the IL");
 	}
 
 	@Override
@@ -55,18 +64,20 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		String name = def.getName();
 		List<Param> params = def.getParams();
 		BytecodeValue val = new BytecodeFunction(params, body, context, name);
-		return new BytecodeContextImpl(val,name,context);
+		context.addToContext(name, val);
+		return context;
 	}
 
+	// not yet tested
 	@Override
 	public BytecodeContext visit(ClassDef classDef) {
-		BytecodeContext newContext = context.clone();
+		BytecodeContext newContext = new BytecodeContextImpl(context);
 		List<Definition> defs = classDef.getDefinitions();
 		for(Definition def : defs) {
 			newContext = def.accept(new BytecodeDefVisitor(newContext));
 		}
-		BytecodeValue val =  new BytecodeClass(newContext);
-		return new BytecodeContextImpl(val,classDef.getName(),context);
+		BytecodeValue val = new BytecodeClass(newContext);
+		context.addToContext(classDef.getName(), val);
+		return context;
 	}
-
 }

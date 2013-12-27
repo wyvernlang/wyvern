@@ -27,4 +27,22 @@ public class BytecodeTuple extends AbstractBytecodeValue<List<BytecodeValue>> {
 		BytecodeTuple bct = (BytecodeTuple) obj;
 		return value.equals(bct.value);
 	}
+	
+	@Override
+	public String toString() {
+		if(value.size() == 1) {
+			return value.get(0).toString();
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		for(int i = 0 ; i < value.size(); i++) {
+			sb.append(value.get(i));
+			if(i == value.size() -1) {
+				continue;
+			}
+			sb.append(",");
+		}
+		sb.append(")");
+		return sb.toString();
+	}
 }

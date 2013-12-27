@@ -8,8 +8,6 @@ import wyvern.targets.Common.WyvernIL.Imm.UnitValue;
 import wyvern.targets.Common.WyvernIL.Imm.VarRef;
 import wyvern.targets.Common.WyvernIL.visitor.OperandVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
-import wyvern.tools.bytecode.values.BytecodeInt;
-import wyvern.tools.bytecode.values.BytecodeString;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
@@ -17,8 +15,13 @@ public class BytecodeImmediateVisitor implements OperandVisitor<BytecodeValue> {
 	private final BytecodeContext context;
 	private final BytecodeOperandVisitor visitor;
 	
-	public BytecodeImmediateVisitor(BytecodeContext c) {
-		context = c;
+	/**
+	 * sets up the visitor with a context to work with
+	 * @param visContext
+	 * 		the context of the program at this point
+	 */
+	public BytecodeImmediateVisitor(BytecodeContext visContext) {
+		context = visContext;
 		visitor = new BytecodeOperandVisitor(context);
 	}
 	

@@ -12,8 +12,8 @@ import wyvern.targets.Common.WyvernIL.TLFromAST;
 import wyvern.targets.Common.WyvernIL.Def.Def.Param;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.bytecode.core.BytecodeContext;
-import wyvern.tools.bytecode.core.EmptyContext;
-import wyvern.tools.bytecode.core.Interperter;
+import wyvern.tools.bytecode.core.BytecodeContextImpl;
+import wyvern.tools.bytecode.core.Interpreter;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeValue;
 import wyvern.tools.typedAST.core.expressions.New;
@@ -33,14 +33,16 @@ public class TestUtil {
 	protected boolean PRINTS_ON = false; 	// add PRINTS_ON = true at the
 											// beginning of a test for some
 											// instruction/context prints
-	protected Interperter interperter;
-	protected BytecodeValue func;
+	protected Interpreter interperter;
+	protected BytecodeValue func;			// an empty function declaration
+											// to be used as value comparison
+											// for the isInContext checks
 
 	@Before
 	public void setUp() throws Exception {
 		List<Param> params = new ArrayList<Param>();
 		List<Statement> statements = new ArrayList<Statement>();
-		func = new BytecodeFunction(params,statements,new EmptyContext(), "");
+		func = new BytecodeFunction(params,statements,new BytecodeContextImpl(), "");
 	}
 
 	@After
@@ -51,6 +53,9 @@ public class TestUtil {
 		}
 	}
 	
+	/*
+	 * method copied exactly from wyvern.targets.Common.WyvernIL.tests.TestIL
+	 */
 	private List<Statement> getResult(TypedAST input) {
 		if (!(input instanceof CoreAST))
 			throw new RuntimeException();
@@ -62,6 +67,14 @@ public class TestUtil {
 		return visitor.getStatments();
 	}
 	
+	/**
+	 * sets up the statements and runs the test, then prints results and
+	 * the simplified context if the PRINTS_ON flag is on
+	 * @param s
+	 * 		the string representing the high level language
+	 * @return
+	 * 		the BytecodeValue of the final evaluated value
+	 */
 	public BytecodeValue runTest(String s) {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add(s);
@@ -77,7 +90,7 @@ public class TestUtil {
 			}
 		}
 
-		interperter = new Interperter(statements);
+		interperter = new Interpreter(statements);
 		BytecodeValue res = interperter.execute();
 		
 		if(PRINTS_ON) {
@@ -87,6 +100,16 @@ public class TestUtil {
 		return res;
 	}
 	
+	/**
+	 * checks if an array of names is in the context with the correct 
+	 * corresponding values associated to them
+	 * @param names
+	 * 		expected names in the context
+	 * @param vals
+	 * 		expected values for the names
+	 * @return
+	 * 		whether all the name/value pairs have been found correctly
+	 */
 	public boolean isInContext(String[] names, BytecodeValue[] vals) {
 		BytecodeContext context = interperter.getCurrentContext();
 		for(int i = 0 ; i < names.length ; i++) {
