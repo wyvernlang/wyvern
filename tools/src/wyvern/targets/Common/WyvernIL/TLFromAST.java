@@ -1,6 +1,7 @@
 package wyvern.targets.Common.WyvernIL;
 
 import wyvern.targets.Common.WyvernIL.Def.Def;
+import wyvern.targets.Common.WyvernIL.Def.Definition;
 import wyvern.targets.Common.WyvernIL.Def.ValDef;
 import wyvern.targets.Common.WyvernIL.Expr.*;
 import wyvern.targets.Common.WyvernIL.Imm.*;
@@ -165,6 +166,8 @@ public class TLFromAST implements CoreASTVisitor {
 		Map<String, TypedAST> args = new1.getArgs();
 		ClassDeclaration decl = new1.getClassDecl();
 
+		List<Definition> defs = new LinkedList<>();
+
 		for (Map.Entry<String, TypedAST> arg : args.entrySet()){
 			if(!(arg.getValue() instanceof CoreAST))
 				throw new RuntimeException();
@@ -175,9 +178,10 @@ public class TLFromAST implements CoreASTVisitor {
 			cArg.accept(argVisitor);
 			
 			this.statements.addAll(argVisitor.getStatements());
+			defs.add(new ValDef(arg.getKey(), argVisitor.getExpr()));
 		}
 		
-		this.expr = new wyvern.targets.Common.WyvernIL.Expr.New(decl.getName());
+		this.expr = new wyvern.targets.Common.WyvernIL.Expr.New(defs);
 	}
 
 	@Override

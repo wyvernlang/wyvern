@@ -114,31 +114,46 @@ public class ExnFromAST implements CoreASTVisitor {
 
 	private ClassDef getClassDef(ClassDeclaration cd) {
 		List<Definition> definitions = new LinkedList<>();
+		List<Definition> classDefs = new LinkedList<>();
 		List<Statement> inializer = new LinkedList<>();
 		for (Declaration decl : cd.getDecls().getDeclIterator()) {
 			if (decl instanceof DefDeclaration) {
 				List<Statement> bodyAST = getBodyAST(((DefDeclaration) decl).getBody());
-				definitions.add(new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), bodyAST));
+				Def e = new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), bodyAST);
+				if (((DefDeclaration) decl).isClass())
+					classDefs.add(e);
+				else
+					definitions.add(e);
 			} else if (decl instanceof ValDeclaration) {
 				TLFromAST gen = TLFromASTApply(((ValDeclaration) decl).getDefinition());
 				if (gen != null) {
 					inializer.addAll(gen.getStatements());
 					inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
 				}
-				definitions.add(new ValDef(decl.getName(), null));
+				ValDef e = new ValDef(decl.getName(), null);
+				if (((ValDeclaration) decl).isClass())
+					classDefs.add(e);
+				else
+					definitions.add(e);
 			} else if (decl instanceof VarDeclaration) {
 				TLFromAST gen = TLFromASTApply(((VarDeclaration) decl).getDefinition());
 				inializer.addAll(gen.getStatements());
 				inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
-				definitions.add(new VarDef(decl.getName(), null));
+				VarDef e = new VarDef(decl.getName(), null);
+				if (((VarDeclaration) decl).isClass())
+					classDefs.add(e);
+				else
+					definitions.add(e);
 			} else if (decl instanceof TypeDeclaration) {
-				definitions.add(getTypeDecl((TypeDeclaration) decl, ((TypeDeclaration) decl).getDecls()));
+				TypeDef typeDecl = getTypeDecl((TypeDeclaration) decl, ((TypeDeclaration) decl).getDecls());
+				classDefs.add(typeDecl);
 			} else if (decl instanceof ClassDeclaration) {
-				definitions.add(getClassDef((ClassDeclaration) decl));
+				ClassDef classDef = getClassDef((ClassDeclaration) decl);
+				classDefs.add(classDef);
 			}
 		}
 		definitions.add(new Def("$init", new LinkedList<Def.Param>(), inializer));
-		return new ClassDef(cd.getName(), definitions);
+		return new ClassDef(cd.getName(), definitions, classDefs);
 	}
 
 	private TypeDef getTypeDecl(TypeDeclaration interfaceDeclaration, DeclSequence decls) {
