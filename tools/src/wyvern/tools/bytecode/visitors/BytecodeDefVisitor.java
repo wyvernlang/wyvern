@@ -14,6 +14,7 @@ import wyvern.targets.Common.WyvernIL.visitor.DefVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.BytecodeContextImpl;
 import wyvern.tools.bytecode.values.BytecodeClass;
+import wyvern.tools.bytecode.values.BytecodeClassDef;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
@@ -68,15 +69,19 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		return context;
 	}
 
-	// not yet tested
 	@Override
 	public BytecodeContext visit(ClassDef classDef) {
 		BytecodeContext newContext = new BytecodeContextImpl(context);
+		List<Definition> classDefs = classDef.getClassDefinitions();
 		List<Definition> defs = classDef.getDefinitions();
-		for(Definition def : defs) {
+		for(Definition def : classDefs) {
 			newContext = def.accept(new BytecodeDefVisitor(newContext));
 		}
-		BytecodeValue val = new BytecodeClass(newContext);
+		BytecodeContext fullContext = new BytecodeContextImpl(newContext);
+		for(Definition def : defs) {
+			fullContext = def.accept(new BytecodeDefVisitor(fullContext));
+		}
+		BytecodeValue val = new BytecodeClassDef(newContext,fullContext);
 		context.addToContext(classDef.getName(), val);
 		return context;
 	}

@@ -3,11 +3,11 @@ package wyvern.tools.bytecode.values;
 import wyvern.tools.bytecode.core.BytecodeContext;
 
 public class BytecodeClass implements BytecodeValue {
+
+	protected final BytecodeContext coreContext;
 	
-	private final BytecodeContext coreContext;
-	
-	public BytecodeClass(BytecodeContext c) {
-		coreContext = c;
+	public BytecodeClass(BytecodeContext context) {
+		coreContext = context;
 	}
 	
 	public BytecodeValue getValue(String name) {
