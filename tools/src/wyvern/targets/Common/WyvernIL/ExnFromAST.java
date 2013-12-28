@@ -2,6 +2,7 @@ package wyvern.targets.Common.WyvernIL;
 
 import org.objectweb.asm.commons.StaticInitMerger;
 import wyvern.targets.Common.WyvernIL.Def.*;
+import wyvern.targets.Common.WyvernIL.Expr.Expression;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
 import wyvern.targets.Common.WyvernIL.Expr.Inv;
 import wyvern.targets.Common.WyvernIL.Imm.VarRef;
@@ -130,7 +131,10 @@ public class ExnFromAST implements CoreASTVisitor {
 					inializer.addAll(gen.getStatements());
 					inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
 				}
-				ValDef e = new ValDef(decl.getName(), gen.getExpr());
+				Expression expr = null;
+				if (gen != null)
+					expr = gen.getExpr();
+				ValDef e = new ValDef(decl.getName(), expr);
 				if (((ValDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
@@ -139,7 +143,10 @@ public class ExnFromAST implements CoreASTVisitor {
 				TLFromAST gen = TLFromASTApply(((VarDeclaration) decl).getDefinition());
 				inializer.addAll(gen.getStatements());
 				inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
-				VarDef e = new VarDef(decl.getName(), gen.getExpr());
+				Expression expr = null;
+				if (gen != null)
+					expr = gen.getExpr();
+				VarDef e = new VarDef(decl.getName(), expr);
 				if (((VarDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
