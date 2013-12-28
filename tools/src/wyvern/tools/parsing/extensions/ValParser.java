@@ -10,7 +10,6 @@ import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.core.binding.LateBinder;
 import wyvern.tools.typedAST.core.binding.LateNameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -20,8 +19,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ValParser implements DeclParser {
     private ValParser() {
@@ -73,28 +70,22 @@ public class ValParser implements DeclParser {
             nc = null;
         }
         final Type parsedType = type;
-		final AtomicReference<Type> rT = new AtomicReference<>(parsedType);
+
         final ValDeclaration intermvd = nc;
         return new Pair<Environment, ContParser>(
-                Environment.getEmptyEnvironment().extend(new LateNameBinding(valName, new LateBinder<Type>() {
-					@Override
-					public Type get() {
-						return rT.get();
-					}
-				})),
+                Environment.getEmptyEnvironment().extend(new NameBindingImpl(valName, parsedType)),
                 new ContParser() {
                     @Override
                     public TypedAST parse(EnvironmentResolver r) {
                         TypedAST definition = null;
                         Type type = null;
-                        if (restctx.getTokens() != null && parsedType == null) {
+                        if (restctx.getTokens() != null) {
                             definition = ParseUtils.parseExpr(restctx);
                             type = definition.typecheck(ctx.getEnv());
                         } else {
                             type = parsedType;
                         }
-						rT.set(type);
-						return new ValDeclaration(valName, type, definition, valNameLocation);
+                        return new ValDeclaration(valName, type, definition, valNameLocation);
                     }
                 });
     }
