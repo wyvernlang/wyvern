@@ -23,4 +23,8 @@ public class BytecodeClass implements BytecodeValue {
 	public BytecodeValue dereference() {
 		return this;
 	}
+	
+	public BytecodeContext getContext() {
+		return coreContext;
+	}
 }

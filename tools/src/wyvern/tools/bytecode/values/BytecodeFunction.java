@@ -35,6 +35,7 @@ public class BytecodeFunction implements BytecodeValue {
 		}
 		coreContext = new BytecodeContextImpl(context);
 		coreContext.addToContext(name, this);
+		coreContext.addToContext("this", null);
 	}
 
 	/**
@@ -79,5 +80,9 @@ public class BytecodeFunction implements BytecodeValue {
 		}
 		sb.append(")");
 		return sb.toString();
+	}
+	
+	public void setThis(BytecodeValue thisClass) {
+		coreContext.setThis(thisClass);
 	}
 }

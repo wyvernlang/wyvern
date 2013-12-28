@@ -7,9 +7,11 @@ public class BytecodeClassDef extends BytecodeClass {
 	
 	private BytecodeContext fullContext;
 
-	public BytecodeClassDef(BytecodeContext context, BytecodeContext fullCtx) {
+	public BytecodeClassDef(BytecodeContext context, BytecodeContext fullCtx, String name) {
 		super(context);
 		fullContext = fullCtx;
+		coreContext.addToContext(name, this);
+		fullContext.addToContext(name, this);
 	}
 	
 	public BytecodeValue getCompleteClass() {

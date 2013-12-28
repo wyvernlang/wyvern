@@ -45,4 +45,10 @@ public interface BytecodeContext {
 	 */
 	public void addToContext(String name, BytecodeValue val);
 	
+	/**
+	 * looks for the name 'this' in the context and sets it to a new value
+	 * @param thisClass
+	 */
+	public void setThis(BytecodeValue thisClass);
+	
 }

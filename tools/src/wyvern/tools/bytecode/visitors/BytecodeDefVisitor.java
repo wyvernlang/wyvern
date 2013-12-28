@@ -81,8 +81,9 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		for(Definition def : defs) {
 			fullContext = def.accept(new BytecodeDefVisitor(fullContext));
 		}
-		BytecodeValue val = new BytecodeClassDef(newContext,fullContext);
-		context.addToContext(classDef.getName(), val);
+		String name = classDef.getName();
+		BytecodeValue val = new BytecodeClassDef(newContext,fullContext,name);
+		context.addToContext(name, val);
 		return context;
 	}
 }

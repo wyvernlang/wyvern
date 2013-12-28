@@ -3,6 +3,7 @@ package wyvern.tools.bytecode.visitors;
 import java.util.ArrayList;
 import java.util.List;
 
+import wyvern.targets.Common.WyvernIL.Def.Definition;
 import wyvern.targets.Common.WyvernIL.Expr.BinOp;
 import wyvern.targets.Common.WyvernIL.Expr.FnInv;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
@@ -11,6 +12,8 @@ import wyvern.targets.Common.WyvernIL.Expr.New;
 import wyvern.targets.Common.WyvernIL.Imm.Operand;
 import wyvern.targets.Common.WyvernIL.visitor.ExprVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
+import wyvern.tools.bytecode.core.BytecodeContextImpl;
+import wyvern.tools.bytecode.values.BytecodeClass;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
@@ -69,7 +72,18 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(New aNew) {
-		return null;
+		BytecodeContext newContext;
+		List<Definition> defs = aNew.getDefs();
+		BytecodeValue thisObject = context.getValue("this");
+		if(thisObject != null) {
+			BytecodeClass thisClass = (BytecodeClass) thisObject;
+			newContext = new BytecodeContextImpl(thisClass.getContext());
+		} else {
+			newContext = context;
+		}
+		for(Definition def : defs) {
+			newContext = def.accept(new BytecodeDefVisitor(newContext));
+		}
+		return new BytecodeClass(newContext);
 	}
-
 }

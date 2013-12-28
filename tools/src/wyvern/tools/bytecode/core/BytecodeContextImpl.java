@@ -80,4 +80,9 @@ public class BytecodeContextImpl implements BytecodeContext {
 		}
 		return sb.toString();
 	}
+
+	@Override
+	public void setThis(BytecodeValue thisClass) {
+		context.put("this", thisClass);
+	}
 }

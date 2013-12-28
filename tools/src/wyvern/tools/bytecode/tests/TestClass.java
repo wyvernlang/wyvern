@@ -13,11 +13,20 @@ public class TestClass extends TestUtil {
 		
 		PRINTS_ON = true;
 				
-		String s =	"class Hello\n"
+/*		String s =	"class Hello\n"
 				+	"	class def make():Hello = new\n"
 				+	"	var testVal:Int = 5\n"
 				+	"	def setV(n : Int):Unit = this.testVal = n\n"
-				+	"	def getV():Int = this.testVal\n";
+				+	"	def getV():Int = this.testVal\n";*/
+		
+		String s = " class X                  \n"
+				+"   class def create() : X   \n"
+				+"     new                    \n"
+				+"   val x:Int = 2            \n"
+				+"   def getX():Int           \n"
+				+"     this.x                 \n";
+				//+" val tX : X = X.create()    \n"
+				//+" tX.getX()                  \n";
 
 		BytecodeValue res = runTest(s);
 		
