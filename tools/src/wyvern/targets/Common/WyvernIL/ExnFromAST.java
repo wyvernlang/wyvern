@@ -136,6 +136,7 @@ public class ExnFromAST implements CoreASTVisitor {
 				if (gen != null)
 					expr = gen.getExpr();
 				ValDef e = new ValDef(decl.getName(), expr);
+				inializer.add(new Defn(e));
 				if (((ValDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
@@ -149,6 +150,7 @@ public class ExnFromAST implements CoreASTVisitor {
 				if (gen != null)
 					expr = gen.getExpr();
 				VarDef e = new VarDef(decl.getName(), expr);
+				inializer.add(new Defn(e));
 				if (((VarDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
