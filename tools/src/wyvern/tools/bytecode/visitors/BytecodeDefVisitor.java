@@ -36,7 +36,10 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	public BytecodeContext visit(VarDef varDef) {
 		String name = varDef.getName();
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
-		BytecodeValue value = varDef.getExn().accept(visitor);
+		BytecodeValue value = null;
+		if(varDef.getExn() != null) {
+			value = varDef.getExn().accept(visitor);
+		}
 		BytecodeValue refValue = new BytecodeRef(value);
 		context.addToContext(name, refValue);
 		return context;
@@ -46,7 +49,10 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	public BytecodeContext visit(ValDef valDef) {
 		String name = valDef.getName();
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
-		BytecodeValue value = valDef.getExn().accept(visitor);
+		BytecodeValue value = null;
+		if(valDef.getExn() != null) {
+			value = valDef.getExn().accept(visitor);
+		}
 		context.addToContext(name, value);
 		return context;
 	}

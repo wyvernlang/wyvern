@@ -27,4 +27,9 @@ public class BytecodeClass implements BytecodeValue {
 	public BytecodeContext getContext() {
 		return coreContext;
 	}
+	
+	@Override
+	public String toString() {
+		return "a class instance";
+	}
 }

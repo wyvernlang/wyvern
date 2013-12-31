@@ -17,4 +17,9 @@ public class BytecodeClassDef extends BytecodeClass {
 	public BytecodeValue getCompleteClass() {
 		return new BytecodeClass(new BytecodeContextImpl(fullContext));
 	}
+
+	@Override
+	public String toString() {
+		return "a class definition";
+	}
 }

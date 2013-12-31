@@ -35,8 +35,12 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
 	@Override
 	public BytecodeValue visit(Inv inv) {
-		// TODO Auto-generated method stub
-		return null;
+		BytecodeClass clas = (BytecodeClass) inv.getSource().accept(opVisitor);
+		BytecodeValue val = clas.getContext().getValue(inv.getId()).dereference();
+		if(val instanceof BytecodeFunction) {
+			((BytecodeFunction) val).setThis(clas);
+		}
+		return val;
 	}
 
 	@Override

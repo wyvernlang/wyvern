@@ -10,10 +10,15 @@ import wyvern.DSL.DSL;
 import wyvern.targets.Common.WyvernIL.ExnFromAST;
 import wyvern.targets.Common.WyvernIL.TLFromAST;
 import wyvern.targets.Common.WyvernIL.Def.Def.Param;
+import wyvern.targets.Common.WyvernIL.Def.ValDef;
+import wyvern.targets.Common.WyvernIL.Stmt.Assign;
+import wyvern.targets.Common.WyvernIL.Stmt.Defn;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.BytecodeContextImpl;
 import wyvern.tools.bytecode.core.Interpreter;
+import wyvern.tools.bytecode.values.BytecodeClass;
+import wyvern.tools.bytecode.values.BytecodeClassDef;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeValue;
 import wyvern.tools.typedAST.core.expressions.New;
@@ -34,15 +39,18 @@ public class TestUtil {
 											// beginning of a test for some
 											// instruction/context prints
 	protected Interpreter interperter;
-	protected BytecodeValue func;			// an empty function declaration
-											// to be used as value comparison
-											// for the isInContext checks
+	protected BytecodeValue func,clas,clasDef;	// empty type declarations
+												// to be used as values in
+												// the isInContext method
+	
 
 	@Before
 	public void setUp() throws Exception {
 		List<Param> params = new ArrayList<Param>();
 		List<Statement> statements = new ArrayList<Statement>();
 		func = new BytecodeFunction(params,statements,new BytecodeContextImpl(), "");
+		clas = new BytecodeClass(new BytecodeContextImpl());
+		clasDef = new BytecodeClass(new BytecodeContextImpl());
 	}
 
 	@After
@@ -82,6 +90,20 @@ public class TestUtil {
 				new ArrayList<DSL>());
 		List<Statement> statements = getResult(pair);
 		
+		/*
+		 * temporary change start
+		 *
+		
+		Assign assign = (Assign) statements.get(1);
+		ValDef valDef = new ValDef("temp$4", assign.getSrc());
+		Defn defn = new Defn(valDef);
+		statements.remove(assign);
+		statements.add(1, defn);
+		
+		 *
+		 * temporary change end
+		 */
+		
 		if(PRINTS_ON) {
 			System.out.println("Instructions:");
 			for (Statement statement : statements) {
@@ -116,7 +138,25 @@ public class TestUtil {
 			try {
 				BytecodeValue val = context.getValue(names[i]).dereference();
 				if(val instanceof BytecodeFunction) {
-					continue;
+					if(vals[i] instanceof BytecodeFunction) {
+						continue;
+					} else {
+						return false;
+					}
+				}
+				if(val instanceof BytecodeClass) {
+					if(vals[i] instanceof BytecodeClass) {
+						continue;
+					} else {
+						return false;
+					}
+				}
+				if(val instanceof BytecodeClassDef) {
+					if(vals[i] instanceof BytecodeClassDef) {
+						continue;
+					} else {
+						return false;
+					}
 				}
 				if(!val.equals(vals[i])) {
 					return false;
