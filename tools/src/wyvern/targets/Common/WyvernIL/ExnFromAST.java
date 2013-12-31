@@ -116,7 +116,9 @@ public class ExnFromAST implements CoreASTVisitor {
 	private ClassDef getClassDef(ClassDeclaration cd) {
 		List<Definition> definitions = new LinkedList<>();
 		List<Definition> classDefs = new LinkedList<>();
+
 		List<Statement> inializer = new LinkedList<>();
+
 		for (Declaration decl : cd.getDecls().getDeclIterator()) {
 			if (decl instanceof DefDeclaration) {
 				List<Statement> bodyAST = getBodyAST(((DefDeclaration) decl).getBody());
@@ -129,7 +131,6 @@ public class ExnFromAST implements CoreASTVisitor {
 				TLFromAST gen = TLFromASTApply(((ValDeclaration) decl).getDefinition());
 				if (gen != null) {
 					inializer.addAll(gen.getStatements());
-					inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
 				}
 				Expression expr = null;
 				if (gen != null)
@@ -141,8 +142,9 @@ public class ExnFromAST implements CoreASTVisitor {
 					definitions.add(e);
 			} else if (decl instanceof VarDeclaration) {
 				TLFromAST gen = TLFromASTApply(((VarDeclaration) decl).getDefinition());
-				inializer.addAll(gen.getStatements());
-				inializer.add(new Assign(new Inv(new VarRef("this"),decl.getName()), gen.getExpr()));
+				if (gen != null) {
+					inializer.addAll(gen.getStatements());
+				}
 				Expression expr = null;
 				if (gen != null)
 					expr = gen.getExpr();

@@ -97,7 +97,7 @@ public class TLFromAST implements CoreASTVisitor {
 		
 		TLFromAST argVisitor = TLFromASTApply(arg);
 		TLFromAST recVisitor = TLFromASTApply(rec);
-		VarRef temp = getTemp(), invRes = getTemp(), argsRes = getTemp();
+		VarRef temp = getTemp(), argsRes = getTemp();
 		if (arg != null) {
 			VarRef res = getTemp();
 			this.statements.addAll(recVisitor.getStatements());
@@ -110,7 +110,7 @@ public class TLFromAST implements CoreASTVisitor {
 		}
 
 		this.statements.addAll(recVisitor.getStatements());
-		this.statements.add(new Assign(new Immediate(temp), recVisitor.getExpr()));
+		this.statements.add(new Defn(new ValDef(temp.getName(), recVisitor.getExpr())));
 		this.expr = new Inv(temp, name);
 	}
 
