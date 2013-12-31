@@ -161,7 +161,7 @@ public class ExnFromAST implements CoreASTVisitor {
 				classDefs.add(classDef);
 			}
 		}
-		definitions.add(new Def("$init", new LinkedList<Def.Param>(), inializer));
+		classDefs.add(new Def("$init", new LinkedList<Def.Param>(), inializer));
 		return new ClassDef(cd.getName(), definitions, classDefs);
 	}
 
