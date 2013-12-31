@@ -42,7 +42,11 @@ public class ClassDef implements Definition {
 		for (Definition def : definitions) {
 			sb.add(def.toString());
 		}
+		List<String> ssb = new LinkedList<>();
+		for (Definition def : classDefinitions) {
+			ssb.add(def.toString());
+		}
 
-		return "class "+name+" {"+ WyvIL.join(sb, "; ") +"}";
+		return "class "+name+" { static {" + WyvIL.join(ssb, "; ") + "}; "+ WyvIL.join(sb, "; ") +"}";
 	}
 }
