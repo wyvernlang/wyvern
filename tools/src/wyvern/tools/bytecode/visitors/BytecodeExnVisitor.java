@@ -37,6 +37,9 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	@Override
 	public BytecodeValue visit(Inv inv) {
 		BytecodeClass clas = (BytecodeClass) inv.getSource().accept(opVisitor);
+		if(clas.getContext().getValue(inv.getId()) == null) {
+			throw new RuntimeException("invoked a null");
+		}
 		BytecodeValue val = clas.getContext().getValue(inv.getId()).dereference();
 		if(val instanceof BytecodeFunction) {
 			((BytecodeFunction) val).setThis(clas);
@@ -79,18 +82,19 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	public BytecodeValue visit(New aNew) {
 		BytecodeContext newContext;
 		List<Definition> defs = aNew.getDefs();
-		BytecodeValue thisObject = context.getValue("this");
-		BytecodeValue newClass;
+		BytecodeValue thisObject = context.getValue("this").dereference();
+		BytecodeClass newClass;
 		if(thisObject != null) {
 			BytecodeClassDef thisClass = (BytecodeClassDef) thisObject;
 			newContext = new BytecodeContextImpl(thisClass.getContext());
-			newClass = thisClass.getCompleteClass();
+			newClass = (BytecodeClass) thisClass.getCompleteClass();
 		} else {
 			newContext = context;
 			newClass = new BytecodeClass(newContext);
 		}
+		BytecodeContext tempContext = new BytecodeContextImpl(context);
 		for(Definition def : defs) {
-			newContext = def.accept(new BytecodeDefVisitor(newContext));
+			def.accept(new BytecodeDefVisitor(newClass.getContext(),tempContext));
 		}
 		return newClass;
 	}

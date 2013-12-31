@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import wyvern.tools.bytecode.values.BytecodeFunction;
+import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 /**
@@ -41,7 +42,7 @@ public class BytecodeContextImpl implements BytecodeContext {
 		if (!context.containsKey(valName)) {
 			String msg = "searching for value that doesn't exist in context: "
 					+ valName;
-			System.out.println(this);
+			System.err.println(this);
 			throw new RuntimeException(msg);
 		}
 		return context.get(valName);
@@ -87,6 +88,8 @@ public class BytecodeContextImpl implements BytecodeContext {
 
 	@Override
 	public void setThis(BytecodeValue thisClass) {
-		context.put("this", thisClass);
+		//context.put("this", thisClass);
+		BytecodeRef ref = (BytecodeRef) context.get("this");
+		ref.setValue(thisClass);
 	}
 }

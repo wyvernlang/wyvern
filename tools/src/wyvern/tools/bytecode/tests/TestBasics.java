@@ -23,6 +23,8 @@ public class TestBasics extends TestUtil {
 
 	@Test
 	public void assignTest() {
+		
+		PRINTS_ON = false;
 				
 		String s = 	"var x : Int = 1 	\n"
 				+ 	"x = 3 				\n"
@@ -38,6 +40,8 @@ public class TestBasics extends TestUtil {
 	
 	@Test
 	public void defnTest() {
+		
+		PRINTS_ON = false;
 
 		String s = 	"val x : Int = 2 + 2 					\n"
 				+ 	"val y : Int = 2 * x 					\n"
@@ -61,6 +65,8 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void gotoLabelIfstmtTest() {
 		
+		PRINTS_ON = false;
+		
 		String s =	"var x:Int = 5 		\n" 
 				+	"var y:Int = 0 		\n" 
 				+ 	"while x > 0 		\n" 
@@ -77,6 +83,8 @@ public class TestBasics extends TestUtil {
 	
 	@Test
 	public void gotoLabelIfstmtTest2() {
+		
+		PRINTS_ON = false;
 				
 		String s =	"val x = if true	\n" 
 				+ 	"	then 			\n" 
@@ -94,6 +102,8 @@ public class TestBasics extends TestUtil {
 	
 	@Test
 	public void gotoLabelIfstmtTest3() {
+		
+		PRINTS_ON = false;
 				
 		String s =	"val y = 16 		\n"
 				+ 	"val x = 43 		\n"
@@ -113,6 +123,8 @@ public class TestBasics extends TestUtil {
 	
 	@Test
 	public void gotoLabelIfstmtTest4() {
+		
+		PRINTS_ON = false;
 				
 		String s =	"val y = 16 			\n"
 				+ 	"val x = 43 			\n"
@@ -132,6 +144,8 @@ public class TestBasics extends TestUtil {
 	
 	@Test
 	public void gotoLabelIfstmtTest5() {
+		
+		PRINTS_ON = false;
 				
 		String s =	"if false || true 	\n" 
 				+ 	"	then 			\n" 

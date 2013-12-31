@@ -19,6 +19,8 @@ public class TestFunctions extends TestUtil {
 	@Test
 	public void defineFunction() {
 		
+		PRINTS_ON = false;
+		
 		String s =	"val fun1 = fn x : Int => x + 1 						\n"
 				+ 	"val fun2 = fn f : Int -> Int => fn x : Int => f(f(x))	\n"
 				+ 	"def fun3(z : Int) : Int								\n"
@@ -34,6 +36,8 @@ public class TestFunctions extends TestUtil {
 	
 	@Test
 	public void invokeFunction() {
+		
+		PRINTS_ON = false;
 		
 		String s =	"def mult(n:Int,m:Int):Int = n+5*m 		\n"
 				+	"val x = mult(3,2) 						\n"
@@ -52,6 +56,8 @@ public class TestFunctions extends TestUtil {
 	@Test
 	public void invokeFunction2() {
 		
+		PRINTS_ON = false;
+		
 		String s =	"val x = (fn x : Int => x + 1)(3)";
 
 		BytecodeValue res = runTest(s);	
@@ -64,6 +70,8 @@ public class TestFunctions extends TestUtil {
 	
 	@Test
 	public void invokeFunction3() {
+		
+		PRINTS_ON = false;
 		
 		String s =	"var x : Int = 3 						\n"
 				+ 	"def mult(n:Int,m:Int):Int = (n+m)*x 	\n"
@@ -79,6 +87,8 @@ public class TestFunctions extends TestUtil {
 	
 	@Test
 	public void invokeFunction4() {
+		
+		PRINTS_ON = false;
 		
 		String s =	"var x : Int = 3				\n"
 				+ 	"def mult(n:Int,m:Int):Int		\n"
@@ -97,6 +107,8 @@ public class TestFunctions extends TestUtil {
 	@Test
 	public void invokeFunction5() {
 		
+		PRINTS_ON = false;
+		
 		String s =	"var x : Int = 3 				\n"
 				+ 	"def mult(n:Int,m:Int):Int 		\n"
 				+ 	" val y = 4 					\n"
@@ -113,6 +125,8 @@ public class TestFunctions extends TestUtil {
 	
 	@Test
 	public void functionCallsFunction() {
+		
+		PRINTS_ON = false;
 		
 		String s =	"def add(x:Int,y:Int):Int 		\n"
 				+ 	"	x + y 						\n"
@@ -137,6 +151,8 @@ public class TestFunctions extends TestUtil {
 	@Test
 	public void nestedFunction() {
 		
+		PRINTS_ON = false;
+		
 		String s =	"def mult(n:Int,m:Int):Int 		\n"
 				+ 	"	def add(x:Int,y:Int):Int 	\n"
 				+ 	"		x + y 					\n"
@@ -159,6 +175,8 @@ public class TestFunctions extends TestUtil {
 	
 	@Test
 	public void recursiveFunction() {
+		
+		PRINTS_ON = false;
 						
 		String s =	"def factorial(n:Int):Int 	\n" 
 				+	" if n==1 					\n"

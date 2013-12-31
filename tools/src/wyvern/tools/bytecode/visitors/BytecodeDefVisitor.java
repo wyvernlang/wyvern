@@ -22,6 +22,8 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 
 	private final BytecodeContext context;
+	private final BytecodeContext evalContext; // context to evaluate against
+											   // will also be changed
 	
 	/**
 	 * sets up the visitor with a context to work with
@@ -29,31 +31,38 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	 * 		the context of the program at this point
 	 */
 	public BytecodeDefVisitor(BytecodeContext visContext) {
-		context = visContext;
+		this(visContext,visContext);
+	}
+	
+	public BytecodeDefVisitor(BytecodeContext changeContext, BytecodeContext evaluateContext) {
+		context = changeContext;
+		evalContext = evaluateContext;
 	}
 	
 	@Override
 	public BytecodeContext visit(VarDef varDef) {
 		String name = varDef.getName();
-		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
+		BytecodeExnVisitor visitor = new BytecodeExnVisitor(evalContext);
 		BytecodeValue value = null;
 		if(varDef.getExn() != null) {
 			value = varDef.getExn().accept(visitor);
 		}
 		BytecodeValue refValue = new BytecodeRef(value);
 		context.addToContext(name, refValue);
+		evalContext.addToContext(name, refValue);
 		return context;
 	}
 
 	@Override
 	public BytecodeContext visit(ValDef valDef) {
 		String name = valDef.getName();
-		BytecodeExnVisitor visitor = new BytecodeExnVisitor(context);
+		BytecodeExnVisitor visitor = new BytecodeExnVisitor(evalContext);
 		BytecodeValue value = null;
 		if(valDef.getExn() != null) {
 			value = valDef.getExn().accept(visitor);
 		}
 		context.addToContext(name, value);
+		evalContext.addToContext(name, value);
 		return context;
 	}
 
@@ -69,27 +78,27 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	public BytecodeContext visit(Def def) {
 		List<Statement> body = def.getBody();
 		String name = def.getName();
+		System.out.println("defining " + def.getName());
 		List<Param> params = def.getParams();
-		BytecodeValue val = new BytecodeFunction(params, body, context, name);
+		BytecodeValue val = new BytecodeFunction(params, body, evalContext, name);
 		context.addToContext(name, val);
+		evalContext.addToContext(name, val);
 		return context;
 	}
 
+	//TODO evalContext
 	@Override
 	public BytecodeContext visit(ClassDef classDef) {
-		BytecodeContext newContext = new BytecodeContextImpl(context);
+		BytecodeContext newContext = new BytecodeContextImpl(evalContext);
 		List<Definition> classDefs = classDef.getClassDefinitions();
 		List<Definition> defs = classDef.getDefinitions();
 		for(Definition def : classDefs) {
 			newContext = def.accept(new BytecodeDefVisitor(newContext));
 		}
-		BytecodeContext fullContext = new BytecodeContextImpl(newContext);
-		for(Definition def : defs) {
-			fullContext = def.accept(new BytecodeDefVisitor(fullContext));
-		}
 		String name = classDef.getName();
-		BytecodeValue val = new BytecodeClassDef(newContext,fullContext,name);
+		BytecodeValue val = new BytecodeClassDef(newContext,defs,name);
 		context.addToContext(name, val);
+		evalContext.addToContext(name, val);
 		return context;
 	}
 }
