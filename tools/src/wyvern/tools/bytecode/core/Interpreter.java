@@ -77,10 +77,25 @@ public class Interpreter {
 	 * 		a BytecodeValue object representing the last value encountered
 	 */
 	public BytecodeValue execute() {
-		while (pc < statements.size()) {
-			step();
+			while (pc < statements.size()) {
+				step();
+			}
+			return finalValue;
+	}
+	
+	public BytecodeValue executeDBG() {
+		try {
+			while (pc < statements.size()) {
+				step();
+			}
+			return finalValue;
+		} catch(RuntimeException e) {
+			System.err.println(e.getMessage());
+			System.err.println(statements.get(--pc));
+			System.err.println("~~~~~~~~");
+			System.err.println(currentContext);
+			throw e;
 		}
-		return finalValue;
 	}
 	
 	/**

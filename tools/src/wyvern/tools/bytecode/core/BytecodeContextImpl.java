@@ -8,8 +8,9 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 
 /**
  * implementation of the BytecodeContext interface
+ * 
  * @author Tal
- *
+ * 
  */
 public class BytecodeContextImpl implements BytecodeContext {
 
@@ -18,15 +19,16 @@ public class BytecodeContextImpl implements BytecodeContext {
 	public BytecodeContextImpl() {
 		context = new HashMap<String, BytecodeValue>();
 	}
-	
+
 	/**
 	 * copy constructor for the context
+	 * 
 	 * @param c
-	 * 		the context to be copied
+	 *            the context to be copied
 	 */
 	public BytecodeContextImpl(BytecodeContext c) {
 		this();
-		context.putAll(((BytecodeContextImpl)c).context);
+		context.putAll(((BytecodeContextImpl) c).context);
 	}
 
 	@Override
@@ -37,42 +39,44 @@ public class BytecodeContextImpl implements BytecodeContext {
 	@Override
 	public BytecodeValue getValue(String valName) {
 		if (!context.containsKey(valName)) {
-			String msg = "searching for value that doesn't exist in context";
+			String msg = "searching for value that doesn't exist in context: "
+					+ valName;
+			System.out.println(this);
 			throw new RuntimeException(msg);
 		}
 		return context.get(valName);
 	}
-	
+
 	@Override
 	public void addToContext(String name, BytecodeValue val) {
-		context.put(name,val);
+		context.put(name, val);
 	}
-	
+
 	@Override
 	public String toString() {
 		return contextToString(false);
 	}
-	
+
 	@Override
 	public String toSimpleString() {
 		return contextToString(true);
 	}
-	
+
 	/**
 	 * helper method for prints
+	 * 
 	 * @param simple
-	 * 		whether we require a simplified version of the context or not
-	 * @return
-	 * 		a string representing the contents of the context
+	 *            whether we require a simplified version of the context or not
+	 * @return a string representing the contents of the context
 	 */
 	private String contextToString(boolean simple) {
 		StringBuilder sb = new StringBuilder();
-		for(String s : context.keySet()) {
-			if(simple && s.contains("$")) {
+		for (String s : context.keySet()) {
+			if (simple && s.contains("$")) {
 				continue;
 			}
 			BytecodeValue val = context.get(s);
-			if(val instanceof BytecodeFunction) {
+			if (val instanceof BytecodeFunction) {
 				sb.append(s + val + "\n");
 			} else {
 				sb.append(s + " = " + val + "\n");

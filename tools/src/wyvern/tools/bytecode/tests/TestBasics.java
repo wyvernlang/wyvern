@@ -24,9 +24,9 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void assignTest() {
 				
-		String s = 	"var x : Int = 1 \n"
-				+ 	"x = 3 \n"
-				+ 	"val y = 5";
+		String s = 	"var x : Int = 1 	\n"
+				+ 	"x = 3 				\n"
+				+ 	"val y = 5			\n";
 		
 		BytecodeValue res = runTest(s);	
 
@@ -39,10 +39,10 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void defnTest() {
 
-		String s = 	"val x : Int = 2 + 2 \n"
-				+ 	"val y : Int = 2 * x \n"
-				+ 	"val z : Str = \"Hello \" + \"World\"\n"
-				+	"val w = (x,y,z)";
+		String s = 	"val x : Int = 2 + 2 					\n"
+				+ 	"val y : Int = 2 * x 					\n"
+				+ 	"val z : Str = \"Hello \" + \"World\"	\n"
+				+	"val w = (x,y,z)						\n";
 
 		BytecodeValue res = runTest(s);	
 
@@ -61,11 +61,11 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void gotoLabelIfstmtTest() {
 		
-		String s =	"var x:Int = 5 \n" 
-				+	"var y:Int = 0 \n" 
-				+ 	"while x > 0 \n" 
-				+ 	"	x = x-1 \n"
-				+	"	y = y+1 \n";
+		String s =	"var x:Int = 5 		\n" 
+				+	"var y:Int = 0 		\n" 
+				+ 	"while x > 0 		\n" 
+				+ 	"	x = x-1 		\n"
+				+	"	y = y+1 		\n";
 		
 		BytecodeValue res = runTest(s);	
 
@@ -78,11 +78,11 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void gotoLabelIfstmtTest2() {
 				
-		String s =	"val x = if true \n" 
-				+ 	"	then \n" 
-				+	"		1 \n" 
-				+	"	else \n" 
-				+	"		2 \n";
+		String s =	"val x = if true	\n" 
+				+ 	"	then 			\n" 
+				+	"		1 			\n" 
+				+	"	else 			\n" 
+				+	"		2 			\n";
 
 		BytecodeValue res = runTest(s);
 		
@@ -95,13 +95,13 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void gotoLabelIfstmtTest3() {
 				
-		String s =	"val y = 16 \n"
-				+ 	"val x = 43 \n"
-				+ 	"if x > y \n" 
-				+ 	"	then \n" 
-				+	"		\"Yes\" \n" 
-				+	"	else \n" 
-				+	"		\"No\" \n";
+		String s =	"val y = 16 		\n"
+				+ 	"val x = 43 		\n"
+				+ 	"if x > y 			\n" 
+				+ 	"	then 			\n" 
+				+	"		\"Yes\" 	\n" 
+				+	"	else 			\n" 
+				+	"		\"No\" 		\n";
 
 		BytecodeValue res = runTest(s);
 		
@@ -114,13 +114,13 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void gotoLabelIfstmtTest4() {
 				
-		String s =	"val y = 16 \n"
-				+ 	"val x = 43 \n"
-				+ 	"if x > y && x < y \n" 
-				+ 	"	then \n" 
-				+	"		\"Yes\" \n" 
-				+	"	else \n" 
-				+	"		\"No\" \n";
+		String s =	"val y = 16 			\n"
+				+ 	"val x = 43 			\n"
+				+ 	"if x > y && x < y 		\n" 
+				+ 	"	then 				\n" 
+				+	"		\"Yes\" 		\n" 
+				+	"	else 				\n" 
+				+	"		\"No\" 			\n";
 
 		BytecodeValue res = runTest(s);
 		
@@ -133,11 +133,11 @@ public class TestBasics extends TestUtil {
 	@Test
 	public void gotoLabelIfstmtTest5() {
 				
-		String s =	"if false || true \n" 
-				+ 	"	then \n" 
-				+	"		\"Yes\" \n" 
-				+	"	else \n" 
-				+	"		\"No\" \n";
+		String s =	"if false || true 	\n" 
+				+ 	"	then 			\n" 
+				+	"		\"Yes\" 	\n" 
+				+	"	else 			\n" 
+				+	"		\"No\" 		\n";
 
 		BytecodeValue res = runTest(s);
 		

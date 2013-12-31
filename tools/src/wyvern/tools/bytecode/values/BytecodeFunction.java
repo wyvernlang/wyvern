@@ -2,6 +2,7 @@ package wyvern.tools.bytecode.values;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import wyvern.targets.Common.WyvernIL.Def.Def.Param;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
@@ -36,6 +37,7 @@ public class BytecodeFunction implements BytecodeValue {
 		coreContext = new BytecodeContextImpl(context);
 		coreContext.addToContext(name, this);
 		coreContext.addToContext("this", null);
+		
 	}
 
 	/**

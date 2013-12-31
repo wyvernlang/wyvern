@@ -15,6 +15,7 @@ public class BytecodeClassDef extends BytecodeClass {
 	}
 	
 	public BytecodeValue getCompleteClass() {
+		
 		return new BytecodeClass(new BytecodeContextImpl(fullContext));
 	}
 

@@ -2,6 +2,7 @@ package wyvern.tools.bytecode.visitors;
 
 import wyvern.targets.Common.WyvernIL.Expr.Expression;
 import wyvern.targets.Common.WyvernIL.Expr.Immediate;
+import wyvern.targets.Common.WyvernIL.Expr.Inv;
 import wyvern.targets.Common.WyvernIL.Imm.VarRef;
 import wyvern.targets.Common.WyvernIL.Stmt.Assign;
 import wyvern.targets.Common.WyvernIL.Stmt.Defn;
@@ -14,6 +15,7 @@ import wyvern.targets.Common.WyvernIL.visitor.StatementVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.Interpreter;
 import wyvern.tools.bytecode.values.BytecodeBoolean;
+import wyvern.tools.bytecode.values.BytecodeClass;
 import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
@@ -41,14 +43,27 @@ public class BytecodeStatementVisitor implements
 	/*
 	 * assumption: 
 	 * dest will always be an Immediate with expression of type VarRef
+	 * or an Inv that will lead to a BytecodeRef in a class
 	 */
 	@Override
 	public BytecodeContext visit(Assign assign) {
-		Immediate imm = (Immediate) assign.getDest();
-		VarRef ref = (VarRef) imm.getInner();
-		BytecodeRef dst = (BytecodeRef) context.getValue(ref.getName());
+		Expression destExpr = assign.getDest();
+		BytecodeRef dest;
+		if(destExpr instanceof Inv) {
+			Inv inv = (Inv) destExpr;
+			BytecodeOperandVisitor opVisitor = new BytecodeOperandVisitor(context);
+			BytecodeClass clas = (BytecodeClass) inv.getSource().accept(opVisitor);
+			BytecodeValue val = clas.getContext().getValue(inv.getId());
+			dest = (BytecodeRef) val;
+		} else if(destExpr instanceof Immediate) {
+			Immediate imm = (Immediate) destExpr;
+			VarRef ref = (VarRef) imm.getInner();
+			dest = (BytecodeRef) context.getValue(ref.getName());
+		} else {
+			throw new RuntimeException("assignment not using Inv or Imm");
+		}
 		BytecodeValue src = assign.getSrc().accept(visitor);
-		dst.setValue(src);
+		dest.setValue(src);
 		return context;
 	}
 
@@ -71,7 +86,6 @@ public class BytecodeStatementVisitor implements
 
 	@Override
 	public BytecodeContext visit(Pure pure) {
-		// evaluate the expression but don't save it anywhere right now
 		Expression expression = pure.getExpression();
 		if(expression != null) {
 			interperter.setFinalVals(expression.accept(visitor),UNSAVED_MESSAGE);
@@ -80,7 +94,8 @@ public class BytecodeStatementVisitor implements
 	}
 
 	/*
-	 * currently unused in implementation
+	 * currently unused in implementation (compiler doesn't generate Return)
+	 * therefore this method has never been tested
 	 */
 	@Override
 	public BytecodeContext visit(Return aReturn) {

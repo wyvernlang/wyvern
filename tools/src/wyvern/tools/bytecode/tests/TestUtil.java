@@ -89,20 +89,7 @@ public class TestUtil {
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs,
 				new ArrayList<DSL>());
 		List<Statement> statements = getResult(pair);
-		
-		/*
-		 * temporary change start
-		 *
-		
-		Assign assign = (Assign) statements.get(1);
-		ValDef valDef = new ValDef("temp$4", assign.getSrc());
-		Defn defn = new Defn(valDef);
-		statements.remove(assign);
-		statements.add(1, defn);
-		
-		 *
-		 * temporary change end
-		 */
+		interperter = new Interpreter(statements);
 		
 		if(PRINTS_ON) {
 			System.out.println("Instructions:");
@@ -112,7 +99,6 @@ public class TestUtil {
 			}
 		}
 
-		interperter = new Interpreter(statements);
 		BytecodeValue res = interperter.execute();
 		
 		if(PRINTS_ON) {
