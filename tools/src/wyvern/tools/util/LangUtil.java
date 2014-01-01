@@ -12,4 +12,9 @@ public class LangUtil {
 	public static boolean isSubtype(Type check, Type against) {
 		return check.subtype(against);
 	}
+
+	//Java: why did you have to erase generics?
+	public static String castString(Object src) {
+		return (String) src;
+	}
 }
