@@ -71,8 +71,9 @@ public class ExnFromAST implements CoreASTVisitor {
 	@Override
 	public void visit(VarDeclaration valDeclaration) {
 		TLFromAST tlator = TLFromASTApply(valDeclaration.getDefinition());
-		statements.addAll(tlator.getStatements());
-		statements.add(new Defn(new VarDef(valDeclaration.getName(), tlator.getExpr())));
+		if (tlator != null)
+			statements.addAll(tlator.getStatements());
+		statements.add(new Defn(new VarDef(valDeclaration.getName(), (tlator != null)?tlator.getExpr():null)));
 	}
 	@Override
 	public void visit(ClassDeclaration clsDeclaration) {
