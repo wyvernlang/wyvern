@@ -50,8 +50,10 @@ public class TypeParser {
 
 					Type[] nt;
 					if (iptype instanceof Tuple) {
-						nt = new Type[((Tuple) iptype).getTypes().length + 1];
+						int length = ((Tuple) iptype).getTypes().length;
+						nt = new Type[length + 1];
 						System.arraycopy(((Tuple) iptype).getTypes(),0,nt,0,((Tuple) iptype).getTypes().length);
+						nt[length] = intype;
 					} else {
 						nt = new Type[] { iptype, intype };
 					}
