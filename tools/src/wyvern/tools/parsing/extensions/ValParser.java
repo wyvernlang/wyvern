@@ -10,6 +10,7 @@ import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.Symbol;
+import wyvern.tools.typedAST.core.binding.LateBinder;
 import wyvern.tools.typedAST.core.binding.LateNameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -19,6 +20,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.Reference;
 
 public class ValParser implements DeclParser {
     private ValParser() {
@@ -69,11 +71,12 @@ public class ValParser implements DeclParser {
             ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, restctx.getTokens());
             nc = null;
         }
+		final Reference<Type> typeRef = new Reference<>(type);
         final Type parsedType = type;
 
         final ValDeclaration intermvd = nc;
         return new Pair<Environment, ContParser>(
-                Environment.getEmptyEnvironment().extend(new NameBindingImpl(valName, parsedType)),
+                Environment.getEmptyEnvironment().extend(new LateNameBinding(valName, typeRef.getBinder())),
                 new ContParser() {
                     @Override
                     public TypedAST parse(EnvironmentResolver r) {
@@ -85,6 +88,7 @@ public class ValParser implements DeclParser {
                         } else {
                             type = parsedType;
                         }
+						typeRef.set(type);
                         return new ValDeclaration(valName, type, definition, valNameLocation);
                     }
                 });
