@@ -9,7 +9,7 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 
 public class TestClass extends TestUtil {
 
-/*	@Test 
+	@Test 
 	public void defineSimpleClassAndInstance() {
 		
 		PRINTS_ON = false;
@@ -24,11 +24,11 @@ public class TestClass extends TestUtil {
 				+ 	"hello.getV()									\n";
 		
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "13");
 		
 		String[] names = { "Hello" };
 		BytecodeValue[] vals = { clasDef };
-		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "13");	
+		assertTrue(isInContext(names,vals));		
 	}
 
 	@Test
@@ -46,11 +46,11 @@ public class TestClass extends TestUtil {
 				+	" tX.getX()                  \n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "2");
 		
 		String[] names = { "X", "tX" };
 		BytecodeValue[] vals = { clasDef, clas };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "2");	
 	}	
 	
 	@Test
@@ -71,17 +71,17 @@ public class TestClass extends TestUtil {
 			    +	"b() + a()                         	\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "3");	
 		
 		String[] names = { "X", "c", "a", "b" };
 		BytecodeValue[] vals = { clasDef, clas, func, func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "3");	
-	}*/
+	}
 	
 	@Test
 	public void simpleTest() {
 		
-		PRINTS_ON = true;
+		PRINTS_ON = false;
 				
 		String s = 	"val y:Int = 12 + 4          	\n"
 				+	"class X                       	\n"
@@ -93,17 +93,17 @@ public class TestClass extends TestUtil {
 				+	"X.create().get()              	\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "16");	
 		
 		String[] names = { "X", "y" };
 		BytecodeValue[] vals = { clasDef, new BytecodeInt(16) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "16");	
 	}
-/*	
+	
 	@Test
 	public void initTest() {
 		
-		PRINTS_ON = true;
+		PRINTS_ON = false;
 				
 		String s = 	"class X                       	\n"
 				+	"   val z:Int = 4 * 2          	\n"
@@ -114,11 +114,85 @@ public class TestClass extends TestUtil {
 				+	"X.create().get()              	\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "8");
 		
 		String[] names = { "X" };
 		BytecodeValue[] vals = { clasDef };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "8");	
-	}*/
+	}
+	
+	@Test
+	public void initAndThisTest() {
+		
+		PRINTS_ON = false;
+				
+		String s = 	"class X                       	\n"
+				+	"   var z:Int = 4 * 2          	\n"
+				+	"   def increase() : Int		\n"
+				+ 	"      this.z = this.z + 1		\n"
+				+ 	"      this.z					\n"
+				+	"   def get():Int              	\n"
+				+	"      this.z                  	\n"
+				+	"   class def create() : X     	\n"
+				+	"      new                     	\n"
+				+	"val x1 : X = X.create()		\n"
+				+ 	"var z1 : Int = x1.increase()	\n"
+				+ 	"val x2 : X = X.create()		\n"
+				+ 	"var z2 : Int = x2.increase()	\n"
+				+ 	"val z3 : Int = x2.increase()	\n";
+
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");	
+		
+		String[] names = { "X", "x1", "x2", "z1", "z2", "z3" };
+		BytecodeInt nine = new BytecodeInt(9);
+		BytecodeValue[] vals = { clasDef, clas, clas, nine, nine, new BytecodeInt(10) };
+		assertTrue(isInContext(names,vals));
+	}
+	
+	@Test
+	public void mutualDependencyTest() {
+		
+		PRINTS_ON = false;
+				
+		String s = 	"class X                       	\n"
+				+	"   var y:Y						\n"
+				+ 	"   class def make() : X 		\n"
+				+ 	"     new						\n"
+				+ 	"class Y						\n"
+				+ 	"   var x:X						\n"
+				+ 	"   class def make() : Y		\n"
+				+ 	"     new						\n"
+				+ 	"var x1 : X = X.make()			\n"
+				+ 	"var y1 : Y = Y.make()			\n";
+
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");	
+		
+		String[] names = { "X", "Y", "x1", "y1" };
+		BytecodeValue[] vals = { clasDef, clasDef, clas, clas };
+		assertTrue(isInContext(names,vals));
+	}
+	
+	@Test
+	public void classAndFieldTest() {
+		
+		PRINTS_ON = false;
+		
+		String s = 	"class Hello									\n"
+				+	"	class def make():Hello = new				\n"
+				+	"	def get4():Int = 4							\n"
+				+	"	def get5():Int = 5							\n"
+				+	"	def getP():Int = this.get4()+this.get5()	\n"
+				+	"val h:Hello = Hello.make()						\n"
+				+	"h.getP()										\n";
+
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "9");
+		
+		String[] names = { "Hello", "h" };
+		BytecodeValue[] vals = { clasDef, clas };
+		assertTrue(isInContext(names,vals));
+	}
 
 }

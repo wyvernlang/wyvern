@@ -42,7 +42,6 @@ public class BytecodeContextImpl implements BytecodeContext {
 		if (!context.containsKey(valName)) {
 			String msg = "searching for value that doesn't exist in context: "
 					+ valName;
-			System.err.println(this);
 			throw new RuntimeException(msg);
 		}
 		return context.get(valName);

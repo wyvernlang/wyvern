@@ -31,11 +31,11 @@ public class TestBasics extends TestUtil {
 				+ 	"val y = 5			\n";
 		
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "()");
 
 		String[] names = { "x", "y" };
 		BytecodeValue[] vals = { new BytecodeInt(3), new BytecodeInt(5) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");
 	}
 	
 	@Test
@@ -49,7 +49,8 @@ public class TestBasics extends TestUtil {
 				+	"val w = (x,y,z)						\n";
 
 		BytecodeValue res = runTest(s);	
-
+		assertEquals(res.toString(), "()");	
+		
 		String[] names = { "x", "y", "z", "w" };
 		List<BytecodeValue> tuple = new ArrayList<BytecodeValue>();
 		tuple.add(new BytecodeInt(4));
@@ -58,8 +59,7 @@ public class TestBasics extends TestUtil {
 		BytecodeValue[] vals = { new BytecodeInt(4), new BytecodeInt(8),
 							     new BytecodeString("Hello World"), 
 								 new BytecodeTuple(tuple)};
-		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");	
+		assertTrue(isInContext(names,vals));	
 	}
 
 	@Test
@@ -74,11 +74,11 @@ public class TestBasics extends TestUtil {
 				+	"	y = y+1 		\n";
 		
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "()");	
 
 		String[] names = { "x", "y" };
 		BytecodeValue[] vals = { new BytecodeInt(0), new BytecodeInt(5) };
-		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");	
+		assertTrue(isInContext(names,vals));	
 	}
 	
 	@Test
@@ -93,11 +93,11 @@ public class TestBasics extends TestUtil {
 				+	"		2 			\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");	
 		
 		String[] names = { "x" };
 		BytecodeValue[] vals = { new BytecodeInt(1) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");	
 	}	
 	
 	@Test
@@ -114,11 +114,11 @@ public class TestBasics extends TestUtil {
 				+	"		\"No\" 		\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "Yes");
 		
 		String[] names = {  };
 		BytecodeValue[] vals = {  };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "Yes");	
 	}	
 	
 	@Test
@@ -135,11 +135,11 @@ public class TestBasics extends TestUtil {
 				+	"		\"No\" 			\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "No");	
 		
 		String[] names = {  };
 		BytecodeValue[] vals = {  };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "No");	
 	}	
 	
 	@Test
@@ -154,10 +154,10 @@ public class TestBasics extends TestUtil {
 				+	"		\"No\" 		\n";
 
 		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "Yes");	
 		
 		String[] names = {  };
 		BytecodeValue[] vals = {  };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "Yes");	
 	}
 }

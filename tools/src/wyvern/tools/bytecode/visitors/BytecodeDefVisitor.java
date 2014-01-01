@@ -78,7 +78,6 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	public BytecodeContext visit(Def def) {
 		List<Statement> body = def.getBody();
 		String name = def.getName();
-		System.out.println("defining " + def.getName());
 		List<Param> params = def.getParams();
 		BytecodeValue val = new BytecodeFunction(params, body, evalContext, name);
 		context.addToContext(name, val);

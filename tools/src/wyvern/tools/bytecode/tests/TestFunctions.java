@@ -27,11 +27,11 @@ public class TestFunctions extends TestUtil {
 				+	"  z+1 													\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "()");	
 
 		String[] names = { "fun1", "fun2", "fun3" };
 		BytecodeValue[] vals = { func, func, func };
-		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");	 
+		assertTrue(isInContext(names,vals)); 
 	}
 	
 	@Test
@@ -45,12 +45,12 @@ public class TestFunctions extends TestUtil {
 				+ 	"val z = mult(1,1)						\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "()");
 
 		String[] names = { "x", "y", "z", "mult" };
 		BytecodeValue[] vals = { new BytecodeInt(13), new BytecodeInt(29),
 								 new BytecodeInt(6), func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");		
 	}
 	
 	@Test
@@ -60,12 +60,12 @@ public class TestFunctions extends TestUtil {
 		
 		String s =	"val x = (fn x : Int => x + 1)(3)";
 
-		BytecodeValue res = runTest(s);	
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");	
 
 		String[] names = { "x" };
 		BytecodeValue[] vals = { new BytecodeInt(4) };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "()");	
 	}
 	
 	@Test
@@ -78,11 +78,11 @@ public class TestFunctions extends TestUtil {
 				+ 	"mult(1,2)								\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "9");
 
 		String[] names = { "x", "mult" };
 		BytecodeValue[] vals = { new BytecodeInt(3) , func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "9");
 	}
 	
 	@Test
@@ -97,11 +97,11 @@ public class TestFunctions extends TestUtil {
 				+ 	"mult(1,2)						\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "2");
 
 		String[] names = { "x", "mult" };
 		BytecodeValue[] vals = { new BytecodeInt(4) , func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "2");
 	}
 	
 	@Test
@@ -116,11 +116,11 @@ public class TestFunctions extends TestUtil {
 				+ 	"mult(1,2)						\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "2");
 
 		String[] names = { "x", "mult" };
 		BytecodeValue[] vals = { new BytecodeInt(3) , func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "2");
 	}
 	
 	@Test
@@ -140,11 +140,11 @@ public class TestFunctions extends TestUtil {
 				+ 	"mult(5,5)						\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "25");
 
 		String[] names = { "add", "mult" };
 		BytecodeValue[] vals = { func , func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "25");
 	}
 	
 	
@@ -165,12 +165,11 @@ public class TestFunctions extends TestUtil {
 				+ 	"mult(3,6)						\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "18");
 
 		String[] names = { "mult" };
 		BytecodeValue[] vals = { func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "18");
-
 	}
 	
 	@Test
@@ -187,11 +186,44 @@ public class TestFunctions extends TestUtil {
 				+ 	"factorial(5)				\n";
 
 		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "120");
 
 		String[] names = { "factorial" };
 		BytecodeValue[] vals = { func };
 		assertTrue(isInContext(names,vals));
-		assertEquals(res.toString(), "120");
 	}
+/*	
+	@Test
+	public void funcReturnsTupleDef() {
 
+		PRINTS_ON = false;
+
+		String s = 	"def func() : Int*Int*Int	\n"
+				+ 	"	(1,2,3)					\n";
+
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");
+
+		String[] names = { "func" };
+		BytecodeValue[] vals = { func };
+		assertTrue(isInContext(names, vals));
+	}
+*/	
+	@Test
+	public void changeUnsetVar() {
+
+		PRINTS_ON = false;
+
+		String s = 	"var x : Int					\n"
+				+ 	"def setX(num : Int) : Unit		\n"
+				+ 	"	x = num						\n";
+
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "(5,23,41,60)");
+
+		String[] names = { "sortFour", "first", "second", "third", "fourth" };
+		BytecodeValue[] vals = { func, new BytecodeInt(5), new BytecodeInt(23),
+				new BytecodeInt(41), new BytecodeInt(60) };
+		assertTrue(isInContext(names, vals));
+	}
 }

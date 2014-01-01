@@ -90,10 +90,11 @@ public class Interpreter {
 			}
 			return finalValue;
 		} catch(RuntimeException e) {
+			//System.err.println("\n >>>>>	 ERROR	 <<<<<<");
 			//System.err.println(e.getMessage());
 			//System.err.println(statements.get(--pc));
-			//System.err.println("~~~~~~~~");
 			//System.err.println(currentContext);
+			//System.err.println(" >>>>>	      	 <<<<<<\n");
 			throw e;
 		}
 	}
