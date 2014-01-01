@@ -658,16 +658,38 @@ public class ParsingTestPhase2 {
 	}
 
 	@Test
-	public void tVals() {
+	public void tFun() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("def factorial(n:Int):Int \n"
 				+ " if n==1 \n"
 				+ "  then \n"
 				+ "   n \n"
 				+ "  else \n"
-				+ "   n * factorial(n-1)");
+				+ "   n * factorial(n-1)\n" +
+				"factorial(5)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		pair.typecheck(Environment.getEmptyEnvironment());
+		Value result = pair.evaluate(Environment.getEmptyEnvironment());
+		System.out.print("");
+	}
+
+	@Test
+	public void tNest() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("def add(x:Int,y:Int):Int \n"
+				+  "  x + y \n"
+				+  "def mult(n:Int,m:Int):Int \n"
+				+  " var z : Int = m \n"
+				+  " var sum : Int = 0 \n"
+				+  " while z > 0 \n"
+				+  "  sum = add(n,sum) \n"
+				+  "  z = z - 1 \n"
+				+  " sum \n"
+				+  "mult(5,5)");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		pair.typecheck(Environment.getEmptyEnvironment());
+		Value result = pair.evaluate(Environment.getEmptyEnvironment());
+		System.out.print("");
 	}
 	/*
 	//Fails: instance methods show up in the static context

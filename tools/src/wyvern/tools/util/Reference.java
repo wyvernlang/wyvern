@@ -1,5 +1,7 @@
 package wyvern.tools.util;
 
+import wyvern.tools.typedAST.core.binding.LateBinder;
+
 public class Reference<T> {
 	private T value;
 	public Reference(T value) {
@@ -15,5 +17,14 @@ public class Reference<T> {
 
 	public T get() {
 		return value;
+	}
+
+	public LateBinder<T> getBinder() {
+		return new LateBinder<T>() {
+			@Override
+			public T get() {
+				return value;
+			}
+		};
 	}
 }

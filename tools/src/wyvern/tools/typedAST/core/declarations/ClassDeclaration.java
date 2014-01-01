@@ -199,7 +199,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()){
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
-			decl = decl.getNextDecl();
 		}
 
 		ClassBinding thisBinding = new ClassBinding("class", this);

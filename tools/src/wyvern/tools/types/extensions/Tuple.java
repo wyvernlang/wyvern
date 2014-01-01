@@ -61,10 +61,10 @@ public class Tuple extends AbstractTypeImpl implements OperatableType {
 		}
 		for (int i = 1; i < types.length; i++) {
 			builder.append('*');
-			if (!types[0].isSimple())
+			if (!types[i].isSimple())
 				builder.append('(');
 			builder.append(types[i].toString());
-			if (!types[0].isSimple())
+			if (!types[i].isSimple())
 				builder.append(')');
 		}
 		return builder.toString();

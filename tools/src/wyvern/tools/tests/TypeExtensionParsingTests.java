@@ -146,33 +146,4 @@ public class TypeExtensionParsingTests {
 		Assert.assertEquals(((JavaClassType) obj).getInnerClass(), Integer.class);
 		is.close();
 	}
-
-	@Test
-	public void testGetTypeName() throws IOException {
-		String testFileName;
-		URL url;
-
-		testFileName = "wyvern/tools/tests/samples/getTypeName.wyv";
-		url = TypeExtensionParsingTests.class.getClassLoader().getResource(testFileName);
-		if (url == null) {
-			Assert.fail("Unable to open " + testFileName + " file.");
-			return;
-		}
-
-		InputStream is = url.openStream();
-		Scanner reader = new Scanner(new InputStreamReader(is));
-		ArrayList<String> strs = new ArrayList<>();
-		strs.add(reader.useDelimiter("\\A").next());
-		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
-		Value evaluate = pair.evaluate(Environment.getEmptyEnvironment());
-		if (!(evaluate instanceof JavaObj))
-			Assert.assertTrue(false);
-		Object obj = ((JavaObj) evaluate).getObj();
-		if (!(obj instanceof JavaClassType))
-			Assert.assertTrue(false);
-		Assert.assertEquals(((JavaClassType) obj).getInnerClass(), Integer.class);
-		is.close();
-	}
 }
