@@ -64,9 +64,11 @@ public class Def implements Definition {
 	@Override
 	public String toString() {
 		List<String> sb = new LinkedList<>();
-		for (Statement def : body) {
-			sb.add(def.toString());
-		}
+		if (body != null)
+			for (Statement def : body) {
+				if (def != null)
+					sb.add(def.toString());
+			}
 		List<String> argsb = new LinkedList<>();
 		for (Param def : params) {
 			argsb.add(def.toString());
