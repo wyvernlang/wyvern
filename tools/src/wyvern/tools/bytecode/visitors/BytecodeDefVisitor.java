@@ -15,6 +15,7 @@ import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.BytecodeContextImpl;
 import wyvern.tools.bytecode.values.BytecodeClass;
 import wyvern.tools.bytecode.values.BytecodeClassDef;
+import wyvern.tools.bytecode.values.BytecodeEmptyVal;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
@@ -43,7 +44,7 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	public BytecodeContext visit(VarDef varDef) {
 		String name = varDef.getName();
 		BytecodeExnVisitor visitor = new BytecodeExnVisitor(evalContext);
-		BytecodeValue value = null;
+		BytecodeValue value = new BytecodeEmptyVal();
 		if(varDef.getExn() != null) {
 			value = varDef.getExn().accept(visitor);
 		}

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import wyvern.tools.bytecode.values.BytecodeInt;
+import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
 /**
@@ -21,10 +22,10 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"val fun1 = fn x : Int => x + 1 						\n"
-				+ 	"val fun2 = fn f : Int -> Int => fn x : Int => f(f(x))	\n"
-				+ 	"def fun3(z : Int) : Int								\n"
-				+	"  z+1 													\n";
+		s =	"val fun1 = fn x : Int => x + 1 						\n"
+		+ 	"val fun2 = fn f : Int -> Int => fn x : Int => f(f(x))	\n"
+		+ 	"def fun3(z : Int) : Int								\n"
+		+	"  z+1 													\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "()");	
@@ -39,10 +40,10 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"def mult(n:Int,m:Int):Int = n+5*m 		\n"
-				+	"val x = mult(3,2) 						\n"
-				+ 	"val y = mult(4,5) 						\n"
-				+ 	"val z = mult(1,1)						\n";
+		s =	"def mult(n:Int,m:Int):Int = n+5*m 		\n"
+		+	"val x = mult(3,2) 						\n"
+		+ 	"val y = mult(4,5) 						\n"
+		+ 	"val z = mult(1,1)						\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "()");
@@ -58,7 +59,7 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"val x = (fn x : Int => x + 1)(3)";
+		s =	"val x = (fn x : Int => x + 1)(3)";
 
 		BytecodeValue res = runTest(s);
 		assertEquals(res.toString(), "()");	
@@ -73,9 +74,9 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"var x : Int = 3 						\n"
-				+ 	"def mult(n:Int,m:Int):Int = (n+m)*x 	\n"
-				+ 	"mult(1,2)								\n";
+		s =	"var x : Int = 3 						\n"
+		+ 	"def mult(n:Int,m:Int):Int = (n+m)*x 	\n"
+		+ 	"mult(1,2)								\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "9");
@@ -90,11 +91,11 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"var x : Int = 3				\n"
-				+ 	"def mult(n:Int,m:Int):Int		\n"
-				+ 	" x = x + 1 					\n"
-				+ 	" n * m 						\n"
-				+ 	"mult(1,2)						\n";
+		s =	"var x : Int = 3				\n"
+		+ 	"def mult(n:Int,m:Int):Int		\n"
+		+ 	" x = x + 1 					\n"
+		+ 	" n * m 						\n"
+		+ 	"mult(1,2)						\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "2");
@@ -109,11 +110,11 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"var x : Int = 3 				\n"
-				+ 	"def mult(n:Int,m:Int):Int 		\n"
-				+ 	" val y = 4 					\n"
-				+ 	" n * m 						\n"
-				+ 	"mult(1,2)						\n";
+		s =	"var x : Int = 3 				\n"
+		+ 	"def mult(n:Int,m:Int):Int 		\n"
+		+ 	" val y = 4 					\n"
+		+ 	" n * m 						\n"
+		+ 	"mult(1,2)						\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "2");
@@ -128,16 +129,16 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"def add(x:Int,y:Int):Int 		\n"
-				+ 	"	x + y 						\n"
-				+ 	"def mult(n:Int,m:Int):Int 		\n"
-				+ 	"	var z : Int = m 			\n"
-				+ 	"	var sum : Int = 0 			\n"
-				+ 	"	while z > 0 				\n"
-				+ 	"		sum = add(n,sum) 		\n"
-				+ 	"		z = z - 1 				\n"
-				+ 	"	sum 						\n"
-				+ 	"mult(5,5)						\n";
+		s =	"def add(x:Int,y:Int):Int 		\n"
+		+ 	"	x + y 						\n"
+		+ 	"def mult(n:Int,m:Int):Int 		\n"
+		+ 	"	var z : Int = m 			\n"
+		+ 	"	var sum : Int = 0 			\n"
+		+ 	"	while z > 0 				\n"
+		+ 	"		sum = add(n,sum) 		\n"
+		+ 	"		z = z - 1 				\n"
+		+ 	"	sum 						\n"
+		+ 	"mult(5,5)						\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "25");
@@ -153,16 +154,16 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"def mult(n:Int,m:Int):Int 		\n"
-				+ 	"	def add(x:Int,y:Int):Int 	\n"
-				+ 	"		x + y 					\n"
-				+ 	"	var z : Int = m 			\n"
-				+ 	"	var sum : Int = 0 			\n"
-				+ 	"	while z > 0 				\n"
-				+ 	"		sum = add(n,sum) 		\n"
-				+ 	"		z = z - 1 				\n"
-				+ 	"	sum 						\n"
-				+ 	"mult(3,6)						\n";
+		s =	"def mult(n:Int,m:Int):Int 		\n"
+		+ 	"	def add(x:Int,y:Int):Int 	\n"
+		+ 	"		x + y 					\n"
+		+ 	"	var z : Int = m 			\n"
+		+ 	"	var sum : Int = 0 			\n"
+		+ 	"	while z > 0 				\n"
+		+ 	"		sum = add(n,sum) 		\n"
+		+ 	"		z = z - 1 				\n"
+		+ 	"	sum 						\n"
+		+ 	"mult(3,6)						\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "18");
@@ -177,13 +178,13 @@ public class TestFunctions extends TestUtil {
 		
 		PRINTS_ON = false;
 						
-		String s =	"def factorial(n:Int):Int 	\n" 
-				+	" if n==1 					\n"
-				+	"  then 					\n"
-				+	"   n 						\n"
-				+	"  else 					\n"
-				+	"   n * factorial(n-1) 		\n"
-				+ 	"factorial(5)				\n";
+		s =	"def factorial(n:Int):Int 	\n" 
+		+	" if n==1 					\n"
+		+	"  then 					\n"
+		+	"   n 						\n"
+		+	"  else 					\n"
+		+	"   n * factorial(n-1) 		\n"
+		+ 	"factorial(5)				\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "120");
@@ -192,14 +193,14 @@ public class TestFunctions extends TestUtil {
 		BytecodeValue[] vals = { func };
 		assertTrue(isInContext(names,vals));
 	}
-/*	
+	
 	@Test
 	public void funcReturnsTupleDef() {
 
 		PRINTS_ON = false;
 
-		String s = 	"def func() : Int*Int*Int	\n"
-				+ 	"	(1,2,3)					\n";
+		s = "def func() : Int*Int*Int	\n"
+		+ 	"	(1,2,3)					\n";
 
 		BytecodeValue res = runTest(s);
 		assertEquals(res.toString(), "()");
@@ -208,22 +209,21 @@ public class TestFunctions extends TestUtil {
 		BytecodeValue[] vals = { func };
 		assertTrue(isInContext(names, vals));
 	}
-*/	
+	
 	@Test
 	public void changeUnsetVar() {
 
 		PRINTS_ON = false;
 
-		String s = 	"var x : Int					\n"
-				+ 	"def setX(num : Int) : Unit		\n"
-				+ 	"	x = num						\n";
+		s = "var x : Int					\n"
+		+ 	"def setX(num : Int) : Unit		\n"
+		+ 	"	x = num						\n";
 
 		BytecodeValue res = runTest(s);
-		assertEquals(res.toString(), "(5,23,41,60)");
+		assertEquals(res.toString(), "()");
 
-		String[] names = { "sortFour", "first", "second", "third", "fourth" };
-		BytecodeValue[] vals = { func, new BytecodeInt(5), new BytecodeInt(23),
-				new BytecodeInt(41), new BytecodeInt(60) };
+		String[] names = { "x", "setX" };
+		BytecodeValue[] vals = { empty, func };
 		assertTrue(isInContext(names, vals));
 	}
 }

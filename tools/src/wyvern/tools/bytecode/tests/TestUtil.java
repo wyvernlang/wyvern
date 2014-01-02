@@ -10,15 +10,13 @@ import wyvern.DSL.DSL;
 import wyvern.targets.Common.WyvernIL.ExnFromAST;
 import wyvern.targets.Common.WyvernIL.TLFromAST;
 import wyvern.targets.Common.WyvernIL.Def.Def.Param;
-import wyvern.targets.Common.WyvernIL.Def.ValDef;
-import wyvern.targets.Common.WyvernIL.Stmt.Assign;
-import wyvern.targets.Common.WyvernIL.Stmt.Defn;
 import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.BytecodeContextImpl;
 import wyvern.tools.bytecode.core.Interpreter;
 import wyvern.tools.bytecode.values.BytecodeClass;
 import wyvern.tools.bytecode.values.BytecodeClassDef;
+import wyvern.tools.bytecode.values.BytecodeEmptyVal;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeValue;
 import wyvern.tools.typedAST.core.expressions.New;
@@ -37,8 +35,9 @@ public class TestUtil {
 
 	protected boolean PRINTS_ON = false; 	// add PRINTS_ON = true at the
 											// beginning of a test for some
-											// instruction/context prints
+	protected String s;						// instruction/context prints
 	protected Interpreter interperter;
+	protected BytecodeValue empty;
 	protected BytecodeValue func,clas,clasDef;	// empty type declarations
 												// to be used as values in
 												// the isInContext method
@@ -51,6 +50,7 @@ public class TestUtil {
 		func = new BytecodeFunction(params,statements,new BytecodeContextImpl(), "");
 		clas = new BytecodeClass(new BytecodeContextImpl());
 		clasDef = new BytecodeClass(new BytecodeContextImpl());
+		empty = new BytecodeEmptyVal();
 	}
 
 	@After
@@ -145,6 +145,7 @@ public class TestUtil {
 					}
 				}
 				if(!val.equals(vals[i])) {
+					System.err.println("in context: " + val + " given: " + vals[i]);
 					return false;
 				}
 			} catch(RuntimeException e) {

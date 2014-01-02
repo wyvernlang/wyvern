@@ -9,12 +9,25 @@ public class BytecodeEmptyVal implements BytecodeValue {
 
 	@Override
 	public BytecodeValue dereference() {
-		throw new RuntimeException("trying to derefernce an empty val");
+		return this;
 	}
 	
 	@Override
 	public String toString() {
-		return new String("context is empty");
+		return new String("undefined");
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof BytecodeEmptyVal) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		// temporary
+		return "undefined".hashCode();
+	}
 }

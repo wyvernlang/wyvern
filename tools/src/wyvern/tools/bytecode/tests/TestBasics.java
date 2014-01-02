@@ -26,9 +26,9 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 				
-		String s = 	"var x : Int = 1 	\n"
-				+ 	"x = 3 				\n"
-				+ 	"val y = 5			\n";
+		s = "var x : Int = 1 	\n"
+		+ 	"x = 3 				\n"
+		+ 	"val y = 5			\n";
 		
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "()");
@@ -43,10 +43,10 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 
-		String s = 	"val x : Int = 2 + 2 					\n"
-				+ 	"val y : Int = 2 * x 					\n"
-				+ 	"val z : Str = \"Hello \" + \"World\"	\n"
-				+	"val w = (x,y,z)						\n";
+		s = "val x : Int = 2 + 2 					\n"
+		+ 	"val y : Int = 2 * x 					\n"
+		+ 	"val z : Str = \"Hello \" + \"World\"	\n"
+		+	"val w = (x,y,z)						\n";
 
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "()");	
@@ -67,11 +67,11 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 		
-		String s =	"var x:Int = 5 		\n" 
-				+	"var y:Int = 0 		\n" 
-				+ 	"while x > 0 		\n" 
-				+ 	"	x = x-1 		\n"
-				+	"	y = y+1 		\n";
+		s =	"var x:Int = 5 		\n" 
+		+	"var y:Int = 0 		\n" 
+		+ 	"while x > 0 		\n" 
+		+ 	"	x = x-1 		\n"
+		+	"	y = y+1 		\n";
 		
 		BytecodeValue res = runTest(s);	
 		assertEquals(res.toString(), "()");	
@@ -86,11 +86,11 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 				
-		String s =	"val x = if true	\n" 
-				+ 	"	then 			\n" 
-				+	"		1 			\n" 
-				+	"	else 			\n" 
-				+	"		2 			\n";
+		s =	"val x = if true	\n" 
+		+ 	"	then 			\n" 
+		+	"		1 			\n" 
+		+	"	else 			\n" 
+		+	"		2 			\n";
 
 		BytecodeValue res = runTest(s);
 		assertEquals(res.toString(), "()");	
@@ -105,13 +105,13 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 				
-		String s =	"val y = 16 		\n"
-				+ 	"val x = 43 		\n"
-				+ 	"if x > y 			\n" 
-				+ 	"	then 			\n" 
-				+	"		\"Yes\" 	\n" 
-				+	"	else 			\n" 
-				+	"		\"No\" 		\n";
+		s =	"val y = 16 		\n"
+		+ 	"val x = 43 		\n"
+		+ 	"if x > y 			\n" 
+		+ 	"	then 			\n" 
+		+	"		\"Yes\" 	\n" 
+		+	"	else 			\n" 
+		+	"		\"No\" 		\n";
 
 		BytecodeValue res = runTest(s);
 		assertEquals(res.toString(), "Yes");
@@ -126,13 +126,13 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 				
-		String s =	"val y = 16 			\n"
-				+ 	"val x = 43 			\n"
-				+ 	"if x > y && x < y 		\n" 
-				+ 	"	then 				\n" 
-				+	"		\"Yes\" 		\n" 
-				+	"	else 				\n" 
-				+	"		\"No\" 			\n";
+		s =	"val y = 16 			\n"
+		+ 	"val x = 43 			\n"
+		+ 	"if x > y && x < y 		\n" 
+		+ 	"	then 				\n" 
+		+	"		\"Yes\" 		\n" 
+		+	"	else 				\n" 
+		+	"		\"No\" 			\n";
 
 		BytecodeValue res = runTest(s);
 		assertEquals(res.toString(), "No");	
@@ -147,11 +147,11 @@ public class TestBasics extends TestUtil {
 		
 		PRINTS_ON = false;
 				
-		String s =	"if false || true 	\n" 
-				+ 	"	then 			\n" 
-				+	"		\"Yes\" 	\n" 
-				+	"	else 			\n" 
-				+	"		\"No\" 		\n";
+		s =	"if false || true 	\n" 
+		+ 	"	then 			\n" 
+		+	"		\"Yes\" 	\n" 
+		+	"	else 			\n" 
+		+	"		\"No\" 		\n";
 
 		BytecodeValue res = runTest(s);
 		assertEquals(res.toString(), "Yes");	
