@@ -59,7 +59,6 @@ public class Def implements Definition {
 		}
 	}
 
-
 	@Override
 	public String toString() {
 		List<String> sb = new LinkedList<>();
