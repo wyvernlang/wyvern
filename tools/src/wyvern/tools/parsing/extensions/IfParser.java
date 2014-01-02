@@ -145,7 +145,7 @@ public class IfParser implements LineParser {
 				result.add((IfClause)elem);
 			}
 		}
-		return new IfExpr(result, body.getLocation());
+		return new IfExpr(result, thenClause.getLocation());
 	}
 
 }
