@@ -253,9 +253,11 @@ public class TLFromAST implements CoreASTVisitor {
 				Statement last = bodyAST.get(bodyAST.size()-1);
 				List<Statement> notLast = bodyAST.subList(0,bodyAST.size()-1);
 				statements.addAll(notLast);
-				if (!(last instanceof Pure))
+
+				if (!(last instanceof Pure)) {
+					statements.add(last);
 					statements.add(new Defn(new ValDef(result, new Immediate(new UnitValue()))));
-				else
+				} else
 					statements.add(new Defn(new ValDef(result, ((Pure)last).getExpression())));
 			}
 			statements.add(new Goto(end));
