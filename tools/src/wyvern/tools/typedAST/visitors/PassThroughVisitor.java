@@ -4,11 +4,7 @@ import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
-import wyvern.tools.typedAST.core.declarations.VarDeclaration;
+import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.IfExpr;
 import wyvern.tools.typedAST.core.expressions.LetExpr;
@@ -135,6 +131,11 @@ public class PassThroughVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(WhileStatement whileStatement) {
 		next.visit(whileStatement);
+	}
+
+	@Override
+	public void visit(ImportDeclaration importDeclaration) {
+		next.visit(importDeclaration);
 	}
 
 }

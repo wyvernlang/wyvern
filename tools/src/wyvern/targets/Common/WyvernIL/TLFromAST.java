@@ -316,6 +316,11 @@ public class TLFromAST implements CoreASTVisitor {
 	}
 
 	@Override
+	public void visit(ImportDeclaration importDeclaration) {
+
+	}
+
+	@Override
 	public void visit(TypeInstance typeInstance) {
 
 	}

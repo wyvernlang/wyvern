@@ -226,6 +226,11 @@ public class ExnFromAST implements CoreASTVisitor {
 		statements.add(end);
 	}
 
+	@Override
+	public void visit(ImportDeclaration importDeclaration) {
+
+	}
+
 
 	//UNUSED
 

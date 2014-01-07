@@ -10,9 +10,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeType;
@@ -23,7 +21,7 @@ import wyvern.tools.util.TreeWriter;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ImportDeclaration extends Declaration {
+public class ImportDeclaration extends Declaration implements CoreAST {
 	private String src;
 	private String equivName;
 	private ImportResolver res;
@@ -157,5 +155,10 @@ public class ImportDeclaration extends Declaration {
 
 	public Reference<TypedAST> getAST() {
 		return ref;
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }
