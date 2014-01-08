@@ -1,6 +1,7 @@
 package wyvern.tools.bytecode.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -194,5 +195,61 @@ public class TestClass extends TestUtil {
 		BytecodeValue[] vals = { clasDef, clas };
 		assertTrue(isInContext(names,vals));
 	}
+	
+	@Test 
+	public void differntUseOfNew() {
+		
+		PRINTS_ON = false;
+							
+		String s =	"class X					\n"
+				+ 	"	var x : Int				\n"
+				+ 	"	class def create() : X	\n"
+				+ 	"		val inst : X = 	new	\n"
+				+ 	"		inst.x = 4			\n"
+				+ 	"		inst				\n"
+				+ 	"	def setX() : Unit		\n"
+				+ 	"		this.x = 2			\n"
+				+ 	"	def getX() : Int		\n"
+				+ 	"		this.x				\n"
+				+ 	"val y : X = X.create()		\n"
+				+ 	"val xBefore = y.getX()		\n"
+				+ 	"y.setX()					\n"
+				+ 	"val xAfter = y.getX()		\n";
+		
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");
+		
+		String[] names = { "X", "xBefore", "xAfter" };
+		BytecodeValue[] vals = { clasDef, new BytecodeInt(4), new BytecodeInt(2) };
+		assertTrue(isInContext(names,vals));		
+	}
+	
+	@Test
+	public void classIfClosureTest() {
+		
+		PRINTS_ON = false;
+		
+		String s = 	"var a : Int = 4 								\n"
+				+ 	"class Hello									\n"
+				+	"	class def make():Hello = new				\n"
+				+	"	def getA() : Int = a						\n"
+				+ 	"	def setA()									\n"
+				+ 	"		if a == 4 								\n"
+				+ 	"			then								\n"
+				+ 	"				a = 2							\n"
+				+ 	"			else								\n"
+				+ 	"				a = 4							\n"
+				+ 	"val h : Hello = Hello.make()					\n"
+				+ 	"val aBefore = h.getA()							\n"
+				+ 	"h.setA()										\n"
+				+ 	"val aAfter = h.getA()							\n";
 
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");
+		
+		String[] names = { "Hello", "h", "a", "aBefore", "aAfter" };
+		BytecodeValue[] vals = { clasDef, clas, new BytecodeInt(2), 
+				new BytecodeInt(4), new BytecodeInt(2) };
+		assertTrue(isInContext(names,vals));
+	}
 }

@@ -10,13 +10,16 @@ import wyvern.tools.bytecode.values.BytecodeValue;
 /**
  * implementation of the BytecodeContext interface
  * 
- * @author Tal
+ * @author Tal Man
  * 
  */
 public class BytecodeContextImpl implements BytecodeContext {
 
 	private final Map<String, BytecodeValue> context;
 
+	/**
+	 * initiates an empty context
+	 */
 	public BytecodeContextImpl() {
 		context = new HashMap<String, BytecodeValue>();
 	}
@@ -87,7 +90,6 @@ public class BytecodeContextImpl implements BytecodeContext {
 
 	@Override
 	public void setThis(BytecodeValue thisClass) {
-		//context.put("this", thisClass);
 		BytecodeRef ref = (BytecodeRef) context.get("this");
 		ref.setValue(thisClass);
 	}

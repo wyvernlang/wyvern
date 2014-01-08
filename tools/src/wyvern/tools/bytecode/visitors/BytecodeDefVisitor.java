@@ -13,18 +13,35 @@ import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.targets.Common.WyvernIL.visitor.DefVisitor;
 import wyvern.tools.bytecode.core.BytecodeContext;
 import wyvern.tools.bytecode.core.BytecodeContextImpl;
-import wyvern.tools.bytecode.values.BytecodeClass;
 import wyvern.tools.bytecode.values.BytecodeClassDef;
 import wyvern.tools.bytecode.values.BytecodeEmptyVal;
 import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * a DefVisitor for the IL interpreter
+ * @author Tal Man
+ *
+ */
 public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 
 	private final BytecodeContext context;
 	private final BytecodeContext evalContext; // context to evaluate against
 											   // will also be changed
+		
+	/**
+	 * sets up the visitor with a context to work with
+	 * @param changeContext
+	 * 		the context of the program to be altered at this point
+	 * @param evaluateContext
+	 * 		the context of the program to be evaluated against (this should
+	 * 		be a throw away copy because it might be changed)
+	 */
+	public BytecodeDefVisitor(BytecodeContext changeContext, BytecodeContext evaluateContext) {
+		context = changeContext;
+		evalContext = evaluateContext;
+	}
 	
 	/**
 	 * sets up the visitor with a context to work with
@@ -33,11 +50,6 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	 */
 	public BytecodeDefVisitor(BytecodeContext visContext) {
 		this(visContext,visContext);
-	}
-	
-	public BytecodeDefVisitor(BytecodeContext changeContext, BytecodeContext evaluateContext) {
-		context = changeContext;
-		evalContext = evaluateContext;
 	}
 	
 	@Override
@@ -70,9 +82,9 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 	@Override
 	public BytecodeContext visit(TypeDef typeDef) {
 		/*
-		 *  currently unused
+		 *  does nothing because currently TypeDef has no role in the IL itself
 		 */
-		throw new RuntimeException("got a TypeDef in the IL");
+		return context;
 	}
 
 	@Override
@@ -86,7 +98,6 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		return context;
 	}
 
-	//TODO evalContext
 	@Override
 	public BytecodeContext visit(ClassDef classDef) {
 		BytecodeContext newContext = new BytecodeContextImpl(evalContext);

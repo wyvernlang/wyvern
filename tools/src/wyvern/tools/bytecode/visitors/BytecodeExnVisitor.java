@@ -19,6 +19,11 @@ import wyvern.tools.bytecode.values.BytecodeFunction;
 import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * a ExprVisitor for the IL interpreter
+ * @author Tal Man
+ *
+ */
 public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 
 	private final BytecodeContext context;
@@ -75,7 +80,7 @@ public class BytecodeExnVisitor implements ExprVisitor<BytecodeValue> {
 	@Override
 	public BytecodeValue visit(Immediate immediate) {
 		Operand inner = immediate.getInner();
-		return inner.accept(new BytecodeImmediateVisitor(context));
+		return inner.accept(new BytecodeOperandVisitor(context));
 	}
 
 	@Override

@@ -6,10 +6,22 @@ public class BytecodeClass implements BytecodeValue {
 
 	protected final BytecodeContext coreContext;
 	
+	/**
+	 * instantiates a new class instance
+	 * @param context
+	 * 		the context to be used in the class
+	 */
 	public BytecodeClass(BytecodeContext context) {
 		coreContext = context;
 	}
 	
+	/**
+	 * finds and returns a value in a class
+	 * @param name
+	 * 		the name of the value to be found
+	 * @return
+	 * 		the value from the context
+	 */
 	public BytecodeValue getValue(String name) {
 		return coreContext.getValue(name);
 	}

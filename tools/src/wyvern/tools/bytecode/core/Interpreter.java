@@ -76,27 +76,11 @@ public class Interpreter {
 	 * @return
 	 * 		a BytecodeValue object representing the last value encountered
 	 */
-/*	public BytecodeValue execute() {
-			while (pc < statements.size()) {
-				step();
-			}
-			return finalValue;
-	}*/
-	
 	public BytecodeValue execute() {
-		try {
 			while (pc < statements.size()) {
 				step();
 			}
 			return finalValue;
-		} catch(RuntimeException e) {
-			//System.err.println("\n >>>>>	 ERROR	 <<<<<<");
-			//System.err.println(e.getMessage());
-			//System.err.println(statements.get(--pc));
-			//System.err.println(currentContext);
-			//System.err.println(" >>>>>	      	 <<<<<<\n");
-			throw e;
-		}
 	}
 	
 	/**
@@ -139,13 +123,6 @@ public class Interpreter {
 			finalValuesSet = true;
 		}
 	}
-	
-	/*
-	 * gets the current working context used only for tests
-	 */
-	public BytecodeContext getCurrentContext() {
-		return currentContext;
-	}
 
 	/**
 	 * returns the program counter for the instruction after a label
@@ -166,15 +143,6 @@ public class Interpreter {
 	public void setProgramCounter(int newPc) {
 		pc = newPc;
 	}
-	
-	/*
-	 *	causes the interpreter to finish executing, currently only used by
-	 *	the Return case of the statement visitor which is unused in the current
-	 *	IL implementation
-	 */
-	public void endExecution() {
-		pc = statements.size() + 1;
-	}
 
 	/**
 	 * gets the current pc
@@ -183,5 +151,42 @@ public class Interpreter {
 	 */
 	public int getProgramCounter() {
 		return pc;
+	}
+	
+	/*
+	 *	causes the interpreter to finish executing, currently only used by
+	 *	the Return case of the statement visitor which is unused in the current
+	 *	IL implementation - so UNUSED
+	 */
+	public void endExecution() {
+		pc = statements.size() + 1;
+	}
+	
+	/*
+	 * debug version of execute that prints information on a thrown exception
+	 * like which statement caused it and what is the context during that time
+	 */
+	public BytecodeValue executeDebug() {
+		try {
+			while (pc < statements.size()) {
+				step();
+			}
+			return finalValue;
+		} catch(RuntimeException e) {
+			System.err.println("\n >>>>>	 ERROR	 <<<<<<");
+			System.err.println(e.getMessage());
+			System.err.println("on statement:");
+			System.err.println(statements.get(--pc));
+			System.err.println("context:");
+			System.err.println(currentContext);
+			throw e;
+		}
+	}
+	
+	/*
+	 * gets the current working context (used only for tests)
+	 */
+	public BytecodeContext getCurrentContext() {
+		return currentContext;
 	}
 }

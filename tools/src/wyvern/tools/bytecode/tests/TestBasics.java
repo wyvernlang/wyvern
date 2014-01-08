@@ -39,6 +39,21 @@ public class TestBasics extends TestUtil {
 	}
 	
 	@Test
+	public void divideTest() {
+		
+		PRINTS_ON = false;
+				
+		s = "(15 / 4 / 2, 12 / 5, 10/11)";
+		
+		BytecodeValue res = runTest(s);	
+		assertEquals(res.toString(), "(1,2,0)");
+
+		String[] names = { };
+		BytecodeValue[] vals = { };
+		assertTrue(isInContext(names,vals));
+	}
+	
+	@Test
 	public void defnTest() {
 		
 		PRINTS_ON = false;
@@ -159,5 +174,26 @@ public class TestBasics extends TestUtil {
 		String[] names = {  };
 		BytecodeValue[] vals = {  };
 		assertTrue(isInContext(names,vals));
+	}
+	
+	@Test
+	public void ifAssignmentTest() {
+		
+		PRINTS_ON = false;
+		
+		s =	"var a : Int = 4	\n"
+		+ 	"if a == 4		 	\n" 
+		+ 	"	then 			\n" 
+		+	"		a = 2	 	\n" 
+		+	"	else 			\n" 
+		+	"		a = 3 		\n";
+
+		BytecodeValue res = runTest(s);
+		assertEquals(res.toString(), "()");	
+		
+		String[] names = { "a" };
+		BytecodeValue[] vals = { new BytecodeInt(2) };
+		assertTrue(isInContext(names,vals));
+		
 	}
 }

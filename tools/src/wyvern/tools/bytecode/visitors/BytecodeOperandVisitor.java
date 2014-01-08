@@ -18,6 +18,11 @@ import wyvern.tools.bytecode.values.BytecodeString;
 import wyvern.tools.bytecode.values.BytecodeTuple;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * an OperandVisitor for the IL interpreter
+ * @author Tal Man
+ *
+ */
 public class BytecodeOperandVisitor implements OperandVisitor<BytecodeValue> {
 
 	private final BytecodeContext context;

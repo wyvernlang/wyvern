@@ -19,6 +19,11 @@ import wyvern.tools.bytecode.values.BytecodeClass;
 import wyvern.tools.bytecode.values.BytecodeRef;
 import wyvern.tools.bytecode.values.BytecodeValue;
 
+/**
+ * a StatementVisitor for the IL interpreter
+ * @author Tal Man
+ *
+ */
 public class BytecodeStatementVisitor implements
 		StatementVisitor<BytecodeContext> {
 
@@ -42,8 +47,7 @@ public class BytecodeStatementVisitor implements
 
 	/*
 	 * assumption: 
-	 * dest will always be an Immediate with expression of type VarRef
-	 * or an Inv that will lead to a BytecodeRef in a class
+	 * dest will always be an Immediate with VarRef or an Inv
 	 */
 	@Override
 	public BytecodeContext visit(Assign assign) {
@@ -95,7 +99,7 @@ public class BytecodeStatementVisitor implements
 
 	/*
 	 * currently unused in implementation (compiler doesn't generate Return)
-	 * therefore this method has never been tested
+	 * therefore this method has never been properly tested
 	 */
 	@Override
 	public BytecodeContext visit(Return aReturn) {

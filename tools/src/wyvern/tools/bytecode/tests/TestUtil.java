@@ -42,15 +42,23 @@ public class TestUtil {
 												// to be used as values in
 												// the isInContext method
 	
+	protected String List = "";				// holds a simple linked list
+											// implementation
+	
+	protected String Mod;			// holds a simple modulus implementation
+	
 
 	@Before
 	public void setUp() throws Exception {
+		Mod = "def mod(num : Int, over : Int)	: Int		\n"
+		+ 	"	num - (over * (num / over))					\n";
 		List<Param> params = new ArrayList<Param>();
 		List<Statement> statements = new ArrayList<Statement>();
 		func = new BytecodeFunction(params,statements,new BytecodeContextImpl(), "");
 		clas = new BytecodeClass(new BytecodeContextImpl());
 		clasDef = new BytecodeClass(new BytecodeContextImpl());
 		empty = new BytecodeEmptyVal();
+		setupList();
 	}
 
 	@After
@@ -101,6 +109,10 @@ public class TestUtil {
 
 		BytecodeValue res = interperter.execute();
 		
+		// currently printing only the simplified context (no variables with
+		// '$' in their names, for full context print needs to change the
+		// Interpreter printContext() method to use toString instead of
+		// toSimpleString
 		if(PRINTS_ON) {
 			interperter.printContext();
 			System.out.println("		DONE");	
@@ -156,4 +168,112 @@ public class TestUtil {
 	}
 
 
+	private void setupList() {
+		if(List != "") {
+			return;
+		}
+		List = "type IntNode     											\n"
+		+"	def getNext() : IntNode                                         \n"
+		+"	def setNext(next : IntNode) : Unit                           	\n"
+		+"	def getValue() : Int                                            \n"
+		+"	def hasNext() : Bool                                            \n"
+		+"                                                                  \n"
+		+"class DummyNode                                                   \n"
+		+"	implements IntNode                                              \n"
+		+"                                                                  \n"
+		+"	class def create() : DummyNode                                  \n"
+		+"		new                                                         \n"
+		+"                                                                  \n"
+		+"	def getNext() : IntNode = this                                  \n"
+		+"	def setNext(nxt : IntNode) : Unit = ()                       	\n"
+		+"	def getValue() : Int = 0	                                    \n"
+		+"	def hasNext() : Bool = false                                    \n"
+		+"                                                                  \n"
+		+"class Node                                                        \n"
+		+"	implements IntNode                                              \n"
+		+"                                                                  \n"
+		+"	var value : Int                                                 \n"
+		+"	var nxt : IntNode                                              	\n"
+		+"                                                                  \n"
+		+"	class def create(value : Int, nxtNode : IntNode) : Node  		\n"
+		+"		val n : Node = new                                          \n"
+		+"		n.value = value												\n"
+		+"		n.nxt = nxtNode												\n"
+		+"		n															\n"
+		+"                                                                  \n"
+		+"	def getNext() : IntNode = this.nxt                             	\n"
+		+"	def setNext(nxt : IntNode) : Unit                          		\n"
+		+"		this.nxt = nxt                                            	\n"
+		+"	def getValue() : Int = this.value                               \n"
+		+"	def hasNext() : Bool = true                                     \n"
+		+"                                                                  \n"
+		+"class IntList                                                     \n"
+		+"	                                                                \n"
+		+"	var first : IntNode                                             \n"
+		+"	var size : Int                                                  \n"
+		+"                                                                  \n"
+		+"	class def create() : IntList                                    \n"
+		+"		val l : IntList = new                                       \n"
+		+"		l.first = DummyNode.create()								\n"
+		+"		l.size = 0													\n"
+		+"		l															\n"
+		+"                                                                  \n"
+		+"	def insert(value : Int, index : Int) : Bool		                \n"
+		+"		if this.size < index || index < 0                           \n"
+		+"			then                                                    \n"
+		+"				false				                                \n"
+		+"			else                                                    \n"
+		+"				var cur : IntNode = this.first                      \n"
+		+"				var prev : IntNode = this.first                     \n"
+		+"				var curIndex : Int = 0                              \n"
+		+"				this.size = this.size + 1							\n"				
+		+"				var node : Node				                    	\n"
+		+"				if index == 0 				                        \n"
+		+"					then                                            \n"
+		+"						node = Node.create(value,this.first)		\n"
+		+"						this.first = node                           \n"
+		+"					else                                            \n"
+		+"						while curIndex < index                      \n"
+		+"							curIndex = curIndex + 1                 \n"
+		+"							prev = cur                              \n"
+		+"							cur = cur.getNext()                     \n"
+		+"						node = Node.create(value,cur)				\n"
+		+"						prev.setNext(node)                          \n"
+		+"				true						 						\n"
+		+"                                                                  \n"
+		+"	def getSize() : Int                                             \n"
+		+"		this.size                                                   \n"
+		+"                                                                  \n"
+		+"	def get(index : Int) : Int                                      \n"
+		+"		if this.size < index || index < 0                           \n"
+		+"			then                                                    \n"
+		+"				0                                                   \n"
+		+"			else                                                    \n"
+		+"				var curIndex : Int = 0                              \n"
+		+"				var cur : IntNode = this.first                      \n"
+		+"				while curIndex < index                              \n"
+		+"					curIndex = curIndex +1 							\n"
+		+"					cur = cur.getNext()                             \n"
+		+"				cur.getValue()                                      \n"
+		+"																	\n"
+		+"	def remove(index : Int)                                        	\n"
+		+"		if this.size  < index || index < 0                         	\n"
+		+"			then                                                   	\n"
+		+"				()                                                 	\n"
+		+"			else                                                   	\n"
+		+"				this.size = this.size - 1                          	\n"
+		+"				if index == 0                                      	\n"
+		+"					then                                           	\n"
+		+"						this.first = this.first.getNext()          	\n"
+		+"					else                                           	\n"
+		+"						var curIndex : Int = 0                     	\n"     
+		+"						var cur : IntNode = this.first             	\n"
+		+"						var prev : IntNode = this.first            	\n"
+		+"						while curIndex < index                     	\n"
+		+"							curIndex = curIndex +1                 	\n"
+		+"							prev = cur 						       	\n"
+		+"							cur = cur.getNext()                    	\n"
+		+"						prev.setNext(cur.getNext())                	\n"
+		+"																	\n";
+	}
 }
