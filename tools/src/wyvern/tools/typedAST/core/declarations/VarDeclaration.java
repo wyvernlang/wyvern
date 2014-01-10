@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -16,6 +18,8 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import javax.tools.Tool;
 
 public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
@@ -40,6 +44,9 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (this.definition != null)
+			if (!(this.definition.typecheck(env).subtype(varBinding.getType())))
+				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
 		return binding.getType();
 	}
 
