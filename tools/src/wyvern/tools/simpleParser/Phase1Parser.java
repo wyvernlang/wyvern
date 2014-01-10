@@ -70,6 +70,14 @@ public class Phase1Parser {
 		if (token.kind == RBRACE) {
 			return new Symbol(token.text, token.getLocation());
 		}
+		if (token.kind == LBRACK) {
+			return new Symbol(token.text, token.getLocation());
+		}
+		if (token.kind == RBRACK) {
+			return new Symbol(token.text, token.getLocation());
+		}
+
+
 		
 		// TODO: other forms
 		
@@ -157,7 +165,7 @@ public class Phase1Parser {
 				token = lexer.peekToken();
 			}
 			
-			if (token.kind == EOF || token.kind == DEDENT) {
+			if (token.kind == EOF || token.kind == DEDENT || token.kind == RPAREN) {
 				break;
 			}
 			
