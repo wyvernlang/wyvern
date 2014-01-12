@@ -4,14 +4,15 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.Invocation;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.InvokableValue;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class StringConstant extends AbstractValue implements InvokableValue, CoreAST {
 	private String value;
@@ -55,6 +56,17 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new StringConstant(value);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

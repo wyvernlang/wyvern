@@ -11,6 +11,9 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class JNull implements TypedAST {
 	@Override
 	public Type getType() {
@@ -35,6 +38,16 @@ public class JNull implements TypedAST {
 	@Override
 	public LineSequenceParser getLineSequenceParser() {
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
 	}
 
 	@Override

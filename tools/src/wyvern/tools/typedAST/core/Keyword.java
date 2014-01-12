@@ -5,11 +5,15 @@ import wyvern.tools.parsing.LineParser;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.KeywordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Keyword extends AbstractValue implements Value, CoreAST {
 	private LineParser parser;
@@ -26,6 +30,16 @@ public class Keyword extends AbstractValue implements Value, CoreAST {
 	@Override
 	public LineParser getLineParser() {
 		return parser;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
 	}
 
 	@Override

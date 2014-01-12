@@ -4,6 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.typedAST.core.Invocation;
@@ -13,21 +14,26 @@ import wyvern.tools.types.*;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
-public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType {
+public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType, ParameterizableType {
 	private ClassDeclaration decl = null;
 	private Reference<Environment> declEnv;
 	protected Reference<Environment> typeEquivalentEnv;
+	private List<String> params;
 
 
 	public ClassType(ClassDeclaration td) {
 		this(td.getDeclEnvRef(),
-				td.getTypeEquivalentEnvironmentReference());
+				td.getTypeEquivalentEnvironmentReference(),
+				td.getTypeParams());
 		this.decl = td;
 	}
 
-	public ClassType(Reference<Environment> declEnv, Reference<Environment> typeEquivalentEnv) {
+	public ClassType(Reference<Environment> declEnv,
+					 Reference<Environment> typeEquivalentEnv,
+					 List<String> typeParams) {
 		this.declEnv = declEnv;
 		this.typeEquivalentEnv = typeEquivalentEnv;
+		this.params = typeParams;
 	}
 
 	@Override
@@ -98,5 +104,10 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 
 	public Environment getEnv() {
 		return declEnv.get();
+	}
+
+	@Override
+	public Type checkParameters(List<Type> params) {
+		return null;
 	}
 }

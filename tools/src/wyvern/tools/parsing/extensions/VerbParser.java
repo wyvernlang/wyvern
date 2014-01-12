@@ -18,7 +18,9 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class VerbParser implements LineParser {
 	private class QuoteClosure implements TypedAST {
@@ -65,6 +67,18 @@ public class VerbParser implements LineParser {
 		@Override
 		public void writeArgsToTree(TreeWriter writer) {
 
+		}
+
+		@Override
+		public Map<String, TypedAST> getChildren() {
+			Map<String, TypedAST> childMap = new HashMap<>();
+			childMap.put("inner", inner);
+			return childMap;
+		}
+
+		@Override
+		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+			return new QuoteClosure(newChildren.get("inner"));
 		}
 	}
 

@@ -13,6 +13,11 @@ import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
+
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 
@@ -64,6 +69,18 @@ public class Application extends CachingTypedAST implements CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		children.put("function", function);
+		children.put("argument", argument);
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new Application(nc.get("function"), nc.get("argument"), location);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

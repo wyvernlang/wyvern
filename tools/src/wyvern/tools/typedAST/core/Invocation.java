@@ -22,6 +22,10 @@ import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
+
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private String operationName;
 	private TypedAST receiver;
@@ -90,6 +94,19 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		
 		return ((Assignable)lhs).evaluateAssignment(ass, env);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		children.put("receiver", receiver);
+		children.put("argument", argument);
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new Invocation(nc.get("receiver"), operationName, nc.get("argument"), location);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

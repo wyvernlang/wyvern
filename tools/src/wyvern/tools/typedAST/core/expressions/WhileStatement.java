@@ -5,6 +5,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -16,6 +17,9 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WhileStatement implements TypedAST, CoreAST {
 
@@ -86,5 +90,18 @@ public class WhileStatement implements TypedAST, CoreAST {
 	
 	public TypedAST getBody() {
 		return body;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		childMap.put("cond", conditional);
+		childMap.put("body", body);
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new WhileStatement(newChildren.get("cond"), newChildren.get("body"), location);
 	}
 }

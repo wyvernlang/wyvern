@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -17,6 +18,8 @@ import javax.tools.Tool;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Ben Chung on 10/21/13.
@@ -88,7 +91,17 @@ public class JavaField extends Declaration {
         return Util.javaToWyvType(src.getType());
     }
 
-    @Override
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
+	}
+
+	@Override
     public FileLocation getLocation() {
         return FileLocation.UNKNOWN;
     }

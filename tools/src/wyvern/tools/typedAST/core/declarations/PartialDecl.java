@@ -13,6 +13,9 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class PartialDecl implements TypedAST {
 
@@ -112,5 +115,15 @@ public class PartialDecl implements TypedAST {
 	public LineSequenceParser getLineSequenceParser() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		throw new RuntimeException("Cannot rewrite a partial declaration");
 	}
 }

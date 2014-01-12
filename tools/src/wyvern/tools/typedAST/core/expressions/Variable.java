@@ -8,13 +8,14 @@ import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
-import wyvern.tools.typedAST.interfaces.Assignable;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
@@ -80,6 +81,16 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 		Value newValue = ass.getValue().evaluate(env);
 		varValue.setValue(newValue);
 		return newValue;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new Hashtable<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new Variable(binding, location);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

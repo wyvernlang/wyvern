@@ -1,8 +1,6 @@
 package wyvern.tools.typedAST.core;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -101,6 +99,25 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	public LineSequenceParser getLineSequenceParser() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		int i = 0;
+		for (TypedAST ast : exps) {
+			childMap.put(i++ + "", ast);
+		}
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		ArrayList<TypedAST> result = new ArrayList<>(newChildren.size());
+		for (String k : newChildren.keySet()) {
+			result.add(Integer.parseInt(k), newChildren.get(k));
+		}
+		return new Sequence(result);
 	}
 
 	@Override

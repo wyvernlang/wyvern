@@ -8,11 +8,15 @@ import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TupleValue extends AbstractValue implements InvokableValue {
 	private Tuple tuple;
@@ -26,6 +30,24 @@ public class TupleValue extends AbstractValue implements InvokableValue {
 	@Override
 	public Type getType() {
 		return tuple;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> map = new HashMap<>();
+		for (int i = 0; i < values.length; i++) {
+			map.put(i + "", values[i]);
+		}
+		return map;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		Value[] ast = new Value[newChildren.size()];
+		for (String k : newChildren.keySet()) {
+			ast[Integer.parseInt(k)] = (Value)newChildren.get(k);
+		}
+		return new TupleValue(tuple, ast);
 	}
 
 	@Override

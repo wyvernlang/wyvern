@@ -25,7 +25,7 @@ public class IfParser implements LineParser {
 	private static IfParser instance = new IfParser();
 	public static IfParser getInstance() { return instance; }
 	
-	private class IfClause extends CachingTypedAST implements IfExpr.IfClause {
+	private class IfClause extends IfExpr.IfClause {
 		private TypedAST clause;
 		private TypedAST body;
 		private boolean isThen = false;
@@ -76,6 +76,11 @@ public class IfParser implements LineParser {
 		@Override
 		public TypedAST getBody() {
 			return body;
+		}
+
+		@Override
+		protected TypedAST createInstance(TypedAST clause, TypedAST body) {
+			return new IfClause(clause, body, isThen);
 		}
 	}
 	private class ThenParser implements LineParser {

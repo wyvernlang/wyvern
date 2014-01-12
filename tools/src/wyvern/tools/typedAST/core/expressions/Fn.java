@@ -1,6 +1,9 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
@@ -69,6 +72,18 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		children.put("body", body);
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new Fn(bindings, nc.get("body"));
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

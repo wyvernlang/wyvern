@@ -11,6 +11,10 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
+
 public class DSLDummy implements TypedAST {
 	private final Type expected;
 	private TypedAST dslDef = null;
@@ -53,7 +57,21 @@ public class DSLDummy implements TypedAST {
         return dslDef.getLineSequenceParser();
     }
 
-    @Override
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		children.put("dslDef", dslDef);
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		DSLDummy dslDummy = new DSLDummy(expected);
+		dslDummy.setDef(newChildren.get("dslDef"));
+		return dslDummy;
+	}
+
+	@Override
     public FileLocation getLocation() {
         if (dslDef != null)
             return dslDef.getLocation();

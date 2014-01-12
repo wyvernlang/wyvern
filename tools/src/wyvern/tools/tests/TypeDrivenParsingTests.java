@@ -24,7 +24,9 @@ import wyvern.tools.util.TreeWriter;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class TypeDrivenParsingTests {
     private class TestType extends AbstractTypeImpl {
@@ -86,7 +88,17 @@ public class TypeDrivenParsingTests {
             return null;
         }
 
-        @Override
+		@Override
+		public Map<String, TypedAST> getChildren() {
+			return new HashMap<>();
+		}
+
+		@Override
+		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+			return this;
+		}
+
+		@Override
         public FileLocation getLocation() {
             return null;
         }

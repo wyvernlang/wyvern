@@ -7,10 +7,14 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class JavaType implements EnvironmentExtender {
 	private final Type equivType;
@@ -44,6 +48,16 @@ public class JavaType implements EnvironmentExtender {
 	@Override
 	public LineSequenceParser getLineSequenceParser() {
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<String, TypedAST>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
 	}
 
 	@Override

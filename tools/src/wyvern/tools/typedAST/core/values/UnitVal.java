@@ -5,11 +5,16 @@ import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
 	private UnitVal(FileLocation location) { this.location = location; }
@@ -36,6 +41,17 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new UnitVal(location);
 	}
 
 	private FileLocation location;

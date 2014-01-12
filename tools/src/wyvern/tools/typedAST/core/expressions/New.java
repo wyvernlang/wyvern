@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -83,9 +84,9 @@ public class New extends CachingTypedAST implements CoreAST {
 				decls.add(e);
 			}
 
-			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, getLocation());
+			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
 			cls = classDeclaration;
-			return new ClassType(new Reference<>(mockEnv), new Reference<>(mockEnv));
+			return new ClassType(new Reference<>(mockEnv), new Reference<>(mockEnv), new LinkedList<String>());
 		}
 	}
 
@@ -98,6 +99,17 @@ public class New extends CachingTypedAST implements CoreAST {
 		AtomicReference<Value> objRef = new AtomicReference<>();
 		objRef.set(new Obj(cls.getFilledBody(objRef).extend(argValEnv)));
 		return objRef.get();
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return args;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+
+		return new New(newChildren, location);
 	}
 
 	public ClassDeclaration getClassDecl() {

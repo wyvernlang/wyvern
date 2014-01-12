@@ -270,4 +270,25 @@ public class TestIL {
 		List<Statement> result = getResult(pair);
 		Assert.assertEquals("class X { static {def create(i : Int) {new }; def $init() {val t = null}}; val t = null; def get() {val temp$0 = this,temp$0.t}},val temp$3 = X,val temp$2 = temp$3.create,val temp$5 = 1,val c = temp$2(temp$5),val temp$6 = c,val a = temp$6.get,val temp$9 = X,val temp$8 = temp$9.create,val temp$11 = 2,val temp$12 = temp$8(temp$11),val b = temp$12.get,val temp$16 = b,val temp$17 = (),val temp$18 = temp$16(temp$17),val temp$14 = a,val temp$15 = (),val temp$19 = temp$14(temp$15),val temp$20 = temp$18 + temp$19,temp$20", join(result));
 	}
+	@Test
+	public void tT() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("var a : Int = 4 \n"
+				+  "if a == 4    \n"
+				+  " then    \n"
+				+ "  a = 2   \n"
+				+ " else    \n"
+				+ "  a = 3   \n");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		List<Statement> result = getResult(pair);
+		Assert.assertEquals("class X { static {def create(i : Int) {new }; def $init() {val t = null}}; val t = null; def get() {val temp$0 = this,temp$0.t}},val temp$3 = X,val temp$2 = temp$3.create,val temp$5 = 1,val c = temp$2(temp$5),val temp$6 = c,val a = temp$6.get,val temp$9 = X,val temp$8 = temp$9.create,val temp$11 = 2,val temp$12 = temp$8(temp$11),val b = temp$12.get,val temp$16 = b,val temp$17 = (),val temp$18 = temp$16(temp$17),val temp$14 = a,val temp$15 = (),val temp$19 = temp$14(temp$15),val temp$20 = temp$18 + temp$19,temp$20", join(result));
+	}
+	@Test
+	public void tP() {
+		ArrayList<String> strs = new ArrayList<>();
+		strs.add("val x = (1,2,3))");
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
+		List<Statement> result = getResult(pair);
+		Assert.assertEquals("class X { static {def create(i : Int) {new }; def $init() {val t = null}}; val t = null; def get() {val temp$0 = this,temp$0.t}},val temp$3 = X,val temp$2 = temp$3.create,val temp$5 = 1,val c = temp$2(temp$5),val temp$6 = c,val a = temp$6.get,val temp$9 = X,val temp$8 = temp$9.create,val temp$11 = 2,val temp$12 = temp$8(temp$11),val b = temp$12.get,val temp$16 = b,val temp$17 = (),val temp$18 = temp$16(temp$17),val temp$14 = a,val temp$15 = (),val temp$19 = temp$14(temp$15),val temp$20 = temp$18 + temp$19,temp$20", join(result));
+	}
 }

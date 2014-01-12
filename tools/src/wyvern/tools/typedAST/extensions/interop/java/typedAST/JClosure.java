@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -20,10 +21,7 @@ import wyvern.tools.util.TreeWriter;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class JClosure extends AbstractValue implements ApplyableValue {
 	public static class JavaInvokableMethod {
@@ -176,6 +174,16 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 	@Override
 	public Type getType() {
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
 	}
 
 	@Override

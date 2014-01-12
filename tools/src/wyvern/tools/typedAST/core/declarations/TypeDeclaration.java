@@ -1,5 +1,8 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.errors.FileLocation;
@@ -75,6 +78,18 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		}
 
 		@Override
+		public Map<String, TypedAST> getChildren() {
+			Map<String, TypedAST> childMap = new HashMap<>();
+			childMap.put("body", body);
+			return childMap;
+		}
+
+		@Override
+		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+			return new AttributeDeclaration(newChildren.get("body"));
+		}
+
+		@Override
 		public FileLocation getLocation() {
 			return null;
 		}
@@ -95,7 +110,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		declEnv = new Reference<>(null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
-		Type classType = new ClassType(attrEnv, attrEnv); // TODO set this to a class type that has the class members
+		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
 		this.location = clsNameLine;
@@ -115,6 +130,18 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type getType() {
 		return this.typeBinding.getType();
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		childMap.put("decls", decls);
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), location);
 	}
 
 	@Override

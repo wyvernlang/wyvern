@@ -1,5 +1,6 @@
 package wyvern.targets.JavaScript.typedAST;
 
+import sun.util.logging.resources.logging_zh_CN;
 import wyvern.targets.JavaScript.types.JSObjectType;
 import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
 import wyvern.tools.errors.FileLocation;
@@ -11,6 +12,9 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class JSCast extends CachingTypedAST implements CoreAST {
@@ -35,6 +39,18 @@ public class JSCast extends CachingTypedAST implements CoreAST {
 	@Override
 	public Value evaluate(Environment env) {
 		throw new RuntimeException();
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		childMap.put("src", source);
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new JSCast(newChildren.get("source"), cast, getLocation());
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -18,12 +19,12 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
-	protected DeclSequence decls;
+	protected DeclSequence decls = new DeclSequence(new LinkedList<Declaration>());
+	private List<String> typeParams;
 	// protected DeclSequence classDecls;
 	
 	private NameBinding nameBinding;
@@ -41,13 +42,33 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> typeEquivalentEnvironmentRef;
 	protected Reference<Environment> declEnvRef;
 
-	public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, Environment declEnv, FileLocation location) {
-        this(name, implementsName, implementsClassName, decls, location);
+	public ClassDeclaration(String name,
+							String implementsName,
+							String implementsClassName,
+							DeclSequence decls,
+							Environment declEnv,
+							List<String> typeParams,
+							FileLocation location) {
+        this(name, implementsName, implementsClassName, decls, typeParams, location);
 		declEnvRef.set(declEnv);
     }
 
-    public ClassDeclaration(String name, String implementsName, String implementsClassName, DeclSequence decls, FileLocation location) {
+	public ClassDeclaration(String name,
+							String implementsName,
+							String implementsClassName,
+							DeclSequence decls,
+							FileLocation location) {
+		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
+
+	}
+    public ClassDeclaration(String name,
+							String implementsName,
+							String implementsClassName,
+							DeclSequence decls,
+							List<String> typeParams,
+							FileLocation location) {
 		this.decls = decls;
+		this.typeParams = typeParams;
 		typeEquivalentEnvironmentRef = new Reference<>();
 		declEnvRef = new Reference<>();
 		nameBinding = new NameBindingImpl(name, null);
@@ -259,5 +280,34 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				Environment
 						.getEmptyEnvironment()
 						.extend(new LateValueBinding("this", objRef, getType())));
+	}
+
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		int i = 0;
+		for (TypedAST ast : decls) {
+			children.put(i++ + "decl", ast);
+		}
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		List<Declaration> decls = new ArrayList<Declaration>(nc.size());
+		for (String key : nc.keySet()) {
+			if (!key.endsWith("decl"))
+				continue;
+			int idx = Integer.parseInt(key.substring(0,key.length() - 4));
+			decls.add(idx, (Declaration)nc.get(key));
+		}
+		return new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
+				new DeclSequence(decls), declEnvRef.get(), typeParams, location);
+	}
+
+
+	public List<String> getTypeParams() {
+		return typeParams;
 	}
 }

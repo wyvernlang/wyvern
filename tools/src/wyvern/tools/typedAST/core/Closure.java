@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.core;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
@@ -25,6 +27,16 @@ public class Closure extends AbstractValue implements ApplyableValue {
 	@Override
 	public Type getType() {
 		return function.getType();
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
 	}
 
 	public TypedAST getInner() {

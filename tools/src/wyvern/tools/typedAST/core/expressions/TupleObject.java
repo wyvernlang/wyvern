@@ -4,6 +4,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -14,6 +15,9 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
 	private TypedAST[] objects;
@@ -65,6 +69,26 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 			newTypes[i] = objects[i].typecheck(env);
 		}
 		return new Tuple(newTypes);
+	}
+
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		int i = 0;
+		for (TypedAST object : objects) {
+			childMap.put(i++ + "", object);
+		}
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		TypedAST[] objs = new TypedAST[newChildren.size()];
+		for (String s : newChildren.keySet()) {
+			objs[Integer.parseInt(s)] = newChildren.get(s);
+		}
+		return new TupleObject(objs);
 	}
 
 	public TypedAST[] getObjects() {

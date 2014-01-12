@@ -1,6 +1,7 @@
 package wyvern.DSL.html.typedAST;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import wyvern.DSL.html.parsing.HtmlTagParser;
@@ -20,8 +21,8 @@ public class AttrAST implements TypedAST {
 	private HashMap<String, TypedAST> attrs;
 	private FileLocation loc;
 
-	public AttrAST(HashMap<String,TypedAST> attrs, FileLocation loc) {
-		this.attrs = attrs;
+	public AttrAST(Map<String,TypedAST> attrs, FileLocation loc) {
+		this.attrs = new HashMap<>(attrs);
 		this.loc = loc;
 	}
 	
@@ -80,6 +81,16 @@ public class AttrAST implements TypedAST {
 	@Override
 	public LineSequenceParser getLineSequenceParser() {
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return attrs;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new AttrAST(newChildren, loc);
 	}
 
 }

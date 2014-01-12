@@ -1,12 +1,16 @@
 package wyvern.tools.parsing.extensions;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
 import wyvern.tools.rawAST.LineSequence;
+import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
@@ -19,7 +23,7 @@ import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
 /**
- * 	class NAME
+ * 	class NAME([param1,param2,...,paramn])
  * 		[implements NAME]
  *		[class implements NAME]
  * 		DELCARATION*
@@ -33,8 +37,8 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 	//REALLY HACKY
 	private static class MutableClassDeclaration extends ClassDeclaration {
 		public MutableClassDeclaration(String name, String implementsName,
-				String implementsClassName, Environment declEnv, FileLocation clsNameLine) {
-			super(name, implementsName, implementsClassName, null, declEnv, clsNameLine);
+				String implementsClassName, Environment declEnv, List<String> typeParams, FileLocation clsNameLine) {
+			super(name, implementsName, implementsClassName, new DeclSequence(new LinkedList<Declaration>()), declEnv, typeParams, clsNameLine);
 		}
 
         public void setDeclEnv(Environment nd) {
@@ -80,10 +84,21 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 		String clsName = s.name;
 		FileLocation clsNameLine = s.getLocation();
 
+		List<String> paramNames = new LinkedList<String>();
+		if (ParseUtils.checkFirst("[",ctx)) {
+			ParseUtils.parseSymbol("[",ctx);
+			while (!ParseUtils.checkFirst("]",ctx)) {
+				paramNames.add(ParseUtils.parseSymbol(ctx).name);
+				if (ParseUtils.checkFirst(",",ctx))
+					ParseUtils.parseSymbol(",",ctx);
+			}
+			ParseUtils.parseSymbol("]",ctx);
+		}
+
 		String implementsName = "";
 		String implementsClassName = "";
 
-		final MutableClassDeclaration mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, clsNameLine);
+		final MutableClassDeclaration mutableDecl = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, paramNames, clsNameLine);
 
 		if (ctx.getTokens() == null) {
 			return new Pair<Environment,ContParser>(mutableDecl.extend(Environment.getEmptyEnvironment()),new ContParser() {
@@ -95,8 +110,8 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 			});
 		}
 		
-		final LineSequence lines = ParseUtils.extractLines(ctx); // Get potential body.
-		
+		final LineSequence lines = (ctx.getTokens() != null)?ParseUtils.extractLines(ctx):new LineSequence(new ArrayList<RawAST>(), first.getLocation()); // Get potential body.
+
 		if (lines.getFirst() != null && lines.getFirst().getFirst() != null &&
 				lines.getFirst().getFirst().toString().equals("implements")) { // FIXME: hack, detected implements
 			implementsName = lines.getFirst().getRest().getFirst().toString();
@@ -116,7 +131,7 @@ public class ClassParser implements DeclParser, TypeExtensionParser {
 		if (ctx.getTokens() != null)
 			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, ctx.getTokens());
 		
-		final MutableClassDeclaration mutableDeclf = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, clsNameLine);
+		final MutableClassDeclaration mutableDeclf = new MutableClassDeclaration(clsName, implementsName, implementsClassName, null, paramNames, clsNameLine);
 		
 		Environment newEnv = mutableDeclf.extend(Environment.getEmptyEnvironment()); 
 		

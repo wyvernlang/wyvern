@@ -18,6 +18,9 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LetExpr extends CachingTypedAST implements CoreAST {
 	private DeclSequence decl;
 	private TypedAST body;
@@ -44,6 +47,19 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	public Value evaluate(Environment env) {
 		Environment newEnv = decl.evalDecls(env);
 		return body.evaluate(newEnv);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		childMap.put("decl", decl);
+		childMap.put("body", body);
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
 	}
 
 	@Override

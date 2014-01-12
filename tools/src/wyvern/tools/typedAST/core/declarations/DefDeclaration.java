@@ -1,7 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -82,6 +84,18 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	}
 
 	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		childMap.put("body", body);
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new DefDeclaration(nameBinding.getName(), type, argNames, newChildren.get("body"), isClass, location);
+	}
+
+	@Override
 	protected Type doTypecheck(Environment env) {
 		Environment extEnv = env;
 		for (NameBinding bind : argNames) {
@@ -138,4 +152,5 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	public FileLocation getLocation() {
 		return location; 
 	}
+
 }

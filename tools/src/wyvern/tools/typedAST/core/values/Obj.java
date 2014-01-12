@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -14,6 +15,9 @@ import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
@@ -35,9 +39,19 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	@Override
 	public Type getType() {
         updateTee();
-		return new ClassType(intEnv, new Reference<>(typeEquivEnv));
+		return new ClassType(intEnv, new Reference<>(typeEquivEnv), new LinkedList<String>());
 	}
-	
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
+	}
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 	}

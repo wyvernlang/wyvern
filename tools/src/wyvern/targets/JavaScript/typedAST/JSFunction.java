@@ -6,13 +6,13 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.typedAST.interfaces.ApplyableValue;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class JSFunction extends AbstractValue implements ApplyableValue, CoreAST {
 	private String name;
@@ -29,6 +29,16 @@ public class JSFunction extends AbstractValue implements ApplyableValue, CoreAST
 	@Override
 	public Type getType() {
 		return this.type;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return new JSFunction(type, name);
 	}
 
 	@Override

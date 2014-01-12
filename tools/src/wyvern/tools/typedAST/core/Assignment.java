@@ -25,6 +25,10 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
+
 public class Assignment extends CachingTypedAST implements CoreAST {
 	private TypedAST target;
 	private TypedAST value;
@@ -86,6 +90,19 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	@Override
 	public LineSequenceParser getLineSequenceParser() {
 		return null;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		children.put("target", target);
+		children.put("value", value);
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new Assignment(nc.get("target"), nc.get("value"), location);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

@@ -4,14 +4,13 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.typedAST.interfaces.ApplyableValue;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.Executor;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExternalFunction extends AbstractValue implements ApplyableValue, CoreAST {
 	private Type type;
@@ -25,6 +24,16 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 	@Override
 	public Type getType() {
 		return type;
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<String, TypedAST>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		return this;
 	}
 
 	@Override

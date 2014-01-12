@@ -20,6 +20,9 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 import javax.tools.Tool;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
@@ -105,6 +108,18 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		Value defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(new VarValue(defValue));
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Hashtable<String, TypedAST> children = new Hashtable<>();
+		children.put("definition", definition);
+		return children;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return new VarDeclaration(getName(), getType(), nc.get("definition"));
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

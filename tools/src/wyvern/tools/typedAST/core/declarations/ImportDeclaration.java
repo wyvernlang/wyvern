@@ -19,6 +19,8 @@ import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
@@ -160,5 +162,19 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		childMap.put("refb", ref.get());
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		ImportDeclaration importDeclaration = new ImportDeclaration(src, equivName, declEnv.get(), res, location);
+		importDeclaration.setASTRef(new Reference<TypedAST>(newChildren.get("refb")));
+		return importDeclaration;
 	}
 }

@@ -8,11 +8,15 @@ import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.rawAST.Symbol;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.ParameterizableType;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.CompilationContext;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class TypeParser {
 	public static ParseUtils.LazyEval<Type> parsePartialType(CompilationContext ctx) {
@@ -35,7 +39,7 @@ public class TypeParser {
 	}
 
 	private static ParseUtils.LazyEval<Type> parseTupleType(CompilationContext ctx) {
-		ParseUtils.LazyEval<Type> type = parseCompositeType(ctx);
+		ParseUtils.LazyEval<Type> type = parseTypeParameter(ctx);
 		while (ctx.getTokens() != null && ParseUtils.checkFirst("*", ctx)) {
 			final RawAST elem = ctx.getTokens();
 			ctx.setTokens(ctx.getTokens().getRest());
@@ -60,6 +64,33 @@ public class TypeParser {
 					return new Tuple(nt);
 				}
 
+			};
+		}
+		return type;
+	}
+
+	private static ParseUtils.LazyEval<Type> parseTypeParameter(CompilationContext ctx) {
+		final ParseUtils.LazyEval<Type> type = parseCompositeType(ctx);
+		if (ParseUtils.checkFirst("[", ctx)) {
+			final RawAST elem = ctx.getTokens();
+			ParseUtils.parseSymbol("[",ctx);
+			final LinkedList<ParseUtils.LazyEval<Type>> parameters = new LinkedList<>();
+			do {
+				parameters.add(parsePartialSimpleType(ctx));
+			} while (ctx.getTokens() != null && ParseUtils.checkFirst(",", ctx));
+			ParseUtils.parseSymbol("]",ctx);
+			return new ParseUtils.LazyEval<Type>() {
+
+				@Override
+				public Type eval(Environment env) {
+					Type pType = type.eval(env);
+					if (!(pType instanceof ParameterizableType))
+						ToolError.reportError(ErrorMessage.CANNOT_INVOKE, elem);
+					List<Type> evaluated = new LinkedList<>();
+					for (ParseUtils.LazyEval<Type> paramType : parameters)
+						evaluated.add(paramType.eval(env));
+					return ((ParameterizableType) pType).checkParameters(evaluated);
+				}
 			};
 		}
 		return type;
