@@ -3,7 +3,9 @@ package wyvern.tools.types.extensions;
 import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
 import static wyvern.tools.errors.ToolError.reportError;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -82,5 +84,17 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	@Override
 	public boolean isSimple() {
 		return false;
+	}
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		map.put("result", result);
+		map.put("argument", argument);
+		return map;
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return new Arrow(newChildren.get("argument"), newChildren.get("result"));
 	}
 }

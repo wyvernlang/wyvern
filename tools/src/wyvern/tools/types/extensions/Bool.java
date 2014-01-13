@@ -4,9 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
@@ -54,5 +52,16 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		return super.subtype(other, subtypes);
+	}
+
+
+	@Override
+	public Map<String, Type> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return this;
 	}
 }

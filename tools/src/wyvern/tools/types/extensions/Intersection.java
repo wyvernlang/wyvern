@@ -7,8 +7,7 @@ import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
 import static wyvern.tools.errors.ToolError.reportError;
@@ -102,5 +101,22 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 		reportError(ACTUAL_FORMAL_TYPE_MISMATCH, opExp, opExp.getArgument().typecheck(env).toString(),
                 toString());
 		return null; //Unreachable
+	}
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		for (int i = 0; i < types.size(); i++) {
+			map.put(i +"", types.get(i));
+		}
+		return map;
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		List<Type> result = new ArrayList<>(types.size());
+		for (int i = 0; i < types.size(); i++) {
+			result.add(newChildren.get(i + ""));
+		}
+		return new Intersection(result);
 	}
 }

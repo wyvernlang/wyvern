@@ -4,9 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
@@ -77,5 +75,16 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 		if (other instanceof JavaClassType)
 			return Util.javaToWyvType(Integer.class).subtype(other, subtypes);
 		return super.subtype(other, subtypes);
+	}
+
+
+	@Override
+	public Map<String, Type> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return this;
 	}
 }

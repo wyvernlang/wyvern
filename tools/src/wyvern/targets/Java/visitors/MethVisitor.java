@@ -231,6 +231,17 @@ public class MethVisitor extends BaseASTVisitor {
 			// TODO Auto-generated method stub
 			return true;
 		}
+		@Override
+		public Map<String, Type> getChildren() {
+			HashMap<String, Type> map = new HashMap<>();
+			map.put("refType", refType);
+			return map;
+		}
+
+		@Override
+		public Type cloneWithChildren(Map<String, Type> newChildren) {
+			return new ObjectType((ClassType) newChildren.get("refType"));
+		}
 	}
 	private class Frame {
 		private final Frame parent;

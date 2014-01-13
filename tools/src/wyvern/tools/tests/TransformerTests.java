@@ -1,14 +1,26 @@
 package wyvern.tools.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import wyvern.DSL.DSL;
+import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;
+import wyvern.tools.typedAST.transformers.Types.AbstractTypeTransformer;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Str;
+import wyvern.tools.util.Reference;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Ben Chung on 1/11/14.
@@ -73,6 +85,22 @@ public class TransformerTests {
 	public void testRep2() {
 		TypedAST ast = compile("class K\n\tval x = 2\n\tclass def create():K\n\t\tnew\nK.create().x");
 		TypedAST transformed = new SimpleReplacer(new IntegerConstant(2), new IntegerConstant(4)).transform(ast);
-		assert(transformed.evaluate(Environment.getEmptyEnvironment()).equals(new IntegerConstant(4)));
+		Assert.assertEquals(transformed.evaluate(Environment.getEmptyEnvironment()), (new IntegerConstant(4)));
+	}
+
+	@Test
+	public void testTTTransform() {
+		ClassType ct = new ClassType(new Reference<>(Environment.getEmptyEnvironment().extend(new NameBindingImpl("x", Int.getInstance()))),
+				new Reference<Environment>(null), new LinkedList<String>());
+		Type result = new AbstractTypeTransformer(){
+			@Override
+			public Type transform(Type type) {
+				if (type instanceof Int) {
+					return Str.getInstance();
+				}
+				return defaultTransformation(type);
+			}
+		}.transform(ct);
+		Assert.assertEquals(((OperatableType)result).checkOperator(new Invocation(null, "x", null, null), Environment.getEmptyEnvironment()), Str.getInstance());
 	}
 }

@@ -3,15 +3,15 @@ package wyvern.tools.types.extensions;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
@@ -155,5 +155,59 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		if (isParserValid)
 			return Util.toJavaClass(attrObj.get(), LineParser.class);
 		return null;
+	}
+
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		List<Binding> bindings = typeDeclEnv.get().getBindings();
+		writeBindings("denv", map, bindings);
+		return map;
+	}
+
+	private void writeBindings(String prefix, HashMap<String, Type> map, List<Binding> bindings) {
+		int i = 0;
+		for (Binding b : bindings) {
+			if (b instanceof NameBindingImpl) {
+				NameBindingImpl ni = (NameBindingImpl)b;
+				map.put(prefix+":"+i++ +":ni:"+ni.getName(), ni.getType());
+			} else if (b instanceof TypeBinding) {
+				TypeBinding tb = (TypeBinding)b;
+				map.put(prefix+":"+i++ +":tb:"+tb.getName(), tb.getType());
+			} else {
+				throw new RuntimeException("Unexpected binding");
+			}
+		}
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		ArrayList<String> denvList = new ArrayList<>(newChildren.keySet());
+		Comparator<String> c = new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				int io1 = Integer.parseInt(o1.split(":")[1]);
+				int io2 = Integer.parseInt(o2.split(":")[1]);
+				return io2 - io1;
+			}
+		};
+		Collections.sort(denvList, c);
+		Environment ndEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), denvList);
+		return new TypeType(new Reference<>(ndEnv));
+	}
+
+	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
+		for (String key : list) {
+			String[] kSplit = key.split(":");
+			Type nt = newChildren.get(key);
+			if(kSplit[2].equals("ni")) {
+				ndEnv = ndEnv.extend(new NameBindingImpl(kSplit[3], nt));
+			} else if (kSplit[2].equals("tb")) {
+				ndEnv = ndEnv.extend(new TypeBinding(kSplit[3], nt));
+			} else {
+				throw new RuntimeException("Unexpected binding");
+			}
+		}
+		return ndEnv;
 	}
 }

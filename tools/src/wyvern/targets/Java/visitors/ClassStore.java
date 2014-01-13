@@ -44,6 +44,16 @@ public class ClassStore {
 			// TODO Auto-generated method stub
 			return true;
 		}
+
+		@Override
+		public Map<String, Type> getChildren() {
+			return new HashMap<>();
+		}
+
+		@Override
+		public Type cloneWithChildren(Map<String, Type> newChildren) {
+			return this;
+		}
 	}
     private class GenericClassType implements Type {
         public final Type parent;
@@ -76,6 +86,16 @@ public class ClassStore {
 		public boolean isSimple() {
 			// TODO Auto-generated method stub
 			return true;
+		}
+
+		@Override
+		public Map<String, Type> getChildren() {
+			return new HashMap<>();
+		}
+
+		@Override
+		public Type cloneWithChildren(Map<String, Type> newChildren) {
+			return this;
 		}
     }
 	private static class ByteClassLoader extends ClassLoader {

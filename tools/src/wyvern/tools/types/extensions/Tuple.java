@@ -1,12 +1,12 @@
 package wyvern.tools.types.extensions;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
@@ -137,5 +137,22 @@ public class Tuple extends AbstractTypeImpl implements OperatableType {
 		if (num >= types.length)
 			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, opExp.getLocation());
 		return types[num];
+	}
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		for (int i = 0; i < types.length; i++) {
+			map.put(i +"", types[i]);
+		}
+		return map;
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		Type[] result = new Type[types.length];
+		for (int i = 0; i < types.length; i++) {
+			result[i] = newChildren.get(i + "");
+		}
+		return new Tuple(result);
 	}
 }

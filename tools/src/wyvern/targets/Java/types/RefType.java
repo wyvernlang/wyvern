@@ -5,7 +5,7 @@ import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,5 +47,16 @@ public class RefType implements Type {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		map.put("inner", inner);
+		return map;
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return new RefType(newChildren.get("inner"));
 	}
 }

@@ -1,6 +1,8 @@
 package wyvern.tools.types.extensions;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.SubtypeRelation;
@@ -25,5 +27,15 @@ public class Unit extends AbstractTypeImpl {
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		return super.subtype(other, subtypes);
+	}
+
+	@Override
+	public Map<String, Type> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return this;
 	}
 }
