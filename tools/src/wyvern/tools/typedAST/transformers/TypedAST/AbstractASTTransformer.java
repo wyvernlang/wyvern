@@ -1,9 +1,7 @@
-package wyvern.tools.typedAST.transformers;
+package wyvern.tools.typedAST.transformers.TypedAST;
 
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Map;
 
 public abstract class AbstractASTTransformer implements AstTransformer {

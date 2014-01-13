@@ -1,6 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.Iterator;
+import java.util.*;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
@@ -133,5 +133,23 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	@Override
 	public Environment evalDecl(Environment env) {
 		return evalDecls(env);
+	}
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		Map<String, TypedAST> childMap = new HashMap<>();
+		int i = 0;
+		for (TypedAST ast : this) {
+			childMap.put(i++ + "", ast);
+		}
+		return childMap;
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		List<TypedAST> result = new ArrayList<>(newChildren.size());
+		for (int i = 0; i < newChildren.size(); i++) {
+			result.add(newChildren.get(i + ""));
+		}
+		return new DeclSequence(result);
 	}
 }

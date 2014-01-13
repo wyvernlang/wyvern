@@ -99,8 +99,10 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		Hashtable<String, TypedAST> children = new Hashtable<>();
-		children.put("receiver", receiver);
-		children.put("argument", argument);
+		if (receiver != null)
+			children.put("receiver", receiver);
+		if (argument != null)
+			children.put("argument", argument);
 		return children;
 	}
 

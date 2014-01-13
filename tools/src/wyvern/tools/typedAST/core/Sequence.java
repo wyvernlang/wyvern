@@ -113,9 +113,9 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		ArrayList<TypedAST> result = new ArrayList<>(newChildren.size());
-		for (String k : newChildren.keySet()) {
-			result.add(Integer.parseInt(k), newChildren.get(k));
+		List<TypedAST> result = new ArrayList<>(newChildren.size());
+		for (int i = 0; i < newChildren.size(); i++) {
+			result.add(newChildren.get(i + ""));
 		}
 		return new Sequence(result);
 	}

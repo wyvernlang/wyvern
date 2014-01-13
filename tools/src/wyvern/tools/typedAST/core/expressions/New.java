@@ -73,16 +73,12 @@ public class New extends CachingTypedAST implements CoreAST {
 			return classVarType;
 		} else { // Standalone
 			isGeneric = true;
+
+			Environment mockEnv = Environment.getEmptyEnvironment();
+
 			LinkedList<Declaration> decls = new LinkedList<>();
 
-            Environment mockEnv = Environment.getEmptyEnvironment();
-
-			for (Map.Entry<String, TypedAST> elem : args.entrySet()) {
-				ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
-				e.typecheck(env);
-                mockEnv = e.extend(mockEnv);
-				decls.add(e);
-			}
+			mockEnv = getGenericDecls(env, mockEnv, decls);
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
 			cls = classDeclaration;
@@ -90,14 +86,40 @@ public class New extends CachingTypedAST implements CoreAST {
 		}
 	}
 
+	private Environment getGenericDecls(Environment env, Environment mockEnv, LinkedList<Declaration> decls) {
+		for (Entry<String, TypedAST> elem : args.entrySet()) {
+			ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
+			e.typecheck(env);
+			mockEnv = e.extend(mockEnv);
+			decls.add(e);
+		}
+		return mockEnv;
+	}
+
 	@Override
 	public Value evaluate(Environment env) {
 		Environment argValEnv = Environment.getEmptyEnvironment();
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
-		cls.evalDecl(env, cls.extendWithValue(Environment.getEmptyEnvironment()));
+
+		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class);
+		ClassDeclaration classDecl;
+		if (classVarTypeBinding != null)
+			classDecl = classVarTypeBinding.getClassDecl();
+		else {
+
+			Environment mockEnv = Environment.getEmptyEnvironment();
+
+			LinkedList<Declaration> decls = new LinkedList<>();
+
+			mockEnv = getGenericDecls(env, mockEnv, decls);
+
+			classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
+		}
+
+		classDecl.evalDecl(env, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
 		AtomicReference<Value> objRef = new AtomicReference<>();
-		objRef.set(new Obj(cls.getFilledBody(objRef).extend(argValEnv)));
+		objRef.set(new Obj(classDecl.getFilledBody(objRef).extend(argValEnv)));
 		return objRef.get();
 	}
 
@@ -109,7 +131,9 @@ public class New extends CachingTypedAST implements CoreAST {
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 
-		return new New(newChildren, location);
+		New aNew = new New(newChildren, location);
+		aNew.cls = cls;
+		return aNew;
 	}
 
 	public ClassDeclaration getClassDecl() {
