@@ -1,6 +1,5 @@
 package wyvern.targets.JavaScript.typedAST;
 
-import sun.util.logging.resources.logging_zh_CN;
 import wyvern.targets.JavaScript.types.JSObjectType;
 import wyvern.targets.JavaScript.visitors.JSCodegenVisitor;
 import wyvern.tools.errors.FileLocation;
