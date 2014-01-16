@@ -31,6 +31,7 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.DSLDummy;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
@@ -364,9 +365,19 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
     private TypedAST parseDSL(CompilationContext ctx) {
         TypedAST ast = parseTuple(ctx);
 
-		DSLDummy dslToken = ctx.getDSLToken();
+		final DSLDummy dslToken = ctx.getDSLToken();
         if (dslToken != null && ctx.getTokens() != null) {
-            dslToken.setDef(dslToken.getExpected().getParser().parse(ast, ctx));
+			final TypedAST dslAST = dslToken.getExpected().getParser().parse(ast, ctx);
+			ast = new AbstractASTTransformer() {
+
+				@Override
+				public TypedAST transform(TypedAST input) {
+					if (input == dslToken)
+						return dslAST;
+					else
+						return defaultTransformation(input);
+				}
+			}.transform(ast);
         }
 
         return ast;
