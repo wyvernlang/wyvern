@@ -2,7 +2,6 @@ package wyvern.tools.tests;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Compiler;
 import wyvern.tools.errors.FileLocation;
@@ -21,6 +20,7 @@ import wyvern.tools.types.Environment;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class TypeExtensionParsingTests {
@@ -88,7 +88,7 @@ public class TypeExtensionParsingTests {
             }
         };
 		//Thread.sleep(10000);
-		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, Arrays.asList(new DSL[] { verb }));
+		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, Arrays.asList(new DSL[]{verb}));
 		Compiler.flush();
 		pair.typecheck(Environment.getEmptyEnvironment());
 		Value evaluate = pair.evaluate(Environment.getEmptyEnvironment());
