@@ -2,7 +2,7 @@ package wyvern.tools.tests;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Compiler;
 import wyvern.tools.errors.FileLocation;
