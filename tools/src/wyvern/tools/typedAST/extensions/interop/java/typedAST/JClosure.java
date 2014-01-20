@@ -41,6 +41,11 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 			this.srcClass = source;
 		}
 
+		@Override
+		public String toString() {
+			return handle.toString();
+		}
+
 		public MethodHandle getHandle() {
 			return handle;
 		}
