@@ -89,6 +89,13 @@ public class ParsingTests {
 				 "			\"Hi\"";
 		TypedAST ast = doCompile(testStr);
 		Value result = ast.evaluate(Globals.getStandardEnv());
-		Assert.assertEquals("StringConstant(\"<html>\n<body>\n<div id=\"main\" class=\"test\">\nHi\n</div>\n</body>\n</html>\n\")",result.toString());
+		Assert.assertEquals("StringConstant(\"<html>\n" +
+				"<body>\n" +
+				"<div class=\"test\" id=\"main\">\n" +
+				"Hi\n" +
+				"</div>\n" +
+				"</body>\n" +
+				"</html>\n" +
+				"\")",result.toString());
 	}
 }
