@@ -94,4 +94,8 @@ public class JavaMeth extends DefDeclaration {
 		ValueBinding vb = (ValueBinding) declEnv.lookup(getName());
 		vb.setValue(closure);
 	}
+	@Override
+	public String toString() {
+		return "JMeth " + getName();
+	}
 }

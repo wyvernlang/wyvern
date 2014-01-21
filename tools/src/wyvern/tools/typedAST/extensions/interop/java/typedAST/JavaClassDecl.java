@@ -40,20 +40,34 @@ public class JavaClassDecl extends ClassDeclaration {
 			if (cstrs.size() > 0)
 				decls.add(new JavaMeth("new", cstrs));
 
+			//Instance method map
 			HashMap<String, List<Pair<MethodHandle, Method>>> map = new HashMap<>();
+
+			//Class method map
+			HashMap<String, List<Pair<MethodHandle, Method>>> sMap = new HashMap<>();
 			for (Method m : clazz.getMethods()) {
-				if (map.containsKey(m.getName())) {
+				if (sMap.containsKey(m.getName()) && Modifier.isStatic(m.getModifiers())) {
+					sMap.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
+					continue;
+				} else if (map.containsKey(m.getName())) {
 					map.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
 					continue;
 				}
 				ArrayList<Pair<MethodHandle, Method>> list = new ArrayList<>();
 				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)), m));
-				map.put(m.getName(), list);
+				if (!Modifier.isStatic(m.getModifiers()))
+					map.put(m.getName(), list);
+				else
+					sMap.put(m.getName(), list);
 			}
 
             for (Field f : clazz.getFields()) {
                 decls.add(new JavaField(f,null,null));//TODO pending upstream push of OpenJDK patch 8009222
             }
+
+			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
+				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
+			}
 
 			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : map.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
