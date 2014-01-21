@@ -4,6 +4,14 @@ import java.io.InputStream;
 import java.io.Reader;
 import wyvern.tools.lex.Token.Kind;
 
+/** Current limitations:
+ *   - DSL blocks are not implemented (and thus neither are raw streams)
+ *   - lookahead is not implemented
+ *   - the lexer still generates INDENT and DEDENT between parentheses
+ * 
+ * @author aldrich
+ *
+ */
 public class LexStream implements ILexStream {
 	private Token currentToken = null;
 	private ILexInput lexInput;
