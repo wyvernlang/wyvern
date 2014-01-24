@@ -3,3 +3,4 @@ bin
 tools/wyvern-tools.iml
 *.class
 *.prefs
+tools/.classpath
