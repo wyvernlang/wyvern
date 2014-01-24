@@ -2,6 +2,9 @@ package wyvern.tools.lex;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import wyvern.tools.lex.Token.Kind;
 
 /** Current limitations:
@@ -16,6 +19,8 @@ public class LexStream implements ILexStream {
 	private Token currentToken = null;
 	private ILexInput lexInput;
 	private ILexData lexData;
+
+	private LinkedList<Token> lookaheadCache = new LinkedList<>();
 
 	public LexStream(String filename, Reader r) {
 		lexInput = new LexInput(filename, r);
@@ -44,8 +49,17 @@ public class LexStream implements ILexStream {
 
 	@Override
 	public Token lookAhead(int n) {
-		// TODO implement me (probably later)
-		throw new UnsupportedOperationException();
+		if (lookaheadCache.size() > n) {
+			return lookaheadCache.get(n);
+		}
+		LinkedList<Token> tokens = new LinkedList<>();
+		for (int i = 0; i < n + 1; i++) {
+			tokens.add(next());
+		}
+		Token result = tokens.getLast();
+		tokens.addAll(lookaheadCache);
+		lookaheadCache = tokens;
+		return result;
 	}
 
 	@Override
@@ -57,6 +71,10 @@ public class LexStream implements ILexStream {
 	/** ensures currentTok != null */
 	private void fill() {
 		if (currentToken == null) {
+			if (lookaheadCache.size() > 0){
+				currentToken = lookaheadCache.poll();
+				return;
+			}
 			currentToken = lexData.getLexerState().getToken(lexInput, lexData);
 		}		
 	}	
