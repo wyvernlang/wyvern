@@ -3,6 +3,7 @@ package wyvern.tools.prsr.std;
 import wyvern.tools.lex.ILexStream;
 import wyvern.tools.prsr.Parser;
 import wyvern.tools.prsr.ParserException;
+import wyvern.tools.prsr.util.TransactionalStream;
 
 import java.util.Arrays;
 import java.util.List;

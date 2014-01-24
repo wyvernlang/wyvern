@@ -3,9 +3,7 @@ package wyvern.tools.prsr.std;
 import wyvern.tools.lex.ILexStream;
 import wyvern.tools.prsr.Parser;
 import wyvern.tools.prsr.ParserException;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.prsr.util.TransactionalStream;
 import wyvern.tools.util.Pair;
 
 /**

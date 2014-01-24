@@ -1,4 +1,4 @@
-package wyvern.tools.prsr.std;
+package wyvern.tools.prsr.util;
 
 import wyvern.tools.lex.ILexStream;
 import wyvern.tools.lex.Token;
