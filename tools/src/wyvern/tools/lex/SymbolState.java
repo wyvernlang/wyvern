@@ -29,7 +29,7 @@ public class SymbolState implements ILexerState {
 						// read and return the symbol
 						lexer.read();
 						lexData.setLexerState(MidLineState.getInstance());
-						return Token.getGroup(ch);
+						return Token.getGroup(ch, lexer.getLocation());
 					} else {
 						// return what is read so far; then get back to reading symbols
 						lexData.setLexerState(SymbolState.getInstance());

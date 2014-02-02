@@ -21,22 +21,31 @@ public class Token implements HasLocation {
 	private Token(Kind k, FileLocation location) { kind = k; text = ""; value = 0; this.location = location; }
 	private Token(Kind k, String t, FileLocation location) { kind = k; text = t; value = 0; this.location = location; }
 	private Token(Kind k, String t, int val, FileLocation location) { kind = k; text = t; value = val; this.location = location; }
-	
-	private static Token tokenEOF = new Token(Kind.EOF,FileLocation.UNKNOWN);
+
 	public static Token getEOF() {
-		return tokenEOF;
+		return new Token(Kind.EOF,FileLocation.UNKNOWN);
 	}
-	private static Token tokenNEWLINE = new Token(Kind.NEWLINE,FileLocation.UNKNOWN);
 	public static Token getNEWLINE() {
-		return tokenNEWLINE;
+		return new Token(Kind.NEWLINE,FileLocation.UNKNOWN);
 	}
-	private static Token tokenINDENT = new Token(Kind.INDENT,FileLocation.UNKNOWN);
 	public static Token getINDENT() {
-		return tokenINDENT;
+		return new Token(Kind.INDENT,FileLocation.UNKNOWN);
 	}
-	private static Token tokenDEDENT = new Token(Kind.DEDENT,FileLocation.UNKNOWN);
 	public static Token getDEDENT() {
-		return tokenDEDENT;
+		return new Token(Kind.DEDENT,FileLocation.UNKNOWN);
+	}
+
+	public static Token getEOF(FileLocation location) {
+		return new Token(Kind.EOF,location);
+	}
+	public static Token getNEWLINE(FileLocation location) {
+		return new Token(Kind.NEWLINE,location);
+	}
+	public static Token getINDENT(FileLocation location) {
+		return new Token(Kind.INDENT,location);
+	}
+	public static Token getDEDENT(FileLocation location) {
+		return new Token(Kind.DEDENT,location);
 	}
 	private static Token LPAREN = new Token(Kind.LPAREN, "(",FileLocation.UNKNOWN);
 	private static Token RPAREN = new Token(Kind.RPAREN, ")",FileLocation.UNKNOWN);
@@ -44,15 +53,19 @@ public class Token implements HasLocation {
 	private static Token RBRACE = new Token(Kind.RBRACE, "}",FileLocation.UNKNOWN);
 	private static Token LBRACK = new Token(Kind.LBRACK, "[",FileLocation.UNKNOWN);
 	private static Token RBRACK = new Token(Kind.RBRACK, "]",FileLocation.UNKNOWN);
-	
+
 	public static Token getGroup(char ch) {
+		return getGroup(ch, FileLocation.UNKNOWN);
+	}
+
+	public static Token getGroup(char ch, FileLocation location) {
 		switch(ch) {
-			case '(': return LPAREN;
-			case ')': return RPAREN;
-			case '[': return LBRACK;
-			case ']': return RBRACK;
-			case '{': return LBRACE;
-			case '}': return RBRACE;
+			case '(': return new Token(Kind.LPAREN, "(",location);
+			case ')': return new Token(Kind.RPAREN, ")",location);
+			case '{': return new Token(Kind.LBRACE, "{",location);
+			case '}': return new Token(Kind.RBRACE, "}",location);
+			case '[': return new Token(Kind.LBRACK, "[",location);
+			case ']': return new Token(Kind.RBRACK, "]",location);
 		}
 		ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
 		return null; // Unreachable.

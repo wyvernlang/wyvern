@@ -55,16 +55,18 @@ class LexInput implements ILexInput {
 	public int getLineNumber() {
 		return lineNum;
 	}
-	
+	int gidx = 0;
 	@Override
 	public FileLocation getLocation() {
-		return new FileLocation(filename, lineNum, charNum);
+		return new FileLocation(filename, lineNum, charNum, gidx);
 	}
 	
 	private void fill() {
 		try {
-			if (currentChar == -1)
+			if (currentChar == -1) {
+				gidx++;
 				currentChar = reader.read();
+			}
 		} catch (IOException e) {
 			ToolError.reportError(ErrorMessage.LEXER_ERROR, HasLocation.UNKNOWN);
 		}

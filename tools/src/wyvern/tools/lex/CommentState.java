@@ -32,7 +32,7 @@ public class CommentState implements ILexerState {
 		while (true) {
 			if (!lexer.hasNext()) {
 				lexData.setLexerState(InitialState.getInstance());
-				return Token.getEOF();
+				return Token.getEOF(lexer.getLocation());
 			}
 			
 			char current = lexer.read();

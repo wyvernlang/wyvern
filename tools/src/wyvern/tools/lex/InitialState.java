@@ -23,7 +23,7 @@ public class InitialState implements ILexerState {
 		while (true) {
 			// if end of file, return EOF token
 			if (!input.hasNext()) {
-				return Token.getEOF();
+				return Token.getEOF(input.getLocation());
 			}
 			
 			char ch = input.peek();
@@ -77,15 +77,15 @@ public class InitialState implements ILexerState {
 					
 		// Doesn't work hugely well with changing amounts of spacing.
 		if (start.equals(lexData.getCurrentPrefix())) {
-			token = Token.getNEWLINE();
+			token = Token.getNEWLINE(lexInput.getLocation());
 		} else if (start.startsWith(lexData.getCurrentPrefix())) {
-			token = Token.getINDENT();
+			token = Token.getINDENT(lexInput.getLocation());
 			lexData.pushPrefix(start);
 		} else if (lexData.getCurrentPrefix().startsWith(start)) {
 			lexData.popPrefix();
 			if (!lexData.getCurrentPrefix().equals(start))
 				lexData.setLexerState(InitialState.getInstance());
-			token = Token.getDEDENT();
+			token = Token.getDEDENT(lexInput.getLocation());
 		} else {
 			// This is commonly caused by inconsistent indentation (i.e. tabs vs spaces).  Best practice is to use spaces everywhere.
 			ToolError.reportError(ErrorMessage.LEXER_ERROR, lexInput.getLocation());
