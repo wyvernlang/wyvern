@@ -44,6 +44,7 @@ class LexInput implements ILexInput {
 		char ch = (char) currentChar;
 		currentChar = -1;
 		charNum++;
+		gidx++;
 		if (ch == '\n') {
 			lineNum++;
 			charNum = 0;
@@ -64,7 +65,6 @@ class LexInput implements ILexInput {
 	private void fill() {
 		try {
 			if (currentChar == -1) {
-				gidx++;
 				currentChar = reader.read();
 			}
 		} catch (IOException e) {
