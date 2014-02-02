@@ -126,4 +126,15 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	public FileLocation getLocation() {
 		return this.location; //TODO
 	}
+
+	@Override
+	public Environment extendTypes(Environment env) {
+		return env;
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		//TODO
+		return env.extend(binding);
+	}
 }

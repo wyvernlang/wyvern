@@ -12,7 +12,17 @@ import wyvern.tools.util.TreeWriter;
 
 public class Tuple extends AbstractTypeImpl implements OperatableType {
 	private Type[] types;
-	
+
+	public static Type fromList(List<Type> types) {
+		if (types.size() == 0) {
+			return Unit.getInstance();
+		} else if (types.size() == 1) {
+			return types.get(0);
+		} else {
+			return new Tuple(types.toArray(new Type[types.size()]));
+		}
+	}
+
 	public Tuple(Type[] types) {
 		this.types = types;
 	}

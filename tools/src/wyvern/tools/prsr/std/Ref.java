@@ -8,7 +8,7 @@ import wyvern.tools.util.Reference;
 /**
  * Created by Ben Chung on 1/24/14.
  */
-public class Ref<T> implements Parser<T> {
+public class Ref<T> extends AbstractParser<T> {
 	private Reference<Parser<T>> ref;
 
 	public Ref(Reference<Parser<T>> ref) {
@@ -17,6 +17,7 @@ public class Ref<T> implements Parser<T> {
 
 	@Override
 	public T parse(ILexStream stream) throws ParserException {
+		preParse();
 		return ref.get().parse(stream);
 	}
 }

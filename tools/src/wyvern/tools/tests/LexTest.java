@@ -214,7 +214,7 @@ public class LexTest {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 		int n = 0;
 		Token token = lexer.next();
-		while (token != Token.getEOF()) {
+		while (token.kind != Token.Kind.EOF) {
 			tokens.add(token);
 			token = lexer.next();
 			n++;

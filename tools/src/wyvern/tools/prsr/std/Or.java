@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Ben Chung on 1/24/14.
  */
-public class Or<T> implements Parser<T> {
+public class Or<T> extends AbstractParser<T> {
 	private List<Parser<T>> clauses;
 
 	public Or(List<Parser<T>> clauses) {
@@ -24,15 +24,17 @@ public class Or<T> implements Parser<T> {
 
 	@Override
 	public T parse(ILexStream stream) throws ParserException {
-		for (Parser<T> parser : clauses)
+		preParse();
+		for (Parser<T> parser : clauses) {
+			TransactionalStream ts = TransactionalStream.transaction(stream);
 			try {
-				TransactionalStream ts = new TransactionalStream(stream);
 				T result = parser.parse(ts);
-				ts.apply();
+				ts.commit();
 				return result;
 			} catch (ParserException e) {
-
+				ts.rollback();
 			}
-		throw new ParserException();
+		}
+		throw new ParserException(stream.peek());
 	}
 }

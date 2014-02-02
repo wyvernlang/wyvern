@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Ben Chung on 1/24/14.
  */
-public class Rep<T> implements Parser<List<T>> {
+public class Rep<T> extends AbstractParser<List<T>> {
 	private Parser<T> rep;
 
 	public Rep(Parser<T> rep) {
@@ -19,13 +19,15 @@ public class Rep<T> implements Parser<List<T>> {
 	}
 	@Override
 	public List<T> parse(ILexStream stream) throws ParserException {
+		preParse();
 		LinkedList<T> output = new LinkedList<>();
 		while (true) {
+			TransactionalStream ts = TransactionalStream.transaction(stream);
 			try {
-				TransactionalStream ts = new TransactionalStream(stream);
 				output.add(rep.parse(ts));
-				ts.apply();
+				ts.commit();
 			} catch (ParserException e) {
+				ts.rollback();
 				break;
 			}
 		}

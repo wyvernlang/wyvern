@@ -177,4 +177,20 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		importDeclaration.setASTRef(new Reference<TypedAST>(newChildren.get("refb")));
 		return importDeclaration;
 	}
+
+	@Override
+	public Environment extendTypes(Environment env) {
+		if (res instanceof ImportEnvResolver && defaultN) {
+			return ((ImportEnvResolver) res).doExtend(env, equivName, ref);
+		}
+		return env.extend(new NameBindingImpl(equivName, equivType));
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		if (res instanceof ImportEnvResolver && defaultN) {
+			return ((ImportEnvResolver) res).doExtend(env, equivName, ref);
+		}
+		return env.extend(new NameBindingImpl(equivName, equivType));
+	}
 }

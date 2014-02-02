@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -39,6 +40,18 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	public ClassType getAttrType() {
 		return (ClassType) nameBinding.getType();
+	}
+
+	@Override
+	public Environment extendTypes(Environment env) {
+		declEnv.set(decls.extendTypes(declEnv.get()));
+		return env.extend(nameBinding);
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		declEnv.set(decls.extendNames(declEnv.get()));
+		return env;
 	}
 
 	public static class AttributeDeclaration extends Declaration {
@@ -100,6 +113,16 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		public TypedAST getBody() {
 			return body;
+		}
+
+		@Override
+		public Environment extendTypes(Environment env) {
+			return env;
+		}
+
+		@Override
+		public Environment extendNames(Environment env) {
+			return env;
 		}
 	}
 

@@ -10,7 +10,7 @@ import java.util.function.Function;
 /**
  * Created by Ben Chung on 1/24/14.
  */
-public class Computed<T,V> implements Parser<T> {
+public class Computed<T,V> extends AbstractParser<T> {
 	private final Parser<V> src;
 	private final Function<V, T> tform;
 
@@ -22,12 +22,15 @@ public class Computed<T,V> implements Parser<T> {
 
 	@Override
 	public T parse(ILexStream stream) throws ParserException {
+		preParse();
+		TransactionalStream ts = TransactionalStream.transaction(stream);
 		try {
-			TransactionalStream ts = new TransactionalStream(stream);
-			T apply = tform.apply(src.parse(ts));
-			ts.apply();
+			V parse = src.parse(ts);
+			T apply = tform.apply(parse);
+			ts.commit();
 			return apply;
 		} catch (ParserException e) {
+			ts.rollback();
 			throw e;
 		}
 	}

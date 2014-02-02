@@ -310,4 +310,29 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public List<String> getTypeParams() {
 		return typeParams;
 	}
+
+
+	@Override
+	public Environment extendTypes(Environment env) {
+		Environment ienv = Environment.getEmptyEnvironment();
+		if (decls != null)
+			for (Declaration decl : decls.getDeclIterator()) {
+				ienv = decl.extendTypes(ienv);
+			}
+		this.declEnvRef.set(ienv);
+		return env.extend(nameBinding);
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		Environment ienv = declEnvRef.get();
+
+		if (decls != null)
+			for (Declaration decl : decls.getDeclIterator()) {
+				ienv = decl.extendNames(ienv);
+			}
+
+		this.declEnvRef.set(ienv);
+		return env;
+	}
 }

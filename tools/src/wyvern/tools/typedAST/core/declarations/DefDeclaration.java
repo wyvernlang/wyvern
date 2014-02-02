@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -13,6 +14,7 @@ import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.TypeAsc;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -22,6 +24,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
@@ -31,14 +34,20 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	private NameBinding nameBinding;
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
+
+	private TypeAsc typeAsc;
+	private List<Pair<String, TypeAsc>> args;
 	
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef, FileLocation location) {
-		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
-		this.type = fullType; // getMethodType(args, returnType);
-		nameBinding = new NameBindingImpl(name, this.type);
+		this(name, (env) -> fullType, argNames.stream().map(binding -> new Pair<String,TypeAsc>(binding.getName(), env -> binding.getType())).collect(Collectors.<Pair<String,TypeAsc>>toList()), body, isClassDef, location);
+	}
+
+	public DefDeclaration(String name, TypeAsc asc, List<Pair<String ,TypeAsc>> args, TypedAST body, boolean isClass, FileLocation location) {
+		nameBinding = new NameBindingImpl(name, null);
+		this.typeAsc = asc;
+		this.args = args;
 		this.body = body;
-		this.argNames = argNames;
-		this.isClass = isClassDef;
+		this.isClass = isClass;
 		this.location = location;
 	}
 
@@ -70,6 +79,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
+		writer.writeArgs(nameBinding.getName(), body);
 		// TODO: implement me
 	}
 
@@ -97,6 +107,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		nameBinding = new NameBindingImpl(nameBinding.getName(), getIType(env));
+		argNames = args.stream().map(pair->new NameBindingImpl(pair.first, pair.second.getAsc(env))).collect(Collectors.toList());
+
 		Environment extEnv = env;
 		for (NameBinding bind : argNames) {
 			extEnv = extEnv.extend(bind);
@@ -105,12 +118,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 			Type bodyType = body.typecheck(extEnv); // Can be null for meth inside type!
 			
 			Type retType;
+			type = nameBinding.getType();
 			if (type instanceof Arrow) {
 				retType = ((Arrow) type).getResult();
 			} else {
 				retType = type;
 			}
-			
+
 			if (bodyType != null && !bodyType.subtype(retType))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
 		}
@@ -119,6 +133,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	protected Environment doExtend(Environment old) {
+		nameBinding = new NameBindingImpl(nameBinding.getName(), getIType(old));
 		Environment newEnv = old.extend(nameBinding);
 		return newEnv;
 	}
@@ -153,4 +168,21 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 		return location; 
 	}
 
+	@Override
+	public Environment extendTypes(Environment env) {
+		return env;
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		Arrow type = getIType(env);
+		nameBinding = new NameBindingImpl(getName(), type);
+
+		return env.extend(nameBinding);
+	}
+
+	private Arrow getIType(Environment env) {
+		List<Type> argsTypes = args.stream().map(pair->pair.second.getAsc(env)).collect(Collectors.toList());
+		return new Arrow(Tuple.fromList(argsTypes), typeAsc.getAsc(env));
+	}
 }

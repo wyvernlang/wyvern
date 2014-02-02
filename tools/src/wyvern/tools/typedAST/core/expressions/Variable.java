@@ -2,7 +2,10 @@ package wyvern.tools.typedAST.core.expressions;
 
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
+
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.Binding;
@@ -20,44 +23,49 @@ import java.util.Map;
 
 public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	private NameBinding binding;
+
+	private String name;
+	private Type type;
 	
 	public Variable(NameBinding binding, FileLocation location) {
-		this.binding = binding;
+		this(binding.getName(), location);
+	}
+
+	public Variable(String name, FileLocation location) {
+		this.name = name;
 		this.location = location;
 	}
 
 	public String getName() {
-		return this.binding.getName();
+		return name;
 	}
 	
 	@Override
 	public Type getType() {
-		return binding.getType();
+		if (type == null)
+			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, location, name);
+		return type;
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName());		
+		writer.writeArgs(name);
 	}
 
 	@Override
 	public Type typecheck(Environment env) {
-		Type type = getType();
-		if (type == null) {
-			String name = binding.getName();
-			binding = env.lookup(name);
-			if (binding == null)
-				reportError(VARIABLE_NOT_DECLARED, this, name);
-			else
-				type = binding.getType();
-		}
+		binding = env.lookup(name);
+		if (binding == null)
+			reportError(VARIABLE_NOT_DECLARED, this, name);
+		else
+			type = binding.getType();
 		return type;
 	}
 
 	@Override
 	public Value evaluate(Environment env) {
 		//Value value = binding.getValue(env);
-		Value value = env.getValue(binding.getName());
+		Value value = env.getValue(name);
 		assert value != null;
 		if (value instanceof VarValue) {
 			return ((VarValue)value).getValue();
@@ -72,7 +80,7 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Value evaluateAssignment(Assignment ass, Environment env) {
-		Value value = env.getValue(binding.getName());
+		Value value = env.getValue(name);
 		if (!(value instanceof VarValue)) {
 			throw new RuntimeException("Trying to assign a non-var");
 		}
@@ -90,7 +98,9 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new Variable(binding, location);
+		Variable variable = new Variable(name, location);
+		variable.type = type;
+		return variable;
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

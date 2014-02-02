@@ -9,11 +9,11 @@ import wyvern.tools.util.Pair;
 /**
  * Created by Ben Chung on 1/24/14.
  */
-public class Concat<T,V> implements Parser<Pair<T,V>> {
-	public static <L,K> Parser<K> getRightConcat(Parser<L> first, Parser<K> last) {
+public class Concat<T,V> extends AbstractParser<Pair<T,V>> {
+	public static <L,K> AbstractParser<K> getRightConcat(Parser<L> first, Parser<K> last) {
 		return new Computed<>(new Concat<L,K>(first, last), (tuple) -> tuple.second);
 	}
-	public static <L,K> Parser<L> getLefConcat(Parser<L> first, Parser<K> last) {
+	public static <L,K> AbstractParser<L> getLeftConcat(Parser<L> first, Parser<K> last) {
 		return new Computed<>(new Concat<L,K>(first, last), (tuple) -> tuple.first);
 	}
 
@@ -28,14 +28,16 @@ public class Concat<T,V> implements Parser<Pair<T,V>> {
 
 	@Override
 	public Pair<T,V> parse(ILexStream stream) throws ParserException {
-		TransactionalStream ts = new TransactionalStream(stream);
+		preParse();
+		TransactionalStream ts = TransactionalStream.transaction(stream);
 		T a;
 		V b;
 		try {
 			a = first.parse(ts);
 			b = last.parse(ts);
-			ts.apply();
+			ts.commit();
 		} catch (ParserException e) {
+			ts.rollback();
 			throw e;
 		}
 		return new Pair<>(a,b);

@@ -40,8 +40,8 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	
 	@Override
 	public final Type typecheck(Environment env) {
-		Environment newEnv = extend(env);
-		return typecheckSelf(newEnv);
+		//Environment newEnv = extend(env);
+		return typecheckSelf(env);
 	}
 
 	public abstract String getName();

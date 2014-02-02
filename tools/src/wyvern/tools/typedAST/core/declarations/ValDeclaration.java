@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.extensions.TypeAsc;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -20,6 +21,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class ValDeclaration extends Declaration implements CoreAST {
+	private TypeAsc asc;
 	TypedAST definition;
 	Type definitionType;
 	NameBinding binding;
@@ -30,16 +32,24 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
+		this(name, definition::typecheck, definition, location);
 		this.definition=definition;
 		binding = new NameBindingImpl(name, null);
 		this.location = location;
 	}
-	
+
 	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
-		this.definition=definition;
-		binding = new NameBindingImpl(name, type);
-		this.location = location;
+		this(name, env -> type, definition, location);
 	}
+
+	public ValDeclaration(String name, TypeAsc asc, TypedAST definition, FileLocation location) {
+		this.asc = asc;
+		this.definition=definition;
+		binding = new NameBindingImpl(name, null);
+		this.location = location;
+
+	}
+
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
@@ -48,15 +58,17 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		if (getType() == null && definition == null)
+			ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, this);
+		Type ascType = asc.getAsc(env);
+		binding = new NameBindingImpl(getName(), ascType);
 		if (this.definition != null)
 			this.definitionType = this.definition.typecheck(env);
-		if (binding.getType() == null) {
-			this.binding = new NameBindingImpl(binding.getName(), definitionType);
-		} else if (this.definitionType != null && !this.definitionType.subtype(binding.getType())){
+
+		if (this.definitionType != null && !this.definitionType.subtype(ascType))
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, this.definitionType.toString(), binding.getType().toString());
-		}
-		
-		return binding.getType();
+
+		return ascType;
 	}
 
 	@Override
@@ -121,5 +133,17 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location; //TODO
+	}
+
+	@Override
+	public Environment extendTypes(Environment env) {
+		return env;
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		Type ascType = asc.getAsc(env);
+		binding = new NameBindingImpl(binding.getName(), ascType);
+		return env.extend(binding);
 	}
 }

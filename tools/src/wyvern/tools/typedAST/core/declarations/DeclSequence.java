@@ -39,7 +39,33 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			}
 
 		});
-		
+	}
+
+	public DeclSequence(final Iterator<TypedAST> iterator) {
+		super(new Iterable<TypedAST>() {
+
+			@Override
+			public Iterator<TypedAST> iterator() {
+				return new Iterator<TypedAST>() {
+					@Override
+					public boolean hasNext() {
+						return iterator.hasNext();
+					}
+
+					@Override
+					public TypedAST next() {
+						return iterator.next();
+					}
+
+					@Override
+					public void remove() {
+						iterator.remove();
+					}
+
+				};
+			}
+
+		});
 	}
 
 	public DeclSequence(final Sequence declAST) {
@@ -78,10 +104,13 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	@Override
 	public Type typecheck(Environment env) {
 		for (TypedAST d : this)
-			env = ((EnvironmentExtender) d).extend(env);
-		for (TypedAST d : this) {
+			env= ((EnvironmentExtender)d).extendTypes(env);
+		for (TypedAST d : this)
+			env= ((EnvironmentExtender)d).extendNames(env);
+		for (TypedAST d : this)
 			d.typecheck(env);
-		}
+		for (TypedAST d : this)
+			env = ((EnvironmentExtender) d).extend(env);
 		
 		return wyvern.tools.types.extensions.Unit.getInstance();
 	}
@@ -121,6 +150,20 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			d.evalDecl(bodyEnv, declEnv);
 		}
 		return newEnv;
+	}
+
+	@Override
+	public Environment extendTypes(Environment env) {
+		for (EnvironmentExtender extender : getDeclIterator())
+			env = extender.extendTypes(env);
+		return env;
+	}
+
+	@Override
+	public Environment extendNames(Environment env) {
+		for (EnvironmentExtender extender : getDeclIterator())
+			env = extender.extendNames(env);
+		return env;
 	}
 
 	public final Environment extend(Environment old) {
