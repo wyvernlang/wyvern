@@ -31,7 +31,7 @@ public class Terminal extends AbstractParser<Token> {
 	}
 
 	@Override
-	public Token parse(ILexStream stream) throws ParserException {
+	public Token doParse(ILexStream stream) throws ParserException {
 		preParse();
 		Token next = stream.peek();
 		if (kind != null && token != null) {
@@ -53,5 +53,18 @@ public class Terminal extends AbstractParser<Token> {
 			throw new ParserException(next);
 		}
 		throw new ParserException(next);
+	}
+
+	public String toString() {
+		if (kind != null && token != null) {
+			return token +":"+kind;
+		}
+		if (kind != null) {
+			return ":"+kind;
+		}
+		if (token != null) {
+			return token;
+		}
+		return "EMP";
 	}
 }

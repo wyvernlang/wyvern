@@ -15,17 +15,16 @@ public class Computed<T,V> extends AbstractParser<T> {
 	private final Function<V, T> tform;
 
 	public Computed(Parser<V> src, Function<V,T> tform) {
-
 		this.src = src;
 		this.tform = tform;
 	}
 
 	@Override
-	public T parse(ILexStream stream) throws ParserException {
+	public T doParse(ILexStream stream) throws ParserException {
 		preParse();
 		TransactionalStream ts = TransactionalStream.transaction(stream);
 		try {
-			V parse = src.parse(ts);
+			V parse = memoize(src).parse(ts);
 			T apply = tform.apply(parse);
 			ts.commit();
 			return apply;
@@ -33,5 +32,9 @@ public class Computed<T,V> extends AbstractParser<T> {
 			ts.rollback();
 			throw e;
 		}
+	}
+
+	public String toString() {
+		return src.toString();
 	}
 }

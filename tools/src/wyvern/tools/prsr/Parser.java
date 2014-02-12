@@ -1,12 +1,14 @@
 package wyvern.tools.prsr;
 
 import wyvern.tools.lex.ILexStream;
+import wyvern.tools.prsr.std.AbstractParser;
 import wyvern.tools.prsr.std.Concat;
 import wyvern.tools.prsr.std.Opt;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.util.Pair;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -23,7 +25,7 @@ public interface Parser<T> {
 
 	public <V> Parser<V> compute(Function<T,V> tform);
 
-	public Parser<T> opt();
+	public Parser<Optional<T>> opt();
 
 	public Parser<List<T>> rep();
 

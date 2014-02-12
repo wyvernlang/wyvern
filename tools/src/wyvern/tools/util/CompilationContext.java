@@ -1,11 +1,10 @@
 package wyvern.tools.util;
 
-import wyvern.stdlib.*;
 import wyvern.stdlib.Compiler;
 import wyvern.tools.parsing.ImportResolver;
 import wyvern.tools.rawAST.ExpressionSequence;
 import wyvern.tools.rawAST.RawAST;
-import wyvern.tools.typedAST.extensions.DSLDummy;
+import wyvern.tools.typedAST.extensions.DSLInf.DSLDummy;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;

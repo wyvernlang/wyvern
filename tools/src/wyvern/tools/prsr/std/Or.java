@@ -22,13 +22,14 @@ public class Or<T> extends AbstractParser<T> {
 		this.clauses = Arrays.asList(parsers);
 	}
 
+
 	@Override
-	public T parse(ILexStream stream) throws ParserException {
+	public T doParse(ILexStream stream) throws ParserException {
 		preParse();
 		for (Parser<T> parser : clauses) {
 			TransactionalStream ts = TransactionalStream.transaction(stream);
 			try {
-				T result = parser.parse(ts);
+				T result = memoize(parser).parse(ts);
 				ts.commit();
 				return result;
 			} catch (ParserException e) {
@@ -36,5 +37,9 @@ public class Or<T> extends AbstractParser<T> {
 			}
 		}
 		throw new ParserException(stream.peek());
+	}
+
+	public String toString() {
+		return clauses.stream().reduce("", (l, r) -> ((l.isEmpty()) ? "" : l + "\n|") + r, (l, r) -> l + "|" + r);
 	}
 }

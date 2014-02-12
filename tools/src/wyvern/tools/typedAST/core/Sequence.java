@@ -151,6 +151,16 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	public static Sequence fromAST(TypedAST s) {
 		return new Sequence(s);
 	}
+
+	public static TypedAST fromList(List<TypedAST> lst) {
+		if (lst.size() == 0) {
+			return new Sequence();
+		} else if (lst.size() == 1) {
+			return lst.get(0);
+		} else {
+			return new Sequence(lst);
+		}
+	}
 	
 	// FIXME: Hack. Flattens decl sequence. NEED TO REFACTOR!
 	public Iterable<Declaration> getDeclIterator() {

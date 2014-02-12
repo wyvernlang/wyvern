@@ -1,7 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,7 +13,7 @@ import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.TypeAsc;
+import wyvern.tools.typedAST.extensions.UnparsedType;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -35,14 +34,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 
-	private TypeAsc typeAsc;
-	private List<Pair<String, TypeAsc>> args;
+	private UnparsedType typeAsc;
+	private List<Pair<String, UnparsedType>> args;
 	
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef, FileLocation location) {
-		this(name, (env) -> fullType, argNames.stream().map(binding -> new Pair<String,TypeAsc>(binding.getName(), env -> binding.getType())).collect(Collectors.<Pair<String,TypeAsc>>toList()), body, isClassDef, location);
+		this(name, (env) -> fullType, argNames.stream().map(binding -> new Pair<String,UnparsedType>(binding.getName(), env -> binding.getType())).collect(Collectors.<Pair<String,UnparsedType>>toList()), body, isClassDef, location);
 	}
 
-	public DefDeclaration(String name, TypeAsc asc, List<Pair<String ,TypeAsc>> args, TypedAST body, boolean isClass, FileLocation location) {
+	public DefDeclaration(String name, UnparsedType asc, List<Pair<String ,UnparsedType>> args, TypedAST body, boolean isClass, FileLocation location) {
 		nameBinding = new NameBindingImpl(name, null);
 		this.typeAsc = asc;
 		this.args = args;

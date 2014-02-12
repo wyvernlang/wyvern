@@ -28,7 +28,7 @@ import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.extensions.DSLDummy;
+import wyvern.tools.typedAST.extensions.DSLInf.DSLDummy;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;

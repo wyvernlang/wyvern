@@ -27,19 +27,23 @@ public class Concat<T,V> extends AbstractParser<Pair<T,V>> {
 	}
 
 	@Override
-	public Pair<T,V> parse(ILexStream stream) throws ParserException {
+	public Pair<T,V> doParse(ILexStream stream) throws ParserException {
 		preParse();
 		TransactionalStream ts = TransactionalStream.transaction(stream);
 		T a;
 		V b;
 		try {
-			a = first.parse(ts);
-			b = last.parse(ts);
+			a = memoize(first).parse(ts);
+			b = memoize(last).parse(ts);
 			ts.commit();
 		} catch (ParserException e) {
 			ts.rollback();
 			throw e;
 		}
 		return new Pair<>(a,b);
+	}
+
+	public String toString() {
+		return "(" + first + " ~ " + last + ")";
 	}
 }

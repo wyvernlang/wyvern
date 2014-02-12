@@ -7,7 +7,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.extensions.TypeAsc;
+import wyvern.tools.typedAST.extensions.UnparsedType;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -16,12 +16,11 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
 public class ValDeclaration extends Declaration implements CoreAST {
-	private TypeAsc asc;
+	private UnparsedType asc;
 	TypedAST definition;
 	Type definitionType;
 	NameBinding binding;
@@ -42,7 +41,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		this(name, env -> type, definition, location);
 	}
 
-	public ValDeclaration(String name, TypeAsc asc, TypedAST definition, FileLocation location) {
+	public ValDeclaration(String name, UnparsedType asc, TypedAST definition, FileLocation location) {
 		this.asc = asc;
 		this.definition=definition;
 		binding = new NameBindingImpl(name, null);

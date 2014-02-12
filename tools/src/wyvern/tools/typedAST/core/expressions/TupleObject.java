@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.TupleValue;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
@@ -17,13 +18,14 @@ import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
 	private TypedAST[] objects;
-	
-	public TupleObject(TypedAST[] objects) {
-		this.objects = objects;
+
+	public TupleObject(TypedAST... paramObjs) {
+		this.objects = paramObjs;
 	}
 	
 	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {
@@ -37,6 +39,20 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 			this.objects = new TypedAST[] { first, rest };
 		}
 		this.location = commaLine;
+	}
+
+	public TupleObject(List<TypedAST> first) {
+		this(first.toArray(new TypedAST[first.size()]));
+	}
+
+	public static TypedAST fromList(List<TypedAST> elems, FileLocation location) {
+		if (elems.size() == 0) {
+			return UnitVal.getInstance(location);
+		} else if (elems.size() == 1) {
+			return elems.get(0);
+		} else {
+			return new TupleObject(elems);
+		}
 	}
 
 	@Override

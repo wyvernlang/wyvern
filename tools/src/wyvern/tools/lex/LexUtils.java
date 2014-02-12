@@ -20,7 +20,7 @@ public class LexUtils {
 			case '&':
 			case '|':
 			case '!':
-			//case '~':
+			case '~':
 			case '^':
 			case ',':
 			case '.':

@@ -1,8 +1,7 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.typedAST.extensions.DSLInf;
 
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
+import wyvern.tools.lex.Token;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -12,37 +11,34 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Ben Chung on 2/7/14.
+ * Created by Ben Chung on 2/9/14.
  */
-public class TypeAsc implements TypedAST {
-	private final TypedAST inner;
-	private final UnparsedType.CacheAsc asc;
+public class UnparsedDSL implements TypedAST {
+	private TypedAST insert;
+	private List<Token> unparsed;
 
-
-	public TypeAsc(TypedAST inner, UnparsedType asc) {
-		this.inner = inner;
-		this.asc = UnparsedType.cacheAsc(asc);
+	public UnparsedDSL(TypedAST insert, List<Token> unparsed) {
+		this.insert = insert;
+		this.unparsed = unparsed;
 	}
 
 	@Override
 	public Type getType() {
-		return asc.getType();
+		return null;
 	}
 
 	@Override
 	public Type typecheck(Environment env) {
-		Type typecheck = inner.typecheck(env);
-		if (!typecheck.subtype(asc.getAsc(env)))
-			ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, inner, asc.getType().toString(), typecheck.toString());
-		return typecheck;
+		return null;
 	}
 
 	@Override
 	public Value evaluate(Environment env) {
-		throw new RuntimeException();
+		return null;
 	}
 
 	@Override
@@ -58,18 +54,18 @@ public class TypeAsc implements TypedAST {
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		HashMap<String, TypedAST> children = new HashMap<>();
-		children.put("inner", inner);
+		children.put("insert", insert);
 		return children;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeAsc(newChildren.get("inner"), asc);
+		return new UnparsedDSL(newChildren.get("insert"), unparsed);
 	}
 
 	@Override
 	public FileLocation getLocation() {
-		return inner.getLocation();
+		return null;
 	}
 
 	@Override

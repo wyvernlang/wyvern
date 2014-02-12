@@ -5,6 +5,9 @@ import wyvern.tools.lex.Token;
 
 import java.io.InputStream;
 import java.util.Stack;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Created by Ben Chung on 1/24/14.
@@ -12,6 +15,8 @@ import java.util.Stack;
 public class TransactionalStream implements ILexStream {
 	private ILexStream source;
 	private Stack<Integer> idxes = new Stack<>();
+	private Stack<Integer> recidxes = new Stack<>();
+	private Consumer<ILexStream> del;
 
 	public static TransactionalStream transaction(ILexStream source) {
 		if (source instanceof TransactionalStream) {
@@ -54,25 +59,47 @@ public class TransactionalStream implements ILexStream {
 		return source.asRawStream();
 	}
 
+	private Consumer<ILexStream> stepper(int steps) {
+		return stream -> {
+			for (int i = 0; i < steps; i++)
+				stream.next();
+		};
+	}
+
+	public Consumer<ILexStream> getDelta() {
+		return del;
+	}
+
 	public void commit() {
 		if (idxes.size() == 1) {
 			int step = idxes.pop();
 			for (; step > 0; step--) {
 				source.next();
 			}
+			del = stepper(computeSteps(step));
 			return;
 		}
 		int newIdx = idxes.pop();
 		idxes.pop();
 		idxes.push(newIdx);
-		System.out.println(idxes.stream().map(n->source.lookAhead(n).location.globalChar).reduce("", (l,r) -> ((l.isEmpty())?"":l+",")+r, (l,r)-> l+","+r));
+		String stackv = idxes.stream().map(n -> source.lookAhead(n).location.globalChar).reduce("", (l, r) -> ((l.isEmpty()) ? "" : l + ",") + r, (l, r) -> l + "," + r);
+		System.out.println(stackv);
+		del = stepper(computeSteps(newIdx));
+	}
+
+	private int computeSteps(int step) {
+		if (recidxes.size() > 0)
+			return step-recidxes.pop();
+		return step;
 	}
 
 	public void rollback() {
+		recidxes.pop();
 		idxes.pop();
 	}
 
 	private void newLevel() {
+		recidxes.push(idxes.peek());
 		idxes.push(idxes.peek());
 	}
 }

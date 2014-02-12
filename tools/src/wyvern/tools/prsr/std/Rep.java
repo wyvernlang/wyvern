@@ -18,13 +18,13 @@ public class Rep<T> extends AbstractParser<List<T>> {
 		this.rep = rep;
 	}
 	@Override
-	public List<T> parse(ILexStream stream) throws ParserException {
+	public List<T> doParse(ILexStream stream) throws ParserException {
 		preParse();
 		LinkedList<T> output = new LinkedList<>();
 		while (true) {
 			TransactionalStream ts = TransactionalStream.transaction(stream);
 			try {
-				output.add(rep.parse(ts));
+				output.add(memoize(rep).parse(ts));
 				ts.commit();
 			} catch (ParserException e) {
 				ts.rollback();
@@ -32,5 +32,8 @@ public class Rep<T> extends AbstractParser<List<T>> {
 			}
 		}
 		return output;
+	}
+	public String toString() {
+		return rep.toString() +".*";
 	}
 }
