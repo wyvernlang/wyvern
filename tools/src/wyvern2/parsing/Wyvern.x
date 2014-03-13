@@ -3,6 +3,18 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import wyvern.tools.typedAST.core.*;
+import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.core.expressions.*;
+import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.values.*;
+import wyvern.tools.typedAST.extensions.*;
+import wyvern.tools.typedAST.core.declarations.*;
+import wyvern.tools.typedAST.abs.*;
+import wyvern.tools.types.*;
+import wyvern.tools.types.extensions.*;
+import java.util.Arrays;
+
 %%
 %parser Wyvern
 
@@ -171,7 +183,12 @@ import java.util.regex.Pattern;
 	ignore terminal comment_t  ::= /\/\/([^\r\n])*/;
 	ignore terminal multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\//;
 	ignore terminal ignoredNewline ::= /(\n[ \t]*)+/;
+	ignore terminal Spaces_t ::= /[ \t]+|(\\\n)/;
     terminal Newline_t ::= /(\n[ \t]*)+/;
+
+ 	terminal identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
+ 		RESULT = lexeme;
+ 	:};
 
     terminal classKwd_t ::= /class/ in (keywds);
 	terminal typeKwd_t 	::= /type/ in (keywds);
@@ -181,9 +198,10 @@ import java.util.regex.Pattern;
 	terminal fnKwd_t 	::= /fn/ in (keywds);
 	terminal metadataKwd_t 	::= /fn/ in (keywds);
 
- 	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ ;
+ 	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
+ 		RESULT = Integer.parseInt(lexeme);
+ 	:};
 
- 	terminal identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () ;
 
 	terminal tilde_t ::= /~/ ;
 	terminal plus_t ::= /\+/ ;
@@ -201,7 +219,7 @@ import java.util.regex.Pattern;
 
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ ;
- 	terminal dsl_t ::= /\{.*?\}/;
+ 	terminal dsl_t ::= /\{.*?\}/ {: RESULT = lexeme; :};
 %lex}
 
 %cf{
@@ -241,57 +259,60 @@ import java.util.regex.Pattern;
     precedence left plus_t, dash_t;
     precedence left mult_t, divide_t;
 
+    non terminal fc2;
+
 	start with fc;
 
-	fc ::= p;
+	fc2 ::= identifier_t;
 
-	p ::= e
-    	| d
+	fc ::= p:pi {: RESULT = pi; :};
+
+	p ::= e:ex {: RESULT = ex; :}
+    	| d:de {: RESULT = de; :}
     	;
 
-    d ::= prd 
-    	| nrd
+    d ::= prd:res {: RESULT = res; :}
+    	| nrd:res {: RESULT = res; :}
     	;
 
-    nrd ::= val Newline_t p
-    	|   var Newline_t p
+    nrd ::= val:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	|   var:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	;
 
-    prd ::= rd Newline_t prd
-    	  | rd Newline_t p
+    prd ::= rd:vd Newline_t prd:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	  | rd:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	  ;
 
-    rd ::= class
-    	|  typedec
-    	|  def
+    rd ::= class:res {: RESULT = res; :}
+    	|  typedec:res {: RESULT = res; :}
+    	|  def:res {: RESULT = res; :}
     	;
 
-    class ::= classKwd_t identifier_t Indent_t objd Dedent_t
-    	|	  classKwd_t identifier_t
+    class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, null, null,
+    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), null); :}
+    	|	  classKwd_t identifier_t:id {:RESULT = new ClassDeclaration((String)id, null, null, null, null); :}
     	;
 
-    otypeasc ::= typeasc
-    			|
+    otypeasc ::= typeasc:ta {: RESULT = ta :}
+    			| {: RESULT = null :}
     			;
+    non terminal declbody;
+    declbody ::= equals_t e:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
 
-    val ::= valKwd_t identifier_t otypeasc equals_t e
-    	| 	valKwd_t identifier_t otypeasc Indent_t p Dedent_t
-    	;
+    val ::= valKwd_t identifier_t:id otypeasc:ty declbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
 
-    params ::= openParen_t iparams closeParen_t
-    		|  openParen_t closeParen_t
+    params ::= openParen_t iparams:ip closeParen_t {: RESULT = ip; :}
+    		|  openParen_t closeParen_t {: RESULT = new LinkedList<NameBinding>(); :}
     		;
 
-   	iparams ::= identifier_t typeasc comma_t iparams
+   	iparams ::= identifier_t typeasc:ta comma_t iparams :re
    			 |	identifier_t typeasc
    			 ;
 
-    def ::= defKwd_t identifier_t params typeasc equals_t e
-    	|	defKwd_t identifier_t params typeasc Indent_t p Dedent_t
+    def ::= defKwd_t identifier_t params typeasc declbody
     	;
 
-    var ::= varKwd_t identifier_t typeasc equals_t e
-    	|	varKwd_t identifier_t typeasc Indent_t p Dedent_t
+    var ::= varKwd_t identifier_t typeasc declbody
     	;
 
     objd ::= objcd Newline_t objd
@@ -324,38 +345,45 @@ import java.util.regex.Pattern;
 
     metadata ::= metadataKwd_t equals_t e;
 
-    e ::= term plus_t term
-    	| term dash_t term
-    	| term mult_t term
-    	| term divide_t term
-    	| term
+    non terminal AE;
+    non terminal ME;
+
+    e ::= AE:aer {:RESULT = aer; :};
+
+    AE ::= AE:l plus_t ME:r {: RESULT = new Invocation((TypedAST)l,"+",(TypedAST)r,null); :}
+    	|  AE:l dash_t ME:r {: RESULT = new Invocation((TypedAST)l,"-",(TypedAST)r,null); :}
+    	|  ME:mer {:RESULT = mer;:};
+
+    ME ::= ME:l mult_t term:r {: RESULT = new Invocation((TypedAST)l,"*",(TypedAST)r,null); :}
+    	|  ME:l divide_t term:r {: RESULT = new Invocation((TypedAST)l,"/",(TypedAST)r,null); :}
+    	|  term:ter {:RESULT = ter;:};
+
+    term ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), null); :}
+    	|	 fnKwd_t identifier_t:id typeasc:t arrow_t openParen_t term:inner closeParen_t {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, null)), (TypedAST)inner); :}
+    	|	 openParen_t e:inner closeParen_t {: RESULT = inner; :}
+    	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, null); :}
+    	|	 term:src dot_t identifier_t:op {: RESULT = new Invocation((TypedAST)src,(String)op, null, null); :}
+    	//|	 term:src typeasc:as {: RESULT = new TypeAsc((Expr)src, (Type)as); :}
+    	|	 inlinelit:lit {: RESULT = new DSLLit((String)lit); :}
+    	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
     	;
 
-    term ::= identifier_t
-    	|	 fnKwd_t identifier_t typeasc arrow_t e
-    	|	 term tuple
-    	|	 term dot_t identifier_t
-    	|	 term typeasc
-    	|	 inlinelit
-    	|	 decimalInteger_t
-    	;
-
-    tuple ::= openParen_t it closeParen_t
-    		| openParen_t closeParen_t
+    tuple ::= openParen_t it:res closeParen_t {:RESULT = res; :}
+    		| openParen_t closeParen_t {: RESULT = UnitVal.getInstance(null); :}
     		;
 
-   	it ::= e comma_t it
-   		|  e 
+   	it ::= e:first comma_t it:rest {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest,null); :}
+   		|  e:el {: RESULT = new TupleObject(new TypedAST[] {(TypedAST)el}); :}
    		;
 
 
-   	type ::= type tarrow_t type
-   		|	 type mult_t type
-   		|	 openParen_t type closeParen_t
-   		|	 identifier_t
+   	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
+   		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}
+   		|	 openParen_t type:ta closeParen_t {: RESULT = ta; :}
+   		|	 identifier_t:id {: RESULT = new UnresolvedType((String)id); :}
    		;
 
-   	typeasc ::= colon_t type;
+   	typeasc ::= colon_t type:ty {: RESULT = ty; :};
 
    	inlinelit ::= dsl_t;
 
