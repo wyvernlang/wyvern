@@ -192,4 +192,20 @@ public class CopperTests {
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
 	}
+	
+	// admittedly this is only a starting point....
+	@Test
+	public void testTrivialDSL() throws IOException, CopperParserException {
+		String input =
+				"val myNumMetadata = /* write me somehow or import from Java */\n" +
+				"type MyNum\n" +
+				"  def getValue():Int\n" +
+				"  metadata = myNumMetadata\n" +
+				"val n:MyNum = { 5 }" +
+				"n.getValue()";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
+	}
+	
 }
