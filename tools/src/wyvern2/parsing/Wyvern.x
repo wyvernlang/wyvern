@@ -14,6 +14,9 @@ import wyvern.tools.typedAST.abs.*;
 import wyvern.tools.types.*;
 import wyvern.tools.types.extensions.*;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.HashMap;
 
 %%
 %parser Wyvern
@@ -197,6 +200,7 @@ import java.util.Arrays;
 	terminal varKwd_t 	::= /var/ in (keywds);
 	terminal fnKwd_t 	::= /fn/ in (keywds);
 	terminal metadataKwd_t 	::= /fn/ in (keywds);
+	terminal newKwd_t 	::= /new/ in (keywds);
 
  	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
  		RESULT = Integer.parseInt(lexeme);
@@ -271,17 +275,23 @@ import java.util.Arrays;
     	| d:de {: RESULT = de; :}
     	;
 
-    d ::= prd:res {: RESULT = res; :}
+	non terminal pnrd;
+
+    d ::= prd:res pnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    	| prd:res {: RESULT = res; :}
     	| nrd:res {: RESULT = res; :}
     	;
 
-    nrd ::= val:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	|   var:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    nrd ::= val:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	|   var:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	;
 
-    prd ::= rd:vd Newline_t prd:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	  | rd:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+
+    prd ::= rd:vd {: RESULT = vd; :}
+    	  | rd:vd prd:re {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); :}
     	  ;
+
+    pnrd ::= e:ex {: RESULT = ex; :}| nrd:nr {: RESULT = nr; :};
 
     rd ::= class:res {: RESULT = res; :}
     	|  typedec:res {: RESULT = res; :}
@@ -290,14 +300,14 @@ import java.util.Arrays;
 
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, null, null,
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), null); :}
-    	|	  classKwd_t identifier_t:id {:RESULT = new ClassDeclaration((String)id, null, null, null, null); :}
+    	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, null, null, null, null); :}
     	;
 
-    otypeasc ::= typeasc:ta {: RESULT = ta :}
-    			| {: RESULT = null :}
+    otypeasc ::= typeasc:ta {: RESULT = ta; :}
+    			| {: RESULT = null; :}
     			;
     non terminal declbody;
-    declbody ::= equals_t e:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
+    declbody ::= equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
 
     val ::= valKwd_t identifier_t:id otypeasc:ty declbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
 
@@ -305,45 +315,46 @@ import java.util.Arrays;
     		|  openParen_t closeParen_t {: RESULT = new LinkedList<NameBinding>(); :}
     		;
 
-   	iparams ::= identifier_t typeasc:ta comma_t iparams :re
-   			 |	identifier_t typeasc
+   	iparams ::= identifier_t:id typeasc:ta comma_t iparams:re {: ((LinkedList<NameBinding>)re).addFirst(new NameBindingImpl((String)id, (Type)ta)); RESULT = re; :}
+   			 |	identifier_t:id typeasc:ta {: LinkedList<NameBinding> llnb = new LinkedList<NameBinding>(); llnb.add(new NameBindingImpl((String)id, (Type)ta)); RESULT = ta; :}
    			 ;
 
-    def ::= defKwd_t identifier_t params typeasc declbody
+    def ::= defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, null);:}
     	;
 
-    var ::= varKwd_t identifier_t typeasc declbody
+    var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
     	;
 
-    objd ::= objcd Newline_t objd
-    	|	 objrd
-    	|
+    objd ::= objcd:cds Newline_t objd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst)); :}
+    	|	 objrd:rest {: RESULT = rest; :}
+    	|	{: RESULT = null; :}
     	;
 
-    objrd ::= objid Newline_t objrd
-    	|	  objid
-    	|
+    objrd ::= objid:rd Newline_t objrd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst)); :}
+    	|	  objid:rd {: RESULT = rd; :}
+    	|	{: RESULT = null; :}
     	;
 
-    objcd ::= classKwd_t def;
-    objid ::= val
-    	|	  var
-    	|	  def
+    objcd ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, null);:}
+                            	;
+    objid ::= val:va {: RESULT = va; :}
+    	|	  var:va {: RESULT = va; :}
+    	|	  def:va {: RESULT = va; :}
     	;
 
 
-    typedec ::= typeKwd_t identifier_t Indent_t typed Dedent_t
-    	|	    typeKwd_t identifier_t
+    typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, null); :}
+    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, null); :}
     	;
 
-    typed ::= tdef Newline_t typed
-    	   | tdef
-    	   | metadata
+    typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
+    	   | tdef:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
+    	   | metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
     	   ;
 
-    tdef ::= defKwd_t identifier_t params typeasc;
+    tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, null); :};
 
-    metadata ::= metadataKwd_t equals_t e;
+    metadata ::= metadataKwd_t equals_t e:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner); :};
 
     non terminal AE;
     non terminal ME;
@@ -366,6 +377,7 @@ import java.util.Arrays;
     	//|	 term:src typeasc:as {: RESULT = new TypeAsc((Expr)src, (Type)as); :}
     	|	 inlinelit:lit {: RESULT = new DSLLit((String)lit); :}
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
+    	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), null); :}
     	;
 
     tuple ::= openParen_t it:res closeParen_t {:RESULT = res; :}
