@@ -19,9 +19,19 @@ public class TypeResolver {
 			return ((UnresolvedType) input).resolve(ctx);
 
 		for (Field f : input.getClass().getDeclaredFields()) {
+			f.setAccessible(true);
+			if (Type[].class.isAssignableFrom(f.getType())) {
+				Type[] inner = (Type[])f.get(input);
+				if (inner == null) continue;
+				for (int i = 0; i < inner.length; i++)
+					if (inner[i] != null && !(visited.contains(inner[i]))) {
+						visited.add(inner[i]);
+						inner[i] = resolve(inner[i], ctx, visited);
+					}
+
+			}
 			if (!Type.class.isAssignableFrom(f.getType()))
 				continue;
-			f.setAccessible(true);
 			Type inner = (Type)f.get(input);
 			if (inner != null && !(visited.contains(inner))) {
 				visited.add(inner);

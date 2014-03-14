@@ -13,6 +13,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Dictionary;
@@ -48,11 +49,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		Type resolved = TypeResolver.resolve(binding.getType(), env);
 		if (this.definition != null)
 			this.definitionType = this.definition.typecheck(env);
 		if (binding.getType() == null) {
-			this.binding = new NameBindingImpl(binding.getName(), definitionType);
-		} else if (this.definitionType != null && !this.definitionType.subtype(binding.getType())){
+			this.binding = new NameBindingImpl(binding.getName(), resolved);
+		} else if (this.definitionType != null && !this.definitionType.subtype(resolved)){
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, this.definitionType.toString(), binding.getType().toString());
 		}
 		

@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Dictionary;
@@ -51,7 +52,7 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 			else
 				type = binding.getType();
 		}
-		return type;
+		return TypeResolver.resolve(type,env);
 	}
 
 	@Override

@@ -298,9 +298,9 @@ import java.util.HashMap;
     	|  def:res {: RESULT = res; :}
     	;
 
-    class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, null, null,
+    class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), null); :}
-    	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, null, null, null, null); :}
+    	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, null); :}
     	;
 
     otypeasc ::= typeasc:ta {: RESULT = ta; :}
@@ -309,15 +309,16 @@ import java.util.HashMap;
     non terminal declbody;
     declbody ::= equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
 
-    val ::= valKwd_t identifier_t:id otypeasc:ty declbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
 
     params ::= openParen_t iparams:ip closeParen_t {: RESULT = ip; :}
     		|  openParen_t closeParen_t {: RESULT = new LinkedList<NameBinding>(); :}
     		;
 
    	iparams ::= identifier_t:id typeasc:ta comma_t iparams:re {: ((LinkedList<NameBinding>)re).addFirst(new NameBindingImpl((String)id, (Type)ta)); RESULT = re; :}
-   			 |	identifier_t:id typeasc:ta {: LinkedList<NameBinding> llnb = new LinkedList<NameBinding>(); llnb.add(new NameBindingImpl((String)id, (Type)ta)); RESULT = ta; :}
+   			 |	identifier_t:id typeasc:ta {: LinkedList<NameBinding> llnb = new LinkedList<NameBinding>(); llnb.add(new NameBindingImpl((String)id, (Type)ta)); RESULT = llnb; :}
    			 ;
+
+    val ::= valKwd_t identifier_t:id otypeasc:ty declbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
 
     def ::= defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, null);:}
     	;
@@ -325,22 +326,37 @@ import java.util.HashMap;
     var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
     	;
 
-    objd ::= objcd:cds Newline_t objd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst)); :}
+    objd ::= objcd:cds objd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst)); :}
     	|	 objrd:rest {: RESULT = rest; :}
     	|	{: RESULT = null; :}
     	;
 
-    objrd ::= objid:rd Newline_t objrd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst)); :}
+    objrd ::= objid:rd objrd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst)); :}
     	|	  objid:rd {: RESULT = rd; :}
     	|	{: RESULT = null; :}
     	;
 
     objcd ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, null);:}
                             	;
-    objid ::= val:va {: RESULT = va; :}
-    	|	  var:va {: RESULT = va; :}
-    	|	  def:va {: RESULT = va; :}
+
+    non terminal cbval;
+    non terminal cbvar;
+    non terminal cbdef;
+    non terminal cbdeclbody;
+
+    objid ::= cbval:va {: RESULT = va; :}
+    	|	  cbvar:va {: RESULT = va; :}
+    	|	  cbdef:va {: RESULT = va; :}
     	;
+
+    cbdeclbody ::= equals_t e:r {: RESULT = r; :} | equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
+
+    cbval ::= valKwd_t identifier_t:id otypeasc:ty cbdeclbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
+
+    cbdef ::= defKwd_t identifier_t:name params:argNames typeasc:fullType cbdeclbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, null);:}
+    	;
+
+    cbvar ::= varKwd_t identifier_t:id typeasc:type cbdeclbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :};
 
 
     typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, null); :}
@@ -352,9 +368,12 @@ import java.util.HashMap;
     	   | metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
     	   ;
 
+   	non terminal otend;
+   	otend ::= Newline_t | ;
+
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, null); :};
 
-    metadata ::= metadataKwd_t equals_t e:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner); :};
+    metadata ::= metadataKwd_t equals_t e:inner otend {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner); :};
 
     non terminal AE;
     non terminal ME;
@@ -385,7 +404,7 @@ import java.util.HashMap;
     		;
 
    	it ::= e:first comma_t it:rest {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest,null); :}
-   		|  e:el {: RESULT = new TupleObject(new TypedAST[] {(TypedAST)el}); :}
+   		|  e:el {: RESULT = el; :}
    		;
 
 
