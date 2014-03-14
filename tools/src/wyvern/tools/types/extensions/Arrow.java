@@ -8,11 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.types.AbstractTypeImpl;
-import wyvern.tools.types.ApplyableType;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.SubtypeRelation;
-import wyvern.tools.types.Type;
+import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
@@ -35,6 +31,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	@Override
 	public Type checkApplication(Application application, Environment env) {
 		Type actualType = application.getArgument().typecheck(env);
+		argument = TypeResolver.resolve(argument, env);
 		if (!actualType.subtype(argument))
 			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application,actualType.toString(),argument.toString());
 		return result;

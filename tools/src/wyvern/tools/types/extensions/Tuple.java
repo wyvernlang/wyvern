@@ -104,6 +104,8 @@ public class Tuple extends AbstractTypeImpl implements OperatableType {
         if (other == this)
             return true;
 
+
+
         if (!(other instanceof Tuple))
             return false;
 

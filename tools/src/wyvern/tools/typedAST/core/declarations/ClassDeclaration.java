@@ -215,7 +215,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public Environment getClassEnv() {
 		
 		Environment classEnv = Environment.getEmptyEnvironment();
-		
+
+		if (decls == null)
+			return classEnv;
+
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()){
 				classEnv = decl.doExtendWithValue(classEnv);

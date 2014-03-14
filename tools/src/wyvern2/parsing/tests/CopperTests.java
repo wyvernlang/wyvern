@@ -59,6 +59,24 @@ public class CopperTests {
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
 	}
 	@Test
+	public void testDeclParams() throws IOException, CopperParserException {
+		String input =
+				"def foo(x:Int):Int = 5+x\n" +
+						"foo(7)";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(12)");
+	}
+	@Test
+	public void testDeclParams2() throws IOException, CopperParserException {
+		String input =
+				"def foo(x:Int,y:Int):Int = 5+x*y\n" +
+						"foo(7,2)";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(19)");
+	}
+	@Test
 	public void testFwdDecls() throws IOException, CopperParserException {
 		String input =
 				"def foo():Int = bar()+20\n" +
@@ -68,6 +86,27 @@ public class CopperTests {
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(29)");
+	}
+	@Test
+	public void testClass() throws IOException, CopperParserException {
+		String input =
+				"class Hello\n" +
+				"6";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(6)");
+	}
+
+	@Test
+	public void testClass2()  throws IOException, CopperParserException {
+		String input =
+				"class Hello\n" +
+				"	def foo():Int = 7\n" +
+				"	val bar:Int = 19\n" +
+				"6";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(6)");
 	}
 
 	@Test
