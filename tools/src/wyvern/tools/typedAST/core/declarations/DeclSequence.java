@@ -10,8 +10,46 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern2.ast.decl.DeclSeq;
 
 public class DeclSequence extends Sequence implements EnvironmentExtender {
+
+
+	public static DeclSequence simplify(DeclSequence in) {
+		return new DeclSequence(new Iterable() {
+			@Override
+			public Iterator iterator() {
+				return new Iterator() {
+					private Stack<Iterator> iterstack = new Stack<>();
+					{
+						iterstack.push(in.iterator());
+					}
+
+					@Override
+					public boolean hasNext() {
+						if (!iterstack.empty()) {
+							if (!iterstack.peek().hasNext()) {
+								iterstack.pop();
+								return hasNext();
+							}
+							return true;
+						}
+						return false;
+					}
+
+					@Override
+					public Object next() {
+						Object oldres = iterstack.peek().next();
+						if (oldres instanceof DeclSequence) {
+							iterstack.push(((DeclSequence) oldres).iterator());
+							return next();
+						}
+						return oldres;
+					}
+				};
+			}
+		});
+	}
 	
 	public DeclSequence(final Iterable first) {
 		super(new Iterable<TypedAST>() {
@@ -77,6 +115,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 
 	@Override
 	public Type typecheck(Environment env) {
+		env = extendName(extendType(env));
 		for (TypedAST d : this)
 			env = ((EnvironmentExtender) d).extend(env);
 		for (TypedAST d : this) {
@@ -123,8 +162,26 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return newEnv;
 	}
 
+	@Override
+	public Environment extendType(Environment env) {
+		Environment nenv = env;
+		for (Declaration d : this.getDeclIterator()) {
+			nenv = d.extendType(nenv);
+		}
+		return nenv;
+	}
+
+	@Override
+	public Environment extendName(Environment env) {
+		Environment nenv = env;
+		for (Declaration d : this.getDeclIterator()) {
+			nenv = d.extendName(nenv);
+		}
+		return nenv;
+	}
+
 	public final Environment extend(Environment old) {
-		Environment newEnv = old;
+		Environment newEnv = extendName(extendType(old));
 		for (EnvironmentExtender d : this.getEnvExts())
 			newEnv = d.extend(newEnv);
 		return newEnv;

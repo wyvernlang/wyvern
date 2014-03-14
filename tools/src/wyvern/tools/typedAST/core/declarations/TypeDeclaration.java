@@ -41,6 +41,16 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		return (ClassType) nameBinding.getType();
 	}
 
+	@Override
+	public Environment extendType(Environment env) {
+		return env.extend(new TypeBinding(nameBinding.getName(), nameBinding.getType()));
+	}
+
+	@Override
+	public Environment extendName(Environment env) {
+		return env;
+	}
+
 	public static class AttributeDeclaration extends Declaration {
 		private final TypedAST body;
 
@@ -100,6 +110,16 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		public TypedAST getBody() {
 			return body;
+		}
+
+		@Override
+		public Environment extendType(Environment env) {
+			return env;
+		}
+
+		@Override
+		public Environment extendName(Environment env) {
+			return env;
 		}
 	}
 

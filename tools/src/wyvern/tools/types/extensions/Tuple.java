@@ -16,6 +16,10 @@ public class Tuple extends AbstractTypeImpl implements OperatableType {
 	public Tuple(Type[] types) {
 		this.types = types;
 	}
+
+	public Tuple(Type first, Type last) {
+		types = new Type[] {first, last};
+	}
 	
 	public Tuple(List<NameBinding> bindings) {
 		this.types = new Type[bindings.size()];

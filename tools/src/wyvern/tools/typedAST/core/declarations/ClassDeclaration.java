@@ -310,4 +310,14 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public List<String> getTypeParams() {
 		return typeParams;
 	}
+
+	@Override
+	public Environment extendType(Environment env) {
+		return env.extend(new TypeBinding(nameBinding.getName(), nameBinding.getType()));
+	}
+
+	@Override
+	public Environment extendName(Environment env) {
+		return env;
+	}
 }
