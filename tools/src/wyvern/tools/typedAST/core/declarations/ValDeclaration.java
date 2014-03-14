@@ -118,6 +118,16 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		return new ValDeclaration(getName(), nc.get("definition"), location);
 	}
 
+	@Override
+	public Environment extendType(Environment env) {
+		return env;
+	}
+
+	@Override
+	public Environment extendName(Environment env) {
+		return env;
+	}
+
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location; //TODO

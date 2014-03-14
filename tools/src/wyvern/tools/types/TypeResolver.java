@@ -5,6 +5,15 @@ import java.util.HashSet;
 
 //Sigh...
 public class TypeResolver {
+	public static Type resolve(Type input, Environment ctx) {
+		try {
+			return resolve(input, ctx, new HashSet<Type>());
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+
 	public static Type resolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);

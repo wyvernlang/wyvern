@@ -111,6 +111,16 @@ public class JavaField extends Declaration {
 
     }
 
+	@Override
+	public Environment extendType(Environment env) {
+		return env;
+	}
+
+	@Override
+	public Environment extendName(Environment env) {
+		return env;
+	}
+
 	public boolean isClass() {
 		return isClass;
 	}
