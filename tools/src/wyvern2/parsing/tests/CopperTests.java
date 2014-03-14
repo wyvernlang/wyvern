@@ -70,4 +70,87 @@ public class CopperTests {
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(29)");
 	}
 
+	@Test
+	public void parseSimpleClass() throws IOException, CopperParserException {
+		String input =
+				"class C\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
+				"5";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
+	}
+	
+	@Test
+	public void parseClassWithNew() throws IOException, CopperParserException {
+		String input =
+				"class C\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
+				"  class def create():C\n" +
+				"    new\n" +
+				"5";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
+	}
+	
+	@Test
+	public void testSimpleClass() throws IOException, CopperParserException {
+		String input =
+				"class C\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
+				"  class def create():C\n" +
+				"    new\n" +
+				"C.create().bar()";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
+	}
+	
+	@Test
+	public void parseSimpleType() throws IOException, CopperParserException {
+		String input =
+				"type T\n" +
+				"  def bar():Int\n" +
+				"5";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
+	}
+	
+	@Test
+	public void testSimpleType() throws IOException, CopperParserException {
+		String input =
+				"type T\n" +
+				"  def bar():Int\n" +
+				"class C\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
+				"  class def create():T\n" +
+				"    new\n" +
+				"C.create().bar()";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
+	}
+	
+	@Test
+	public void testSimpleMetadata() throws IOException, CopperParserException {
+		String input =
+				"class C\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
+				"  class def create():T\n" +
+				"    new\n" +
+				"type T\n" +
+				"  def foo():Int\n" +
+				"  metadata = C.create()\n" +
+				"T.bar()";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
+	}
 }
