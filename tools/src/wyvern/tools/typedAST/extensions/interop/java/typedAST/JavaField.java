@@ -117,7 +117,7 @@ public class JavaField extends Declaration {
 	}
 
 	@Override
-	public Environment extendName(Environment env) {
+	public Environment extendName(Environment env, Environment against) {
 		return env;
 	}
 

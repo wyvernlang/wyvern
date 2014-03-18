@@ -1,5 +1,5 @@
 /*
- * Built at Fri Mar 14 18:04:24 ADT 2014
+ * Built at Fri Mar 14 18:28:50 ADT 2014
  * by Copper version 0.7.1,
  *      revision 1cd57156c790d7c88540b5f453389b9ca39fae06,
  *      build 20131117-2243
@@ -691,7 +691,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             java.lang.Object cds = (java.lang.Object) _children[0];
             java.lang.Object rst = (java.lang.Object) _children[1];
             java.lang.Object RESULT = null;
-             RESULT = new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst)); 
+             RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_107()
@@ -739,7 +739,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             java.lang.Object rd = (java.lang.Object) _children[0];
             java.lang.Object rst = (java.lang.Object) _children[1];
             java.lang.Object RESULT = null;
-             RESULT = new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst)); 
+             RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_113()

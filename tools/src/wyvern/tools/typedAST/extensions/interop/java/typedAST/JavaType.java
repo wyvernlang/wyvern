@@ -82,7 +82,7 @@ public class JavaType implements EnvironmentExtender {
 	}
 
 	@Override
-	public Environment extendName(Environment env) {
+	public Environment extendName(Environment env, Environment against) {
 		return env;
 	}
 

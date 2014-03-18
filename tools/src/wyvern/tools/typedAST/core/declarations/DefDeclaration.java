@@ -115,9 +115,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	protected Environment doExtend(Environment old) {
-		type = TypeResolver.resolve(type, old);
-		Environment newEnv = old.extend(new LateNameBinding(name, () -> type));
-		return newEnv;
+		return extendName(old, old);
 	}
 
 	@Override
@@ -156,7 +154,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	}
 
 	@Override
-	public Environment extendName(Environment env) {
-		return env;
+	public Environment extendName(Environment env, Environment against) {
+		return env.extend(new LateNameBinding(name, () -> TypeResolver.resolve(type, against)));
 	}
 }

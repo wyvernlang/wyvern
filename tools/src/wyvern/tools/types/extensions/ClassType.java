@@ -73,8 +73,12 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 
 	private TypeType equivType = null;
 	public TypeType getEquivType() {
-		if (typeEquivalentEnv == null || typeEquivalentEnv.get() == null)
-			throw new RuntimeException();
+		if (typeEquivalentEnv == null || typeEquivalentEnv.get() == null) {
+			if (declEnv.get() != null)
+				typeEquivalentEnv.set(TypeDeclUtils.getTypeEquivalentEnvironment(declEnv.get()));
+			else
+				throw new RuntimeException();
+		}
 
 		if (equivType == null)
 			equivType = new TypeType(typeEquivalentEnv.get());

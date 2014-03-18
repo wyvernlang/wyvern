@@ -184,7 +184,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendName(Environment env) {
+	public Environment extendName(Environment env, Environment against) {
 		return env;
 	}
 }
