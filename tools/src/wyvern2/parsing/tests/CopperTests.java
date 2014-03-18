@@ -110,6 +110,35 @@ public class CopperTests {
 	}
 
 	@Test
+	public void testClass3() throws IOException, CopperParserException {
+		String input =
+				"class Hello\n" +
+						"	class def create():Hello = new\n" +
+						"	def foo():Int = 7\n" +
+						"	val bar:Int = 19\n" +
+						"Hello.create().foo()";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(7)");
+	}
+
+	@Test
+	public void testClassMutual() throws IOException, CopperParserException {
+		String input =
+				"class Foo\n" +
+				"	class def create():Foo = new\n" +
+				"	def hello():Hello = Hello.create()\n" +
+				"class Hello\n" +
+				"	class def create():Hello = new\n" +
+				"	def foo():Foo = Foo.create()\n" +
+				"	val bar:Int = 19\n" +
+				"Hello.create().bar";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
+		Assert.assertEquals("IntegerConstant(19)", res.evaluate(Globals.getStandardEnv()).toString());
+	}
+
+	@Test
 	public void parseSimpleClass() throws IOException, CopperParserException {
 		String input =
 				"class C\n" +
@@ -207,5 +236,4 @@ public class CopperTests {
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
 	}
-	
 }

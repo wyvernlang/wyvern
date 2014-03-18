@@ -42,6 +42,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> typeEquivalentEnvironmentRef;
 	protected Reference<Environment> declEnvRef;
 
+	Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
+	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>());;
+
 	public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
@@ -74,7 +77,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		nameBinding = new NameBindingImpl(name, null);
 		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
-		typeBinding = new TypeBinding(name, objectType);
+		typeBinding = new TypeBinding(name, objType);
 		nameBinding = new NameBindingImpl(name, classType);
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
@@ -127,13 +130,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment genv = env.extend(new ClassBinding("class", this));
 		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
 
-		if (decls != null)
+
+
+		if (decls != null) {
+			if (this.typeEquivalentEnvironmentRef.get() == null)
+				typeEquivalentEnvironmentRef.set(TypeDeclUtils.getTypeEquivalentEnvironment(declEnvRef.get()));
 			for (Declaration decl : decls.getDeclIterator()) {
-				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
-					decl.typecheckSelf(genv);
-				else
-					decl.typecheckSelf(oenv);
+				TypeBinding binding = new TypeBinding(nameBinding.getName(), getObjectType());
+				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()) {
+					decl.typecheckSelf(genv.extend(declEnvRef.get()).extend(binding));
+				} else {
+					decl.typecheckSelf(oenv.extend(objEnv.get()).extend(binding));
+				}
 			}
+		}
 		
 		// check the implements and class implements
 		// FIXME: Should support multiple implements statements!
@@ -177,7 +187,13 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		}
 
 		return Unit.getInstance();
-	}	
+	}
+
+	private Type getObjectType() {
+		Environment declEnv = getObjEnv();
+		Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(declEnv);
+		return new ClassType(new Reference<>(declEnv), new Reference<>(objTee), new LinkedList<>());
+	}
 	
 	@Override
 	protected Environment doExtend(Environment old) {
@@ -234,6 +250,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 		
 		return classEnv;
+	}
+
+	public Environment getObjEnv() {
+		return objEnv.get();
 	}
 	
 	public DeclSequence getDecls() {
@@ -316,11 +336,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendType(Environment env) {
-		return env.extend(new TypeBinding(nameBinding.getName(), nameBinding.getType()));
+		return env.extend(typeBinding);
 	}
 
 	@Override
-	public Environment extendName(Environment env) {
+	public Environment extendName(Environment env, Environment against) {
+		TypeBinding objBinding = new LateTypeBinding(nameBinding.getName(), this::getObjectType);
+
+		declEnvRef.set(Environment.getEmptyEnvironment());
+		for (Declaration decl : decls.getDeclIterator()) {
+			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
+				declEnvRef.set(decl.extendName(declEnvRef.get(), env.extend(objBinding)));
+			else
+				objEnv.set(decl.extendName(objEnv.get(), env.extend(objBinding)));
+		}
 		return env;
 	}
 }

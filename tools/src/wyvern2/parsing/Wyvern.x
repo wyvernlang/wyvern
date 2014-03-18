@@ -326,12 +326,12 @@ import java.util.HashMap;
     var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
     	;
 
-    objd ::= objcd:cds objd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst)); :}
+    objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
     	|	 objrd:rest {: RESULT = rest; :}
     	|	{: RESULT = null; :}
     	;
 
-    objrd ::= objid:rd objrd:rst {: RESULT = new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst)); :}
+    objrd ::= objid:rd objrd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); :}
     	|	  objid:rd {: RESULT = rd; :}
     	|	{: RESULT = null; :}
     	;

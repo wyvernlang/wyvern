@@ -49,9 +49,13 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		Type resolved = TypeResolver.resolve(binding.getType(), env);
+		Type resolved = null;
+		if (binding.getType() != null)
+			resolved = TypeResolver.resolve(binding.getType(), env);
 		if (this.definition != null)
 			this.definitionType = this.definition.typecheck(env);
+		if (resolved == null)
+			resolved = definitionType;
 		if (binding.getType() == null) {
 			this.binding = new NameBindingImpl(binding.getName(), resolved);
 		} else if (this.definitionType != null && !this.definitionType.subtype(resolved)){
@@ -86,7 +90,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old) {
-		return old.extend(binding);
+		return extendName(old, old);
 	}
 
 	@Override
@@ -126,8 +130,14 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendName(Environment env) {
-		return env;
+	public Environment extendName(Environment env, Environment against) {
+		Type resolved;
+		if (binding.getType() != null)
+			resolved = TypeResolver.resolve(binding.getType(), against);
+		else
+			resolved = definitionType;
+
+		return env.extend(new NameBindingImpl(getName(), resolved));
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

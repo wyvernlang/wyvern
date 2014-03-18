@@ -19,7 +19,6 @@ public class Def implements Definition {
 		this.body = body;
 	}
 
-
 	@Override
 	public <R> R accept(DefVisitor<R> visitor) {
 		return visitor.visit(this);

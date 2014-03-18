@@ -18,6 +18,7 @@ public class TypeResolver {
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);
 
+
 		for (Field f : input.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			if (Type[].class.isAssignableFrom(f.getType())) {

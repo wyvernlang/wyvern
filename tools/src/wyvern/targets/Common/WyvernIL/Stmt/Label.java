@@ -13,7 +13,9 @@ public class Label implements Statement {
 		return visitor.visit(this);
 	}
 
-
+	public int getIdx() {
+		return num;
+	}
 
 	@Override
 	public String toString() {

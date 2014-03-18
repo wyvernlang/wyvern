@@ -15,6 +15,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -23,7 +24,9 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeUtils;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -61,7 +64,9 @@ public class New extends CachingTypedAST implements CoreAST {
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class);
 
 		if (classVarTypeBinding != null) { //In a class method
-			Type classVarType = classVarTypeBinding.getType();
+			Environment declEnv = classVarTypeBinding.getClassDecl().getObjEnv();
+			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(declEnv);
+			Type classVarType = new ClassType(new Reference<>(declEnv), new Reference<>(objTee), new LinkedList<>());
 			if (!(classVarType instanceof ClassType)) {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
