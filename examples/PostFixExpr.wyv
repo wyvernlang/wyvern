@@ -3,7 +3,7 @@ type PostFixExpr
   metadata = new : HasParser
     def parser():Parser = ~
       start -> p::prim next::start
-        'SeqExpr.make(p,next)'
+        'SeqExpr.make(%p%,%next%)'
       start -> p::prim
         'p'
       prim -> '*'
@@ -11,7 +11,7 @@ type PostFixExpr
       prim -> '+'
         'AddExpr.make()'
       prim -> n::number			// assume number is built in from the standard Wyvern lexer
-        'NumExpr.make(n)'
+        'NumExpr.make(%n%)'
 		
 class SeqExpr implements PostFixExpr
   val left:PostFixExpr
