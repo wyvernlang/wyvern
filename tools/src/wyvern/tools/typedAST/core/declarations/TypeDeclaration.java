@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Reference;
@@ -26,7 +27,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	
 	private Environment declEvalEnv;
 	protected Reference<Obj> attrObj = new Reference<>();
-    protected Reference<Environment> declEnv;
+    protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 
 	public Reference<Obj> getAttrObjRef() {
@@ -36,26 +37,37 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Environment getAttrEnv() {
 		return attrEnv.get();
 	}
-
-	public ClassType getAttrType() {
-		return (ClassType) nameBinding.getType();
-	}
-
 	@Override
 	public Environment extendType(Environment env) {
-		return env.extend(new TypeBinding(nameBinding.getName(), nameBinding.getType()));
+		return env.extend(typeBinding);
 	}
 
+	private boolean declGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		if (!declGuard) {
+			for (Declaration decl : decls.getDeclIterator()) {
+				declEnv.set(decl.extendName(declEnv.get(), against));
+				if (decl instanceof AttributeDeclaration) {
+					env = env.extend(new NameBindingImpl(getName(), ((AttributeDeclaration) decl).getType()));
+					nameBinding = new NameBindingImpl(nameBinding.getName(), decl.getType());
+				}
+			}
+			declGuard = true;
+		}
 		return env;
 	}
 
 	public static class AttributeDeclaration extends Declaration {
 		private final TypedAST body;
+		private Type rType;
 
 		public AttributeDeclaration(TypedAST body) {
 			this.body = body;
+		}
+		public AttributeDeclaration(TypedAST body, Type result) {
+			this.body = body;
+			this.rType = result;
 		}
 
 		@Override
@@ -84,7 +96,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		public Type getType() {
-			return null;
+			return rType;
 		}
 
 		@Override
@@ -119,6 +131,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		public Environment extendName(Environment env, Environment against) {
+			rType = TypeResolver.resolve(rType, against);
 			return env;
 		}
 	}
@@ -127,7 +140,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null);
-		declEnv = new Reference<>(null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>()); // TODO set this to a class type that has the class members
@@ -195,19 +207,12 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 
 		Environment attrEnv = Environment.getEmptyEnvironment();
+		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof AttributeDeclaration) {
-				for (Declaration idecl : ((DeclSequence)((AttributeDeclaration) decl).getBody()).getDeclIterator()) {
-					attrEnv = idecl.doExtendWithValue(attrEnv);
-					idecl.bindDecl(evalEnv, attrEnv);
-				}
+				vb.setValue(((AttributeDeclaration) decl).getBody().evaluate(evalEnv));
 			}
 		}
-		Obj typeAttrObj = new Obj(attrEnv);
-		
-		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
-		attrObj.set(typeAttrObj);
-		vb.setValue(typeAttrObj);
 	}
 	
 	public DeclSequence getDecls() {

@@ -187,7 +187,7 @@ import java.util.HashMap;
 	ignore terminal multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\//;
 	ignore terminal ignoredNewline ::= /(\n[ \t]*)+/;
 	ignore terminal Spaces_t ::= /[ \t]+|(\\\n)/;
-    terminal Newline_t ::= /(\n[ \t]*)+/;
+    terminal Newline_t ::= /(\n[ \t]*)+/ {: :};
 
  	terminal identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = lexeme;
@@ -199,7 +199,7 @@ import java.util.HashMap;
 	terminal defKwd_t 	::= /def/ in (keywds);
 	terminal varKwd_t 	::= /var/ in (keywds);
 	terminal fnKwd_t 	::= /fn/ in (keywds);
-	terminal metadataKwd_t 	::= /fn/ in (keywds);
+	terminal metadataKwd_t 	::= /metadata/ in (keywds);
 	terminal newKwd_t 	::= /new/ in (keywds);
 
  	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
@@ -364,16 +364,13 @@ import java.util.HashMap;
     	;
 
     typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
-    	   | tdef:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
-    	   | metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
+    	   |  tdef:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
+    	   |  metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
     	   ;
-
-   	non terminal otend;
-   	otend ::= Newline_t | ;
 
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, null); :};
 
-    metadata ::= metadataKwd_t equals_t e:inner otend {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner); :};
+    metadata ::= metadataKwd_t typeasc:type equals_t e:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); :};
 
     non terminal AE;
     non terminal ME;

@@ -40,7 +40,8 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	
 	@Override
 	public final Type typecheck(Environment env) {
-		Environment newEnv = extend(env);
+		Environment tEnv = this.extendType(env);
+		Environment newEnv = extend(extendName(tEnv, tEnv));
 		return typecheckSelf(newEnv);
 	}
 

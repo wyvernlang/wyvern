@@ -1,5 +1,5 @@
 /*
- * Built at Fri Mar 14 18:28:50 ADT 2014
+ * Built at Fri Mar 21 12:24:20 EDT 2014
  * by Copper version 0.7.1,
  *      revision 1cd57156c790d7c88540b5f453389b9ca39fae06,
  *      build 20131117-2243
@@ -148,6 +148,9 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             java.lang.Object RESULT = null;
             switch(_prod)
             {
+            case 73:
+                RESULT = runSemanticAction_73();
+                break;
             case 74:
                 RESULT = runSemanticAction_74();
                 break;
@@ -211,8 +214,8 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             case 94:
                 RESULT = runSemanticAction_94();
                 break;
-            case 95:
-                RESULT = runSemanticAction_95();
+            case 97:
+                RESULT = runSemanticAction_97();
                 break;
             case 98:
                 RESULT = runSemanticAction_98();
@@ -264,6 +267,12 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
                 break;
             case 114:
                 RESULT = runSemanticAction_114();
+                break;
+            case 115:
+                RESULT = runSemanticAction_115();
+                break;
+            case 116:
+                RESULT = runSemanticAction_116();
                 break;
             case 117:
                 RESULT = runSemanticAction_117();
@@ -364,15 +373,6 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             case 149:
                 RESULT = runSemanticAction_149();
                 break;
-            case 150:
-                RESULT = runSemanticAction_150();
-                break;
-            case 151:
-                RESULT = runSemanticAction_151();
-                break;
-            case 152:
-                RESULT = runSemanticAction_152();
-                break;
             default:
         runDefaultProdAction();
                  break;
@@ -419,7 +419,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             }
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_74()
+        public java.lang.Object runSemanticAction_73()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object l = (java.lang.Object) _children[0];
@@ -428,7 +428,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Invocation((TypedAST)l,"+",(TypedAST)r,null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_75()
+        public java.lang.Object runSemanticAction_74()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object l = (java.lang.Object) _children[0];
@@ -437,7 +437,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Invocation((TypedAST)l,"-",(TypedAST)r,null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_76()
+        public java.lang.Object runSemanticAction_75()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object mer = (java.lang.Object) _children[0];
@@ -445,7 +445,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             RESULT = mer;
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_77()
+        public java.lang.Object runSemanticAction_76()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object l = (java.lang.Object) _children[0];
@@ -454,7 +454,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Invocation((TypedAST)l,"*",(TypedAST)r,null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_78()
+        public java.lang.Object runSemanticAction_77()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object l = (java.lang.Object) _children[0];
@@ -463,12 +463,20 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Invocation((TypedAST)l,"/",(TypedAST)r,null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_79()
+        public java.lang.Object runSemanticAction_78()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ter = (java.lang.Object) _children[0];
             java.lang.Object RESULT = null;
             RESULT = ter;
+            return RESULT;
+        }
+        public java.lang.Object runSemanticAction_79()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object r = (java.lang.Object) _children[1];
+            java.lang.Object RESULT = null;
+             RESULT = r; 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_80()
@@ -490,14 +498,6 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
         public java.lang.Object runSemanticAction_82()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
-            java.lang.Object r = (java.lang.Object) _children[1];
-            java.lang.Object RESULT = null;
-             RESULT = r; 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_83()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
             java.lang.Object name = (java.lang.Object) _children[1];
             java.lang.Object argNames = (java.lang.Object) _children[2];
             java.lang.Object fullType = (java.lang.Object) _children[3];
@@ -506,7 +506,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, null);
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_84()
+        public java.lang.Object runSemanticAction_83()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -516,7 +516,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_85()
+        public java.lang.Object runSemanticAction_84()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -526,7 +526,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_86()
+        public java.lang.Object runSemanticAction_85()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -536,7 +536,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_87()
+        public java.lang.Object runSemanticAction_86()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -544,13 +544,21 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             RESULT = new ClassDeclaration((String)id, "", "", null, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_88()
+        public java.lang.Object runSemanticAction_87()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object res = (java.lang.Object) _children[0];
             java.lang.Object after = (java.lang.Object) _children[1];
             java.lang.Object RESULT = null;
              RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); 
+            return RESULT;
+        }
+        public java.lang.Object runSemanticAction_88()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object res = (java.lang.Object) _children[0];
+            java.lang.Object RESULT = null;
+             RESULT = res; 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_89()
@@ -564,9 +572,9 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
         public java.lang.Object runSemanticAction_90()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
-            java.lang.Object res = (java.lang.Object) _children[0];
+            java.lang.Object r = (java.lang.Object) _children[1];
             java.lang.Object RESULT = null;
-             RESULT = res; 
+             RESULT = r; 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_91()
@@ -580,14 +588,6 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
         public java.lang.Object runSemanticAction_92()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
-            java.lang.Object r = (java.lang.Object) _children[1];
-            java.lang.Object RESULT = null;
-             RESULT = r; 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_93()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
             java.lang.Object name = (java.lang.Object) _children[1];
             java.lang.Object argNames = (java.lang.Object) _children[2];
             java.lang.Object fullType = (java.lang.Object) _children[3];
@@ -596,7 +596,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, null);
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_94()
+        public java.lang.Object runSemanticAction_93()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object aer = (java.lang.Object) _children[0];
@@ -604,7 +604,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             RESULT = aer; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_95()
+        public java.lang.Object runSemanticAction_94()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object pi = (java.lang.Object) _children[0];
@@ -612,7 +612,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = pi; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_98()
+        public java.lang.Object runSemanticAction_97()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[0];
@@ -622,7 +622,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              ((LinkedList<NameBinding>)re).addFirst(new NameBindingImpl((String)id, (Type)ta)); RESULT = re; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_99()
+        public java.lang.Object runSemanticAction_98()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[0];
@@ -631,7 +631,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              LinkedList<NameBinding> llnb = new LinkedList<NameBinding>(); llnb.add(new NameBindingImpl((String)id, (Type)ta)); RESULT = llnb; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_100()
+        public java.lang.Object runSemanticAction_99()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object first = (java.lang.Object) _children[0];
@@ -640,7 +640,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new TupleObject((TypedAST)first,(TypedAST)rest,null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_101()
+        public java.lang.Object runSemanticAction_100()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object el = (java.lang.Object) _children[0];
@@ -648,12 +648,22 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = el; 
             return RESULT;
         }
+        public java.lang.Object runSemanticAction_101()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object type = (java.lang.Object) _children[1];
+            java.lang.Object inner = (java.lang.Object) _children[3];
+            java.lang.Object RESULT = null;
+             RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); 
+            return RESULT;
+        }
         public java.lang.Object runSemanticAction_102()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
-            java.lang.Object inner = (java.lang.Object) _children[2];
+            java.lang.Object vd = (java.lang.Object) _children[0];
+            java.lang.Object re = (java.lang.Object) _children[1];
             java.lang.Object RESULT = null;
-             RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner); 
+             RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_103()
@@ -668,15 +678,6 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
         public java.lang.Object runSemanticAction_104()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
-            java.lang.Object vd = (java.lang.Object) _children[0];
-            java.lang.Object re = (java.lang.Object) _children[1];
-            java.lang.Object RESULT = null;
-             RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_105()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
             java.lang.Object name = (java.lang.Object) _children[2];
             java.lang.Object argNames = (java.lang.Object) _children[3];
             java.lang.Object fullType = (java.lang.Object) _children[4];
@@ -685,7 +686,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, null);
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_106()
+        public java.lang.Object runSemanticAction_105()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object cds = (java.lang.Object) _children[0];
@@ -694,7 +695,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_107()
+        public java.lang.Object runSemanticAction_106()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object rest = (java.lang.Object) _children[0];
@@ -702,11 +703,19 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = rest; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_108()
+        public java.lang.Object runSemanticAction_107()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object RESULT = null;
              RESULT = null; 
+            return RESULT;
+        }
+        public java.lang.Object runSemanticAction_108()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object va = (java.lang.Object) _children[0];
+            java.lang.Object RESULT = null;
+             RESULT = va; 
             return RESULT;
         }
         public java.lang.Object runSemanticAction_109()
@@ -728,21 +737,13 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
         public java.lang.Object runSemanticAction_111()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
-            java.lang.Object va = (java.lang.Object) _children[0];
-            java.lang.Object RESULT = null;
-             RESULT = va; 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_112()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
             java.lang.Object rd = (java.lang.Object) _children[0];
             java.lang.Object rst = (java.lang.Object) _children[1];
             java.lang.Object RESULT = null;
              RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_113()
+        public java.lang.Object runSemanticAction_112()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object rd = (java.lang.Object) _children[0];
@@ -750,14 +751,14 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = rd; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_114()
+        public java.lang.Object runSemanticAction_113()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object RESULT = null;
              RESULT = null; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_117()
+        public java.lang.Object runSemanticAction_114()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ta = (java.lang.Object) _children[0];
@@ -765,14 +766,14 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = ta; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_118()
+        public java.lang.Object runSemanticAction_115()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object RESULT = null;
              RESULT = null; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_119()
+        public java.lang.Object runSemanticAction_116()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ex = (java.lang.Object) _children[0];
@@ -780,7 +781,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = ex; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_120()
+        public java.lang.Object runSemanticAction_117()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object de = (java.lang.Object) _children[0];
@@ -788,7 +789,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = de; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_121()
+        public java.lang.Object runSemanticAction_118()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ip = (java.lang.Object) _children[1];
@@ -796,14 +797,14 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = ip; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_122()
+        public java.lang.Object runSemanticAction_119()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object RESULT = null;
              RESULT = new LinkedList<NameBinding>(); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_123()
+        public java.lang.Object runSemanticAction_120()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ex = (java.lang.Object) _children[0];
@@ -811,7 +812,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = ex; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_124()
+        public java.lang.Object runSemanticAction_121()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object nr = (java.lang.Object) _children[0];
@@ -819,7 +820,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = nr; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_125()
+        public java.lang.Object runSemanticAction_122()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object vd = (java.lang.Object) _children[0];
@@ -828,7 +829,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_126()
+        public java.lang.Object runSemanticAction_123()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object vd = (java.lang.Object) _children[0];
@@ -836,31 +837,31 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = vd; 
             return RESULT;
         }
+        public java.lang.Object runSemanticAction_124()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object res = (java.lang.Object) _children[0];
+            java.lang.Object RESULT = null;
+             RESULT = res; 
+            return RESULT;
+        }
+        public java.lang.Object runSemanticAction_125()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object res = (java.lang.Object) _children[0];
+            java.lang.Object RESULT = null;
+             RESULT = res; 
+            return RESULT;
+        }
+        public java.lang.Object runSemanticAction_126()
+        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
+        {
+            java.lang.Object res = (java.lang.Object) _children[0];
+            java.lang.Object RESULT = null;
+             RESULT = res; 
+            return RESULT;
+        }
         public java.lang.Object runSemanticAction_127()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
-            java.lang.Object res = (java.lang.Object) _children[0];
-            java.lang.Object RESULT = null;
-             RESULT = res; 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_128()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
-            java.lang.Object res = (java.lang.Object) _children[0];
-            java.lang.Object RESULT = null;
-             RESULT = res; 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_129()
-        throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
-        {
-            java.lang.Object res = (java.lang.Object) _children[0];
-            java.lang.Object RESULT = null;
-             RESULT = res; 
-            return RESULT;
-        }
-        public java.lang.Object runSemanticAction_130()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object name = (java.lang.Object) _children[1];
@@ -870,7 +871,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_131()
+        public java.lang.Object runSemanticAction_128()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[0];
@@ -878,7 +879,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Variable(new NameBindingImpl((String)id, null), null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_132()
+        public java.lang.Object runSemanticAction_129()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -888,7 +889,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, null)), (TypedAST)inner); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_133()
+        public java.lang.Object runSemanticAction_130()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object inner = (java.lang.Object) _children[1];
@@ -896,7 +897,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = inner; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_134()
+        public java.lang.Object runSemanticAction_131()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object src = (java.lang.Object) _children[0];
@@ -905,7 +906,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Application((TypedAST)src, (TypedAST)tgt, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_135()
+        public java.lang.Object runSemanticAction_132()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object src = (java.lang.Object) _children[0];
@@ -914,7 +915,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Invocation((TypedAST)src,(String)op, null, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_136()
+        public java.lang.Object runSemanticAction_133()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object lit = (java.lang.Object) _children[0];
@@ -922,7 +923,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DSLLit((String)lit); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_137()
+        public java.lang.Object runSemanticAction_134()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object res = (java.lang.Object) _children[0];
@@ -930,14 +931,14 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new IntegerConstant((Integer)res); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_138()
+        public java.lang.Object runSemanticAction_135()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object RESULT = null;
              RESULT = new New(new HashMap<String,TypedAST>(), null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_139()
+        public java.lang.Object runSemanticAction_136()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object res = (java.lang.Object) _children[1];
@@ -945,14 +946,14 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
             RESULT = res; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_140()
+        public java.lang.Object runSemanticAction_137()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object RESULT = null;
              RESULT = UnitVal.getInstance(null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_141()
+        public java.lang.Object runSemanticAction_138()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object t1 = (java.lang.Object) _children[0];
@@ -961,7 +962,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Arrow((Type)t1,(Type)t2); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_142()
+        public java.lang.Object runSemanticAction_139()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object t1 = (java.lang.Object) _children[0];
@@ -970,7 +971,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new Tuple((Type)t1,(Type)t2); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_143()
+        public java.lang.Object runSemanticAction_140()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ta = (java.lang.Object) _children[1];
@@ -978,7 +979,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = ta; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_144()
+        public java.lang.Object runSemanticAction_141()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[0];
@@ -986,7 +987,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new UnresolvedType((String)id); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_145()
+        public java.lang.Object runSemanticAction_142()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object ty = (java.lang.Object) _children[1];
@@ -994,7 +995,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = ty; 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_146()
+        public java.lang.Object runSemanticAction_143()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object def = (java.lang.Object) _children[0];
@@ -1003,7 +1004,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_147()
+        public java.lang.Object runSemanticAction_144()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object def = (java.lang.Object) _children[0];
@@ -1011,7 +1012,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_148()
+        public java.lang.Object runSemanticAction_145()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object md = (java.lang.Object) _children[0];
@@ -1019,7 +1020,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_149()
+        public java.lang.Object runSemanticAction_146()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object name = (java.lang.Object) _children[1];
@@ -1028,7 +1029,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new TypeDeclaration((String)name, (DeclSequence)body, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_150()
+        public java.lang.Object runSemanticAction_147()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object name = (java.lang.Object) _children[1];
@@ -1036,7 +1037,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new TypeDeclaration((String)name, null, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_151()
+        public java.lang.Object runSemanticAction_148()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -1046,7 +1047,7 @@ public class Wyvern extends edu.umn.cs.melt.copper.runtime.engines.single.Single
              RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); 
             return RESULT;
         }
-        public java.lang.Object runSemanticAction_152()
+        public java.lang.Object runSemanticAction_149()
         throws edu.umn.cs.melt.copper.runtime.logging.CopperParserException
         {
             java.lang.Object id = (java.lang.Object) _children[1];
@@ -1324,321 +1325,320 @@ public static final byte[] symbolNamesHash = edu.umn.cs.melt.copper.runtime.auxi
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\115\121\333\156\324\060" +
 "\024\364\136\273\005\132\220\170\346\027\252\046\331\115\132\361" +
 "\124\211\005\125\334\252\266\342\205\207\225\067\366\156\135\071" +
-"\116\352\170\167\251\370\022\376\001\176\206\237\100\074\360\017" +
-"\330\147\234\302\213\347\034\147\146\074\347\344\373\037\066\332" +
+"\116\352\170\167\251\370\017\276\002\176\206\237\100\074\360\017" +
+"\330\236\223\302\213\347\234\170\146\074\347\344\373\037\066\332" +
 "\130\366\374\363\273\133\276\345\107\232\233\365\321\225\263\312" +
 "\254\137\376\370\371\351\327\357\027\137\337\364\031\373\322\060" +
 "\306\276\071\066\230\177\174\355\330\341\053\051\244\161\227\262" +
-"\341\312\056\234\143\023\134\120\171\156\272\162\377\203\334\151" +
-"\145\044\135\137\065\274\224\155\050\367\270\265\365\056\124\217" +
-"\112\315\333\366\355\116\204\346\111\251\353\126\136\160\053\015" +
-"\261\312\132\327\135\125\125\234\014\103\025\315\307\202\267\067" +
-"\241\170\046\144\251\052\256\317\215\223\153\211\070\102\256\242" +
-"\353\104\250\255\022\024\141\044\152\007\154\065\175\222\167\033" +
-"\256\021\151\145\272\024\052\244\127\053\005\247\103\265\066\265" +
-"\225\042\116\342\330\101\045\035\027\334\361\310\037\127\033\115" +
-"\256\117\103\241\026\377\045\234\030\271\213\254\307\165\043\315" +
-"\303\150\343\106\157\350\331\203\366\246\266\016\333\046\205\173" +
-"\130\315\236\123\032\261\367\335\175\043\273\151\266\134\377\053" +
-"\155\054\107\127\327\147\227\327\216\365\317\346\376\170\077\017" +
-"\213\135\372\255\350\145\055\356\375\347\320\254\010\275\074\242" +
-"\015\030\266\357\130\117\320\306\072\372\200\310\075\077\153\177" +
-"\125\372\166\125\246\076\204\062\141\176\255\102\064\325\160\313" +
-"\053\257\354\207\166\322\155\304\163\215\365\136\243\172\171\133" +
-"\172\034\172\214\255\212\210\317\116\232\360\144\035\006\343\255" +
-"\177\243\327\204\245\104\323\141\103\056\203\046\234\375\160\014" +
-"\035\105\032\072\151\053\257\167\233\106\313\320\172\171\130\124" +
-"\347\062\012\225\210\067\176\036\357\101\363\016\150\332\061\055" +
-"\351\302\353\026\315\154\006\310\001\005\340\004\160\112\220\037" +
-"\023\144\350\246\350\246\011\040\003\244\200\051\101\002\263\304" +
-"\233\015\374\045\235\063\072\361\041\205\105\012\213\064\276\011" +
-"\136\102\047\010\005\142\244\160\115\221\264\200\252\300\213\263" +
-"\214\370\170\011\364\014\274\024\161\263\030\036\252\014\001\062" +
-"\074\231\105\001\254\062\214\222\341\265\031\164\063\350\022\060" +
-"\223\123\172\047\245\023\364\024\342\024\135\022\351\270\114\216" +
-"\211\210\040\111\144\304\025\305\265\203\230\103\226\307\016\314" +
-"\034\314\034\314\034\311\163\044\317\221\047\207\165\021\327\005" +
-"\135\001\135\021\327\005\135\001\335\064\002\344\323\370\107\301" +
-"\234\306\237\023\341\344\057\013\363\005\203\016\005\000\000"
+"\341\312\056\234\143\023\174\210\345\271\351\312\375\017\162\247" +
+"\225\221\361\363\125\303\113\331\206\162\217\133\133\357\102\365" +
+"\250\324\274\155\337\356\104\150\236\224\272\156\345\005\267\322" +
+"\104\126\131\353\272\253\252\212\107\303\120\221\371\130\360\366" +
+"\046\024\317\204\054\125\305\365\271\161\162\055\021\107\310\025" +
+"\271\116\204\332\052\021\043\214\104\355\200\255\216\127\362\156" +
+"\303\065\042\255\114\227\102\205\364\152\245\340\164\250\326\246" +
+"\266\122\320\044\216\035\124\322\161\301\035\047\376\270\332\350" +
+"\350\372\064\024\152\361\137\302\211\221\073\142\075\256\033\151" +
+"\036\106\033\067\172\023\237\075\150\157\152\353\260\355\250\160" +
+"\017\253\331\163\112\043\366\276\273\157\144\067\315\226\353\177" +
+"\245\245\162\164\165\175\166\171\355\130\377\154\356\217\367\363" +
+"\260\330\245\337\212\136\326\342\336\137\207\146\025\321\313\011" +
+"\155\300\260\175\307\172\042\156\254\243\017\042\271\347\147\355" +
+"\257\112\337\256\312\324\207\120\046\314\257\125\210\246\032\156" +
+"\171\345\225\375\320\116\272\215\170\256\261\336\153\124\057\157" +
+"\113\217\103\217\324\052\302\160\075\251\303\100\274\365\336\275" +
+"\046\054\203\314\206\115\124\017\232\160\366\303\061\164\061\312" +
+"\320\111\133\171\275\333\064\132\206\326\313\303\202\072\227\121" +
+"\250\004\175\361\163\170\217\070\347\040\116\071\216\313\271\360" +
+"\272\105\063\313\000\123\300\014\220\003\012\300\111\204\354\064" +
+"\302\364\030\220\000\040\237\246\000\270\044\220\047\136\076\360" +
+"\037\343\071\213\047\056\122\130\244\260\110\351\225\064\062\222" +
+"\170\202\120\020\035\256\051\262\345\210\121\200\062\003\037\057" +
+"\121\116\360\122\360\062\360\062\274\225\301\061\303\223\031\011" +
+"\020\076\303\050\031\315\200\273\344\064\072\043\033\010\051\350" +
+"\051\272\004\306\011\076\046\307\221\210\247\023\142\220\041\255" +
+"\226\162\203\222\243\313\141\222\303\044\207\056\207\056\247\261" +
+"\221\074\107\362\034\351\012\350\012\350\012\350\012\350\012\350" +
+"\246\020\114\041\230\322\077\244\073\332\057\301\311\137\212\234" +
+"\153\113\370\004\000\000"
 });
 
 public static final byte[] symbolDisplayNamesHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
-(new String[]{ "\037\213\010\000\000\000\000\000\000\000\115\121\313\156\324\060" +
-"\024\315\274\332\051\320\202\304\232\035\353\252\111\146\222\126" +
-"\254\220\250\120\305\103\210\112\154\220\072\362\304\236\251\053" +
-"\307\111\035\317\014\025\137\302\077\300\317\360\023\210\005\377" +
-"\200\175\317\115\141\343\163\257\163\316\361\271\067\337\377\044" +
-"\223\215\113\236\176\176\173\043\266\342\330\010\273\076\276\364" +
-"\116\333\365\213\037\077\077\375\372\375\354\353\353\141\222\174" +
-"\151\223\044\371\346\223\301\163\237\034\275\122\122\131\377\121" +
-"\265\102\273\205\367\311\024\027\124\136\330\276\074\170\257\166" +
-"\106\133\105\327\227\255\250\124\027\313\175\341\134\263\213\325" +
-"\203\312\210\256\173\263\223\261\171\124\231\246\123\037\204\123" +
-"\226\130\125\143\232\276\252\153\101\206\261\142\363\075\051\272" +
-"\353\130\074\221\252\322\265\060\027\326\253\265\102\034\251\126" +
-"\354\072\225\172\253\045\105\230\310\306\003\073\103\237\324\355" +
-"\106\030\104\132\331\076\205\216\351\365\112\303\351\110\257\155" +
-"\343\224\344\111\174\162\130\053\057\244\360\202\371\173\365\306" +
-"\220\353\343\130\350\305\177\011\247\126\355\230\365\260\151\225" +
-"\275\037\155\257\065\033\172\366\260\273\156\234\307\256\111\341" +
-"\357\127\263\357\265\101\354\003\177\327\252\176\232\255\060\377" +
-"\112\307\345\340\312\047\303\227\347\341\170\167\036\227\272\014" +
-"\033\061\313\106\336\205\131\143\263\042\014\122\106\027\061\156" +
-"\076\110\045\155\253\247\217\210\074\010\163\016\127\125\150\127" +
-"\125\026\002\150\033\147\067\072\306\322\255\160\242\016\312\141" +
-"\154\247\375\066\002\327\272\340\065\151\226\067\125\300\161\100" +
-"\156\065\043\076\173\145\343\223\115\034\112\164\341\215\101\033" +
-"\027\302\246\343\226\134\106\155\074\207\361\030\173\212\064\366" +
-"\312\325\101\357\067\255\121\261\015\362\270\244\336\145\022\053" +
-"\311\067\141\236\340\101\363\216\150\332\341\125\330\320\170\321" +
-"\316\347\200\002\120\002\116\001\147\004\305\011\101\216\156\206" +
-"\156\226\002\162\100\006\230\021\244\060\113\203\331\050\134\322" +
-"\071\247\023\037\062\130\144\260\310\370\115\360\122\072\101\050" +
-"\021\043\203\153\206\244\045\124\045\136\234\347\304\307\113\240" +
-"\347\340\145\210\233\163\170\250\162\004\310\361\144\316\002\130" +
-"\345\030\045\307\153\163\350\346\320\245\140\246\147\364\116\106" +
-"\047\350\031\304\031\272\224\351\270\114\117\210\210\040\051\063" +
-"\170\105\274\166\020\013\310\012\356\300\054\300\054\300\054\220" +
-"\274\100\362\002\171\012\130\227\274\056\350\112\350\112\136\027" +
-"\164\045\164\063\006\310\147\374\107\301\234\361\317\141\070\375" +
-"\013\164\136\166\357\004\005\000\000"
+(new String[]{ "\037\213\010\000\000\000\000\000\000\000\115\121\313\156\023\061" +
+"\024\235\114\222\066\005\132\220\130\263\143\135\165\036\231\151" +
+"\305\012\211\012\125\074\204\250\304\006\251\221\063\166\122\127" +
+"\036\217\353\161\022\052\376\203\257\200\237\341\047\020\013\376" +
+"\001\333\347\116\141\343\163\257\347\234\343\163\357\174\377\223" +
+"\114\067\066\171\372\371\355\015\333\262\143\305\364\372\370\322" +
+"\131\251\327\057\176\374\374\364\353\367\263\257\257\323\044\371" +
+"\142\222\044\371\346\222\321\163\227\034\275\022\134\150\367\121" +
+"\030\046\355\302\271\144\206\213\130\136\350\241\074\170\057\166" +
+"\112\152\021\257\057\015\153\104\037\312\175\146\155\267\013\325" +
+"\203\106\261\276\177\263\343\241\171\324\250\256\027\037\230\025" +
+"\072\262\232\116\165\103\325\266\054\032\206\212\314\367\070\353" +
+"\257\103\361\204\213\106\266\114\135\150\047\326\002\161\270\130" +
+"\221\353\214\313\255\344\061\302\224\167\016\330\253\370\111\334" +
+"\156\230\102\244\225\036\122\310\220\136\256\044\234\216\344\132" +
+"\167\126\160\232\304\045\207\255\160\214\063\307\210\277\327\156" +
+"\124\164\175\034\012\271\370\057\341\114\213\035\261\036\166\106" +
+"\350\373\321\366\214\332\304\147\017\373\353\316\072\354\072\052" +
+"\334\375\152\366\235\124\210\175\340\356\214\030\246\331\062\365" +
+"\257\264\124\216\256\134\222\276\074\367\307\273\363\260\324\245" +
+"\337\210\132\166\374\316\317\032\232\125\104\057\045\264\001\303" +
+"\346\275\224\307\155\015\364\161\044\217\374\234\351\252\361\355" +
+"\252\311\175\000\251\303\354\112\206\130\322\060\313\132\257\114" +
+"\103\073\033\266\341\271\332\172\257\151\267\274\151\074\116\074" +
+"\122\053\011\303\347\131\027\206\141\275\367\036\231\260\010\062" +
+"\233\230\250\036\233\160\246\341\230\270\030\145\342\204\155\275" +
+"\336\155\214\022\241\365\362\260\234\301\145\032\052\116\067\176" +
+"\016\357\021\347\034\307\051\323\053\277\231\311\302\314\013\100" +
+"\011\230\003\052\100\015\070\215\120\234\105\050\117\000\031\000" +
+"\362\062\007\300\045\203\074\363\362\261\277\214\347\074\236\370" +
+"\220\303\042\207\105\116\257\344\221\221\305\023\204\232\350\160" +
+"\315\221\255\102\214\032\224\071\370\170\211\162\202\227\203\127" +
+"\200\127\340\255\002\216\005\236\054\110\200\360\005\106\051\150" +
+"\006\174\313\316\242\063\262\201\220\203\236\243\313\140\234\341" +
+"\062\073\211\104\074\235\021\203\014\151\265\224\033\224\012\135" +
+"\005\223\012\046\025\164\025\164\025\215\215\344\025\222\127\110" +
+"\127\103\127\103\127\103\127\103\127\103\127\102\120\102\120\322" +
+"\077\244\157\264\137\202\323\277\022\122\057\210\356\004\000\000" +
+""
 });
 
 public static final byte[] symbolNumbersHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\133\363\226\201\265\264" +
 "\210\201\051\332\323\167\127\202\132\331\253\115\113\231\030\030" +
-"\052\012\030\030\030\146\062\014\022\240\060\210\261\003\003\003" +
+"\052\012\030\030\030\246\061\014\022\240\060\110\261\003\003\003" +
 "\023\020\063\103\061\043\032\033\131\216\025\210\131\240\230\025" +
 "\052\306\004\125\307\210\246\216\021\015\263\040\231\205\314\007" +
-"\141\066\044\163\030\320\364\241\213\243\323\060\173\231\260\350" +
-"\101\267\037\104\263\043\251\147\106\123\203\054\216\055\014\140" +
-"\352\140\176\007\207\005\000\201\004\257\015\177\002\000\000"
+"\141\066\044\163\030\320\364\241\213\043\313\243\333\317\344\200" +
+"\335\136\020\315\216\244\236\031\115\015\262\070\066\277\303\324" +
+"\301\374\014\016\003\000\372\226\224\167\163\002\000\000"
 });
 
 public static final byte[] productionLHSsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
-(new String[]{ "\037\213\010\000\000\000\000\000\000\000\205\303\067\012\002\001" +
-"\000\004\300\345\300\177\210\341\314\071\207\063\307\102\260\267" +
-"\361\011\042\050\176\310\316\312\322\047\011\376\301\055\266\130" +
-"\154\034\230\307\007\261\313\031\301\141\273\173\035\303\353\373" +
-"\171\017\200\333\011\300\076\016\044\070\151\123\066\155\103\316" +
-"\160\226\163\232\267\005\055\162\211\313\134\341\052\327\264\256" +
-"\015\156\152\213\333\266\143\273\266\247\175\035\350\120\043\035" +
-"\351\330\116\170\372\347\114\347\077\027\274\264\053\135\363\346" +
-"\013\370\262\274\272\133\001\000\000"
+(new String[]{ "\037\213\010\000\000\000\000\000\000\000\205\303\271\011\002\001" +
+"\000\004\300\345\300\076\304\347\374\317\377\377\316\037\003\155" +
+"\300\304\022\104\120\154\310\314\310\320\222\004\173\160\203\015" +
+"\026\023\007\346\361\101\342\162\106\160\330\356\136\307\360\372" +
+"\176\336\003\340\166\002\260\117\002\051\116\333\214\315\332\220" +
+"\163\234\347\202\026\155\111\313\134\341\210\253\134\343\272\066" +
+"\264\311\055\155\163\307\166\155\317\366\165\240\103\035\351\130" +
+"\047\166\312\361\237\063\235\377\134\360\322\256\164\315\233\057" +
+"\052\275\232\346\123\001\000\000"
 });
 
 public static final byte[] parseTableHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\355\135\131\267\024\065" +
 "\020\316\001\161\301\005\121\024\301\255\334\160\305\175\027\265" +
-"\161\277\350\005\367\355\272\040\212\270\013\310\105\334\220\305" +
-"\015\134\120\101\345\017\370\346\223\217\376\036\237\074\307\147" +
-"\137\115\346\116\101\045\135\225\356\364\044\323\231\231\376\316" +
-"\311\251\364\127\325\137\162\353\364\364\355\116\272\323\177\374" +
-"\253\026\314\156\125\363\147\146\246\226\376\367\367\272\145\007" +
-"\366\255\232\247\324\216\315\112\251\303\232\237\067\063\065\375" +
-"\327\372\025\333\377\371\363\167\244\247\124\207\112\314\156\121" +
-"\073\225\316\230\077\133\240\172\061\034\077\137\227\143\310\366" +
-"\202\276\075\126\227\343\230\370\343\165\071\201\341\027\352\162" +
-"\242\056\047\365\267\117\326\345\024\046\156\221\056\247\366\353" +
-"\213\165\071\115\227\323\373\333\113\234\330\063\074\177\317\231" +
-"\244\276\124\227\263\372\365\145\114\354\162\135\316\326\345\234" +
-"\172\331\152\002\255\176\156\154\315\266\161\064\133\205\122\373" +
-"\014\343\132\204\344\067\026\213\324\012\365\111\261\125\032\071" +
-"\040\351\261\165\136\154\315\266\141\035\133\257\030\306\265\010" +
-"\311\157\054\026\251\025\352\223\142\253\064\162\100\322\143\353" +
-"\374\330\232\155\303\072\266\366\032\306\265\010\311\157\054\026" +
-"\251\025\352\223\142\253\064\162\200\225\255\375\206\161\055\102" +
-"\362\033\213\105\152\205\372\244\330\052\215\034\060\330\057\021" +
-"\364\365\226\263\335\350\172\213\211\143\257\267\230\070\040\365" +
-"\045\142\140\115\000\163\275\105\221\364\274\165\101\154\315\266" +
-"\221\064\133\027\306\326\154\033\111\263\165\121\154\315\266\141" +
-"\235\345\137\062\214\153\021\056\017\112\135\314\305\325\201\336" +
-"\367\022\227\063\072\115\264\206\011\053\133\217\030\306\265\010" +
-"\311\157\054\050\265\302\327\212\366\137\312\151\271\034\307\347" +
-"\004\053\133\237\033\006\055\005\307\041\117\175\124\103\322\361" +
-"\361\122\073\271\300\312\326\016\303\240\355\120\206\225\255\335" +
-"\206\101\113\301\161\310\123\037\325\220\164\174\274\324\116\056" +
-"\260\262\365\241\141\320\166\050\343\150\266\326\267\335\225\021" +
-"\200\165\154\175\143\030\327\042\044\277\261\130\244\126\250\117" +
-"\212\255\322\310\001\126\266\236\067\014\332\016\145\130\331\172" +
-"\271\355\336\344\016\053\133\317\031\006\155\035\100\304\061\010" +
-"\250\061\347\303\354\163\031\251\273\163\076\227\327\330\377\012" +
-"\147\233\035\203\200\322\234\117\241\164\115\365\262\265\223\211" +
-"\146\147\310\114\054\220\031\062\252\301\351\110\274\326\130\050" +
-"\371\234\270\105\244\276\330\027\133\027\132\347\112\350\317\220" +
-"\011\376\345\130\267\262\265\316\060\256\105\110\176\143\115\321" +
-"\252\127\111\055\122\055\035\267\322\325\246\072\222\306\260\000" +
-"\112\135\055\371\254\154\355\062\014\132\012\216\103\236\372\250" +
-"\206\244\343\343\245\166\162\301\350\317\125\023\137\310\134\365" +
-"\065\244\036\171\256\032\306\057\133\327\222\372\200\331\322\236" +
-"\353\164\271\136\152\155\122\221\156\354\124\002\050\165\303\260" +
-"\332\362\001\224\272\061\164\237\260\154\351\026\156\012\155\141" +
-"\124\001\112\335\354\162\365\263\245\367\276\045\101\247\106\012" +
-"\342\171\353\126\135\156\153\245\113\031\203\317\126\241\324\166" +
-"\056\032\152\374\022\245\175\163\001\050\165\173\315\270\073\134" +
-"\256\073\157\111\000\245\126\271\134\236\063\373\375\330\073\003" +
-"\373\222\371\314\076\244\315\326\135\201\175\231\340\154\065\350" +
-"\113\214\154\335\355\363\167\331\162\064\012\237\337\032\203\370" +
-"\304\060\150\073\224\141\145\353\123\303\240\355\120\206\225\255" +
-"\147\015\203\266\103\031\126\266\076\063\014\332\072\160\143\251" +
-"\006\247\043\361\125\276\134\220\364\371\255\325\261\065\333\106" +
-"\320\135\365\075\014\327\366\163\247\367\222\372\222\276\275\257" +
-"\152\077\217\136\315\353\255\102\251\257\014\343\132\204\344\067" +
-"\026\213\324\012\365\111\261\125\032\071\300\312\326\046\303\240" +
-"\355\120\206\225\255\067\014\203\266\103\031\345\363\126\241\324" +
-"\073\156\024\050\165\277\244\240\175\017\304\350\211\326\171\120" +
-"\227\207\030\176\112\227\065\272\074\334\100\323\074\345\071\255" +
-"\313\132\210\060\127\151\035\133\317\030\006\055\005\307\041\117" +
-"\175\124\103\322\361\361\122\073\271\040\350\177\342\243\041\312" +
-"\072\376\261\206\235\152\014\335\346\343\051\365\273\321\100\011" +
-"\240\324\023\056\227\364\352\364\111\201\177\052\166\133\261\001" +
-"\112\075\315\361\325\331\202\314\317\045\303\204\165\226\377\322" +
-"\060\256\105\110\176\143\261\110\255\120\237\024\133\245\221\003" +
-"\006\377\045\102\305\230\005\004\074\075\027\013\320\340\151\120" +
-"\275\317\014\303\275\100\267\255\143\353\127\303\240\245\340\070" +
-"\344\251\217\152\110\072\076\136\152\047\027\210\263\257\057\066" +
-"\125\204\041\274\331\004\055\075\043\053\316\276\316\066\125\034" +
-"\144\337\334\061\262\307\326\372\324\155\160\260\316\133\275\373" +
-"\060\327\042\044\277\261\020\376\306\135\351\236\317\160\034\237" +
-"\023\254\154\255\061\214\153\021\222\277\230\273\343\015\315\326" +
-"\032\067\306\160\034\237\023\254\154\255\065\214\153\021\222\337" +
-"\330\142\356\036\337\367\114\363\021\055\230\173\246\171\055\027" +
-"\303\361\303\006\324\175\246\171\332\060\256\105\110\176\143\213" +
-"\271\121\021\137\266\216\150\301\134\266\246\271\030\216\037\066" +
-"\240\156\266\276\066\214\153\021\222\337\130\054\122\053\324\047" +
-"\305\126\151\344\000\053\133\337\031\306\265\010\311\157\054\026" +
-"\251\025\352\223\142\253\064\162\100\375\073\237\102\251\215\306" +
-"\102\346\353\030\245\104\320\150\340\206\364\375\311\033\121\356" +
-"\252\137\215\327\237\274\221\164\064\360\265\330\232\155\043\151" +
-"\266\066\306\326\154\033\111\263\365\172\154\315\266\301\316\047" +
-"\276\037\242\020\032\357\323\211\245\225\012\154\266\336\015\121" +
-"\010\215\367\351\304\322\112\005\066\133\357\205\050\204\306\373" +
-"\164\142\151\245\302\104\314\354\157\202\350\063\373\244\205\356" +
-"\251\021\001\354\261\265\045\104\001\062\076\266\210\206\071\266" +
-"\336\154\272\077\202\315\326\333\203\252\216\053\302\256\267\012" +
-"\245\076\116\333\237\274\321\075\065\042\001\224\172\313\345\202" +
-"\306\040\046\376\027\072\262\063\144\245\253\234\141\200\075\313" +
-"\377\210\005\267\071\053\201\363\113\373\124\151\345\206\356\371" +
-"\055\016\040\334\201\261\307\326\117\130\160\233\263\022\070\077" +
-"\010\167\064\220\371\135\264\213\126\126\317\330\074\254\266\142" +
-"\043\351\057\061\350\236\140\024\020\077\133\240\324\326\130\132" +
-"\271\201\075\157\035\152\257\077\171\203\315\326\101\143\101\251" +
-"\017\132\352\124\266\140\107\154\266\265\327\237\274\061\261\253" +
-"\225\315\222\372\220\276\103\006\355\277\315\271\235\324\063\131" +
-"\075\243\120\352\067\211\247\076\254\273\274\024\357\362\122\073" +
-"\271\240\166\266\016\113\074\365\141\335\345\245\170\227\227\332" +
-"\311\005\043\377\113\344\336\253\156\274\342\073\204\274\127\375" +
-"\255\141\134\213\220\374\306\142\221\132\241\076\051\266\112\043" +
-"\007\044\275\363\031\273\057\106\114\364\232\224\037\205\356\063" +
-"\221\053\341\325\232\211\201\156\045\274\000\000\263\126\024\173" +
-"\237\130\232\353\350\060\007\353\177\142\357\355\330\202\171\113" +
-"\226\343\220\247\076\252\041\351\370\170\251\235\134\300\036\133" +
-"\043\073\266\231\032\101\117\200\367\236\306\205\011\136\315\054" +
-"\170\146\077\370\277\356\070\301\072\157\365\146\134\013\146\346" +
-"\225\343\220\247\076\252\041\351\370\170\251\235\134\020\064\263" +
-"\337\170\335\065\350\146\310\052\000\243\075\373\312\176\373\245" +
-"\313\026\007\020\276\343\230\347\210\115\303\276\304\030\073\335" +
-"\345\363\117\364\135\365\356\320\175\362\074\266\240\376\150\340" +
-"\036\122\317\144\134\276\242\205\161\136\231\145\057\335\266\256" +
-"\267\176\061\014\132\012\216\103\236\372\250\206\244\343\343\245" +
-"\166\162\001\073\373\372\105\173\375\311\033\362\057\021\062\137" +
-"\335\251\015\004\335\125\217\335\333\231\241\230\350\053\210\340" +
-"\165\173\273\221\146\011\300\254\115\041\076\001\336\370\333\276" +
-"\172\337\175\115\367\145\264\366\307\322\212\201\354\263\225\325" +
-"\154\154\322\273\352\066\126\207\115\272\126\011\073\056\177\000" +
-"\013\156\163\126\002\347\227\366\251\322\312\015\154\266\176\300" +
-"\202\333\234\225\300\371\245\175\252\264\162\003\233\255\357\261" +
-"\340\066\147\045\160\176\230\270\261\123\250\310\022\170\326\337" +
-"\162\342\126\326\211\153\013\120\153\375\255\232\112\223\164\275" +
-"\125\072\113\260\277\304\155\375\350\221\072\003\327\001\014\370" +
-"\316\032\233\255\237\007\354\324\330\302\032\337\352\255\111\134" +
-"\070\153\023\113\034\362\324\107\065\044\035\037\057\265\223\013" +
-"\254\154\365\306\016\013\146\014\221\343\220\247\076\252\041\351" +
-"\370\170\251\235\134\320\235\345\045\000\363\236\145\366\367\211" +
-"\131\235\103\047\366\315\225\203\244\076\071\157\256\034\042\365" +
-"\026\146\310\012\141\106\136\102\150\274\117\047\226\126\052\260" +
-"\331\012\172\116\041\064\336\247\023\113\053\025\202\146\061\066" +
-"\244\357\117\336\260\256\267\172\363\210\256\105\110\176\143\261" +
-"\110\255\120\237\024\133\245\221\003\330\137\342\036\152\073\034" +
-"\005\233\255\356\175\152\001\154\266\306\156\235\322\130\030\331" +
-"\065\222\132\171\272\204\075\266\112\337\166\363\041\064\336\247" +
-"\023\113\053\025\330\147\154\262\376\136\123\233\140\217\255\336" +
-"\127\045\241\346\033\341\105\340\127\050\175\072\261\264\122\201" +
-"\315\126\151\245\113\216\253\343\013\201\321\211\245\225\012\154" +
-"\266\202\276\006\032\032\357\323\211\245\225\012\154\266\202\146" +
-"\344\103\343\175\072\261\264\122\341\177\372\022\052\127\171\263" +
-"\000\000"
+"\335\275\310\025\367\355\272\134\024\305\135\100\057\342\006\270" +
+"\201\054\212\202\313\057\360\315\047\037\375\075\076\171\216\317" +
+"\276\232\314\114\101\045\267\052\335\231\111\046\231\231\376\316" +
+"\311\251\356\257\252\277\344\324\351\351\351\116\322\351\077\376" +
+"\125\213\346\266\252\205\063\063\123\313\377\373\173\375\212\203" +
+"\173\327\054\120\152\373\146\245\324\157\232\137\060\063\065\375" +
+"\327\354\252\155\377\374\371\073\322\017\253\026\136\314\155\121" +
+"\073\224\316\226\077\123\240\072\061\034\277\120\227\143\310\376" +
+"\242\236\075\126\227\343\230\370\343\165\071\201\341\027\353\162" +
+"\242\056\047\365\366\117\326\345\024\046\156\211\056\247\366\266" +
+"\227\352\162\232\056\247\367\366\227\071\261\147\010\155\076\223" +
+"\154\057\327\345\254\336\366\012\046\166\245\056\147\353\162\116" +
+"\263\114\365\003\255\176\156\154\315\234\070\232\251\112\251\335" +
+"\206\161\055\102\362\033\213\105\252\205\372\244\330\072\215\334" +
+"\110\172\116\235\027\133\063\047\254\163\152\326\060\256\105\110" +
+"\176\143\261\110\265\120\237\024\133\247\221\033\111\317\251\363" +
+"\143\153\346\204\165\116\355\062\214\153\021\222\337\130\054\122" +
+"\055\324\047\305\326\151\344\206\225\251\075\206\161\055\102\362" +
+"\033\213\105\252\205\372\244\330\072\215\334\030\354\327\007\372" +
+"\176\312\331\357\353\176\212\211\143\357\247\230\070\040\333\313" +
+"\304\300\006\000\346\176\212\042\351\165\352\202\330\232\071\221" +
+"\064\123\027\306\326\314\211\244\231\272\050\266\146\116\130\127" +
+"\364\227\014\343\132\204\313\203\122\027\163\161\115\240\217\275" +
+"\304\345\214\116\077\132\303\202\225\251\107\014\343\132\204\344" +
+"\067\026\224\132\345\253\105\373\057\345\264\134\216\343\113\201" +
+"\225\251\317\015\203\226\202\343\220\247\076\252\041\351\370\170" +
+"\251\236\022\140\145\152\316\060\150\133\330\260\062\265\303\060" +
+"\150\051\070\016\171\352\243\032\222\216\217\227\352\051\001\126" +
+"\246\076\062\014\332\026\066\216\146\152\066\167\123\012\207\165" +
+"\116\175\153\030\327\042\044\277\261\130\244\132\250\117\212\255" +
+"\323\310\015\053\123\317\033\006\155\013\033\126\246\136\316\335" +
+"\232\222\141\145\352\071\303\240\155\002\210\330\227\000\015\306" +
+"\146\230\143\056\043\333\356\330\314\345\065\307\136\341\354\263" +
+"\175\011\060\157\154\246\122\352\063\343\101\353\104\263\243\130" +
+"\046\026\310\050\026\325\340\164\044\136\153\054\226\174\116\334" +
+"\022\262\275\324\027\333\004\132\343\112\350\215\142\011\376\225" +
+"\270\155\145\352\121\303\270\026\041\371\215\065\105\253\136\045" +
+"\325\110\265\164\334\152\127\233\352\110\032\303\000\050\165\265" +
+"\344\263\062\365\205\141\320\122\160\034\362\324\107\065\044\035" +
+"\037\057\325\123\002\106\177\014\231\370\232\216\041\137\103\266" +
+"\043\217\041\303\170\145\352\132\262\075\140\246\264\347\072\135" +
+"\256\347\152\232\124\244\353\363\224\000\112\335\060\254\272\074" +
+"\155\270\061\364\230\260\114\351\032\156\012\255\141\024\001\112" +
+"\335\354\162\315\063\245\217\276\045\101\243\106\006\342\165\352" +
+"\126\135\156\313\322\244\102\301\147\252\122\352\103\056\032\032" +
+"\374\372\244\143\113\000\050\165\173\303\270\073\134\256\275\116" +
+"\161\000\245\326\270\134\231\243\355\275\330\073\003\333\122\360" +
+"\150\073\244\315\324\135\201\155\231\320\114\365\321\226\101\063" +
+"\165\267\317\337\146\212\034\137\371\374\126\137\302\166\303\240" +
+"\155\141\303\312\324\047\206\101\333\302\206\225\251\147\015\203" +
+"\266\205\015\053\123\237\032\006\155\023\270\261\124\203\323\221" +
+"\370\072\137\011\110\072\177\352\236\330\232\071\021\364\204\174" +
+"\057\303\345\236\347\171\037\331\136\326\263\367\327\035\047\150" +
+"\065\274\237\252\224\372\332\060\256\105\110\176\143\261\110\265" +
+"\120\237\024\133\247\221\033\126\246\336\060\014\332\026\066\254" +
+"\114\155\062\014\332\026\066\346\137\247\052\245\336\161\243\100" +
+"\251\007\044\005\355\173\060\106\113\264\316\103\300\134\057\065" +
+"\067\245\313\132\350\143\146\243\076\146\235\056\323\320\035\217" +
+"\134\077\110\373\254\163\352\031\303\240\245\340\070\344\251\217" +
+"\152\110\072\076\136\252\247\004\004\375\367\075\026\242\254\343" +
+"\037\357\263\121\175\103\327\371\104\052\355\266\047\217\003\050" +
+"\365\244\313\045\275\363\174\112\340\237\216\135\127\114\200\160" +
+"\005\250\317\024\264\317\201\035\130\127\364\257\014\343\132\204" +
+"\344\067\026\213\124\013\365\111\261\165\032\271\061\370\257\017" +
+"\152\146\246\101\206\331\220\272\316\027\002\343\147\030\356\105" +
+"\272\157\235\123\207\015\203\226\202\343\220\247\076\252\041\351" +
+"\370\170\251\236\022\040\216\214\366\375\246\017\014\141\276\250" +
+"\256\343\225\324\165\270\020\107\106\267\366\253\070\310\261\045" +
+"\143\144\317\251\331\324\165\270\260\256\123\153\015\343\132\204" +
+"\344\257\272\317\144\241\157\255\255\165\143\014\307\361\245\300" +
+"\312\324\224\141\134\213\220\374\125\367\011\066\064\123\123\156" +
+"\214\341\070\276\024\130\231\232\066\214\153\021\222\337\330\252" +
+"\373\274\356\233\073\174\104\013\272\163\207\247\271\030\216\037" +
+"\046\240\351\334\341\165\206\161\055\102\362\033\133\165\173\067" +
+"\174\231\072\242\005\335\114\255\343\142\070\176\230\200\246\231" +
+"\372\306\060\256\105\110\176\143\261\110\265\120\237\024\133\247" +
+"\221\033\126\246\366\032\306\265\010\311\157\054\026\251\026\352" +
+"\223\142\353\064\162\243\371\323\114\245\324\106\143\101\251\015" +
+"\211\033\125\044\202\172\362\136\115\337\236\162\021\345\011\371" +
+"\265\170\355\051\027\111\173\362\066\306\326\314\211\244\231\172" +
+"\075\266\146\116\044\315\324\130\215\260\262\343\175\357\207\050" +
+"\204\306\373\164\142\151\245\000\233\251\167\103\024\102\343\175" +
+"\072\261\264\122\200\315\324\173\041\012\241\361\076\235\130\132" +
+"\051\060\021\243\355\233\040\352\150\073\121\177\163\020\305\161" +
+"\005\173\116\155\016\121\200\202\317\051\242\141\316\251\267\372" +
+"\075\336\200\315\324\333\203\050\216\053\302\356\247\052\245\076" +
+"\116\333\236\162\321\316\340\340\000\314\357\052\250\057\141\336" +
+"\177\342\044\141\144\107\261\206\176\207\312\136\321\277\307\202" +
+"\373\234\225\300\371\245\143\352\264\112\102\073\177\312\005\010" +
+"\317\011\354\071\365\003\026\334\347\254\004\316\017\302\223\257" +
+"\346\077\250\151\170\061\310\262\262\104\320\235\155\051\110\372" +
+"\353\333\022\133\063\047\332\373\051\016\300\314\327\141\257\123" +
+"\077\015\261\121\043\003\066\123\077\032\013\005\257\020\221\003" +
+"\154\257\113\273\106\054\203\211\134\251\153\216\154\017\351\273" +
+"\130\220\377\115\310\155\144\273\200\225\045\052\245\176\226\170" +
+"\352\303\155\227\227\342\135\136\252\247\004\064\316\324\057\022" +
+"\117\175\270\355\362\122\274\313\113\365\224\200\221\377\365\161" +
+"\357\041\367\325\333\010\041\357\041\177\147\030\327\042\044\277" +
+"\261\130\244\132\250\117\212\255\323\310\215\244\117\063\143\265" +
+"\352\311\304\256\275\030\274\042\313\304\255\376\326\150\215\017" +
+"\150\127\177\153\010\140\326\324\146\237\373\006\032\101\034\127" +
+"\130\377\175\235\136\333\212\351\275\345\070\344\251\217\152\110" +
+"\072\076\136\252\247\004\260\347\324\310\364\330\016\023\101\263" +
+"\254\073\163\207\241\340\057\062\245\104\360\150\373\266\332\240" +
+"\061\205\165\235\352\274\167\133\071\357\337\112\034\362\324\107" +
+"\065\044\035\037\057\325\123\002\202\106\333\373\376\162\000\264" +
+"\243\130\036\300\350\216\214\262\137\061\153\063\345\002\224\332" +
+"\311\361\145\366\272\364\331\226\101\373\074\167\371\374\023\373" +
+"\204\374\145\350\061\361\063\005\005\257\070\062\010\332\325\112" +
+"\172\361\334\152\045\326\352\206\326\375\324\041\303\240\245\340" +
+"\070\344\251\217\152\110\072\076\136\252\247\004\260\043\243\305" +
+"\276\013\234\023\362\257\017\012\376\076\143\016\004\075\041\117" +
+"\304\273\241\022\046\366\056\141\167\350\061\155\357\060\007\120" +
+"\152\217\313\211\263\254\373\036\167\203\210\153\036\150\255\175" +
+"\261\264\006\105\361\231\332\037\113\153\120\044\175\102\316\261" +
+"\362\351\201\124\332\154\077\372\001\054\270\317\131\011\234\137" +
+"\072\246\116\253\044\260\231\332\217\005\367\071\053\201\363\113" +
+"\307\324\151\225\004\066\123\373\260\340\076\147\045\160\176\230" +
+"\250\076\117\250\171\307\005\074\353\117\071\161\253\233\304\345" +
+"\000\064\132\177\252\241\322\244\334\117\315\173\243\245\314\076" +
+"\117\150\076\323\354\040\331\036\362\074\317\212\324\336\342\050" +
+"\254\376\251\116\157\126\305\364\152\161\034\362\324\107\065\044" +
+"\035\037\057\325\123\002\254\114\165\372\011\053\246\277\220\343" +
+"\220\247\076\252\041\351\370\170\251\236\022\320\136\321\071\100" +
+"\357\215\030\212\342\237\373\212\171\333\151\042\337\006\071\104" +
+"\266\047\347\155\220\303\144\173\370\167\011\363\276\213\341\103" +
+"\150\274\117\047\226\126\012\260\231\142\347\023\110\010\215\367" +
+"\351\304\322\112\201\240\021\207\015\351\333\123\056\254\373\251" +
+"\316\130\275\153\021\222\337\130\054\122\055\324\047\305\326\151" +
+"\344\006\373\353\333\111\155\213\056\330\114\215\325\072\234\261" +
+"\060\262\053\340\014\375\215\111\366\234\012\372\136\131\150\274" +
+"\117\047\226\126\012\260\063\070\212\175\157\063\047\330\163\252" +
+"\263\232\043\050\365\153\023\205\152\300\325\037\251\116\054\255" +
+"\024\140\063\065\157\225\112\216\153\342\013\201\321\211\245\225" +
+"\002\154\246\202\106\064\103\343\175\072\261\264\122\200\315\124" +
+"\320\127\062\103\343\175\072\261\264\122\340\177\162\305\364\060" +
+"\357\257\000\000"
 });
 
 public static final byte[] shiftableSetsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
-(new String[]{ "\037\213\010\000\000\000\000\000\000\000\305\126\275\112\303\140" +
-"\024\275\111\023\232\024\012\242\223\333\027\210\120\227\222\241" +
-"\202\326\115\034\212\270\071\026\241\025\004\043\052\265\111\244" +
-"\203\164\325\311\305\305\261\205\072\351\342\340\163\370\004\076" +
-"\202\217\040\230\100\135\344\073\037\234\020\060\103\063\234\336" +
-"\237\234\173\356\317\353\227\270\331\130\326\372\207\347\303\233" +
-"\141\073\113\343\213\366\136\234\036\235\246\273\227\353\055\347" +
-"\343\141\177\144\213\114\106\042\362\224\214\145\345\357\277\256" +
-"\276\357\247\073\235\227\240\046\126\137\234\223\070\115\122\261" +
-"\373\007\223\121\356\264\170\053\347\175\365\055\173\374\365\141" +
-"\311\362\231\044\327\062\025\073\053\176\335\045\120\273\353\236" +
-"\315\164\200\130\221\247\264\026\315\371\347\326\177\131\140\127" +
-"\365\156\113\353\012\306\340\201\232\257\216\365\131\371\063\220" +
-"\156\316\356\263\076\206\362\066\252\261\050\200\200\244\235\166" +
-"\225\263\313\245\213\053\010\055\220\022\015\022\125\336\266\026" +
-"\160\025\052\255\152\040\300\107\000\210\141\205\215\026\027\003" +
-"\112\264\102\300\124\132\016\200\065\307\215\123\357\156\262\003" +
-"\200\316\312\122\275\005\331\070\021\054\055\050\224\013\047\203" +
-"\362\006\344\007\016\172\172\112\160\272\241\007\164\305\002\170" +
-"\054\101\200\236\273\045\046\265\245\232\164\017\352\111\254\162" +
-"\266\347\061\302\352\000\255\104\013\371\160\256\240\005\326\156" +
-"\211\011\207\164\025\054\232\267\134\177\140\013\070\220\141\241" +
-"\102\334\203\220\253\016\107\073\134\054\150\274\226\330\121\320" +
-"\025\175\024\031\110\244\127\221\211\022\170\176\040\332\141\073" +
-"\353\203\343\030\301\014\110\024\012\016\002\160\101\102\022\361" +
-"\112\345\107\270\101\242\021\327\234\045\056\031\176\177\320\355" +
-"\314\003\156\300\056\341\122\355\014\057\113\124\050\222\304\022" +
-"\175\116\357\017\050\006\343\031\305\161\145\000\320\227\323\073" +
-"\252\260\320\146\205\157\070\063\127\077\024\074\237\223\070\017" +
-"\000\000"
+(new String[]{ "\037\213\010\000\000\000\000\000\000\000\305\126\275\112\303\120" +
+"\030\375\322\066\064\055\024\104\047\267\033\210\020\227\322\241" +
+"\202\306\115\034\212\270\071\006\241\025\004\053\052\261\115\044" +
+"\203\164\325\311\305\301\065\205\072\351\342\340\163\370\004\076" +
+"\202\217\040\230\100\135\344\236\013\047\004\354\320\016\247\337" +
+"\317\075\337\371\176\136\277\304\116\046\262\026\036\236\217\156" +
+"\106\335\044\036\137\164\367\306\361\321\151\274\173\271\356\067" +
+"\076\036\366\243\232\110\032\211\310\323\164\042\053\177\377\165" +
+"\365\175\077\333\351\277\270\165\261\102\151\234\214\343\151\054" +
+"\265\360\040\215\162\247\305\257\152\274\257\276\045\217\277\076" +
+"\054\131\176\322\351\265\314\244\226\024\337\366\022\250\337\005" +
+"\147\231\016\020\253\347\050\255\105\147\376\271\365\137\026\330" +
+"\125\063\360\265\256\140\014\036\250\267\324\261\076\253\126\006" +
+"\322\315\331\175\326\307\120\316\106\065\026\005\340\222\264\323" +
+"\256\162\166\271\164\161\005\241\005\122\242\101\242\312\331\326" +
+"\002\266\102\245\125\155\004\264\020\000\142\130\136\333\347\142" +
+"\100\211\126\010\230\112\313\001\260\346\270\161\232\301\046\073" +
+"\000\350\254\054\065\130\220\215\323\203\245\005\205\262\341\144" +
+"\120\316\220\174\340\160\240\247\004\247\353\071\100\127\054\200" +
+"\307\022\004\350\271\133\142\122\133\252\103\367\240\236\304\052" +
+"\147\173\036\303\253\016\320\112\264\220\017\347\012\132\140\355" +
+"\226\230\160\110\127\356\242\163\313\365\007\266\200\003\031\267" +
+"\032\174\007\244\304\351\163\264\303\305\202\306\153\211\035\005" +
+"\135\321\107\221\201\104\172\025\231\050\201\347\007\242\035\266" +
+"\263\076\070\216\341\146\100\242\120\160\020\200\013\322\100\042" +
+"\002\370\021\156\220\150\217\153\316\022\227\014\277\077\350\166" +
+"\346\001\333\145\227\260\351\304\341\264\153\052\024\111\142\211" +
+"\076\247\367\007\024\203\361\214\342\106\037\176\040\275\212\012" +
+"\013\155\160\174\252\231\051\371\001\206\214\361\150\037\017\000" +
+"\000"
 });
 
 public static final byte[] layoutSetsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\133\363\226\201\265\264" +
 "\210\101\070\332\047\053\261\054\121\257\264\044\063\107\317\051" +
 "\263\044\070\265\304\072\127\122\203\345\174\237\113\001\023\003" +
-"\103\105\001\003\003\303\214\342\042\006\001\164\125\171\177\073" +
+"\103\105\001\003\003\303\364\342\042\006\001\164\125\171\177\073" +
 "\352\054\115\126\053\062\063\060\106\063\260\044\145\226\024\227" +
 "\060\060\105\173\125\024\000\015\005\321\012\054\133\205\066\226" +
 "\116\206\231\301\310\000\005\025\305\205\014\165\014\114\245\040" +
 "\222\025\046\301\250\300\241\060\052\061\052\061\052\061\052\061" +
 "\052\061\052\061\052\061\052\061\052\061\052\061\052\061\052\061" +
-"\052\061\052\061\210\044\000\046\367\307\234\070\017\000\000"
+"\052\061\052\101\177\011\000\177\324\250\141\037\017\000\000"
 });
 
 public static final byte[] prefixSetsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\133\363\226\201\265\264" +
 "\210\101\070\332\047\053\261\054\121\257\264\044\063\107\317\051" +
 "\263\044\070\265\304\072\127\122\203\345\174\237\113\001\023\003" +
-"\103\105\001\003\003\303\214\342\042\006\001\164\125\171\177\073" +
+"\103\105\001\003\003\303\364\342\042\006\001\164\125\171\177\073" +
 "\352\054\115\126\053\062\063\060\106\063\260\044\145\226\024\227" +
 "\060\060\105\173\125\024\000\015\005\321\012\054\133\205\066\226" +
 "\116\206\231\301\310\000\005\025\305\205\014\165\014\114\245\040" +
 "\222\165\124\142\124\142\124\142\124\142\124\142\124\142\124\142" +
-"\124\142\124\142\124\142\124\142\124\142\124\142\124\142\220\112" +
-"\000\000\133\025\061\100\070\017\000\000"
+"\124\142\124\142\124\142\124\142\124\142\124\142\124\142\140\045" +
+"\000\350\370\174\243\037\017\000\000"
 });
 
 public static final byte[] prefixMapsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\355\312\041\016\202\120" +
 "\000\307\341\377\336\360\004\132\250\044\323\013\026\002\315\021" +
-"\155\104\022\301\200\323\355\301\336\163\044\216\100\366\020\026" +
-"\117\342\146\066\333\364\014\122\150\156\146\266\337\227\277\353" +
-"\133\213\320\152\125\226\273\103\165\256\154\360\365\321\156\153" +
-"\137\354\175\026\077\076\267\364\365\334\030\251\163\222\056\143" +
-"\134\376\170\247\170\035\335\207\334\115\057\161\177\205\106\275" +
-"\014\227\313\345\162\271\134\056\227\313\345\162\271\134\056\227" +
-"\313\345\162\271\134\056\167\316\367\013\173\074\374\214\153\032" +
+"\155\104\022\301\200\323\355\301\336\163\044\216\100\365\022\026" +
+"\117\342\146\066\333\364\014\122\150\156\126\302\357\313\337\365" +
+"\255\105\150\265\052\313\335\241\072\127\066\370\372\150\267\265" +
+"\057\366\076\213\037\237\133\372\172\156\214\324\071\111\227\061" +
+"\056\177\274\123\274\216\356\103\356\246\227\270\277\102\243\136" +
+"\206\313\345\162\271\134\056\227\313\345\162\271\134\056\227\313" +
+"\345\162\271\134\056\227\073\267\373\005\221\350\021\373\077\032" +
 "\000\000"
 });
 
@@ -1663,72 +1663,73 @@ public static final byte[] acceptSetsHash = edu.umn.cs.melt.copper.runtime.auxil
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\133\363\226\201\265\264" +
 "\210\101\070\332\047\053\261\054\121\257\264\044\063\107\317\051" +
 "\263\044\070\265\304\072\127\122\203\345\174\237\113\001\023\003" +
-"\103\105\001\003\003\103\114\161\021\203\000\272\252\274\277\035" +
+"\103\105\001\003\003\103\112\161\021\203\000\272\252\274\277\035" +
 "\165\226\046\253\025\231\031\030\243\031\130\222\062\113\212\113" +
 "\030\230\242\275\052\012\200\206\202\150\005\226\255\102\033\113" +
-"\047\303\314\140\250\050\056\144\250\143\140\052\005\221\254\330" +
-"\004\030\101\202\014\002\104\253\144\301\045\301\240\200\113\242" +
-"\201\170\113\011\030\205\123\007\351\022\015\070\055\147\302\056" +
-"\341\200\063\110\030\161\111\050\060\310\021\031\252\100\212\130" +
-"\225\002\044\372\224\005\267\121\014\012\130\045\070\250\220\114" +
-"\200\326\222\157\004\116\367\072\020\253\222\203\366\111\316\203" +
-"\344\044\207\045\071\020\237\116\260\233\051\100\214\112\152\232" +
-"\305\010\161\057\311\176\307\225\326\310\320\301\104\025\057\123" +
-"\053\345\060\221\036\026\270\322\301\300\104\346\300\330\012\052" +
-"\117\261\111\060\342\322\301\104\274\053\032\110\211\222\101\022" +
-"\050\330\265\062\342\016\076\206\206\012\000\041\144\017\111\114" +
-"\010\000\000"
+"\047\303\314\140\250\050\056\144\250\143\140\052\005\221\254\104" +
+"\011\060\202\004\031\004\210\125\311\102\271\021\014\014\015\330" +
+"\045\034\160\353\120\040\336\122\002\022\014\114\304\072\223\221" +
+"\172\256\121\140\220\303\141\024\043\251\106\261\340\220\340\300" +
+"\035\170\054\270\044\004\250\026\252\015\070\055\147\120\300\052" +
+"\041\100\126\142\045\071\262\161\330\116\124\142\305\145\046\007" +
+"\321\052\111\116\047\034\144\073\213\250\360\044\067\225\342\224" +
+"\300\023\360\016\130\045\024\110\167\025\311\221\113\315\244\105" +
+"\215\140\145\242\044\045\221\353\160\046\032\373\231\170\255\344" +
+"\046\072\334\361\356\200\125\202\021\227\253\230\350\342\365\006" +
+"\352\104\036\325\302\025\227\004\043\351\106\001\075\107\255\074" +
+"\353\000\224\000\000\353\166\161\247\024\011\000\000"
 });
 
 public static final byte[] rejectSetsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
 (new String[]{ "\037\213\010\000\000\000\000\000\000\000\133\363\226\201\265\264" +
 "\210\101\070\332\047\053\261\054\121\257\264\044\063\107\317\051" +
 "\263\044\070\265\304\072\127\122\203\345\174\237\113\001\023\003" +
-"\103\105\001\003\003\103\114\161\021\203\000\272\252\274\277\035" +
+"\103\105\001\003\003\103\112\161\021\203\000\272\252\274\277\035" +
 "\165\226\046\253\025\231\031\030\243\031\130\222\062\113\212\113" +
 "\030\230\242\275\052\012\200\206\202\150\005\226\255\102\033\113" +
 "\047\303\314\140\250\050\056\144\250\143\140\052\005\221\254\243" +
-"\002\243\002\164\020\140\004\011\062\010\014\032\367\214\012\214" +
-"\306\017\051\301\100\272\304\160\014\142\204\027\000\372\257\233" +
-"\102\264\006\000\000"
+"\002\243\002\103\125\200\021\044\310\040\060\150\334\063\052\060" +
+"\002\243\024\247\213\111\227\030\015\100\262\265\002\000\031\230" +
+"\010\126\104\007\000\000"
 });
 
 public static final byte[] possibleSetsHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
-(new String[]{ "\037\213\010\000\000\000\000\000\000\000\325\224\261\116\303\060" +
-"\020\206\177\273\256\324\061\152\047\026\344\156\114\235\272\124" +
-"\135\242\212\011\261\261\040\205\245\225\030\202\150\225\066\116" +
-"\225\251\312\330\211\205\307\200\205\201\347\340\111\170\004\010" +
-"\116\245\056\350\376\301\250\103\030\142\313\372\174\167\072\373" +
-"\163\136\077\321\055\066\030\044\327\017\363\355\174\124\270\364" +
-"\161\064\113\335\315\275\233\056\317\056\314\307\323\145\246\201" +
-"\062\003\160\227\157\020\375\336\265\372\332\357\046\343\227\141" +
-"\007\052\201\131\244\056\167\320\311\125\231\371\244\315\154\315" +
-"\173\377\255\170\076\346\100\231\257\261\203\056\232\261\353\327" +
-"\312\177\235\272\256\277\045\000\104\162\004\240\031\060\210\145" +
-"\000\053\107\050\354\145\120\321\342\054\225\246\021\267\014\104" +
-"\250\144\120\321\342\132\006\061\071\335\303\050\003\213\163\021" +
-"\104\064\225\237\302\042\254\107\244\363\130\006\206\027\207\025" +
-"\101\217\171\305\365\141\251\232\362\247\062\221\002\020\105\025" +
-"\357\274\327\106\105\231\076\341\136\375\063\140\351\105\061\251" +
-"\231\160\177\121\224\171\105\365\071\041\010\067\221\013\027\354" +
-"\125\073\145\150\047\140\046\052\046\234\246\046\122\031\370\337" +
-"\207\135\155\073\317\052\034\360\367\321\164\376\003\300\057\073" +
-"\370\124\011\000\000"
+(new String[]{ "\037\213\010\000\000\000\000\000\000\000\315\224\261\112\303\120" +
+"\024\206\377\173\173\013\216\105\227\272\310\165\163\352\344\042" +
+"\056\101\234\304\101\160\314\124\321\041\242\022\233\033\311\124" +
+"\062\166\352\342\143\350\342\320\347\350\223\370\010\032\157\013" +
+"\056\162\176\341\224\332\070\044\341\362\345\376\347\162\316\227" +
+"\274\276\243\133\216\260\223\236\337\016\237\206\203\062\144\167" +
+"\203\223\054\134\336\204\343\373\335\003\067\237\236\346\026\250" +
+"\162\000\327\305\010\275\237\157\075\174\114\306\107\207\057\373" +
+"\035\230\024\356\052\013\105\200\115\317\252\074\206\056\236\336" +
+"\315\266\337\312\347\357\014\124\305\043\306\260\345\342\336\215" +
+"\153\023\257\116\323\064\237\022\100\217\354\130\022\031\000\136" +
+"\004\216\105\325\064\312\022\140\060\221\101\102\217\013\057\003" +
+"\113\213\367\151\224\225\001\357\225\321\236\012\027\154\207\307" +
+"\036\211\062\164\120\265\014\034\022\021\154\361\046\072\031\370" +
+"\130\204\024\117\144\341\270\076\265\326\053\332\366\065\002\275" +
+"\355\172\251\071\210\023\041\237\301\337\333\276\221\356\352\155" +
+"\247\200\332\016\142\273\347\063\127\273\333\246\242\172\260\202" +
+"\242\152\023\327\010\250\273\377\263\273\053\110\115\335\045\046" +
+"\032\146\242\245\212\266\352\025\035\155\273\363\140\155\347\277" +
+"\127\165\024\337\361\053\370\002\121\232\063\263\034\012\000\000" +
+""
 });
 
 public static final byte[] cMapHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
-(new String[]{ "\037\213\010\000\000\000\000\000\000\000\355\321\111\112\004\061" +
-"\024\006\340\164\151\073\265\163\073\117\355\330\266\107\161\341" +
-"\011\334\170\004\021\024\057\324\073\127\056\075\222\340\035\174" +
-"\005\117\250\205\112\051\256\344\013\174\374\171\125\311\113\040" +
-"\117\157\245\173\177\127\252\353\313\253\227\233\341\303\353\363" +
-"\270\052\345\361\266\164\112\075\106\055\034\206\365\106\075\154" +
-"\271\257\155\357\072\067\076\371\267\033\016\302\126\130\012\107" +
-"\341\064\354\205\325\060\025\272\241\377\215\231\264\334\350\073" +
-"\031\316\302\171\326\235\137\132\374\341\372\372\254\223\306\075" +
-"\076\276\315\347\174\041\354\207\355\320\373\242\307\116\346\154" +
-"\346\132\346\040\154\206\351\254\217\303\104\316\347\062\253\074" +
-"\357\042\254\374\341\033\002\000\000\000\000\000\000\000\000\000" +
+(new String[]{ "\037\213\010\000\000\000\000\000\000\000\355\321\071\112\005\101" +
+"\020\006\340\171\243\317\175\337\367\335\347\162\023\003\117\140" +
+"\342\021\104\120\274\220\231\221\241\107\022\274\203\377\100\013" +
+"\023\250\214\142\044\137\303\107\125\365\122\335\320\117\157\125" +
+"\377\356\266\252\257\056\056\137\256\007\367\257\317\217\165\125" +
+"\075\334\124\275\252\031\347\035\034\307\162\253\076\355\170\256" +
+"\153\357\046\366\076\131\233\215\341\130\215\303\330\216\335\330" +
+"\213\371\030\217\205\070\372\306\144\061\323\352\273\025\047\161" +
+"\126\352\376\057\255\377\160\177\163\327\120\353\035\037\163\233" +
+"\045\337\210\375\130\211\351\057\172\254\305\142\114\225\272\056" +
+"\161\047\346\142\244\324\007\061\126\362\245\022\107\313\175\203" +
+"\230\370\303\077\004\000\000\000\000\000\000\000\000\000\000\000" +
 "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000" +
 "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000" +
 "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000" +
@@ -1744,53 +1745,60 @@ public static final byte[] cMapHash = edu.umn.cs.melt.copper.runtime.auxiliary.i
 "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000" +
 "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000" +
 "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000" +
-"\000\000\000\360\317\274\003\050\057\060\323\033\000\004\000"
+"\000\340\237\171\007\265\173\127\215\033\000\004\000"
 });
 
 public static final byte[] deltaHash = edu.umn.cs.melt.copper.runtime.auxiliary.internal.ByteArrayEncoder.literalToByteArray
-(new String[]{ "\037\213\010\000\000\000\000\000\000\000\355\132\111\123\024\061" +
-"\024\116\015\202\042\213\310\342\060\056\210\333\260\072\040\210" +
-"\053\040\040\056\243\054\262\213\343\201\237\000\124\015\345\211" +
-"\073\047\176\005\067\117\036\375\075\234\254\362\314\225\327\125" +
-"\335\226\046\235\351\164\346\245\175\311\364\127\365\125\167\177" +
-"\057\171\365\125\052\323\111\136\317\367\337\254\276\274\317\352" +
-"\112\245\142\366\354\164\071\167\174\064\231\141\354\333\056\143" +
-"\354\053\350\231\122\161\361\347\116\376\340\327\217\223\100\036" +
-"\144\226\240\274\307\016\031\270\376\343\330\273\257\363\257\027" +
-"\200\365\300\006\340\105\340\045\140\243\037\273\354\137\233\374" +
-"\153\063\260\005\330\012\274\342\267\365\364\066\340\125\377\276" +
-"\335\277\172\354\000\166\002\273\200\327\174\055\013\354\006\346" +
-"\200\327\201\067\224\034\337\254\160\255\104\036\274\316\347\011" +
-"\323\171\055\024\202\343\133\310\304\312\331\023\334\013\216\251" +
-"\341\066\057\220\167\054\100\311\361\035\205\104\275\070\176\242" +
-"\241\365\313\273\313\050\375\362\170\334\223\334\107\041\116\333" +
-"\130\110\374\355\166\137\242\353\217\161\224\343\007\125\072\306" +
-"\237\025\111\254\040\171\124\307\344\221\072\066\217\324\261\200" +
-"\276\030\155\373\125\032\011\216\007\220\351\345\035\322\350\067" +
-"\054\213\071\060\053\036\042\263\040\321\107\042\372\215\312\142" +
-"\344\307\370\021\057\044\276\346\215\111\364\164\315\113\006\343" +
-"\052\215\110\071\126\102\125\363\370\061\213\077\217\315\237\101" +
-"\252\305\004\166\302\032\233\025\064\316\040\366\325\204\250\073" +
-"\176\342\300\074\176\212\314\027\010\071\236\001\237\007\317\202" +
-"\343\227\310\304\310\371\117\016\243\357\212\111\356\371\357\074" +
-"\141\072\257\205\302\241\052\326\024\367\114\367\175\154\337\012" +
-"\022\307\361\064\011\307\330\210\163\372\177\245\322\210\224\343" +
-"\132\251\127\014\032\340\214\106\237\131\131\314\201\175\305\234" +
-"\006\137\127\210\171\171\347\065\162\276\221\305\034\250\011\025" +
-"\022\342\333\210\370\073\131\314\201\171\374\136\203\305\012\261" +
-"\202\104\377\020\221\363\243\054\346\300\030\253\356\053\026\270" +
-"\147\036\366\356\053\342\100\257\356\226\304\156\163\061\104\137" +
-"\012\321\324\034\223\207\165\365\012\261\302\142\337\351\277\166" +
-"\034\057\133\347\370\377\215\161\155\327\204\302\336\307\237\044" +
-"\172\132\257\250\336\361\212\061\307\330\260\257\136\201\016\301" +
-"\361\052\062\275\274\153\032\375\326\145\061\007\052\054\174\213" +
-"\015\115\247\101\277\344\035\323\037\143\373\052\054\344\041\070" +
-"\336\104\146\101\242\157\105\364\373\054\213\071\120\305\342\133" +
-"\154\153\072\015\372\045\357\230\376\030\333\127\305\112\167\233" +
-"\251\143\265\177\053\174\221\350\064\116\246\366\215\261\051\307" +
-"\045\143\216\355\373\236\147\237\343\364\324\144\176\107\157\337" +
-"\367\074\373\034\247\073\172\363\273\115\373\352\307\344\127\351" +
-"\163\103\227\200\260\041\100\000\000"
+(new String[]{ "\037\213\010\000\000\000\000\000\000\000\355\232\311\156\024\061" +
+"\020\206\255\204\260\357\133\010\353\014\113\130\002\303\276\007" +
+"\110\330\007\010\201\260\005\206\045\054\017\000\110\101\234\270" +
+"\163\342\051\270\161\342\310\363\160\102\342\314\225\152\311\214" +
+"\172\051\167\333\161\331\343\062\375\113\237\354\056\117\227\177" +
+"\131\156\167\247\340\333\157\061\060\373\136\364\167\072\355\301" +
+"\077\077\047\207\276\174\036\355\023\342\343\133\041\304\033\210" +
+"\367\165\332\023\077\146\206\077\374\372\376\365\137\170\104\060" +
+"\322\354\073\361\111\200\363\256\353\244\337\017\314\003\006\144" +
+"\177\076\260\100\366\027\002\213\200\305\300\022\140\051\260\014" +
+"\130\056\307\127\000\053\201\125\362\172\265\154\327\310\066\141" +
+"\255\154\327\001\353\145\177\020\330\000\014\001\033\201\115\162" +
+"\216\315\132\256\267\000\133\201\155\262\265\245\101\224\047\103" +
+"\301\165\242\146\256\337\054\211\347\143\330\030\026\307\356\053" +
+"\233\057\043\324\065\245\266\273\110\352\334\265\023\071\335\041" +
+"\073\024\161\372\035\262\223\030\352\234\273\222\326\170\207\014" +
+"\153\376\316\126\273\313\006\043\332\327\072\332\063\307\061\222" +
+"\071\274\234\327\173\221\070\375\171\255\353\172\237\246\153\176" +
+"\157\031\047\052\270\036\221\354\117\365\165\070\240\210\267\014" +
+"\363\150\021\311\132\263\220\227\063\344\040\022\017\373\151\074" +
+"\144\171\377\141\054\130\357\220\312\363\372\110\305\175\145\363" +
+"\125\273\016\121\107\323\027\154\134\147\124\273\166\252\143\351" +
+"\013\057\117\343\161\044\336\273\157\076\323\063\044\035\077\101" +
+"\356\072\170\005\357\372\044\026\014\336\065\252\110\352\174\247" +
+"\200\323\300\031\331\332\322\310\135\237\245\310\133\160\075\052" +
+"\147\072\047\333\040\251\153\252\376\204\272\076\237\352\363\130" +
+"\153\236\325\311\020\135\137\250\164\075\106\014\145\316\156\256" +
+"\202\353\161\142\056\023\346\272\010\134\112\372\377\101\115\365" +
+"\012\022\017\343\014\321\315\022\226\153\236\325\311\253\222\153" +
+"\251\276\016\327\025\361\126\356\272\155\230\027\045\222\067\172" +
+"\113\162\043\325\327\341\246\341\357\255\320\172\032\157\051\342" +
+"\341\074\215\324\262\255\251\116\140\301\340\135\353\127\202\175" +
+"\234\327\267\015\347\253\166\035\274\042\162\155\262\103\046\221" +
+"\373\342\372\016\271\243\270\357\056\211\353\220\244\127\061\343" +
+"\131\173\342\351\232\147\305\214\142\255\247\210\326\172\112\065" +
+"\026\374\323\210\252\340\372\036\160\037\170\040\133\133\032\104" +
+"\171\062\170\071\257\037\042\161\332\267\114\210\265\247\352\212" +
+"\331\030\061\224\071\273\271\042\251\075\325\256\155\134\077\142" +
+"\351\332\154\255\023\065\163\375\146\111\074\037\303\306\260\070" +
+"\166\137\331\174\031\325\025\263\036\126\314\170\256\065\205\353" +
+"\151\042\327\323\252\261\202\353\307\222\047\251\276\016\035\105" +
+"\274\145\230\107\213\110\276\124\023\371\070\371\236\032\316\127" +
+"\355\232\122\376\252\223\163\135\353\147\212\061\367\157\031\033" +
+"\327\275\173\067\326\256\375\271\346\131\305\341\371\077\210\170" +
+"\272\256\353\041\376\236\306\361\012\236\153\374\046\215\237\277" +
+"\300\170\176\137\363\374\027\151\236\337\327\074\327\072\121\057" +
+"\317\220\027\212\371\062\042\165\075\103\340\332\315\311\147\112" +
+"\134\265\247\227\206\363\145\024\334\276\246\163\375\212\245\153" +
+"\027\153\375\232\245\153\253\265\376\013\342\223\343\045\101\107" +
+"\000\000"
 });
 
 public static void initArrays()
@@ -1951,10 +1959,10 @@ public Wyvern() {}
     static
     {
         TERMINAL_COUNT = 34;
-        GRAMMAR_SYMBOL_COUNT = 73;
-        SYMBOL_COUNT = 153;
-        PARSER_STATE_COUNT = 152;
-        SCANNER_STATE_COUNT = 92;
+        GRAMMAR_SYMBOL_COUNT = 72;
+        SYMBOL_COUNT = 150;
+        PARSER_STATE_COUNT = 151;
+        SCANNER_STATE_COUNT = 100;
         DISAMBIG_GROUP_COUNT = 7;
         SCANNER_START_STATENUM = 1;
         PARSER_START_STATENUM = 1;

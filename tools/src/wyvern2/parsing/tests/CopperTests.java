@@ -154,10 +154,10 @@ public class CopperTests {
 	public void parseClassWithNew() throws IOException, CopperParserException {
 		String input =
 				"class C\n" +
-				"  def bar():Int\n" +
-				"    9\n" +
 				"  class def create():C\n" +
 				"    new\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
 				"5";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
@@ -168,10 +168,10 @@ public class CopperTests {
 	public void testSimpleClass() throws IOException, CopperParserException {
 		String input =
 				"class C\n" +
-				"  def bar():Int\n" +
-				"    9\n" +
 				"  class def create():C\n" +
 				"    new\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
 				"C.create().bar()";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
@@ -195,10 +195,10 @@ public class CopperTests {
 				"type T\n" +
 				"  def bar():Int\n" +
 				"class C\n" +
-				"  def bar():Int\n" +
-				"    9\n" +
 				"  class def create():T\n" +
 				"    new\n" +
+				"  def bar():Int\n" +
+				"    9\n" +
 				"C.create().bar()";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
@@ -209,17 +209,19 @@ public class CopperTests {
 	public void testSimpleMetadata() throws IOException, CopperParserException {
 		String input =
 				"class C\n" +
-				"  def bar():Int\n" +
-				"    9\n" +
 				"  class def create():T\n" +
 				"    new\n" +
+				"  def foo():Int\n" +
+				"    9\n" +
+				"  def bar():Int\n" +
+				"    12\n" +
 				"type T\n" +
 				"  def foo():Int\n" +
-				"  metadata = C.create()\n" +
+				"  metadata:C = C.create()\n" +
 				"T.bar()";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
-		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(12)");
 	}
 	
 	// admittedly this is only a starting point....

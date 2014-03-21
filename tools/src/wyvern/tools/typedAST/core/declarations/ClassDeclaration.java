@@ -134,7 +134,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		if (decls != null) {
 			if (this.typeEquivalentEnvironmentRef.get() == null)
-				typeEquivalentEnvironmentRef.set(TypeDeclUtils.getTypeEquivalentEnvironment(declEnvRef.get()));
+				typeEquivalentEnvironmentRef.set(TypeDeclUtils.getTypeEquivalentEnvironment(decls,true));
 			for (Declaration decl : decls.getDeclIterator()) {
 				TypeBinding binding = new TypeBinding(nameBinding.getName(), getObjectType());
 				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()) {
@@ -192,7 +192,17 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private Type getObjectType() {
 		Environment declEnv = getObjEnv();
 		Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(declEnv);
-		return new ClassType(new Reference<>(declEnv), new Reference<>(objTee), new LinkedList<>());
+		return new ClassType(objEnv, new Reference<Environment>(objTee) {
+			@Override
+			public Environment get() {
+				return TypeDeclUtils.getTypeEquivalentEnvironment(objEnv.get());
+			}
+
+			@Override
+			public void set(Environment e) {
+				throw new RuntimeException();
+			}
+		}, new LinkedList<>());
 	}
 	
 	@Override
@@ -339,16 +349,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return env.extend(typeBinding);
 	}
 
+	boolean envGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		TypeBinding objBinding = new LateTypeBinding(nameBinding.getName(), this::getObjectType);
 
-		declEnvRef.set(Environment.getEmptyEnvironment());
-		for (Declaration decl : decls.getDeclIterator()) {
-			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
-				declEnvRef.set(decl.extendName(declEnvRef.get(), env.extend(objBinding)));
-			else
-				objEnv.set(decl.extendName(objEnv.get(), env.extend(objBinding)));
+		if (!envGuard && decls != null) {
+			declEnvRef.set(Environment.getEmptyEnvironment());
+			for (Declaration decl : decls.getDeclIterator()) {
+				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
+					declEnvRef.set(decl.extendName(declEnvRef.get(), env.extend(objBinding)));
+				else
+					objEnv.set(decl.extendName(objEnv.get(), env.extend(objBinding)));
+			}
+			envGuard = true;
 		}
 		return env;
 	}
