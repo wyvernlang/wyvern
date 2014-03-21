@@ -223,6 +223,24 @@ public class CopperTests {
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv()), Int.getInstance());
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(12)");
 	}
+
+	@Test
+	public void testDSL1() throws IOException, CopperParserException {
+		String input =
+				"{ 1 { 2 } {3} 4 {5} {5 {6{{3}}}} }";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+
+	}
+
+	@Test
+	public void testDSL2() throws IOException, CopperParserException {
+		String input =
+				"val test = 6\n" +
+				"	hello\n" +
+				"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+
+	}
 	
 	// admittedly this is only a starting point....
 	@Test

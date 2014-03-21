@@ -22,13 +22,16 @@ import java.util.HashMap;
 %parser Wyvern
 
 %aux{
-	Integer parenLevel;
+	Integer parenLevel, cl;
 	Stack<Integer> depths;
 	Pattern nlRegex;
+	boolean nextDsl;
 %aux}
 
 %init{
 	parenLevel = 0;
+	cl = 0;
+	nextDsl = false;
 	depths = new Stack<Integer>();
 	depths.push(0);
 	nlRegex = Pattern.compile("\n[\t ]*");
@@ -143,6 +146,61 @@ import java.util.HashMap;
 		}
 	:};
 
+	disambiguate curlyDsl1:(Spaces_t,notCurly_t)
+	{:
+		if (cl > 0) return notCurly_t;
+		return Spaces_t;
+	:};
+	disambiguate curlyDsl2:(comment_t,notCurly_t)
+	{:
+		if (cl > 0) return notCurly_t;
+		return comment_t;
+	:};
+	disambiguate curlyDsl3:(multi_comment_t,notCurly_t)
+	{:
+		if (cl > 0) return notCurly_t;
+		return multi_comment_t;
+	:};
+	disambiguate curlyDsl4:(ignoredNewline,notCurly_t)
+	{:
+		if (cl > 0) return notCurly_t;
+		return ignoredNewline;
+	:};
+	disambiguate dslWhitespace1:(dslWhitespace_t,ignoredNewline)
+	{:
+		return dslWhitespace_t;
+	:};
+	disambiguate dslWhitespace2:(Dedent_t,dslWhitespace_t,ignoredNewline)
+	{:
+		Matcher inputPattern = nlRegex.matcher(lexeme);
+		String output = "";
+		while(inputPattern.find())
+		{
+			output = inputPattern.group();
+		}
+		int newDepth = output.length() - 1;
+		if(newDepth < depths.peek()){
+			return Dedent_t;
+		} else {
+			return dslWhitespace_t;
+		}
+	:};
+
+	disambiguate dslLine1:(comment_t,dslLine_t)
+	{:
+		if (nextDsl) return dslLine_t;
+		return comment_t;
+	:};
+	disambiguate dslLine2:(dslLine_t,multi_comment_t)
+	{:
+		if (nextDsl) return dslLine_t;
+		return dslLine_t;
+	:};
+	disambiguate dslLine3:(Spaces_t,dslLine_t)
+	{:
+		if (nextDsl) return dslLine_t;
+		return Spaces_t;
+	:};
 
 
 
@@ -223,7 +281,13 @@ import java.util.HashMap;
 
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ ;
- 	terminal dsl_t ::= /\{.*?\}/ {: RESULT = lexeme; :};
+
+ 	terminal oCurly_t ::= /\{/ {: cl++; :};
+ 	terminal cCurly_t ::= /\}/ {: cl--; :};
+ 	terminal notCurly_t ::= /[^\{\}]*/;
+
+ 	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: System.out.println("ws"); nextDsl = true; :};
+ 	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; :};
 %lex}
 
 %cf{
@@ -255,6 +319,9 @@ import java.util.HashMap;
 	non terminal objrd;
 	non terminal typed;
 	non terminal inlinelit;
+   	non terminal dslBlock;
+   	non terminal dslInner;
+   	non terminal dsle;
 
    	precedence right tarrow_t;
     precedence left colon_t;
@@ -271,7 +338,7 @@ import java.util.HashMap;
 
 	fc ::= p:pi {: RESULT = pi; :};
 
-	p ::= e:ex {: RESULT = ex; :}
+	p ::= dsle:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
     	;
 
@@ -307,7 +374,7 @@ import java.util.HashMap;
     			| {: RESULT = null; :}
     			;
     non terminal declbody;
-    declbody ::= equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
+    declbody ::= equals_t dsle:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
 
 
     params ::= openParen_t iparams:ip closeParen_t {: RESULT = ip; :}
@@ -349,7 +416,7 @@ import java.util.HashMap;
     	|	  cbdef:va {: RESULT = va; :}
     	;
 
-    cbdeclbody ::= equals_t e:r {: RESULT = r; :} | equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
+    cbdeclbody ::= equals_t dsle:r {: RESULT = r; :} | equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
 
     cbval ::= valKwd_t identifier_t:id otypeasc:ty cbdeclbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
 
@@ -374,6 +441,8 @@ import java.util.HashMap;
 
     non terminal AE;
     non terminal ME;
+
+    dsle ::= e Newline_t | e dslBlock;
 
     e ::= AE:aer {:RESULT = aer; :};
 
@@ -413,6 +482,19 @@ import java.util.HashMap;
 
    	typeasc ::= colon_t type:ty {: RESULT = ty; :};
 
-   	inlinelit ::= dsl_t;
+   	non terminal innerdsl;
+    precedence left oCurly_t;
+
+   	inlinelit ::= oCurly_t innerdsl cCurly_t;
+
+   	innerdsl ::= notCurly_t | notCurly_t oCurly_t innerdsl cCurly_t innerdsl | ;
+
+	non terminal dslLine;
+	non terminal dslStart;
+
+   	dslBlock ::= Indent_t dslStart Dedent_t;
+   	dslStart ::= dslLine_t | dslLine_t dslInner;
+   	dslInner ::= dslLine | dslLine dslInner;
+   	dslLine ::= dslWhitespace_t dslLine_t;
 
 %cf}
