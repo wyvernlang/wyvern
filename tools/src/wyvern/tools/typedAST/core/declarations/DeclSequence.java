@@ -161,7 +161,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	}
 	
 	public final Environment bindDecls(Environment bodyEnv, Environment declEnv) {
-		Environment newEnv = bodyEnv;
+		Environment newEnv = declEnv;
 		for (Declaration d : this.getDeclIterator()) {
 			d.evalDecl(bodyEnv, declEnv);
 		}

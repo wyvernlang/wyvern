@@ -285,9 +285,10 @@ public class CopperTests {
 				"val test = (new.x())+9/3-3\n" +
 						"	val d = 4\n" +
 						"	def x():Int = 7\n" +
-						"7\n";
+						"test\n";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-
+		res.typecheck(Globals.getStandardEnv());
+		Assert.assertEquals("IntegerConstant(7)",res.evaluate(Globals.getStandardEnv()).toString());
 	}
 	
 	// admittedly this is only a starting point....

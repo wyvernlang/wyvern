@@ -39,6 +39,7 @@ public class New extends CachingTypedAST implements CoreAST {
 	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
 	private static int generic_num = 0;
 	private DeclSequence seq;
+	private Type ct;
 
 	public void setBody(DeclSequence seq) {
 		this.seq = seq;
@@ -69,10 +70,18 @@ public class New extends CachingTypedAST implements CoreAST {
 		
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class);
 
+
 		if (classVarTypeBinding != null) { //In a class method
 			Environment declEnv = classVarTypeBinding.getClassDecl().getObjEnv();
-			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(declEnv);
-			Type classVarType = new ClassType(new Reference<>(declEnv), new Reference<>(objTee), new LinkedList<>());
+			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
+			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>()))));
+
+
+
+			Environment nnames = seq.extend(seq.extendName(declEnv,declEnv.extend(env)));
+
+			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(declEnv));
+			Type classVarType = new ClassType(new Reference<>(nnames.extend(declEnv)), new Reference<>(objTee), new LinkedList<>());
 			if (!(classVarType instanceof ClassType)) {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
@@ -80,20 +89,27 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
 			cls = classVarTypeBinding.getClassDecl();
+			ct = classVarType;
 
 			return classVarType;
 		} else { // Standalone
 			isGeneric = true;
+			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env);
+			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>()))));
+
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
 
 			LinkedList<Declaration> decls = new LinkedList<>();
 
 			mockEnv = getGenericDecls(env, mockEnv, decls);
+			Environment nnames = (seq.extendName(mockEnv,mockEnv.extend(env)));
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
 			cls = classDeclaration;
-			return new ClassType(new Reference<>(mockEnv), new Reference<>(mockEnv), new LinkedList<String>());
+			Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
+			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>());
+			return ct;
 		}
 	}
 
@@ -125,12 +141,13 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			mockEnv = getGenericDecls(env, mockEnv, decls);
 
-			classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
+			classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
 		}
 
-		classDecl.evalDecl(env, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
 		AtomicReference<Value> objRef = new AtomicReference<>();
-		objRef.set(new Obj(classDecl.getFilledBody(objRef).extend(argValEnv)));
+		classDecl.evalDecl(env.extend(new LateValueBinding("this", objRef, ct)), classDecl.extendWithValue(Environment.getEmptyEnvironment()));
+		Environment objenv = seq.bindDecls(env, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
+		objRef.set(new Obj(objenv.extend(argValEnv)));
 		return objRef.get();
 	}
 
