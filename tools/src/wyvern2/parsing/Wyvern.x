@@ -146,6 +146,25 @@ import java.util.HashMap;
 		}
 	:};
 
+	disambiguate ignoredNewline8:(Dedent_t,Indent_t,ignoredNewline)
+	{:
+		if (parenLevel > 0)
+			return ignoredNewline;
+
+		Matcher inputPattern = nlRegex.matcher(lexeme);
+		String output = "";
+		while(inputPattern.find())
+		{
+			output = inputPattern.group();
+		}
+		int newDepth = output.length() - 1;
+		if(newDepth > depths.peek()){
+			return Indent_t;
+		} else {
+			return Dedent_t;
+		}
+	:};
+
 	disambiguate curlyDsl1:(Spaces_t,notCurly_t)
 	{:
 		if (cl > 0) return notCurly_t;
@@ -200,6 +219,12 @@ import java.util.HashMap;
 	{:
 		if (nextDsl) return dslLine_t;
 		return Spaces_t;
+	:};
+
+	disambiguate signal:(dslSignal_t,newSignal_t)
+	{:
+		//Should never be used.
+		throw new RuntimeException();
 	:};
 
 
@@ -284,10 +309,14 @@ import java.util.HashMap;
 
  	terminal oCurly_t ::= /\{/ {: cl++; :};
  	terminal cCurly_t ::= /\}/ {: cl--; :};
- 	terminal notCurly_t ::= /[^\{\}]*/;
+ 	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
 
- 	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: System.out.println("ws"); nextDsl = true; :};
- 	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; :};
+ 	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
+ 	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
+
+ 	terminal newSignal_t ::= //;
+ 	terminal dslSignal_t ::= //;
+ 	terminal caseSignal_t ::= //;
 %lex}
 
 %cf{
@@ -322,8 +351,14 @@ import java.util.HashMap;
    	non terminal dslBlock;
    	non terminal dslInner;
    	non terminal dsle;
+   	non terminal newBlock;
+   	non terminal dslce;
+   	non terminal newCBlock;
+   	non terminal obljid;
+   	non terminal objcld;
 
    	precedence right tarrow_t;
+   	precedence left Dedent_t;
     precedence left colon_t;
     precedence left openParen_t;
     precedence left dot_t;
@@ -338,7 +373,7 @@ import java.util.HashMap;
 
 	fc ::= p:pi {: RESULT = pi; :};
 
-	p ::= dsle:ex {: RESULT = ex; :}
+	p ::= dslce:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
     	;
 
@@ -394,13 +429,12 @@ import java.util.HashMap;
     	;
 
     objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
+    	|	 objcld:ld  {: RESULT = ld; :}
     	|	 objrd:rest {: RESULT = rest; :}
-    	|	{: RESULT = null; :}
     	;
 
     objrd ::= objid:rd objrd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); :}
-    	|	  objid:rd {: RESULT = rd; :}
-    	|	{: RESULT = null; :}
+    	|	  obljid:rd {: RESULT = rd; :}
     	;
 
     objcd ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, null);:}
@@ -411,12 +445,19 @@ import java.util.HashMap;
     non terminal cbdef;
     non terminal cbdeclbody;
 
-    objid ::= cbval:va {: RESULT = va; :}
-    	|	  cbvar:va {: RESULT = va; :}
-    	|	  cbdef:va {: RESULT = va; :}
+    objid ::= val:va {: RESULT = va; :}
+    	|	  var:va {: RESULT = va; :}
+    	|	  def:va {: RESULT = va; :};
+
+    obljid ::= cbval:va {: RESULT = va; :}
+    	|	   cbvar:va {: RESULT = va; :}
+    	|      cbdef:va {: RESULT = va; :}
     	;
 
-    cbdeclbody ::= equals_t dsle:r {: RESULT = r; :} | equals_t e:r Newline_t {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
+    cbdeclbody ::= equals_t dslce:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
+
+    objcld ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType cbdeclbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, null);:}
+                            	;
 
     cbval ::= valKwd_t identifier_t:id otypeasc:ty cbdeclbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, null); :};
 
@@ -441,10 +482,58 @@ import java.util.HashMap;
 
     non terminal AE;
     non terminal ME;
+    non terminal tle;
 
-    dsle ::= e Newline_t | e dslBlock;
+    dsle ::= tle:exn Newline_t {: RESULT = exn; :}
+    | tle:exn dslSignal_t dslBlock:dsl {:
+    	ASTExplorer exp = new ASTExplorer();
+    	exp.transform((TypedAST) exn);
+    	if (!exp.foundTilde())
+			throw new RuntimeException();
+		((DSLLit)exp.getRef()).setText((String)dsl);
+    	RESULT = exn;
+    :}
+    | tle:exn newSignal_t newBlock:blk {:
+		ASTExplorer exp = new ASTExplorer();
+		exp.transform((TypedAST) exn);
+		if (!exp.foundNew())
+			throw new RuntimeException();
+		((New)exp.getRef()).setBody((DeclSequence)blk);
+		RESULT = exn;
+	:};
 
-    e ::= AE:aer {:RESULT = aer; :};
+    dslce ::= tle:exn {: RESULT = exn; :}
+    | tle:exn dslSignal_t dslBlock:dsl {:
+		ASTExplorer exp = new ASTExplorer();
+		exp.transform((TypedAST) exn);
+		if (!exp.foundTilde())
+			throw new RuntimeException();
+		((DSLLit)exp.getRef()).setText((String)dsl);
+		RESULT = exn;
+	 :}
+    | tle:exn newSignal_t newCBlock:blk {:
+		ASTExplorer exp = new ASTExplorer();
+		exp.transform((TypedAST) exn);
+		if (!exp.foundNew())
+			throw new RuntimeException();
+		((New)exp.getRef()).setBody((DeclSequence)blk);
+		RESULT = exn;
+	 :};
+
+	tle ::= e:aer {:
+		ASTExplorer exp = new ASTExplorer();
+		exp.transform((TypedAST) aer);
+		if (exp.foundNew()){
+			pushToken(Terminals.newSignal_t,"");
+		}else if (exp.foundTilde())
+			pushToken(Terminals.dslSignal_t,"");
+
+		RESULT = aer;
+	:};
+
+    e ::= AE:aer {:
+    	RESULT = aer;
+    :};
 
     AE ::= AE:l plus_t ME:r {: RESULT = new Invocation((TypedAST)l,"+",(TypedAST)r,null); :}
     	|  AE:l dash_t ME:r {: RESULT = new Invocation((TypedAST)l,"-",(TypedAST)r,null); :}
@@ -463,6 +552,7 @@ import java.util.HashMap;
     	|	 inlinelit:lit {: RESULT = new DSLLit((String)lit); :}
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), null); :}
+    	|	 tilde_t {: RESULT = new DSLLit(""); :}
     	;
 
     tuple ::= openParen_t it:res closeParen_t {:RESULT = res; :}
@@ -485,16 +575,19 @@ import java.util.HashMap;
    	non terminal innerdsl;
     precedence left oCurly_t;
 
-   	inlinelit ::= oCurly_t innerdsl cCurly_t;
+   	inlinelit ::= oCurly_t innerdsl:idsl cCurly_t {: RESULT = idsl; :};
 
-   	innerdsl ::= notCurly_t | notCurly_t oCurly_t innerdsl cCurly_t innerdsl | ;
+   	innerdsl ::= notCurly_t:str {: RESULT = str; :} | notCurly_t:str oCurly_t innerdsl:idsl cCurly_t innerdsl:stre {: RESULT = str + "{" + idsl + "}" + stre; :} | {: RESULT = ""; :};
 
 	non terminal dslLine;
 	non terminal dslStart;
 
-   	dslBlock ::= Indent_t dslStart Dedent_t;
-   	dslStart ::= dslLine_t | dslLine_t dslInner;
-   	dslInner ::= dslLine | dslLine dslInner;
-   	dslLine ::= dslWhitespace_t dslLine_t;
+   	dslBlock ::= Indent_t dslStart:dsl Dedent_t {: RESULT = dsl; :};
+   	dslStart ::= dslLine_t:s {: RESULT = s; :} | dslLine_t:st dslInner:i {: RESULT = (String)st + (String)i; :};
+   	dslInner ::= dslLine:i {: RESULT = i; :}| dslLine:i dslInner:n {: RESULT = (String)i + (String)n; :};
+   	dslLine ::= dslWhitespace_t:ws dslLine_t:ln {: RESULT = (String)ws + (String)ln; :};
+
+   	newBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | Newline_t {: RESULT = new DeclSequence(); :};
+   	newCBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | {: RESULT = new DeclSequence(); :};
 
 %cf}

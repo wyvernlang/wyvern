@@ -29,6 +29,7 @@ import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
+import wyvern2.ast.decl.DeclSeq;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
@@ -37,6 +38,11 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
 	private static int generic_num = 0;
+	private DeclSequence seq;
+
+	public void setBody(DeclSequence seq) {
+		this.seq = seq;
+	}
 
 	public static void resetGenNum() {
 		generic_num = 0;

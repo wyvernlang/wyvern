@@ -14,6 +14,10 @@ import wyvern2.ast.decl.DeclSeq;
 
 public class DeclSequence extends Sequence implements EnvironmentExtender {
 
+	public DeclSequence() {
+		this(Arrays.asList());
+	}
+
 
 	public static DeclSequence simplify(DeclSequence in) {
 		return new DeclSequence(new Iterable() {

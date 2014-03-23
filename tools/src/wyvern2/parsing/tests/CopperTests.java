@@ -3,8 +3,12 @@ package wyvern2.parsing.tests;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import org.junit.Assert;
 import org.junit.Test;
+import wyvern.DSL.DSL;
 import wyvern.stdlib.Globals;
+import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.extensions.DSLLit;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -228,16 +232,60 @@ public class CopperTests {
 	public void testDSL1() throws IOException, CopperParserException {
 		String input =
 				"{ 1 { 2 } {3} 4 {5} {5 {6{{3}}}} }";
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-
+		DSLLit res = (DSLLit)new Wyvern().parse(new StringReader(input), "test input");
+		Assert.assertEquals(" 1 { 2 } {3} 4 {5} {5 {6{{3}}}} ", res.getText());
 	}
 
 	@Test
 	public void testDSL2() throws IOException, CopperParserException {
 		String input =
-				"val test = 6\n" +
-				"	hello\n" +
-				"7\n";
+				"val test = ~\n" +
+						"	hello\n" +
+						"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		String parsed = ((DSLLit)((ValDeclaration) ((Sequence) res).getDeclIterator().iterator().next()).getDefinition()).getText();
+		Assert.assertEquals("hello", parsed);
+	}
+	@Test
+	public void testDSL3() throws IOException, CopperParserException {
+		String input =
+				"val test = ~\n" +
+						"	hello\n" +
+						"	world\n" +
+						"		today\n" +
+						"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		String parsed = ((DSLLit)((ValDeclaration) ((Sequence) res).getDeclIterator().iterator().next()).getDefinition()).getText();
+		Assert.assertEquals("hello\nworld\n\ttoday", parsed);
+
+	}
+
+	@Test(expected = CopperParserException.class)
+	public void testDSL4() throws IOException, CopperParserException {
+		String input =
+				"val test = 7\n" +
+						"	hello\n" +
+						"	world\n" +
+						"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+	}
+	@Test
+	public void testNew1() throws IOException, CopperParserException {
+		String input =
+				"val test = new\n" +
+						"	val d = 4\n" +
+						"	def x():Int = 7\n" +
+						"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+
+	}
+	@Test
+	public void testNew2() throws IOException, CopperParserException {
+		String input =
+				"val test = (new.x())+9/3-3\n" +
+						"	val d = 4\n" +
+						"	def x():Int = 7\n" +
+						"7\n";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 
 	}
@@ -257,3 +305,4 @@ public class CopperTests {
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
 	}
 }
+

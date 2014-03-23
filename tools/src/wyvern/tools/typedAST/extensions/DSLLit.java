@@ -14,8 +14,18 @@ import java.util.Map;
  * Created by Ben Chung on 3/11/14.
  */
 public class DSLLit extends AbstractTypedAST {
-	public DSLLit(String inner) {
+	String dslText = null;
 
+	public void setText(String text) {
+		if (dslText == null)
+			throw new RuntimeException();
+		dslText = text;
+	}
+
+	public String getText() { return dslText; }
+
+	public DSLLit(String dslText) {
+		this.dslText = dslText;
 	}
 
 	@Override
