@@ -15,6 +15,7 @@ import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.*;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
@@ -22,12 +23,12 @@ import wyvern.tools.util.TreeWriter;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
-	private Reference<Obj> attrObj;
+	private Reference<Value> attrObj;
 	private Reference<Environment> typeDeclEnv;
 
 	public TypeType(TypeDeclaration decl) {
 		typeDeclEnv = decl.getDeclEnv();
-		attrObj = decl.getAttrObjRef();
+		attrObj = decl.getMetaValue();
 	}
 
 	public TypeType(Environment declEnv) {
@@ -37,11 +38,14 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	public TypeType(Reference<Environment> declEnv) {
 		this.typeDeclEnv = declEnv;
 	}
+
+	public Value getAttrValue() { return attrObj.get(); }
 	
 	public TypeDeclaration getDecl() {
 		return this.decl;
 	}
-	
+	public Obj getAttrObj() { return null; }
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write		
@@ -66,13 +70,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		// the operation should exist
 		String opName = opExp.getOperationName();
 		NameBinding m = typeDeclEnv.get().lookup(opName);
-
-		if (m == null) {
-            NameBinding n = attrObj.get().getIntEnv().lookup(opName);
-            if (n == null)
-			    reportError(OPERATOR_DOES_NOT_APPLY, opExp, opName, this.toString());
-            return n.getType();
-        }
 		
 		// TODO Auto-generated method stub
 		return m.getType();
@@ -148,12 +145,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	private boolean isParserValid = false;
 	@Override
 	public LineParser getParser() {
-		if (!isParserCheck) {
-			isParserValid = Util.checkCast(attrObj.get(), LineParser.class);
-			isParserCheck = true;
-		}
-		if (isParserValid)
-			return Util.toJavaClass(attrObj.get(), LineParser.class);
 		return null;
 	}
 

@@ -3,8 +3,9 @@ package wyvern.tools.typedAST.core.declarations;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
@@ -12,6 +13,7 @@ import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -30,6 +32,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 
+	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
+	private Reference<Value> metaValue = new Reference<>();
+
 	public Reference<Obj> getAttrObjRef() {
 		return attrObj;
 	}
@@ -37,6 +42,11 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Environment getAttrEnv() {
 		return attrEnv.get();
 	}
+
+	public Reference<Value> getMetaValue() {
+		return metaValue;
+	}
+
 	@Override
 	public Environment extendType(Environment env) {
 		return env.extend(typeBinding);
@@ -49,7 +59,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			for (Declaration decl : decls.getDeclIterator()) {
 				declEnv.set(decl.extendName(declEnv.get(), against));
 				if (decl instanceof AttributeDeclaration) {
-					env = env.extend(new NameBindingImpl(getName(), ((AttributeDeclaration) decl).getType()));
+					env = env.extend(new NameBindingImpl(getName(), decl.getType()));
 					nameBinding = new NameBindingImpl(nameBinding.getName(), decl.getType());
 				}
 			}
@@ -184,6 +194,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
 		}
+		evalMeta(Globals.getStandardEnv());
 
 		return this.typeBinding.getType();
 	}	
@@ -208,13 +219,18 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		Environment attrEnv = Environment.getEmptyEnvironment();
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		evalMeta(evalEnv);
+		vb.setValue(metaValue.get());
+	}
+
+	private void evalMeta(Environment evalEnv) {
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof AttributeDeclaration) {
-				vb.setValue(((AttributeDeclaration) decl).getBody().evaluate(evalEnv));
+				metaValue.set(((AttributeDeclaration) decl).getBody().evaluate( evalEnv.extend(attrEvalEnv)));
 			}
 		}
 	}
-	
+
 	public DeclSequence getDecls() {
 		return decls;
 	}
