@@ -1,0 +1,13 @@
+<project name="wyvern" default="copper-generate" basedir=".">
+    <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler-0.7.1.jar"/>
+    <target name="copper-generate">
+        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java">
+            <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
+        </copper>
+    </target>
+    <target name="copper-debug">
+        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt">
+            <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
+        </copper>
+    </target>
+</project>
