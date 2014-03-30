@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.*;
 
 %%
 %parser Wyvern
@@ -478,7 +479,7 @@ import java.util.HashMap;
 
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, null); :};
 
-    metadata ::= metadataKwd_t typeasc:type equals_t e:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); :};
+    metadata ::= metadataKwd_t typeasc:type equals_t dslce:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); :};
 
     non terminal AE;
     non terminal ME;
@@ -498,7 +499,7 @@ import java.util.HashMap;
 		exp.transform((TypedAST) exn);
 		if (!exp.foundNew())
 			throw new RuntimeException();
-		((New)exp.getRef()).setBody((DeclSequence)blk);
+		((New)exp.getRef()).setBody((blk instanceof DeclSequence) ? (DeclSequence)blk : new DeclSequence(Arrays.asList((TypedAST)blk)));
 		RESULT = exn;
 	:};
 
@@ -516,7 +517,7 @@ import java.util.HashMap;
 		exp.transform((TypedAST) exn);
 		if (!exp.foundNew())
 			throw new RuntimeException();
-		((New)exp.getRef()).setBody((DeclSequence)blk);
+		((New)exp.getRef()).setBody((blk instanceof DeclSequence) ? (DeclSequence)blk : new DeclSequence(Arrays.asList((TypedAST)blk)));
 		RESULT = exn;
 	 :};
 
@@ -525,8 +526,9 @@ import java.util.HashMap;
 		exp.transform((TypedAST) aer);
 		if (exp.foundNew()){
 			pushToken(Terminals.newSignal_t,"");
-		}else if (exp.foundTilde())
+		}else if (exp.foundTilde()) {
 			pushToken(Terminals.dslSignal_t,"");
+		}
 
 		RESULT = aer;
 	:};
@@ -549,10 +551,10 @@ import java.util.HashMap;
     	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, null); :}
     	|	 term:src dot_t identifier_t:op {: RESULT = new Invocation((TypedAST)src,(String)op, null, null); :}
     	//|	 term:src typeasc:as {: RESULT = new TypeAsc((Expr)src, (Type)as); :}
-    	|	 inlinelit:lit {: RESULT = new DSLLit((String)lit); :}
+    	|	 inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), null); :}
-    	|	 tilde_t {: RESULT = new DSLLit(""); :}
+    	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	;
 
     tuple ::= openParen_t it:res closeParen_t {:RESULT = res; :}

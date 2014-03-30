@@ -29,6 +29,8 @@ public class ASTExplorer extends AbstractASTVisitor {
 			discovered |= 1;
 		}
 		if (input instanceof DSLLit) {
+			if (((DSLLit) input).getText().isPresent())
+				return this.defaultTransformation(input);
 			if (discovered != 0)
 				throw new RuntimeException("Discovered second forward reference");
 			ref = input;
