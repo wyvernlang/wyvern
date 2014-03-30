@@ -1,14 +1,8 @@
 package wyvern.tools.typedAST.core;
 
-import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
-import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.interfaces.ApplyableValue;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -19,6 +13,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
 
+import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
+import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 

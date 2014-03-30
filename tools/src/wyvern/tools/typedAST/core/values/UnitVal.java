@@ -1,18 +1,15 @@
 package wyvern.tools.typedAST.core.values;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 

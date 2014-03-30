@@ -1,7 +1,6 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.interfaces.*;

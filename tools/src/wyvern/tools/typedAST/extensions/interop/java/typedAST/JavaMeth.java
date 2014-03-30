@@ -1,24 +1,17 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 
-import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
-import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Intersection;
-import wyvern.tools.util.Pair;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

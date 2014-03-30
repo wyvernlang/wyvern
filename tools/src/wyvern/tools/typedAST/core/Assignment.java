@@ -1,19 +1,10 @@
 package wyvern.tools.typedAST.core;
 
-import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
-import static wyvern.tools.errors.ToolError.reportError;
-import static wyvern.tools.errors.ToolError.reportEvalError;
-
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.interfaces.Assignable;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -22,6 +13,9 @@ import wyvern.tools.util.TreeWriter;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
+
+import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
+import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
 	private TypedAST target;
@@ -79,11 +73,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
-	}
-	
-	@Override
-	public LineSequenceParser getLineSequenceParser() {
-		return null;
 	}
 
 	@Override

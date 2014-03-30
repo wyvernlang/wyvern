@@ -1,8 +1,6 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -41,18 +39,6 @@ public class DSLDummy implements TypedAST {
     @Override
     public Value evaluate(Environment env) {
         return dslDef.evaluate(env);
-    }
-
-    @Override
-    public LineParser getLineParser() {
-        if (dslDef != null)
-            return dslDef.getLineParser();
-        return null;
-    }
-
-    @Override
-    public LineSequenceParser getLineSequenceParser() {
-        return dslDef.getLineSequenceParser();
     }
 
 	@Override

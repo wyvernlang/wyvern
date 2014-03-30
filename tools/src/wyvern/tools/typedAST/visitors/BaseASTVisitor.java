@@ -1,20 +1,11 @@
 package wyvern.tools.typedAST.visitors;
 
-import java.util.Map.Entry;
-
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.*;
-import wyvern.tools.typedAST.core.expressions.Fn;
-import wyvern.tools.typedAST.core.expressions.IfExpr;
-import wyvern.tools.typedAST.core.expressions.LetExpr;
-import wyvern.tools.typedAST.core.expressions.New;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.expressions.TypeInstance;
-import wyvern.tools.typedAST.core.expressions.Variable;
-import wyvern.tools.typedAST.core.expressions.WhileStatement;
+import wyvern.tools.typedAST.core.expressions.*;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
@@ -22,6 +13,8 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+
+import java.util.Map.Entry;
 
 public abstract class BaseASTVisitor implements CoreASTVisitor {
 

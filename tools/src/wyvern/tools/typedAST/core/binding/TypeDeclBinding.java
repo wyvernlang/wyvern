@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.core.binding;
 
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;

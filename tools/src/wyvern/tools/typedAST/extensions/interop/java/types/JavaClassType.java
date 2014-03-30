@@ -6,10 +6,6 @@ import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeDeclUtils;
-import wyvern.tools.types.extensions.TypeType;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class JavaClassType extends ClassType {
 	private final Class clazz;

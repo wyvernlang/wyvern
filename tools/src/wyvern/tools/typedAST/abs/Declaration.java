@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.abs;
 
-import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -47,11 +46,6 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	public abstract String getName();
 	protected abstract Type doTypecheck(Environment env);
 
-	@Override
-	public LineSequenceParser getLineSequenceParser() {
-		return null;
-	}
-	
 	public final Environment extend(Environment old) {
 		Environment newEnv = doExtend(old);
 		if (nextDecl != null)

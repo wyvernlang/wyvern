@@ -1,5 +1,0 @@
-val applyTwice : (Int->Int)->(Int->Int) = fn f : Int -> Int => fn x : Int => f(f(x))
-
-val addOne : (Int->Int) = fn x : Int => x + 1
-
-applyTwice(addOne)(2+2*3)

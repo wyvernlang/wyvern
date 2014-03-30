@@ -1,7 +1,5 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.*;
-
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -21,6 +19,8 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.*;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 

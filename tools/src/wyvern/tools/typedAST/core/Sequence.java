@@ -1,23 +1,17 @@
 package wyvern.tools.typedAST.core;
 
-import java.util.*;
-
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.*;
 
 public class Sequence implements CoreAST, Iterable<TypedAST> {
 	private LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
@@ -85,18 +79,6 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 			}
 		}
 		return lastVal;
-	}
-
-	@Override
-	public LineParser getLineParser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public LineSequenceParser getLineSequenceParser() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

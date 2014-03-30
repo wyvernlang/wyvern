@@ -1,17 +1,10 @@
 package wyvern.tools.types;
 
-import wyvern.tools.parsing.LineParser;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 public abstract class AbstractTypeImpl implements Type {
-
-    @Override
-    public LineParser getParser() {
-        return null;
-    }
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {

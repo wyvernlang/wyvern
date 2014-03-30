@@ -1,33 +1,24 @@
 package wyvern.tools.typedAST.extensions.interop.java;
 
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
-import wyvern.tools.typedAST.interfaces.InvokableValue;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
-import wyvern.tools.util.Pair;
 
-import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,4 +1,0 @@
-import "java:wyvern.tools.util.LangUtil" as Util
-
-val x : Int = 2
-Util.LangUtil.getType(x)

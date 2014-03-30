@@ -18,7 +18,6 @@ import wyvern.tools.util.TreeWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	protected Reference<Environment> intEnv;
