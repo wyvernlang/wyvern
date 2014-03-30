@@ -15,6 +15,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class PartialDecl implements TypedAST {
@@ -94,7 +95,7 @@ public class PartialDecl implements TypedAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		// TODO Auto-generated method stub
 		return null;
 	}

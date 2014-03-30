@@ -5,8 +5,6 @@ import org.junit.Test;
 import wyvern.DSL.DSL;
 import wyvern.tools.typedAST.core.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;
@@ -21,6 +19,7 @@ import wyvern.tools.util.Reference;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 
 /**
  * Created by Ben Chung on 1/11/14.
@@ -38,7 +37,7 @@ public class TransformerTests {
 		strs.add(src);
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		wyvern.stdlib.Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		return pair;
 	}
 

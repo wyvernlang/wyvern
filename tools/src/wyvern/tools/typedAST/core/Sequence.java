@@ -7,10 +7,8 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.Unit;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.PartialDeclSequence;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -64,10 +62,10 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type lastType = wyvern.tools.types.extensions.Unit.getInstance();
 		for (TypedAST t : exps) {
-			lastType = t.typecheck(env);
+			lastType = t.typecheck(env, Optional.empty());
 			if (t instanceof EnvironmentExtender)
 				env = ((EnvironmentExtender) t).extend(env);
 		}

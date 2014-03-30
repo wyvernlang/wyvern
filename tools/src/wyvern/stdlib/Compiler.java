@@ -20,13 +20,11 @@ import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Compiler {
     private static String getMD5(String input) {
@@ -124,7 +122,7 @@ public class Compiler {
 		CompilationContext newCtx = new CompilationContext(null, null, null,
 				new ImportCompileResolver(Arrays.asList(new CompilerInputResolver(files), new JavaImportResolver(), new FileResolver())));
 		TypedAST root = compileSource(startupname, files.get(0), dsls, newCtx);
-		root.typecheck(Environment.getEmptyEnvironment());
+		root.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		return xformer.transform(new ImportChecker(new IdentityTranformer()).transform(root));
     }
 

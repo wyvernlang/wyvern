@@ -10,8 +10,8 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by Ben Chung on 3/13/14.
@@ -33,9 +33,9 @@ public class TypeAsc extends AbstractTypedAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		should = TypeResolver.resolve(should, env);
-		if (!(should.subtype(exn.typecheck(env))))
+		if (!(should.subtype(exn.typecheck(env, Optional.empty()))))
 			throw new RuntimeException();
 		return should;
 	}

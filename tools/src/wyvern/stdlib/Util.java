@@ -14,6 +14,7 @@ import wyvern.tools.util.Pair;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 
 public class Util {
 	public static TypedAST doCompile(String input, List<DSL> dsls) {
@@ -30,7 +31,7 @@ public class Util {
 		for (DSL dsl : dsls)
 			env = dsl.addToEnv(env);
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		return typedAST;
 	}
 

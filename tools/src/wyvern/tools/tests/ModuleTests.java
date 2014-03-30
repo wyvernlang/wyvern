@@ -2,18 +2,14 @@ package wyvern.tools.tests;
 
 import org.junit.Test;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Compiler;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.ContParser;
-import wyvern.tools.parsing.RecordTypeParser;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
-import wyvern.tools.util.Pair;
 
 public class ModuleTests {
 	@Test
@@ -30,7 +26,7 @@ public class ModuleTests {
                 "	def n():Int = 3\n");
         TypedAST pair = Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		pair.evaluate(Environment.getEmptyEnvironment());
 	}
 
@@ -48,7 +44,7 @@ public class ModuleTests {
                 "	def n():Int = 3\n");
         TypedAST pair = Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 	}
 
 }

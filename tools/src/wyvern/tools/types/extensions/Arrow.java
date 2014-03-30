@@ -6,6 +6,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.types.*;
@@ -30,7 +31,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	
 	@Override
 	public Type checkApplication(Application application, Environment env) {
-		Type actualType = application.getArgument().typecheck(env);
+		Type actualType = application.getArgument().typecheck(env, Optional.of(argument));
 		argument = TypeResolver.resolve(argument, env);
 		if (!actualType.subtype(argument))
 			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application,actualType.toString(),argument.toString());

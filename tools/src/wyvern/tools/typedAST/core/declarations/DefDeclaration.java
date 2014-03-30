@@ -1,16 +1,12 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Closure;
-import wyvern.tools.typedAST.core.binding.LateNameBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
@@ -33,7 +29,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	private String name;
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
-	
+
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, fullType);
@@ -44,7 +40,17 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 		this.location = location;
 	}
 
-	
+
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef) {
+		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
+		this.type = fullType;
+		this.name = name;
+		this.body = body;
+		this.argNames = argNames;
+		this.isClass = isClassDef;
+	}
+
+
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
 		Type argType = null;
 		if (args.size() == 0) {
@@ -86,7 +92,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> childMap = new HashMap<>();
-		childMap.put("body", body);
+		if (body != null)
+			childMap.put("body", body);
 		return childMap;
 	}
 
@@ -102,7 +109,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 			extEnv = extEnv.extend(bind);
 		}
 		if (body != null) {
-			Type bodyType = body.typecheck(extEnv); // Can be null for meth inside type!
+			Type bodyType = body.typecheck(extEnv, Optional.empty()); // Can be null for meth inside type!
 			type = TypeResolver.resolve(type, env);
 			
 			Type retType = ((Arrow)type).getResult();

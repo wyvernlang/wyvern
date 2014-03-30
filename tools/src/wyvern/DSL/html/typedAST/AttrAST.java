@@ -3,6 +3,7 @@ package wyvern.DSL.html.typedAST;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import wyvern.DSL.html.parsing.HtmlTagParser;
 import wyvern.tools.errors.FileLocation;
@@ -64,7 +65,7 @@ public class AttrAST implements TypedAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		throw new RuntimeException();
 	}
 

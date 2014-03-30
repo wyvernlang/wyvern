@@ -1,15 +1,12 @@
 package wyvern.tools.typedAST.core;
 
 import static wyvern.tools.errors.ErrorMessage.CANNOT_INVOKE;
-import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -22,9 +19,9 @@ import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private String operationName;
@@ -44,11 +41,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
-		Type receiverType = receiver.typecheck(env);
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		Type receiverType = receiver.typecheck(env, Optional.empty());
 		
 		if (argument != null)
-			argument.typecheck(env);
+			argument.typecheck(env, Optional.empty());
 		
 		if (receiverType instanceof OperatableType) {
 			return ((OperatableType)receiverType).checkOperator(this,env);

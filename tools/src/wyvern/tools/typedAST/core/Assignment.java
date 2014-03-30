@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.core;
 
-import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_ASSIGNED;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
@@ -8,26 +7,21 @@ import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.expressions.LetExpr;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.ApplyableType;
-import wyvern.tools.types.AssignableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
 	private TypedAST target;
@@ -47,14 +41,14 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		if (nextExpr == null) {
-			Type tT = target.typecheck(env);
-			Type vT = value.typecheck(env);
+			Type tT = target.typecheck(env, Optional.empty());
+			Type vT = value.typecheck(env, Optional.of(tT));
 			if (!vT.subtype(tT))
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
 		} else {
-			nextExpr.typecheck(env);
+			nextExpr.typecheck(env, Optional.empty());
 		}
 		return Unit.getInstance();
 	}

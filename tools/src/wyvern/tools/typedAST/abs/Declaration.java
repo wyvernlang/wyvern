@@ -1,13 +1,12 @@
 package wyvern.tools.typedAST.abs;
 
-import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
-import wyvern.tools.typedAST.core.expressions.LetExpr;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+
+import java.util.Optional;
 
 // TODO: Consider adding a class "ListOfDeclarations" that only handles indents with decls and make
 // Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)
@@ -33,13 +32,13 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	public final void typecheckAll(Environment env) {
 		Environment newEnv = env;
 		for (Declaration d = this; d != null; d = d.nextDecl) {
-			d.typecheck(newEnv);
+			d.typecheck(newEnv, Optional.empty());
 			newEnv = d.doExtend(newEnv);
 		}
 	}
 	
 	@Override
-	public final Type typecheck(Environment env) {
+	public final Type typecheck(Environment env, Optional<Type> expected) {
 		Environment tEnv = this.extendType(env);
 		Environment newEnv = extend(extendName(tEnv, tEnv));
 		return typecheckSelf(newEnv);

@@ -10,6 +10,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern2.ast.decl.Decl;
 import wyvern2.ast.decl.DeclSeq;
 
 public class DeclSequence extends Sequence implements EnvironmentExtender {
@@ -28,12 +29,19 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 					{
 						iterstack.push(in.iterator());
 					}
+					private Object lookahead;
 
 					@Override
 					public boolean hasNext() {
 						if (!iterstack.empty()) {
 							if (!iterstack.peek().hasNext()) {
 								iterstack.pop();
+								return hasNext();
+							}
+							lookahead = iterstack.peek().next();
+							if (lookahead instanceof DeclSequence) {
+								iterstack.push(((DeclSequence) lookahead).iterator());
+								lookahead = null;
 								return hasNext();
 							}
 							return true;
@@ -43,12 +51,12 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 
 					@Override
 					public Object next() {
-						Object oldres = iterstack.peek().next();
-						if (oldres instanceof DeclSequence) {
-							iterstack.push(((DeclSequence) oldres).iterator());
-							return next();
+						if (lookahead != null) {
+							Object res = lookahead;
+							lookahead = null;
+							return res;
 						}
-						return oldres;
+						return iterstack.peek().next();
 					}
 				};
 			}
@@ -118,14 +126,14 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		Environment wtypes = extendType(env);
 		env = extendName(wtypes, wtypes);
 		for (Declaration d : this.getDeclIterator())
 			env = d.extend(env);
 
 		for (TypedAST d : this) {
-			d.typecheck(env);
+			d.typecheck(env, Optional.empty());
 		}
 		
 		return wyvern.tools.types.extensions.Unit.getInstance();

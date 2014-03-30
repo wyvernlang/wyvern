@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Scanner;
 
 import junit.framework.Assert;
@@ -61,7 +62,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 		
 		//Value resultValue = typedAST.evaluate(env);
 		//Assert.assertEquals("()", resultValue.toString());
@@ -103,7 +104,7 @@ public class ClassTypeCheckerTests {
 		if (typedAST instanceof Declaration) {
 			((Declaration) typedAST).typecheckAll(env);
 		} else {
-			Type resultType = typedAST.typecheck(env);
+			Type resultType = typedAST.typecheck(env, Optional.empty());
 			Assert.assertEquals(Unit.getInstance(), resultType);
 		}
 	}
@@ -138,7 +139,7 @@ public class ClassTypeCheckerTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
-			typedAST.typecheck(env);
+			typedAST.typecheck(env, Optional.empty());
 		} catch (ToolError e) {
 			Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of Stack on line number Test:11,15", e.toString());
 			return;
@@ -173,7 +174,7 @@ public class ClassTypeCheckerTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
-			typedAST.typecheck(env);
+			typedAST.typecheck(env, Optional.empty());
 		} catch (ToolError e) {
 			Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackBar has no declaration in the context on line number Test:11,15", e.toString());
 			return;
@@ -229,7 +230,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Unit.getInstance(), resultType);
 	}
 	
@@ -261,7 +262,7 @@ public class ClassTypeCheckerTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration()]]", typedAST.toString());		
 
 		try {
-			typedAST.typecheck(env);
+			typedAST.typecheck(env, Optional.empty());
 		} catch (ToolError e) {
 			Assert.assertEquals("wyvern.tools.errors.ToolError: StackImpl is not a subtype of StackFactory on line number Test:11,15", e.toString());
 			return;
@@ -296,7 +297,7 @@ public class ClassTypeCheckerTests {
 
 		
 		try {
-			typedAST.typecheck(env);
+			typedAST.typecheck(env, Optional.empty());
 		} catch (ToolError e) {
 			Assert.assertEquals("wyvern.tools.errors.ToolError: Type StackFactoryFoo has no declaration in the context on line number Test:11,15", e.toString());
 			return;
@@ -339,7 +340,7 @@ public class ClassTypeCheckerTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
 		try {
-			typedAST.typecheck(env);
+			typedAST.typecheck(env, Optional.empty());
 		} catch (ToolError e) {
 			Assert.assertEquals("wyvern.tools.errors.ToolError: Actual argument type Str does not match formal argument type Int on line number Test:23,11", e.toString());
 			return;
@@ -390,7 +391,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 	}
 	
 	@Test
@@ -444,7 +445,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 
 		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
 		
@@ -506,7 +507,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 
 		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
 		
@@ -567,7 +568,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 
 		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
 		
@@ -626,7 +627,7 @@ public class ClassTypeCheckerTests {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableClassDeclaration(), MutableClassDeclaration(), DefDeclaration()]]", typedAST.toString());		
 
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 
 		DeclSequence ds = (DeclSequence) ((Sequence) typedAST).iterator().next();
 		

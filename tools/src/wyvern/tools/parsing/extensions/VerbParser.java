@@ -7,7 +7,6 @@ import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.typedAST.core.Application;
 import wyvern.tools.typedAST.core.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
@@ -21,6 +20,7 @@ import wyvern.tools.util.TreeWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 
 public class VerbParser implements LineParser {
 	private class QuoteClosure implements TypedAST {
@@ -35,12 +35,12 @@ public class VerbParser implements LineParser {
 		}
 
 		@Override
-		public Type typecheck(Environment env) {
-			inner.typecheck(env);
+		public Type typecheck(Environment env, Optional<Type> expected) {
+			inner.typecheck(env, Optional.empty());
 			Fn fn = new Fn(new LinkedList<NameBinding>(), inner);
-			fn.typecheck(env);
+			fn.typecheck(env, Optional.empty());
 			arg = new Application(new Closure(fn, env), UnitVal.getInstance(inner.getLocation()), inner.getLocation());
-			arg.typecheck(env);
+			arg.typecheck(env, Optional.empty());
 			return Util.javaToWyvType(TypedAST.class);
 		}
 

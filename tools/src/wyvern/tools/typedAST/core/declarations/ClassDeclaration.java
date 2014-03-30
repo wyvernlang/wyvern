@@ -113,12 +113,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public Type getType() {
 		return this.typeBinding.getType();
 	}
-	
-	public TypeType getTypeType() { // FIXME: Should this be really what getType returns?
-		if (this.nameImplements != null) {
-			return (TypeType) this.nameImplements.getType();
-		} else { return null; }
-	}
 
 	@Override
 	public Type doTypecheck(Environment env) {

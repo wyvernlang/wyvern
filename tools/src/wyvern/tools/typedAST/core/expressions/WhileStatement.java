@@ -5,7 +5,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -20,6 +19,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class WhileStatement implements TypedAST, CoreAST {
 
@@ -49,11 +49,11 @@ public class WhileStatement implements TypedAST, CoreAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
-		if (!(conditional.typecheck(env) instanceof Bool))
+	public Type typecheck(Environment env, Optional<Type> expected) {
+		if (!(conditional.typecheck(env, Optional.empty()) instanceof Bool))
 			ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_APPLIED, conditional);
 		
-		body.typecheck(env);
+		body.typecheck(env, Optional.empty());
 		return Unit.getInstance();	
 	}
 	

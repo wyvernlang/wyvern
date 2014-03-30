@@ -10,23 +10,20 @@ import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.*;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.CompilationContext;
-import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 public class TypeDrivenParsingTests {
     private class TestType extends AbstractTypeImpl {
@@ -69,7 +66,7 @@ public class TypeDrivenParsingTests {
         }
 
         @Override
-        public Type typecheck(Environment env) {
+        public Type typecheck(Environment env, Optional<Type> expected) {
             return new TestType();
         }
 
@@ -115,7 +112,7 @@ public class TypeDrivenParsingTests {
         Environment env = Globals.getStandardEnv();
         env = env.extend(new TypeBinding("TestType",new TestType()));
         TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-        Type resultType = typedAST.typecheck(env);
+        Type resultType = typedAST.typecheck(env, Optional.empty());
         return typedAST;
     }
 

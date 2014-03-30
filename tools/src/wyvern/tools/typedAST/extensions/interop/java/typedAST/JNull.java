@@ -13,6 +13,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class JNull implements TypedAST {
 	@Override
@@ -21,7 +22,7 @@ public class JNull implements TypedAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		return new JNullType();
 	}
 

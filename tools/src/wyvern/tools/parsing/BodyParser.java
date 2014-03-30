@@ -39,6 +39,7 @@ import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 // NB! See: http://en.cppreference.com/w/cpp/language/operator_precedence
@@ -240,7 +241,7 @@ public class BodyParser implements RawASTVisitor<Environment, TypedAST> {
                 Symbol sym = ParseUtils.parseSymbol(ctx);
                 ast = new Invocation(ast, sym.name, null, first.getLocation());
             } else {
-                Type type = ast.typecheck(ctx.getEnv());
+                Type type = ast.typecheck(ctx.getEnv(), Optional.empty());
                 if (type instanceof Arrow) {
                     ctx.setExpected(((Arrow) type).getArgument());
                 } else {

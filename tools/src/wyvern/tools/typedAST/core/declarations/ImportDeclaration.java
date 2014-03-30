@@ -21,7 +21,7 @@ import wyvern.tools.util.TreeWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private String src;
@@ -93,7 +93,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		if (typechecking || ref.get() == null || typechecked) //Recursive reference hasn't been resolved yet
 			return Unit.getInstance();
 		typechecking = true;
-		ref.get().typecheck(env);
+		ref.get().typecheck(env, Optional.empty());
 		typechecking = false;
         typechecked = true;
 		return Unit.getInstance();
@@ -121,7 +121,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     private boolean evaluating = false;
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-        typecheck(evalEnv);
+        typecheck(evalEnv, Optional.empty());
 		if (res instanceof ImportEnvResolver && defaultN) {
 			((ImportEnvResolver) res).evalDecl(evalEnv, declEnv, ref.get());
 			return;

@@ -84,7 +84,7 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 				} catch (ToolError e) {
 					continue;
 				}
-		reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application, application.getArgument().typecheck(env).toString(),
+		reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application, application.getArgument().typecheck(env, Optional.empty()).toString(),
                 toString());
 		return null; //Unreachable
 	}
@@ -98,7 +98,7 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 				} catch (ToolError e) {
 					continue;
 				}
-		reportError(ACTUAL_FORMAL_TYPE_MISMATCH, opExp, opExp.getArgument().typecheck(env).toString(),
+		reportError(ACTUAL_FORMAL_TYPE_MISMATCH, opExp, opExp.getArgument().typecheck(env, Optional.empty()).toString(),
                 toString());
 		return null; //Unreachable
 	}

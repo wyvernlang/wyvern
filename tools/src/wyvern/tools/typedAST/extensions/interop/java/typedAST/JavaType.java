@@ -3,7 +3,6 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
@@ -15,6 +14,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class JavaType implements EnvironmentExtender {
 	private final Type equivType;
@@ -31,7 +31,7 @@ public class JavaType implements EnvironmentExtender {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		return equivType;
 	}
 

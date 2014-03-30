@@ -1,9 +1,9 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
@@ -35,7 +35,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		Type argType = null;
 		if (bindings.size() == 0)
 			argType = Unit.getInstance();
@@ -50,7 +50,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 			extEnv = extEnv.extend(bind);
 		}
 
-		Type resultType = body.typecheck(extEnv);
+		Type resultType = body.typecheck(extEnv, expected.map(exp -> ((Arrow)exp).getResult()));
 		return new Arrow(argType, resultType);
 	}
 

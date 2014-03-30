@@ -16,9 +16,9 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 public class ValDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
@@ -53,9 +53,11 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		if (binding.getType() != null)
 			resolved = TypeResolver.resolve(binding.getType(), env);
 		if (this.definition != null)
-			this.definitionType = this.definition.typecheck(env);
+			this.definitionType = this.definition.typecheck(env, Optional.ofNullable(resolved));
 		if (resolved == null)
 			resolved = definitionType;
+
+		binding = new NameBindingImpl(binding.getName(), resolved);
 		if (binding.getType() == null) {
 			this.binding = new NameBindingImpl(binding.getName(), resolved);
 		} else if (this.definitionType != null && !this.definitionType.subtype(resolved)){

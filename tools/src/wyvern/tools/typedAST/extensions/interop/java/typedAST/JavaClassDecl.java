@@ -6,7 +6,9 @@ import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 
@@ -105,7 +107,28 @@ public class JavaClassDecl extends ClassDeclaration {
 		return new JavaClassType(this);
 	}
 
+	@Override
+	public Type doTypecheck(Environment env) {
+		return Unit.getInstance();
+	}
+
+	@Override
+	public void evalDecl(Environment evalEnv, Environment declEnv) {
+		initalize();
+		super.evalDecl(evalEnv, declEnv);
+	}
+
+	@Override
+	public DeclSequence getDecls() {
+		initalize();
+		return decls;
+	}
+
+	boolean initalized = false;
 	public void initalize() {
+		if (initalized)
+			return;
+		initalized = true;
 		super.decls = getDecls(this.clazz);
 		super.declEnvRef.set(super.decls.extend(Environment.getEmptyEnvironment()));
 		super.declEvalEnv = Environment.getEmptyEnvironment();
@@ -114,6 +137,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	@Override
 	public void updateEnv() {
+		initalize();
 		Reference<Environment> ref = getTypeEquivalentEnvironmentReference();
 		Environment env = ref.get();
 		if (env == null)

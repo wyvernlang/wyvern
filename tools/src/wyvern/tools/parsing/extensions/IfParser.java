@@ -1,12 +1,12 @@
 package wyvern.tools.parsing.extensions;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.*;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
@@ -61,11 +61,11 @@ public class IfParser implements LineParser {
 			return ((BooleanConstant)returned).getValue();
 		}
 		@Override
-		protected Type doTypecheck(Environment env) {
-			if (!(clause.typecheck(env) instanceof Bool)) {
+		protected Type doTypecheck(Environment env, Optional<Type> expected) {
+			if (!(clause.typecheck(env, Optional.empty()) instanceof Bool)) {
 				ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_APPLIED, this);
 			}
-			return body.typecheck(env);
+			return body.typecheck(env, Optional.empty());
 		}
 		public boolean getIsThen() { return isThen; }
 		

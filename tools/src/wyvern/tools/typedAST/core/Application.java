@@ -12,11 +12,12 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
@@ -37,11 +38,11 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
-		Type fnType = function.typecheck(env);
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		Type fnType = function.typecheck(env, Optional.empty());
 		
 		if (this.argument != null)
-			this.argument.typecheck(env);
+			this.argument.typecheck(env, Optional.of(((Arrow)fnType).getArgument()));
 		
 		if (!(fnType instanceof ApplyableType))
 			reportError(TYPE_CANNOT_BE_APPLIED, this, fnType.toString());

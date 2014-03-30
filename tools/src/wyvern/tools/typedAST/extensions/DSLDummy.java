@@ -3,17 +3,15 @@ package wyvern.tools.typedAST.extensions;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.LineParser;
 import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 public class DSLDummy implements TypedAST {
 	private final Type expected;
@@ -36,8 +34,8 @@ public class DSLDummy implements TypedAST {
     }
 
     @Override
-    public Type typecheck(Environment env) {
-        return dslDef.typecheck(env);
+    public Type typecheck(Environment env, Optional<Type> expected) {
+        return dslDef.typecheck(env, Optional.empty());
     }
 
     @Override

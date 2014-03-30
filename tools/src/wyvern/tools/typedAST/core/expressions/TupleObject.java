@@ -1,14 +1,10 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.Invocation;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -18,6 +14,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
 	private TypedAST[] objects;
@@ -63,10 +60,11 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		Type[] newTypes = new Type[objects.length];
 		for (int i = 0; i < objects.length; i++) {
-			newTypes[i] = objects[i].typecheck(env);
+			final int sti = i;
+			newTypes[i] = objects[i].typecheck(env, expected.map(exp -> ((Tuple)exp).getTypes()[sti]));
 		}
 		return new Tuple(newTypes);
 	}

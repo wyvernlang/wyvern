@@ -4,12 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Compiler;
-import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.parsing.extensions.VerbParser;
 import wyvern.tools.typedAST.core.Keyword;
 import wyvern.tools.typedAST.core.binding.KeywordNameBinding;
-import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
@@ -21,6 +18,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class TypeExtensionParsingTests {
@@ -35,7 +33,7 @@ public class TypeExtensionParsingTests {
 				"T.t\n");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(4));
 	}
 
@@ -51,7 +49,7 @@ public class TypeExtensionParsingTests {
 				"T.x(4)\n");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(6));
 	}
 
@@ -90,7 +88,7 @@ public class TypeExtensionParsingTests {
 		//Thread.sleep(10000);
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, Arrays.asList(new DSL[]{verb}));
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Value evaluate = pair.evaluate(Environment.getEmptyEnvironment());
 		Assert.assertEquals(evaluate, new IntegerConstant(4));
 	}
@@ -113,7 +111,7 @@ public class TypeExtensionParsingTests {
 		strs.add(reader.useDelimiter("\\A").next());
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Assert.assertEquals(pair.evaluate(Environment.getEmptyEnvironment()), new IntegerConstant(4950));
 		is.close();
 	}
@@ -136,7 +134,7 @@ public class TypeExtensionParsingTests {
 		strs.add(reader.useDelimiter("\\A").next());
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
 		Compiler.flush();
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Value evaluate = pair.evaluate(Environment.getEmptyEnvironment());
 		if (!(evaluate instanceof JavaObj))
 			Assert.assertTrue(false);

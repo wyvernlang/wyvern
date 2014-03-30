@@ -25,7 +25,7 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	
 	@Override
 	public Type checkOperator(Invocation opExp, Environment env) {
-		Type type2 = opExp.getArgument().typecheck(env);
+		Type type2 = opExp.getArgument().typecheck(env, Optional.empty());
 		String operatorName = opExp.getOperationName();
 		
 		if (!(legalOperators.contains(operatorName)))

@@ -4,13 +4,11 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.binding.VarBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
-import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -19,10 +17,9 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import javax.tools.Tool;
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
@@ -48,7 +45,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		if (this.definition != null)
-			if (!(this.definition.typecheck(env).subtype(varBinding.getType())))
+			if (!(this.definition.typecheck(env, Optional.of(varBinding.getType())).subtype(varBinding.getType())))
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
 		return binding.getType();
 	}

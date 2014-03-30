@@ -4,7 +4,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -17,6 +16,7 @@ import wyvern.tools.util.TreeWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class IfExpr extends CachingTypedAST implements CoreAST {
 	public abstract static class IfClause extends CachingTypedAST implements TypedAST {
@@ -89,14 +89,14 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		Type lastType = null;
 		for (IfClause clause : clauses) {
 			if (lastType == null) {
-				lastType = clause.typecheck(env);
+				lastType = clause.typecheck(env, expected);
 				continue;
 			}
-			if (clause.typecheck(env) != lastType) {
+			if (clause.typecheck(env, expected) != lastType) {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, clause);
 			}
 		}

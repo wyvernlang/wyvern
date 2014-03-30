@@ -2,6 +2,7 @@ package wyvern.DSL.html.tests;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Optional;
 
 import junit.framework.Assert;
 
@@ -24,7 +25,7 @@ public class ParsingTests {
 		Environment env = Globals.getStandardEnv();
 		env = Html.extend(env);
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		return typedAST;
 	}
 	

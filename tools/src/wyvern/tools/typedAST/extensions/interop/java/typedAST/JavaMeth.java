@@ -69,7 +69,7 @@ public class JavaMeth extends DefDeclaration {
 				getJMethType(cstrs),
 				null,
 				null,
-				cstrs.get(0).getClassMeth(), FileLocation.UNKNOWN);
+				cstrs.get(0).getClassMeth());
 		this.methods = cstrs;
 	}
 

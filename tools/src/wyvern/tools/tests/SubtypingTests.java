@@ -4,6 +4,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 
 import junit.framework.Assert;
 
@@ -70,7 +71,7 @@ public class SubtypingTests {
 		if (typedAST instanceof Declaration) {
 			((Declaration) typedAST).typecheckAll(env);
 		} else {
-			Type resultType = typedAST.typecheck(env);
+			Type resultType = typedAST.typecheck(env, Optional.empty());
 			Assert.assertEquals(Unit.getInstance(), resultType);
 		}
 	}
@@ -120,7 +121,7 @@ public class SubtypingTests {
 			if (typedAST instanceof Declaration) {
 				((Declaration) typedAST).typecheckAll(env);
 			} else {
-				Type resultType = typedAST.typecheck(env);
+				Type resultType = typedAST.typecheck(env, Optional.empty());
 				Assert.assertEquals(Unit.getInstance(), resultType);
 			}
 		} catch (ToolError e) {
@@ -151,7 +152,7 @@ public class SubtypingTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
-		s.typecheck(env);
+		s.typecheck(env, Optional.empty());
 		
 		DeclSequence ds = (DeclSequence) s.iterator().next();
 		
@@ -186,7 +187,7 @@ public class SubtypingTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
-		s.typecheck(env);
+		s.typecheck(env, Optional.empty());
 		
 		DeclSequence ds = (DeclSequence) s.iterator().next();
 		
@@ -221,7 +222,7 @@ public class SubtypingTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
-		s.typecheck(env);
+		s.typecheck(env, Optional.empty());
 		
 		DeclSequence ds = (DeclSequence) s.iterator().next();
 		
@@ -256,7 +257,7 @@ public class SubtypingTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
-		s.typecheck(env);
+		s.typecheck(env, Optional.empty());
 		
 		DeclSequence ds = (DeclSequence) s.iterator().next();
 		
@@ -297,7 +298,7 @@ public class SubtypingTests {
 		Assert.assertEquals("[[MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration(), MutableTypeDeclaration()]]", typedAST.toString());		
 		
 		Sequence s = (Sequence) typedAST;
-		s.typecheck(env);
+		s.typecheck(env, Optional.empty());
 		
 		DeclSequence ds = (DeclSequence) s.iterator().next();
 		
@@ -378,7 +379,7 @@ public class SubtypingTests {
 		if (typedAST instanceof Declaration) {
 			((Declaration) typedAST).typecheckAll(env);
 		} else {
-			Type resultType = typedAST.typecheck(env);
+			Type resultType = typedAST.typecheck(env, Optional.empty());
 			Assert.assertEquals(Unit.getInstance(), resultType);
 		}
 	}

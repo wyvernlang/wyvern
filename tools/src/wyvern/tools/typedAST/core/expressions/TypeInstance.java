@@ -4,9 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
-import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -17,6 +15,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class TypeInstance extends AbstractTypedAST implements CoreAST {
 	private TypeBinding binding;
@@ -40,7 +39,7 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env) {
+	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type type = getType();
 		if (type == null) {
 			String name = binding.getName();

@@ -16,11 +16,9 @@ import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 
-import javax.tools.Tool;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 /**
  * Created by Ben Chung on 8/9/13.
@@ -96,7 +94,7 @@ public class ImportParser implements DeclParser {
 
 				TypedAST result = parserPair.second.parse(r);
 				declaration.setASTRef(new Reference<TypedAST>(result));
-                declaration.typecheck(Globals.getStandardEnv());
+                declaration.typecheck(Globals.getStandardEnv(), Optional.empty());
                 declaration.evalDecl(Environment.getEmptyEnvironment());
 				return declaration;
 			}

@@ -1,9 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -15,7 +12,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -24,12 +20,10 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeUtils;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-import wyvern2.ast.decl.DeclSeq;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
@@ -64,7 +58,7 @@ public class New extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
 		
@@ -74,7 +68,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		if (classVarTypeBinding != null) { //In a class method
 			Environment declEnv = classVarTypeBinding.getClassDecl().getObjEnv();
 			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
-			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>()))));
+			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>()))), Optional.empty());
 
 
 
@@ -95,7 +89,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		} else { // Standalone
 			isGeneric = true;
 			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env);
-			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>()))));
+			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>()))), Optional.empty());
 
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
@@ -116,7 +110,7 @@ public class New extends CachingTypedAST implements CoreAST {
 	private Environment getGenericDecls(Environment env, Environment mockEnv, LinkedList<Declaration> decls) {
 		for (Entry<String, TypedAST> elem : args.entrySet()) {
 			ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
-			e.typecheck(env);
+			e.typecheck(env, Optional.empty());
 			mockEnv = e.extend(mockEnv);
 			decls.add(e);
 		}
@@ -153,13 +147,16 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Map<String, TypedAST> getChildren() {
-		return args;
+		HashMap<String,TypedAST> outMap = new HashMap<>();
+		outMap.put("seq", (seq==null)? new DeclSequence(Arrays.asList()) : seq);
+		return outMap;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 
-		New aNew = new New(newChildren, location);
+		New aNew = new New(new HashMap<>(), location);
+		aNew.setBody((DeclSequence) newChildren.get("seq"));
 		aNew.cls = cls;
 		return aNew;
 	}

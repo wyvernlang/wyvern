@@ -1,14 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.LineSequenceParser;
-import wyvern.tools.rawAST.LineSequence;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -20,6 +13,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class LetExpr extends CachingTypedAST implements CoreAST {
 	private DeclSequence decl;
@@ -36,10 +30,10 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env) {
-		decl.typecheck(env);
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		decl.typecheck(env, Optional.empty());
 		Environment newEnv = decl.extendWithDecls(env);
-		Type bodyType = body.typecheck(newEnv);
+		Type bodyType = body.typecheck(newEnv, Optional.empty());
 		return bodyType;
 	}
 

@@ -5,14 +5,11 @@ import static wyvern.tools.parsing.ParseUtils.parseSymbol;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
 import wyvern.tools.parsing.DeclParser;
 import wyvern.tools.parsing.ParseUtils;
 import wyvern.tools.rawAST.Symbol;
-import wyvern.tools.typedAST.core.binding.LateBinder;
 import wyvern.tools.typedAST.core.binding.LateNameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -21,6 +18,8 @@ import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.CompilationContext;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
+
+import java.util.Optional;
 
 public class ValParser implements DeclParser {
     private ValParser() {
@@ -84,7 +83,7 @@ public class ValParser implements DeclParser {
                         Type type = null;
                         if (restctx.getTokens() != null) {
                             definition = ParseUtils.parseExpr(restctx);
-                            type = definition.typecheck(ctx.getEnv());
+                            type = definition.typecheck(ctx.getEnv(), Optional.empty());
                         } else {
                             type = parsedType;
                         }

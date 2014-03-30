@@ -1,11 +1,10 @@
 package wyvern.tools.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.BodyParser;
-import wyvern.tools.parsing.LineParser;
 import wyvern.tools.rawAST.RawAST;
 import wyvern.tools.simpleParser.Phase1Parser;
 import wyvern.tools.typedAST.core.Keyword;
@@ -24,6 +23,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class JavaInteropTests {
 
@@ -38,7 +38,7 @@ public class JavaInteropTests {
 		env = env.extend(new KeywordNameBinding("JImport", new Keyword(new JImportParser())));
 		env = env.extend(new KeywordNameBinding("JNull", new Keyword(new JNullParser())));
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		return typedAST;
 	}
 

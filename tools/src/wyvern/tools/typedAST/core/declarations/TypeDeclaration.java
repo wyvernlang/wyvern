@@ -77,7 +77,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		protected Type doTypecheck(Environment env) {
-			return body.typecheck(env);
+			return body.typecheck(env, Optional.empty());
 		}
 
 		@Override

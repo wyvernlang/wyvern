@@ -10,12 +10,13 @@ import wyvern.tools.util.TreeWritable;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface TypedAST extends TreeWritable, HasLocation {
 
 	/** should call typecheck() before getType() -- except maybe for declarations */
 	Type getType();
-	Type typecheck(Environment env);
+	Type typecheck(Environment env, Optional<Type> expected);
 	
 	/** an interpreter */
 	Value evaluate(Environment env);

@@ -5,8 +5,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Optional;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +40,8 @@ public class ExtensionsTest {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);		
 		Assert.assertEquals("[[ValDeclaration(\"b\", Invocation(Invocation(BooleanConstant(true), \"&&\", BooleanConstant(true)), \"&&\", BooleanConstant(true)))], Invocation(Variable(\"b\"), \"||\", Invocation(BooleanConstant(false), \"&&\", BooleanConstant(true)))]",
-				typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+				typedAST.toString());
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Bool.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("BooleanConstant(true)", resultValue.toString());
@@ -63,7 +64,7 @@ public class ExtensionsTest {
 			Assert.assertEquals("{$I {$L "+ first + " " + ops[i] +" "+ second +" $L} $I}", parsedResult.toString());
 			typedAST = parsedResult.accept(new BodyParser(), env);
 			Assert.assertEquals("Invocation(IntegerConstant(" + first + "), \"" + ops[i] + "\", IntegerConstant(" + second + "))", typedAST.toString());
-			resultType = typedAST.typecheck(env);
+			resultType = typedAST.typecheck(env, Optional.empty());
 			Assert.assertEquals(Bool.getInstance(), resultType);
 			resultValue = typedAST.evaluate(env);
 			Assert.assertEquals("BooleanConstant("+ results[i] +")", resultValue.toString());
@@ -88,7 +89,7 @@ public class ExtensionsTest {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("Invocation(Invocation(IntegerConstant(100), \"+\", StringConstant(\" Hello \")), \"+\", StringConstant(\"world!\"))", typedAST.toString());
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Str.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("StringConstant(\"100 Hello world!\")", resultValue.toString());
@@ -104,7 +105,7 @@ public class ExtensionsTest {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[DefDeclaration()], Application(Variable(\"m\"), IntegerConstant(5))]", typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		
 		typedAST.evaluate(env); // will result in stack overflow

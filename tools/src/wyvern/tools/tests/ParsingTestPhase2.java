@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 
@@ -18,7 +18,6 @@ import org.junit.rules.ExpectedException;
 
 import wyvern.DSL.DSL;
 import wyvern.stdlib.Globals;
-import wyvern.targets.Common.WyvernIL.Stmt.Statement;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.BodyParser;
 import wyvern.tools.parsing.ContParser;
@@ -50,7 +49,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[ValDeclaration(\"x\", IntegerConstant(5))], Variable(\"x\")]", typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
@@ -65,7 +64,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("Application(Fn([NameBindingImpl(\"x\", Int())], Variable(\"x\")), IntegerConstant(1))", typedAST.toString());
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(1)", resultValue.toString());
@@ -80,7 +79,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("Application(Fn([NameBindingImpl(\"x\", Int())], Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))), IntegerConstant(3))", typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(4)", resultValue.toString());
@@ -95,7 +94,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("Invocation(Invocation(IntegerConstant(3), \"*\", IntegerConstant(4)), \"+\", Invocation(IntegerConstant(5), \"*\", IntegerConstant(6)))", typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(42)", resultValue.toString());
@@ -110,7 +109,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("Application(ExternalFunction(), StringConstant(\"Testing printing.\"))", typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Unit.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("()", resultValue.toString());
@@ -125,7 +124,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\")))))", typedAST.toString());		
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(arrow(arrow(integer, integer),arrow(integer,integer)), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("Closure(Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\"))))), Environment())", resultValue.toString());
@@ -141,7 +140,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[ValDeclaration(\"applyTwice\", Fn([NameBindingImpl(\"f\", Arrow(Int(), Int()))], Fn([NameBindingImpl(\"x\", Int())], Application(Variable(\"f\"), Application(Variable(\"f\"), Variable(\"x\"))))))], [ValDeclaration(\"addOne\", Fn([NameBindingImpl(\"x\", Int())], Invocation(Variable(\"x\"), \"+\", IntegerConstant(1))))], Application(Application(Variable(\"applyTwice\"), Variable(\"addOne\")), IntegerConstant(1))]", typedAST.toString());
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(integer, resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(3)", resultValue.toString());
@@ -157,7 +156,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[DefDeclaration()], Application(Variable(\"double\"), IntegerConstant(5))]", typedAST.toString());
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
@@ -173,7 +172,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[DefDeclaration()], Application(Variable(\"mult\"), TupleObject(IntegerConstant(3), IntegerConstant(2)))]", typedAST.toString());
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(13)", resultValue.toString());
@@ -187,7 +186,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(3)", resultValue.toString());
@@ -204,7 +203,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
@@ -223,7 +222,7 @@ public class ParsingTestPhase2 {
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("[[DefDeclaration(), DefDeclaration()], Application(Variable(\"doublePlusOne\"), IntegerConstant(5))]", typedAST.toString());
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(11)", resultValue.toString());
@@ -242,7 +241,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		typedAST.typecheck(env);
+		typedAST.typecheck(env, Optional.empty());
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("StringConstant(\"hello\")", resultValue.toString());
 	}
@@ -260,7 +259,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(9)", resultValue.toString());
@@ -287,7 +286,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
@@ -307,7 +306,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(9)", resultValue.toString());
@@ -327,7 +326,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(5)", resultValue.toString());
@@ -349,7 +348,7 @@ public class ParsingTestPhase2 {
 		
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(6)", resultValue.toString());
@@ -361,7 +360,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(1)", resultValue.toString());
@@ -373,7 +372,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(2)", resultValue.toString());
@@ -385,7 +384,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(4)", resultValue.toString());
@@ -404,7 +403,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
@@ -424,7 +423,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals(Int.getInstance(), resultType);
 		Value resultValue = typedAST.evaluate(env);
 		Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
@@ -445,7 +444,7 @@ public class ParsingTestPhase2 {
 			
 			Environment env = Globals.getStandardEnv();
 			TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
-			Type resultType = typedAST.typecheck(env);
+			Type resultType = typedAST.typecheck(env, Optional.empty());
 			Assert.assertEquals(Int.getInstance(), resultType);
 			Value resultValue = typedAST.evaluate(env);
 			Assert.assertEquals("IntegerConstant(10)", resultValue.toString());
@@ -471,7 +470,7 @@ public class ParsingTestPhase2 {
 		TypedAST typedAST = parsedResult.accept(new BodyParser(), env);
 		Assert.assertEquals("DefDeclaration()", typedAST.toString());		
 
-		Type resultType = typedAST.typecheck(env);
+		Type resultType = typedAST.typecheck(env, Optional.empty());
 		Assert.assertEquals("Unit -> Unit", resultType.toString());
 		
 		// Value resultValue = typedAST.evaluate(env);
@@ -497,7 +496,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("Int",result.typecheck(env, Optional.empty()).toString());
 		Assert.assertEquals("IntegerConstant(11)", result.evaluate(env).toString());
 	}
 
@@ -512,7 +511,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("Int",result.typecheck(env, Optional.empty()).toString());
 		Assert.assertEquals("IntegerConstant(1)", result.evaluate(env).toString());
 	}
 	@Test
@@ -526,7 +525,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("Int",result.typecheck(env, Optional.empty()).toString());
 		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
 	}
 	@Test
@@ -541,7 +540,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		Assert.assertEquals("Int",result.typecheck(env).toString());
+		Assert.assertEquals("Int",result.typecheck(env, Optional.empty()).toString());
 		Assert.assertEquals("IntegerConstant(5)", result.evaluate(env).toString());
 	}
 
@@ -553,7 +552,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 	}
 
 	@Test
@@ -564,7 +563,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 	}
 
 	@Test
@@ -576,7 +575,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 	}
 	@Test
 	public void testGenericNew3() {
@@ -588,7 +587,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
 	}
 	@Test
@@ -602,7 +601,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 		Assert.assertEquals("IntegerConstant(2)", result.evaluate(env).toString());
 	}
 
@@ -619,7 +618,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 
 	}
 
@@ -638,7 +637,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 
 	}
 
@@ -654,7 +653,7 @@ public class ParsingTestPhase2 {
 		RawAST parsedResult = Phase1Parser.parse("Test", reader);
 		Environment env = Globals.getStandardEnv();
 		TypedAST result = parsedResult.accept(new BodyParser(), env);
-		result.typecheck(env);
+		result.typecheck(env, Optional.empty());
 	}
 
 	@Test
@@ -668,7 +667,7 @@ public class ParsingTestPhase2 {
 				+ "   n * factorial(n-1)\n" +
 				"factorial(5)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Value result = pair.evaluate(Environment.getEmptyEnvironment());
 		System.out.print("");
 	}
@@ -687,7 +686,7 @@ public class ParsingTestPhase2 {
 				+  " sum \n"
 				+  "mult(5,5)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs, new ArrayList<DSL>());
-		pair.typecheck(Environment.getEmptyEnvironment());
+		pair.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Value result = pair.evaluate(Environment.getEmptyEnvironment());
 		System.out.print("");
 	}
