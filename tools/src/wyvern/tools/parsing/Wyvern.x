@@ -308,7 +308,9 @@ import wyvern.tools.errors.FileLocation;
  	terminal colon_t ::= /:/ ;
 
 
- 	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ ;
+ 	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
+ 		RESULT = lexeme.substring(1,lexeme.length()-1);
+ 	:};
 
  	terminal oCurly_t ::= /\{/ {: cl++; :};
  	terminal cCurly_t ::= /\}/ {: cl--; :};
@@ -464,7 +466,7 @@ import wyvern.tools.errors.FileLocation;
 
     cbdeclbody ::= equals_t dslce:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
     cbevalbody ::= cbdeclbody:bdy {: RESULT = bdy; :}| {: RESULT = null; :};
-    cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| {: RESULT = null; :};
+    cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| Newline_t {: RESULT = null; :};
 
     objcld ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType cbdeclbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, new FileLocation(currentState.pos));:}
                             	;
@@ -555,9 +557,12 @@ import wyvern.tools.errors.FileLocation;
     	|  ME:l divide_t term:r {: RESULT = new Invocation((TypedAST)l,"/",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  term:ter {:RESULT = ter;:};
 
+    non terminal etuple;
+
     term ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
-    	|	 fnKwd_t identifier_t:id typeasc:t arrow_t openParen_t term:inner closeParen_t {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, null)), (TypedAST)inner); :}
+    	|	 fnKwd_t identifier_t:id typeasc:t arrow_t openParen_t e:inner closeParen_t {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, (Type)t)), (TypedAST)inner); :}
     	|	 openParen_t e:inner closeParen_t {: RESULT = inner; :}
+    	|	 etuple:tpe {: RESULT = tpe; :}
     	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, new FileLocation(currentState.pos)); :}
     	|	 term:src dot_t identifier_t:op {: RESULT = new Invocation((TypedAST)src,(String)op, null, new FileLocation(currentState.pos)); :}
     	//|	 term:src typeasc:as {: RESULT = new TypeAsc((Expr)src, (Type)as); :}
@@ -565,7 +570,12 @@ import wyvern.tools.errors.FileLocation;
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
+    	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}
     	;
+
+    etuple ::= openParen_t e:first comma_t it:rest closeParen_t {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
+                   		| openParen_t closeParen_t {: RESULT = UnitVal.getInstance(null); :}
+                   		;
 
     tuple ::= openParen_t it:res closeParen_t {:RESULT = res; :}
     		| openParen_t closeParen_t {: RESULT = UnitVal.getInstance(null); :}
