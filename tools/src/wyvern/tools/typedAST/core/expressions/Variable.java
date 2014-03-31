@@ -1,10 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
-import static wyvern.tools.errors.ToolError.reportError;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
-import wyvern.tools.typedAST.core.Assignment;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
@@ -16,6 +13,9 @@ import wyvern.tools.util.TreeWriter;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
+
+import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
+import static wyvern.tools.errors.ToolError.reportError;
 
 
 public class Variable extends AbstractTypedAST implements CoreAST, Assignable {

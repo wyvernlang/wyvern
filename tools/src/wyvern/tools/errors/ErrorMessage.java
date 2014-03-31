@@ -1,7 +1,6 @@
 package wyvern.tools.errors;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public enum ErrorMessage {
 	// Type errors

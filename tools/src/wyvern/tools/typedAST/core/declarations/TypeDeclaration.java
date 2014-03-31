@@ -1,10 +1,5 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -21,6 +16,11 @@ import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;

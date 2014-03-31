@@ -1,5 +1,7 @@
 package wyvern.tools.errors;
 
+import edu.umn.cs.melt.copper.runtime.io.InputPosition;
+
 public final class FileLocation {
 	public final String filename;
 	public final int line;
@@ -8,6 +10,12 @@ public final class FileLocation {
 		this.filename = filename;
 		this.line = line;
 		this.character = charP;
+	}
+
+	public FileLocation(InputPosition copperState) {
+		filename = copperState.getFileName();
+		line = copperState.getLine();
+		character = copperState.getColumn();
 	}
 	
 	public String toString() {

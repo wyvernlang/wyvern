@@ -1,8 +1,6 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
@@ -37,16 +35,6 @@ public class JavaType implements EnvironmentExtender {
 
 	@Override
 	public Value evaluate(Environment env) {
-		return null;
-	}
-
-	@Override
-	public LineParser getLineParser() {
-		return null;
-	}
-
-	@Override
-	public LineSequenceParser getLineSequenceParser() {
 		return null;
 	}
 

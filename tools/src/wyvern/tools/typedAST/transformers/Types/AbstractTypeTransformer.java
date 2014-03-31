@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.transformers.Types;
 
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
 import java.util.Map;

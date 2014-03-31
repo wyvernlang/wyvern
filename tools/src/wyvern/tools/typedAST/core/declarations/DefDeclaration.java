@@ -1,12 +1,10 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.*;
-
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Closure;
+import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
@@ -21,6 +19,8 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.*;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
@@ -162,6 +162,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		for (int i = 0; i < argNames.size(); i++) {
+			NameBinding oldBinding = argNames.get(i);
+			argNames.set(i, new NameBindingImpl(oldBinding.getName(), TypeResolver.resolve(oldBinding.getType(), against)));
+		}
 		return env.extend(new NameBindingImpl(name, TypeResolver.resolve(type, against)));
 	}
 }

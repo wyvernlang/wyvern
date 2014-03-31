@@ -1,16 +1,16 @@
 package wyvern.tools.types.extensions;
 
-import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
-import static wyvern.tools.errors.ToolError.reportError;
+import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.types.*;
+import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
-import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.types.*;
-import wyvern.tools.util.TreeWriter;
+import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
+import static wyvern.tools.errors.ToolError.reportError;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	private Type result;

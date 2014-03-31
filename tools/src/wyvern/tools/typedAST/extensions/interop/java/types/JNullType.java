@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.extensions.interop.java.types;
 
-import wyvern.tools.parsing.LineParser;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -19,12 +18,6 @@ public class JNullType implements Type {
 	public boolean subtype(Type other) {
 		return other instanceof JavaClassType;
 	}
-
-	@Override
-	public LineParser getParser() {
-		return null;
-	}
-
 	@Override
 	public boolean isSimple() {
 		return true;

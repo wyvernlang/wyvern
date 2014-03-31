@@ -6,9 +6,7 @@ import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.Pair;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 
 /**

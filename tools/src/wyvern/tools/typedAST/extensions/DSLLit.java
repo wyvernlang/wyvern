@@ -9,7 +9,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
-import wyvern2.parsing.ExtParser;
+import wyvern.tools.parsing.ExtParser;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,14 +1,16 @@
 package wyvern.tools.types.extensions;
 
-import java.util.*;
-
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class Tuple extends AbstractTypeImpl implements OperatableType {
 	private Type[] types;

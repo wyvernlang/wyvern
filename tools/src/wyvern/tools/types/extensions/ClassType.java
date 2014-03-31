@@ -1,12 +1,6 @@
 package wyvern.tools.types.extensions;
 
-import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
-import static wyvern.tools.errors.ToolError.reportError;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -15,6 +9,11 @@ import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.types.*;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.*;
+
+import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
+import static wyvern.tools.errors.ToolError.reportError;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType, ParameterizableType {
 	private ClassDeclaration decl = null;

@@ -1,6 +1,6 @@
 package wyvern.tools.typedAST.interfaces;
 
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.types.Environment;
 
 public interface InvokableValue extends Value {

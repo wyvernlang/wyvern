@@ -122,7 +122,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 
 		Environment genv = env.extend(new ClassBinding("class", this));
-		Environment oenv = genv.extend(new NameBindingImpl("this", nameBinding.getType()));
+		Environment oenv = genv.extend(new NameBindingImpl("this", getObjectType()));
 
 
 

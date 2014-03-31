@@ -1,25 +1,18 @@
 package wyvern.tools.types.extensions;
 
-import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
-import static wyvern.tools.errors.ToolError.reportError;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.*;
-import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
+
+import java.util.*;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
@@ -143,10 +136,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 
 	private boolean isParserCheck = false;
 	private boolean isParserValid = false;
-	@Override
-	public LineParser getParser() {
-		return null;
-	}
 
 	@Override
 	public Map<String, Type> getChildren() {

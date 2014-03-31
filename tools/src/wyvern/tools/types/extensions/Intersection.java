@@ -1,9 +1,8 @@
 package wyvern.tools.types.extensions;
 
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
@@ -40,11 +39,6 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 			subtypes.remove(sr);
 		}
 		return false;
-	}
-
-	@Override
-	public LineParser getParser() {
-		return null;
 	}
 
 	@Override

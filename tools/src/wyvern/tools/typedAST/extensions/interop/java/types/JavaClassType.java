@@ -1,15 +1,11 @@
 package wyvern.tools.typedAST.extensions.interop.java.types;
 
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeDeclUtils;
-import wyvern.tools.types.extensions.TypeType;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class JavaClassType extends ClassType {
 	private final Class clazz;

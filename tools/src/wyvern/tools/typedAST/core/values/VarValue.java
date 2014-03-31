@@ -5,7 +5,6 @@ import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;

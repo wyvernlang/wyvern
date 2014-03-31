@@ -3,14 +3,16 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.ImportResolver;
-import wyvern.tools.parsing.resolvers.ImportEnvResolver;
+import wyvern.tools.util.ImportResolver;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeType;
@@ -101,9 +103,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old) {
+		/*
 		if (res instanceof ImportEnvResolver && defaultN) {
 			return ((ImportEnvResolver) res).doExtend(old, equivName, ref);
 		}
+		*/
 		return old
 				.extend(new TypeBinding(equivName, equivType))
                 .extend(vb)
@@ -112,9 +116,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendWithValue(Environment old) {
-		if (res instanceof ImportEnvResolver && defaultN) {
+		/*if (res instanceof ImportEnvResolver && defaultN) {
 			return ((ImportEnvResolver) res).extendWithValue(old, ref.get());
-		}
+		}*/
 		return old.extend(new ValueBinding(equivName, equivType));
 	}
 
@@ -122,10 +126,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
         typecheck(evalEnv, Optional.empty());
-		if (res instanceof ImportEnvResolver && defaultN) {
+		/*if (res instanceof ImportEnvResolver && defaultN) {
 			((ImportEnvResolver) res).evalDecl(evalEnv, declEnv, ref.get());
 			return;
-		}
+		}*/
 		Environment intEnv = Environment.getEmptyEnvironment();
         if (!evaluating) {
             evaluating = true;

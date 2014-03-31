@@ -3,8 +3,6 @@ package wyvern.tools.typedAST.core.expressions;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.LineParser;
-import wyvern.tools.parsing.LineSequenceParser;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -67,16 +65,6 @@ public class WhileStatement implements TypedAST, CoreAST {
 			body.evaluate(env);
 		}
 		return UnitVal.getInstance(this.getLocation());
-	}
-
-	@Override
-	public LineParser getLineParser() {
-		return null;
-	}
-
-	@Override
-	public LineSequenceParser getLineSequenceParser() {
-		return null;
 	}
 
 	@Override
