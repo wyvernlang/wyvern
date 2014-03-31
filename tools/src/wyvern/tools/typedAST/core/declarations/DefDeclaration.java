@@ -162,6 +162,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		for (int i = 0; i < argNames.size(); i++) {
+			NameBinding oldBinding = argNames.get(i);
+			argNames.set(i, new NameBindingImpl(oldBinding.getName(), TypeResolver.resolve(oldBinding.getType(), against)));
+		}
 		return env.extend(new NameBindingImpl(name, TypeResolver.resolve(type, against)));
 	}
 }
