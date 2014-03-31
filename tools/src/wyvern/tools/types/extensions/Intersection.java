@@ -1,8 +1,8 @@
 package wyvern.tools.types.extensions;
 
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.core.Application;
-import wyvern.tools.typedAST.core.Invocation;
+import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 

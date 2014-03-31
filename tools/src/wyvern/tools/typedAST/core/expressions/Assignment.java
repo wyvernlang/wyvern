@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.core;
+package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;

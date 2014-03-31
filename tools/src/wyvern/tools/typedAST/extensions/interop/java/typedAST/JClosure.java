@@ -2,7 +2,7 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
-import wyvern.tools.typedAST.core.Application;
+import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
