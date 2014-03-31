@@ -60,14 +60,14 @@ public class TestIL {
 	@Test
 	public void testLambdaCall() {
 		ArrayList<String> strs = new ArrayList<>();
-		strs.add("(fn x : Int => x)(1)");
+		strs.add("(fn x : Int => (x))(1)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {x},val temp$0 = 0$lambda,val temp$1 = 1,temp$0(temp$1)");;
 	}
 	@Test
 	public void testLambdaCallWithAdd() {
 		ArrayList<String> strs = new ArrayList<>();
-		strs.add("(fn x : Int => x + 1)(3)");
+		strs.add("(fn x : Int => (x + 1))(3)");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {val temp$1 = x,val temp$2 = 1,val temp$3 = temp$1 + temp$2,temp$3},val temp$0 = 0$lambda,val temp$4 = 3,temp$0(temp$4)");;
 	}
@@ -82,7 +82,7 @@ public class TestIL {
 	@Test
 	public void testHigherOrderTypes() {
 		ArrayList<String> strs = new ArrayList<>();
-		strs.add("fn f : Int -> Int => fn x : Int => f(f(x))");
+		strs.add("fn f : Int -> Int => (fn x : Int => (f(f(x))))");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		Assert.assertEquals(join(getResult(pair)),"def 1$lambda(f : Int -> Int) {def 0$lambda(x : Int) {val temp$0 = f,val temp$1 = f,val temp$2 = x,val temp$3 = temp$1(temp$2),temp$0(temp$3)},0$lambda},1$lambda");
 	}
@@ -145,7 +145,7 @@ public class TestIL {
 				+"	def getV():Int = this.testVal\n"
 				+"val h:Hello = Hello.make()\n"
 				+"h.setV(10)\n"
-				+"h.getV()");
+				+"h.getV()\n");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		Assert.assertEquals(join(getResult(pair)),"class Hello { static {def make() {new }; def $init() {var testVal = 5}}; var testVal = 5; def setV(n : Int) {val temp$0 = this,temp$0.testVal = n}; def getV() {val temp$2 = this,temp$2.testVal}},val temp$5 = Hello,val temp$4 = temp$5.make,val temp$7 = (),val h = temp$4(temp$7),val temp$9 = h,val temp$8 = temp$9.setV,val temp$11 = 10,temp$8(temp$11),val temp$13 = h,val temp$12 = temp$13.getV,val temp$15 = (),temp$12(temp$15)");
 	}
@@ -196,25 +196,12 @@ public class TestIL {
 	public void testGenericNew2() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("val test = new\n" +
-				"	x = 2\n");
+				"	val x = 2\n" +
+				"test\n");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		List<Statement> result = getResult(pair);
-		Assert.assertEquals(join(result),"val test = new ");
+		Assert.assertEquals(join(result),"val test = new ,test");
 	}
-	@Test
-	public void testInnerTypes() {
-		ArrayList<String> strs = new ArrayList<>();
-		strs.add("" +
-				"class A\n" +
-				"	class B\n" +
-				"		val x : C.D\n" +
-				"class C\n" +
-				"	class D\n" +
-				"		val y : A.B\n");
-		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
-		List<Statement> result = getResult(pair);
-		Assert.assertEquals(join(result),"class A { static {class B { static {def $init() {val x = null}}; val x = null}; def $init() {}}; },class C { static {class D { static {def $init() {val y = null}}; val y = null}; def $init() {}}; }");
-}
 	@Test
 	public void tIf() {
 		ArrayList<String> strs = new ArrayList<>();
@@ -254,12 +241,12 @@ public class TestIL {
 	public void tC() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("class X                         \n"
-				+"   class def create(i:Int) : X    \n"
-				+"       new                        \n"
-				+"         val t = i                \n"
-				+"   val t:Int                      \n"
-				+"   def get():Int                  \n"
-				+"        this.t                    \n"
+				+"	class def create(i:Int) : X    \n"
+				+"		new                        \n"
+				+"			val t = i                \n"
+				+"	val t:Int                      \n"
+				+"	def get():Int                  \n"
+				+"		this.t                    \n"
 				+"val c:X = X.create(1)    \n"
 				+"val a:Unit->Int = c.get             \n"
 				+"val b:Unit->Int = X.create(2).get           \n"
@@ -284,9 +271,9 @@ public class TestIL {
 	@Test
 	public void tP() {
 		ArrayList<String> strs = new ArrayList<>();
-		strs.add("val x = (1,2,3))");
+		strs.add("val x = (1,2,3)\nx");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		List<Statement> result = getResult(pair);
-		Assert.assertEquals("val temp$0 = 1,val temp$1 = 2,val temp$2 = 3,val x = (temp$0,temp$1,temp$2)", join(result));
+		Assert.assertEquals("val temp$0 = 1,val temp$1 = 2,val temp$2 = 3,val x = (temp$0,temp$1,temp$2),x", join(result));
 	}
 }
