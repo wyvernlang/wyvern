@@ -42,6 +42,8 @@ public class New extends CachingTypedAST implements CoreAST {
 		this.seq = seq;
 	}
 
+	public DeclSequence getDecls() { return seq; }
+
 	public static void resetGenNum() {
 		generic_num = 0;
 	}

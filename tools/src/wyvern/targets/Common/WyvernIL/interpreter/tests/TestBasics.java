@@ -60,10 +60,11 @@ public class TestBasics extends TestUtil {
 		s = "val x : Int = 2 + 2 					\n"
 		+ 	"val y : Int = 2 * x 					\n"
 		+ 	"val z : Str = \"Hello \" + \"World\"	\n"
-		+	"val w = (x,y,z)						\n";
+		+	"val w = (x,y,z)						\n"
+		+   "w\n";
 
 		BytecodeValue res = runTest(s);	
-		assertEquals(res.toString(), "()");	
+		assertEquals(res.toString(), "(4,8,Hello World)");
 		
 		String[] names = { "x", "y", "z", "w" };
 		List<BytecodeValue> tuple = new ArrayList<BytecodeValue>();

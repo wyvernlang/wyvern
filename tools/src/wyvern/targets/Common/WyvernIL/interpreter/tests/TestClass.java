@@ -59,10 +59,10 @@ public class TestClass extends TestUtil {
 		PRINTS_ON = false;
 				
 		String s = 	"class X                      		\n"
+				+	"   class def create(i:Int) : X    	\n"
+				+	"       new                        	\n"
+				+	"         val t = i                    	\n"
 			    +	"   val t:Int                      	\n"
-			    +	"   class def create(i:Int) : X    	\n"
-			    +	"       new                        	\n"
-			    +	"         t = i                    	\n"
 			    +	"   def get():Int                  	\n"
 			    +	"        this.t                    	\n"
 			    +	"val c : X = X.create(1)    		\n"
@@ -85,11 +85,11 @@ public class TestClass extends TestUtil {
 				
 		String s = 	"val y:Int = 12 + 4          	\n"
 				+	"class X                       	\n"
+				+	"   class def create() : X     	\n"
+				+	"      new                     	\n"
 				+	"   val z:Int = y              	\n"
 				+	"   def get():Int              	\n"
 				+	"      this.z                  	\n"
-				+	"   class def create() : X     	\n"
-				+	"      new                     	\n"
 				+	"X.create().get()              	\n";
 
 		BytecodeValue res = runTest(s);
