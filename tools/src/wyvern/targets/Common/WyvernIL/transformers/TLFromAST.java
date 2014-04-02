@@ -22,6 +22,7 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -179,6 +180,11 @@ public class TLFromAST implements CoreASTVisitor {
 			this.statements.addAll(argVisitor.getStatements());
 			defs.add(new ValDef(arg.getKey(), argVisitor.getExpr()));
 		}
+
+		ArrayList<Definition> addedDecls = new ArrayList<>(), addedClassDecls = new ArrayList<>();
+		ArrayList<Statement> initalizers = new ArrayList<>();
+		new ExnFromAST().getClassBody(new1.getDecls(), addedDecls, addedClassDecls, initalizers);
+
 		
 		this.expr = new wyvern.targets.Common.wyvernIL.IL.Expr.New(defs);
 	}

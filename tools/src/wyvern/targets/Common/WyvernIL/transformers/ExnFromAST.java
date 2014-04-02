@@ -112,9 +112,16 @@ public class ExnFromAST implements CoreASTVisitor {
 		List<Definition> definitions = new LinkedList<>();
 		List<Definition> classDefs = new LinkedList<>();
 
-		List<Statement> inializer = new LinkedList<>();
+		List<Statement> initalizer = new LinkedList<>();
 
-		for (Declaration decl : cd.getDecls().getDeclIterator()) {
+		DeclSequence decls = cd.getDecls();
+		getClassBody(decls, definitions, classDefs, initalizer);
+		classDefs.add(new Def("$init", new LinkedList<Def.Param>(), initalizer));
+		return new ClassDef(cd.getName(), definitions, classDefs);
+	}
+
+	public void getClassBody(DeclSequence decls, List<Definition> definitions, List<Definition> classDefs, List<Statement> initializer) {
+		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof DefDeclaration) {
 				List<Statement> bodyAST = getBodyAST(((DefDeclaration) decl).getBody());
 				Def e = new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), bodyAST);
@@ -125,13 +132,13 @@ public class ExnFromAST implements CoreASTVisitor {
 			} else if (decl instanceof ValDeclaration) {
 				TLFromAST gen = TLFromASTApply(((ValDeclaration) decl).getDefinition());
 				if (gen != null) {
-					inializer.addAll(gen.getStatements());
+					initializer.addAll(gen.getStatements());
 				}
 				Expression expr = null;
 				if (gen != null)
 					expr = gen.getExpr();
 				ValDef e = new ValDef(decl.getName(), expr);
-				inializer.add(new Defn(e));
+				initializer.add(new Defn(e));
 				if (((ValDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
@@ -139,13 +146,13 @@ public class ExnFromAST implements CoreASTVisitor {
 			} else if (decl instanceof VarDeclaration) {
 				TLFromAST gen = TLFromASTApply(((VarDeclaration) decl).getDefinition());
 				if (gen != null) {
-					inializer.addAll(gen.getStatements());
+					initializer.addAll(gen.getStatements());
 				}
 				Expression expr = null;
 				if (gen != null)
 					expr = gen.getExpr();
 				VarDef e = new VarDef(decl.getName(), expr);
-				inializer.add(new Defn(e));
+				initializer.add(new Defn(e));
 				if (((VarDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
@@ -158,8 +165,6 @@ public class ExnFromAST implements CoreASTVisitor {
 				classDefs.add(classDef);
 			}
 		}
-		classDefs.add(new Def("$init", new LinkedList<Def.Param>(), inializer));
-		return new ClassDef(cd.getName(), definitions, classDefs);
 	}
 
 	private TypeDef getTypeDecl(TypeDeclaration interfaceDeclaration, DeclSequence decls) {
