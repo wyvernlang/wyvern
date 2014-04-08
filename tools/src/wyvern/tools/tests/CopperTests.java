@@ -286,6 +286,31 @@ public class CopperTests {
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 	}
 	@Test
+	public void testDSL5() throws IOException, CopperParserException {
+		String input =
+				"val test:Int = ~\n" +
+						"	hello\n" +
+						"	world\n" +
+						"		today\n" +
+						"	today\n" +
+						"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		String parsed = ((DSLLit)((ValDeclaration) ((Sequence) res).getDeclIterator().iterator().next()).getDefinition()).getText().get();
+		Assert.assertEquals("hello\nworld\n\ttoday\ntoday", parsed);
+	}
+	@Test
+	public void testDSL6()  throws IOException, CopperParserException {
+		String input =
+				"val test:Int = if (a):\n" +
+						"	hello\n" +
+						"	world\n" +
+						"		today\n" +
+						"	today\n" +
+						"7\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+	}
+
+	@Test
 	public void testNew1() throws IOException, CopperParserException {
 		String input =
 				"val test = new\n" +

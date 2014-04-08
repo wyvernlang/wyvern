@@ -361,6 +361,7 @@ import wyvern.tools.errors.FileLocation;
    	non terminal newCBlock;
    	non terminal obljid;
    	non terminal objcld;
+   	non terminal dslSeq;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -498,7 +499,7 @@ import wyvern.tools.errors.FileLocation;
     non terminal tle;
 
     dsle ::= tle:exn Newline_t {: RESULT = exn; :}
-    | tle:exn dslSignal_t dslBlock:dsl {:
+    | tle:exn dslSignal_t dslSeq:dsl {:
     	ASTExplorer exp = new ASTExplorer();
     	exp.transform((TypedAST) exn);
     	if (!exp.foundTilde())
@@ -516,7 +517,7 @@ import wyvern.tools.errors.FileLocation;
 	:};
 
     dslce ::= tle:exn {: RESULT = exn; :}
-    | tle:exn dslSignal_t dslBlock:dsl {:
+    | tle:exn dslSignal_t dslSeq:dsl {:
 		ASTExplorer exp = new ASTExplorer();
 		exp.transform((TypedAST) exn);
 		if (!exp.foundTilde())
@@ -533,7 +534,9 @@ import wyvern.tools.errors.FileLocation;
 		RESULT = exn;
 	 :};
 
-	tle ::= e:aer {:
+	non terminal colonApp;
+
+	tle ::= colonApp:aer {:
 		ASTExplorer exp = new ASTExplorer();
 		exp.transform((TypedAST) aer);
 		if (exp.foundNew()){
@@ -544,6 +547,10 @@ import wyvern.tools.errors.FileLocation;
 
 		RESULT = aer;
 	:};
+
+	colonApp ::= e:src {: RESULT = src; :} | term:src tuple:tgt colon_t {: RESULT = new Application((TypedAST)src,
+		new TupleObject((TypedAST)tgt, new DSLLit(Optional.empty()), new FileLocation(currentState.pos)),
+		new FileLocation(currentState.pos)); :};
 
     e ::= AE:aer {:
     	RESULT = aer;
@@ -604,6 +611,8 @@ import wyvern.tools.errors.FileLocation;
 	non terminal dslLine;
 	non terminal dslStart;
 
+	dslSeq ::= dslBlock:blk  {: RESULT = blk; :}
+			 | dslBlock:blk1 dslSeq:blk2 {: RESULT = (String)blk1 + "\n" + (String)blk2;:};
    	dslBlock ::= Indent_t dslStart:dsl Dedent_t {: RESULT = dsl; :};
    	dslStart ::= dslLine_t:s {: RESULT = s; :} | dslLine_t:st dslInner:i {: RESULT = (String)st + (String)i; :};
    	dslInner ::= dslLine:i {: RESULT = i; :}| dslLine:i dslInner:n {: RESULT = (String)i + (String)n; :};
