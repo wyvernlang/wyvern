@@ -2,6 +2,7 @@ package wyvern.targets.Common.wyvernIL.IL.Def;
 
 import wyvern.targets.Common.wyvernIL.IL.WyvIL;
 import wyvern.targets.Common.wyvernIL.IL.visitor.DefVisitor;
+import wyvern.tools.types.Type;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,5 +48,9 @@ public class ClassDef implements Definition {
 		}
 
 		return "class "+name+" { static {" + WyvIL.join(ssb, "; ") + "}; "+ WyvIL.join(sb, "; ") +"}";
+	}
+
+	public Type getType() {
+		return null;//TODO
 	}
 }

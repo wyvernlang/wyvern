@@ -2,11 +2,13 @@ package wyvern.targets.Common.wyvernIL.IL.Def;
 
 import wyvern.targets.Common.wyvernIL.IL.Expr.Expression;
 import wyvern.targets.Common.wyvernIL.IL.visitor.DefVisitor;
+import wyvern.tools.types.Type;
 
 public class VarDef implements Definition {
 
 	private String name;
 	private Expression exn;
+	private Type type;
 
 	public VarDef(String name, Expression exn) {
 		this.name = name;
@@ -28,5 +30,9 @@ public class VarDef implements Definition {
 	@Override
 	public String toString() {
 		return "var "+name+" = " + exn;
+	}
+
+	public Type getType() {
+		return type;
 	}
 }
