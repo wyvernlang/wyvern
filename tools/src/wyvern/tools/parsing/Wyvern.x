@@ -362,6 +362,7 @@ import wyvern.tools.errors.FileLocation;
    	non terminal obljid;
    	non terminal objcld;
    	non terminal dslSeq;
+   	non terminal elst;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -379,9 +380,12 @@ import wyvern.tools.errors.FileLocation;
 
 	fc ::= p:pi {: RESULT = pi; :};
 
-	p ::= dslce:ex {: RESULT = ex; :}
+	p ::= elst:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
     	;
+
+    elst ::= dsle:ex elst:elst {: RESULT = new Sequence((TypedAST)ex, (TypedAST)elst); :}
+    	|	 dslce:ex {: RESULT = ex; :};
 
 	non terminal pnrd;
 
