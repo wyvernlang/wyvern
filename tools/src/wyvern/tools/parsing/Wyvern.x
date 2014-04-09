@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.abs.*;
 import wyvern.tools.types.*;
 import wyvern.tools.types.extensions.*;
+import wyvern.tools.util.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -279,6 +280,9 @@ import wyvern.tools.errors.FileLocation;
  		RESULT = lexeme;
  	:};
 
+	terminal taggedKwd_t ::= /tagged/ in (keywds);
+	terminal matchKwd_t ::= /match/ in (keywds);
+	
     terminal classKwd_t ::= /class/ in (keywds);
 	terminal typeKwd_t 	::= /type/ in (keywds);
 	terminal valKwd_t 	::= /val/ in (keywds);
@@ -315,6 +319,9 @@ import wyvern.tools.errors.FileLocation;
  	terminal oCurly_t ::= /\{/ {: cl++; :};
  	terminal cCurly_t ::= /\}/ {: cl--; :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
+
+ 	terminal oSquareBracket_t ::= /\[/;
+ 	terminal cSquareBracket_t ::= /\]/;
 
  	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
  	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
@@ -361,6 +368,7 @@ import wyvern.tools.errors.FileLocation;
    	non terminal newCBlock;
    	non terminal obljid;
    	non terminal objcld;
+   	non terminal matchpattern;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -406,6 +414,8 @@ import wyvern.tools.errors.FileLocation;
     	;
 
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
+    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
+    	|	  taggedKwd_t classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
     	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
@@ -480,8 +490,9 @@ import wyvern.tools.errors.FileLocation;
     cbvar ::= varKwd_t identifier_t:id typeasc:type cbdeclbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :};
 
 
-    typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, null); :}
+    typedec ::= taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, true, new FileLocation(currentState.pos)); :}
+    	|		typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, false, new FileLocation(currentState.pos)); :}
+    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, false, null); :}
     	;
 
     typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
@@ -585,6 +596,12 @@ import wyvern.tools.errors.FileLocation;
    		|  e:el {: RESULT = el; :}
    		;
 
+	
+
+	matchpattern ::= identifier_t:id arrow_t declbody:body {:
+			Pair<String, TypedAST> matchCase = new Pair((String)id, (TypedAST)body);
+			RESULT = matchCase; :}
+		;
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}

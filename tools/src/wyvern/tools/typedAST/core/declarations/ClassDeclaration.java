@@ -45,6 +45,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>());;
 
+	private boolean isTagged;
+	
 	public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
@@ -56,6 +58,17 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		declEnvRef.set(declEnv);
     }
 
+	public ClassDeclaration(String name,
+			boolean isTagged,
+			String implementsName,
+			String implementsClassName,
+			DeclSequence decls,
+			FileLocation location) {
+		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
+		
+		this.isTagged = isTagged;
+	}
+	
 	public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,

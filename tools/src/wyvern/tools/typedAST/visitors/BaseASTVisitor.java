@@ -183,6 +183,10 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 		((CoreAST)body).accept(this);
 		((CoreAST)conditional).accept(this);
 	}
+	
+	public void visit(Match match) {
+		//TODO
+	}
 
 	@Override
 	public void visit(ImportDeclaration id) {

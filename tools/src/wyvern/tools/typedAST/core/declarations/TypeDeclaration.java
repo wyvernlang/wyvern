@@ -31,7 +31,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	protected Reference<Obj> attrObj = new Reference<>();
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
-
+	
+	private boolean isTagged;
+	
 	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
 	private Reference<Value> metaValue = new Reference<>();
 
@@ -146,8 +148,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		}
 	}
 
-    public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, boolean isTagged, FileLocation clsNameLine) {
 		this.decls = decls;
+		this.isTagged = isTagged;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null);
 		Type objectType = new TypeType(this);
@@ -183,7 +186,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), isTagged, location);
 	}
 
 	@Override
@@ -240,6 +243,14 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
+	/**
+	 * Returns true if this Type Declaration is tagged.
+	 * @return
+	 */
+	public boolean isTagged() {
+		return isTagged;
+	}
+	
 	private FileLocation location = FileLocation.UNKNOWN;
 	
 	@Override

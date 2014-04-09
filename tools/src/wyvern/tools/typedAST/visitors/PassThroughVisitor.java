@@ -125,6 +125,11 @@ public class PassThroughVisitor implements CoreASTVisitor {
 	public void visit(WhileStatement whileStatement) {
 		next.visit(whileStatement);
 	}
+	
+	@Override
+	public void visit(Match match) {
+		next.visit(match);
+	}
 
 	@Override
 	public void visit(ImportDeclaration importDeclaration) {

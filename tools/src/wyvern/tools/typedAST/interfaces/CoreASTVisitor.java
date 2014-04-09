@@ -33,5 +33,6 @@ public interface CoreASTVisitor {
 	void visit(Sequence sequence);
 	void visit(IfExpr ifExpr);
 	void visit(WhileStatement whileStatement);
+	void visit(Match match);
 	void visit(ImportDeclaration importDeclaration);
 }
