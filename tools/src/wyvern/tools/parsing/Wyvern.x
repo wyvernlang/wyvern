@@ -384,8 +384,9 @@ import wyvern.tools.errors.FileLocation;
     	| d:de {: RESULT = de; :}
     	;
 
-    elst ::= dsle:ex elst:elst {: RESULT = new Sequence((TypedAST)ex, (TypedAST)elst); :}
-    	|	 dslce:ex {: RESULT = ex; :};
+    elst ::= dslce:ce {: RESULT = ce; :}
+    	|    dsle:ce elst:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
+    	| ;
 
 	non terminal pnrd;
 

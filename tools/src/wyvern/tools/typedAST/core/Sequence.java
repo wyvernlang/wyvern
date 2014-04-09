@@ -41,6 +41,18 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		for (TypedAST elem : first)
 			exps.add(elem);
 	}
+
+	public Sequence(TypedAST first, TypedAST second) {
+		if (second instanceof Sequence) {
+			exps.add(first);
+			exps.addAll(((Sequence) second).exps);
+			return;
+		}
+		exps.add(first);
+		if (second != null)
+			exps.add(second);
+	}
+
 	public Sequence() {
 		// TODO Auto-generated constructor stub
 	}

@@ -276,15 +276,6 @@ public class CopperTests {
 
 	}
 
-	@Test(expected = CopperParserException.class)
-	public void testDSL4() throws IOException, CopperParserException {
-		String input =
-				"val test = 7\n" +
-						"	hello\n" +
-						"	world\n" +
-						"7\n";
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-	}
 	@Test
 	public void testDSL5() throws IOException, CopperParserException {
 		String input =
