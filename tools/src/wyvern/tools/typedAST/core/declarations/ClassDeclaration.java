@@ -42,7 +42,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> typeEquivalentEnvironmentRef;
 	protected Reference<Environment> declEnvRef;
 
-	Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
+	private Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
+	protected Environment getObjEnvV() { return objEnv.get(); }
+	protected void setObjEnv(Environment newEnv) { objEnv.set(newEnv); }
+
 	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>());;
 
 	public ClassDeclaration(String name,
@@ -77,11 +80,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		nameBinding = new NameBindingImpl(name, null);
 		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
-		typeBinding = new TypeBinding(name, objType);
+		typeBinding = new TypeBinding(name, getObjType());
 		nameBinding = new NameBindingImpl(name, classType);
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
 		this.location = location;
+	}
+
+	protected ClassType getObjType() {
+		return objType;
 	}
 
 	protected void updateEnv() {

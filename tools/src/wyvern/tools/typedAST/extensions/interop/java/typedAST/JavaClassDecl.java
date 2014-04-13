@@ -39,7 +39,7 @@ public class JavaClassDecl extends ClassDeclaration {
 						lookup.unreflectConstructor(c), JavaMeth.getNames(c), true, clazz));
 			}
 			if (cstrs.size() > 0)
-				decls.add(new JavaMeth("new", cstrs));
+				decls.add(new JavaMeth("create", cstrs));
 
 			//Instance method map
 			HashMap<String, List<Pair<MethodHandle, Method>>> map = new HashMap<>();
@@ -102,12 +102,13 @@ public class JavaClassDecl extends ClassDeclaration {
 
 
 	@Override
-	public ClassType getClassType() {
+	public ClassType getObjType() {
 		return new JavaClassType(this);
 	}
 
 	@Override
 	public Type doTypecheck(Environment env) {
+		updateEnv();
 		return Unit.getInstance();
 	}
 
@@ -134,27 +135,39 @@ public class JavaClassDecl extends ClassDeclaration {
 		updateEnv();
 	}
 
+	private boolean envDone = false;
 	@Override
 	public void updateEnv() {
+		if (envDone)
+			return;
+		envDone = true;
 		initalize();
-		Reference<Environment> ref = getTypeEquivalentEnvironmentReference();
-		Environment env = ref.get();
-		if (env == null)
-			env = Environment.getEmptyEnvironment();
+		Environment declEnv = getDeclEnvRef().get();
+		Environment objEnv = getObjEnvV();
+		if (declEnv == null)
+			declEnv = Environment.getEmptyEnvironment();
+		if (objEnv == null)
+			objEnv = Environment.getEmptyEnvironment();
 		for (Declaration decl : this.getDecls().getDeclIterator()) {
 			if (decl instanceof JavaMeth) {
-				if (((JavaMeth) decl).isClass())
+				if (((JavaMeth) decl).isClass()) {
+					declEnv = decl.extend(declEnv);
 					continue;
-				env = decl.extend(env);
+				}
+				objEnv = decl.extend(objEnv);
 			} else if (decl instanceof JavaField) {
-				if (((JavaField) decl).isClass())
+				if (((JavaField) decl).isClass()) {
+					declEnv = decl.extend(declEnv);
 					continue;
-				env = decl.extend(env);
+				}
+				objEnv = decl.extend(objEnv);
 			} else {
 				throw new RuntimeException();
 			}
 		}
-		ref.set(env);
+		//getDeclEnvRef().set(declEnv);
+		setObjEnv(objEnv);
+		envDone = true;
 	}
 
 	private static Method findHighestMethod(Class c, Method m) {

@@ -361,6 +361,14 @@ public class CopperTests {
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(parser)))).toString(), "IntegerConstant(5)");
 	}
 	@Test
+	public void testImport1() throws IOException, CopperParserException {
+		String input =
+				"import java:java.lang.Long\n" +
+					"Long.create(\"45\")";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+	}
+	@Test
 	public void testMultiExn() throws IOException, CopperParserException {
 		String input =
 				"5\n6";
