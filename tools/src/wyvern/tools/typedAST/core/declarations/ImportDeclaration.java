@@ -97,11 +97,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendWithValue(Environment old) {
-		return old;
+		return binder.extendVal(old);
 	}
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-
+		binder.bindVal(evalEnv);
 	}
 }

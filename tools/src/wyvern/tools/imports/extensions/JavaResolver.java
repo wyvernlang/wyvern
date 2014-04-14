@@ -48,6 +48,16 @@ public class JavaResolver implements ImportResolver {
 		public Type typecheck(Environment env) {
 			return resolved.typecheck(env, Optional.<Type>empty());
 		}
+
+		@Override
+		public Environment extendVal(Environment env) {
+			return resolved.extendWithValue(env);
+		}
+
+		@Override
+		public Environment bindVal(Environment env) {
+			return resolved.bindDecl(env);
+		}
 	}
 
 	private HashMap<String, JavaClassDecl> binderHashMap = new HashMap<>();

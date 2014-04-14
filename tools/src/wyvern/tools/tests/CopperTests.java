@@ -16,6 +16,7 @@ import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.extensions.DSLLit;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -347,6 +348,7 @@ public class CopperTests {
 
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 
+
 		Type metaType = Util.javaToWyvType(ExtParser.class);
 		ExtParser parser = str -> {
 			New newv = new New(new HashMap<>(), null);
@@ -364,10 +366,13 @@ public class CopperTests {
 	public void testImport1() throws IOException, CopperParserException {
 		String input =
 				"import java:java.lang.Long\n" +
-					"Long.create(\"45\")";
+				"Long.create(\"45\")";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		Value result = res.evaluate(Globals.getStandardEnv());
+		Assert.assertEquals(((Long) ((JavaObj) result).getObj()).longValue(), 45);
 	}
+	
 	@Test
 	public void testMultiExn() throws IOException, CopperParserException {
 		String input =

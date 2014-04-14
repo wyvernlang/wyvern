@@ -9,4 +9,8 @@ public interface ImportBinder {
 	public Environment extendNames(Environment in);
 	public Environment extend(Environment in);
 	public Type typecheck(Environment env);
+
+	//Evaluation
+	public Environment extendVal(Environment env);
+	public Environment bindVal(Environment env);
 }

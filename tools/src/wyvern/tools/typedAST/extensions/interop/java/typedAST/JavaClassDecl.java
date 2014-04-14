@@ -192,4 +192,10 @@ public class JavaClassDecl extends ClassDeclaration {
     public String toString() {
         return "JavaClassDecl("+this.clazz.getName()+")";
     }
+
+	@Override
+	public Environment evaluateDeclarations(Environment addtlEnv) {
+		initalize();
+		return super.evaluateDeclarations(addtlEnv);
+	}
 }
