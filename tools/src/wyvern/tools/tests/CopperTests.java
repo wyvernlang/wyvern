@@ -379,5 +379,16 @@ public class CopperTests {
 				"5\n6";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 	}
+
+	@Test
+	public void testModule() throws IOException, CopperParserException {
+		String input =
+				"module A\n" +
+				"class C\n" +
+				"	def d():Int = 2\n" +
+				"val k = 4\n";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+	}
 }
 

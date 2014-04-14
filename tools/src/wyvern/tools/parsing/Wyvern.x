@@ -289,6 +289,7 @@ import java.net.URI;
 	terminal metadataKwd_t 	::= /metadata/ in (keywds);
 	terminal newKwd_t 	::= /new/ in (keywds);
  	terminal importKwd_t   ::= /import/ in (keywds);
+ 	terminal moduleKwd_t   ::= /module/ in (keywds);
 
  	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
  		RESULT = Integer.parseInt(lexeme);
@@ -386,6 +387,10 @@ import java.net.URI;
    	non terminal import;
    	non terminal fragaddr;
    	non terminal elst;
+   	non terminal module;
+   	non terminal pm;
+   	non terminal dm;
+   	non terminal mnrd;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -401,7 +406,11 @@ import java.net.URI;
 
 	fc2 ::= identifier_t;
 
-	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :} | p:prog {: RESULT = prog; :};
+	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :}
+		 | module:mod pm:prog {: RESULT = prog;:}
+		 | p:prog {: RESULT = prog; :};
+
+	pm ::= dm:ds {: RESULT = ds; :} | {: RESULT = new Sequence(); :};
 
 	p ::= elst:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
@@ -412,6 +421,15 @@ import java.net.URI;
     	| ;
 
 	non terminal pnrd;
+
+    dm ::= prd:res mnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    	 | prd:res {: RESULT = res; :}
+    	 | mnrd:res {: RESULT = res; :}
+    	;
+
+    mnrd ::= val:vd pm:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 |   var:vd pm:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 ;
 
     d ::= prd:res pnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
     	| prd:res {: RESULT = res; :}
@@ -463,6 +481,8 @@ import java.net.URI;
     	;
 
 	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
+
+	module ::= moduleKwd_t identifier_t:id {: RESULT = id; :};
 
     objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
     	|	 objcld:ld  {: RESULT = ld; :}
