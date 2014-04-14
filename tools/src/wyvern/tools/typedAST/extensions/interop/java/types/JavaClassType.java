@@ -6,6 +6,9 @@ import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.util.Reference;
+
+import java.util.LinkedList;
 
 public class JavaClassType extends ClassType {
 	private final Class clazz;
@@ -13,7 +16,12 @@ public class JavaClassType extends ClassType {
 
 
 	public JavaClassType(JavaClassDecl cd) {
-		super(cd);
+		super(new Reference<Environment>() {
+			@Override
+			public Environment get() {
+				return cd.getObjEnv();
+			}
+		}, null, new LinkedList<>());
 		this.clazz = cd.getClazz();
 		decl = cd;
 	}

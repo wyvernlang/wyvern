@@ -46,7 +46,8 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		if (other instanceof JavaClassType)
-			return Util.javaToWyvType(String.class).subtype(other, subtypes);
+			return (((JavaClassType) other).getInnerClass().isAssignableFrom(String.class));
+
 		return super.subtype(other, subtypes);
 	}
 	@Override

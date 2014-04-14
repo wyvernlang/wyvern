@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.*;
 import wyvern.tools.errors.FileLocation;
+import java.net.URI;
 
 %%
 %parser Wyvern
@@ -287,11 +288,30 @@ import wyvern.tools.errors.FileLocation;
 	terminal fnKwd_t 	::= /fn/ in (keywds);
 	terminal metadataKwd_t 	::= /metadata/ in (keywds);
 	terminal newKwd_t 	::= /new/ in (keywds);
+ 	terminal importKwd_t   ::= /import/ in (keywds);
+ 	terminal moduleKwd_t   ::= /module/ in (keywds);
 
  	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
  		RESULT = Integer.parseInt(lexeme);
  	:};
 
+ 	terminal ialpha_t ::= /[a-zA-Z][a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]*/ {: RESULT = lexeme; :};
+ 	terminal xalphas_t ::= /[a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: RESULT = lexeme; :};
+ 	terminal xpalphas_t ::= /[a-zA-Z0-9\+\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: RESULT = lexeme; :};
+ 	            
+	disambiguate xpa1:(xpalphas_t,identifier_t){: return xpalphas_t; :};
+	disambiguate xpa2:(xpalphas_t,decimalInteger_t){: return xpalphas_t; :};
+	disambiguate xpa3:(xpalphas_t,openParen_t){: return xpalphas_t; :};
+	disambiguate xpa4:(xpalphas_t,shortString_t){: return xpalphas_t; :};
+	disambiguate xpa5:(xpalphas_t,classKwd_t){: return xpalphas_t; :};
+	disambiguate xpa6:(xpalphas_t,typeKwd_t){: return xpalphas_t; :};
+	disambiguate xpa7:(xpalphas_t,valKwd_t){: return xpalphas_t; :};
+	disambiguate xpa8:(xpalphas_t,defKwd_t){: return xpalphas_t; :};
+	disambiguate xpa9:(xpalphas_t,varKwd_t){: return xpalphas_t; :};
+	disambiguate xpa10:(xpalphas_t,fnKwd_t){: return xpalphas_t; :};
+	disambiguate xpa11:(xpalphas_t,metadataKwd_t){: return xpalphas_t; :};
+	disambiguate xpa12:(xpalphas_t,newKwd_t){: return xpalphas_t; :};
+	disambiguate xpa13:(xpalphas_t,importKwd_t){: return xpalphas_t; :};
 
 	terminal tilde_t ::= /~/ ;
 	terminal plus_t ::= /\+/ ;
@@ -306,6 +326,8 @@ import wyvern.tools.errors.FileLocation;
  	terminal tarrow_t ::= /-\>/ ;
  	terminal dot_t ::= /\./ ;
  	terminal colon_t ::= /:/ ;
+ 	terminal pound_t ::= /#/ ;
+ 	terminal question_t ::= /?/ ;
 
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
@@ -362,6 +384,13 @@ import wyvern.tools.errors.FileLocation;
    	non terminal obljid;
    	non terminal objcld;
    	non terminal dslSeq;
+   	non terminal import;
+   	non terminal fragaddr;
+   	non terminal elst;
+   	non terminal module;
+   	non terminal pm;
+   	non terminal dm;
+   	non terminal mnrd;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -377,13 +406,30 @@ import wyvern.tools.errors.FileLocation;
 
 	fc2 ::= identifier_t;
 
-	fc ::= p:pi {: RESULT = pi; :};
+	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :}
+		 | module:mod pm:prog {: RESULT = prog;:}
+		 | p:prog {: RESULT = prog; :};
 
-	p ::= dslce:ex {: RESULT = ex; :}
+	pm ::= dm:ds {: RESULT = ds; :} | {: RESULT = new Sequence(); :};
+
+	p ::= elst:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
     	;
 
+    elst ::= dslce:ce {: RESULT = ce; :}
+    	|    dsle:ce elst:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
+    	| ;
+
 	non terminal pnrd;
+
+    dm ::= prd:res mnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    	 | prd:res {: RESULT = res; :}
+    	 | mnrd:res {: RESULT = res; :}
+    	;
+
+    mnrd ::= val:vd pm:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 |   var:vd pm:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 ;
 
     d ::= prd:res pnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
     	| prd:res {: RESULT = res; :}
@@ -433,6 +479,10 @@ import wyvern.tools.errors.FileLocation;
 
     var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
     	;
+
+	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
+
+	module ::= moduleKwd_t identifier_t:id {: RESULT = id; :};
 
     objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
     	|	 objcld:ld  {: RESULT = ld; :}
@@ -620,5 +670,28 @@ import wyvern.tools.errors.FileLocation;
 
    	newBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | Newline_t {: RESULT = new DeclSequence(); :};
    	newCBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | {: RESULT = new DeclSequence(); :};
+
+   	//URIs
+   	non terminal uri;
+   	non terminal path;
+   	non terminal scheme;
+   	non terminal fragmentid;
+   	non terminal search;
+
+   	fragaddr ::= uri:re {:RESULT=re;:} | uri:re pound_t fragmentid:fid {:
+   		try {
+   		RESULT =  new URI(((URI)re).getScheme(), ((URI)re).getSchemeSpecificPart(), (String)fid);
+   		} catch (Exception e) { throw new RuntimeException(e); }
+   	:};
+   	uri ::= scheme:schm colon_t path:pth {:
+			try {
+			RESULT = new URI((String)schm,(String)pth,"");
+			} catch (Exception e) { throw new RuntimeException(e); }
+   		:};
+   	path ::= xpalphas_t:xa {: RESULT = xa; :} | xpalphas_t:xa divide_t path:xb {:RESULT = (String)xa + "/" + (String)xb; :} | {:RESULT = "";:};
+   	scheme ::= ialpha_t:sch {:RESULT=sch;:};
+   	fragmentid ::= xalphas_t:xa{:RESULT=xa;:};
+   	search ::= xalphas_t:xa{:RESULT=xa;:} | xalphas_t:xa plus_t search:sh {:RESULT=(String)xa + (String)sh;:};
+
 
 %cf}
