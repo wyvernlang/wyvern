@@ -280,8 +280,9 @@ import wyvern.tools.errors.FileLocation;
  		RESULT = lexeme;
  	:};
 
-	terminal taggedKwd_t ::= /tagged/ in (keywds);
-	terminal matchKwd_t ::= /match/ in (keywds);
+	terminal taggedKwd_t  ::= /tagged/  in (keywds);
+	terminal matchKwd_t   ::= /match/   in (keywds);
+	terminal defaultKwd_t ::= /default/ in (keywds);
 	
     terminal classKwd_t ::= /class/ in (keywds);
 	terminal typeKwd_t 	::= /type/ in (keywds);
@@ -368,7 +369,13 @@ import wyvern.tools.errors.FileLocation;
    	non terminal newCBlock;
    	non terminal obljid;
    	non terminal objcld;
-   	non terminal matchpattern;
+
+
+   	non terminal matchStatement;
+   	non terminal caseStatements;
+   	non terminal caseStatementsO;
+   	non terminal varStatement;
+   	non terminal defaultStatement;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -582,6 +589,7 @@ import wyvern.tools.errors.FileLocation;
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}
+    	|    matchStatement:stmt {: RESULT = new StringConstant("Match Statement"); :} 
     	;
 
     etuple ::= openParen_t e:first comma_t it:rest closeParen_t {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
@@ -595,13 +603,33 @@ import wyvern.tools.errors.FileLocation;
    	it ::= e:first comma_t it:rest {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
    		|  e:el {: RESULT = el; :}
    		;
-
 	
+	//complete match statement
+	matchStatement ::= matchKwd_t openParen_t identifier_t:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
+			{: RESULT = UnitVal.getInstance(null);//new Match(id, matchStatements); :};
 
-	matchpattern ::= identifier_t:id arrow_t declbody:body {:
-			Pair<String, TypedAST> matchCase = new Pair((String)id, (TypedAST)body);
-			RESULT = matchCase; :}
-		;
+	//group of 0 or more variable cases, followed by 1 default case
+	//caseStatements ::= caseStatementsO:mstmt Newline_t defaultStatement:dstmt {: RESULT = UnitVal.getInstance(null); :}
+    // 	  | defaultStatement:dstmt 								    {: RESULT = UnitVal.getInstance(null); :}
+	//	  ;
+		  
+	//testing, to get it compiling without a disambiguation function
+	caseStatements ::= varStatement:dstmt {: RESULT = UnitVal.getInstance(null); :}
+     	  | defaultStatement:dstmt 		  {: RESULT = UnitVal.getInstance(null); :}
+		  ;
+	
+	//group of 1 or more variable cases
+	caseStatementsO ::= varStatement:f Newline_t caseStatementsO:o			{: RESULT = UnitVal.getInstance(null); :}
+     	  | varStatement:f										{: RESULT = UnitVal.getInstance(null); :}
+		  ;
+	
+	//a single match case statement
+	varStatement ::= identifier_t:id arrow_t decimalInteger_t:num {: RESULT = UnitVal.getInstance(null); :}
+    	  ;
+    
+    //a default match statement
+    defaultStatement ::= defaultKwd_t arrow_t decimalInteger_t:num 	{: RESULT = UnitVal.getInstance(null); :}
+    	  ;
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}
