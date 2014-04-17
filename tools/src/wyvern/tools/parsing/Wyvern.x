@@ -344,6 +344,8 @@ import java.net.URI;
  	terminal newSignal_t ::= //;
  	terminal dslSignal_t ::= //;
  	terminal caseSignal_t ::= //;
+
+ 	terminal moduleName_t ::= /[a-zA-Z\.]+/ {: RESULT = lexeme; :};
 %lex}
 
 %cf{
@@ -391,6 +393,7 @@ import java.net.URI;
    	non terminal pm;
    	non terminal dm;
    	non terminal mnrd;
+   	non terminal ptl;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -407,10 +410,14 @@ import java.net.URI;
 	fc2 ::= identifier_t;
 
 	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :}
-		 | module:mod pm:prog {: RESULT = prog;:}
+		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos));:}
 		 | p:prog {: RESULT = prog; :};
 
-	pm ::= dm:ds {: RESULT = ds; :} | {: RESULT = new Sequence(); :};
+	ptl ::= import:imp Newline_t ptl:nxt {: RESULT = new DeclSequence((TypedAST)imp, (TypedAST)nxt); :}
+		|   import:imp {: RESULT = imp; :}
+		|   pm:bdy {: RESULT = bdy; :};
+
+	pm ::= dm:ds {: RESULT = ds; :} | {: RESULT = new DeclSequence(); :};
 
 	p ::= elst:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
@@ -422,13 +429,13 @@ import java.net.URI;
 
 	non terminal pnrd;
 
-    dm ::= prd:res mnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    dm ::= prd:res mnrd:after {: RESULT = new DeclSequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
     	 | prd:res {: RESULT = res; :}
     	 | mnrd:res {: RESULT = res; :}
     	;
 
-    mnrd ::= val:vd pm:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	 |   var:vd pm:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    mnrd ::= val:vd pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 |   var:vd pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	 ;
 
     d ::= prd:res pnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
@@ -482,7 +489,7 @@ import java.net.URI;
 
 	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
 
-	module ::= moduleKwd_t identifier_t:id {: RESULT = id; :};
+	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
 
     objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
     	|	 objcld:ld  {: RESULT = ld; :}

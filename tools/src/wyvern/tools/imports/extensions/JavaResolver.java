@@ -31,7 +31,7 @@ public class JavaResolver implements ImportResolver {
 
 		@Override
 		public Environment extendTypes(Environment in) {
-			return resolved.extendType(in);
+			return resolved.extendType(in, in);
 		}
 
 		@Override

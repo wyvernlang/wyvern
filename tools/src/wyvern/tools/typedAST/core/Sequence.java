@@ -146,51 +146,26 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	
 	// FIXME: Hack. Flattens decl sequence. NEED TO REFACTOR!
 	public Iterable<Declaration> getDeclIterator() {
-		final Iterator<TypedAST> inner = iterator();
+
+		final Iterator<TypedAST> inner = flatten();
 		return new Iterable<Declaration>() {
 
 			@Override
 			public Iterator<Declaration> iterator() {
 				return new Iterator<Declaration>() {
-					
-					Iterator<Declaration> ss = null;
-
 					@Override
 					public boolean hasNext() {
-						if (ss != null && ss.hasNext()) {
-							return ss.hasNext();
-						} else {
-							ss = null;
-							return inner.hasNext();
-						}
+						return inner.hasNext();
 					}
 
 					@Override
 					public Declaration next() {
-						if (ss != null && ss.hasNext()) {
-							return ss.next();
-						} else {
-							ss = null;
-							TypedAST next = inner.next();
-							if (next instanceof Declaration) {
-								return (Declaration) next;
-							} else if (next instanceof DeclSequence) {
-								ss = ((DeclSequence) next).getDeclIterator().iterator();
-								return ss.next();
-							} else {
-								return (Declaration) inner.next(); // Will cause a cast error.
-							}
-						}
+						return (Declaration)inner.next();
 					}
 
 					@Override
 					public void remove() {
-						if (ss != null && ss.hasNext()) {
-							ss.remove();
-						} else {
-							ss = null;
-							inner.remove();
-						}
+						inner.remove();
 					}
 				};
 			}
@@ -240,32 +215,40 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 
 	public Iterator<TypedAST> flatten() {
 		final Iterator<TypedAST> internal = this.getIterator().iterator();
+
 		return new Iterator<TypedAST>() {
-			private Iterator<TypedAST> flattened = null;
+			private Stack<Iterator<TypedAST>> iterstack = new Stack<>();
+			{
+				iterstack.push(internal);
+			}
+			private TypedAST lookahead;
+
 			@Override
 			public boolean hasNext() {
-				return (flattened != null && flattened.hasNext()) || internal.hasNext();
+				if (!iterstack.empty()) {
+					if (!iterstack.peek().hasNext()) {
+						iterstack.pop();
+						return hasNext();
+					}
+					lookahead = iterstack.peek().next();
+					if (lookahead instanceof Sequence) {
+						iterstack.push(((Sequence) lookahead).iterator());
+						lookahead = null;
+						return hasNext();
+					}
+					return true;
+				}
+				return false;
 			}
 
 			@Override
 			public TypedAST next() {
-				if (flattened != null && flattened.hasNext()) {
-					return flattened.next();
+				if (lookahead != null) {
+					TypedAST res = lookahead;
+					lookahead = null;
+					return res;
 				}
-
-				TypedAST newT = internal.next();
-				if (newT instanceof Sequence) {
-					flattened = ((Sequence) newT).flatten();
-					if (flattened.hasNext())
-						return flattened.next();
-				}
-
-				return newT;  //To change body of implemented methods use File | Settings | File Templates.
-			}
-
-			@Override
-			public void remove() {
-				throw new RuntimeException();
+				return iterstack.peek().next();
 			}
 		};
 	}

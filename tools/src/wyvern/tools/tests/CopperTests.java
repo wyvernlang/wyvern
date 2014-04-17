@@ -384,11 +384,13 @@ public class CopperTests {
 	public void testModule() throws IOException, CopperParserException {
 		String input =
 				"module A\n" +
+				"import java:java.lang.Long\n" +
 				"class C\n" +
-				"	def d():Int = 2\n" +
+				"	def d():Long = Long.create(\"192\")\n" +
 				"val k = 4\n";
 
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 	}
 }
 
