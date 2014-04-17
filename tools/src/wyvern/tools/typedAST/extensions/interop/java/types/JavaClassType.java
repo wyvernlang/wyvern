@@ -14,6 +14,11 @@ public class JavaClassType extends ClassType {
 	private final Class clazz;
 	private final JavaClassDecl decl;
 
+	@Override
+	public String getName() {
+		return clazz.getSimpleName();
+	}
+
 
 	public JavaClassType(JavaClassDecl cd) {
 		super(new Reference<Environment>() {
@@ -21,7 +26,7 @@ public class JavaClassType extends ClassType {
 			public Environment get() {
 				return cd.getObjEnv();
 			}
-		}, null, new LinkedList<>());
+		}, null, new LinkedList<>(), "");
 		this.clazz = cd.getClazz();
 		decl = cd;
 	}

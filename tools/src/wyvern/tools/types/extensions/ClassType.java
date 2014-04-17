@@ -20,21 +20,25 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private Reference<Environment> declEnv;
 	protected Reference<Environment> typeEquivalentEnv;
 	private List<String> params;
+	private String name;
 
 
 	public ClassType(ClassDeclaration td) {
 		this(td.getDeclEnvRef(),
 				td.getTypeEquivalentEnvironmentReference(),
-				td.getTypeParams());
+				td.getTypeParams(),
+				td.getName());
 		this.decl = td;
 	}
 
 	public ClassType(Reference<Environment> declEnv,
 					 Reference<Environment> typeEquivalentEnv,
-					 List<String> typeParams) {
+					 List<String> typeParams,
+					 String name) {
 		this.declEnv = declEnv;
 		this.typeEquivalentEnv = typeEquivalentEnv;
 		this.params = typeParams;
+		this.name = name;
 	}
 
 	@Override
@@ -168,7 +172,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		Collections.sort(teenvList, c);
 		Environment ndEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), denvList);
 		Environment nteEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), teenvList);
-		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params);
+		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params, getName());
 	}
 
 	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
@@ -184,5 +188,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 			}
 		}
 		return ndEnv;
+	}
+
+	public String getName() {
+		return name;
 	}
 }

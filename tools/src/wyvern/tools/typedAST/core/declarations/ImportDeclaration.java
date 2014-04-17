@@ -37,7 +37,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		this.location = location;
 	}
 
-
+	public URI getUri() {
+		return uri;
+	}
 	@Override
 	public Environment extendType(Environment env) {
 		binder = env.lookupBinding(uri.getScheme(), ImportResolverBinding.class).getBound().resolveImport(uri);

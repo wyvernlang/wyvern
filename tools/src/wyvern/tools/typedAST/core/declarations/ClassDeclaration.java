@@ -46,7 +46,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected Environment getObjEnvV() { return objEnv.get(); }
 	protected void setObjEnv(Environment newEnv) { objEnv.set(newEnv); }
 
-	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>());;
+	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>(), "");
+
+	public ClassType getOType() {
+		return new ClassType(objEnv, new Reference<>(), new LinkedList<>(), getName());
+	}
 
 	public ClassDeclaration(String name,
 							String implementsName,
@@ -203,7 +207,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			public void set(Environment e) {
 				throw new RuntimeException();
 			}
-		}, new LinkedList<>());
+		}, new LinkedList<>(), this.getName());
 	}
 	
 	@Override

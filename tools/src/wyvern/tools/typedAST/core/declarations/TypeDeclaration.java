@@ -152,7 +152,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		typeBinding = new TypeBinding(name, null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
-		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>()); // TODO set this to a class type that has the class members
+		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
 		this.location = clsNameLine;
