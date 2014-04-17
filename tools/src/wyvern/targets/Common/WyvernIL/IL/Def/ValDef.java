@@ -14,9 +14,10 @@ public class ValDef implements Definition {
 	private Type type;
 	private Expression exn;
 
-	public ValDef(String name, Expression exn) {
+	public ValDef(String name, Expression exn, Type itype) {
 		this.name = name;
 		this.exn = exn;
+		this.type = itype;
 	}
 
 	@Override

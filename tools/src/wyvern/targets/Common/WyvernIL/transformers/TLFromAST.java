@@ -21,6 +21,7 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.extensions.Unit;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -101,16 +102,16 @@ public class TLFromAST implements CoreASTVisitor {
 		if (arg != null) {
 			VarRef res = getTemp();
 			this.statements.addAll(recVisitor.getStatements());
-			this.statements.add(new Defn(new ValDef(temp.getName(), recVisitor.getExpr())));
+			this.statements.add(new Defn(new ValDef(temp.getName(), recVisitor.getExpr(), rec.getType())));
 			this.statements.addAll(argVisitor.getStatements());
-			this.statements.add(new Defn(new ValDef(argsRes.getName(), argVisitor.getExpr())));
-			this.statements.add(new Defn(new ValDef(res.getName(), new BinOp(temp, argsRes, name))));
+			this.statements.add(new Defn(new ValDef(argsRes.getName(), argVisitor.getExpr(), arg.getType())));
+			this.statements.add(new Defn(new ValDef(res.getName(), new BinOp(temp, argsRes, name), invocation.getType())));
 			this.expr = new Immediate(res);
 			return;
 		}
 
 		this.statements.addAll(recVisitor.getStatements());
-		this.statements.add(new Defn(new ValDef(temp.getName(), recVisitor.getExpr())));
+		this.statements.add(new Defn(new ValDef(temp.getName(), recVisitor.getExpr(), rec.getType())));
 		this.expr = new Inv(temp, name);
 	}
 
@@ -126,12 +127,12 @@ public class TLFromAST implements CoreASTVisitor {
 		VarRef funv = getTemp();
 		TLFromAST funcVisitor = TLFromASTApply(func);
 		this.statements.addAll(funcVisitor.getStatements());
-		this.statements.add(new Defn(new ValDef(funv.getName(), funcVisitor.getExpr())));
+		this.statements.add(new Defn(new ValDef(funv.getName(), funcVisitor.getExpr(), func.getType())));
 
 		TLFromAST argVisitor = TLFromASTApply(arg);
 		this.statements.addAll(argVisitor.getStatements());
 		VarRef argv = getTemp();
-		this.statements.add(new Defn(new ValDef(argv.getName(), argVisitor.getExpr())));
+		this.statements.add(new Defn(new ValDef(argv.getName(), argVisitor.getExpr(), arg.getType())));
 		
 		this.expr = new FnInv (funv, argv);
 	}
@@ -178,7 +179,7 @@ public class TLFromAST implements CoreASTVisitor {
 			cArg.accept(argVisitor);
 			
 			this.statements.addAll(argVisitor.getStatements());
-			defs.add(new ValDef(arg.getKey(), argVisitor.getExpr()));
+			defs.add(new ValDef(arg.getKey(), argVisitor.getExpr(), arg.getValue().getType()));
 		}
 
 		ArrayList<Definition> addedDecls = new ArrayList<>(), addedClassDecls = new ArrayList<>();
@@ -207,7 +208,7 @@ public class TLFromAST implements CoreASTVisitor {
 
 			stmts.addAll(visitor.getStatements());
 			VarRef tempRef = getTemp();
-			stmts.add(new Defn(new ValDef(tempRef.getName(), visitor.getExpr())));
+			stmts.add(new Defn(new ValDef(tempRef.getName(), visitor.getExpr(), object.getType())));
 			ops.add(tempRef);
 		}
 
@@ -253,7 +254,7 @@ public class TLFromAST implements CoreASTVisitor {
 			statements.add(ifT);
 			List<Statement> bodyAST = getBodyAST(clause.getBody());
 			if (bodyAST.size() == 0) {
-				statements.add(new Defn(new ValDef(result, new Immediate(new UnitValue()))));
+				statements.add(new Defn(new ValDef(result, new Immediate(new UnitValue()), Unit.getInstance())));
 			} else {
 				Statement last = bodyAST.get(bodyAST.size()-1);
 				List<Statement> notLast = bodyAST.subList(0,bodyAST.size()-1);
@@ -261,9 +262,9 @@ public class TLFromAST implements CoreASTVisitor {
 
 				if (!(last instanceof Pure)) {
 					statements.add(last);
-					statements.add(new Defn(new ValDef(result, new Immediate(new UnitValue()))));
+					statements.add(new Defn(new ValDef(result, new Immediate(new UnitValue()), Unit.getInstance())));
 				} else
-					statements.add(new Defn(new ValDef(result, ((Pure)last).getExpression())));
+					statements.add(new Defn(new ValDef(result, ((Pure)last).getExpression(), ifExpr.getType())));
 			}
 			statements.add(new Goto(end));
 		}

@@ -11,11 +11,13 @@ public class ClassDef implements Definition {
 	private String name;
 	private List<Definition> definitions;
 	private List<Definition> classDefinitions;
+	private Type type;
 
-	public ClassDef(String name, List<Definition> definitions, List<Definition> classDefinitions) {
+	public ClassDef(String name, List<Definition> definitions, List<Definition> classDefinitions, Type type) {
 		this.name = name;
 		this.definitions = definitions;
 		this.classDefinitions = classDefinitions;
+		this.type = type;
 	}
 
 	@Override
@@ -51,6 +53,6 @@ public class ClassDef implements Definition {
 	}
 
 	public Type getType() {
-		return null;//TODO
+		return type;
 	}
 }

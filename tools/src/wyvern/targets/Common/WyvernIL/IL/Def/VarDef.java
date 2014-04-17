@@ -10,9 +10,10 @@ public class VarDef implements Definition {
 	private Expression exn;
 	private Type type;
 
-	public VarDef(String name, Expression exn) {
+	public VarDef(String name, Expression exn, Type type) {
 		this.name = name;
 		this.exn = exn;
+		this.type = type;
 	}
 
 	@Override
