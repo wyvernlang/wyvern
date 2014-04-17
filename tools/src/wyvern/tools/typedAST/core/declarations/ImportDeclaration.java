@@ -41,8 +41,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		return uri;
 	}
 	@Override
-	public Environment extendType(Environment env) {
-		binder = env.lookupBinding(uri.getScheme(), ImportResolverBinding.class).getBound().resolveImport(uri);
+	public Environment extendType(Environment env, Environment against) {
+		binder = against.lookupBinding(uri.getScheme(), ImportResolverBinding.class).getBound().resolveImport(uri);
 		return binder.extendTypes(env);
 	}
 

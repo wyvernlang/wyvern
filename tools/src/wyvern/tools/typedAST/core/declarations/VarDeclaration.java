@@ -120,7 +120,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendType(Environment env) {
+	public Environment extendType(Environment env, Environment against) {
 		return env;
 	}
 

@@ -5,10 +5,12 @@ import wyvern.tools.types.Environment;
 public interface EnvironmentExtender extends TypedAST {
 	/**
 	 * Extend the environment with later-initalized type names (to allow mutually-recursive types)
-	 * @param extend The environment to extend
+	 * @param env The environment to extend
+	 * @param against The environment to check against
 	 * @return The new environment with bound names
 	 */
-	public Environment extendType(Environment extend);
+	public Environment extendType(Environment env, Environment against);
+
 
 	/**
 	 * Extend the environment with later-initalized method names (for mutually recursive methods)

@@ -156,7 +156,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	}
 
 	@Override
-	public Environment extendType(Environment env) {
+	public Environment extendType(Environment env, Environment against) {
 		return env;
 	}
 
