@@ -6,6 +6,7 @@ import static wyvern.tools.types.TypeUtils.unit;
 import static wyvern.tools.types.TypeUtils.str;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.JavaResolver;
+import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.typedAST.core.binding.ImportResolverBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
@@ -26,6 +27,7 @@ public class Globals {
 	public static Environment getStandardEnv() {
 		Environment env = Environment.getEmptyEnvironment();
 		env = env.extend(new ImportResolverBinding("java",JavaResolver.getInstance()));
+		env = env.extend(new ImportResolverBinding("wyv", WyvernResolver.getInstance()));
 
 		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));

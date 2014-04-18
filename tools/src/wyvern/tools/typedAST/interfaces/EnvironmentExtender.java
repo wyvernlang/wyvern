@@ -22,5 +22,6 @@ public interface EnvironmentExtender extends TypedAST {
 
 
 	public Environment extend(Environment env);
+
 	public Environment evalDecl(Environment env);
 }

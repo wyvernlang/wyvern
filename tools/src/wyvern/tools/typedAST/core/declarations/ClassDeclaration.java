@@ -229,7 +229,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		declEvalEnv = declEnv.extend(evalEnv);
+		if (declEvalEnv == null)
+			declEvalEnv = declEnv.extend(evalEnv);
 		Obj classObj = new Obj(getClassEnv());
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
@@ -363,9 +364,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			declEnvRef.set(Environment.getEmptyEnvironment());
 			for (Declaration decl : decls.getDeclIterator()) {
 				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
-					declEnvRef.set(decl.extendName(declEnvRef.get(), env.extend(objBinding)));
+					declEnvRef.set(decl.extendName(declEnvRef.get(), against.extend(objBinding)));
 				else
-					objEnv.set(decl.extendName(objEnv.get(), env.extend(objBinding)));
+					objEnv.set(decl.extendName(objEnv.get(), against.extend(objBinding)));
 			}
 			envGuard = true;
 		}

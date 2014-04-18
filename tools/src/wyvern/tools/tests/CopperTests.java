@@ -4,6 +4,8 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import org.junit.Assert;
 import org.junit.Test;
 import wyvern.stdlib.Globals;
+import wyvern.tools.imports.extensions.WyvernResolver;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
@@ -391,6 +393,30 @@ public class CopperTests {
 
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		Environment out = ((Declaration)res).evalDecl(Globals.getStandardEnv());
+	}
+
+	@Test
+	public void testImport2() throws IOException, CopperParserException {
+		String input1 =
+				"module A\n" +
+				"import java:java.lang.Long\n" +
+				"class C\n" +
+				"	class def create():C = new\n" +
+				"	def d():Long = Long.create(\"192\")\n" +
+				"val k = 4\n";
+
+		String input2 =
+				"import wyv:in1\n" +
+				"val c = A.C.create()\n" +
+				"c.d()\n";
+
+		WyvernResolver.addFile("in1", input1);
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input2), "test input");
+		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		Value out = res.evaluate(Globals.getStandardEnv());
+		Long finalRes = (Long)((JavaObj)out).getObj();
+		Assert.assertEquals(192, (long)finalRes);
 	}
 }
 

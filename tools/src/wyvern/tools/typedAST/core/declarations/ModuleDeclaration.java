@@ -3,9 +3,13 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -13,16 +17,14 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ModuleDeclaration extends Declaration {
 	private final String name;
 	private final EnvironmentExtender inner;
 	private FileLocation location;
 	private final ClassType selfType;
+	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 
 	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location) {
@@ -42,6 +44,25 @@ public class ModuleDeclaration extends Declaration {
 		return inner.typecheck(env, Optional.empty());
 	}
 
+	private Iterable<TypedAST> getInnerIterable() {
+		if (inner instanceof Sequence) {
+			return ((Sequence) inner).getIterator();
+		}
+		final Reference<Boolean> gotten = new Reference<>(false);
+		return () -> new Iterator<TypedAST>() {
+			@Override
+			public boolean hasNext() {
+				return !gotten.get();
+			}
+
+			@Override
+			public EnvironmentExtender next() {
+				gotten.set(true);
+				return inner;
+			}
+		};
+	}
+
 	boolean extGuard = false;
 	@Override
 	protected Environment doExtend(Environment old) {
@@ -55,7 +76,13 @@ public class ModuleDeclaration extends Declaration {
 	@Override
 	public Environment extendType(Environment extend, Environment against) {
 		if (!typeGuard) {
-			dclEnv.set(inner.extendType(dclEnv.get(), Globals.getStandardEnv()));
+			for (TypedAST ast : getInnerIterable()) {
+				if (ast instanceof ImportDeclaration) {
+					importEnv.set(((ImportDeclaration) ast).extendType(importEnv.get(), Globals.getStandardEnv()));
+				} else if (ast instanceof EnvironmentExtender) {
+					dclEnv.set(((EnvironmentExtender) ast).extendType(dclEnv.get(), importEnv.get().extend(Globals.getStandardEnv())));
+				}
+			}
 			typeGuard = true;
 		}
 		return extend;
@@ -65,7 +92,13 @@ public class ModuleDeclaration extends Declaration {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		if (!nameGuard) {
-			dclEnv.set(inner.extendName(dclEnv.get(), Globals.getStandardEnv()));
+			for (TypedAST ast : getInnerIterable()) {
+				if (ast instanceof ImportDeclaration) {
+					importEnv.set(((ImportDeclaration) ast).extendName(importEnv.get(), Globals.getStandardEnv()));
+				} else if (ast instanceof EnvironmentExtender) {
+					dclEnv.set(((EnvironmentExtender) ast).extendName(dclEnv.get(), Globals.getStandardEnv().extend(importEnv.get())));
+				}
+			}
 			nameGuard = true;
 		}
 		return env;
@@ -73,13 +106,15 @@ public class ModuleDeclaration extends Declaration {
 
 	@Override
 	public Environment extendWithValue(Environment old) {
-		//TODO
-		return null;
+		return old.extend(new ValueBinding(name, selfType));
 	}
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		//TODO
+		ValueBinding selfBinding = (ValueBinding) declEnv.lookup(name);
+		Environment objEnv = Environment.getEmptyEnvironment();
+		Value selfV = new Obj(inner.evalDecl(objEnv));
+		selfBinding.setValue(selfV);
 	}
 
 	@Override
