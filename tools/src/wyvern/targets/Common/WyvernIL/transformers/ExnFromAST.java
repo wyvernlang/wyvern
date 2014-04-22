@@ -227,6 +227,11 @@ public class ExnFromAST implements CoreASTVisitor {
 		statements.add(new Defn(new ImportDef(importDeclaration.getUri())));
 	}
 
+	@Override
+	public void visit(ModuleDeclaration moduleDeclaration) {
+
+	}
+
 
 	//UNUSED
 

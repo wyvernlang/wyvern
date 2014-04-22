@@ -7,9 +7,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -19,7 +17,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
-public class ModuleDeclaration extends Declaration {
+public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;
 	private final EnvironmentExtender inner;
 	private FileLocation location;
@@ -143,5 +141,10 @@ public class ModuleDeclaration extends Declaration {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public void accept(CoreASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

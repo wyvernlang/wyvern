@@ -34,4 +34,5 @@ public interface CoreASTVisitor {
 	void visit(IfExpr ifExpr);
 	void visit(WhileStatement whileStatement);
 	void visit(ImportDeclaration importDeclaration);
+	void visit(ModuleDeclaration moduleDeclaration);
 }

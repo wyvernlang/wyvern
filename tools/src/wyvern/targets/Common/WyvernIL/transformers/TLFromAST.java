@@ -327,6 +327,11 @@ public class TLFromAST implements CoreASTVisitor {
 	}
 
 	@Override
+	public void visit(ModuleDeclaration moduleDeclaration) {
+
+	}
+
+	@Override
 	public void visit(TypeInstance typeInstance) {
 
 	}
