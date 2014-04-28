@@ -2,11 +2,13 @@ package wyvern.tools.imports.extensions;
 
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
+import wyvern.tools.typedAST.core.binding.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.Reference;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -36,12 +38,14 @@ public class JavaResolver implements ImportResolver {
 
 		@Override
 		public Environment extendNames(Environment in) {
-			return resolved.extendName(in, in);
+			Environment oldMetaEnv = in.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment());
+			return resolved.extendName(in, in).extend(new MetadataInnerBinding(bindVal(extendVal(resolved.extend(oldMetaEnv)))));
 		}
 
 		@Override
 		public Environment extend(Environment in) {
-			return resolved.extend(in);
+			Environment oldMetaEnv = in.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment());
+			return resolved.extend(in).extend(new MetadataInnerBinding(bindVal(extendVal(resolved.extend(oldMetaEnv)))));
 		}
 
 		@Override
