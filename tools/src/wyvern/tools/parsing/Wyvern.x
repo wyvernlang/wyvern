@@ -652,6 +652,7 @@ import java.net.URI;
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}
+   		|    type:t dot_t identifier_t:el {: RESULT = new TypeInv((Type)t, (String)el); :}
    		|	 openParen_t type:ta closeParen_t {: RESULT = ta; :}
    		|	 identifier_t:id {: RESULT = new UnresolvedType((String)id); :}
    		;
