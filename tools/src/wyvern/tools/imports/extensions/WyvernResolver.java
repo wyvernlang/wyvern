@@ -23,6 +23,7 @@ public class WyvernResolver implements ImportResolver {
 	public static void addFile(String name, String source) {
 		savedResolutions.put(name, source);
 	}
+	public static void clearFiles() {savedResolutions.clear();}
 
 	public static WyvernResolver getInstance() {
 		if (instance == null)
