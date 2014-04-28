@@ -107,7 +107,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 
 	@Override
 	public Type getInnerType(String name) {
-		return declEnv.get().lookup(name).getType();
+		return declEnv.get().lookupType(name).getType();
 	}
 
 
