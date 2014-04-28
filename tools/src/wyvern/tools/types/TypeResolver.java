@@ -1,5 +1,7 @@
 package wyvern.tools.types;
 
+import wyvern.tools.types.extensions.TypeInv;
+
 import java.lang.reflect.Field;
 import java.util.HashSet;
 
@@ -40,6 +42,9 @@ public class TypeResolver {
 				f.set(input, resolved);
 			}
 		}
+
+		if (input instanceof TypeInv)
+			return ((TypeInv)input).resolve();
 		return input;
 	}
 }
