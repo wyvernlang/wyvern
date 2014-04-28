@@ -343,10 +343,10 @@ public class CopperTests {
 	public void testTrivialDSL() throws IOException, CopperParserException {
 		String input =
 				"type MyNum\n" +
-				"  def getValue():Int\n" +
-				"  metadata:ExtParser = myNumMetadata\n" +
-				"val n:MyNum = { 5 }\n" +
-				"n.getValue()";
+						"  def getValue():Int\n" +
+						"  metadata:ExtParser = myNumMetadata\n" +
+						"val n:MyNum = { 5 }\n" +
+						"n.getValue()";
 
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 
@@ -363,6 +363,42 @@ public class CopperTests {
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("myNumMetadata", metaType)).extend(new TypeBinding("ExtParser", metaType)), Optional.empty()), Int.getInstance());
 		res = new DSLTransformer().transform(res);
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(parser)))).toString(), "IntegerConstant(5)");
+	}
+
+	@Test
+	public void testTrivialDSL2() throws IOException, CopperParserException {
+		String input =
+				"import java:wyvern.tools.tests.TrivDSLParser\n" +
+						"type MyNum\n" +
+						"  def getValue():Int\n" +
+						"  metadata:TrivDSLParser = TrivDSLParser.create()\n" +
+						"val n:MyNum = { 5 }\n" +
+						"n.getValue()";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()), Int.getInstance());
+		res = new DSLTransformer().transform(res);
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
+	}
+	@Test
+	public void testTrivialDSL3() throws IOException, CopperParserException {
+		String input =
+				"module A\n" +
+				"import java:wyvern.tools.tests.TrivDSLParser\n" +
+				"type MyNum\n" +
+				"  def getValue():Int\n" +
+				"  metadata:TrivDSLParser = TrivDSLParser.create()\n";
+		String in2 = "import wyv:in1\n" +
+					 "val n:A.MyNum = { 5 }\n" +
+					 "n.getValue()";
+		WyvernResolver.clearFiles();
+		WyvernResolver.addFile("in1", input);
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(in2), "test input");
+
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()), Int.getInstance());
+		res = new DSLTransformer().transform(res);
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");
 	}
 	@Test
 	public void testImport1() throws IOException, CopperParserException {
@@ -411,6 +447,7 @@ public class CopperTests {
 				"val c = A.C.create()\n" +
 				"c.d()\n";
 
+		WyvernResolver.clearFiles();
 		WyvernResolver.addFile("in1", input1);
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input2), "test input");
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
