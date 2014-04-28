@@ -10,6 +10,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class Environment implements TreeWritable {
 	private Environment parentEnvironment;
@@ -70,11 +71,11 @@ public class Environment implements TreeWritable {
 		return parentEnvironment.getValue(name);
 	}
 
-	public <T> T lookupBinding(String name, Class<T> bindingType) {
+	public <T> Optional<T> lookupBinding(String name, Class<T> bindingType) {
 		if (this.name == null)
-			return null;
+			return Optional.empty();
 		if (this.name.equals(name) && bindingType.isAssignableFrom(this.binding.getClass()))
-			return (T)binding;
+			return Optional.of((T)binding);
 		return parentEnvironment.lookupBinding(name, bindingType);
 	}
 
@@ -103,7 +104,8 @@ public class Environment implements TreeWritable {
 	}
 
 	private void writeBinding(List<Binding> binding) {
-		binding.add(this.binding);
+		if (this.binding != null)
+			binding.add(this.binding);
 		if (parentEnvironment != null)
 			parentEnvironment.writeBinding(binding);
 	}

@@ -181,7 +181,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
             TypeType implementsCT = (TypeType) (
 					((ClassType)nameImplementsClass.getType())
 							.getEnv()
-							.lookupBinding("type", TypeDeclBinding.class)).getType();
+							.lookupBinding("type", TypeDeclBinding.class)).get().getType();
 			
 			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,

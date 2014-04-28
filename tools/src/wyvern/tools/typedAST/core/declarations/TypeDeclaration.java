@@ -226,7 +226,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private void evalMeta(Environment evalEnv) {
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof AttributeDeclaration) {
-				metaValue.set(((AttributeDeclaration) decl).getBody().evaluate( evalEnv.extend(attrEvalEnv)));
+				metaValue.set(((AttributeDeclaration) decl).getBody().evaluate( evalEnv.extend(attrEvalEnv.extend(
+						evalEnv.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment())))));
 			}
 		}
 	}
