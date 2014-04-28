@@ -5,6 +5,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.*;
@@ -16,20 +17,24 @@ import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;
 	private final EnvironmentExtender inner;
+	private final ClassType subTypeType;
 	private FileLocation location;
 	private final ClassType selfType;
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
+	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
 
 	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
 		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), name);
+		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), name);
 	}
 
 	@Override
@@ -67,7 +72,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		if (!extGuard) {
 			dclEnv.set(inner.extend(dclEnv.get()));
 		}
-		return old.extend(new NameBindingImpl(name, selfType));
+		return old.extend(new NameBindingImpl(name, selfType)).extend(new TypeBinding(name, subTypeType));
 	}
 
 	boolean typeGuard = false;
@@ -78,7 +83,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 				if (ast instanceof ImportDeclaration) {
 					importEnv.set(((ImportDeclaration) ast).extendType(importEnv.get(), Globals.getStandardEnv()));
 				} else if (ast instanceof EnvironmentExtender) {
-					dclEnv.set(((EnvironmentExtender) ast).extendType(dclEnv.get(), importEnv.get().extend(Globals.getStandardEnv())));
+					Environment delta = ((EnvironmentExtender) ast).extendType(Environment.getEmptyEnvironment(), importEnv.get().extend(Globals.getStandardEnv()));
+					dclEnv.set(dclEnv.get().extend(delta));
+					delta.getBindings().stream()
+							.flatMap(bndg -> (bndg instanceof TypeBinding)? Stream.of((TypeBinding)bndg) : Stream.empty())
+							.forEach(bndg -> typeEnv.set(typeEnv.get().extend(bndg)));
 				}
 			}
 			typeGuard = true;
