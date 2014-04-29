@@ -136,4 +136,9 @@ public class PassThroughVisitor implements CoreASTVisitor {
 		next.visit(importDeclaration);
 	}
 
+	@Override
+	public void visit(ModuleDeclaration moduleDeclaration) {
+		next.visit(moduleDeclaration);
+	}
+
 }

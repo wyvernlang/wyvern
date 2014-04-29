@@ -35,4 +35,5 @@ public interface CoreASTVisitor {
 	void visit(WhileStatement whileStatement);
 	void visit(Match match);
 	void visit(ImportDeclaration importDeclaration);
+	void visit(ModuleDeclaration moduleDeclaration);
 }

@@ -84,7 +84,7 @@ public class Util {
 
 		JavaClassDecl decl = new JavaClassDecl(toGet);
 		declCache.put(toGet, decl);
-		decl.initalize();
+		//decl.initalize();
 		return decl;
 	}
 	public static Value toWyvObj(Object arg) {
@@ -156,11 +156,11 @@ public class Util {
 		return newType;
 	}
 
-	public static ClassDeclaration javaToWyvDecl(Class jClass) {
+	public static JavaClassDecl javaToWyvDecl(Class jClass) {
 
 		JavaClassDecl jcd = getDecl(jClass);
 		classCache.put(jClass, jcd.getType()); //Prevent infinite recursion
-		jcd.initalize();
+		//jcd.initalize();
 		return jcd;
 	}
 
@@ -176,7 +176,7 @@ public class Util {
 		else {
 			JavaClassDecl jcd = getDecl(jType);
 			classCache.put(jType, jcd.getType()); //Prevent infinite recursion
-			jcd.initalize();
+			//jcd.initalize();
 			return jcd.getType();
 		}
 	}

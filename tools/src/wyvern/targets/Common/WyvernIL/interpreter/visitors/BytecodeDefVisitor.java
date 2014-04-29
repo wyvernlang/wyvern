@@ -103,4 +103,10 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		evalContext.addToContext(name, val);
 		return context;
 	}
+
+	@Override
+	public BytecodeContext visit(ImportDef importDef) {
+		//TODO
+		return context;
+	}
 }

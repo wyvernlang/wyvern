@@ -42,8 +42,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> typeEquivalentEnvironmentRef;
 	protected Reference<Environment> declEnvRef;
 
-	Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
-	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>());;
+	private Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
+	protected Environment getObjEnvV() { return objEnv.get(); }
+	protected void setObjEnv(Environment newEnv) { objEnv.set(newEnv); }
+
+	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>(), "");
+
+	public ClassType getOType() {
+		return new ClassType(objEnv, new Reference<>(), new LinkedList<>(), getName());
+	}
 
 	private boolean isTagged;
 	
@@ -90,11 +97,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		nameBinding = new NameBindingImpl(name, null);
 		Type objectType = getClassType();
 		Type classType = objectType; // TODO set this to a class type that has the class members
-		typeBinding = new TypeBinding(name, objType);
+		typeBinding = new TypeBinding(name, getObjType());
 		nameBinding = new NameBindingImpl(name, classType);
 		this.implementsName = implementsName;
 		this.implementsClassName = implementsClassName;
 		this.location = location;
+	}
+
+	protected ClassType getObjType() {
+		return objType;
 	}
 
 	protected void updateEnv() {
@@ -183,7 +194,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
             TypeType implementsCT = (TypeType) (
 					((ClassType)nameImplementsClass.getType())
 							.getEnv()
-							.lookupBinding("type", TypeDeclBinding.class)).getType();
+							.lookupBinding("type", TypeDeclBinding.class)).get().getType();
 			
 			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
@@ -209,7 +220,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			public void set(Environment e) {
 				throw new RuntimeException();
 			}
-		}, new LinkedList<>());
+		}, new LinkedList<>(), this.getName());
 	}
 	
 	@Override
@@ -231,7 +242,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		declEvalEnv = declEnv.extend(evalEnv);
+		if (declEvalEnv == null)
+			declEvalEnv = declEnv.extend(evalEnv);
 		Obj classObj = new Obj(getClassEnv());
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
@@ -352,7 +364,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendType(Environment env) {
+	public Environment extendType(Environment env, Environment against) {
 		return env.extend(typeBinding);
 	}
 
@@ -365,9 +377,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			declEnvRef.set(Environment.getEmptyEnvironment());
 			for (Declaration decl : decls.getDeclIterator()) {
 				if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass())
-					declEnvRef.set(decl.extendName(declEnvRef.get(), env.extend(objBinding)));
+					declEnvRef.set(decl.extendName(declEnvRef.get(), against.extend(objBinding)));
 				else
-					objEnv.set(decl.extendName(objEnv.get(), env.extend(objBinding)));
+					objEnv.set(decl.extendName(objEnv.get(), against.extend(objBinding)));
 			}
 			envGuard = true;
 		}

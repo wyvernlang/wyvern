@@ -7,11 +7,15 @@ import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
@@ -36,9 +40,18 @@ public class Application extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		Type fnType = function.typecheck(env, Optional.empty());
-		
+
+		Type argument = null;
+		if (fnType instanceof Arrow)
+			argument = ((Arrow) fnType).getArgument();
+		else if (fnType instanceof Intersection) {
+			List<Type> args = fnType.getChildren().values().stream()
+					.filter(tpe -> tpe instanceof Arrow).map(tpe->((Arrow)tpe).getArgument())
+					.collect(Collectors.toList());
+			argument = new Intersection(args);
+		}
 		if (this.argument != null)
-			this.argument.typecheck(env, Optional.of(((Arrow)fnType).getArgument()));
+			this.argument.typecheck(env, Optional.ofNullable(argument));
 		
 		if (!(fnType instanceof ApplyableType))
 			reportError(TYPE_CANNOT_BE_APPLIED, this, fnType.toString());

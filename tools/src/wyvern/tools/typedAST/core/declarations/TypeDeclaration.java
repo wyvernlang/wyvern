@@ -50,7 +50,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendType(Environment env) {
+	public Environment extendType(Environment env, Environment against) {
 		return env.extend(typeBinding);
 	}
 
@@ -137,7 +137,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		}
 
 		@Override
-		public Environment extendType(Environment env) {
+		public Environment extendType(Environment env, Environment against) {
 			return env;
 		}
 
@@ -155,7 +155,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		typeBinding = new TypeBinding(name, null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
-		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>()); // TODO set this to a class type that has the class members
+		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
 		this.location = clsNameLine;
@@ -197,7 +197,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
 		}
-		evalMeta(Globals.getStandardEnv());
+		evalMeta(Globals.getStandardEnv().extend(env.lookupBinding("metaEnv", MetadataInnerBinding.class).orElse(new MetadataInnerBinding())));
 
 		return this.typeBinding.getType();
 	}	
@@ -229,7 +229,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private void evalMeta(Environment evalEnv) {
 		for (Declaration decl : decls.getDeclIterator()) {
 			if (decl instanceof AttributeDeclaration) {
-				metaValue.set(((AttributeDeclaration) decl).getBody().evaluate( evalEnv.extend(attrEvalEnv)));
+				metaValue.set(((AttributeDeclaration) decl).getBody().evaluate( evalEnv.extend(attrEvalEnv.extend(
+						evalEnv.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment())))));
 			}
 		}
 	}

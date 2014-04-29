@@ -4,6 +4,7 @@ import wyvern.targets.Common.wyvernIL.IL.Stmt.Statement;
 import wyvern.targets.Common.wyvernIL.IL.WyvIL;
 import wyvern.targets.Common.wyvernIL.IL.visitor.DefVisitor;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,10 @@ public class Def implements Definition {
 
 	public List<Statement> getBody() {
 		return body;
+	}
+
+	public Arrow getType() {
+		return null; //TODO
 	}
 
 	public static class Param {
