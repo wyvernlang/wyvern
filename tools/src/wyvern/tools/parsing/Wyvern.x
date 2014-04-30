@@ -671,15 +671,10 @@ import java.net.URI;
 	//complete match statement
 	matchStatement ::= matchKwd_t openParen_t identifier_t:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
 			{: RESULT = UnitVal.getInstance(null);//new Match(id, matchStatements); :};
-
+	
 	//group of 0 or more variable cases, followed by 1 default case
-	//caseStatements ::= caseStatementsO:mstmt Newline_t defaultStatement:dstmt {: RESULT = UnitVal.getInstance(null); :}
-    // 	  | defaultStatement:dstmt 								    {: RESULT = UnitVal.getInstance(null); :}
-	//	  ;
-		  
-	//testing, to get it compiling without a disambiguation function
-	caseStatements ::= varStatement:dstmt {: RESULT = UnitVal.getInstance(null); :}
-     	  | defaultStatement:dstmt 		  {: RESULT = UnitVal.getInstance(null); :}
+	caseStatements ::= caseStatementsO:mstmt {: RESULT = UnitVal.getInstance(null); :}
+     	  | defaultStatement:dstmt 								    {: RESULT = UnitVal.getInstance(null); :}
 		  ;
 	
 	//group of 1 or more variable cases

@@ -88,6 +88,8 @@ public class TagTests {
 				"                               \n" +
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
+				
+				
 				"                               \n";
 				
 		
@@ -139,7 +141,6 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
 				"	Y => 23                     \n" +
-				"	default => 50                     \n" +
 				"                               \n";
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
@@ -149,5 +150,31 @@ public class TagTests {
 		Assert.assertEquals(v.toString(), "StringConstant(\"Match Statement\")");
 	}
 	
-	
+	@Test
+	public void matchTestMulti2() throws CopperParserException, IOException {		
+		String input = 	
+				"val y = 12 + 4           \n" +
+				"                               \n" +
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 15                     \n" +
+				"	Y => 23                     \n" +
+				"	default => 50                     \n" +
+				"                               \n";
+				
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		
+		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		Assert.assertEquals(v.toString(), "StringConstant(\"Match Statement\")");
+	}
 }
