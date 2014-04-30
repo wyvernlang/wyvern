@@ -653,7 +653,7 @@ import java.net.URI;
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}
-    	|    matchStatement:stmt {: RESULT = new StringConstant("Match Statement"); :} 
+    	|    matchStatement:stmt {: RESULT = stmt; :} 
     	;
 
     etuple ::= openParen_t e:first comma_t it:rest closeParen_t {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
@@ -670,24 +670,29 @@ import java.net.URI;
 	
 	//complete match statement
 	matchStatement ::= matchKwd_t openParen_t identifier_t:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
-			{: RESULT = UnitVal.getInstance(null);//new Match(id, matchStatements); :};
+			{: RESULT = new Match((String) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
 	
 	//group of 0 or more variable cases, followed by 1 default case
-	caseStatements ::= caseStatementsO:mstmt {: RESULT = UnitVal.getInstance(null); :}
-     	  | defaultStatement:dstmt 								    {: RESULT = UnitVal.getInstance(null); :}
+	caseStatements ::= caseStatementsO:mstmt {: RESULT = mstmt; :}
+     	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
 		  ;
 	
 	//group of 1 or more variable cases
-	caseStatementsO ::= varStatement:f Newline_t caseStatementsO:o			{: RESULT = UnitVal.getInstance(null); :}
-     	  | varStatement:f										{: RESULT = UnitVal.getInstance(null); :}
+	caseStatementsO ::= varStatement:f Newline_t caseStatementsO:o {: 
+				List<Case> cases = new ArrayList<Case>(); 
+				cases.add((Case) f); 
+				cases.addAll((List<Case>) o);
+				RESULT = cases; 
+			:}
+     	  | varStatement:f {: List<Case> cases = new ArrayList<Case>(); cases.add((Case) f); RESULT = cases; :}
 		  ;
 	
 	//a single match case statement
-	varStatement ::= identifier_t:id arrow_t decimalInteger_t:num {: RESULT = UnitVal.getInstance(null); :}
+	varStatement ::= identifier_t:id arrow_t dslce:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
     	  ;
     
     //a default match statement
-    defaultStatement ::= defaultKwd_t arrow_t decimalInteger_t:num 	{: RESULT = UnitVal.getInstance(null); :}
+    defaultStatement ::= defaultKwd_t arrow_t dslce:inner 	{: RESULT = new Case((TypedAST) inner); :}
     	  ;
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
