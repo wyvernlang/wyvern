@@ -109,7 +109,7 @@ import java.net.URI;
 		}
 	:};
 
-	disambiguate ignoredNewline6:(Indent_t, Newline_t, ignoredNewline) 
+	disambiguate ignoredNewline6:(Indent_t, Newline_t, ignoredNewline)
 	{:
 		if(parenLevel > 0){
 			return ignoredNewline;
@@ -298,7 +298,7 @@ import java.net.URI;
  	terminal ialpha_t ::= /[a-zA-Z][a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]*/ {: RESULT = lexeme; :};
  	terminal xalphas_t ::= /[a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: RESULT = lexeme; :};
  	terminal xpalphas_t ::= /[a-zA-Z0-9\+\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: RESULT = lexeme; :};
- 	            
+
 	disambiguate xpa1:(xpalphas_t,identifier_t){: return xpalphas_t; :};
 	disambiguate xpa2:(xpalphas_t,decimalInteger_t){: return xpalphas_t; :};
 	disambiguate xpa3:(xpalphas_t,openParen_t){: return xpalphas_t; :};
@@ -539,7 +539,7 @@ import java.net.URI;
 
 
     typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, null); :}
+    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
     	;
 
     typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
@@ -629,6 +629,7 @@ import java.net.URI;
     	|	 etuple:tpe {: RESULT = tpe; :}
     	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, new FileLocation(currentState.pos)); :}
     	|	 term:src dot_t identifier_t:op {: RESULT = new Invocation((TypedAST)src,(String)op, null, new FileLocation(currentState.pos)); :}
+		|	 term:src dot_t metadataKwd_t {: RESULT = new Invocation((TypedAST)src,"metadata", null, new FileLocation(currentState.pos)); :}
     	//|	 term:src typeasc:as {: RESULT = new TypeAsc((Expr)src, (Type)as); :}
     	|	 inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
