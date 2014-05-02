@@ -436,16 +436,16 @@ public class CopperTests {
 	public void testImport2() throws IOException, CopperParserException {
 		String input1 =
 				"module A\n" +
-				"import java:java.lang.Long\n" +
-				"class C\n" +
-				"	class def create():C = new\n" +
-				"	def d():Long = Long.create(\"192\")\n" +
-				"val k = 4\n";
+						"import java:java.lang.Long\n" +
+						"class C\n" +
+						"	class def create():C = new\n" +
+						"	def d():Long = Long.create(\"192\")\n" +
+						"val k = 4\n";
 
 		String input2 =
 				"import wyv:in1\n" +
-				"val c = A.C.create()\n" +
-				"c.d()\n";
+						"val c = A.C.create()\n" +
+						"c.d()\n";
 
 		WyvernResolver.clearFiles();
 		WyvernResolver.addFile("in1", input1);
@@ -454,6 +454,34 @@ public class CopperTests {
 		Value out = res.evaluate(Globals.getStandardEnv());
 		Long finalRes = (Long)((JavaObj)out).getObj();
 		Assert.assertEquals(192, (long)finalRes);
+	}
+	@Test
+	public void testImport3() throws IOException, CopperParserException {
+		String input1 =
+				"module A\n" +
+				"val k = 19\n";
+
+		String input2 =
+				"module M\n" +
+				"import wyv:in1\n" +
+				"type Tt\n" +
+				"	def t():Int\n" +
+				"type Tp\n" +
+				"	metadata:Tt = new\n" +
+				"		def t():Int = A.k\n";
+
+		String input3 =
+				"import wyv:in2\n" +
+				"M.Tp.t()";
+
+		WyvernResolver.clearFiles();
+		WyvernResolver.addFile("in1", input1);
+		WyvernResolver.addFile("in2", input2);
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input3), "test input");
+		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		Value out = res.evaluate(Globals.getStandardEnv());
+		int finalRes = ((IntegerConstant)out).getValue();
+		Assert.assertEquals(19, (int)finalRes);
 	}
 }
 

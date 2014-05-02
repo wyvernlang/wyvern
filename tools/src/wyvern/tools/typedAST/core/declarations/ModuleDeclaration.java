@@ -103,7 +103,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 				if (ast instanceof ImportDeclaration) {
 					importEnv.set(((ImportDeclaration) ast).extendName(importEnv.get(), Globals.getStandardEnv()));
 				} else if (ast instanceof EnvironmentExtender) {
-					dclEnv.set(((EnvironmentExtender) ast).extendName(dclEnv.get(), Globals.getStandardEnv().extend(importEnv.get())));
+					dclEnv.set(((EnvironmentExtender) ast).extendName(dclEnv.get(),
+							Globals.getStandardEnv().extend(importEnv.get()).extend(dclEnv.get())));
 				}
 			}
 			nameGuard = true;

@@ -5,6 +5,7 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.typedAST.core.binding.MetadataInnerBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -47,6 +48,11 @@ public class WyvernResolver implements ImportResolver {
 			res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		}
 
+		private Environment MiBEnv = Environment.getEmptyEnvironment();
+		private Environment getMiBEnv() { return MiBEnv; }
+
+		private MetadataInnerBinding mib = new MetadataInnerBinding(new Reference<>(this::getMiBEnv));
+
 		boolean etping = false;
 		@Override
 		public Environment extendTypes(Environment in) {
@@ -54,8 +60,10 @@ public class WyvernResolver implements ImportResolver {
 				throw new RuntimeException("Cyclic dependency");
 			}
 			etping = true;
-			if (res instanceof EnvironmentExtender)
+			if (res instanceof EnvironmentExtender) {
 				in = ((EnvironmentExtender) res).extendType(in, Globals.getStandardEnv());
+				MiBEnv = ((EnvironmentExtender) res).extendType(MiBEnv, Globals.getStandardEnv());
+			}
 			etping = false;
 			return in;
 		}
@@ -67,10 +75,12 @@ public class WyvernResolver implements ImportResolver {
 				throw new RuntimeException("Cyclic dependency");
 			}
 			enaming = true;
-			if (res instanceof EnvironmentExtender)
+			if (res instanceof EnvironmentExtender) {
 				in = ((EnvironmentExtender) res).extendName(in, Globals.getStandardEnv());
+				MiBEnv = ((EnvironmentExtender) res).extendName(MiBEnv, Globals.getStandardEnv());
+			}
 			enaming = false;
-			return in;
+			return in.extend(mib);
 		}
 
 		boolean extending = false;
@@ -83,7 +93,7 @@ public class WyvernResolver implements ImportResolver {
 			if (res instanceof EnvironmentExtender)
 				in = ((EnvironmentExtender) res).extend(in);
 			extending = false;
-			return in;
+			return in.extend(mib.from(in));
 		}
 
 		boolean typechecking = false;
@@ -94,6 +104,10 @@ public class WyvernResolver implements ImportResolver {
 			}
 			typechecking = true;
 			Type resu = res.typecheck(env, Optional.<Type>empty());
+
+			if (res instanceof EnvironmentExtender) {
+				MiBEnv = ((EnvironmentExtender) res).evalDecl(MiBEnv);
+			}
 			typechecking = false;
 			return resu;
 		}
