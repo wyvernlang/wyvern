@@ -673,18 +673,13 @@ import java.net.URI;
 			{: RESULT = new Match((String) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
 	
 	//group of 0 or more variable cases, followed by 1 default case
-	caseStatements ::= caseStatementsO:mstmt {: RESULT = mstmt; :}
-     	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
-		  ;
-	
-	//group of 1 or more variable cases
-	caseStatementsO ::= varStatement:f Newline_t caseStatementsO:o {: 
+	caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 
 				List<Case> cases = new ArrayList<Case>(); 
-				cases.add((Case) f); 
-				cases.addAll((List<Case>) o);
+				cases.add((Case) mstmt); 
+				cases.addAll((List<Case>) rest);
 				RESULT = cases; 
 			:}
-     	  | varStatement:f {: List<Case> cases = new ArrayList<Case>(); cases.add((Case) f); RESULT = cases; :}
+     	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
 		  ;
 	
 	//a single match case statement
