@@ -36,12 +36,9 @@ public class TagTests {
 	 * Test the tagged keyword works with types.
 	 */
 	public void taggedTypeParseTest1() throws CopperParserException, IOException {		
-		String input = 	
-				"val y = 12 + 1 \n" +
-				"                               \n" +
-				"tagged type IntWrapper\n" +
-				"  def getValue() : Int\n" + 
-			    "y";
+		String input =
+				"tagged type IntWrapper    \n" +
+				"  def getValue() : Int    \n";
 		
 		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
@@ -52,16 +49,12 @@ public class TagTests {
 	 * Test the tagged keyword works with multiple types.
 	 */
 	public void taggedTypeParseTest2() throws CopperParserException, IOException {		
-		String input = 	
-				"val y = 5 + 1 \n" +
-				"                               \n" +
-				"tagged type Type1\n" +
-				"  def getValue1() : Int\n" + 
-				"                               \n" +
-				"tagged type Type2\n" +
-				"  def getValue2() : Int\n" + 
-				"                               \n" +
-			    "y";
+		String input = 
+				"tagged type Type1          \n" +
+				"  def getValue1() : Int    \n" + 
+				"                           \n" +
+				"tagged type Type2          \n" +
+				"  def getValue2() : Int    \n";
 		
 		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
@@ -78,15 +71,9 @@ public class TagTests {
 				"                               \n" +
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
-				"	default => 15               \n" +
-				"                               \n";
-				
+				"	default => 15               \n";
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
+		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -128,8 +115,7 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
 				"	Y => 23                     \n" +
-				"	default => 50                \n" +
-				"                               \n";
+				"	default => 50               \n";
 				
 		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
@@ -137,9 +123,7 @@ public class TagTests {
 	
 	@Test
 	public void matchParseTestMulti2() throws CopperParserException, IOException {		
-		String input = 	
-				"val y = 12 + 4           \n" +
-				"                               \n" +
+		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n" +
@@ -153,18 +137,60 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
 				"	Y => 23                     \n" +
-				"	default => 50                     \n" +
-				"                               \n";
+				"	default => 50               \n";
 				
 		new Wyvern().parse(new StringReader(input), "test input");		
 		//reaching here without a parse exception is a pass
 	}
 	
 	@Test
-	public void duplicateCaseTest() throws CopperParserException, IOException {
-		String input = 	
-				"val y = 12 + 4           \n" +
+	public void matchInterpretTest1() throws CopperParserException, IOException {		
+		String input = 
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
 				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	default => 15               \n";
+				
+		
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		
+		res.evaluate(Environment.getEmptyEnvironment());
+		
+		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
+	}
+	
+	@Test
+	public void matchInterpretTest2() throws CopperParserException, IOException {		
+		String input = 
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 25                     \n" +
+				"	default => 15               \n";
+				
+		
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		
+		res.evaluate(Environment.getEmptyEnvironment());
+		
+		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		Assert.assertEquals(v.toString(), "IntegerConstant(25)");
+	}
+	
+	@Test
+	public void duplicateCaseTest() throws CopperParserException, IOException {
+		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n" +
@@ -178,20 +204,121 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
 				"	Y => 23                     \n" +
-				"	Y => 34                     \n" +
-				"	default => 50                     \n" +
-				"                               \n";
+				"	Y => 34                     \n" +	// Y given twice; error
+				"	default => 50               \n";
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
 		try {
 			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		} catch (ToolError toolError) {
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DUPLICATE_TAG_ERROR);
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DUPLICATE_TAG);
 			
 			return;
 		}
 		
-		Assert.fail("Should have failed with error: " + ErrorMessage.DUPLICATE_TAG_ERROR);
+		Assert.fail("Should have failed with error: " + ErrorMessage.DUPLICATE_TAG);
+	}
+	
+	@Test
+	public void unknownCaseTest() throws CopperParserException, IOException {
+		String input = 	
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 15                     \n" +
+				"	Y => 23                     \n" +
+				"	Z => 34                     \n" +	// Z is not declared anywhere; error
+				"	default => 50               \n";
+				
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		
+		try {
+			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		} catch (ToolError toolError) {
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.UNKNOWN_TAG);
+			
+			return;
+		}
+		
+		Assert.fail("Should have failed with error: " + ErrorMessage.UNKNOWN_TAG);
+	}
+	
+	@Test
+	public void untaggedCaseTest() throws CopperParserException, IOException {
+		String input = 	
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"class Z                        \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 15                     \n" +
+				"	Y => 23                     \n" +
+				"	Z => 34                     \n" +	// Z is not declared but not a tagged type; error
+				"	default => 50               \n";
+				
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		
+		try {
+			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		} catch (ToolError toolError) {
+			//TODO: maybe this should be a different error message
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.UNKNOWN_TAG);
+			
+			return;
+		}
+		
+		Assert.fail("Should have failed with error: " + ErrorMessage.UNKNOWN_TAG);
+	}
+	
+	@Test
+	//TODO: this test fails because it throws an exception during parsing, and not the defined error message.
+	// It might be worth finding a way to bubble this parse exception up to the user in a more readable way...
+	public void defaultNotLastTest() throws CopperParserException, IOException {
+		String input = 	
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 15                     \n" +
+				"	default => 23                     \n" +
+				"	Y => 50               \n";
+				
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		
+		try {
+			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		} catch (ToolError toolError) {
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DEFAULT_NOT_LAST);
+			
+			return;
+		}
+		
+		Assert.fail("Should have failed with error: " + ErrorMessage.DEFAULT_NOT_LAST);
 	}
 }

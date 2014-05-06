@@ -26,7 +26,12 @@ public enum ErrorMessage {
 	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
 	
 	// Tagged Type errors
-	DUPLICATE_TAG_ERROR("Duplicate tag found", 0),
+	//TODO: these need parameters that give more information
+	DUPLICATE_TAG("Duplicate tag found", 0),
+	UNKNOWN_TAG("No tag declared with given name", 0),
+	DEFAULT_NOT_PRESENT("Default case not present in non-exhaustive match", 0),
+	DEFAULT_PRESENT("Default case present in exhaustive match", 0),
+	DEFAULT_NOT_LAST("Default case present in exhaustive match", 0),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

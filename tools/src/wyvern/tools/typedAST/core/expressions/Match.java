@@ -120,11 +120,32 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		// Variable we're matching must exist and be a tagged type
-		// TODO
+		//Note: currently all errors given use matchingOver because it has a location
+		//TODO: use the actual entity that is responsible for the error
 		
-		// Types we are matching over must all be tagged types
-		// TODO
+		// Variable we're matching must exist and be a tagged type
+		for (Case c : cases) {
+			if (c.isDefault()) continue;
+			
+			String tagName = c.getTaggedTypeMatch();
+			
+			Optional<ClassType> type = env.lookupBinding(tagName, ClassType.class);
+			
+			NameBinding binding = env.lookup(tagName);
+			
+			if (binding == null) {
+				// type wasn't declared...
+				ToolError.reportError(ErrorMessage.UNKNOWN_TAG, matchingOver);
+			}
+			
+			Type t = binding.getType();
+			
+			if (t instanceof ClassType) {
+				ClassType classType = (ClassType) t;
+				
+				//TODO: check this is tagged. Currently can't because information not accessible in object.
+			}
+		}
 		
 		// All tagged types must be unique
 		Set<String> caseSet = new HashSet<String>();
@@ -134,9 +155,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 		}
 		
 		if (caseSet.size() != cases.size()) {
-			//TODO: make this report the exact location of the duplicate
-			//currently using matchingOver because it has a location
-			ToolError.reportError(ErrorMessage.DUPLICATE_TAG_ERROR, matchingOver);
+
+			ToolError.reportError(ErrorMessage.DUPLICATE_TAG, matchingOver);
 		}
 			
 		// If we've omitted default, we must included all possible tags
