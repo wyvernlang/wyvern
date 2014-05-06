@@ -669,8 +669,8 @@ import java.net.URI;
    		;
 	
 	//complete match statement
-	matchStatement ::= matchKwd_t openParen_t identifier_t:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
-			{: RESULT = new Match((String) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
+	matchStatement ::= matchKwd_t openParen_t term:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
+			{: RESULT = new Match((TypedAST) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
 	
 	//group of 0 or more variable cases, followed by 1 default case
 	caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 

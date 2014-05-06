@@ -7,12 +7,17 @@ import java.util.Optional;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
 
 /**
@@ -22,15 +27,17 @@ import wyvern.tools.util.TreeWriter;
  */
 public class Match extends CachingTypedAST implements CoreAST {
 
-	private String matchingOver;
+	private TypedAST matchingOver;
 	
 	private List<Case> cases;
 	private Case defaultCase;
 	
 	private FileLocation location;
 	
-	public Match(String matchingOver, List<Case> cases, FileLocation location) {		
+	public Match(TypedAST matchingOver, List<Case> cases, FileLocation location) {		
+		
 		this.matchingOver = matchingOver;
+		
 		this.cases = cases;
 		
 		//find the default case and remove it from the typed cases
@@ -54,7 +61,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 * @param defaultCase
 	 * @param location
 	 */
-	private Match(String matchingOver, List<Case> cases, Case defaultCase, FileLocation location) {		
+	private Match(TypedAST matchingOver, List<Case> cases, Case defaultCase, FileLocation location) {		
 		this.matchingOver = matchingOver;
 		this.cases = cases;
 		this.defaultCase = defaultCase;
@@ -65,11 +72,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 	public Value evaluate(Environment env) {
 		for (Case c : cases) {
 			//TODO: this actually needs to check against the type of what we're matching over
-			//currently just checks against the name (placeholder)
 			if (c.getTaggedTypeMatch().equals(matchingOver)) return c.getAST().evaluate(env);
 		}
 		
-		//no match
+		//no match, evaluate the default case
 		return defaultCase.getAST().evaluate(env);
 	}
 
@@ -109,7 +115,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		//TODO: type checking?
+		//TODO
+		
 		return null;
 	}
 }

@@ -20,19 +20,15 @@ public class TagTests {
 	 * Test the tagged keyword works with classes.
 	 */
 	public void taggedClassTest1() throws CopperParserException, IOException {		
-		String input = 	
-				"val y = 12 + 4           \n" +
-				"                               \n" +
+		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
-				"        new                    \n" +
-				"y							       \n";
+				"        new                    \n";
 		
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(16)");	
+		//reaching here without a parse exception is a pass
 	}
 	
 	@Test
@@ -77,9 +73,7 @@ public class TagTests {
 	
 	@Test
 	public void matchTest1() throws CopperParserException, IOException {		
-		String input = 	
-				"val y = 12 + 4           \n" +
-				"                               \n" +
+		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n" +
@@ -89,7 +83,6 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
 				"	default => 15               \n" +
-				
 				"                               \n";
 				
 		
@@ -103,9 +96,7 @@ public class TagTests {
 	
 	@Test
 	public void matchTest2() throws CopperParserException, IOException {		
-		String input = 	
-				"val y = 12 + 4           \n" +
-				"                               \n" +
+		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n" +
@@ -113,8 +104,7 @@ public class TagTests {
 				"val x = X.create()             \n" +
 				"                               \n" +
 				"match(x):                      \n" +
-				"	default => 15               \n" +
-				"                               \n";
+				"	default => 15               \n";
 				
 		
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
@@ -122,14 +112,13 @@ public class TagTests {
 		
 		res.evaluate(Environment.getEmptyEnvironment());
 		
-		//reaching here without a parse exception is a pass
+		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
 	}
 	
 	@Test
 	public void matchTestMulti1() throws CopperParserException, IOException {		
 		String input = 	
-				"val y = 12 + 4           \n" +
-				"                               \n" +
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n" +
@@ -177,9 +166,8 @@ public class TagTests {
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
+
 		res.evaluate(Environment.getEmptyEnvironment());
-		
 		
 		//reaching here without a parse exception is a pass
 	}
