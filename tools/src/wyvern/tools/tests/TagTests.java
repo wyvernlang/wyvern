@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -170,5 +172,40 @@ public class TagTests {
 		res.evaluate(Environment.getEmptyEnvironment());
 		
 		//reaching here without a parse exception is a pass
+	}
+	
+	@Test
+	public void duplicateCaseTest() throws CopperParserException, IOException {
+		String input = 	
+				"val y = 12 + 4           \n" +
+				"                               \n" +
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 15                     \n" +
+				"	Y => 23                     \n" +
+				"	Y => 34                     \n" +
+				"	default => 50                     \n" +
+				"                               \n";
+				
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		
+		try {
+			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		} catch (ToolError toolError) {
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DUPLICATE_TAG_ERROR);
+			
+			return;
+		}
+		
+		Assert.fail("Should have failed with error: " + ErrorMessage.DUPLICATE_TAG_ERROR);
 	}
 }

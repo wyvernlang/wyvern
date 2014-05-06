@@ -25,6 +25,9 @@ public enum ErrorMessage {
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),
 	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
 	
+	// Tagged Type errors
+	DUPLICATE_TAG_ERROR("Duplicate tag found", 0),
+	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
 	CANNOT_INVOKE("Cannot invoke operations on the value %ARG", 1),

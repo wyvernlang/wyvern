@@ -1,11 +1,15 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -18,6 +22,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 /**
@@ -115,8 +120,31 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		//TODO
+		// Variable we're matching must exist and be a tagged type
+		// TODO
 		
-		return null;
+		// Types we are matching over must all be tagged types
+		// TODO
+		
+		// All tagged types must be unique
+		Set<String> caseSet = new HashSet<String>();
+		
+		for (Case c : cases) {
+			if (c.isTyped()) caseSet.add(c.getTaggedTypeMatch());
+		}
+		
+		if (caseSet.size() != cases.size()) {
+			//TODO: make this report the exact location of the duplicate
+			//currently using matchingOver because it has a location
+			ToolError.reportError(ErrorMessage.DUPLICATE_TAG_ERROR, matchingOver);
+		}
+			
+		// If we've omitted default, we must included all possible tags
+		// TODO
+		
+		// If we've included default, we can't have included all possible tags
+		// TODO
+		
+		return Unit.getInstance();
 	}
 }
