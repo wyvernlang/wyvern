@@ -21,15 +21,13 @@ public class TagTests {
 	/**
 	 * Test the tagged keyword works with classes.
 	 */
-	public void taggedClassTest1() throws CopperParserException, IOException {		
+	public void taggedClassParseTest1() throws CopperParserException, IOException {		
 		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n";
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
+		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -37,7 +35,7 @@ public class TagTests {
 	/**
 	 * Test the tagged keyword works with types.
 	 */
-	public void taggedTypeTest1() throws CopperParserException, IOException {		
+	public void taggedTypeParseTest1() throws CopperParserException, IOException {		
 		String input = 	
 				"val y = 12 + 1 \n" +
 				"                               \n" +
@@ -45,17 +43,15 @@ public class TagTests {
 				"  def getValue() : Int\n" + 
 			    "y";
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(13)");
+		new Wyvern().parse(new StringReader(input), "test input");
+		//reaching here without a parse exception is a pass
 	}
 	
 	@Test
 	/**
 	 * Test the tagged keyword works with multiple types.
 	 */
-	public void taggedTypeTest2() throws CopperParserException, IOException {		
+	public void taggedTypeParseTest2() throws CopperParserException, IOException {		
 		String input = 	
 				"val y = 5 + 1 \n" +
 				"                               \n" +
@@ -67,14 +63,12 @@ public class TagTests {
 				"                               \n" +
 			    "y";
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(6)");
+		new Wyvern().parse(new StringReader(input), "test input");
+		//reaching here without a parse exception is a pass
 	}
 	
 	@Test
-	public void matchTest1() throws CopperParserException, IOException {		
+	public void matchParseTest1() throws CopperParserException, IOException {		
 		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
@@ -97,7 +91,7 @@ public class TagTests {
 	}
 	
 	@Test
-	public void matchTest2() throws CopperParserException, IOException {		
+	public void matchParseTest2() throws CopperParserException, IOException {		
 		String input = 
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
@@ -119,7 +113,7 @@ public class TagTests {
 	}
 	
 	@Test
-	public void matchTestMulti1() throws CopperParserException, IOException {		
+	public void matchParseTestMulti1() throws CopperParserException, IOException {		
 		String input = 	
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
@@ -137,16 +131,12 @@ public class TagTests {
 				"	default => 50                \n" +
 				"                               \n";
 				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
+		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
 	}
 	
 	@Test
-	public void matchTestMulti2() throws CopperParserException, IOException {		
+	public void matchParseTestMulti2() throws CopperParserException, IOException {		
 		String input = 	
 				"val y = 12 + 4           \n" +
 				"                               \n" +
@@ -166,11 +156,7 @@ public class TagTests {
 				"	default => 50                     \n" +
 				"                               \n";
 				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-
-		res.evaluate(Environment.getEmptyEnvironment());
-		
+		new Wyvern().parse(new StringReader(input), "test input");		
 		//reaching here without a parse exception is a pass
 	}
 	
