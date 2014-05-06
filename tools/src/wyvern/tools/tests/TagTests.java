@@ -321,4 +321,156 @@ public class TagTests {
 		
 		Assert.fail("Should have failed with error: " + ErrorMessage.DEFAULT_NOT_LAST);
 	}
+	
+	public void nonExhaustiveErrorTest() {
+		String input = 
+			"tagged class Dyn [comprises DynInt, DynChar, DynByte]       \n" +
+			"    class def create() : X                                  \n" +
+			"        new                                                 \n" +
+			"                                                            \n" +
+			"tagged class DynInt [case of Dyn]                           \n" +
+			"    class def create() : DynInt                             \n" +
+			"        new                                                 \n" +
+			"                                                            \n" +
+			"tagged class DynChar [case of Dyn]                          \n" +
+			"    class def create() : DynChar                            \n" +
+			"        new                                                 \n" +
+			"                                                            \n" +
+			"tagged class DynByte [case of Dyn]                          \n" +
+			"    class def create() : DynByte                            \n" +
+			"        new                                                 \n" +
+			"                                                            \n" +
+			"val i = DynInt.create()                                     \n" +
+			"                                                            \n" +
+			"match(i):                                                   \n" +
+			"	DynInt => 10                                             \n" +
+			"	DynChar => 15                                            \n";
+		// DynByte not specified; error
+		
+		//ErrorMessage.DEFAULT_NOT_PRESENT
+		
+		Assert.fail("TODO");
+	}
+	
+	public void ExhaustiveWithDefaultTest() {
+		String input = 
+				"tagged class Dyn [comprises DynInt, DynChar, DynByte]       \n" +
+				"    class def create() : X                                  \n" +
+				"        new                                                 \n" +
+				"                                                            \n" +
+				"tagged class DynInt [case of Dyn]                           \n" +
+				"    class def create() : DynInt                             \n" +
+				"        new                                                 \n" +
+				"                                                            \n" +
+				"tagged class DynChar [case of Dyn]                          \n" +
+				"    class def create() : DynChar                            \n" +
+				"        new                                                 \n" +
+				"                                                            \n" +
+				"tagged class DynByte [case of Dyn]                          \n" +
+				"    class def create() : DynByte                            \n" +
+				"        new                                                 \n" +
+				"                                                            \n" +
+				"val i = DynInt.create()                                     \n" +
+				"                                                            \n" +
+				"match(i):                                                   \n" +
+				"	DynInt => 10                                             \n" +
+				"	DynChar => 15                                            \n" +
+				"	DynByte => 25                                            \n" +
+				"	default => 15                                            \n";
+			// default specified with exhaustive search; error
+				
+			//ErrorMessage.DEFAULT_PRESENT
+				
+			Assert.fail("TODO");
+	}
+	
+	public void caseOfParseTest() {
+		String input = 
+			"tagged class Dyn                            \n" +
+			"    class def create() : X                  \n" +
+			"        new                                 \n" +
+			"                                            \n" +
+			"tagged class DynInt [case of Dyn]           \n" +
+			"    class def create() : DynInt             \n" +
+			"        new                                 \n" +
+			"                                            \n" +
+			"tagged class DynChar [case of Dyn]          \n" +
+			"    class def create() : DynChar            \n" +
+			"        new                                 \n" +
+			"                                            \n" +
+			"val i = DynInt.create()                     \n" +
+			"                                            \n" +
+			"match(i):                                   \n" +
+			"	DynInt => 10                             \n" +
+			"	DynChar => 15                            \n" +
+			"	default => 23                            \n";
+		
+		Assert.fail("TODO");
+	}
+	
+	public void comprisesParseTest() {
+		String input = 
+			"tagged class Dyn [comprises DynInt, DynChar] \n" +
+			"    class def create() : X                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class DynInt [case of Dyn]            \n" +
+			"    class def create() : DynInt              \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class DynChar [case of Dyn]           \n" +
+			"    class def create() : DynChar             \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"val i = DynInt.create()                      \n" +
+			"                                             \n" +
+			"match(i):                                    \n" +
+			"	DynInt => 10                              \n" +
+			"	DynChar => 15                             \n";
+		// Default not needed here because match is exhaustive
+		
+		Assert.fail("TODO");
+	}
+	
+	public void jsonTest() {
+		//TODO, make this test do something useful!
+		
+		String input = 
+				"tagged class JSON                            \n" +
+				"    class def create() : X                   \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"tagged class ValueJSON [case of JSON]        \n" +
+				"    class def create() : ValueJSON           \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"tagged class ObjJSON [case of JSON]          \n" +
+				"    class def create() : ObjJSON             \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"tagged class StrJSON [case of JSON]          \n" +
+				"    class def create() : StrJSON             \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"tagged class NumJSON [case of JSON]          \n" +
+				"    class def create() : NumJSON             \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"tagged class IntJSON [case of NumJSON]       \n" +
+				"    class def create() : IntJSON             \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"tagged class DoubleJSON [case of NumJSON]    \n" +
+				"    class def create() : DoubleJSON          \n" +
+				"        new                                  \n" +
+				"                                             \n" +
+				"val json = DoubleJSON.create()               \n" +
+				"                                             \n" +
+				"match(i):                                    \n" +
+				"	ObjJSON => 10                             \n" +
+				"	StrJSON => 15                             \n" + 
+				"	default => 15                             \n";
+			
+			Assert.fail("TODO");
+	}
 }
