@@ -284,6 +284,9 @@ import java.net.URI;
 	terminal taggedKwd_t  ::= /tagged/  in (keywds);
 	terminal matchKwd_t   ::= /match/   in (keywds);
 	terminal defaultKwd_t ::= /default/ in (keywds);
+	terminal caseKwd_t ::= /case/ in (keywds);
+	terminal ofKwd_t ::= /of/ in (keywds);
+	terminal comprisesKwd_t ::= /comprises/ in (keywds);
 	
     terminal classKwd_t ::= /class/ in (keywds);
 	terminal typeKwd_t 	::= /type/ in (keywds);
@@ -409,6 +412,12 @@ import java.net.URI;
    	non terminal caseStatementsO;
    	non terminal varStatement;
    	non terminal defaultStatement;
+   	
+   	non terminal taggedInfo;
+   	non terminal caseOf;
+   	non terminal comprises;
+   	non terminal listTags;
+   	non terminal singleTag;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -476,7 +485,7 @@ import java.net.URI;
 
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  taggedKwd_t classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, "", "",
+    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
     	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
@@ -689,6 +698,46 @@ import java.net.URI;
     //a default match statement
     defaultStatement ::= defaultKwd_t arrow_t dslce:inner 	{: RESULT = new Case((TypedAST) inner); :}
     	  ;
+
+	// hierarchical tags
+
+	taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
+	             | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
+	             | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
+	             |              {: RESULT = new TaggedInfo(); :}
+	             ;
+	
+	// [case of tag]
+   	caseOf ::= oSquareBracket_t caseKwd_t ofKwd_t singleTag:tag cSquareBracket_t 
+   			{: RESULT = tag; :}
+   			;
+   	
+   	// [comprises tag+]
+	comprises ::= oSquareBracket_t comprisesKwd_t listTags:tags cSquareBracket_t
+   	      {: RESULT = tags; :}
+   	      ;
+   	      
+   	//1 or more tags
+   	listTags ::= singleTag:tag comma_t listTags:rest {: 
+   					List<String> tags = new ArrayList<String>();
+   			   		tags.add((String) tag);
+   			   		tags.addAll((List<String>) rest);
+   			   
+   			   		RESULT = tags; 
+   				:}
+               | singleTag:tag {: 
+               		List<String> tags = new ArrayList<String>();
+   			   		tags.add((String) tag);
+   			   		
+               		RESULT = tags; 
+                 :}
+   	           ;
+   	           
+   	//a single tag
+   	singleTag ::= identifier_t:id {: RESULT = (String) id; :}
+   	            ;
+
+	// end hierarchical tags
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}

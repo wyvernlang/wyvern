@@ -410,7 +410,8 @@ public class TagTests {
 			Assert.fail("TODO");
 	}
 	
-	public void caseOfParseTest() {
+	@Test
+	public void caseOfParseTest() throws CopperParserException, IOException {
 		String input = 
 			"tagged class Dyn                            \n" +
 			"    class def create() : X                  \n" +
@@ -431,10 +432,12 @@ public class TagTests {
 			"	DynChar => 15                            \n" +
 			"	default => 23                            \n";
 		
-		Assert.fail("TODO");
+		new Wyvern().parse(new StringReader(input), "test input");
+		//reaching here without a parse exception is a pass
 	}
 	
-	public void comprisesParseTest() {
+	@Test
+	public void comprisesParseTest() throws CopperParserException, IOException {
 		String input = 
 			"tagged class Dyn [comprises DynInt, DynChar] \n" +
 			"    class def create() : X                   \n" +
@@ -452,10 +455,12 @@ public class TagTests {
 			"                                             \n" +
 			"match(i):                                    \n" +
 			"	DynInt => 10                              \n" +
-			"	DynChar => 15                             \n";
-		// Default not needed here because match is exhaustive
+			"	DynChar => 15                             \n" +
+			"	default => 15                             \n";
 		
-		Assert.fail("TODO");
+		
+		new Wyvern().parse(new StringReader(input), "test input");
+		//reaching here without a parse exception is a pass
 	}
 	
 	public void jsonTest() {
