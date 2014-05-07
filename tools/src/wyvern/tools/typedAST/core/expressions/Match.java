@@ -75,12 +75,18 @@ public class Match extends CachingTypedAST implements CoreAST {
 	
 	@Override
 	public Value evaluate(Environment env) {
+		// We've already typechecked, so this cast should be safe 
+		ClassType matchingOverClass = (ClassType) matchingOver.getType();
+		String className = matchingOverClass.getName();
+		
 		for (Case c : cases) {
-			//TODO: this actually needs to check against the type of what we're matching over
-			if (c.getTaggedTypeMatch().equals(matchingOver)) return c.getAST().evaluate(env);
+			if (c.getTaggedTypeMatch().equals(className)) {
+				// We've got a match, evaluate this case
+				return c.getAST().evaluate(env);
+			}
 		}
 		
-		//no match, evaluate the default case
+		// No match, evaluate the default case
 		return defaultCase.getAST().evaluate(env);
 	}
 
@@ -120,6 +126,9 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		// First typecheck all children
+		matchingOver.typecheck(env, expected);
+		
 		//Note: currently all errors given use matchingOver because it has a location
 		//TODO: use the actual entity that is responsible for the error
 		
