@@ -39,6 +39,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 	
 	private FileLocation location;
 	
+	public String toString() {
+		return "Match: " + matchingOver + " with " + cases.size() + " cases and default: " + defaultCase;
+	}
+	
 	public Match(TypedAST matchingOver, List<Case> cases, FileLocation location) {		
 		
 		this.matchingOver = matchingOver;
@@ -131,6 +135,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		//Note: currently all errors given use matchingOver because it has a location
 		//TODO: use the actual entity that is responsible for the error
+		
+		this.matchingOver.typecheck(env, expected);
 		
 		// Variable we're matching must exist and be a tagged type
 		for (Case c : cases) {

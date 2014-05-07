@@ -168,6 +168,26 @@ public class TagTests {
 	@Test
 	public void matchInterpretTest2() throws CopperParserException, IOException {		
 		String input = 
+				"tagged class Z                 \n" +
+				"    class def create() : Z     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class W                 \n" +
+				"    class def create() : W     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class V                 \n" +
+				"    class def create() : V     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class U                 \n" +
+				"    class def create() : U     \n" +
+				"        new                    \n" +
+				"                               \n" +
 				"tagged class X                 \n" +
 				"    class def create() : X     \n" +
 				"        new                    \n" +
@@ -175,7 +195,12 @@ public class TagTests {
 				"val x = X.create()             \n" +
 				"                               \n" +
 				"match(x):                      \n" +
-				"	X => 25                     \n" +
+				"	X => 1                     \n" +
+				"	Y => 2                     \n" +
+				"	Z => 3                     \n" +
+				"	W => 4                     \n" +
+				"	U => 5                     \n" +
+				"	V => 6                     \n" +
 				"	default => 15               \n";
 		
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
@@ -495,11 +520,13 @@ public class TagTests {
 				"    class def create() : DoubleJSON          \n" +
 				"        new                                  \n" +
 				"                                             \n" +
-				"val json = DoubleJSON.create()               \n" +
+				"val json = IntJSON.create()               \n" +
 				"                                             \n" +
-				"match(i):                                    \n" +
+				"match(json):                                    \n" +
+				"	NumJSON => 15                             \n" + 
 				"	ObjJSON => 10                             \n" +
 				"	StrJSON => 15                             \n" + 
+				"	IntJSON => 15                             \n" + 
 				"	default => 15                             \n";
 			
 			Assert.fail("TODO");
