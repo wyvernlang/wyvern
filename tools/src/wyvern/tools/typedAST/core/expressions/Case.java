@@ -9,6 +9,10 @@ public class Case {
 	
 	private TypedAST ast;
 	
+	public String toString() {
+		return "Case " + taggedTypeName + " with expression: " + ast;
+	}
+	
 	//TODO refactor this class into two classes for each type?
 	private CaseType caseType;
 	
