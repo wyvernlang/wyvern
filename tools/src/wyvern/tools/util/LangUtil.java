@@ -17,4 +17,18 @@ public class LangUtil {
 	public static String castString(Object src) {
 		return (String) src;
 	}
+
+	public static int strCharInt(String src) {
+		if (src.length() != 1)
+			throw new RuntimeException();
+		return src.charAt(0);
+	}
+
+	public static int doubleToInt(double dble) {
+		return (int)dble;
+	}
+
+	public static String intToStr(int charCode) {
+		return new String(new char[] {(char)charCode});
+	}
 }
