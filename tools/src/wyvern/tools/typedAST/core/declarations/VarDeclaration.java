@@ -74,7 +74,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment doExtend(Environment old) {
+	protected Environment doExtend(Environment old, Environment against) {
 		return old.extend(binding).extend(varBinding);
 	}
 

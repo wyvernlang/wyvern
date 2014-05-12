@@ -32,32 +32,33 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 		Environment newEnv = env;
 		for (Declaration d = this; d != null; d = d.nextDecl) {
 			d.typecheck(newEnv, Optional.empty());
-			newEnv = d.doExtend(newEnv);
+			newEnv = d.doExtend(newEnv, newEnv);
 		}
 	}
 	
 	@Override
 	public final Type typecheck(Environment env, Optional<Type> expected) {
 		Environment tEnv = this.extendType(env, env);
-		Environment newEnv = extend(extendName(tEnv, tEnv));
+		Environment nEnv = extendName(tEnv, tEnv);
+		Environment newEnv = extend(nEnv, nEnv);
 		return typecheckSelf(newEnv);
 	}
 
 	public abstract String getName();
 	protected abstract Type doTypecheck(Environment env);
 
-	public final Environment extend(Environment old) {
-		Environment newEnv = doExtend(old);
+	public final Environment extend(Environment old, Environment against) {
+		Environment newEnv = doExtend(old, against);
 		if (nextDecl != null)
-			newEnv = nextDecl.extend(newEnv);
+			newEnv = nextDecl.extend(newEnv, newEnv);
 		return newEnv;
 	}
 	
 	public final Environment extendWithSelf(Environment old) {
-		return doExtend(old);
+		return doExtend(old, old);
 	}
 
-	protected abstract Environment doExtend(Environment old);
+	protected abstract Environment doExtend(Environment old, Environment against);
 	public abstract Environment extendWithValue(Environment old);
 	public abstract void evalDecl(Environment evalEnv, Environment declEnv);
 	

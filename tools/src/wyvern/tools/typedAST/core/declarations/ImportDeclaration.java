@@ -1,31 +1,20 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.ImportBinder;
-import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.ImportResolverBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.TypeBinding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private URI uri;
@@ -94,7 +83,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment doExtend(Environment old) {
+	protected Environment doExtend(Environment old, Environment against) {
 		return binder.extend(old);
 	}
 

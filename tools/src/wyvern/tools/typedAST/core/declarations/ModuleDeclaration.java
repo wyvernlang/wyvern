@@ -68,9 +68,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	boolean extGuard = false;
 	@Override
-	protected Environment doExtend(Environment old) {
+	protected Environment doExtend(Environment old, Environment against) {
 		if (!extGuard) {
-			dclEnv.set(inner.extend(dclEnv.get()));
+			dclEnv.set(inner.extend(dclEnv.get(), old.extend(dclEnv.get())));
 		}
 		return old.extend(new NameBindingImpl(name, selfType)).extend(new TypeBinding(name, subTypeType));
 	}

@@ -91,7 +91,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		}
 
 		@Override
-		protected Environment doExtend(Environment old) {
+		protected Environment doExtend(Environment old, Environment against) {
 			return old;
 		}
 
@@ -189,7 +189,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type doTypecheck(Environment env) {
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
-		Environment eenv = decls.extend(env);
+		Environment eenv = decls.extend(env, env);
 		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
@@ -200,7 +200,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}	
 	
 	@Override
-	protected Environment doExtend(Environment old) {
+	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
 		return newEnv;

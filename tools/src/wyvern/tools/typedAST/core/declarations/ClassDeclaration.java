@@ -211,7 +211,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 	
 	@Override
-	protected Environment doExtend(Environment old) {
+	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		
 		// FIXME: Currently allow this and class in both class and object methods. :(

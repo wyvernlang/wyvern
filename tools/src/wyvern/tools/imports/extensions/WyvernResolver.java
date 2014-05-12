@@ -91,7 +91,7 @@ public class WyvernResolver implements ImportResolver {
 			}
 			extending = true;
 			if (res instanceof EnvironmentExtender)
-				in = ((EnvironmentExtender) res).extend(in);
+				in = ((EnvironmentExtender) res).extend(in, in);
 			extending = false;
 			return in.extend(mib.from(in));
 		}

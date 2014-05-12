@@ -91,8 +91,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	protected Environment doExtend(Environment old) {
-		return extendName(old, old);
+	protected Environment doExtend(Environment old, Environment against) {
+		return extendName(old, against);
 	}
 
 	@Override

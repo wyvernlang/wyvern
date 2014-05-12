@@ -132,7 +132,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		Environment wtypes = extendType(env, env);
 		env = extendName(wtypes, wtypes);
 		for (Declaration d : this.getDeclIterator())
-			env = d.extend(env);
+			env = d.extend(env, env);
 
 		for (TypedAST d : this) {
 			d.typecheck(env, Optional.empty());
@@ -196,11 +196,11 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return nenv;
 	}
 
-	public final Environment extend(Environment old) {
-		Environment wtypes = extendType(old, old);
-		Environment newEnv = extendName(wtypes, wtypes);
+	public final Environment extend(Environment old, Environment against) {
+		Environment wtypes = extendType(old, against);
+		Environment newEnv = extendName(wtypes, against);
 		for (EnvironmentExtender d : this.getEnvExts())
-			newEnv = d.extend(newEnv);
+			newEnv = d.extend(newEnv, against);
 		return newEnv;
 	}
 
