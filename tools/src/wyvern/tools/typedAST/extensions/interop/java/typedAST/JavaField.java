@@ -1,15 +1,12 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -19,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by Ben Chung on 10/21/13.
@@ -27,10 +25,10 @@ public class JavaField extends Declaration {
     private NameBinding nameBinding;
     private final Field src;
     private final MethodHandle getter;
-    private final MethodHandle setter;
+    private final Optional<MethodHandle> setter;
 	private boolean isClass;
 
-    public JavaField(Field src, MethodHandle getter, MethodHandle setter) {
+    public JavaField(Field src, MethodHandle getter, Optional<MethodHandle> setter) {
         this.src = src;
         this.getter = getter;
         this.setter = setter;
