@@ -51,7 +51,7 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 				case "+": return new IntegerConstant(value + intArgValue.value);
 				case "-": return new IntegerConstant(value - intArgValue.value);
 				case "*": return new IntegerConstant(value * intArgValue.value);
-				case "/": return new IntegerConstant(value / intArgValue.value);
+				case "/": try { return new IntegerConstant(value / intArgValue.value); } catch (ArithmeticException e) { throw new RuntimeException(exp.getLocation() + "", e); }
 				case ">": return new BooleanConstant(value > intArgValue.value);
 				case "<": return new BooleanConstant(value < intArgValue.value);
 				case ">=": return new BooleanConstant(value >= intArgValue.value);
