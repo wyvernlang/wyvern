@@ -35,7 +35,7 @@ public class TypeAsc extends AbstractTypedAST {
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		should = TypeResolver.resolve(should, env);
-		if (!(should.subtype(exn.typecheck(env, Optional.empty()))))
+		if (!(exn.typecheck(env, Optional.empty()).subtype(should)))
 			throw new RuntimeException();
 		return should;
 	}
