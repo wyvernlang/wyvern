@@ -63,7 +63,10 @@ public class JavaClassDecl extends ClassDeclaration {
 			}
 
             for (Field f : clazz.getFields()) {
-                decls.add(new JavaField(f,null,null));//TODO pending upstream push of OpenJDK patch 8009222
+				Optional<MethodHandle> setter = Optional.empty();
+				if (!Modifier.isFinal(f.getModifiers()))
+					setter = Optional.of(lookup.unreflectSetter(f));
+                decls.add(new JavaField(f,lookup.unreflectGetter(f),setter));
             }
 
 			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
