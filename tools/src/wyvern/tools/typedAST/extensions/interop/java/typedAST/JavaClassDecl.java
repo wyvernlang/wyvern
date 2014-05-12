@@ -10,7 +10,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -146,7 +145,7 @@ public class JavaClassDecl extends ClassDeclaration {
 			return;
 		envDone = true;
 		initalize();
-		Environment declEnv = getDeclEnvRef().get();
+		Environment declEnv = Environment.getEmptyEnvironment();
 		Environment objEnv = getObjEnvV();
 		if (declEnv == null)
 			declEnv = Environment.getEmptyEnvironment();
@@ -155,21 +154,21 @@ public class JavaClassDecl extends ClassDeclaration {
 		for (Declaration decl : this.getDecls().getDeclIterator()) {
 			if (decl instanceof JavaMeth) {
 				if (((JavaMeth) decl).isClass()) {
-					declEnv = decl.extend(declEnv);
+					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
-				objEnv = decl.extend(objEnv);
+				objEnv = decl.extend(objEnv, objEnv);
 			} else if (decl instanceof JavaField) {
 				if (((JavaField) decl).isClass()) {
-					declEnv = decl.extend(declEnv);
+					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
-				objEnv = decl.extend(objEnv);
+				objEnv = decl.extend(objEnv, objEnv);
 			} else {
 				throw new RuntimeException();
 			}
 		}
-		//getDeclEnvRef().set(declEnv);
+		getDeclEnvRef().set(declEnv);
 		setObjEnv(objEnv);
 		envDone = true;
 	}
