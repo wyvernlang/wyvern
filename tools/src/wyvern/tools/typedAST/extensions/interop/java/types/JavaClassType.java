@@ -24,6 +24,7 @@ public class JavaClassType extends ClassType {
 		super(new Reference<Environment>() {
 			@Override
 			public Environment get() {
+				cd.initalize();
 				return cd.getObjEnv();
 			}
 		}, null, new LinkedList<>(), "");
@@ -32,7 +33,7 @@ public class JavaClassType extends ClassType {
 	}
 
 	public void initalize() {
-		((JavaClassDecl)super.getDecl()).initalize();
+		(decl).initalize();
 	}
 
 	public Class getInnerClass() {
