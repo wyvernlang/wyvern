@@ -228,7 +228,7 @@ import java.net.URI;
 	disambiguate signal:(dslSignal_t,newSignal_t)
 	{:
 		//Should never be used.
-		throw new RuntimeException();
+		throw new RuntimeException(new FileLocation(currentState.pos) + "");
 	:};
 
 
@@ -290,6 +290,9 @@ import java.net.URI;
 	terminal newKwd_t 	::= /new/ in (keywds);
  	terminal importKwd_t   ::= /import/ in (keywds);
  	terminal moduleKwd_t   ::= /module/ in (keywds);
+	terminal ifKwd_t 	::= /if/ in (keywds);
+ 	terminal thenKwd_t   ::= /then/ in (keywds);
+ 	terminal elseKwd_t   ::= /else/ in (keywds);
 
  	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
  		RESULT = Integer.parseInt(lexeme);
@@ -328,6 +331,10 @@ import java.net.URI;
  	terminal colon_t ::= /:/ ;
  	terminal pound_t ::= /#/ ;
  	terminal question_t ::= /?/ ;
+ 	terminal bar_t ::= /\|/ ;
+ 	terminal and_t ::= /&/ ;
+ 	terminal gt_t ::= />/ ;
+ 	terminal lt_t ::= /</ ;
 
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
@@ -400,6 +407,7 @@ import java.net.URI;
     precedence left colon_t;
     precedence left openParen_t;
     precedence left dot_t;
+    precedence left equals_t, lt_t, gt_t;
     precedence left plus_t, dash_t;
     precedence left mult_t, divide_t;
 
@@ -413,7 +421,7 @@ import java.net.URI;
 		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos));:}
 		 | p:prog {: RESULT = prog; :};
 
-	ptl ::= import:imp Newline_t ptl:nxt {: RESULT = new DeclSequence((TypedAST)imp, (TypedAST)nxt); :}
+	ptl ::= import:imp Newline_t ptl:nxt {: RESULT = DeclSequence.simplify(new DeclSequence((TypedAST)imp, (TypedAST)nxt)); :}
 		|   import:imp {: RESULT = imp; :}
 		|   pm:bdy {: RESULT = bdy; :};
 
@@ -424,7 +432,7 @@ import java.net.URI;
     	;
 
     elst ::= dslce:ce {: RESULT = ce; :}
-    	|    dsle:ce elst:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
+    	|    dsle:ce p:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
     	| ;
 
 	non terminal pnrd;
@@ -469,7 +477,6 @@ import java.net.URI;
     			;
     non terminal declbody;
     declbody ::= equals_t dsle:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
-
 
     params ::= openParen_t iparams:ip closeParen_t {: RESULT = ip; :}
     		|  openParen_t closeParen_t {: RESULT = new LinkedList<NameBinding>(); :}
@@ -609,28 +616,47 @@ import java.net.URI;
 		new TupleObject((TypedAST)tgt, new DSLLit(Optional.empty()), new FileLocation(currentState.pos)),
 		new FileLocation(currentState.pos)); :};
 
-    e ::= AE:aer {:
-    	RESULT = aer;
-    :};
+	non terminal a;
+
+    e ::= fnKwd_t identifier_t:id typeasc:t arrow_t e:inner {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, (Type)t)), (TypedAST)inner); :}
+    	|	 openParen_t e:src typeasc:as closeParen_t {: RESULT = new TypeAsc((TypedAST)src, (Type)as); :}
+    	|	 ifKwd_t e:check thenKwd_t e:thenE elseKwd_t e:elseE {:
+    		RESULT = new IfExpr(Arrays.asList(new IfExpr.CondClause((TypedAST)check, (TypedAST)thenE, new FileLocation(currentState.pos)),
+    										  new IfExpr.UncondClause((TypedAST)elseE, new FileLocation(currentState.pos))), new FileLocation(currentState.pos)); :}
+    	| a:aer {: RESULT = aer; :};
+
+	non terminal EE;
+	non terminal BE;
+
+    a ::= EE:are {: RESULT = are; :};
+
+    EE ::= EE:l equals_t equals_t EE:r {: RESULT = new Invocation((TypedAST)l,"==",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    	|  EE:l gt_t EE:r {: RESULT = new Invocation((TypedAST)l,">",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    	|  EE:l lt_t EE:r {: RESULT = new Invocation((TypedAST)l,"<",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    	|  AE:mer {:RESULT = mer;:};
 
     AE ::= AE:l plus_t ME:r {: RESULT = new Invocation((TypedAST)l,"+",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  AE:l dash_t ME:r {: RESULT = new Invocation((TypedAST)l,"-",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  ME:mer {:RESULT = mer;:};
 
-    ME ::= ME:l mult_t term:r {: RESULT = new Invocation((TypedAST)l,"*",(TypedAST)r, new FileLocation(currentState.pos)); :}
-    	|  ME:l divide_t term:r {: RESULT = new Invocation((TypedAST)l,"/",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    ME ::= ME:l mult_t BE:r {: RESULT = new Invocation((TypedAST)l,"*",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    	|  ME:l divide_t BE:r {: RESULT = new Invocation((TypedAST)l,"/",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    	|  BE:ter {:RESULT = ter;:};
+
+    BE ::= BE:l bar_t bar_t term:r {: RESULT = new Invocation((TypedAST)l, "||", (TypedAST)r, new FileLocation(currentState.pos)); :}
+    	|  BE:l and_t and_t term:r {: RESULT = new Invocation((TypedAST)l, "&&", (TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  term:ter {:RESULT = ter;:};
+
 
     non terminal etuple;
 
+
     term ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
-    	|	 fnKwd_t identifier_t:id typeasc:t arrow_t openParen_t e:inner closeParen_t {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, (Type)t)), (TypedAST)inner); :}
     	|	 openParen_t e:inner closeParen_t {: RESULT = inner; :}
     	|	 etuple:tpe {: RESULT = tpe; :}
     	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, new FileLocation(currentState.pos)); :}
     	|	 term:src dot_t identifier_t:op {: RESULT = new Invocation((TypedAST)src,(String)op, null, new FileLocation(currentState.pos)); :}
 		|	 term:src dot_t metadataKwd_t {: RESULT = new Invocation((TypedAST)src,"metadata", null, new FileLocation(currentState.pos)); :}
-    	//|	 term:src typeasc:as {: RESULT = new TypeAsc((Expr)src, (Type)as); :}
     	|	 inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
