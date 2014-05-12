@@ -58,6 +58,8 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	@Override
 	public Type checkOperator(Invocation opExp, Environment env) {
 		// should not be any arguments - that is in a separate application at present
+		if (opExp.getArgument() != null)
+			throw new RuntimeException(opExp.getLocation().toString());
 		assert opExp.getArgument() == null;
 		
 		// the operation should exist
