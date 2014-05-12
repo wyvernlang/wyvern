@@ -3,6 +3,8 @@ package wyvern.tools.typedAST.core.values;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -35,11 +37,21 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	@Override
 	public Value evaluateInvocation(Invocation exp, Environment env) {
 		String operator = exp.getOperationName();
-		if (!operator.equals("+")) {
+		if (!operator.equals("+") && !operator.equals("==")) {
+
 			throw new RuntimeException("forgot to typecheck!");
 		}
-		
 		Value argValue =  exp.getArgument().evaluate(env);
+
+		if (operator.equals("==")) {
+			if (argValue instanceof StringConstant) {
+				return new BooleanConstant(this.getValue().equals(((StringConstant) argValue).getValue()));
+			} else if (argValue instanceof JavaObj) {
+				return new BooleanConstant(((String)((JavaObj) argValue).getObj()).equals(this.getValue()));
+			}
+			throw new RuntimeException("forgot to typecheck!");
+		}
+
 		if (argValue instanceof StringConstant) {
 			return new StringConstant(this.value + ((StringConstant) argValue).value);
 		} else	if (argValue instanceof IntegerConstant) {
