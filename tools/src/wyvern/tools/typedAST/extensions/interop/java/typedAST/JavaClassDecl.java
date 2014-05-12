@@ -174,15 +174,24 @@ public class JavaClassDecl extends ClassDeclaration {
 		Class[] ifaces = c.getInterfaces();
 		for (int i = 0; i < ifaces.length; i++) {
 			Method ifaceMethod = findHighestMethod(ifaces[i], m);
-			if (ifaceMethod != null) return ifaceMethod;
+
+			if (ifaceMethod != null) {
+				ifaceMethod.setAccessible(true);
+				return ifaceMethod;
+			}
 		}
 		if (c.getSuperclass() != null) {
 			Method parentMethod = findHighestMethod(
 					c.getSuperclass(), m);
-			if (parentMethod != null) return parentMethod;
+			if (parentMethod != null) {
+				parentMethod.setAccessible(true);
+				return parentMethod;
+			}
 		}
 		try {
-			return c.getDeclaredMethod(m.getName(), m.getParameterTypes());
+			Method declaredMethod = c.getDeclaredMethod(m.getName(), m.getParameterTypes());
+			declaredMethod.setAccessible(true);
+			return declaredMethod;
 		} catch (NoSuchMethodException e) {
 			return null;
 		}
