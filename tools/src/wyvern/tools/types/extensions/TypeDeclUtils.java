@@ -54,7 +54,7 @@ public class TypeDeclUtils {
 			DefDeclaration getter = new DefDeclaration(propName, type,
 					new LinkedList<NameBinding>(), null, false, FileLocation.UNKNOWN);
 
-			tev = getter.extend(tev);
+			tev = getter.extend(tev, tev);
 		}
 		return tev;
 	}
@@ -68,7 +68,7 @@ public class TypeDeclUtils {
 			if (d instanceof DefDeclaration) {
 				if (((DefDeclaration) d).isClass() != useClassMembers)
 					continue;
-				newEnv = d.extend(newEnv);
+				newEnv = d.extend(newEnv, newEnv);
 			} else if (d instanceof VarDeclaration) {
 				if (((VarDeclaration) d).isClass() != useClassMembers)
 					continue;
@@ -96,9 +96,9 @@ public class TypeDeclUtils {
 				DefDeclaration getter = new DefDeclaration(propName, type,
 						new LinkedList<NameBinding>(), null, false, line);
 
-				newEnv = getter.extend(newEnv);
+				newEnv = getter.extend(newEnv, newEnv);
 			} else if (d instanceof TypeDeclaration) {
-				newEnv = d.extend(newEnv);
+				newEnv = d.extend(newEnv, newEnv);
 			} else if (d instanceof ClassDeclaration) {
 				ClassDeclaration cd = (ClassDeclaration) d;
 				TypeType tt = ((ClassType) cd.getType()).getEquivType();
