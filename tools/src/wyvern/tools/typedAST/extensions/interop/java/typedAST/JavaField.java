@@ -51,8 +51,8 @@ public class JavaField extends Declaration {
     }
 
     @Override
-    protected Environment doExtend(Environment old) {
         Environment newEnv = old.extend(nameBinding);
+    protected Environment doExtend(Environment old, Environment against) {
         return newEnv;
     }
 

@@ -76,8 +76,8 @@ public class New extends CachingTypedAST implements CoreAST {
 			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName()))), Optional.empty());
 
 
-
-			Environment nnames = seq.extend(seq.extendName(declEnv,declEnv.extend(env)));
+			Environment environment = seq.extendName(declEnv, declEnv.extend(env));
+			Environment nnames = seq.extend(environment, environment);
 
 			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(declEnv));
 			Type classVarType = new ClassType(new Reference<>(nnames.extend(declEnv)), new Reference<>(objTee), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName());
@@ -116,7 +116,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		for (Entry<String, TypedAST> elem : args.entrySet()) {
 			ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
 			e.typecheck(env, Optional.empty());
-			mockEnv = e.extend(mockEnv);
+			mockEnv = e.extend(mockEnv, mockEnv);
 			decls.add(e);
 		}
 		return mockEnv;
