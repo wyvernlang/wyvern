@@ -485,7 +485,7 @@ import java.net.URI;
 
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, "", "",
+    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, (TaggedInfo) tagInfo, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
     	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;

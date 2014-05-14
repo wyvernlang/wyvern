@@ -5,6 +5,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -53,6 +54,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	private boolean isTagged;
+	private TaggedInfo taggedInfo;
 	
 	public ClassDeclaration(String name,
 							String implementsName,
@@ -67,6 +69,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	public ClassDeclaration(String name,
 			boolean isTagged,
+			TaggedInfo taggedInfo,
 			String implementsName,
 			String implementsClassName,
 			DeclSequence decls,
@@ -74,6 +77,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 		
 		this.isTagged = isTagged;
+		this.taggedInfo = taggedInfo;
 	}
 	
 	public ClassDeclaration(String name,
@@ -108,6 +112,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return objType;
 	}
 
+	
+	
 	protected void updateEnv() {
 		typeEquivalentEnvironmentRef.set(TypeDeclUtils.getTypeEquivalentEnvironment(getDecls(), false));
 	}
@@ -203,6 +209,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
                         nameImplementsClass.getName());
 			}
 		}
+		
+		//TODO
+		//type-test the tag information
 
 		return Unit.getInstance();
 	}
@@ -294,6 +303,25 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
+	/**
+	 * Returns if this class is tagged or not.
+	 * 
+	 * @return true if tagged, false otherwise
+	 */
+	public boolean isTagged() {
+		return isTagged;
+	}
+	
+	/**
+	 * Returns the tag information associated with this class. 
+	 * If this class isn't tagged this information will be null.
+	 * 
+	 * @return the tag info
+	 */
+	public TaggedInfo getTaggedInfo() {
+		return taggedInfo;
+	}
+	
 	private FileLocation location = FileLocation.UNKNOWN;
 	
 	@Override
