@@ -20,9 +20,10 @@ public class SpliceExn extends AbstractTypedAST {
 		this.exn = exn;
 	}
 
+	private Optional<Type> cached = Optional.empty();
 	@Override
 	public Type getType() {
-		return Util.javaToWyvType(TypedAST.class);
+		return cached.get();
 	}
 
 	@Override
@@ -30,7 +31,9 @@ public class SpliceExn extends AbstractTypedAST {
 		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
 			.map(oeb->oeb.getStore())
 			.orElse(Environment.getEmptyEnvironment());
-		return exn.typecheck(outerEnv, expected);
+		Type exnType = exn.typecheck(outerEnv, expected);
+		cached = Optional.of(exnType);
+		return exnType;
 	}
 
 	@Override
