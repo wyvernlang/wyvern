@@ -136,8 +136,11 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		Type resolved;
 		if (binding.getType() != null)
 			resolved = TypeResolver.resolve(binding.getType(), against);
-		else
+		else {
+			if (definitionType == null)
+				typecheckSelf(against);
 			resolved = definitionType;
+		}
 
 		return env.extend(new NameBindingImpl(getName(), resolved));
 	}

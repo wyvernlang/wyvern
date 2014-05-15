@@ -320,13 +320,24 @@ public class CopperTests {
 	public void testNew3() throws IOException, CopperParserException {
 		String input =
 				"val test = (new.d.k)+9/3-3\n" +
-				"	val d = new\n" +
-				"		val k = 19\n" +
-				"	def x():Int = 7\n" +
-				"test\n";
+						"	val d = new\n" +
+						"		val k = 19\n" +
+						"	def x():Int = 7\n" +
+						"test\n";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Globals.getStandardEnv(), Optional.empty());
 		Assert.assertEquals("IntegerConstant(19)",res.evaluate(Globals.getStandardEnv()).toString());
+	}
+	@Test
+	public void testNew4() throws IOException, CopperParserException {
+		String input =
+				"val x = 3\n" +
+				"val test = new\n" +
+				"	val x = x\n" +
+				"test.x\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+		Assert.assertEquals("IntegerConstant(3)",res.evaluate(Globals.getStandardEnv()).toString());
 	}
 	
 	// admittedly this is only a starting point....

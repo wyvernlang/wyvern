@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -129,10 +130,15 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
+		Environment ienv = env;
 		Environment wtypes = extendType(env, env);
 		env = extendName(wtypes, wtypes);
-		for (Declaration d : this.getDeclIterator())
-			env = d.extend(env, env);
+		for (Declaration d : this.getDeclIterator()) {
+			Environment againstEnv = env;
+			if ((d instanceof ValDeclaration) || (d instanceof VarDeclaration))
+				againstEnv = ienv;
+			env = d.extend(env, againstEnv);
+		}
 
 		for (TypedAST d : this) {
 			d.typecheck(env, Optional.empty());
