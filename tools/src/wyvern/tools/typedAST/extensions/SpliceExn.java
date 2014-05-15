@@ -7,64 +7,50 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
-import wyvern.tools.parsing.ExtParser;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Created by Ben Chung on 3/11/14.
- */
-public class DSLLit extends AbstractTypedAST {
-	Optional<String> dslText = Optional.empty();
-	TypedAST dslAST = null;
-	Type dslASTType = null;
+public class SpliceExn extends AbstractTypedAST {
+	private final TypedAST exn;
 
-	public void setText(String text) {
-		if (dslText == null)
-			throw new RuntimeException();
-		dslText = Optional.of(text);
+	public SpliceExn(TypedAST exn) {
+		this.exn = exn;
 	}
-
-	public Optional<String> getText() { return dslText; }
-
-	public DSLLit(Optional<String> dslText) {
-		this.dslText = (dslText);
-	}
-
-	public TypedAST getAST() { return (dslAST); }
 
 	@Override
 	public Type getType() {
-		return dslASTType;
+		return Util.javaToWyvType(TypedAST.class);
 	}
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		Type dslType = expected.get();
-
-		ExtParser parser = (ExtParser) Util.toJavaObject(((TypeType) dslType).getAttrValue(), ExtParser.class);
-
-		dslAST = new TSLBlock(parser.parse(dslText.get()));
-
-		return dslAST.typecheck(env,expected);
+		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+			.map(oeb->oeb.getStore())
+			.orElse(Environment.getEmptyEnvironment());
+		return exn.typecheck(outerEnv, expected);
 	}
 
 	@Override
 	public Value evaluate(Environment env) {
-		return null;
+		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+				.map(oeb->oeb.getStore())
+				.orElse(Environment.getEmptyEnvironment());
+		return exn.evaluate(outerEnv);
 	}
 
 	@Override
 	public Map<String, TypedAST> getChildren() {
-		return null;
+		Map<String, TypedAST> result = new HashMap<>(1);
+		result.put("exn", exn);
+		return result;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return null;
+		return new SpliceExn(newChildren.get("exn"));
 	}
 
 	@Override

@@ -10,13 +10,15 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.*;
+import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.New;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.extensions.DSLLit;
+import wyvern.tools.typedAST.extensions.SpliceExn;
+import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -31,6 +33,7 @@ import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.Wyvern;
 
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -513,110 +516,118 @@ public class CopperTests {
 	}
 
 	@Test
-	public void testRDP() throws IOException, CopperParserException {
-		long st = System.nanoTime();
-		for (int i = 0; i < 50; i++) {
-			String tokenizer =
-					"module Tokenizer\n" +
-					"import java:java.lang.String\n" +
-					"import java:java.io.StringReader\n" +
-					"import java:java.io.StreamTokenizer\n" +
-					"import java:wyvern.tools.util.LangUtil\n" +
-					"val s : Str = \"2+3\"\n" +
-					"type Token\n" +
-					"	def typeOf():Int\n"+
-					"	def getStr():String\n"+
-					"	def getNum():Int\n"+
-					"class StrTok\n" +
-					"	class def create(s:String):StrTok = new\n" +
-					"		val s:String = s\n" +
-					"	val s:String\n" +
-					"	def typeOf():Int = 0\n" +
-					"	def getStr():String = this.s\n"+
-					"	def getNum():Int = 1/0\n"+
-					"class NumTok\n" +
-					"	class def create(n:Int):NumTok = new\n" +
-					"		val n:Int = n\n" +
-					"	val n : Int\n" +
-					"	def typeOf():Int = 1\n" +
-					"	def getStr():String\n" +
-					"		val in : Int = 1/0\n" +
-					"		\"\"\n"+
-					"	def getNum():Int = this.n\n"+
-					"class TokenizerWrapper\n" +
-					"	class def create(str:StringReader):TokenizerWrapper = new\n" +
-					"		val jtok = StreamTokenizer.create(str)\n" +
-					"	val jtok : StreamTokenizer\n" +
-					"	def next():Bool = this.jtok.nextToken() == StreamTokenizer.TT_EOF\n" +
-					"	def nextTok():Token = " +
-							"(if this.jtok.ttype == StreamTokenizer.TT_NUMBER then\n" +
-								"(NumTok.create(LangUtil.doubleToInt(this.jtok.nval)) : Token) \n" +
-							"else \n" +
-								"(if this.jtok.ttype == StreamTokenizer.TT_WORD then (StrTok.create(this.jtok.sval) : Token)\n" +
-								" else (if this.jtok.ttype > 0 then (StrTok.create(LangUtil.intToStr(this.jtok.ttype)) : Token) else (NumTok.create(0-1):Token))))\n";
-			String parser =
-					"import wyv:in1\n" +
-					"import java:java.lang.String\n" +
-					"import java:java.io.StringReader\n" +
-					"class CalculatorParser\n" +
-					"	class def create(s:String):CalculatorParser\n" +
-					"		val itkzr = Tokenizer.TokenizerWrapper.create(StringReader.create(s))\n" +
-					"		itkzr.next()\n" +
-					"		new\n" +
-					"			val tkzr:Tokenizer.TokenizerWrapper = itkzr\n" +
-					"	val tkzr : Tokenizer.TokenizerWrapper\n" +
-					"	def checkNextStr(s:Str):Bool\n" +
-					"		val nt = this.tkzr.nextTok()\n" +
-					"		(nt.typeOf() == 0) && (s == nt.getStr())\n"+
-					"	def E():Int\n" +
-					"		def recurser(iv:Int):Int\n" +
-					"			val nt = this.tkzr.nextTok()\n" +
-					"			def ithen():Int\n" +
-					"				val opstr = nt.getStr()\n" +
-					"				this.tkzr.next()\n" +
-					"				val t1 = this.T()\n" +
-					"				if \"+\" == opstr then recurser(iv+t1) else recurser(iv-t1)\n" +
-					"			if nt.typeOf() == 0 then (if (\"+\" == nt.getStr()) || (\"-\" == nt.getStr()) then ithen() else iv) else iv\n" +
-					"		recurser(this.T())\n" +
-					"	def T():Int\n" +
-					"		def recurser(iv:Int):Int\n" +
-					"			val nt = this.tkzr.nextTok()\n" +
-					"			def ithen():Int\n" +
-					"				val opstr = nt.getStr()\n" +
-					"				this.tkzr.next()\n" +
-					"				val t1 = this.P()\n" +
-					"				if \"*\" == opstr then recurser(iv*t1) else recurser(iv/t1)\n" +
-					"			if nt.typeOf() == 0 then (if (\"/\" == nt.getStr()) || (\"*\" == nt.getStr()) then ithen() else iv) else iv\n" +
-					"		recurser(this.P())\n" +
-					"	def P():Int\n" +
-					"		val nt = this.tkzr.nextTok()\n" +
-					"		def num():Int\n" +
-					"			this.tkzr.next()\n" +
-					"			nt.getNum()\n" +
-					"		def paren():Int\n" +
-					"			this.tkzr.next()\n" +
-					"			val res = this.E()\n" +
-					"			val nt2 = this.tkzr.nextTok()\n" +
-					"			if nt2.typeOf() == 0 then if  \")\" == nt.getStr() then res else 1/0 else 1/0\n" +
-					"		def neg():Int\n" +
-					"			this.tkzr.next()\n" +
-					"			0-this.P()\n" +
-					"		if nt.typeOf() == 1 then " +
-								"num() " +
-							"else " +
-								"if \"(\" == nt.getStr() then " +
-									"paren() " +
-								"else " +
-									"if \"-\" == nt.getStr() then neg() else 1/0\n" +
-					"CalculatorParser.create(\"1+2*2+3\").E()";
-			WyvernResolver.clearFiles();
-			WyvernResolver.addFile("in1", tokenizer);
-			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(parser), "test input");
-			Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+	public void testSplice1() throws IOException, CopperParserException {
+		TypedAST testAST = new Sequence(
+				new ValDeclaration("x", new IntegerConstant(4), null),
+				new Application(new TSLBlock(new Fn(Arrays.asList(new NameBindingImpl("x", Int.getInstance())),
+						new SpliceExn(new Variable(new NameBindingImpl("x", Int.getInstance()), null)))), new IntegerConstant(9), null) );
+		Type result = testAST.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		Value out = testAST.evaluate(Globals.getStandardEnv());
+		int finalRes = ((IntegerConstant)out).getValue();
+		Assert.assertEquals(4, finalRes);
+	}
 
-			Value out = res.evaluate(Globals.getStandardEnv());
-		}
-		long elapsed = System.nanoTime() - st;
+	@Test
+	public void testRDP() throws IOException, CopperParserException {
+		String tokenizer =
+				"module Tokenizer\n" +
+						"import java:java.lang.String\n" +
+						"import java:java.io.StringReader\n" +
+						"import java:java.io.StreamTokenizer\n" +
+						"import java:wyvern.tools.util.LangUtil\n" +
+						"val s : Str = \"2+3\"\n" +
+						"type Token\n" +
+						"	def typeOf():Int\n"+
+						"	def getStr():String\n"+
+						"	def getNum():Int\n"+
+						"class StrTok\n" +
+						"	class def create(s:String):StrTok = new\n" +
+						"		val s:String = s\n" +
+						"	val s:String\n" +
+						"	def typeOf():Int = 0\n" +
+						"	def getStr():String = this.s\n"+
+						"	def getNum():Int = 1/0\n"+
+						"class NumTok\n" +
+						"	class def create(n:Int):NumTok = new\n" +
+						"		val n:Int = n\n" +
+						"	val n : Int\n" +
+						"	def typeOf():Int = 1\n" +
+						"	def getStr():String\n" +
+						"		val in : Int = 1/0\n" +
+						"		\"\"\n"+
+						"	def getNum():Int = this.n\n"+
+						"class TokenizerWrapper\n" +
+						"	class def create(str:StringReader):TokenizerWrapper = new\n" +
+						"		val jtok = StreamTokenizer.create(str)\n" +
+						"	val jtok : StreamTokenizer\n" +
+						"	def next():Bool = this.jtok.nextToken() == StreamTokenizer.TT_EOF\n" +
+						"	def nextTok():Token = " +
+						"(if this.jtok.ttype == StreamTokenizer.TT_NUMBER then\n" +
+						"(NumTok.create(LangUtil.doubleToInt(this.jtok.nval)) : Token) \n" +
+						"else \n" +
+						"(if this.jtok.ttype == StreamTokenizer.TT_WORD then (StrTok.create(this.jtok.sval) : Token)\n" +
+						" else (if this.jtok.ttype > 0 then (StrTok.create(LangUtil.intToStr(this.jtok.ttype)) : Token) else (NumTok.create(0-1):Token))))\n";
+		String parser =
+				"import wyv:in1\n" +
+						"import java:java.lang.String\n" +
+						"import java:java.io.StringReader\n" +
+						"class CalculatorParser\n" +
+						"	class def create(s:String):CalculatorParser\n" +
+						"		val itkzr = Tokenizer.TokenizerWrapper.create(StringReader.create(s))\n" +
+						"		itkzr.next()\n" +
+						"		new\n" +
+						"			val tkzr:Tokenizer.TokenizerWrapper = itkzr\n" +
+						"	val tkzr : Tokenizer.TokenizerWrapper\n" +
+						"	def checkNextStr(s:Str):Bool\n" +
+						"		val nt = this.tkzr.nextTok()\n" +
+						"		(nt.typeOf() == 0) && (s == nt.getStr())\n"+
+						"	def E():Int\n" +
+						"		def recurser(iv:Int):Int\n" +
+						"			val nt = this.tkzr.nextTok()\n" +
+						"			def ithen():Int\n" +
+						"				val opstr = nt.getStr()\n" +
+						"				this.tkzr.next()\n" +
+						"				val t1 = this.T()\n" +
+						"				if \"+\" == opstr then recurser(iv+t1) else recurser(iv-t1)\n" +
+						"			if nt.typeOf() == 0 then (if (\"+\" == nt.getStr()) || (\"-\" == nt.getStr()) then ithen() else iv) else iv\n" +
+						"		recurser(this.T())\n" +
+						"	def T():Int\n" +
+						"		def recurser(iv:Int):Int\n" +
+						"			val nt = this.tkzr.nextTok()\n" +
+						"			def ithen():Int\n" +
+						"				val opstr = nt.getStr()\n" +
+						"				this.tkzr.next()\n" +
+						"				val t1 = this.P()\n" +
+						"				if \"*\" == opstr then recurser(iv*t1) else recurser(iv/t1)\n" +
+						"			if nt.typeOf() == 0 then (if (\"/\" == nt.getStr()) || (\"*\" == nt.getStr()) then ithen() else iv) else iv\n" +
+						"		recurser(this.P())\n" +
+						"	def P():Int\n" +
+						"		val nt = this.tkzr.nextTok()\n" +
+						"		def num():Int\n" +
+						"			this.tkzr.next()\n" +
+						"			nt.getNum()\n" +
+						"		def paren():Int\n" +
+						"			this.tkzr.next()\n" +
+						"			val res = this.E()\n" +
+						"			val nt2 = this.tkzr.nextTok()\n" +
+						"			if nt2.typeOf() == 0 then if  \")\" == nt.getStr() then res else 1/0 else 1/0\n" +
+						"		def neg():Int\n" +
+						"			this.tkzr.next()\n" +
+						"			0-this.P()\n" +
+						"		if nt.typeOf() == 1 then " +
+						"num() " +
+						"else " +
+						"if \"(\" == nt.getStr() then " +
+						"paren() " +
+						"else " +
+						"if \"-\" == nt.getStr() then neg() else 1/0\n" +
+						"CalculatorParser.create(\"1+2*2+3\").E()";
+		WyvernResolver.clearFiles();
+		WyvernResolver.addFile("in1", tokenizer);
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(parser), "test input");
+		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+
+		Value out = res.evaluate(Globals.getStandardEnv());
 	}
 }
 
