@@ -1,7 +1,16 @@
 package wyvern.tools.util;
 
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.parsing.ParseBuffer;
+import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.parsing.transformers.DSLTransformer;
+import wyvern.tools.typedAST.extensions.SpliceExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 public class LangUtil {
 
@@ -30,5 +39,15 @@ public class LangUtil {
 
 	public static String intToStr(int charCode) {
 		return new String(new char[] {(char)charCode});
+	}
+
+	public static TypedAST splice(ParseBuffer buffer) {
+		try {
+			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
+			res = new DSLTransformer().transform(res);
+			return new SpliceExn(res);
+		} catch (IOException | CopperParserException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
