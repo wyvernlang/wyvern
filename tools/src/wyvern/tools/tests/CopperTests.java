@@ -33,7 +33,6 @@ import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.Wyvern;
 
 import java.io.*;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -356,7 +355,7 @@ public class CopperTests {
 		Type metaType = Util.javaToWyvType(ExtParser.class);
 		ExtParser parser = str -> {
 			New newv = new New(new HashMap<>(), null);
-			TypedAST dbody = new IntegerConstant(Integer.parseInt(str.trim()));
+			TypedAST dbody = new IntegerConstant(Integer.parseInt(str.getSrcString().trim()));
 			newv.setBody(new DeclSequence(Arrays.asList(new DefDeclaration("getValue", new Arrow(Unit.getInstance(), Int.getInstance()), new ArrayList<>(), dbody, false))));
 			return newv;
 		};
