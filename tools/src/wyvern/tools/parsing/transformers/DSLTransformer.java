@@ -1,6 +1,6 @@
 package wyvern.tools.parsing.transformers;
 
-import wyvern.tools.typedAST.extensions.DSLLit;
+import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;
 

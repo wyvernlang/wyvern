@@ -16,7 +16,7 @@ import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.typedAST.extensions.DSLLit;
+import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.typedAST.extensions.SpliceExn;
 import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.extensions.interop.java.Util;

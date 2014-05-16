@@ -1,7 +1,8 @@
-package wyvern.tools.typedAST.extensions;
+package wyvern.tools.parsing;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -47,7 +48,7 @@ public class DSLLit extends AbstractTypedAST {
 
 		ExtParser parser = (ExtParser) Util.toJavaObject(((TypeType) dslType).getAttrValue(), ExtParser.class);
 
-		dslAST = new TSLBlock(parser.parse(dslText.get()));
+		dslAST = new TSLBlock(parser.parse(new ParseBuffer(dslText.get())));
 
 		return dslAST.typecheck(env,expected);
 	}
