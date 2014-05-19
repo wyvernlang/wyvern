@@ -15,6 +15,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
+	Type definitionType;
 	NameBinding binding;
 	VarBinding varBinding;
 
@@ -44,9 +46,12 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		if (this.definition != null)
-			if (!(this.definition.typecheck(env, Optional.of(varBinding.getType())).subtype(varBinding.getType())))
+		if (this.definition != null) {
+			Type varType = definitionType;
+			boolean defType = this.definition.typecheck(env, Optional.of(varType)).subtype(varType);
+			if (!defType)
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
+		}
 		return binding.getType();
 	}
 
@@ -126,7 +131,9 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		return env;
+		definitionType = TypeResolver.resolve(binding.getType(), against);
+
+		return env.extend(new NameBindingImpl(getName(), definitionType));
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

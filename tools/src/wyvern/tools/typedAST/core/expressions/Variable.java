@@ -71,6 +71,11 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
+	public void checkAssignment(Assignment ass, Environment env) {
+		VarBinding vb = env.lookupBinding(binding.getName(), VarBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
+	}
+
+	@Override
 	public Value evaluateAssignment(Assignment ass, Environment env) {
 		Value value = env.getValue(binding.getName());
 		if (!(value instanceof VarValue)) {

@@ -4,6 +4,7 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import org.junit.Assert;
 import org.junit.Test;
 import wyvern.stdlib.Globals;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
@@ -46,6 +47,24 @@ public class CopperTests {
 		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		Value v = res.evaluate(Environment.getEmptyEnvironment());
 		Assert.assertEquals(v.toString(), "IntegerConstant(2)");
+	}
+	@Test(expected= ToolError.class)
+	public void testVal2() throws IOException, CopperParserException {
+		String input = "val yx:Int = false\nyx";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+	@Test(expected= RuntimeException.class)
+	public void testVal3() throws IOException, CopperParserException {
+		String input = "val yx:Int = 3\nyx = 9\nyx";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+	@Test
+	public void testVar1() throws IOException, CopperParserException {
+		String input = "var yx:Int = 3\nyx = 9\nyx";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
 	}
 	@Test
 	public void testAdd() throws IOException, CopperParserException {

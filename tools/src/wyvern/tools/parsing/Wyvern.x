@@ -451,8 +451,13 @@ import java.net.URI;
     	| nrd:res {: RESULT = res; :}
     	;
 
+    non terminal lvalue;
+    lvalue ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
+    	|	   lvalue:prev dot_t identifier_t:id {: RESULT = new Invocation((TypedAST)prev, (String)id, null, new FileLocation(currentState.pos)); :};
+
     nrd ::= val:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	|   var:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	|   lvalue:to equals_t e:va Newline_t p:re {: RESULT = new Sequence(Arrays.asList(new Assignment((TypedAST)to, (TypedAST)va, new FileLocation(currentState.pos)), (TypedAST)re));:}
     	;
 
 

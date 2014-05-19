@@ -80,6 +80,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
+	public void checkAssignment(Assignment ass, Environment env) {
+		((Assignable)receiver).evaluateAssignment(ass, env);
+	}
+
+	@Override
 	public Value evaluateAssignment(Assignment ass, Environment env) {
 		Value lhs = receiver.evaluate(env);
 		if (!(lhs instanceof Assignable))
