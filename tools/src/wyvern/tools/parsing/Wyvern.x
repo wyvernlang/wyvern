@@ -228,7 +228,7 @@ import java.net.URI;
 	disambiguate signal:(dslSignal_t,newSignal_t)
 	{:
 		//Should never be used.
-		throw new RuntimeException(new FileLocation(currentState.pos) + "");
+		throw new RuntimeException(new FileLocation(currentState.pos) + " state:" + currentState.statenum);
 	:};
 
 
@@ -322,6 +322,7 @@ import java.net.URI;
 	terminal mult_t ::= /\*/ ;
 	terminal divide_t ::= /\// ;
 	terminal equals_t ::= /=/ ;
+	terminal equalsequals_t ::= /==/ ;
 	terminal openParen_t ::= /\(/  {:  parenLevel++; :};
  	terminal closeParen_t ::= /\)/ {:  parenLevel--; :};
  	terminal comma_t ::= /,/ ;
@@ -407,7 +408,8 @@ import java.net.URI;
     precedence left colon_t;
     precedence left openParen_t;
     precedence left dot_t;
-    precedence left equals_t, lt_t, gt_t;
+    precedence left equalsequals_t, lt_t, gt_t;
+    precedence left equals_t;
     precedence left plus_t, dash_t;
     precedence left mult_t, divide_t;
 
@@ -453,7 +455,7 @@ import java.net.URI;
 
     non terminal lvalue;
     lvalue ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
-    	|	   lvalue:prev dot_t identifier_t:id {: RESULT = new Invocation((TypedAST)prev, (String)id, null, new FileLocation(currentState.pos)); :};
+    	|	   term:prev dot_t identifier_t:id {: RESULT = new Invocation((TypedAST)prev, (String)id, null, new FileLocation(currentState.pos)); :};
 
     nrd ::= val:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	|   var:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
@@ -635,7 +637,7 @@ import java.net.URI;
 
     a ::= EE:are {: RESULT = are; :};
 
-    EE ::= EE:l equals_t equals_t EE:r {: RESULT = new Invocation((TypedAST)l,"==",(TypedAST)r, new FileLocation(currentState.pos)); :}
+    EE ::= EE:l equalsequals_t EE:r {: RESULT = new Invocation((TypedAST)l,"==",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  EE:l gt_t EE:r {: RESULT = new Invocation((TypedAST)l,">",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  EE:l lt_t EE:r {: RESULT = new Invocation((TypedAST)l,"<",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  AE:mer {:RESULT = mer;:};
@@ -656,12 +658,10 @@ import java.net.URI;
     non terminal etuple;
 
 
-    term ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
+    term ::= lvalue:lv {: RESULT = lv; :}
     	|	 openParen_t e:inner closeParen_t {: RESULT = inner; :}
     	|	 etuple:tpe {: RESULT = tpe; :}
     	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, new FileLocation(currentState.pos)); :}
-    	|	 term:src dot_t identifier_t:op {: RESULT = new Invocation((TypedAST)src,(String)op, null, new FileLocation(currentState.pos)); :}
-		|	 term:src dot_t metadataKwd_t {: RESULT = new Invocation((TypedAST)src,"metadata", null, new FileLocation(currentState.pos)); :}
     	|	 inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
     	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
