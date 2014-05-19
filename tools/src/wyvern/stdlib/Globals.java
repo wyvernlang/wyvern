@@ -38,17 +38,13 @@ public class Globals {
 		env = env.extend(new ValueBinding("true", new BooleanConstant(true)));
 		env = env.extend(new ValueBinding("false", new BooleanConstant(false)));
 		
-		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(str, unit), new Executor() {
-			@Override public Value execute(Value argument) {
-				System.out.println(((StringConstant)argument).getValue());
-				return UnitVal.getInstance(FileLocation.UNKNOWN); // Fake line number! FIXME:
-			}
+		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(str, unit), (env1, argument) -> {
+			System.out.println(((StringConstant)argument).getValue());
+			return UnitVal.getInstance(FileLocation.UNKNOWN); // Fake line number! FIXME:
 		})));
-		env = env.extend(new ValueBinding("printInteger", new ExternalFunction(arrow(integer, unit), new Executor() {
-			@Override public Value execute(Value argument) {
-				System.out.println(((IntegerConstant)argument).getValue());
-				return UnitVal.getInstance(FileLocation.UNKNOWN); // Fake line number! FIXME:
-			}
+		env = env.extend(new ValueBinding("printInteger", new ExternalFunction(arrow(integer, unit), (env1, argument) -> {
+			System.out.println(((IntegerConstant)argument).getValue());
+			return UnitVal.getInstance(FileLocation.UNKNOWN); // Fake line number! FIXME:
 		})));
 		return env;
 	}
