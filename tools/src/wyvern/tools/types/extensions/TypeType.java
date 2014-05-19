@@ -14,7 +14,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
-public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
+public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType, MetaType {
 	private TypeDeclaration decl;
 	private Reference<Value> attrObj;
 	private Reference<Environment> typeDeclEnv;
@@ -32,8 +32,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		this.typeDeclEnv = declEnv;
 	}
 
-	public Value getAttrValue() { return attrObj.get(); }
-	
 	public TypeDeclaration getDecl() {
 		return this.decl;
 	}
@@ -195,5 +193,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 			}
 		}
 		return ndEnv;
+	}
+
+	@Override
+	public Value getMetaObj() {
+		return attrObj.get();
 	}
 }

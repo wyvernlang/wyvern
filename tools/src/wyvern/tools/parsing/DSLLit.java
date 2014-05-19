@@ -7,11 +7,15 @@ import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.MetaType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
 import wyvern.tools.parsing.ExtParser;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,10 +50,13 @@ public class DSLLit extends AbstractTypedAST {
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type dslType = expected.get();
 
-		ExtParser parser = (ExtParser) Util.toJavaObject(((TypeType) dslType).getAttrValue(), ExtParser.class);
+		ExtParser parser = (ExtParser) Util.toJavaObject(((MetaType) dslType).getMetaObj(), ExtParser.class);
 
-		dslAST = new TSLBlock(parser.parse(new ParseBuffer(dslText.get())));
-
+		try {
+			dslAST = new TSLBlock(parser.parse(new ParseBuffer(dslText.get())));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		return dslAST.typecheck(env,expected);
 	}
 
