@@ -210,8 +210,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 		}
 		
-		//TODO
-		//type-test the tag information
 
 		return Unit.getInstance();
 	}
@@ -240,12 +238,63 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		//newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
 		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
 		
+		//extend with tag information
+		if (isTagged) {
+			//type-test the tag information
+			
+			//first add the new binding
+			TagBinding tagBinding = new TagBinding(getName(), taggedInfo);
+			newEnv = newEnv.extend(tagBinding);
+			
+			//TODO fix this hack
+			TagBinding.tagBindings.put(getName(), tagBinding);
+			
+			//now handle case-of and comprises clauses
+			if (taggedInfo.getCaseOfTag() != null) {
+				String caseOf = taggedInfo.getCaseOfTag();
+				
+				Optional<TagBinding> caseOfBindingO = Optional.of(TagBinding.tagBindings.get(caseOf));
+				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
+				
+				if (caseOfBindingO.isPresent()) {
+					 TagBinding caseOfBinding = caseOfBindingO.get();
+					 
+					 //set up relationship between two bindings
+					 tagBinding.setCaseOfParent(caseOfBinding);
+					 caseOfBinding.addCaseOfDirectChild(tagBinding);
+				} else {
+					ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, caseOf);
+				}
+			}
+			
+			if (!taggedInfo.getComprisesTags().isEmpty()) {
+				//set up comprises tags
+				//TODO: this will likely fail because the other tags won't be declared yet
+				
+				for (String s : taggedInfo.getComprisesTags()) {
+					
+					Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.tagBindings.get(s));
+					//TODO, change to real code: newEnv.lookupBinding(s, TagBinding.class);
+					
+					if (comprisesBindingO.isPresent()) {
+						TagBinding comprisesBinding = comprisesBindingO.get();
+						
+						tagBinding.comprisesTags.add(comprisesBinding);
+					} else {
+						//TODO throw proper error
+						ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, s);
+					}
+				}
+			}
+		}
+		
 		return newEnv;
 	}
 
 	@Override
 	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+		
 		return newEnv;
 	}
 
@@ -278,7 +327,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
 		}
-
+		
 		ClassBinding thisBinding = new ClassBinding("class", this);
 		Environment evalEnv = classEnv.extend(thisBinding);
 		
@@ -286,6 +335,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			if (decl instanceof DefDeclaration && ((DefDeclaration) decl).isClass()){
 				decl.bindDecl(evalEnv,classEnv);
 			}
+		
+		classEnv = classEnv.extend(new ClassBinding("claasdasdass", this));
 		
 		return classEnv;
 	}

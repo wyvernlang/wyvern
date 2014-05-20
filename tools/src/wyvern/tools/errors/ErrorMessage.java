@@ -27,6 +27,11 @@ public enum ErrorMessage {
 	
 	// Tagged Type errors
 	//TODO: these need parameters that give more information
+	
+	//For tagged declaration
+	
+	
+	//For match statement
 	DUPLICATE_TAG("Duplicate tag found", 0),
 	UNKNOWN_TAG("No tag declared with given name", 0),
 	DEFAULT_NOT_PRESENT("Default case not present in non-exhaustive match", 0),

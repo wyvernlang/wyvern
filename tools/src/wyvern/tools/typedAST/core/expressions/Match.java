@@ -13,6 +13,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.TagBinding;
 import wyvern.tools.typedAST.core.binding.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -83,8 +84,14 @@ public class Match extends CachingTypedAST implements CoreAST {
 		ClassType matchingOverClass = (ClassType) matchingOver.getType();
 		String className = matchingOverClass.getName();
 		
+		TagBinding matchingOverBinding = TagBinding.tagBindings.get(className);
+		//TODO: fix this, replace with real code
+		
 		for (Case c : cases) {
-			if (c.getTaggedTypeMatch().equals(className)) {
+			TagBinding binding = TagBinding.tagBindings.get(c.getTaggedTypeMatch());
+			//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
+			
+			if (hasMatch(matchingOverBinding, binding.getName())) {
 				// We've got a match, evaluate this case
 				return c.getAST().evaluate(env);
 			}
@@ -94,6 +101,19 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return defaultCase.getAST().evaluate(env);
 	}
 
+	/**
+	 * Searches recursively to see if what we are matching over is a sub-tag of the given target.
+	 * @param tag
+	 * @param currentBinding
+	 * @return
+	 */
+	private boolean hasMatch(TagBinding matchingOver, String matchTarget) {
+		if (matchingOver.getName().equals(matchTarget)) return true;
+		
+		if (matchingOver.getCaseOfParent() == null) return false;
+		else return hasMatch(matchingOver.getCaseOfParent(), matchTarget);
+	}
+	
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> children = new HashMap<>();
