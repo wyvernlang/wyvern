@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -9,6 +11,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.TreeWriter;
 
@@ -64,7 +67,13 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		Type[] newTypes = new Type[objects.length];
 		for (int i = 0; i < objects.length; i++) {
 			final int sti = i;
-			newTypes[i] = objects[i].typecheck(env, expected.map(exp -> ((Tuple)exp).getTypes()[sti]));
+			newTypes[i] = objects[i].typecheck(env, expected.map(exp -> {
+				if (exp instanceof Tuple) return ((Tuple)exp).getTypes()[sti];
+				if (exp instanceof Intersection)
+					return ((Intersection)exp).getTypes().stream().filter(tpe -> tpe instanceof Tuple).filter(tpe -> ((Tuple)tpe).getTypes().length == objects.length).findFirst().get();
+				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, getType().toString(), exp.toString());
+				throw new RuntimeException();
+			}));
 		}
 		return new Tuple(newTypes);
 	}

@@ -17,6 +17,13 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 		this.types = types;
 	}
 
+	public int getOptions() {
+		return types.size();
+	}
+	public List<Type> getTypes() {
+		return types;
+	}
+
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		if (other instanceof Intersection) {

@@ -37,6 +37,9 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		if (nextExpr == null) {
+			if (!(target instanceof Assignable))
+				throw new RuntimeException("Invalid target");
+			((Assignable)target).checkAssignment(this, env);
 			Type tT = target.typecheck(env, Optional.empty());
 			Type vT = value.typecheck(env, Optional.of(tT));
 			if (!vT.subtype(tT))

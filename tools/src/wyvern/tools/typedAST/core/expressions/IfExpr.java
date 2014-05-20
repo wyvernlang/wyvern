@@ -4,6 +4,8 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -11,6 +13,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.ArrayList;
@@ -38,6 +41,111 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		@Override
 		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 			return createInstance(newChildren.get("clause"), newChildren.get("body"));
+		}
+	}
+
+	public static class CondClause extends IfClause {
+		private final TypedAST cond;
+		private final TypedAST body;
+		private FileLocation location;
+
+		public CondClause(TypedAST cond, TypedAST body, FileLocation location) {
+			this.cond = cond;
+			this.body = body;
+			this.location = location;
+		}
+
+		@Override
+		public boolean satisfied(Environment env) {
+			return ((BooleanConstant)cond.evaluate(env)).getValue();
+		}
+
+		@Override
+		public TypedAST getClause() {
+			return cond;
+		}
+
+		@Override
+		public TypedAST getBody() {
+			return body;
+		}
+
+		@Override
+		protected TypedAST createInstance(TypedAST clause, TypedAST body) {
+			return new CondClause(clause, body, location);
+		}
+
+		@Override
+		protected Type doTypecheck(Environment env, Optional<Type> expected) {
+			if (!(cond.typecheck(env, Optional.of(Bool.getInstance())).equals(Bool.getInstance())))
+				throw new RuntimeException();
+			return body.typecheck(env, expected);
+		}
+
+		@Override
+		public Value evaluate(Environment env) {
+			return body.evaluate(env);
+		}
+
+		@Override
+		public FileLocation getLocation() {
+			return location;
+		}
+
+		@Override
+		public void writeArgsToTree(TreeWriter writer) {
+
+		}
+	}
+
+	public static class UncondClause extends IfClause {
+
+		private final TypedAST body;
+		private final FileLocation location;
+
+		public UncondClause(TypedAST body, FileLocation location) {
+			this.body = body;
+			this.location = location;
+		}
+
+		@Override
+		public boolean satisfied(Environment env) {
+			return true;
+		}
+
+		@Override
+		public TypedAST getClause() {
+			return new IntegerConstant(1337);
+		}
+
+		@Override
+		public TypedAST getBody() {
+			return body;
+		}
+
+		@Override
+		protected TypedAST createInstance(TypedAST clause, TypedAST body) {
+			return new UncondClause(body, location);
+		}
+
+		@Override
+		protected Type doTypecheck(Environment env, Optional<Type> expected) {
+			return body.typecheck(env, expected);
+		}
+
+		@Override
+		public Value evaluate(Environment env) {
+			return body.evaluate(env);
+		}
+
+		@Override
+		public FileLocation getLocation() {
+			return location;
+		}
+
+		@Override
+		public void writeArgsToTree(TreeWriter writer) {
+
 		}
 	}
 
@@ -92,11 +200,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		Type lastType = null;
 		for (IfClause clause : clauses) {
+			Type clauseType = clause.typecheck(env, expected);
 			if (lastType == null) {
-				lastType = clause.typecheck(env, expected);
+				lastType = clauseType;
 				continue;
 			}
-			if (clause.typecheck(env, expected) != lastType) {
+			if (!clauseType.subtype(lastType) && !lastType.subtype(clauseType)) {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, clause);
 			}
 		}

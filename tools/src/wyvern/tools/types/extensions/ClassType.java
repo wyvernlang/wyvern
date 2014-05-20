@@ -18,7 +18,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType, ParameterizableType {
 	private ClassDeclaration decl = null;
 	private Reference<Environment> declEnv;
-	protected Reference<Environment> typeEquivalentEnv;
+	protected Reference<Environment> typeEquivalentEnv = new Reference<>();
 	private List<String> params;
 	private String name;
 
@@ -57,6 +57,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	@Override
 	public Type checkOperator(Invocation opExp, Environment env) {
 		// should not be any arguments - that is in a separate application at present
+		if (opExp.getArgument() != null)
+			throw new RuntimeException(opExp.getLocation().toString());
 		assert opExp.getArgument() == null;
 		
 		// the operation should exist
@@ -77,9 +79,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private TypeType equivType = null;
 	public TypeType getEquivType() {
 		if (typeEquivalentEnv == null || typeEquivalentEnv.get() == null) {
-			if (declEnv.get() != null)
+			if (declEnv.get() != null) {
+				if (typeEquivalentEnv == null)
+					typeEquivalentEnv = new Reference<>();
 				typeEquivalentEnv.set(TypeDeclUtils.getTypeEquivalentEnvironment(declEnv.get()));
-			else
+			} else
 				throw new RuntimeException();
 		}
 

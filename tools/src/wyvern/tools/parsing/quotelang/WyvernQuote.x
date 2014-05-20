@@ -1,8 +1,8 @@
-package wyvern.tools.parsing;
+package wyvern.tools.parsing.quotelang;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.parsing.transformers.*;
 import wyvern.tools.typedAST.core.*;
 import wyvern.tools.typedAST.interfaces.*;
@@ -14,7 +14,6 @@ import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.abs.*;
 import wyvern.tools.types.*;
 import wyvern.tools.types.extensions.*;
-import wyvern.tools.util.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +23,7 @@ import wyvern.tools.errors.FileLocation;
 import java.net.URI;
 
 %%
-%parser Wyvern
+%parser WyvernQuote
 
 %aux{
 	Integer parenLevel, cl;
@@ -281,13 +280,6 @@ import java.net.URI;
  		RESULT = lexeme;
  	:};
 
-	terminal taggedKwd_t  ::= /tagged/  in (keywds);
-	terminal matchKwd_t   ::= /match/   in (keywds);
-	terminal defaultKwd_t ::= /default/ in (keywds);
-	terminal caseKwd_t ::= /case/ in (keywds);
-	terminal ofKwd_t ::= /of/ in (keywds);
-	terminal comprisesKwd_t ::= /comprises/ in (keywds);
-	
     terminal classKwd_t ::= /class/ in (keywds);
 	terminal typeKwd_t 	::= /type/ in (keywds);
 	terminal valKwd_t 	::= /val/ in (keywds);
@@ -344,6 +336,7 @@ import java.net.URI;
  	terminal and_t ::= /&/ ;
  	terminal gt_t ::= />/ ;
  	terminal lt_t ::= /</ ;
+ 	terminal dollar_t ::= /$/ ;
 
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
@@ -353,9 +346,6 @@ import java.net.URI;
  	terminal oCurly_t ::= /\{/ {: cl++; :};
  	terminal cCurly_t ::= /\}/ {: cl--; :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
-
- 	terminal oSquareBracket_t ::= /\[/;
- 	terminal cSquareBracket_t ::= /\]/;
 
  	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
  	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
@@ -413,19 +403,6 @@ import java.net.URI;
    	non terminal dm;
    	non terminal mnrd;
    	non terminal ptl;
-
-
-   	non terminal matchStatement;
-   	non terminal caseStatements;
-   	non terminal caseStatementsO;
-   	non terminal varStatement;
-   	non terminal defaultStatement;
-   	
-   	non terminal taggedInfo;
-   	non terminal caseOf;
-   	non terminal comprises;
-   	non terminal listTags;
-   	non terminal singleTag;
 
    	precedence right tarrow_t;
    	precedence left Dedent_t;
@@ -499,8 +476,6 @@ import java.net.URI;
     	;
 
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
-    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, (TaggedInfo) tagInfo, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
     	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
@@ -578,9 +553,9 @@ import java.net.URI;
     cbvar ::= varKwd_t identifier_t:id typeasc:type cbdeclbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :};
 
 
-    typedec ::= taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, true, new FileLocation(currentState.pos)); :}
-    	|		typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, false, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, false, null); :}
+    typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
+    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
+    	;
 
     typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
     	   |  tdef:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
@@ -683,7 +658,6 @@ import java.net.URI;
 
     non terminal etuple;
 
-
     term ::= lvalue:lv {: RESULT = lv; :}
     	|	 openParen_t e:inner closeParen_t {: RESULT = inner; :}
     	|	 etuple:tpe {: RESULT = tpe; :}
@@ -693,7 +667,8 @@ import java.net.URI;
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}
-    	|    matchStatement:stmt {: RESULT = stmt; :} 
+    	|	 dollar_t identifier_t:id {: RESULT = new ToastExpression(new SpliceExn(new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos))));:}
+    	|	 dollar_t openParen_t term:inner closeParen_t {: RESULT = new ToastExpression(new SpliceExn((TypedAST)inner)); :}
     	;
 
     etuple ::= openParen_t e:first comma_t it:rest closeParen_t {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
@@ -707,69 +682,7 @@ import java.net.URI;
    	it ::= e:first comma_t it:rest {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
    		|  e:el {: RESULT = el; :}
    		;
-	
-	//complete match statement
-	matchStatement ::= matchKwd_t openParen_t term:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
-			{: RESULT = new Match((TypedAST) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
-	
-	//group of 0 or more variable cases, followed by 0 or 1 default case
-	caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 
-				List<Case> cases = new ArrayList<Case>(); 
-				cases.add((Case) mstmt); 
-				cases.addAll((List<Case>) rest);
-				RESULT = cases; 
-			:}
-     	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
-		  |                    {: RESULT = new ArrayList<Case>(); :}
-		  ;
-	
-	//a single match case statement
-	varStatement ::= identifier_t:id arrow_t dslce:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
-    	  ;
-    
-    //a default match statement
-    defaultStatement ::= defaultKwd_t arrow_t dslce:inner 	{: RESULT = new Case((TypedAST) inner); :}
-    	  ;
 
-	// hierarchical tags
-
-	taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
-	             | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
-	             | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
-	             |              {: RESULT = new TaggedInfo(); :}
-	             ;
-	
-	// [case of tag]
-   	caseOf ::= oSquareBracket_t caseKwd_t ofKwd_t singleTag:tag cSquareBracket_t 
-   			{: RESULT = tag; :}
-   			;
-   	
-   	// [comprises tag+]
-	comprises ::= oSquareBracket_t comprisesKwd_t listTags:tags cSquareBracket_t
-   	      {: RESULT = tags; :}
-   	      ;
-   	      
-   	//1 or more tags
-   	listTags ::= singleTag:tag comma_t listTags:rest {: 
-   					List<String> tags = new ArrayList<String>();
-   			   		tags.add((String) tag);
-   			   		tags.addAll((List<String>) rest);
-   			   
-   			   		RESULT = tags; 
-   				:}
-               | singleTag:tag {: 
-               		List<String> tags = new ArrayList<String>();
-   			   		tags.add((String) tag);
-   			   		
-               		RESULT = tags; 
-                 :}
-   	           ;
-   	           
-   	//a single tag
-   	singleTag ::= identifier_t:id {: RESULT = (String) id; :}
-   	            ;
-
-	// end hierarchical tags
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}

@@ -43,7 +43,7 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 	@Override
 	public Value evaluateApplication(Application app, Environment env) {
 		Value argValue = app.getArgument().evaluate(env);
-		return exec.execute(argValue);
+		return exec.execute(env, argValue);
 	}
 
 	@Override

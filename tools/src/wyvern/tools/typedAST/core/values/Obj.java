@@ -2,6 +2,8 @@ package wyvern.tools.typedAST.core.values;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
+import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.VarBinding;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.Assignable;
@@ -58,11 +60,21 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	@Override
 	public Value evaluateInvocation(Invocation exp, Environment env) {
 		String operation = exp.getOperationName();
-		return getIntEnv().getValue(operation);
+		return getIntEnv().getValue(operation, env.extend(new ValueBinding("this", this)));
 	}
 	
 	public Environment getIntEnv() {
 		return intEnv.get();
+	}
+
+	@Override
+	public void checkAssignment(Assignment ass, Environment env) {
+		if (!(ass.getTarget() instanceof Invocation))
+			throw new RuntimeException("Something really, really weird happened.");
+		String operation = ((Invocation) ass.getTarget()).getOperationName();
+		VarBinding vb = intEnv.get().lookupBinding(operation, VarBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
+
+		return;
 	}
 
 	@Override

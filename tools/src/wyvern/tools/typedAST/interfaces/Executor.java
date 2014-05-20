@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.interfaces;
 
 
+import wyvern.tools.types.Environment;
+
 public interface Executor {
-	Value execute(Value argument);
+	Value execute(Environment execEnv, Value argument);
 }

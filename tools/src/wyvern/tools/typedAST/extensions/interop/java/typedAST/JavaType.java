@@ -58,7 +58,7 @@ public class JavaType implements EnvironmentExtender {
 	}
 
 	@Override
-	public Environment extend(Environment env) {
+	public Environment extend(Environment env, Environment against) {
 		return env
 				.extend(new TypeBinding(name, equivType))
 				.extend(new NameBindingImpl(name, equivType));

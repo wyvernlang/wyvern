@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.extensions.interop.java;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.typedAST.core.binding.LateValueBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
@@ -90,8 +91,8 @@ public class Util {
 	public static Value toWyvObj(Object arg) {
 		if (arg instanceof JavaWyvObject)
 			return ((JavaWyvObject) arg).getInnerObj();
-		if (arg instanceof String)
-			return new StringConstant((String) arg);
+//		if (arg instanceof String)
+//			return new StringConstant((String) arg);
 		if (arg instanceof Integer)
 			return new IntegerConstant((Integer) arg);
 		JavaClassDecl decl = getDecl(arg.getClass());
@@ -107,7 +108,7 @@ public class Util {
 		return newObj;
 	}
 
-	private static HashSet<ValueBinding> bindings = new HashSet<>();
+	private static HashSet<Binding> bindings = new HashSet<>();
 	public static void setValueBinding(Object arg, ValueBinding b) {
 		if (bindings.contains(b))
 			return;

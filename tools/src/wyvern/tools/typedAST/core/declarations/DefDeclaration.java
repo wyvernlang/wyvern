@@ -121,7 +121,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	}
 
 	@Override
-	protected Environment doExtend(Environment old) {
+	protected Environment doExtend(Environment old, Environment against) {
 		return extendName(old, old);
 	}
 

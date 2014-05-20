@@ -1,6 +1,7 @@
 package wyvern.tools.tests;
 
 import wyvern.tools.parsing.ExtParser;
+import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.expressions.New;
@@ -16,9 +17,9 @@ import java.util.HashMap;
 
 public class TrivDSLParser implements ExtParser {
 	@Override
-	public TypedAST parse(String input) {
+	public TypedAST parse(ParseBuffer input) {
 		New newv = new New(new HashMap<>(), null);
-		TypedAST dbody = new IntegerConstant(Integer.parseInt(input.trim()));
+		TypedAST dbody = new IntegerConstant(Integer.parseInt(input.getSrcString().trim()));
 		newv.setBody(new DeclSequence(Arrays.asList(new DefDeclaration("getValue", new Arrow(Unit.getInstance(), Int.getInstance()), new ArrayList<>(), dbody, false))));
 		return newv;
 	}

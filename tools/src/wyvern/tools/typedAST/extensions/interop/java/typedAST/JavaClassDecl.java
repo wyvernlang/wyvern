@@ -10,7 +10,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -63,7 +62,10 @@ public class JavaClassDecl extends ClassDeclaration {
 			}
 
             for (Field f : clazz.getFields()) {
-                decls.add(new JavaField(f,null,null));//TODO pending upstream push of OpenJDK patch 8009222
+				Optional<MethodHandle> setter = Optional.empty();
+				if (!Modifier.isFinal(f.getModifiers()))
+					setter = Optional.of(lookup.unreflectSetter(f));
+                decls.add(new JavaField(f,lookup.unreflectGetter(f),setter));
             }
 
 			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
@@ -130,8 +132,9 @@ public class JavaClassDecl extends ClassDeclaration {
 			return;
 		initalized = true;
 		super.decls = getDecls(this.clazz);
-		super.declEnvRef.set(super.decls.extend(Environment.getEmptyEnvironment()));
-		super.declEvalEnv = Environment.getEmptyEnvironment();
+		Environment emptyEnvironment = Environment.getEmptyEnvironment();
+		super.declEnvRef.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
+		super.declEvalEnv = emptyEnvironment;
 		updateEnv();
 	}
 
@@ -142,7 +145,7 @@ public class JavaClassDecl extends ClassDeclaration {
 			return;
 		envDone = true;
 		initalize();
-		Environment declEnv = getDeclEnvRef().get();
+		Environment declEnv = Environment.getEmptyEnvironment();
 		Environment objEnv = getObjEnvV();
 		if (declEnv == null)
 			declEnv = Environment.getEmptyEnvironment();
@@ -151,21 +154,21 @@ public class JavaClassDecl extends ClassDeclaration {
 		for (Declaration decl : this.getDecls().getDeclIterator()) {
 			if (decl instanceof JavaMeth) {
 				if (((JavaMeth) decl).isClass()) {
-					declEnv = decl.extend(declEnv);
+					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
-				objEnv = decl.extend(objEnv);
+				objEnv = decl.extend(objEnv, objEnv);
 			} else if (decl instanceof JavaField) {
 				if (((JavaField) decl).isClass()) {
-					declEnv = decl.extend(declEnv);
+					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
-				objEnv = decl.extend(objEnv);
+				objEnv = decl.extend(objEnv, objEnv);
 			} else {
 				throw new RuntimeException();
 			}
 		}
-		//getDeclEnvRef().set(declEnv);
+		getDeclEnvRef().set(declEnv);
 		setObjEnv(objEnv);
 		envDone = true;
 	}
@@ -174,15 +177,24 @@ public class JavaClassDecl extends ClassDeclaration {
 		Class[] ifaces = c.getInterfaces();
 		for (int i = 0; i < ifaces.length; i++) {
 			Method ifaceMethod = findHighestMethod(ifaces[i], m);
-			if (ifaceMethod != null) return ifaceMethod;
+
+			if (ifaceMethod != null) {
+				ifaceMethod.setAccessible(true);
+				return ifaceMethod;
+			}
 		}
 		if (c.getSuperclass() != null) {
 			Method parentMethod = findHighestMethod(
 					c.getSuperclass(), m);
-			if (parentMethod != null) return parentMethod;
+			if (parentMethod != null) {
+				parentMethod.setAccessible(true);
+				return parentMethod;
+			}
 		}
 		try {
-			return c.getDeclaredMethod(m.getName(), m.getParameterTypes());
+			Method declaredMethod = c.getDeclaredMethod(m.getName(), m.getParameterTypes());
+			declaredMethod.setAccessible(true);
+			return declaredMethod;
 		} catch (NoSuchMethodException e) {
 			return null;
 		}

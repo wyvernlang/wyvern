@@ -1,60 +1,52 @@
-package wyvern.tools.typedAST.core.expressions;
+package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Created by Ben Chung on 3/13/14.
- */
-public class TypeAsc extends AbstractTypedAST {
-
-	private final TypedAST exn;
-	private Type should;
-
-	public TypeAsc(TypedAST exn, Type should) {
-
+public class ToastExpression extends AbstractTypedAST {
+	private TypedAST exn;
+	public ToastExpression(TypedAST exn) {
 		this.exn = exn;
-		this.should = should;
 	}
 
 	@Override
 	public Type getType() {
-		return should;
+		return Util.javaToWyvType(TypedAST.class);
 	}
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		should = TypeResolver.resolve(should, env);
-		if (!(exn.typecheck(env, Optional.empty()).subtype(should)))
-			throw new RuntimeException();
-		return should;
+		exn.typecheck(env, expected);
+		return Util.javaToWyvType(TypedAST.class);
 	}
 
 	@Override
 	public Value evaluate(Environment env) {
-		return exn.evaluate(env);
+		Value res = exn.evaluate(env);
+
+		return Util.toWyvObj(res);
 	}
 
 	@Override
 	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> output = new HashMap<>();
-		output.put("exn", exn);
-		return output;
+		Map<String, TypedAST> result = new HashMap<>(1);
+		result.put("exn", exn);
+		return result;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeAsc(newChildren.get("exn"), should);
+		return new ToastExpression(newChildren.get("exn"));
 	}
 
 	@Override
@@ -64,6 +56,6 @@ public class TypeAsc extends AbstractTypedAST {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(exn, should);
+
 	}
 }

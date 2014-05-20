@@ -22,6 +22,8 @@ public class UnresolvedType implements Type {
 	}
 	
 	public Type resolve(Environment env) {
+		if (env.lookupType(typeName) == null)
+			throw new RuntimeException("Cannot find "+typeName +" in environment "+env);
 		return env.lookupType(typeName).getUse();
 	}
 	

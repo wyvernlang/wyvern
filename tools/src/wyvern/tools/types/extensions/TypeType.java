@@ -14,7 +14,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
-public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
+public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType, MetaType {
 	private TypeDeclaration decl;
 	private Reference<Value> attrObj;
 	private Reference<Environment> typeDeclEnv;
@@ -32,8 +32,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		this.typeDeclEnv = declEnv;
 	}
 
-	public Value getAttrValue() { return attrObj.get(); }
-	
 	public TypeDeclaration getDecl() {
 		return this.decl;
 	}
@@ -58,11 +56,17 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	@Override
 	public Type checkOperator(Invocation opExp, Environment env) {
 		// should not be any arguments - that is in a separate application at present
+		if (opExp.getArgument() != null)
+			throw new RuntimeException(opExp.getLocation().toString());
 		assert opExp.getArgument() == null;
 		
 		// the operation should exist
 		String opName = opExp.getOperationName();
+
 		NameBinding m = typeDeclEnv.get().lookup(opName);
+
+		if (m == null)
+			throw new RuntimeException("Invalid operation "+opName+" on type " + this);
 		
 		// TODO Auto-generated method stub
 		return m.getType();
@@ -189,5 +193,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 			}
 		}
 		return ndEnv;
+	}
+
+	@Override
+	public Value getMetaObj() {
+		return attrObj.get();
 	}
 }

@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.core.expressions;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.VarBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
@@ -68,6 +69,11 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public void checkAssignment(Assignment ass, Environment env) {
+		VarBinding vb = env.lookupBinding(binding.getName(), VarBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
 	}
 
 	@Override

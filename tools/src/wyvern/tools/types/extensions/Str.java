@@ -17,7 +17,7 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	private static Str instance = new Str();
 	public static Str getInstance() { return instance; }
 
-	private static final Set<String> legalOperators = new HashSet<String>(Arrays.asList(new String[] {"+"}));
+	private static final Set<String> legalOperators = new HashSet<String>(Arrays.asList(new String[] {"+", "=="}));
 	
 	@Override
 	public Type checkOperator(Invocation opExp, Environment env) {
@@ -26,9 +26,17 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 		
 		if (!(legalOperators.contains(operatorName)))
 			reportError(OPERATOR_DOES_NOT_APPLY, opExp, operatorName, this.toString());
-		
-		if (!((type2 instanceof Str) || (type2 instanceof Int)))
-			reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
+
+		if (operatorName.equals("+"))
+			if (!((type2 instanceof Str) || (type2 instanceof Int)))
+				reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
+		if (operatorName.equals("==")) {
+			if (type2 instanceof JavaClassType && String.class.isAssignableFrom(((JavaClassType)type2).getInnerClass()))
+				return Bool.getInstance();
+			if (!(type2.subtype(Str.getInstance())))
+				reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
+			return Bool.getInstance();
+		}
 		
 		return this;
 	}

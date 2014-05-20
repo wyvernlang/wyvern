@@ -1,15 +1,12 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -19,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by Ben Chung on 10/21/13.
@@ -27,10 +25,10 @@ public class JavaField extends Declaration {
     private NameBinding nameBinding;
     private final Field src;
     private final MethodHandle getter;
-    private final MethodHandle setter;
+    private final Optional<MethodHandle> setter;
 	private boolean isClass;
 
-    public JavaField(Field src, MethodHandle getter, MethodHandle setter) {
+    public JavaField(Field src, MethodHandle getter, Optional<MethodHandle> setter) {
         this.src = src;
         this.getter = getter;
         this.setter = setter;
@@ -51,14 +49,37 @@ public class JavaField extends Declaration {
     }
 
     @Override
-    protected Environment doExtend(Environment old) {
-        Environment newEnv = old.extend(nameBinding);
+    protected Environment doExtend(Environment old, Environment against) {
+        Environment newEnv = old;
         return newEnv;
     }
 
+	private class JavaFieldValueBinding extends ValueBinding {
+
+		public JavaFieldValueBinding(String name, Type type) {
+			super(name, type);
+		}
+
+		@Override
+		public Value getValue(Environment env) {
+			Object value = null;
+			try {
+				if (Modifier.isStatic(src.getModifiers())) {
+					value = src.get(null);
+				} else {
+					value = src.get(((JavaObj)env.lookup("this").getValue(env)).getObj());
+				}
+				return Util.toWyvObj(value);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+
+		}
+	}
+
     @Override
     public Environment extendWithValue(Environment old) {
-        Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+        Environment newEnv = old.extend(new JavaFieldValueBinding(nameBinding.getName(), nameBinding.getType()));
         return newEnv;
     }
 
@@ -66,23 +87,7 @@ public class JavaField extends Declaration {
 	private boolean binding = false;
     @Override
     public void evalDecl(Environment evalEnv, Environment declEnv) {
-		if (!binding)
-			binding = true;
-		else
-			return;
-        ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
-        try {
-            Object value = null;
-            if (Modifier.isStatic(src.getModifiers())) {
-                value = src.get(null);
-            } else {
-                value = src.get(((JavaObj)evalEnv.lookup("this").getValue(evalEnv)).getObj());
-            }
-			Util.setValueBinding(value, vb);
-			binding = false;
-        } catch (Throwable t) {
-            ToolError.reportError(ErrorMessage.JAVA_INVOCATION_ERROR, this, src.getName(), t.toString());
-        }
+		//Not actually needed.
     }
 
     @Override
@@ -117,9 +122,10 @@ public class JavaField extends Declaration {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		return env;
+		return env.extend(nameBinding);
 	}
 
+	@Override
 	public boolean isClass() {
 		return isClass;
 	}
