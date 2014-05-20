@@ -1,4 +1,4 @@
-package wyvern.tools.tests;
+package wyvern.tools.tests.tagTests;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -206,8 +206,6 @@ public class TagTests {
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
 		Value v = res.evaluate(Environment.getEmptyEnvironment());
 		Assert.assertEquals(v.toString(), "IntegerConstant(25)");
 	}
@@ -373,10 +371,11 @@ public class TagTests {
 		Assert.fail("Should have failed with error: " + ErrorMessage.DEFAULT_NOT_LAST);
 	}
 	
-	public void nonExhaustiveErrorTest() {
+	@Test
+	public void nonExhaustiveErrorTest() throws CopperParserException, IOException {
 		String input = 
 			"tagged class Dyn [comprises DynInt, DynChar, DynByte]       \n" +
-			"    class def create() : X                                  \n" +
+			"    class def create() : Dyn                                \n" +
 			"        new                                                 \n" +
 			"                                                            \n" +
 			"tagged class DynInt [case of Dyn]                           \n" +
@@ -398,7 +397,19 @@ public class TagTests {
 			"	DynChar => 15                                            \n";
 		// DynByte not specified; error
 		
-		//ErrorMessage.DEFAULT_NOT_PRESENT
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+	
+		
+		try {
+			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		} catch (ToolError toolError) {
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DEFAULT_NOT_PRESENT);
+			
+			return;
+		}
+		
+		Assert.fail("Should have failed with error: " + ErrorMessage.DEFAULT_NOT_PRESENT);
+		
 		
 		Assert.fail("TODO");
 	}
@@ -488,6 +499,44 @@ public class TagTests {
 		//reaching here without a parse exception is a pass
 	}
 	
+	@Test
+	public void simpleHierarchicalExecTest() throws CopperParserException, IOException {
+		String input = 
+			"tagged class A                               \n" +
+			"    class def create() : A                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class B [case of A]                   \n" +
+			"    class def create() : B                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class C [case of A]                   \n" +
+			"    class def create() : C                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class D [case of B]                   \n" +
+			"    class def create() : D                   \n" +
+			"        new                                  \n" +
+			
+			"val d = D.create()                           \n" +
+			"                                             \n" +
+			"match(d):                                    \n" +
+			"	B => 15                                   \n" +		//matches B since D is a subtag of B
+			"	C => 25                                   \n" +
+			"	default => 35                             \n";
+		
+				
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		
+		res.evaluate(Environment.getEmptyEnvironment());
+		
+		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		
+		// Should be 15 because D is a subclass of B and will match that
+		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
+	}
+	
 	public void jsonTest() {
 		//TODO, make this test do something useful!
 		
@@ -520,9 +569,9 @@ public class TagTests {
 				"    class def create() : DoubleJSON          \n" +
 				"        new                                  \n" +
 				"                                             \n" +
-				"val json = IntJSON.create()               \n" +
+				"val json = IntJSON.create()                  \n" +
 				"                                             \n" +
-				"match(json):                                    \n" +
+				"match(json):                                 \n" +
 				"	NumJSON => 15                             \n" + 
 				"	ObjJSON => 10                             \n" +
 				"	StrJSON => 15                             \n" + 
