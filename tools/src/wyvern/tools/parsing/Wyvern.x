@@ -681,7 +681,7 @@ import java.net.URI;
 	matchStatement ::= matchKwd_t openParen_t term:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
 			{: RESULT = new Match((TypedAST) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
 	
-	//group of 0 or more variable cases, followed by 1 default case
+	//group of 0 or more variable cases, followed by 0 or 1 default case
 	caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 
 				List<Case> cases = new ArrayList<Case>(); 
 				cases.add((Case) mstmt); 
@@ -689,6 +689,7 @@ import java.net.URI;
 				RESULT = cases; 
 			:}
      	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
+		  | {: RESULT = new ArrayList<Case>(); :}
 		  ;
 	
 	//a single match case statement
