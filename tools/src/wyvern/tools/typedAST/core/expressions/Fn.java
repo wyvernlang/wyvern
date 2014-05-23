@@ -85,7 +85,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+	public TypedAST doClone(Map<String, TypedAST> nc) {
 		return new Fn(bindings, nc.get("body"));
 	}
 

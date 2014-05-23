@@ -158,7 +158,7 @@ public class New extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 
 		New aNew = new New(new HashMap<>(), location);
 		aNew.setBody((DeclSequence) newChildren.get("seq"));

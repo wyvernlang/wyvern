@@ -89,7 +89,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+	public TypedAST doClone(Map<String, TypedAST> nc) {
 		return new Application(nc.get("function"), nc.get("argument"), location);
 	}
 

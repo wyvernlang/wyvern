@@ -39,7 +39,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+		public TypedAST doClone(Map<String, TypedAST> newChildren) {
 			return createInstance(newChildren.get("clause"), newChildren.get("body"));
 		}
 	}
@@ -175,7 +175,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		ArrayList<IfClause> clauses = new ArrayList<>(newChildren.size());
 		int i = 0;
 		for (String s : newChildren.keySet())
