@@ -1,7 +1,9 @@
-test seven[IntegerConstant(7):Int] {: 7 :}
-test plus[IntegerConstant(9):Int] {: 7 + 2 :}
+test seven[IntegerConstant(7):Int]
+	7
+test plus[IntegerConstant(9):Int]
+	7 + 2
 test val[IntegerConstant(5):Int]
-{:
 	val x = 5
 	x
-:}
+test lambdaCall[IntegerConstant(1):Int]
+	(fn x : Int => x)(1)
