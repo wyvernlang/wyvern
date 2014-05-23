@@ -7,6 +7,9 @@
         <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java">
             <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
         </copper>
+        <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java">
+            <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
+        </copper>
     </target>
     <target name="copper-debug">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt">
@@ -14,6 +17,9 @@
         </copper>
         <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java" dump="ON" dumpfile="copper-quotes-output.txt">
             <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
+        </copper>
+        <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java" dump="ON" dumpfile="copper-tests-output.txt">
+            <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
         </copper>
     </target>
 </project>
