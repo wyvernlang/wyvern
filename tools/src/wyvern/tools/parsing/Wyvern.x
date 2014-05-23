@@ -272,9 +272,9 @@ import java.net.URI;
 
 	ignore terminal comment_t  ::= /\/\/([^\r\n])*/;
 	ignore terminal multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\//;
-	ignore terminal ignoredNewline ::= /(\n[ \t]*)+/;
-	ignore terminal Spaces_t ::= /[ \t]+|(\\\n)/;
-    terminal Newline_t ::= /(\n[ \t]*)+/ {: :};
+	ignore terminal ignoredNewline ::= /((\n|(\r\n))[ \t]*)+/;
+	ignore terminal Spaces_t ::= /[ \t]+|(\\(\n|(\r\n)))/;
+    terminal Newline_t ::= /((\n|(\r\n))[ \t]*)+/ {: :};
 
  	terminal identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = lexeme;
