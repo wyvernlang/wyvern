@@ -117,13 +117,16 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		Hashtable<String, TypedAST> children = new Hashtable<>();
-		children.put("definition", definition);
+		if (definition != null)
+			children.put("definition", definition);
 		return children;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new ValDeclaration(getName(), nc.get("definition"), location);
+		if (nc.containsKey("definition"))
+			return new ValDeclaration(getName(), nc.get("definition"), location);
+		return new ValDeclaration(getName(), null, location);
 	}
 
 	@Override
