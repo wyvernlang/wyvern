@@ -68,8 +68,6 @@ import java.net.URI;
 		}
 		int newDepth = output.length();
 		if(newDepth < depths.peek()){
-			nextDedent = true;
-			pushToken(Terminals.Newline_t,output);
 			return Dedent_t;
 		} else {
 			return Newline_t;
@@ -81,9 +79,6 @@ import java.net.URI;
 		if(parenLevel > 0){
 			return ignoredNewline;
 		}
-		nextDedent = true;
-
-		pushToken(Terminals.Newline_t,"");
 		return Dedent_t;
 	:};
 
@@ -150,8 +145,6 @@ import java.net.URI;
 		if(newDepth > depths.peek()){
 			return Indent_t;
 		} else if (newDepth < depths.peek()) {
-			nextDedent = true;
-			pushToken(Terminals.Newline_t,output);
 			return Dedent_t;
 		} else {
 			return Newline_t;
@@ -173,8 +166,6 @@ import java.net.URI;
 		if(newDepth > depths.peek()){
 			return Indent_t;
 		} else {
-			nextDedent = true;
-			pushToken(Terminals.Newline_t,output);
 			return Dedent_t;
 		}
 	:};
@@ -270,22 +261,12 @@ import java.net.URI;
 		depths.pop();
 		if(newDepth < depths.peek()) {
 			pushToken(Terminals.Dedent_t,output);
+		} else {
+			pushToken(Terminals.Newline_t,lexeme);
 		}
 	:};
 
-    terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/
-    {:
-		Matcher inputPattern = nlRegex.matcher(lexeme);
-		String output = "";
-		while(inputPattern.find()) {
-			output = inputPattern.group(2);
-		}
-		int newDepth = output.length();
-		if(newDepth < depths.peek() && !nextDedent) {
-			pushToken(Terminals.Dedent_t,lexeme);
-		}
-		nextDedent = false;
-    :};
+    terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {::};
 
 	terminal DedentRepair_t ::= /(\n[ \t]*)+/
 	{:
@@ -372,7 +353,7 @@ import java.net.URI;
  	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
  	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
 
- 	terminal newSignal_t ::= /dgdkfghfugiehri/;
+ 	terminal newSignal_t ::= /dgdkfghfugiehri/; //placeholders to make error messages sane
  	terminal dslSignal_t ::= /sdfgjtyertdvcx/;
  	terminal caseSignal_t ::= //;
 
@@ -422,8 +403,8 @@ import java.net.URI;
    	non terminal mnrd;
    	non terminal ptl;
 
+   	precedence left Dedent_t, Newline_t;
    	precedence right tarrow_t;
-   	precedence left Dedent_t;
     precedence left colon_t;
     precedence left openParen_t;
     precedence left dot_t;
@@ -446,28 +427,28 @@ import java.net.URI;
 		|   import:imp {: RESULT = imp; :}
 		|   pm:bdy {: RESULT = bdy; :};
 
+	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
+
+	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
+
 	pm ::= dm:ds {: RESULT = ds; :} | {: RESULT = new DeclSequence(); :};
 
 	p ::= elst:ex {: RESULT = ex; :}
     	| d:de {: RESULT = de; :}
     	;
 
-    elst ::= dsle:ce {: RESULT = ce; :}
-    	|    dsle:ce p:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
-    	| ;
-
 	non terminal pnrd;
 
-    dm ::= prd:res mnrd:after {: RESULT = new DeclSequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    dm ::= prd:res Newline_t mnrd:after {: RESULT = new DeclSequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
     	 | prd:res  {: RESULT = res; :}
     	 | mnrd:res {: RESULT = res; :}
     	;
 
-    mnrd ::= val:vd pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	 |   var:vd pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    mnrd ::= val:vd Newline_t pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 |   var:vd Newline_t pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	 ;
 
-    d ::= prd:res pnrd:after {:RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    d ::= prd:res Newline_t pnrd:after {:RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
     	| prd:res {: RESULT = res; :}
     	| nrd:res {: RESULT = res; :}
     	;
@@ -476,19 +457,12 @@ import java.net.URI;
     lvalue ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
     	|	   term:prev dot_t identifier_t:id {: RESULT = new Invocation((TypedAST)prev, (String)id, null, new FileLocation(currentState.pos)); :};
 
-    nrd ::= val:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	|   var:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	|   lvalue:to equals_t e:va Newline_t p:re {:
-    	if (re != null)
-    		RESULT = new Sequence(Arrays.asList(new Assignment((TypedAST)to, (TypedAST)va, new FileLocation(currentState.pos)), (TypedAST)re));
-    	else
-    		RESULT = new Assignment((TypedAST)to, (TypedAST)va, new FileLocation(currentState.pos));
-    	:}
+    nrd ::= val:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	|   var:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	;
 
-
-    prd ::= rd:vd {: RESULT = vd; :}
-    	  | rd:vd prd:re {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); :}
+    prd ::= prd:re Newline_t rd:vd{: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); :}
+    	  | rd:vd {: RESULT = vd; :}
     	  ;
 
     pnrd ::= elst:ex {: RESULT = ex; :}| nrd:nr {: RESULT = nr; :};
@@ -520,21 +494,17 @@ import java.net.URI;
     var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
     	;
 
-	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
-
-	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
-
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
+    	|	  classKwd_t identifier_t:id {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
 
-    objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
+    objd ::= objcd:cds Newline_t objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
     	|	 objrd:rest {: RESULT = rest; :}
     	|	 objcd:cds {: RESULT = cds; :}
     	;
 
-    objrd ::= objid:rd objrd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); :}
+    objrd ::= objid:rd Newline_t objrd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); :}
     	|	  objid:rd {: RESULT = rd; :}
     	;
 
@@ -550,7 +520,7 @@ import java.net.URI;
     	|	  var:va {: RESULT = va; :}
     	|	  def:va {: RESULT = va; :};
 
-    cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| Newline_t {: RESULT = null; :};
+    cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| {: RESULT = null; :};
 
     cbval ::= valKwd_t identifier_t:id otypeasc:ty cbvalbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, new FileLocation(currentState.pos)); :};
 
@@ -558,7 +528,7 @@ import java.net.URI;
                             	;
 
     typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
+    	|	    typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
     	;
 
     typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
@@ -574,7 +544,11 @@ import java.net.URI;
     non terminal ME;
     non terminal tle;
 
-    dsle ::= tle:exn Newline_t {: RESULT = exn; :}
+    elst ::= dsle:ce {: RESULT = ce; :}
+    	|    dsle:ce Newline_t p:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
+    	| ;
+
+    dsle ::= tle:exn {: RESULT = exn; :}
     | tle:exn dslSignal_t dslSeq:dsl {:
     	ASTExplorer exp = new ASTExplorer();
     	exp.transform((TypedAST) exn);
@@ -621,8 +595,12 @@ import java.net.URI;
 
 	non terminal EE;
 	non terminal BE;
+	non terminal ASSN;
 
-    a ::= EE:are {: RESULT = are; :};
+    a ::= ASSN:are {: RESULT = are; :};
+
+	ASSN ::= lvalue:to equals_t e:va {:RESULT = new Assignment((TypedAST)to, (TypedAST)va, new FileLocation(currentState.pos));:}
+		 |   EE:va {: RESULT = va; :};
 
     EE ::= EE:l equalsequals_t EE:r {: RESULT = new Invocation((TypedAST)l,"==",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  EE:l gt_t EE:r {: RESULT = new Invocation((TypedAST)l,">",(TypedAST)r, new FileLocation(currentState.pos)); :}
@@ -694,7 +672,7 @@ import java.net.URI;
    	dslInner ::= dslLine:i {: RESULT = i; :}| dslLine:i dslInner:n {: RESULT = (String)i + (String)n; :};
    	dslLine ::= dslWhitespace_t:ws dslLine_t:ln {: RESULT = (String)ws + (String)ln; :};
 
-   	newBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | Newline_t {: RESULT = new DeclSequence(); :};
+   	newBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | {: RESULT = new DeclSequence(); :};
 
    	//URIs
    	non terminal uri;
