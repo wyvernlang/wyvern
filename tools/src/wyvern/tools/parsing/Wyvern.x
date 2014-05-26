@@ -260,13 +260,13 @@ import java.net.URI;
 		int newDepth = output.length();
 		depths.pop();
 		if(newDepth < depths.peek()) {
-			pushToken(Terminals.Dedent_t,output);
+			pushToken(Terminals.Dedent_t,lexeme);
 		} else {
 			pushToken(Terminals.Newline_t,lexeme);
 		}
 	:};
 
-    terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {::};
+    terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {: :};
 
 	terminal DedentRepair_t ::= /(\n[ \t]*)+/
 	{:
@@ -440,6 +440,7 @@ import java.net.URI;
 	non terminal pnrd;
 
     dm ::= prd:res Newline_t mnrd:after {: RESULT = new DeclSequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    	 | prd:res Newline_t {: RESULT = res; :}
     	 | prd:res  {: RESULT = res; :}
     	 | mnrd:res {: RESULT = res; :}
     	;
