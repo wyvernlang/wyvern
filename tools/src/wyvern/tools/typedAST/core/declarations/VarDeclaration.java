@@ -132,8 +132,10 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		definitionType = TypeResolver.resolve(binding.getType(), against);
+		binding = new NameBindingImpl(binding.getName(), definitionType);
+		varBinding = new VarBinding(binding.getName(), definitionType);
 
-		return env.extend(new NameBindingImpl(getName(), definitionType));
+		return env.extend(binding).extend(varBinding);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
