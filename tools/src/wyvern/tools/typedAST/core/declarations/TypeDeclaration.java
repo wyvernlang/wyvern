@@ -87,7 +87,10 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		protected Type doTypecheck(Environment env) {
-			return body.typecheck(env, Optional.empty());
+			Type result = body.typecheck(env, Optional.ofNullable(rType));
+			if (!result.subtype(rType))
+				throw new RuntimeException("Invalid type for metadata");
+			return result;
 		}
 
 		@Override
