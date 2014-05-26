@@ -160,12 +160,15 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 		return env;
 	}
 
+	Type resolvedType = null;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		for (int i = 0; i < argNames.size(); i++) {
 			NameBinding oldBinding = argNames.get(i);
 			argNames.set(i, new NameBindingImpl(oldBinding.getName(), TypeResolver.resolve(oldBinding.getType(), against)));
 		}
-		return env.extend(new NameBindingImpl(name, TypeResolver.resolve(type, against)));
+		if (resolvedType == null)
+			resolvedType = TypeResolver.resolve(type, against);
+		return env.extend(new NameBindingImpl(name, resolvedType));
 	}
 }
