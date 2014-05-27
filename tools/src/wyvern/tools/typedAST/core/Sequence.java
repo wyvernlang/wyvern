@@ -113,6 +113,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
+		writer.writeArgs(exps.toArray());
 		// TODO Auto-generated method stub
 	}
 
