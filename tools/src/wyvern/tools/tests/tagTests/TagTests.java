@@ -258,15 +258,7 @@ public class TagTests {
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
-		try {
-			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		} catch (ToolError toolError) {
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DUPLICATE_TAG);
-			
-			return;
-		}
-		
-		Assert.fail("Should have failed with error: " + ErrorMessage.DUPLICATE_TAG);
+		typeCheckfailWith(res, ErrorMessage.DUPLICATE_TAG);
 	}
 	
 	@Test
@@ -290,15 +282,7 @@ public class TagTests {
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
-		try {
-			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		} catch (ToolError toolError) {
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.UNKNOWN_TAG);
-			
-			return;
-		}
-		
-		Assert.fail("Should have failed with error: " + ErrorMessage.UNKNOWN_TAG);
+		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
 	}
 	
 	@Test
@@ -326,16 +310,7 @@ public class TagTests {
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
-		try {
-			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		} catch (ToolError toolError) {
-			//TODO: maybe this should be a different error message
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.UNKNOWN_TAG);
-			
-			return;
-		}
-		
-		Assert.fail("Should have failed with error: " + ErrorMessage.UNKNOWN_TAG);
+		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
 	}
 	
 	@Test
@@ -360,15 +335,7 @@ public class TagTests {
 				
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
-		try {
-			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		} catch (ToolError toolError) {
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DEFAULT_NOT_LAST);
-			
-			return;
-		}
-		
-		Assert.fail("Should have failed with error: " + ErrorMessage.DEFAULT_NOT_LAST);
+		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_LAST);
 	}
 	
 	@Test
@@ -400,18 +367,7 @@ public class TagTests {
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 	
 		
-		try {
-			res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		} catch (ToolError toolError) {
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), ErrorMessage.DEFAULT_NOT_PRESENT);
-			
-			return;
-		}
-		
-		Assert.fail("Should have failed with error: " + ErrorMessage.DEFAULT_NOT_PRESENT);
-		
-		
-		Assert.fail("TODO");
+		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_PRESENT);
 	}
 	
 	public void ExhaustiveWithDefaultTest() {
@@ -441,7 +397,7 @@ public class TagTests {
 				"	default => 15                                            \n";
 			// default specified with exhaustive search; error
 				
-			//ErrorMessage.DEFAULT_PRESENT
+			//typeCheckfailWith(res, ErrorMessage.DEFAULT_PRESENT);
 				
 			Assert.fail("TODO");
 	}
@@ -497,6 +453,70 @@ public class TagTests {
 		
 		new Wyvern().parse(new StringReader(input), "test input");
 		//reaching here without a parse exception is a pass
+	}
+	
+	@Test
+	public void defaultPresentFullComprisesTest() throws CopperParserException, IOException {
+		//Checks that an error is caught when a default is included but all comprises tags are included
+		
+		String input = 
+			"tagged class Dyn [comprises DynInt, DynChar] \n" +
+			"    class def create() : Dyn                 \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class DynInt [case of Dyn]            \n" +
+			"    class def create() : DynInt              \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class DynChar [case of Dyn]           \n" +
+			"    class def create() : DynChar             \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"val i = DynInt.create()                      \n" +
+			"                                             \n" +
+			"match(i):                                    \n" +
+			"	DynInt => 10                              \n" +
+			"	DynChar => 15                             \n" +
+			"	default => 15                             \n";
+		
+		
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		
+		typeCheckfailWith(res, ErrorMessage.DEFAULT_PRESENT);
+	}
+	
+	@Test
+	public void comprisesExecTest() throws CopperParserException, IOException {
+		String input = 
+			"tagged class Dyn [comprises DynInt, DynChar] \n" +
+			"    class def create() : Dyn                 \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class DynInt [case of Dyn]            \n" +
+			"    class def create() : DynInt              \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class DynChar [case of Dyn]           \n" +
+			"    class def create() : DynChar             \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"val i = Dyn.create()                         \n" +
+			"                                             \n" +
+			"match(i):                                    \n" +
+			"	DynInt => 10                              \n" +
+			"	DynChar => 15                             \n" +
+			"	default => 15                             \n";
+		
+		
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		
+		res.evaluate(Environment.getEmptyEnvironment());
+		
+		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		
+		// Should be 15 because D is a subclass of B and will match that
+		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
 	}
 	
 	@Test
@@ -579,5 +599,26 @@ public class TagTests {
 				"	default => 15                             \n";
 			
 			Assert.fail("TODO");
+	}
+	
+	/**
+	 * Attempts to typecheck the given AST and catch the given ErrorMessage.
+	 * This error being thrown indicates the test passed.
+	 * 
+	 * If the error isn't thrown, the test fails.
+	 * 
+	 * @param ast
+	 * @param errorMessage
+	 */
+	private void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
+		try {
+			ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		} catch (ToolError toolError) {
+			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), errorMessage);
+			
+			return;
+		}
+		
+		Assert.fail("Should have failed with error: " + errorMessage);
 	}
 }

@@ -18,29 +18,53 @@ public class TagBinding implements Binding {
 	/** The parent TagBinding if this has a case-of. May be null.  */
 	private TagBinding caseOfParent;
 	/** The list of direct sub-tags of this tag.  */
-	public List<TagBinding> directSubtags = new ArrayList<TagBinding>();
+	private List<TagBinding> directSubtags = new ArrayList<TagBinding>();
 	/** The list of comprises TagBindings. */
-	public List<TagBinding> comprisesTags = new ArrayList<TagBinding>();
+	private List<TagBinding> comprisesTags = new ArrayList<TagBinding>();
 	
 	//TODO: Remove this giant hack. Currently having a universal tag map because
 	//type checking/ eval is not working properly
-	public static Map<String, TagBinding> tagBindings = new HashMap<String, TagBinding>();
+	private static Map<String, TagBinding> tagBindings = new HashMap<String, TagBinding>();
 	
+	private static Map<String, TaggedInfo> tagInfos = new HashMap<String, TaggedInfo>();
 	
-	public TagBinding(String tagName) {
-		this.tagName = tagName;
-	}
-	
-	public TagBinding(String tagName, String caseOf, List<String> comprises) {
-		this.tagName = tagName;
-		this.caseOf = caseOf;
-		this.comprises.addAll(comprises);
-	}
-	
-	public TagBinding(String tagName, TaggedInfo taggedInfo) {
+	/**
+	 * Internal constructor to instantiate a TagBinding.
+	 * 
+	 * @param tagName
+	 * @param taggedInfo
+	 */
+	private TagBinding(String tagName, TaggedInfo taggedInfo) {
 		this.tagName = tagName;
 		this.caseOf = taggedInfo.getCaseOfTag();
 		this.comprises.addAll(taggedInfo.getComprisesTags());
+	}
+	
+	/**
+	 * Gets the TagBinding, creating it if necessary.
+	 * 
+	 * @param tagName
+	 * @return
+	 */
+	public static TagBinding getOrCreate(String tagName) {
+		if (tagBindings.containsKey(tagName)) {
+			return tagBindings.get(tagName);
+		}
+		
+		//If not present, create it, associate it, then return it
+		TagBinding binding = new TagBinding(tagName, tagInfos.get(tagName));
+		tagBindings.put(tagName, binding);
+		
+		return binding;
+	}
+	
+	public static TagBinding get(String tagName) {
+		if (!tagBindings.containsKey(tagName)) {
+			//throw new RuntimeException("Attempted to get non-existant tag: " + tagName);
+			return null;
+		}
+		
+		return tagBindings.get(tagName);
 	}
 	
 	@Override
@@ -64,6 +88,18 @@ public class TagBinding implements Binding {
 		return caseOfParent != null;
 	}
 	
+	public List<TagBinding> getComprisesOf() {
+		return comprisesTags;
+	}
+	
+	public boolean hasAnyComprises() {
+		return comprisesTags.size() != 0;
+	}
+	
+	public List<TagBinding> getDirectSubtags() {
+		return directSubtags;
+	}
+	
 	/**
 	 * Adds a TagBinding as a direct child/ sub-tag of this TagBinding.
 	 * @param tagBinding
@@ -85,5 +121,9 @@ public class TagBinding implements Binding {
 	@Override
 	public String toString() {
 		return "{tag: " + tagName + ", case-of: " + caseOf + ", comprises: " + comprises + "}";
+	}
+	
+	public static void associate(TaggedInfo taggedInfo) {
+		tagInfos.put(taggedInfo.getTagName(), taggedInfo);
 	}
 }

@@ -38,6 +38,7 @@ public enum ErrorMessage {
 	DEFAULT_PRESENT("Default case present in exhaustive match", 0),
 	DEFAULT_NOT_LAST("Default case present but not last", 0),
 	
+	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
 	CANNOT_INVOKE("Cannot invoke operations on the value %ARG", 1),

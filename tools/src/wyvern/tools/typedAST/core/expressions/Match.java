@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,11 +85,11 @@ public class Match extends CachingTypedAST implements CoreAST {
 		ClassType matchingOverClass = (ClassType) matchingOver.getType();
 		String className = matchingOverClass.getName();
 		
-		TagBinding matchingOverBinding = TagBinding.tagBindings.get(className);
+		TagBinding matchingOverBinding = TagBinding.get(className);
 		//TODO: fix this, replace with real code
 		
 		for (Case c : cases) {
-			TagBinding binding = TagBinding.tagBindings.get(c.getTaggedTypeMatch());
+			TagBinding binding = TagBinding.get(c.getTaggedTypeMatch());
 			//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
 			
 			if (hasMatch(matchingOverBinding, binding.getName())) {
@@ -123,7 +124,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 			children.put("match case: " + c.getTaggedTypeMatch(), c.getAST());
 		}
 		
-		children.put("match default-case: " + defaultCase.getTaggedTypeMatch(), defaultCase.getAST());
+		if (defaultCase != null) {
+			children.put("match default-case: " + defaultCase.getTaggedTypeMatch(), defaultCase.getAST());
+		}
+		
 		
 		return children;
 	}
@@ -156,9 +160,26 @@ public class Match extends CachingTypedAST implements CoreAST {
 		//Note: currently all errors given use matchingOver because it has a location
 		//TODO: use the actual entity that is responsible for the error
 		
-		this.matchingOver.typecheck(env, expected);
+		matchingOver.typecheck(env, expected);		
 		
 		// Variable we're matching must exist and be a tagged type
+		Type matchingOverType = matchingOver.getType();
+		
+		if (!(matchingOverType instanceof ClassType)) {
+			//TODO change this to be a typecheck error
+			throw new RuntimeException("variable matching over must be of type ClassType");
+		}
+		
+		ClassType matchingOverClass = (ClassType) matchingOver.getType();
+		String className = matchingOverClass.getName();
+		
+		TagBinding matchBinding = TagBinding.get(className);
+		
+		if (matchBinding == null) {
+			//TODO change this to a typecheck error
+			throw new RuntimeException("Value is not tagged.");
+		}
+		
 		for (Case c : cases) {
 			if (c.isDefault()) continue;
 			
@@ -190,12 +211,33 @@ public class Match extends CachingTypedAST implements CoreAST {
 		}
 		
 		if (caseSet.size() != cases.size()) {
-
 			ToolError.reportError(ErrorMessage.DUPLICATE_TAG, matchingOver);
 		}
 			
-		// If we've omitted default, we must included all possible tags
-		// TODO
+		// If we've omitted default, we must included all possible sub-tags
+		if (defaultCase == null) {
+			//first, the variables tag must use comprised-of, and must be more than 1
+			if (!matchBinding.hasAnyComprises()) {
+				//TODO change to type-check exception
+				throw new RuntimeException("Value has no comprises-of tags!");
+			}
+			
+			List<TagBinding> comprisesTags = new ArrayList<TagBinding>(matchBinding.getComprisesOf());
+			
+			//add this tag because it needs to be included too
+			comprisesTags.add(matchBinding);
+			
+			//check that each tag is present 
+			for (TagBinding t : comprisesTags) {
+				for (Case c : cases) {
+					//Found a match, this tag is present
+					if (c.getTaggedTypeMatch().equals(t.getName())) continue;
+				}
+				
+				//if we reach here the tag wasn't present
+				ToolError.reportError(ErrorMessage.DEFAULT_NOT_PRESENT, matchingOver);
+			}
+		}
 		
 		// If we've included default, we can't have included all possible tags
 		// TODO

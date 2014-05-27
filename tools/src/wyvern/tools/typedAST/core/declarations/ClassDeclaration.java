@@ -75,6 +75,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 		
 		this.taggedInfo = taggedInfo;
+		
+		//TODO: this will need to be replaced with proper type resolution for tags.
+		this.taggedInfo.setTagName(name);
+		this.taggedInfo.associateTag();
 	}
 	
 	public ClassDeclaration(String name,
@@ -237,18 +241,18 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		if (isTagged()) {
 			//type-test the tag information
 			
-			//first add the new binding
-			TagBinding tagBinding = new TagBinding(getName(), taggedInfo);
-			newEnv = newEnv.extend(tagBinding);
+			//TODO: fix this
 			
-			//TODO fix this hack
-			TagBinding.tagBindings.put(getName(), tagBinding);
+			//first get/ create the binding
+			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
+			newEnv = newEnv.extend(tagBinding);
 			
 			//now handle case-of and comprises clauses
 			if (taggedInfo.getCaseOfTag() != null) {
 				String caseOf = taggedInfo.getCaseOfTag();
 				
-				Optional<TagBinding> caseOfBindingO = Optional.of(TagBinding.tagBindings.get(caseOf));
+				//TODO: could case-of come before?
+				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
 				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
 				
 				if (caseOfBindingO.isPresent()) {
@@ -264,17 +268,17 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			
 			if (!taggedInfo.getComprisesTags().isEmpty()) {
 				//set up comprises tags
-				//TODO: this will likely fail because the other tags won't be declared yet
 				
 				for (String s : taggedInfo.getComprisesTags()) {
+					// Because comprises refers to tags defined ahead of this, we use the associated tag values
 					
-					Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.tagBindings.get(s));
+					Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.getOrCreate(s));
 					//TODO, change to real code: newEnv.lookupBinding(s, TagBinding.class);
 					
 					if (comprisesBindingO.isPresent()) {
 						TagBinding comprisesBinding = comprisesBindingO.get();
 						
-						tagBinding.comprisesTags.add(comprisesBinding);
+						tagBinding.getComprisesOf().add(comprisesBinding);
 					} else {
 						//TODO throw proper error
 						ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, s);

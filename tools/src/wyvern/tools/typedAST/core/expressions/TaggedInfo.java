@@ -3,6 +3,8 @@ package wyvern.tools.typedAST.core.expressions;
 import java.util.List;
 import java.util.ArrayList;
 
+import wyvern.tools.typedAST.core.binding.TagBinding;
+
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
  * 
@@ -10,6 +12,7 @@ import java.util.ArrayList;
  */
 public class TaggedInfo {
 
+	private String tagName;
 	private String caseOf;
 	private List<String> comprises;
 	
@@ -18,7 +21,7 @@ public class TaggedInfo {
 	 * Has no case of, and no comprises. 
 	 */
 	public TaggedInfo() {
-		comprises = new ArrayList<String>();
+		this(null, null);
 	}
 	
 	/**
@@ -26,9 +29,13 @@ public class TaggedInfo {
 	 * @param caseOf
 	 */
 	public TaggedInfo(String caseOf) {
-		this(caseOf, new ArrayList<String>());
+		this(caseOf, null);
 	}
 	
+	/**
+	 * Constructs a TaggedInfo with the given comprises tags.
+	 * @param comprises
+	 */
 	public TaggedInfo(List<String> comprises) {
 		this(null, comprises);
 	}
@@ -41,11 +48,36 @@ public class TaggedInfo {
 	 * @param caseOf
 	 * @param comprises
 	 */
-	public TaggedInfo(String caseOf, List<String> comprises) {
-		if (comprises == null) throw new NullPointerException("comprises cannot be null");
+	public TaggedInfo(String caseOf, List<String> comprises) {		
+		if (comprises == null) comprises = new ArrayList<String>();
 		
 		this.caseOf = caseOf;
 		this.comprises = comprises;
+	}
+	
+	/**
+	 * Associate this TaggedInfo with the TagBinding tagset.
+	 */
+	public void associateTag() {
+		TagBinding.associate(this);
+	}
+	
+	/**
+	 * Associates this name with the tag. Needed because we don't know tags name when this object is
+	 * instantiated.
+	 * 
+	 * @param tagName
+	 */
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
+	}
+	
+	/**
+	 * Gets the tag's name.
+	 * @return
+	 */
+	public String getTagName() {
+		return tagName;
 	}
 	
 	/**

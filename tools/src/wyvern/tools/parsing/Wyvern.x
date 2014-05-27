@@ -721,7 +721,9 @@ import java.net.URI;
 				RESULT = cases; 
 			:}
      	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
-		  |                    {: RESULT = new ArrayList<Case>(); :}
+		  | varStatement:mstmt           {: 
+		  		List<Case> cases = new ArrayList<Case>(); cases.add((Case) mstmt); RESULT = cases; 
+		  		:}
 		  ;
 	
 	//a single match case statement
