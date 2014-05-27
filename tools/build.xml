@@ -7,6 +7,9 @@
         <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java">
             <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
         </copper>
+        <copper outputfile="src/wyvern/tools/parsing/parselang/TypeParser.java">
+            <inputs file="src/wyvern/tools/parsing/parselang/TypeParser.x"/>
+        </copper>
         <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java">
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
         </copper>

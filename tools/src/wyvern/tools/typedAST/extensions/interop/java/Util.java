@@ -388,4 +388,19 @@ public class Util {
 						arguments, FileLocation.UNKNOWN)
 						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
 	}
+
+	public static Value getInternalValue(Obj receiver, String target) {
+		return new Invocation(receiver, target, null, FileLocation.UNKNOWN)
+						.evaluate(Environment.getEmptyEnvironment());//Therefore, can only handle strings and ints
+	}
+	
+
+	public static Object doInvokeVarargs(Obj receiver, String target, Object... args) {
+		Value arguments = toWyvObjs(args);
+		return toJavaObject((
+				new Application(
+						new Invocation(receiver, target, null, FileLocation.UNKNOWN),
+						arguments, FileLocation.UNKNOWN)
+						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
+	}
 }
