@@ -4,11 +4,14 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.core.binding.VarBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -81,7 +84,10 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public void checkAssignment(Assignment ass, Environment env) {
-		((Assignable)receiver).evaluateAssignment(ass, env);
+		Type recType = receiver.typecheck(env, Optional.empty());
+		if (!(recType instanceof ClassType)) //TODO: Hack
+			throw new RuntimeException("Cannot assign to a field on a type without fields!");
+		((ClassType) recType).getEnv().lookupBinding(operationName, VarBinding.class).get();
 	}
 
 	@Override
