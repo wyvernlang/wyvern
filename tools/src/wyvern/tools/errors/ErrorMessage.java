@@ -37,7 +37,7 @@ public enum ErrorMessage {
 	DEFAULT_NOT_PRESENT("Default case not present in non-exhaustive match", 0),
 	DEFAULT_PRESENT("Default case present in exhaustive match", 0),
 	DEFAULT_NOT_LAST("Default case present but not last", 0),
-	
+	NO_COMPRISES("Value being matched over must specify comprises-of tags", 0),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

@@ -27,7 +27,7 @@ public class TagTests {
 				"    class def create() : X     \n" +
 				"        new                    \n";
 		
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -40,7 +40,7 @@ public class TagTests {
 				"tagged type IntWrapper    \n" +
 				"  def getValue() : Int    \n";
 		
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -56,7 +56,7 @@ public class TagTests {
 				"tagged type Type2          \n" +
 				"  def getValue2() : Int    \n";
 		
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -73,7 +73,7 @@ public class TagTests {
 				"	X => 15                     \n" +
 				"	default => 15               \n";
 		
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -89,14 +89,8 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	default => 15               \n";
 				
-		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -117,7 +111,7 @@ public class TagTests {
 				"	Y => 23                     \n" +
 				"	default => 50               \n";
 				
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -139,7 +133,7 @@ public class TagTests {
 				"	Y => 23                     \n" +
 				"	default => 50               \n";
 				
-		new Wyvern().parse(new StringReader(input), "test input");		
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -156,13 +150,8 @@ public class TagTests {
 				"	default => 15               \n";
 				
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -203,11 +192,8 @@ public class TagTests {
 				"	V => 6                     \n" +
 				"	default => 15               \n";
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(25)");
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 1);
 	}
 	
 	@Test
@@ -228,13 +214,8 @@ public class TagTests {
 				"	Y => 23                     \n" +
 				"	default => 50               \n";
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
-		Assert.assertEquals(v.toString(), "IntegerConstant(23)");
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 23);
 	}
 	
 	@Test
@@ -256,7 +237,7 @@ public class TagTests {
 				"	Y => 34                     \n" +	// Y given twice; error
 				"	default => 50               \n";
 				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		TypedAST res = getAST(input);
 		
 		typeCheckfailWith(res, ErrorMessage.DUPLICATE_TAG);
 	}
@@ -280,7 +261,7 @@ public class TagTests {
 				"	Z => 34                     \n" +	// Z is not declared anywhere; error
 				"	default => 50               \n";
 				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		TypedAST res = getAST(input);
 		
 		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
 	}
@@ -308,7 +289,7 @@ public class TagTests {
 				"	Z => 34                     \n" +	// Z is not declared but not a tagged type; error
 				"	default => 50               \n";
 				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		TypedAST res = getAST(input);
 		
 		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
 	}
@@ -333,7 +314,7 @@ public class TagTests {
 				"	default => 23                     \n" +
 				"	Y => 50               \n";
 				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		TypedAST res = getAST(input);
 		
 		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_LAST);
 	}
@@ -364,9 +345,8 @@ public class TagTests {
 			"	DynChar => 15                                            \n";
 		// DynByte not specified; error
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		TypedAST res = getAST(input);
 	
-		
 		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_PRESENT);
 	}
 	
@@ -424,7 +404,7 @@ public class TagTests {
 			"	DynChar => 15                            \n" +
 			"	default => 23                            \n";
 		
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -451,7 +431,7 @@ public class TagTests {
 			"	default => 15                             \n";
 		
 		
-		new Wyvern().parse(new StringReader(input), "test input");
+		getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -472,15 +452,16 @@ public class TagTests {
 			"    class def create() : DynChar             \n" +
 			"        new                                  \n" +
 			"                                             \n" +
-			"val i = DynInt.create()                      \n" +
+			"val i = Dyn.create()                         \n" +
 			"                                             \n" +
 			"match(i):                                    \n" +
+			"	Dyn => 5                                  \n" +
 			"	DynInt => 10                              \n" +
 			"	DynChar => 15                             \n" +
-			"	default => 15                             \n";
+			"	default => 20                             \n";
 		
 		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		TypedAST res = getAST(input);
 		
 		typeCheckfailWith(res, ErrorMessage.DEFAULT_PRESENT);
 	}
@@ -507,16 +488,10 @@ public class TagTests {
 			"	DynChar => 15                             \n" +
 			"	default => 15                             \n";
 		
-		
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		TypedAST ast = getAST(input);
 		
 		// Should be 15 because D is a subclass of B and will match that
-		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
+		evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -545,16 +520,10 @@ public class TagTests {
 			"	C => 25                                   \n" +
 			"	default => 35                             \n";
 		
-				
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		res.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		
-		res.evaluate(Environment.getEmptyEnvironment());
-		
-		Value v = res.evaluate(Environment.getEmptyEnvironment());
+		TypedAST ast = getAST(input);
 		
 		// Should be 15 because D is a subclass of B and will match that
-		Assert.assertEquals(v.toString(), "IntegerConstant(15)");
+		evaluateExpecting(ast, 15);
 	}
 	
 	public void jsonTest() {
@@ -620,5 +589,35 @@ public class TagTests {
 		}
 		
 		Assert.fail("Should have failed with error: " + errorMessage);
+	}
+	
+	/**
+	 * Completely evaluates the given AST, and compares it to the given value.
+	 * Does typechecking first, then evaluation.
+	 * 
+	 * @param ast
+	 * @param value
+	 */
+	private void evaluateExpecting(TypedAST ast, int value) {
+		ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+		ast.evaluate(Environment.getEmptyEnvironment());
+		
+		Value v = ast.evaluate(Environment.getEmptyEnvironment());
+		
+		String expecting = "IntegerConstant(" + value + ")"; 
+		
+		Assert.assertEquals(v.toString(), expecting);
+	}
+	
+	/**
+	 * Converts the given program into the AST representation.
+	 * 
+	 * @param program
+	 * @return
+	 * @throws IOException 
+	 * @throws CopperParserException 
+	 */
+	private TypedAST getAST(String program) throws CopperParserException, IOException {
+		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
 	}
 }

@@ -213,35 +213,53 @@ public class Match extends CachingTypedAST implements CoreAST {
 		if (caseSet.size() != cases.size()) {
 			ToolError.reportError(ErrorMessage.DUPLICATE_TAG, matchingOver);
 		}
-			
+	
 		// If we've omitted default, we must included all possible sub-tags
 		if (defaultCase == null) {
-			//first, the variables tag must use comprised-of, and must be more than 1
+			//first, the variables tag must use comprised-of!
 			if (!matchBinding.hasAnyComprises()) {
 				//TODO change to type-check exception
-				throw new RuntimeException("Value has no comprises-of tags!");
+				ToolError.reportError(ErrorMessage.NO_COMPRISES, matchingOver);
 			}
 			
-			List<TagBinding> comprisesTags = new ArrayList<TagBinding>(matchBinding.getComprisesOf());
-			
-			//add this tag because it needs to be included too
-			comprisesTags.add(matchBinding);
-			
-			//check that each tag is present 
-			for (TagBinding t : comprisesTags) {
-				for (Case c : cases) {
-					//Found a match, this tag is present
-					if (c.getTaggedTypeMatch().equals(t.getName())) continue;
-				}
-				
-				//if we reach here the tag wasn't present
+			//next, the match cases must include all those in the comprises-of list
+			if (!comprisesSatisfied(matchBinding)) {
 				ToolError.reportError(ErrorMessage.DEFAULT_NOT_PRESENT, matchingOver);
 			}
 		}
 		
-		// If we've included default, we can't have included all possible tags
-		// TODO
+		// If we've included default, we can't have included all subtags for a tag using comprised-of
+		if (defaultCase != null) {
+			// We only care if tag specifies comprises-of
+			if (matchBinding.hasAnyComprises()) {
+				//all subtags were specified, error
+				if (comprisesSatisfied(matchBinding)) {
+					ToolError.reportError(ErrorMessage.DEFAULT_PRESENT, matchingOver);
+				}
+			}
+		}
 		
 		return Unit.getInstance();
+	}
+	
+	private boolean comprisesSatisfied(TagBinding matchBinding) {
+		List<TagBinding> comprisesTags = new ArrayList<TagBinding>(matchBinding.getComprisesOf());
+		
+		//add this tag because it needs to be included too
+		comprisesTags.add(matchBinding);
+		
+		//check that each tag is present 
+		for (TagBinding t : comprisesTags) {
+			for (Case c : cases) {
+				//Found a match, this tag is present
+				if (c.getTaggedTypeMatch().equals(t.getName())) continue;
+			}
+			
+			//if we reach here the tag wasn't present
+			return false;
+		}
+		
+		//we made it through them all
+		return true;
 	}
 }
