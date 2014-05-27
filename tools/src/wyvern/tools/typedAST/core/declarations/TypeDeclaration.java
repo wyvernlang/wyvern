@@ -4,6 +4,7 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -32,7 +33,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 	
-	private boolean isTagged;
+	private TaggedInfo taggedInfo;
 	
 	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
 	private Reference<Value> metaValue = new Reference<>();
@@ -148,9 +149,14 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		}
 	}
 
-    public TypeDeclaration(String name, DeclSequence decls, boolean isTagged, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    	this(name, decls, clsNameLine);
+    	
+    	this.taggedInfo = taggedInfo;
+	}
+	
+    public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
 		this.decls = decls;
-		this.isTagged = isTagged;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null);
 		Type objectType = new TypeType(this);
@@ -186,7 +192,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), isTagged, location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), location);
 	}
 
 	@Override
@@ -249,7 +255,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	 * @return
 	 */
 	public boolean isTagged() {
-		return isTagged;
+		return taggedInfo != null;
 	}
 	
 	private FileLocation location = FileLocation.UNKNOWN;

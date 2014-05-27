@@ -500,7 +500,7 @@ import java.net.URI;
 
     class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, true, (TaggedInfo) tagInfo, "", "",
+    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, (TaggedInfo) tagInfo, "", "",
     	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
     	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
@@ -578,9 +578,9 @@ import java.net.URI;
     cbvar ::= varKwd_t identifier_t:id typeasc:type cbdeclbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :};
 
 
-    typedec ::= taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, true, new FileLocation(currentState.pos)); :}
-    	|		typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, false, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, false, null); :}
+    typedec ::= taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
+    	|		typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
+    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, null); :}
 		;
 
     typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}

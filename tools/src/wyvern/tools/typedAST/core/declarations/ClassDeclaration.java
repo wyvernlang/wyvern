@@ -52,8 +52,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public ClassType getOType() {
 		return new ClassType(objEnv, new Reference<>(), new LinkedList<>(), getName());
 	}
-
-	private boolean isTagged;
+	
 	private TaggedInfo taggedInfo;
 	
 	public ClassDeclaration(String name,
@@ -68,7 +67,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
     }
 
 	public ClassDeclaration(String name,
-			boolean isTagged,
 			TaggedInfo taggedInfo,
 			String implementsName,
 			String implementsClassName,
@@ -76,7 +74,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			FileLocation location) {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 		
-		this.isTagged = isTagged;
 		this.taggedInfo = taggedInfo;
 	}
 	
@@ -237,7 +234,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
 		
 		//extend with tag information
-		if (isTagged) {
+		if (isTagged()) {
 			//type-test the tag information
 			
 			//first add the new binding
@@ -358,7 +355,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	 * @return true if tagged, false otherwise
 	 */
 	public boolean isTagged() {
-		return isTagged;
+		return taggedInfo != null;
 	}
 	
 	/**
