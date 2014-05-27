@@ -278,7 +278,7 @@ public class TagTests {
 				"        new                    \n" +
 				"                               \n" +
 				"class Z                        \n" +
-				"    class def create() : Y     \n" +
+				"    class def create() : Z     \n" +
 				"        new                    \n" +
 				"                               \n" +
 				"val x = X.create()             \n" +
@@ -286,17 +286,15 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
 				"	Y => 23                     \n" +
-				"	Z => 34                     \n" +	// Z is not declared but not a tagged type; error
+				"	Z => 34                     \n" +	// Z is declared but not a tagged type; error
 				"	default => 50               \n";
 				
-		TypedAST res = getAST(input);
+		TypedAST ast = getAST(input);
 		
-		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
+		typeCheckfailWith(ast, ErrorMessage.NOT_TAGGED);
 	}
 	
 	@Test
-	//TODO: this test fails because it throws an exception during parsing, and not the defined error message.
-	// It might be worth finding a way to bubble this parse exception up to the user in a more readable way...
 	public void defaultNotLastTest() throws CopperParserException, IOException {
 		String input = 	
 				"tagged class X                 \n" +
@@ -320,6 +318,30 @@ public class TagTests {
 	}
 	
 	@Test
+	public void multipleDefaultsTest() throws CopperParserException, IOException {
+		String input = 	
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class Y                 \n" +
+				"    class def create() : Y     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"match(x):                      \n" +
+				"	X => 15                     \n" +
+				"	default => 23               \n" +
+				"	Y => 50                     \n" +
+				"	default => 23               \n";
+				
+		TypedAST res = getAST(input);
+		
+		typeCheckfailWith(res, ErrorMessage.MULTIPLE_DEFAULTS);
+	}
+	
+	@Test
 	public void nonExhaustiveErrorTest() throws CopperParserException, IOException {
 		String input = 
 			"tagged class Dyn [comprises DynInt, DynChar, DynByte]       \n" +
@@ -338,7 +360,7 @@ public class TagTests {
 			"    class def create() : DynByte                            \n" +
 			"        new                                                 \n" +
 			"                                                            \n" +
-			"val i = DynInt.create()                                     \n" +
+			"val i = Dyn.create()                                        \n" +
 			"                                                            \n" +
 			"match(i):                                                   \n" +
 			"	DynInt => 10                                             \n" +
@@ -606,7 +628,7 @@ public class TagTests {
 		
 		String expecting = "IntegerConstant(" + value + ")"; 
 		
-		Assert.assertEquals(v.toString(), expecting);
+		Assert.assertEquals(expecting, v.toString());
 	}
 	
 	/**

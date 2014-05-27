@@ -718,12 +718,24 @@ import java.net.URI;
 				List<Case> cases = new ArrayList<Case>(); 
 				cases.add((Case) mstmt); 
 				cases.addAll((List<Case>) rest);
+				
 				RESULT = cases; 
 			:}
-     	  | defaultStatement:dstmt 		{: List<Case> cases = new ArrayList<Case>(); cases.add((Case) dstmt); RESULT = cases; :}
-		  | varStatement:mstmt           {: 
+			//this is actually a syntax error, but letting it parse so can give a more informative
+			//error message to the user later on
+     	  | defaultStatement:dstmt Newline_t caseStatements:rest {:
+     	  		List<Case> cases = new ArrayList<Case>();
+     	  		cases.add((Case) dstmt);
+     	  		cases.addAll((List<Case>) rest);
+     	  		
+     	  		RESULT = cases; :}
+     	  | defaultStatement:dstmt {: 
+     	  		List<Case> cases = new ArrayList<Case>();
+     	  		cases.add((Case) dstmt);
+     	  		RESULT = cases; :}
+		  | varStatement:mstmt {: 
 		  		List<Case> cases = new ArrayList<Case>(); cases.add((Case) mstmt); RESULT = cases; 
-		  		:}
+		  	:}
 		  ;
 	
 	//a single match case statement

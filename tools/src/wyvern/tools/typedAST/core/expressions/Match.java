@@ -39,6 +39,9 @@ public class Match extends CachingTypedAST implements CoreAST {
 	private List<Case> cases;
 	private Case defaultCase;
 	
+	/** Original list which preserves the order and contents. Needed for checking. */
+	private List<Case> originalCaseList;
+	
 	private FileLocation location;
 	
 	public String toString() {
@@ -46,9 +49,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 	
 	public Match(TypedAST matchingOver, List<Case> cases, FileLocation location) {		
+		//clone original list so we have a canonical copy
+		this.originalCaseList = new ArrayList<Case>(cases);
 		
 		this.matchingOver = matchingOver;
-		
 		this.cases = cases;
 		
 		//find the default case and remove it from the typed cases
@@ -162,6 +166,28 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		matchingOver.typecheck(env, expected);		
 		
+		// Check not more than 1 default
+		for (int numDefaults = 0, i = 0; i < originalCaseList.size(); i++) {
+			Case c = originalCaseList.get(i);
+			
+			if (c.isDefault()) {
+				numDefaults++;
+				
+				if (numDefaults > 1) {
+					ToolError.reportError(ErrorMessage.MULTIPLE_DEFAULTS, matchingOver);
+				}
+			}
+		}
+		
+		//check default is last (do this after counting so user gets more specific error message)
+		for (int i = 0; i < originalCaseList.size(); i++) {
+		
+			if (originalCaseList.get(i).isDefault() && i != originalCaseList.size() - 1) {
+				ToolError.reportError(ErrorMessage.DEFAULT_NOT_LAST, matchingOver);
+			}
+		}
+		
+		
 		// Variable we're matching must exist and be a tagged type
 		Type matchingOverType = matchingOver.getType();
 		
@@ -199,7 +225,14 @@ public class Match extends CachingTypedAST implements CoreAST {
 			if (t instanceof ClassType) {
 				ClassType classType = (ClassType) t;
 				
-				//TODO: check this is tagged. Currently can't because information not accessible in object.
+				String name = classType.getName();
+				
+				TagBinding tagBinding = TagBinding.get(name);
+				
+				if (tagBinding == null) {
+					//not tagged
+					ToolError.reportError(ErrorMessage.NOT_TAGGED, matchingOver);
+				}
 			}
 		}
 		
