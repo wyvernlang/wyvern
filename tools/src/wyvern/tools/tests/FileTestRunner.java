@@ -21,10 +21,13 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @RunWith(Parameterized.class)
 public class FileTestRunner {
 	private static String filename = "wyvern/tools/tests/basic.test";
+
+	private static Predicate<TestCase> casePredicate = (cas) -> true;
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Iterable<Object[]> data() {
@@ -36,7 +39,8 @@ public class FileTestRunner {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return cases.stream().map(caze->new Object[] {caze.getName(), caze.getCode(), caze.getExpectedValue(), caze.getExpectedType()})::iterator;
+		return cases.stream().filter(casePredicate)
+				.map(caze -> new Object[]{caze.getName(), caze.getCode(), caze.getExpectedValue(), caze.getExpectedType()})::iterator;
 	}
 	private final String name;
 	private final String code;
