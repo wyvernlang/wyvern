@@ -311,8 +311,8 @@ public class TagTests {
 				"                               \n" +
 				"match(x):                      \n" +
 				"	X => 15                     \n" +
-				"	default => 23                     \n" +
-				"	Y => 50               \n";
+				"	default => 23               \n" +
+				"	Y => 50                     \n";
 				
 		TypedAST res = getAST(input);
 		

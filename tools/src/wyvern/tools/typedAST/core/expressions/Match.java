@@ -250,10 +250,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		//check that each tag is present 
 		for (TagBinding t : comprisesTags) {
-			for (Case c : cases) {
-				//Found a match, this tag is present
-				if (c.getTaggedTypeMatch().equals(t.getName())) continue;
-			}
+			if (containsTagBinding(cases, t)) continue;
 			
 			//if we reach here the tag wasn't present
 			return false;
@@ -261,5 +258,22 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		//we made it through them all
 		return true;
+	}
+	
+	/**
+	 * Helper method to simplify checking for a tag.
+	 * Returns true if the given binding tag is present in the list of cases.
+	 * 
+	 * @param cases
+	 * @param binding
+	 * @return
+	 */
+	private boolean containsTagBinding(List<Case> cases, TagBinding binding) {
+		for (Case c : cases) {
+			//Found a match, this tag is present
+			if (c.getTaggedTypeMatch().equals(binding.getName())) return true;
+		}
+		
+		return false;
 	}
 }

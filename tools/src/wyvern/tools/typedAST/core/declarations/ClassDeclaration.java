@@ -268,7 +268,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			
 			if (!taggedInfo.getComprisesTags().isEmpty()) {
 				//set up comprises tags
-				
 				for (String s : taggedInfo.getComprisesTags()) {
 					// Because comprises refers to tags defined ahead of this, we use the associated tag values
 					
