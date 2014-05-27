@@ -112,6 +112,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 * @param currentBinding
 	 * @return
 	 */
+	//TODO: rename this method to something like isSubtag()
 	private boolean hasMatch(TagBinding matchingOver, String matchTarget) {
 		if (matchingOver.getName().equals(matchTarget)) return true;
 		
@@ -206,6 +207,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 			throw new RuntimeException("Value is not tagged.");
 		}
 		
+		//All things we match over must be tagged types
 		for (Case c : cases) {
 			if (c.isDefault()) continue;
 			
@@ -258,6 +260,23 @@ public class Match extends CachingTypedAST implements CoreAST {
 			//next, the match cases must include all those in the comprises-of list
 			if (!comprisesSatisfied(matchBinding)) {
 				ToolError.reportError(ErrorMessage.DEFAULT_NOT_PRESENT, matchingOver);
+			}
+		}
+		
+		//A tag cannot be earlier than one of its subtags
+		for (int i = 0; i < cases.size() - 1; i++) {
+			Case beforeCase = cases.get(i);
+			
+			for (int j = i + 1; j < cases.size(); j++) {
+				Case afterCase = cases.get(j);
+				
+				if (afterCase.isDefault()) break;
+				
+				TagBinding afterBinding = TagBinding.get(afterCase.getTaggedTypeMatch());
+				
+				if (hasMatch(afterBinding, beforeCase.getTaggedTypeMatch())) {
+					ToolError.reportError(ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG, matchingOver);
+				}
 			}
 		}
 		

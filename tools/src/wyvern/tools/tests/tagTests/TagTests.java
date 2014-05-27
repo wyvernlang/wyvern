@@ -372,10 +372,11 @@ public class TagTests {
 		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_PRESENT);
 	}
 	
-	public void ExhaustiveWithDefaultTest() {
+	@Test
+	public void exhaustiveWithDefaultTest() throws CopperParserException, IOException {
 		String input = 
 				"tagged class Dyn [comprises DynInt, DynChar, DynByte]       \n" +
-				"    class def create() : X                                  \n" +
+				"    class def create() : Dyn                                \n" +
 				"        new                                                 \n" +
 				"                                                            \n" +
 				"tagged class DynInt [case of Dyn]                           \n" +
@@ -390,18 +391,18 @@ public class TagTests {
 				"    class def create() : DynByte                            \n" +
 				"        new                                                 \n" +
 				"                                                            \n" +
-				"val i = DynInt.create()                                     \n" +
+				"val i = Dyn.create()                                        \n" +
 				"                                                            \n" +
 				"match(i):                                                   \n" +
 				"	DynInt => 10                                             \n" +
 				"	DynChar => 15                                            \n" +
-				"	DynByte => 25                                            \n" +
-				"	default => 15                                            \n";
+				"	DynByte => 20                                            \n" +
+				"   Dyn     => 25                                            \n" +
+				"	default => 30                                            \n";
 			// default specified with exhaustive search; error
 				
-			//typeCheckfailWith(res, ErrorMessage.DEFAULT_PRESENT);
-				
-			Assert.fail("TODO");
+			TypedAST ast = getAST(input);
+			typeCheckfailWith(ast, ErrorMessage.DEFAULT_PRESENT);
 	}
 	
 	@Test
@@ -477,9 +478,9 @@ public class TagTests {
 			"val i = Dyn.create()                         \n" +
 			"                                             \n" +
 			"match(i):                                    \n" +
-			"	Dyn => 5                                  \n" +
 			"	DynInt => 10                              \n" +
 			"	DynChar => 15                             \n" +
+			"	Dyn => 5                                  \n" +
 			"	default => 20                             \n";
 		
 		
@@ -517,6 +518,70 @@ public class TagTests {
 	}
 	
 	@Test
+	public void subtagAfterSupertagTest1() throws CopperParserException, IOException {
+		String input = 
+			"tagged class A                               \n" +
+			"    class def create() : A                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class B [case of A]                   \n" +
+			"    class def create() : B                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class C [case of A]                   \n" +
+			"    class def create() : C                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class D [case of B]                   \n" +
+			"    class def create() : D                   \n" +
+			"        new                                  \n" +
+			
+			"val d = D.create()                           \n" +
+			"                                             \n" +
+			"match(d):                                    \n" +
+			"	A => 15                                   \n" +	//Error, this will catch everything
+			"	B => 15                                   \n" + //So anything after is pointless
+			"	C => 25                                   \n" +
+			"	default => 35                             \n";
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckfailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
+	}
+	
+	@Test
+	public void subtagAfterSupertagTest2() throws CopperParserException, IOException {
+		String input = 
+			"tagged class A [comprises B, C]              \n" +
+			"    class def create() : A                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class B [case of A]                   \n" +
+			"    class def create() : B                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class C [case of A]                   \n" +
+			"    class def create() : C                   \n" +
+			"        new                                  \n" +
+			"                                             \n" +
+			"tagged class D [case of B]                   \n" +
+			"    class def create() : D                   \n" +
+			"        new                                  \n" +
+			
+			"val d = A.create()                           \n" +
+			"                                             \n" +
+			"match(d):                                    \n" +
+			"	C => 15                                   \n" +	
+			"	B => 15                                   \n" + //Error, this will catch the D just below
+			"	D => 25                                   \n" + 
+			"	A => 25                                   \n";
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckfailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
+	}
+	
+	@Test
 	public void simpleHierarchicalExecTest() throws CopperParserException, IOException {
 		String input = 
 			"tagged class A                               \n" +
@@ -548,12 +613,13 @@ public class TagTests {
 		evaluateExpecting(ast, 15);
 	}
 	
-	public void jsonTest() {
+	@Test
+	public void jsonTest() throws CopperParserException, IOException {
 		//TODO, make this test do something useful!
 		
 		String input = 
 				"tagged class JSON                            \n" +
-				"    class def create() : X                   \n" +
+				"    class def create() : JSON                \n" +
 				"        new                                  \n" +
 				"                                             \n" +
 				"tagged class ValueJSON [case of JSON]        \n" +
@@ -583,13 +649,15 @@ public class TagTests {
 				"val json = IntJSON.create()                  \n" +
 				"                                             \n" +
 				"match(json):                                 \n" +
-				"	NumJSON => 15                             \n" + 
-				"	ObjJSON => 10                             \n" +
-				"	StrJSON => 15                             \n" + 
-				"	IntJSON => 15                             \n" + 
-				"	default => 15                             \n";
+				"	IntJSON => 25                             \n" +
+				"	NumJSON => 10                             \n" + 
+				"	ObjJSON => 15                             \n" +
+				"	StrJSON => 20                             \n" + 
+				"	default => 30                             \n";
 			
-			Assert.fail("TODO");
+			TypedAST ast = getAST(input);
+			
+			evaluateExpecting(ast, 25);
 	}
 	
 	/**

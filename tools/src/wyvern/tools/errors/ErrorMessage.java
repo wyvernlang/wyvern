@@ -40,6 +40,7 @@ public enum ErrorMessage {
 	MULTIPLE_DEFAULTS("More than 1 default case defined", 0),
 	NO_COMPRISES("Value being matched over must specify comprises-of tags", 0),
 	NOT_TAGGED("Type is not tagged", 0),
+	SUPERTAG_PRECEEDS_SUBTAG("Supertag preceeds subtag; will catch everything", 0),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
