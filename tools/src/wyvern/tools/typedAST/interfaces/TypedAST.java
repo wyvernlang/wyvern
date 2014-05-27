@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.interfaces;
 
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.parsing.ExtParser;
+import wyvern.tools.parsing.HasParser;
 import wyvern.tools.parsing.quotelang.QuoteParser;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -31,7 +32,7 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 */
 	TypedAST cloneWithChildren(Map<String, TypedAST> newChildren);
 
-	public static ExtParser meta$get() {
-		return new QuoteParser();
+	public static HasParser meta$get() {
+		return () -> new QuoteParser();
 	}
 }
