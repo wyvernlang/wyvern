@@ -673,7 +673,7 @@ public class TagTests {
 		try {
 			ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
 		} catch (ToolError toolError) {
-			Assert.assertEquals(toolError.getTypecheckingErrorMessage(), errorMessage);
+			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
 			
 			return;
 		}
