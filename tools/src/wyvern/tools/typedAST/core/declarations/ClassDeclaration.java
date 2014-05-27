@@ -111,7 +111,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		//TODO: implement me
-		//writer.writeArgs(definition);
+		writer.writeArgs(decls);
 	}
 
 	@Override

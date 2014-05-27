@@ -18,13 +18,14 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
-public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
+public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
 	protected TypedAST body; // HACK
 	private String name;
 	private Type type;
@@ -76,7 +77,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		// TODO: implement me
+		writer.writeArgs(name, type, body);
 	}
 
 	@Override
