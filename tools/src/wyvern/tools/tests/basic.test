@@ -1,10 +1,15 @@
 test seven[IntegerConstant(7):Int]
 	7
+
 test plus[IntegerConstant(9):Int]
 	7 + 2
 test val[IntegerConstant(5):Int]
 	val x = 5
 	x
+test val2[IntegerConstant(2):Int]
+	val x = 2
+	val y = x
+	y
 test lambdaCall[IntegerConstant(1):Int]
 	(fn x : Int => x)(1)
 test lambdaAdd[IntegerConstant(4):Int]
@@ -25,9 +30,58 @@ test classAndField[StringConstant("hello"):Str]
 	h.hiString
 test classAndMethod[IntegerConstant(9):Int]
 	class Hello
-    	class def make():Hello = new
-    	def get4():Int = 4
-    	def get5():Int = 5
-    	def getP():Int = this.get4()+this.get5()
-  	val h:Hello = Hello.make()
-    h.getP()
+		class def make():Hello = new
+		def get4():Int = 4
+		def get5():Int = 5
+		def getP():Int = this.get4()+this.get5()
+	val h:Hello = Hello.make()
+	h.getP()
+test var[IntegerConstant(4):Int]
+	var x:Int = 1
+    x=2
+    var y:Int = 3
+    y=4
+    x=y
+    x
+test varInClass[IntegerConstant(10):Int]
+	class Hello
+		class def make():Hello = new
+		var testVal:Int = 5
+		def setV(n : Int):Unit
+			this.testVal = n
+		def getV():Int = this.testVal
+	val h:Hello = Hello.make()
+	h.setV(10)
+	h.getV()
+test genericNew[IntegerConstant(2):Int]
+	val test = new
+		val x = 2
+	test.x
+test class1[IntegerConstant(3):Int]
+	class X
+		class def create(i:Int):X = new
+			val t = i
+		val t:Int
+		def get():Int
+			this.t
+	val c:X = X.create(1)
+	val a = c.get
+	val b = X.create(2).get
+	b() + a()
+test class2[IntegerConstant(4):Int]
+	class C
+		class def create(i:Int):C = new
+			val t = i
+		def create(i:Int):Int
+			9
+	1
+	4
+test class3[IntegerConstant(2):Int]
+	class C
+		class def create(i:Int):C
+			new
+				val t = i
+		val k = 2
+	C.create(4).k
+test tuple[TupleValue(IntegerConstant(1), IntegerConstant(2), IntegerConstant(3)):Int*Int*Int]
+	(1,2,3)
