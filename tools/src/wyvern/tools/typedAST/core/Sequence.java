@@ -70,7 +70,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type lastType = wyvern.tools.types.extensions.Unit.getInstance();
 		for (TypedAST t : exps) {
-			lastType = t.typecheck(env, Optional.empty());
+			lastType = t.typecheck(env, (exps.getLast() == t)?expected:Optional.empty());
 			if (t instanceof EnvironmentExtender)
 				env = ((EnvironmentExtender) t).extend(env, env);
 		}
