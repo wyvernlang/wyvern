@@ -6,8 +6,9 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.binding.VarBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -26,7 +27,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	Type definitionType;
 	NameBinding binding;
-	VarBinding varBinding;
 
 	private boolean isClass;
 	public boolean isClass() {
@@ -35,8 +35,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	public VarDeclaration(String varName, Type parsedType, TypedAST definition) {
 		this.definition=definition;
-		binding = new NameBindingImpl(varName, parsedType);
-		varBinding = new VarBinding(varName, parsedType);
+		binding = new AssignableNameBinding(varName, parsedType);
 	}
 
 	@Override
@@ -80,36 +79,25 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
-		return old.extend(binding).extend(varBinding);
+		return old.extend(binding);
 	}
 
 	@Override
 	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
+		Environment newEnv = old.extend(new VarValueBinding(binding.getName(), binding.getType(), null));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		Value exVal = declEnv.getValue(binding.getName());
-		if (exVal != null) {
-			if (exVal.getType() instanceof VarValue)
-				return;
-
-			ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
-			vb.setValue(new VarValue(exVal));
-			return;
-		}
-		
+		VarValueBinding vb = (VarValueBinding) declEnv.lookup(binding.getName());
 		if (definition == null) {
-            ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
-            vb.setValue(new VarValue(null));
+            vb.assign(null);
 			return;
 		}
 		Value defValue = definition.evaluate(evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
-		vb.setValue(new VarValue(defValue));
+		vb.assign(defValue);
 	}
 
 	@Override
@@ -132,10 +120,9 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		definitionType = TypeResolver.resolve(binding.getType(), against);
-		binding = new NameBindingImpl(binding.getName(), definitionType);
-		varBinding = new VarBinding(binding.getName(), definitionType);
+		binding = new AssignableNameBinding(binding.getName(), definitionType);
 
-		return env.extend(binding).extend(varBinding);
+		return env.extend(binding);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

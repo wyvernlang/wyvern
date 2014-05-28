@@ -5,7 +5,7 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.parsing.Wyvern;
-import wyvern.tools.typedAST.core.binding.MetadataInnerBinding;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;

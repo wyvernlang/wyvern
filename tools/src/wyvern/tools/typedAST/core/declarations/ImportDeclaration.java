@@ -3,7 +3,7 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.ImportResolverBinding;
+import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;

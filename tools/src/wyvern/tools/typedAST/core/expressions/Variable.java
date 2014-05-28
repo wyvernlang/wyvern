@@ -2,8 +2,10 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.VarBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
@@ -73,20 +75,19 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public void checkAssignment(Assignment ass, Environment env) {
-		VarBinding vb = env.lookupBinding(binding.getName(), VarBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
+		AssignableNameBinding vb =
+				env.lookupBinding(binding.getName(), AssignableNameBinding.class)
+					.orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
 	}
 
 	@Override
 	public Value evaluateAssignment(Assignment ass, Environment env) {
-		Value value = env.getValue(binding.getName());
-		if (!(value instanceof VarValue)) {
-			throw new RuntimeException("Trying to assign a non-var");
-		}
-		VarValue varValue = (VarValue)value;
-		
-		Value newValue = ass.getValue().evaluate(env);
-		varValue.setValue(newValue);
-		return newValue;
+		Value value = ass.getValue().evaluate(env);
+		env.lookupBinding(binding.getName(), AssignableValueBinding.class)
+				.orElseThrow(() -> new RuntimeException("Invalid assignment"))
+				.assign(value);
+
+		return value;
 	}
 
 	@Override

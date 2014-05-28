@@ -1,5 +1,6 @@
-package wyvern.tools.typedAST.core.binding;
+package wyvern.tools.typedAST.core.binding.evaluation;
 
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
