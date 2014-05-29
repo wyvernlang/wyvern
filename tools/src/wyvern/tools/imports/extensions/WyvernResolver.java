@@ -5,6 +5,7 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -46,6 +47,7 @@ public class WyvernResolver implements ImportResolver {
 				throw new RuntimeException(e);
 			}
 			res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+			res = new DSLTransformer().transform(res);
 		}
 
 		private Environment MiBEnv = Environment.getEmptyEnvironment();
