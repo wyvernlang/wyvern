@@ -37,6 +37,8 @@ public class QuoteParser implements ExtParser {
 			if (input instanceof ToastExpression) {
 				Value result = input.evaluate(evalEnv);
 				TypedAST iExn = Util.toJavaClass((Obj)result, TypedAST.class);
+				if (!(iExn instanceof Obj))
+					return iExn;
 				TypedAST equivExn = Util.toJavaClass((Obj)iExn, TypedAST.class);
 				return equivExn;
 			}
