@@ -22,9 +22,9 @@ import java.util.stream.Stream;
 public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;
 	private final EnvironmentExtender inner;
-	private final ClassType subTypeType;
+	private ClassType subTypeType;
 	private FileLocation location;
-	private final ClassType selfType;
+	private ClassType selfType;
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
@@ -109,7 +109,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			}
 			nameGuard = true;
 		}
-		return env;
+		return env.extend(new NameBindingImpl(name, selfType)).extend(new TypeBinding(name, subTypeType));
 	}
 
 	@Override
@@ -140,7 +140,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new ModuleDeclaration(name, (EnvironmentExtender)newChildren.get("body"), getLocation());
+		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), getLocation());
+		newDecl.selfType = selfType;
+		newDecl.subTypeType = subTypeType;
+		newDecl.importEnv = importEnv;
+		newDecl.typeEnv = typeEnv;
+		newDecl.dclEnv = dclEnv;
+		return newDecl;
 	}
 
 	@Override
