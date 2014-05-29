@@ -125,8 +125,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
 		if (nc.containsKey("definition"))
-			return new ValDeclaration(getName(), nc.get("definition"), location);
-		return new ValDeclaration(getName(), null, location);
+			return new ValDeclaration(getName(), binding.getType(), nc.get("definition"), location);
+		return new ValDeclaration(getName(), binding.getType(), null, location);
 	}
 
 	@Override

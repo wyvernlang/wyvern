@@ -125,7 +125,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-			return new AttributeDeclaration(newChildren.get("body"));
+			return new AttributeDeclaration(newChildren.get("body"), rType);
 		}
 
 		@Override

@@ -31,7 +31,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef, FileLocation location) {
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, fullType);
 		this.name = name;
@@ -42,13 +43,26 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef) {
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						   TypedAST body, boolean isClassDef) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = fullType;
 		this.name = name;
 		this.body = body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
+		this.location = location;
+	}
+
+	private DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location, boolean placeholder) {
+		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
+		this.type = fullType;
+		this.name = name;
+		this.body = body;
+		this.argNames = argNames;
+		this.isClass = isClassDef;
+		this.location = location;
 	}
 
 
@@ -100,7 +114,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location);
+		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location, true);
 	}
 
 	@Override
