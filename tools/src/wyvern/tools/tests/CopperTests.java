@@ -763,5 +763,44 @@ public class CopperTests {
 
 		Value out = res.evaluate(Globals.getStandardEnv());
 	}
+
+	@Test
+	public void lazyTSL() throws IOException, CopperParserException {
+		String parser = "" +
+				"module LazyParser\n" +
+				"import java:wyvern.tools.parsing.ParseBuffer\n" +
+				"import java:wyvern.tools.typedAST.interfaces.TypedAST\n" +
+				"import java:wyvern.tools.util.LangUtil\n" +
+				"class Parser\n" +
+				"	class def create():Parser = new\n" +
+				"	def parse(buf:ParseBuffer):TypedAST\n" +
+				"		val spliced = LangUtil.splice(buf)\n" +
+				"		~\n" +
+				"			new\n" +
+				"				def get():Int = $spliced\n";
+		String supplier = "" +
+				"module LazyTSL\n" +
+				"import wyv:parser\n" +
+				"import java:wyvern.tools.parsing.ExtParser\n" +
+				"import java:wyvern.tools.parsing.HasParser\n" +
+				"type Lazy\n" +
+				"	def get():Int\n" +
+				"	metadata:HasParser = new\n" +
+				"		def getParser():ExtParser = LazyParser.Parser.create()\n";
+		String client = ""+
+				"import wyv:supplier\n" +
+				"val x = 4\n" +
+				"val test:LazyTSL.Lazy = ~\n" +
+				"	4 + x\n" +
+				"test.get()";
+		WyvernResolver.clearFiles();
+		WyvernResolver.addFile("parser", parser);
+		WyvernResolver.addFile("supplier", supplier);
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(client), "test input");
+		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		res = new DSLTransformer().transform(res);
+		Value finalV = res.evaluate(Globals.getStandardEnv());
+	}
 }
 
