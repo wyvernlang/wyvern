@@ -386,4 +386,10 @@ public class Util {
 						arguments, FileLocation.UNKNOWN)
 						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
 	}
+
+	public static Value invokeValue(Value reciever, String target, Value args) {
+		return new Application(
+				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
+				args, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
+	}
 }
