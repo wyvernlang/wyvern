@@ -627,7 +627,7 @@ public class CopperTests {
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		res = new DSLTransformer().transform(res);
 		Value finalV = res.evaluate(Globals.getStandardEnv());
-		Assert.assertEquals(new IntegerConstant(2), Util.toJavaObject(finalV, IntegerConstant.class));
+		Assert.assertEquals(new Sequence(new IntegerConstant(2)).toString(), Util.toJavaObject(finalV, Sequence.class).toString());
 	}
 
 	@Test
@@ -642,7 +642,7 @@ public class CopperTests {
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		res = new DSLTransformer().transform(res);
 		Value finalV = res.evaluate(Globals.getStandardEnv());
-		Assert.assertEquals("Invocation(IntegerConstant(2), \"+\", IntegerConstant(5))", Util.toJavaObject(finalV, Invocation.class).toString());
+		Assert.assertEquals("[Invocation(IntegerConstant(2), \"+\", Sequence(IntegerConstant(5)))]", Util.toJavaObject(finalV, TypedAST.class).toString());
 	}
 	@Test
 	public void testASTTSL3() throws IOException, CopperParserException {
@@ -657,7 +657,7 @@ public class CopperTests {
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		res = new DSLTransformer().transform(res);
 		Value finalV = res.evaluate(Globals.getStandardEnv());
-		Assert.assertEquals("Invocation(IntegerConstant(2), \"+\", IntegerConstant(5))", Util.toJavaObject(finalV, Invocation.class).toString());
+		Assert.assertEquals("[Invocation(IntegerConstant(2), \"+\", IntegerConstant(5))]", Util.toJavaObject(finalV, Invocation.class).toString());
 	}
 
 	@Test
