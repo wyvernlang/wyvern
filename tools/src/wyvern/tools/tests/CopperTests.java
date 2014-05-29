@@ -701,7 +701,8 @@ public class CopperTests {
 						"(if this.jtok.ttype == StreamTokenizer.TT_WORD then (StrTok.create(this.jtok.sval) : Token)\n" +
 						" else (if this.jtok.ttype > 0 then (StrTok.create(LangUtil.intToStr(this.jtok.ttype)) : Token) else (NumTok.create(0-1):Token))))\n";
 		String parser =
-				"import wyv:in1\n" +
+				"module CalcParser\n" +
+						"import wyv:tokenizer\n" +
 						"import java:java.lang.String\n" +
 						"import java:java.io.StringReader\n" +
 						"class CalculatorParser\n" +
@@ -748,18 +749,43 @@ public class CopperTests {
 						"			this.tkzr.next()\n" +
 						"			0-this.P()\n" +
 						"		if nt.typeOf() == 1 then " +
-						"num() " +
-						"else " +
-						"if \"(\" == nt.getStr() then " +
-						"paren() " +
-						"else " +
-						"if \"-\" == nt.getStr() then neg() else 1/0\n" +
-						"CalculatorParser.create(\"1+2*2+3\").E()";
-		WyvernResolver.clearFiles();
-		WyvernResolver.addFile("in1", tokenizer);
+									"num() " +
+								"else " +
+									"if \"(\" == nt.getStr() then " +
+										"paren() " +
+									"else " +
+						"				if \"-\" == nt.getStr() then neg() else 1/0\n";
 
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(parser), "test input");
+		String typer = ""+
+				"module CalculatorType\n" +
+				"import wyv:parser\n" +
+				"import java:wyvern.tools.parsing.ExtParser\n" +
+				"import java:wyvern.tools.parsing.HasParser\n" +
+				"import java:wyvern.tools.parsing.ParseBuffer\n" +
+				"import java:wyvern.tools.typedAST.interfaces.TypedAST\n" +
+				"type Calculator\n" +
+				"	def eval():Int\n" +
+				"	metadata:HasParser = new\n" +
+				"		def getParser():ExtParser = new\n" +
+				"			def parse(buf:ParseBuffer):TypedAST\n" +
+				"				val oNum = CalcParser.CalculatorParser.create(buf.getSrcString()).E()\n" +
+				"				~\n" +
+				"					new\n" +
+				"						def eval():Int = $oNum\n";
+
+		String user = "" +
+				"import wyv:typer\n" +
+				"val calc:CalculatorType.Calculator = { 2 + 3*2 + 5 }\n" +
+				"calc.eval()\n";
+
+		WyvernResolver.clearFiles();
+		WyvernResolver.addFile("tokenizer", tokenizer);
+		WyvernResolver.addFile("parser", parser);
+		WyvernResolver.addFile("typer", typer);
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(user), "test input");
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+		res = new DSLTransformer().transform(res);
 
 		Value out = res.evaluate(Globals.getStandardEnv());
 	}
