@@ -786,8 +786,10 @@ public class CopperTests {
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(user), "test input");
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		res = new DSLTransformer().transform(res);
+		Assert.assertEquals("Int", result.toString());
 
 		Value out = res.evaluate(Globals.getStandardEnv());
+		Assert.assertEquals("IntegerConstant(13)", out.toString());
 	}
 
 	@Test
