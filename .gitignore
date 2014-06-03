@@ -10,3 +10,4 @@ tools/src/wyvern/tools/tests/utils/TestSuiteParser.java
 tools/copper-output.txt
 tools/copper-quotes-output.txt
 tools/copper-tests-output.txt
+tools/copper-composer/copper-composer.iml
