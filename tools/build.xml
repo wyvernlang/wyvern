@@ -1,12 +1,7 @@
 <project name="wyvern" default="copper-generate" basedir=".">
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler-0.7.1.jar"/>
     <taskdef name="composer" classname="wyvern.tools.parsing.CopperComposer" classpath="copper-composer/bin:lib/CopperCompiler-0.7.1.jar"/>
-    <target name="copper-compose-compile">
-        <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
-            <classpath path="lib/CopperCompiler-0.7.1.jar:lib/ant.jar"/>
-        </javac>
-    </target>
-    <target name="copper-compose" depends="copper-compose-compile">
+    <target name="copper-compose">
         <composer hostgrammar="src/wyvern/tools/parsing/Wyvern.x"
                   hostgrammarname="Wyvern"
                   extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
