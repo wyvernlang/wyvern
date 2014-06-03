@@ -85,4 +85,10 @@ public class JavaClassType extends ClassType implements MetaType {
 			throw new RuntimeException(e);
 		}
 	}
+
+
+	@Override
+	public String toString() {
+		return "JavaClass("+decl.getClazz().getName()+")";
+	}
 }

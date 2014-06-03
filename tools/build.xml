@@ -1,11 +1,20 @@
 <project name="wyvern" default="copper-generate" basedir=".">
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler-0.7.1.jar"/>
-    <target name="copper-generate">
+    <taskdef name="composer" classname="wyvern.tools.parsing.CopperComposer" classpath="copper-composer/bin:lib/CopperCompiler-0.7.1.jar"/>
+    <target name="copper-compose-compile">
+        <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
+            <classpath path="lib/CopperCompiler-0.7.1.jar:lib/ant.jar"/>
+        </javac>
+    </target>
+    <target name="copper-compose" depends="copper-compose-compile">
+        <composer hostgrammar="src/wyvern/tools/parsing/Wyvern.x"
+                  hostgrammarname="Wyvern"
+                  extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
+                  output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
+    </target>
+    <target name="copper-generate" depends="copper-compose">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
-        </copper>
-        <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java">
-            <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
         </copper>
         <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java">
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
@@ -14,9 +23,6 @@
     <target name="copper-debug">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
-        </copper>
-        <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java" dump="ON" dumpfile="copper-quotes-output.txt">
-            <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
         </copper>
         <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java" dump="ON" dumpfile="copper-tests-output.txt">
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
