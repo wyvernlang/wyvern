@@ -1,7 +1,0 @@
-<project name="copper-composer" default="copper-compose-compile">
-    <target name="copper-compose-compile">
-        <javac destdir="bin" srcdir="src">
-            <classpath path="../lib/CopperCompiler-0.7.1.jar:../lib/ant.jar"/>
-        </javac>
-    </target>
-</project>
