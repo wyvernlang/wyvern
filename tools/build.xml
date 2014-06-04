@@ -12,6 +12,15 @@
                   extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
                   output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
     </target>
+    <target name="copper-subparsers">
+        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler-0.7.1.jar"/>
+        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
+                  hostgrammar="Wyvern"
+                  newfc="objd"
+                  newpackage="wyvern.tools.parsing.parselang"
+                  newname="WyvernDecls"
+                  target="src/wyvern/tools/parsing/parselang/WyvernDecls.java"/>
+    </target>
     <target name="copper-generate" depends="copper-compose">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
