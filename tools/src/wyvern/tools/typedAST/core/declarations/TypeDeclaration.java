@@ -4,6 +4,10 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -121,7 +125,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-			return new AttributeDeclaration(newChildren.get("body"));
+			return new AttributeDeclaration(newChildren.get("body"), rType);
 		}
 
 		@Override

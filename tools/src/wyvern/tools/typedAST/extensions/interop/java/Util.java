@@ -3,12 +3,10 @@ package wyvern.tools.typedAST.extensions.interop.java;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.binding.LateValueBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
@@ -402,5 +400,11 @@ public class Util {
 						new Invocation(receiver, target, null, FileLocation.UNKNOWN),
 						arguments, FileLocation.UNKNOWN)
 						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
+	}
+
+	public static Value invokeValue(Value reciever, String target, Value args) {
+		return new Application(
+				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
+				args, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
 	}
 }

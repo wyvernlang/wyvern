@@ -1,5 +1,6 @@
-package wyvern.tools.typedAST.core.binding;
+package wyvern.tools.typedAST.core.binding.compiler;
 
+import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;

@@ -1,4 +1,3 @@
-package wyvern.tools.parsing;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

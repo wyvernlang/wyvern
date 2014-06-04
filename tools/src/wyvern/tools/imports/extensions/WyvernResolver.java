@@ -5,15 +5,15 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.parsing.Wyvern;
-import wyvern.tools.typedAST.core.binding.MetadataInnerBinding;
+import wyvern.tools.parsing.transformers.DSLTransformer;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Optional;
@@ -38,14 +38,15 @@ public class WyvernResolver implements ImportResolver {
 
 		private TypedAST res;
 
-		public WyvernBinder(String filename, String source) {
+		public WyvernBinder(String filename, Reader source) {
 			res = null;
 			try {
-				res = (TypedAST)new Wyvern().parse(new StringReader(source), filename);
+				res = (TypedAST)new Wyvern().parse(source, filename);
 			} catch (IOException | CopperParserException e) {
 				throw new RuntimeException(e);
 			}
 			res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
+			res = new DSLTransformer().transform(res);
 		}
 
 		private Environment MiBEnv = Environment.getEmptyEnvironment();
@@ -144,7 +145,15 @@ public class WyvernResolver implements ImportResolver {
 		if (savedBinders.containsKey(filename))
 			return savedBinders.get(filename);
 		if (savedResolutions.containsKey(filename))
-			return addAndBind(filename, new WyvernBinder(filename,savedResolutions.get(filename)));
-		throw new RuntimeException("Unknown file"); //TODO
+			return addAndBind(filename, new WyvernBinder(filename,new StringReader(savedResolutions.get(filename))));
+
+		File fsFile = new File(filename);
+		if (!fsFile.exists() || !fsFile.canRead())
+			throw new RuntimeException("Invalid file");
+		try (FileInputStream fis = new FileInputStream(fsFile)) {
+			return addAndBind(filename, new WyvernBinder(filename, new InputStreamReader(fis)));
+		} catch (Exception e) {
+			throw new RuntimeException("File opening failed with exception", e);
+		}
 	}
 }

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        
+<CopperSpec xmlns="http://melt.cs.umn.edu/copper/xmlns">
+    <ExtendedParser id="QuoteParser">
+        <HostGrammar>
+            <GrammarRef id="_Wyvern"/>
+        </HostGrammar>
+        <ExtensionGrammars>
+            <GrammarRef id="Quote"/>
+        </ExtensionGrammars>
+        <StartSymbol>
+            <NonterminalRef id="fc" grammar="_Wyvern"/>
+        </StartSymbol>
+        <ClassName>WyvernQuote</ClassName>
+        <Preamble>
+            <Code>
+                <![CDATA[
+package wyvern.tools.parsing.quotelang;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import wyvern.tools.parsing.transformers.*;
+import wyvern.tools.typedAST.core.*;
+import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.core.expressions.*;
+import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.values.*;
+import wyvern.tools.typedAST.extensions.*;
+import wyvern.tools.typedAST.core.declarations.*;
+import wyvern.tools.typedAST.abs.*;
+import wyvern.tools.types.*;
+import wyvern.tools.types.extensions.*;
+import wyvern.tools.parsing.DSLLit;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.*;
+import wyvern.tools.errors.FileLocation;
+import java.net.URI;
+                ]]>
+            </Code>
+        </Preamble>
+    </ExtendedParser>
+    <ExtensionGrammar id="Quote">
+        <MarkingTerminals>
+            <TerminalRef id="dollar_t"/>
+        </MarkingTerminals>
+        <BridgeProductions>
+            <ProductionRef id="dollarTerm"/>
+        </BridgeProductions>
+        <Declarations>
+            <Terminal id="dollar_t">
+                <Regex>
+                    <CharacterSet>
+                        <SingleCharacter char="$"/>
+                    </CharacterSet>
+                </Regex>
+            </Terminal>
+            <Nonterminal id="DB">
+                <PP>DB</PP>
+            </Nonterminal>
+            <Production id="dollarTerm">
+                <Code>
+                    <![CDATA[
+                        RESULT = new ToastExpression(new SpliceExn((TypedAST)inner));
+                    ]]>
+                </Code>
+                <LHS>
+                    <NonterminalRef id="term" grammar="_Wyvern"/>
+                </LHS>
+                <RHS>
+                    <TerminalRef id="dollar_t"/>
+                    <NonterminalRef id="DB" name="inner"/>
+                </RHS>
+            </Production>
+            <Production id="dollarBody1">
+                <Code>
+                    <![CDATA[
+                        RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos));
+                    ]]>
+                </Code>
+                <LHS>
+                    <NonterminalRef id="DB"/>
+                </LHS>
+                <RHS>
+                    <TerminalRef id="identifier_t" grammar="_Wyvern" name="id"/>
+                </RHS>
+            </Production>
+            <Production id="dollarBody2">
+                <Code>
+                    <![CDATA[
+                        RESULT = inner;
+                    ]]>
+                </Code>
+                <LHS>
+                    <NonterminalRef id="DB"/>
+                </LHS>
+                <RHS>
+                    <TerminalRef id="openParen_t" grammar="_Wyvern"/>
+                    <NonterminalRef id="term" grammar="_Wyvern" name="inner"/>
+                    <TerminalRef id="closeParen_t" grammar="_Wyvern"/>
+                </RHS>
+            </Production>
+        </Declarations>
+    </ExtensionGrammar>
+</CopperSpec>

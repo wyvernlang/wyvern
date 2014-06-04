@@ -15,4 +15,9 @@ public class JavaObj extends Obj {
 	public Object getObj() {
 		return obj;
 	}
+
+	@Override
+	public String toString() {
+		return "JavaObj("+obj.toString()+")";
+	}
 }

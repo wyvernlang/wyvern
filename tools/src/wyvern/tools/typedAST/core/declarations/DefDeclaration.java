@@ -7,7 +7,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -31,7 +31,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef, FileLocation location) {
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, fullType);
 		this.name = name;
@@ -42,13 +43,26 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef) {
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						   TypedAST body, boolean isClassDef) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = fullType;
 		this.name = name;
 		this.body = body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
+		this.location = location;
+	}
+
+	private DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location, boolean placeholder) {
+		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
+		this.type = fullType;
+		this.name = name;
+		this.body = body;
+		this.argNames = argNames;
+		this.isClass = isClassDef;
+		this.location = location;
 	}
 
 
@@ -100,7 +114,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location);
+		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location, true);
 	}
 
 	@Override
@@ -110,7 +124,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			extEnv = extEnv.extend(bind);
 		}
 		if (body != null) {
-			Type bodyType = body.typecheck(extEnv, Optional.empty()); // Can be null for meth inside type!
+			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for meth inside type!
 			type = TypeResolver.resolve(type, env);
 			
 			Type retType = ((Arrow)type).getResult();
