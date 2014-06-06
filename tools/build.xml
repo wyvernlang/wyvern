@@ -1,6 +1,7 @@
 <project name="wyvern" default="copper-generate" basedir=".">
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler-0.7.1.jar"/>
     <target name="copper-compose-compile">
+        <mkdir dir="copper-composer/bin"/>
         <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
             <classpath path="lib/CopperCompiler-0.7.1.jar:lib/ant.jar"/>
         </javac>
