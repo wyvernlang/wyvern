@@ -1,20 +1,20 @@
 <project name="wyvern" default="copper-generate" basedir=".">
-    <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler-0.7.1.jar"/>
+    <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
     <target name="copper-compose-compile">
         <mkdir dir="copper-composer/bin"/>
         <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
-            <classpath path="lib/CopperCompiler-0.7.1.jar:lib/ant.jar"/>
+            <classpath path="lib/CopperCompiler.jar:lib/ant.jar"/>
         </javac>
     </target>
     <target name="copper-compose" depends="copper-compose-compile">
-        <taskdef name="composer" classname="wyvern.tools.parsing.CopperComposer" classpath="copper-composer/bin:lib/CopperCompiler-0.7.1.jar"/>
+        <taskdef name="composer" classname="wyvern.tools.parsing.CopperComposer" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
         <composer hostgrammar="src/wyvern/tools/parsing/Wyvern.x"
                   hostgrammarname="Wyvern"
                   extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
                   output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
     </target>
     <target name="copper-subparsers">
-        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler-0.7.1.jar"/>
+        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
         <newstart original="src/wyvern/tools/parsing/Wyvern.x"
                   hostgrammar="Wyvern"
                   newfc="objd"
