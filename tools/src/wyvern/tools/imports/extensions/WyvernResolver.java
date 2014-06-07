@@ -13,9 +13,13 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -147,6 +151,21 @@ public class WyvernResolver implements ImportResolver {
 			return savedBinders.get(filename);
 		if (savedResolutions.containsKey(filename))
 			return addAndBind(filename, new WyvernBinder(filename,savedResolutions.get(filename)));
-		throw new RuntimeException("Unknown file"); //TODO
+		
+		// try to load the file from the file system
+		File file = new File(filename);
+		if (file.canRead()) try {
+			Reader reader = new FileReader(file);
+			CharBuffer buf = CharBuffer.allocate(64000);
+			reader.read(buf);
+			buf.rewind();
+			String contents = buf.toString();
+			//System.out.println(contents);
+			return addAndBind(filename, new WyvernBinder(filename,contents));
+		} catch (IOException e) {			
+			throw new RuntimeException("Could not read file " + filename);
+		}
+		
+		throw new RuntimeException("Could not read file " + filename);
 	}
 }
