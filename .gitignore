@@ -11,3 +11,5 @@ tools/copper-output.txt
 tools/copper-quotes-output.txt
 tools/copper-tests-output.txt
 tools/copper-composer/copper-composer.iml
+tools/src/wyvern/tools/parsing/parselang/TypeParser.java
+tools/src/wyvern/tools/parsing/parselang/WyvernDecls.java
