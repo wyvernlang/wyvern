@@ -1,0 +1,6 @@
+test typechecking1 [():Unit]
+	module TestModule
+		type TestType
+			type TestTypeInner
+				def bar() : Int
+

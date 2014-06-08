@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RunWith(Parameterized.class)
 public class FileTestRunner {
 	private static String fileRoot = "wyvern/tools/tests/embedded/";
-	private static String[] files = new String[] { "basic.test", "class.test", "tsl.test", "module.test" };
+	private static String[] files = new String[] { "basic.test", "class.test", "tsl.test", "module.test", "typechecking.test" };
 
 	private static Predicate<TestCase> casePredicate = (cas) -> true;
 
