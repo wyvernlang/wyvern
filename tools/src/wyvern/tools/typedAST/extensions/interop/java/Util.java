@@ -407,4 +407,17 @@ public class Util {
 				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
 				args, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
 	}
+	public static Value invokeValueVarargs(Value reciever, String target, Value... args) {
+		Value iargs;
+		if (args.length == 0)
+			iargs = UnitVal.getInstance(FileLocation.UNKNOWN);
+		else if (args.length == 1)
+			iargs = args[0];
+		else
+			iargs = new TupleValue(null, args);
+
+		return new Application(
+				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
+				iargs, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
+	}
 }

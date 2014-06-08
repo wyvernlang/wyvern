@@ -420,7 +420,8 @@ import java.net.URI;
 
 	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :}
 		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos));:}
-		 | p:prog {: RESULT = prog; :};
+		 | p:prog {: RESULT = prog; :}
+		 | {: RESULT = new Sequence(); :};
 
 	ptl ::= import:imp Newline_t ptl:nxt {: RESULT = DeclSequence.simplify(new DeclSequence((TypedAST)imp, (TypedAST)nxt)); :}
 		|   import:imp {: RESULT = imp; :}
