@@ -349,7 +349,7 @@ import java.net.URI;
  	terminal cCurly_t ::= /\}/ {: cl--; :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
 
- 	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
+ 	terminal dslWhitespace_t ::= /((\r\n|\n)([ \t]*))+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
  	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
 
  	terminal newSignal_t ::= /dgdkfghfugiehri/; //placeholders to make error messages sane
