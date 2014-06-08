@@ -60,7 +60,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		if (!declGuard) {
-			System.out.println("decls = " + decls);
 			for (Declaration decl : decls.getDeclIterator()) {
 				declEnv.set(decl.extendName(declEnv.get(), against));
 				if (decl instanceof AttributeDeclaration) {

@@ -18,14 +18,14 @@ public class TypeCheckingTests {
 		String input =
 				"module TestModule\n" +
 				"type TestType\n" +
-//				"  type TestTypeInner\n" +
+				"  type TestTypeInner\n" +
 				"    def bar() : Int\n" +
 				"";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
 		System.out.println(res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE({bar : Unit -> Int})");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
 		
 		// System.out.println(res.evaluate(Globals.getStandardEnv()).toString());
 		
