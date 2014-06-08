@@ -1,8 +1,10 @@
 module Tokenizer
+
 import java:java.lang.String
 import java:java.io.StringReader
 import java:java.io.StreamTokenizer
 import java:wyvern.tools.util.LangUtil
+
 val s : Str = "2+3"
 type Token
 	def typeOf():Int

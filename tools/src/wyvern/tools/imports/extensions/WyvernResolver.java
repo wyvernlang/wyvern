@@ -15,6 +15,7 @@ import wyvern.tools.util.Reference;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -149,11 +150,11 @@ public class WyvernResolver implements ImportResolver {
 
 		File fsFile = new File(filename);
 		if (!fsFile.exists() || !fsFile.canRead())
-			throw new RuntimeException("Invalid file");
+			throw new RuntimeException("Cannot read file " + filename);
 		try (FileInputStream fis = new FileInputStream(fsFile)) {
 			return addAndBind(filename, new WyvernBinder(filename, new InputStreamReader(fis)));
 		} catch (Exception e) {
-			throw new RuntimeException("File opening failed with exception", e);
+			throw new RuntimeException("Opening file "+filename+" failed with exception", e);
 		}
 	}
 }

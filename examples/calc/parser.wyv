@@ -1,7 +1,10 @@
 module CalcParser
+
 import wyv:tokenizer.wyv
+
 import java:java.lang.String
 import java:java.io.StringReader
+
 class CalculatorParser
 	class def create(s:String):CalculatorParser
 		val itkzr = Tokenizer.TokenizerWrapper.create(StringReader.create(s))
