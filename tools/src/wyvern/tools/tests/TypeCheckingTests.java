@@ -18,7 +18,7 @@ public class TypeCheckingTests {
 		String input =
 				"module TestModule\n" +
 				"type TestType\n" +
-				"  type TestTypeInner\n" +
+//				"  type TestTypeInner\n" +
 				"    def bar() : Int\n" +
 				"";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
