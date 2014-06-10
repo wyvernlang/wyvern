@@ -1,4 +1,4 @@
-test typechecking1 [():Unit]
+test typechecking1 [():TYPE()]
 	module TestModule
 		type TestType
 			type TestTypeInner
