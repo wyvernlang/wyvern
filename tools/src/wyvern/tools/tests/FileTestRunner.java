@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @RunWith(Parameterized.class)
 public class FileTestRunner {
 	private static String fileRoot = "wyvern/tools/tests/embedded/";
-	private static String[] files = new String[] { "basic.test", "class.test", "tsl.test", "module.test" };
+	private static String[] files = new String[] { "basic.test", "class.test", "tsl.test", "module.test", "parselang.test"};
 
-	private static Predicate<TestCase> casePredicate = (cas) -> true;
+	private static Predicate<TestCase> casePredicate = (cas) -> cas.getName().equals("singleParser");
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Iterable<Object[]> data() {

@@ -1,0 +1,18 @@
+test singleParser[IntegerConstant(1):Int]
+	import java:wyvern.tools.parsing.parselang.Parser
+	val parser:Parser = ~
+		%%
+		%parser HelloWorld
+
+		%lex{
+			terminal Int hello_t ::= /hello/ {: 2 :};
+			terminal Int world_t ::= /world/ {: 1 :};
+		%lex}
+
+		%cf{
+			non terminal Int helloworld;
+			start with helloworld;
+
+			helloworld ::= hello_t:a world_t:b {: a :};
+		%cf}
+	parser

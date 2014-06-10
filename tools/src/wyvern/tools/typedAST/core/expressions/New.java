@@ -53,6 +53,11 @@ public class New extends CachingTypedAST implements CoreAST {
 		this.location = fileLocation;
 	}
 
+	public New(DeclSequence seq, FileLocation fileLocation) {
+		this.seq = seq;
+		this.location = fileLocation;
+	}
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(cls);
