@@ -1,0 +1,17 @@
+test typechecking1 [():TYPE()]
+	module TestModule
+		type TestType
+			type TestTypeInner
+				def bar() : Int
+
+test typechecking2 [():TYPE()]
+	module TestModule
+		type TestType
+			type TestTypeInner
+				def bar() : Int
+		
+		type M
+			type A
+				def create() : Int
+
+

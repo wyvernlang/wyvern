@@ -377,6 +377,7 @@ import java.net.URI;
 	non terminal objid;
 	non terminal objcd;
 	non terminal tdef;
+	non terminal typemember;
 	non terminal metadata;
 	non terminal e;
 	non terminal term;
@@ -532,11 +533,13 @@ import java.net.URI;
     	|	    typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
     	;
 
-    typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
-    	   |  tdef:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
+    typed ::= typemember:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
+    	   |  typemember:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
     	   |  metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
     	   ;
 
+	typemember ::= tdef:r {: RESULT = r; :} | typedec:r {: RESULT = r; :};
+	
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, new FileLocation(currentState.pos)); :};
 
     metadata ::= metadataKwd_t typeasc:type equals_t dsle:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); :};

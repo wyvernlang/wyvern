@@ -23,12 +23,12 @@ public class TypeCheckingTests {
 				"";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
-		System.out.println(res.typecheck(Globals.getStandardEnv(), Optional.empty()));
+		// System.out.println(res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE({bar : Unit -> Int})");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
 		
 		// System.out.println(res.evaluate(Globals.getStandardEnv()).toString());
 		
-		// Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(5)");		
+		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "()");		
 	}
 }

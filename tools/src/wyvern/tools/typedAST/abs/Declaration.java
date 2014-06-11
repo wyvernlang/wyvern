@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.abs;
 
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -20,8 +22,8 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	@Override
 	public final Value evaluate(Environment env) {
 		// code smell - can we eliminate this function?
-		throw new RuntimeException("cannot evaluate a decl to a value - use evalDecls to get an updated environment");
-		//return UnitVal.getInstance();
+		// throw new RuntimeException("cannot evaluate a decl to a value - use evalDecls to get an updated environment");
+		return UnitVal.getInstance(this.getLocation());
 	}
 	
 	public final Type typecheckSelf(Environment env) {
