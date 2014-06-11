@@ -31,8 +31,12 @@ class TokenizerWrapper
 		val jtok = StreamTokenizer.create(str)
 	val jtok : StreamTokenizer
 	def next():Bool = this.jtok.nextToken() == StreamTokenizer.TT_EOF
-	def nextTok():Token = (if this.jtok.ttype == StreamTokenizer.TT_NUMBER then
-(NumTok.create(LangUtil.doubleToInt(this.jtok.nval)) : Token) 
-else 
-(if this.jtok.ttype == StreamTokenizer.TT_WORD then (StrTok.create(this.jtok.sval) : Token)
- else (if this.jtok.ttype > 0 then (StrTok.create(LangUtil.intToStr(this.jtok.ttype)) : Token) else (NumTok.create(0-1):Token))))
+	def nextTok():Token =
+		if this.jtok.ttype == StreamTokenizer.TT_NUMBER then
+			NumTok.create(LangUtil.doubleToInt(this.jtok.nval))
+		else if this.jtok.ttype == StreamTokenizer.TT_WORD then
+			(StrTok.create(this.jtok.sval) : Token)
+		else if this.jtok.ttype > 0 then
+			(StrTok.create(LangUtil.intToStr(this.jtok.ttype)) : Token)
+		else
+			NumTok.create(0-1)
