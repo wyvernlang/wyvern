@@ -21,7 +21,7 @@ public class FileTestRunner {
 	private static String fileRoot = "wyvern/tools/tests/embedded/";
 	private static String[] files = new String[] { "basic.test", "class.test", "tsl.test", "module.test", "parselang.test"};
 
-	private static Predicate<TestCase> casePredicate = (cas) -> cas.getName().equals("singleParser");
+	private static Predicate<TestCase> casePredicate = (cas) -> true;
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Iterable<Object[]> data() {
