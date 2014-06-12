@@ -45,7 +45,7 @@ public class SingleTestCase implements TestCase {
 
 	@Override
 	public void execute() throws IOException, CopperParserException {
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(code), "test input");
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(code+"\n"), "test input");
 		Assert.assertEquals(expectedType, res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty()).toString());
 		res = new DSLTransformer().transform(res);
 		Value finalV = res.evaluate(Globals.getStandardEnv());
