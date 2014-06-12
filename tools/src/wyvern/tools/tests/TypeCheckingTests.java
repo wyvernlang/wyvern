@@ -77,15 +77,14 @@ public class TypeCheckingTests {
 	@Test
 	public void testTypeMembers4() throws IOException, CopperParserException {
 		String input =
-			    "type M\n" +
+				"type M\n" +
 				"  class A\n" +
 				"    def foo() : Int = 42\n" +
 				"    def create() : A = new\n" +
 				"\n" +
-				"def f(i : Int) : M = ~\n" +
-				"  new\n" +
+				"def f(i : Int) : M = new\n" +
 				"    class A\n" +
-				"      def foo() = i\n" +
+				"      def foo():Int = i\n" +
 				"      def create():A = new\n" +
 				"\n" +
 //				"val m1:M = f(1)\n" + // "new, 1st" instance of M with class A
