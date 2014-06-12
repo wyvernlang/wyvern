@@ -93,7 +93,7 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 
 	private Type[] fromValue(Value value) {
 		if (value.getType() instanceof Tuple) {
-			return ((Tuple) value.getType()).getTypes();
+			return ((Tuple) value.getType()).getTypeArray();
 		} else {
 			return new Type[] { value.getType() };
 		}
