@@ -79,29 +79,29 @@ public class TypeCheckingTests {
 		String input =
 			    "type M\n" +
 				"  class A\n" +
-				"    def foo() : Int\n" +
-				"    def create() : A = new\n" +
+				"    def foo() : Int = 42\n" +
+//				"    def create() : A = new\n" +
 				"\n" +
-				"def f(i : Int) : M = ~\n" +
-				"  new\n" +
-				"    class A\n" +
-				"      def foo() = i\n" +
-				"    def create():A = new\n" +
+//				"def f(i : Int) : M = ~\n" +
+//				"  new\n" +
+//				"    class A\n" +
+//				"      def foo() = i\n" +
+//				"    def create():A = new\n" +
 				"\n" +
-				"val m1:M = f(1)\n" + // "new, 1st" instance of M with class A
-				"val m2:M = f(2)\n" + // "new, 2nd" instance of M with class A
+//				"val m1:M = f(1)\n" + // "new, 1st" instance of M with class A
+//				"val m2:M = f(2)\n" + // "new, 2nd" instance of M with class A
 				"\n" +
-				"val m1a : m1.A = m1.A.create()\n" +
-				"printInteger(m1a.foo())\n" + // 1
+//				"val m1a : m1.A = m1.A.create()\n" +
+//				"printInteger(m1a.foo())\n" + // 1
 				"\n" +
-				"val m2a : m2.A = m2.A.create()\n" +
-				"printInteger(m1a.foo())\n" + // 2
+//				"val m2a : m2.A = m2.A.create()\n" +
+//				"printInteger(m1a.foo())\n" + // 2
 				"";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		
 		System.out.println("Parsed OK.");
 		
-		// System.out.println("typecheck returned: " + res.typecheck(Globals.getStandardEnv(), Optional.empty()));
+		System.out.println("typecheck returned: " + res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
 		// Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
 		
