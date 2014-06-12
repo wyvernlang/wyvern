@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -209,5 +210,20 @@ public class JavaClassDecl extends ClassDeclaration {
 	public Environment evaluateDeclarations(Environment addtlEnv) {
 		initalize();
 		return super.evaluateDeclarations(addtlEnv);
+	}
+
+	@Override
+	public Environment extendType(Environment env, Environment against) {
+		return super.extendType(env, against);
+	}
+
+	@Override
+	public Map<String, TypedAST> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+		return this;
 	}
 }
