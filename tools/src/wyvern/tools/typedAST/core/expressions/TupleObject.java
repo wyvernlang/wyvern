@@ -90,7 +90,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		TypedAST[] objs = new TypedAST[newChildren.size()];
 		for (String s : newChildren.keySet()) {
 			objs[Integer.parseInt(s)] = newChildren.get(s);

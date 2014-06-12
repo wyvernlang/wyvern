@@ -52,7 +52,7 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
 	}
 

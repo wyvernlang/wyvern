@@ -17,6 +17,7 @@ import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -425,7 +426,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
 		List<Declaration> decls = new ArrayList<Declaration>(nc.size());
-		for (String key : nc.keySet()) {
+		Iterable<String> keys = nc.keySet().stream().filter(key->key.endsWith("decl"))
+				.map(key->new Pair<String,Integer>(key, Integer.parseInt(key.substring(0,key.length() - 4))))
+				.<Pair<String,Integer>>sorted((a,b)->a.second-b.second)
+				.map(pair->pair.first)::iterator;
+		for (String key : keys) {
 			if (!key.endsWith("decl"))
 				continue;
 			int idx = Integer.parseInt(key.substring(0,key.length() - 4));

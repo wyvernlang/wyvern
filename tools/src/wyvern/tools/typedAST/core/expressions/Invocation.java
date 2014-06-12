@@ -104,7 +104,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
+	public TypedAST doClone(Map<String, TypedAST> nc) {
 		return new Invocation(nc.get("receiver"), operationName, nc.get("argument"), location);
 	}
 
