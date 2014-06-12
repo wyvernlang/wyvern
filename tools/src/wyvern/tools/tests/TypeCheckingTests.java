@@ -82,11 +82,11 @@ public class TypeCheckingTests {
 				"    def foo() : Int = 42\n" +
 				"    def create() : A = new\n" +
 				"\n" +
-//				"def f(i : Int) : M = ~\n" +
-//				"  new\n" +
-//				"    class A\n" +
-//				"      def foo() = i\n" +
-//				"    def create():A = new\n" +
+				"def f(i : Int) : M = ~\n" +
+				"  new\n" +
+				"    class A\n" +
+				"      def foo() = i\n" +
+				"      def create():A = new\n" +
 				"\n" +
 //				"val m1:M = f(1)\n" + // "new, 1st" instance of M with class A
 //				"val m2:M = f(2)\n" + // "new, 2nd" instance of M with class A
