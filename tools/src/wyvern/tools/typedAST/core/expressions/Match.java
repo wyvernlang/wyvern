@@ -328,4 +328,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		return false;
 	}
+
+	@Override
+	protected TypedAST doClone(Map<String, TypedAST> nc) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
