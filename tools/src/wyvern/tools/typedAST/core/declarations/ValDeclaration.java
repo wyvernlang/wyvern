@@ -144,6 +144,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				typecheckSelf(against);
 			resolved = definitionType;
 		}
+		definitionType = resolved;
 
 		return env.extend(new NameBindingImpl(getName(), resolved));
 	}
