@@ -27,20 +27,28 @@ import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.parsing.parselang.java.StoringClassLoader;
 import wyvern.tools.parsing.parselang.java.StoringFileManager;
 import wyvern.tools.parsing.parselang.java.StringFileObject;
+import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
-import wyvern.tools.typedAST.core.expressions.New;
+import wyvern.tools.typedAST.core.expressions.*;
+import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.core.values.StringConstant;
+import wyvern.tools.typedAST.core.values.TupleValue;
+import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.LangUtil;
@@ -122,18 +130,22 @@ public class CopperTSL implements ExtParser {
 		res.setClassName(javaClassName);
 
 		String pic = res.getParserInitCode();
+		TypedAST parserInitAST;
 		if (pic == null)
-			pic = "";
-		TypedAST parserInitAST = LangUtil.splice(new IParseBuffer(pic));
+			parserInitAST = new Sequence();
+		else
+			parserInitAST = LangUtil.splice(new IParseBuffer(pic));
 		String defNamePIA = "initGEN" + methNum.get();
 		toGenDefs.put(defNamePIA, parserInitAST);
 		methNum.set(methNum.get()+1);
 		res.setParserInitCode(String.format("Util.invokeValueVarargs(%s, \"%s\");\n", PAIRED_OBJECT_NAME, defNamePIA));
 
 		String ppc = res.getPostParseCode();
+		TypedAST postParseAST;
 		if (ppc == null)
-			ppc = "";
-		TypedAST postParseAST = LangUtil.splice(new IParseBuffer(ppc));
+			postParseAST = new Sequence();
+		else
+			postParseAST = LangUtil.splice(new IParseBuffer(ppc));
 		String defNameP = "postGEN" + methNum.get();
 		toGenDefs.put(defNameP, postParseAST);
 		methNum.set(methNum.get() + 1);
@@ -157,14 +169,19 @@ public class CopperTSL implements ExtParser {
 		res.setParserClassAuxCode("Value "+PAIRED_OBJECT_NAME+" = null;");
 
 		AtomicInteger cdIdx = new AtomicInteger();
-		TypedAST[] classDecls = new TypedAST[toGen.size() + toGenDefs.size()];
+		TypedAST[] classDecls = new TypedAST[toGen.size() + toGenDefs.size() + 1];
+		FileLocation unkLoc = FileLocation.UNKNOWN;
 		toGen.entrySet().stream().forEach(entry->classDecls[cdIdx.getAndIncrement()]
-				= new ValDeclaration(entry.getKey(), entry.getValue(), FileLocation.UNKNOWN));
+				= new ValDeclaration(entry.getKey(), entry.getValue(), unkLoc));
 		toGenDefs.entrySet().stream().forEach(entry->classDecls[cdIdx.getAndIncrement()]
-				= new DefDeclaration(entry.getKey(), Unit.getInstance(), new LinkedList<>(), entry.getValue(), false));
+				= new DefDeclaration(entry.getKey(), new Arrow(Unit.getInstance(), Unit.getInstance()), new LinkedList<>(), entry.getValue(), false));
+		classDecls[cdIdx.getAndIncrement()] = new DefDeclaration("create", new Arrow(Unit.getInstance(),
+				new UnresolvedType(wyvClassName)),
+				Arrays.asList(),
+				new New(new DeclSequence(), unkLoc), true);
 
 
-		TypedAST pairedObj = new ClassDeclaration(wyvClassName, "", "", new DeclSequence(classDecls), FileLocation.UNKNOWN);
+		TypedAST pairedObj = new ClassDeclaration(wyvClassName, "", "", new DeclSequence(classDecls), unkLoc);
 
 		ParserCompilerParameters pcp = new ParserCompilerParameters();
 
@@ -203,8 +220,7 @@ public class CopperTSL implements ExtParser {
 						org.objectweb.asm.Type.getType(Value.class));
 				org.objectweb.asm.Type thisType = org.objectweb.asm.Type.getType("L" + javaClassName + ";");
 
-				Textifier p = new Textifier();
-				MethodVisitor res = new TraceMethodVisitor(new CheckMethodAdapter(super.visitMethod(access, name, ndesc, null, exceptions)), p);
+				MethodVisitor res = new CheckMethodAdapter(super.visitMethod(access, name, ndesc, null, exceptions));
 				GeneratorAdapter generator = new GeneratorAdapter(
 						res,
 						Opcodes.ASM5,
@@ -221,9 +237,6 @@ public class CopperTSL implements ExtParser {
 				generator.visitMaxs(2, 2);
 				generator.visitEnd();
 
-				for (Object o : p.getText())
-					System.out.println(o);
-
 				return new MethodVisitor(Opcodes.ASM5) {};
 			}
 		});
@@ -232,9 +245,35 @@ public class CopperTSL implements ExtParser {
 
 		JavaClassDecl jcd = Util.javaToWyvDecl(javaClass);
 
-		new New(Arrays.asList(pairedObj, jcd, new DefDeclaration("parse", new Arrow(Util.javaToWyvType(ParseBuffer.class), Util.javaToWyvType()))))
+		Type parseBufferType = Util.javaToWyvType(ParseBuffer.class);
 
-		return null;
+
+		Type javaClassType = Util.javaToWyvType(javaClass);
+		TypedAST bufGet = new Application(
+				new Invocation(new Variable(new NameBindingImpl("buf", null), unkLoc), "getSrcString", null, unkLoc),
+				UnitVal.getInstance(unkLoc),
+				unkLoc);
+		ClassType emptyType =
+				new ClassType(new Reference<>(Environment.getEmptyEnvironment()), new Reference<>(Environment.getEmptyEnvironment()), new LinkedList<>(), "empty");
+		TypedAST javaObjInit = new Application(new ExternalFunction(new Arrow(emptyType, Util.javaToWyvType(Value.class)), (env,arg)->Util.toWyvObj(arg)),
+				new Application(
+						new Invocation(new Variable(new NameBindingImpl(wyvClassName, null), unkLoc), "create", null, unkLoc),
+						UnitVal.getInstance(unkLoc), unkLoc), unkLoc);
+		TypedAST body = new Application(new ExternalFunction(new Arrow(Util.javaToWyvType(Object.class), Util.javaToWyvType(TypedAST.class)),
+					(env,arg)-> arg),
+				new Application(new Invocation(new Application(
+					new Invocation(new Variable(new NameBindingImpl(javaClassName, null), unkLoc), "create", null, unkLoc),
+					javaObjInit, unkLoc), "parse", null, unkLoc),
+					new TupleObject(new TypedAST[] {bufGet, new StringConstant("TSL code")}), unkLoc), unkLoc);
+
+		DefDeclaration parseDef =
+				new DefDeclaration("parse",
+						new Arrow(parseBufferType, Util.javaToWyvType(TypedAST.class)),
+						Arrays.asList(new NameBindingImpl("buf", parseBufferType)),
+						body,
+						false);
+
+		return new New(new DeclSequence(Arrays.asList(pairedObj, jcd, parseDef)), unkLoc);
 	}
 
 	private Pair<String, Type> parseType(NonTerminal elem) {
