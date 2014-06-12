@@ -80,7 +80,7 @@ public class TypeCheckingTests {
 			    "type M\n" +
 				"  class A\n" +
 				"    def foo() : Int = 42\n" +
-//				"    def create() : A = new\n" +
+				"    def create() : A = new\n" +
 				"\n" +
 //				"def f(i : Int) : M = ~\n" +
 //				"  new\n" +
@@ -96,6 +96,8 @@ public class TypeCheckingTests {
 				"\n" +
 //				"val m2a : m2.A = m2.A.create()\n" +
 //				"printInteger(m1a.foo())\n" + // 2
+				"\n" +
+				"printInteger(36)" + // This is to make this work for debugging as the above decls are w/o module.
 				"";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		

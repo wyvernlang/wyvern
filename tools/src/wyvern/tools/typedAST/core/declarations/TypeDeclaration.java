@@ -210,7 +210,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env, env);
 		
-		// System.out.println("Doing doTypecheck for Type: " + this.getName());
+		System.out.println("Doing doTypecheck for Type: " + this.getName());
 		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
