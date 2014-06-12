@@ -100,7 +100,7 @@ public class Util {
 		if (pregenerated.containsKey(arg)) {
 			return pregenerated.get(arg);
 		}
-		JavaObj newObj = new JavaObj(decl.getFilledBody(thisRef),arg);
+		JavaObj newObj = new JavaObj(decl.getFilledBody(thisRef),arg, decl);
 		pregenerated.put(arg, newObj);
 		thisRef.set(newObj);
 		return newObj;
