@@ -538,7 +538,7 @@ import java.net.URI;
     	   |  metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
     	   ;
 
-	typemember ::= tdef:r {: RESULT = r; :} | typedec:r {: RESULT = r; :};
+	typemember ::= tdef:r {: RESULT = r; :} | typedec:r {: RESULT = r; :} | class:r {: RESULT = r; :};
 	
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, new FileLocation(currentState.pos)); :};
 
