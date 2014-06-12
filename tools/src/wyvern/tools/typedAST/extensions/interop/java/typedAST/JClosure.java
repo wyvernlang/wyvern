@@ -16,8 +16,12 @@ import wyvern.tools.util.TreeWriter;
 
 import java.lang.invoke.MethodHandle;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class JClosure extends AbstractValue implements ApplyableValue {
+	private static AtomicInteger uidGen = new AtomicInteger();
+	private int uid = uidGen.getAndIncrement();
+
 	public static class JavaInvokableMethod {
 		private final Class[] paramaterTypes;
 		private Boolean classMeth;
@@ -111,17 +115,20 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 	@Override
 	public Value evaluateApplication(Application app, Environment env) {
 		Environment iEnv = evalEnv.extend(env);
+		Value[] values = vFromV(app.getArgument().evaluate(env));;
+		Type[] wyvTypes = new Type[values.length];
+		for (int ii = 0; ii < wyvTypes.length; ii++)
+				wyvTypes[ii] = values[ii].getType();
+		if (wyvTypes.length == 1 && wyvTypes[0] instanceof Unit)
+			wyvTypes = new Type[0];
 		//Implementation of section 15.12.2.2. of the Java Language Specification
 		for (JavaInvokableMethod m : methods) {
 			boolean suitable = true;
 			Class<?>[] parameterTypes = m.getParameterTypes();
-			Type[] wyvTypes = new Type[parameterTypes.length];
-			Value[] values = vFromV(app.getArgument().evaluate(env));
+			if (wyvTypes.length != parameterTypes.length)
+				continue;
 			for (int i = 0; i < parameterTypes.length; i++) {
-
-				Type wyv = values[i].getType();
-				wyvTypes[i] = wyv;
-
+				Type wyv = wyvTypes[i];
 				if (!Util.checkTypeCast(wyv, parameterTypes[i])) {
 					suitable = false;
 					break;
