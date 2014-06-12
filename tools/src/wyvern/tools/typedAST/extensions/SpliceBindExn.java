@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.extensions;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
@@ -10,14 +11,12 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.TreeWriter;
 
 import javax.lang.model.element.Name;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 	private final TypedAST exn;
@@ -49,6 +48,12 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
 			.map(oeb->oeb.getStore())
 			.orElse(Environment.getEmptyEnvironment());
+
+		List<NameBinding> newBindings = new ArrayList<>();
+		for (NameBinding binding : bindings)
+			newBindings.add(new NameBindingImpl(binding.getName(), TypeResolver.resolve(binding.getType(), env)));
+		bindings = newBindings;
+
 		outerEnv = outerEnv.extend(bindings.stream().reduce(Environment.getEmptyEnvironment(), Environment::extend, (a,b)->b.extend(a)));
 		Type exnType = exn.typecheck(outerEnv, expected);
 		cached = Optional.of(exnType);
