@@ -66,3 +66,7 @@ test simpleIf3[IntegerConstant(9):Int]
 	if true then if false then 4 else 9 else if true then 3 else 6
 test tuple[TupleValue(IntegerConstant(1), IntegerConstant(2), IntegerConstant(3)):Int*Int*Int]
 	(1,2,3)
+test parseBreak[IntegerConstant(7):Int]
+	val test = 7
+
+	test

@@ -12,7 +12,15 @@ import wyvern.tools.util.Pair;
 	Integer parenLevel;
 	Stack<Integer> depths;
 	Pattern nlRegex;
+	Pattern wsRegex;
 	boolean nextDsl;
+	private String getLastMatch(Pattern patt, String str, int groupN) {
+		String output = "";
+		Matcher input = patt.matcher(str);
+		while (input.find())
+			output = input.group(groupN);
+		return output;
+	}
 %aux}
 
 %init{
@@ -21,6 +29,7 @@ import wyvern.tools.util.Pair;
 	depths = new Stack<Integer>();
 	depths.push(0);
 	nlRegex = Pattern.compile("(\r\n|\n)([\t ]*)");
+
 %init}
 
 %lex{
@@ -39,27 +48,18 @@ import wyvern.tools.util.Pair;
  	:};
 
 	ignore terminal Spaces_t ::= /[ \t]+|(\\(\n|(\r\n)))/;
-    terminal Newline_t ::= /((\n|(\r\n))[ \t]*)+/ {: :};
+    terminal Newline_t ::= /((\n|(\r\n))[ \t]*)+/ {: System.out.println("nl"); :};
 	terminal Indent_t ::= /(((\r\n)|\n)[ \t]*)+/
 	{:
 		//Need to determine new indentation depth and will treat all but the last "\n[\t ]*" as whitespace
-		Matcher inputPattern = nlRegex.matcher(lexeme);
-		String output = "";
-		while(inputPattern.find()) {
-			output = inputPattern.group(2);
-		}
-		int newDepth = output.length();
-		depths.push(newDepth);
+		String output = getLastMatch(nlRegex, lexeme, 2);
+		depths.push(output.length());
 	:};
 
 	terminal Dedent_t ::= /(((\r\n)|\n)[ \t]*)+/
 	{:
 		//Need to determine new indentation depth and will treat all but the last "\n[\t ]*" as whitespace
-		Matcher inputPattern = nlRegex.matcher(lexeme);
-		String output = "";
-		while(inputPattern.find()) {
-			output = inputPattern.group(2);
-		}
+		String output = getLastMatch(nlRegex, lexeme, 2);
 		int newDepth = output.length();
 		depths.pop();
 		if(newDepth < depths.peek()) {
@@ -69,12 +69,7 @@ import wyvern.tools.util.Pair;
 	disambiguate dedent2:(Newline_t, Dedent_t)
 	{:
 		//Given the lexeme of the terminals, need to treat all but the last "\n[\t ]*" as whitespace
-		Matcher inputPattern = nlRegex.matcher(lexeme);
-		String output = "";
-		while(inputPattern.find())
-		{
-			output = inputPattern.group(2);
-		}
+		String output = getLastMatch(nlRegex, lexeme, 2);
 		int newDepth = output.length();
 		if(newDepth < depths.peek()){
 			return Dedent_t;
@@ -83,16 +78,15 @@ import wyvern.tools.util.Pair;
 		}
 	:};
 
-	terminal dslWhitespace_t ::= /((\r\n|\n)[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
+	terminal dslWhitespace_t ::= /((\r\n|\n)[ \t]*)+/ {:
+		nextDsl = true;
+		String newWs = getLastMatch(nlRegex, lexeme, 2).substring(depths.peek());
+		RESULT = "\n"+newWs;
+	:};
 	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme.trim(); :};
 	disambiguate dslWhitespace:(Dedent_t,dslWhitespace_t)
 	{:
-		Matcher inputPattern = nlRegex.matcher(lexeme);
-		String output = "";
-		while(inputPattern.find())
-		{
-			output = inputPattern.group(2);
-		}
+		String output = getLastMatch(nlRegex, lexeme, 2);
 		int newDepth = output.length();
 		if(newDepth < depths.peek()){
 			return Dedent_t;

@@ -55,4 +55,44 @@ test class3[IntegerConstant(2):Int]
 		val k = 2
 	C.create(4).k
 
+test newlineClass1[IntegerConstant(9):Int]
+	class C
 
+		class def create(i:Int):C
+			new
+				val t = i
+		val k = 9
+	C.create(0).k
+test newlineClass2[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+
+			new
+				val t = i
+		val k = 9
+	C.create(0).k
+test newlineClass3[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+			new
+
+				val t = i
+		val k = 9
+	C.create(0).k
+test newlineClass4[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+			new
+				val t = i
+
+		val k = 9
+	C.create(0).k
+
+test newlineClass5[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+			new
+				val t = i
+		val k = 9
+
+	C.create(0).k

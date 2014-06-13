@@ -29,6 +29,13 @@ import java.net.URI;
 	Stack<Integer> depths;
 	Pattern nlRegex;
 	boolean nextDsl, nextDedent;
+	private String getLastMatch(Pattern patt, String str, int groupN) {
+		String output = "";
+		Matcher input = patt.matcher(str);
+		while (input.find())
+			output = input.group(groupN);
+		return output;
+	}
 %aux}
 
 %init{
@@ -348,8 +355,11 @@ import java.net.URI;
  	terminal oCurly_t ::= /\{/ {: cl++; :};
  	terminal cCurly_t ::= /\}/ {: cl--; :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
-
- 	terminal dslWhitespace_t ::= /((\r\n|\n)([ \t]*))+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
+	terminal dslWhitespace_t ::= /((\r\n|\n)[ \t]*)+/ {:
+		nextDsl = true;
+		String newWs = getLastMatch(nlRegex, lexeme, 2).substring(depths.peek());
+		RESULT = "\n"+newWs;
+	:};
  	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
 
  	terminal newSignal_t ::= /dgdkfghfugiehri/; //placeholders to make error messages sane
