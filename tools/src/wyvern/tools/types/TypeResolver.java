@@ -4,9 +4,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.extensions.TypeInv;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 //Sigh...
 public class TypeResolver {
@@ -23,8 +21,19 @@ public class TypeResolver {
 		}
 	}
 
-
+	private static WeakHashMap<Type, Type> resolved = new WeakHashMap<>();
 	public static Type resolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
+		if (resolved.containsKey(input)) {
+			return resolved.get(input);
+		}
+		Type result = iresolve(input, ctx, visited);
+		resolved.put(input, result);
+		return result;
+	}
+
+
+	private static Type iresolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
+
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);
 
