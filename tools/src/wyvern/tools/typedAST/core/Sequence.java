@@ -31,7 +31,31 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 			callback.map(elem);
 		}
 	}
-	
+
+	public static Sequence append(Sequence s, TypedAST e) {
+		Iterator<TypedAST> innerIter = s.iterator();
+		return new Sequence(() -> new Iterator<TypedAST>() {
+			private boolean fetched = false;
+			@Override
+			public boolean hasNext() {
+				if (innerIter.hasNext())
+					return true;
+				return !fetched;
+			}
+
+			@Override
+			public TypedAST next() {
+				if (innerIter.hasNext())
+					return innerIter.next();
+				if (!fetched) {
+					fetched = true;
+					return e;
+				}
+				throw new RuntimeException();
+			}
+		});
+	}
+
 	public Sequence(TypedAST first) {
 		exps.add(first);
 	}

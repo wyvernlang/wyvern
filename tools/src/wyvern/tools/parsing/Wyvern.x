@@ -404,7 +404,7 @@ import java.net.URI;
    	non terminal dsle;
    	non terminal newBlock;
    	non terminal dslSeq;
-   	non terminal import;
+   	non terminal TypedAST import;
    	non terminal fragaddr;
    	non terminal elst;
    	non terminal module;
@@ -412,6 +412,7 @@ import java.net.URI;
    	non terminal dm;
    	non terminal mnrd;
    	non terminal ptl;
+   	non terminal TypedAST impSeq;
 
    	precedence left Dedent_t, Newline_t;
    	precedence right tarrow_t;
@@ -423,20 +424,20 @@ import java.net.URI;
     precedence left plus_t, dash_t;
     precedence left mult_t, divide_t;
 
-    non terminal fc2;
-
 	start with fc;
 
-	fc2 ::= identifier_t;
 
-	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :}
+	fc ::= impSeq:imp Newline_t fc:nxt {: RESULT = new Sequence(imp, (TypedAST)nxt); :}
 		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos));:}
 		 | p:prog {: RESULT = prog; :}
 		 | {: RESULT = new Sequence(); :};
 
-	ptl ::= import:imp Newline_t ptl:nxt {: RESULT = DeclSequence.simplify(new DeclSequence((TypedAST)imp, (TypedAST)nxt)); :}
-		|   import:imp {: RESULT = imp; :}
+	ptl ::= impSeq:imp Newline_t ptl:nxt {: RESULT = DeclSequence.simplify(new DeclSequence((TypedAST)imp, (TypedAST)nxt)); :}
+		|   impSeq:imp {: RESULT = imp; :}
 		|   pm:bdy {: RESULT = bdy; :};
+
+	impSeq ::= impSeq:a Newline_t import:b {: RESULT = DeclSequence.simplify(new DeclSequence(a,b)); :}
+			|  import:a {: RESULT = a; :};
 
 	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
 
