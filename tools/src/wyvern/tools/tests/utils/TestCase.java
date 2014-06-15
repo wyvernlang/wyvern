@@ -1,32 +1,10 @@
 package wyvern.tools.tests.utils;
 
-public class TestCase {
-	public String getName() {
-		return name;
-	}
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
-	public String getCode() {
-		return code;
-	}
+import java.io.IOException;
 
-	public String getExpectedValue() {
-		return expectedValue;
-	}
-
-	public String getExpectedType() {
-		return expectedType;
-	}
-
-	private final String name;
-	private final String code;
-	private final String expectedValue;
-	private final String expectedType;
-
-	public TestCase(String name, String code, String expectedValue, String expectedType) {
-
-		this.name = name;
-		this.code = code;
-		this.expectedValue = expectedValue;
-		this.expectedType = expectedType;
-	}
+public interface TestCase {
+	String getName();
+	void execute() throws IOException, CopperParserException;
 }

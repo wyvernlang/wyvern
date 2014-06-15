@@ -9,8 +9,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import sun.reflect.generics.tree.ClassSignature;
-import sun.reflect.generics.tree.MethodTypeSignature;
-import sun.reflect.generics.tree.TypeSignature;
 import wyvern.tools.types.extensions.*;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
@@ -38,7 +36,7 @@ public class GenerationContext {
 				return;
 			}
 			if (argument instanceof Tuple) {
-				wyvern.tools.types.Type[] types = ((Tuple) argument).getTypes();
+				wyvern.tools.types.Type[] types = ((Tuple) argument).getTypeArray();
 				if (types.length == 2) {
 					sig.visitClassType(Type.getInternalName(BiFunction.class));
 					SignatureVisitor sw2 = sig.visitTypeArgument('=');
@@ -63,7 +61,7 @@ public class GenerationContext {
 			sw2.visitEnd();
 		} else if (type instanceof Tuple) {
 			Class genTgt = null;
-			switch (((Tuple) type).getTypes().length) {
+			switch (((Tuple) type).getTypeArray().length) {
 				case 0: genTgt = null; break;
 				case 1: genTgt = null; break;
 				case 2: genTgt = Pair.class; break;
@@ -79,7 +77,7 @@ public class GenerationContext {
 			}
 			sig.visitClassType(Type.getInternalName(genTgt));
 			SignatureVisitor sw2 = sig.visitTypeArgument('=');
-			for (wyvern.tools.types.Type tpe : ((Tuple) type).getTypes())
+			for (wyvern.tools.types.Type tpe : ((Tuple) type).getTypeArray())
 				getSignature(tpe, sw2, false);
 			sw2.visitEnd();
 			return;
@@ -124,7 +122,7 @@ public class GenerationContext {
 
 	public Type[] getTypes(wyvern.tools.types.Type type) {
 		if (type instanceof Tuple) {
-			return Arrays.asList(((Tuple) type).getTypes()).stream().map(tpe -> getType(tpe,false)).toArray(Type[]::new);
+			return Arrays.asList(((Tuple) type).getTypeArray()).stream().map(tpe -> getType(tpe,false)).toArray(Type[]::new);
 		}
 		if (type instanceof Unit) {
 			return new Type[0];

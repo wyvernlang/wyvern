@@ -5,9 +5,14 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -50,9 +55,20 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		return metaValue;
 	}
 
+	// FIXME: I am not convinced typeGuard is required (alex).
+	private boolean typeGuard = false;
 	@Override
 	public Environment extendType(Environment env, Environment against) {
-		return env.extend(typeBinding);
+		if (!typeGuard) {
+			env = env.extend(typeBinding);
+			for (Declaration decl : decls.getDeclIterator()) {
+				if (decl instanceof EnvironmentExtender) {
+					env = ((EnvironmentExtender) decl).extendType(env, against);
+				}
+			}
+			typeGuard = true;
+		}
+		return env;
 	}
 
 	private boolean declGuard = false;
@@ -90,7 +106,10 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		protected Type doTypecheck(Environment env) {
-			return body.typecheck(env, Optional.empty());
+			Type result = body.typecheck(env, Optional.ofNullable(rType));
+			if (!result.subtype(rType))
+				throw new RuntimeException("Invalid type for metadata");
+			return result;
 		}
 
 		@Override
@@ -121,7 +140,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		@Override
 		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-			return new AttributeDeclaration(newChildren.get("body"));
+			return new AttributeDeclaration(newChildren.get("body"), rType);
 		}
 
 		@Override
@@ -199,6 +218,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Type doTypecheck(Environment env) {
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env, env);
+		
+		System.out.println("Doing doTypecheck for Type: " + this.getName());
 		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);

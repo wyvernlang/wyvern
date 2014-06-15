@@ -7,7 +7,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -18,19 +18,21 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
-public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
+public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
 	protected TypedAST body; // HACK
 	private String name;
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef, FileLocation location) {
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, fullType);
 		this.name = name;
@@ -41,13 +43,26 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 	}
 
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames, TypedAST body, boolean isClassDef) {
+	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						   TypedAST body, boolean isClassDef) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = fullType;
 		this.name = name;
 		this.body = body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
+		this.location = location;
+	}
+
+	private DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location, boolean placeholder) {
+		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
+		this.type = fullType;
+		this.name = name;
+		this.body = body;
+		this.argNames = argNames;
+		this.isClass = isClassDef;
+		this.location = location;
 	}
 
 
@@ -76,7 +91,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		// TODO: implement me
+		writer.writeArgs(name, type, body);
 	}
 
 	@Override
@@ -99,7 +114,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location);
+		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location, true);
 	}
 
 	@Override
@@ -109,7 +124,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 			extEnv = extEnv.extend(bind);
 		}
 		if (body != null) {
-			Type bodyType = body.typecheck(extEnv, Optional.empty()); // Can be null for meth inside type!
+			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for meth inside type!
 			type = TypeResolver.resolve(type, env);
 			
 			Type retType = ((Arrow)type).getResult();
@@ -122,7 +137,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
-		return extendName(old, old);
+		return extendName(old, against);
 	}
 
 	@Override
@@ -160,12 +175,15 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode {
 		return env;
 	}
 
+	Type resolvedType = null;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		for (int i = 0; i < argNames.size(); i++) {
 			NameBinding oldBinding = argNames.get(i);
 			argNames.set(i, new NameBindingImpl(oldBinding.getName(), TypeResolver.resolve(oldBinding.getType(), against)));
 		}
-		return env.extend(new NameBindingImpl(name, TypeResolver.resolve(type, against)));
+		if (resolvedType == null)
+			resolvedType = TypeResolver.resolve(type, against);
+		return env.extend(new NameBindingImpl(name, resolvedType));
 	}
 }

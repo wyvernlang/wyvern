@@ -6,7 +6,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -117,13 +117,16 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		Hashtable<String, TypedAST> children = new Hashtable<>();
-		children.put("definition", definition);
+		if (definition != null)
+			children.put("definition", definition);
 		return children;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new ValDeclaration(getName(), nc.get("definition"), location);
+		if (nc.containsKey("definition"))
+			return new ValDeclaration(getName(), binding.getType(), nc.get("definition"), location);
+		return new ValDeclaration(getName(), binding.getType(), null, location);
 	}
 
 	@Override
@@ -141,6 +144,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				typecheckSelf(against);
 			resolved = definitionType;
 		}
+		definitionType = resolved;
 
 		return env.extend(new NameBindingImpl(getName(), resolved));
 	}

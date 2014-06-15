@@ -3,12 +3,10 @@ package wyvern.tools.typedAST.extensions.interop.java;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.binding.LateValueBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
@@ -102,7 +100,7 @@ public class Util {
 		if (pregenerated.containsKey(arg)) {
 			return pregenerated.get(arg);
 		}
-		JavaObj newObj = new JavaObj(decl.getFilledBody(thisRef),arg);
+		JavaObj newObj = new JavaObj(decl.getFilledBody(thisRef),arg, decl);
 		pregenerated.put(arg, newObj);
 		thisRef.set(newObj);
 		return newObj;
@@ -214,7 +212,7 @@ public class Util {
 	private static int nArgs(Arrow methType) {
 		int nArgs = 0;
 		if (methType.getArgument() instanceof Tuple) {
-			nArgs = ((Tuple) methType.getArgument()).getTypes().length;
+			nArgs = ((Tuple) methType.getArgument()).getTypeArray().length;
 		} else if (methType.getArgument() instanceof Unit) {
 			nArgs = 0;
 		} else {
@@ -226,7 +224,7 @@ public class Util {
 	private static Type[] getArgTypes(Arrow methType) {
 		Type argType = methType.getArgument();
 		if (argType instanceof Tuple)
-			return ((Tuple) argType).getTypes();
+			return ((Tuple) argType).getTypeArray();
 		else if (argType instanceof Unit)
 			return new Type[0];
 		else
@@ -387,5 +385,39 @@ public class Util {
 						new Invocation(receiver, target, null, FileLocation.UNKNOWN),
 						arguments, FileLocation.UNKNOWN)
 						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
+	}
+
+	public static Value getInternalValue(Obj receiver, String target) {
+		return new Invocation(receiver, target, null, FileLocation.UNKNOWN)
+						.evaluate(Environment.getEmptyEnvironment());//Therefore, can only handle strings and ints
+	}
+	
+
+	public static Object doInvokeVarargs(Obj receiver, String target, Object... args) {
+		Value arguments = toWyvObjs(args);
+		return toJavaObject((
+				new Application(
+						new Invocation(receiver, target, null, FileLocation.UNKNOWN),
+						arguments, FileLocation.UNKNOWN)
+						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
+	}
+
+	public static Value invokeValue(Value reciever, String target, Value args) {
+		return new Application(
+				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
+				args, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
+	}
+	public static Value invokeValueVarargs(Value reciever, String target, Value... args) {
+		Value iargs;
+		if (args.length == 0)
+			iargs = UnitVal.getInstance(FileLocation.UNKNOWN);
+		else if (args.length == 1)
+			iargs = args[0];
+		else
+			iargs = new TupleValue(null, args);
+
+		return new Application(
+				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
+				iargs, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
 	}
 }

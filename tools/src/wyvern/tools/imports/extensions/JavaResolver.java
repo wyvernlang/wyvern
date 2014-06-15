@@ -2,7 +2,7 @@ package wyvern.tools.imports.extensions;
 
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
-import wyvern.tools.typedAST.core.binding.MetadataInnerBinding;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;

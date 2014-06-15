@@ -1,12 +1,20 @@
 package wyvern.tools.types;
 
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.extensions.TypeInv;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 
 //Sigh...
 public class TypeResolver {
+	public interface Resolvable {
+		public Map<String, Type> getTypes();
+		public Type setTypes(Map<String, Type> newTypes);
+	}
+
 	public static Type resolve(Type input, Environment ctx) {
 		try {
 			return resolve(input, ctx, new HashSet<Type>());
@@ -19,6 +27,19 @@ public class TypeResolver {
 	public static Type resolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);
+
+		if (input instanceof Resolvable) {
+			Map<String, Type> toResolve = ((Resolvable) input).getTypes();
+			toResolve.replaceAll((key, type) -> {
+				try {
+					visited.add(type);
+					return resolve(type, ctx, visited);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			});
+			return ((Resolvable) input).setTypes(toResolve);
+		}
 
 
 		for (Field f : input.getClass().getDeclaredFields()) {

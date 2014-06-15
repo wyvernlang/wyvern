@@ -37,6 +37,8 @@ public class QuoteParser implements ExtParser {
 			if (input instanceof ToastExpression) {
 				Value result = input.evaluate(evalEnv);
 				TypedAST iExn = Util.toJavaClass((Obj)result, TypedAST.class);
+				if (!(iExn instanceof Obj))
+					return iExn;
 				TypedAST equivExn = Util.toJavaClass((Obj)iExn, TypedAST.class);
 				return equivExn;
 			}
@@ -46,7 +48,7 @@ public class QuoteParser implements ExtParser {
 
 	@Override
 	public TypedAST parse(ParseBuffer input) throws IOException, CopperParserException {
-		TypedAST quoted = (TypedAST) new WyvernQuote().parse(input.getSrcString());
+		TypedAST quoted = (TypedAST) new WyvernQuote().parse(input.getSrcString()+"\n");
 		return new Application(new ExternalFunction(arrow(unit, Util.javaToWyvType(TypedAST.class)), (env, arg) -> {
 			TypedAST adapted = new ToastExecutor(env).transform(quoted);
 			return Util.toWyvObj(adapted);

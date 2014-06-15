@@ -22,7 +22,7 @@ public class ToolError extends RuntimeException {
 
 	protected ToolError(ErrorMessage message, HasLocation errorLocation, String... args) {
         super(message.getErrorMessage(args) + " on line number " +
-                ((errorLocation != null)?errorLocation.getLocation().toString():"NULL"));
+                ((errorLocation != null)?errorLocation.getLocation() + "":"NULL"));
         assert message.numberOfArguments() == args.length;
         this.errorMessage = message;
 	}

@@ -2,8 +2,10 @@ package wyvern.tools.typedAST.core.values;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
-import wyvern.tools.typedAST.core.binding.VarBinding;
+import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.Assignable;
@@ -72,7 +74,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		if (!(ass.getTarget() instanceof Invocation))
 			throw new RuntimeException("Something really, really weird happened.");
 		String operation = ((Invocation) ass.getTarget()).getOperationName();
-		VarBinding vb = intEnv.get().lookupBinding(operation, VarBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
+		intEnv.get().lookupBinding(operation, AssignableNameBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
 
 		return;
 	}
@@ -82,15 +84,13 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		if (!(ass.getTarget() instanceof Invocation))
 			throw new RuntimeException("Something really, really weird happened.");
 		String operation = ((Invocation) ass.getTarget()).getOperationName();
-		
-		Value value = intEnv.get().getValue(operation);
-		if (!(value instanceof VarValue)) {
-			throw new RuntimeException("Trying to assign a non-var");
-		}
-		VarValue varValue = (VarValue)value;
-		
+
 		Value newValue = ass.getValue().evaluate(env);
-		varValue.setValue(newValue);
+
+		intEnv.get().lookupBinding(operation, AssignableValueBinding.class)
+				.orElseThrow(() -> new RuntimeException("Trying to assign a non-var"))
+				.assign(newValue);
+
 		return newValue;
 	}
 

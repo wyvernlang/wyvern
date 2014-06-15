@@ -1,5 +1,7 @@
-package wyvern.tools.typedAST.core.binding;
+package wyvern.tools.typedAST.core.binding.typechecking;
 
+import wyvern.tools.typedAST.core.binding.LateBinder;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.types.Type;
 
 /**

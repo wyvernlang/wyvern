@@ -68,9 +68,9 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		for (int i = 0; i < objects.length; i++) {
 			final int sti = i;
 			newTypes[i] = objects[i].typecheck(env, expected.map(exp -> {
-				if (exp instanceof Tuple) return ((Tuple)exp).getTypes()[sti];
+				if (exp instanceof Tuple) return ((Tuple)exp).getTypeArray()[sti];
 				if (exp instanceof Intersection)
-					return ((Intersection)exp).getTypes().stream().filter(tpe -> tpe instanceof Tuple).filter(tpe -> ((Tuple)tpe).getTypes().length == objects.length).findFirst().get();
+					return ((Intersection)exp).getTypes().stream().filter(tpe -> tpe instanceof Tuple).filter(tpe -> ((Tuple)tpe).getTypeArray().length == objects.length).findFirst().get();
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, getType().toString(), exp.toString());
 				throw new RuntimeException();
 			}));

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class TreeWriter {
 	private StringBuffer buf = new StringBuffer();
-	boolean first;
+	boolean first = true;
 	
 	public void writeArgs() {
 		// no args needed

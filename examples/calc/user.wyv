@@ -1,0 +1,4 @@
+import wyv:type.wyv
+
+val calc:CalculatorType.Calculator = { 2 + 3*2 + 5 }
+calc.eval()

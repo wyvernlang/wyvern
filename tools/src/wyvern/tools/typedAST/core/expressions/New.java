@@ -5,10 +5,10 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.ClassBinding;
-import wyvern.tools.typedAST.core.binding.LateValueBinding;
+import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.ValueBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
@@ -27,6 +27,7 @@ import wyvern.tools.util.TreeWriter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.StreamSupport;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
@@ -53,6 +54,11 @@ public class New extends CachingTypedAST implements CoreAST {
 		this.location = fileLocation;
 	}
 
+	public New(DeclSequence seq, FileLocation fileLocation) {
+		this.seq = seq;
+		this.location = fileLocation;
+	}
+
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(cls);
@@ -76,7 +82,8 @@ public class New extends CachingTypedAST implements CoreAST {
 			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName()))), Optional.empty());
 
 
-			Environment environment = seq.extendName(declEnv, declEnv.extend(env));
+			Environment environment = seq.extendType(declEnv, declEnv.extend(env));
+			environment = seq.extendName(environment, environment.extend(env));
 			Environment nnames = seq.extend(environment, environment);
 
 			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(declEnv));
@@ -93,8 +100,15 @@ public class New extends CachingTypedAST implements CoreAST {
 			return classVarType;
 		} else { // Standalone
 			isGeneric = true;
-			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env);
-			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), null))), Optional.empty());
+			Environment innerEnv = seq.extendType(Environment.getEmptyEnvironment(), env);
+			Environment savedInner = env.extend(innerEnv);
+			innerEnv = seq.extendName(innerEnv, savedInner);
+
+			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), null)));
+			final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
+					reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
+			seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
+
 
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
@@ -144,8 +158,11 @@ public class New extends CachingTypedAST implements CoreAST {
 		}
 
 		AtomicReference<Value> objRef = new AtomicReference<>();
-		classDecl.evalDecl(env.extend(new LateValueBinding("this", objRef, ct)), classDecl.extendWithValue(Environment.getEmptyEnvironment()));
-		Environment objenv = seq.bindDecls(env, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
+		Environment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
+		classDecl.evalDecl(evalEnv, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
+		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
+				reduce(env, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
+		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 		objRef.set(new Obj(objenv.extend(argValEnv)));
 		return objRef.get();
 	}

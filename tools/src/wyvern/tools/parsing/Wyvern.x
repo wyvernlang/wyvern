@@ -1,4 +1,3 @@
-package wyvern.tools.parsing;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,16 +29,24 @@ import java.net.URI;
 	Integer parenLevel, cl;
 	Stack<Integer> depths;
 	Pattern nlRegex;
-	boolean nextDsl;
+	boolean nextDsl, nextDedent;
+	private String getLastMatch(Pattern patt, String str, int groupN) {
+		String output = "";
+		Matcher input = patt.matcher(str);
+		while (input.find())
+			output = input.group(groupN);
+		return output;
+	}
 %aux}
 
 %init{
 	parenLevel = 0;
 	cl = 0;
 	nextDsl = false;
+	nextDedent = false;
 	depths = new Stack<Integer>();
 	depths.push(0);
-	nlRegex = Pattern.compile("\n[\t ]*");
+	nlRegex = Pattern.compile("(\r\n|\n)([\t ]*)");
 %init}
 
 %lex{
@@ -64,9 +71,9 @@ import java.net.URI;
 		String output = "";
 		while(inputPattern.find())
 		{
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		if(newDepth < depths.peek()){
 			return Dedent_t;
 		} else {
@@ -100,9 +107,9 @@ import java.net.URI;
 		Matcher inputPattern = nlRegex.matcher(lexeme);
 		String output = "";
 		while(inputPattern.find()) {
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		if(newDepth < depths.peek()) {
 			return DedentRepair_t;
 		} else {
@@ -120,9 +127,9 @@ import java.net.URI;
 		String output = "";
 		while(inputPattern.find())
 		{
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		if(newDepth > depths.peek()){
 			return Indent_t;
 		} else {
@@ -139,9 +146,9 @@ import java.net.URI;
 		String output = "";
 		while(inputPattern.find())
 		{
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		if(newDepth > depths.peek()){
 			return Indent_t;
 		} else if (newDepth < depths.peek()) {
@@ -160,9 +167,9 @@ import java.net.URI;
 		String output = "";
 		while(inputPattern.find())
 		{
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		if(newDepth > depths.peek()){
 			return Indent_t;
 		} else {
@@ -200,9 +207,9 @@ import java.net.URI;
 		String output = "";
 		while(inputPattern.find())
 		{
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		if(newDepth < depths.peek()){
 			return Dedent_t;
 		} else {
@@ -237,32 +244,36 @@ import java.net.URI;
 	class keywds;
     class specialNumbers;
 
-	terminal Indent_t ::= /(\n[ \t]*)+/
+	terminal Indent_t ::= /(((\r\n)|\n)([ \t]*))+/
 	{:
 		//Need to determine new indentation depth and will treat all but the last "\n[\t ]*" as whitespace
 		Matcher inputPattern = nlRegex.matcher(lexeme);
 		String output = "";
 		while(inputPattern.find()) {
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		depths.push(newDepth);
 	:};
 
-	terminal Dedent_t ::= /(\n[ \t]*)+/
+	terminal Dedent_t ::= /(((\r\n)|\n)([ \t]*))+/
 	{:
 		//Need to determine new indentation depth and will treat all but the last "\n[\t ]*" as whitespace
 		Matcher inputPattern = nlRegex.matcher(lexeme);
 		String output = "";
 		while(inputPattern.find()) {
-			output = inputPattern.group();
+			output = inputPattern.group(2);
 		}
-		int newDepth = output.length() - 1;
+		int newDepth = output.length();
 		depths.pop();
 		if(newDepth < depths.peek()) {
-			pushToken(Terminals.Dedent_t,output);
+			pushToken(Terminals.Dedent_t,lexeme);
+		} else {
+			pushToken(Terminals.Newline_t,lexeme);
 		}
 	:};
+
+    terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {: :};
 
 	terminal DedentRepair_t ::= /(\n[ \t]*)+/
 	{:
@@ -275,19 +286,11 @@ import java.net.URI;
 	ignore terminal multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\//;
 	ignore terminal ignoredNewline ::= /((\n|(\r\n))[ \t]*)+/;
 	ignore terminal Spaces_t ::= /[ \t]+|(\\(\n|(\r\n)))/;
-    terminal Newline_t ::= /((\n|(\r\n))[ \t]*)+/ {: :};
 
  	terminal identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = lexeme;
  	:};
 
-	terminal taggedKwd_t  ::= /tagged/  in (keywds);
-	terminal matchKwd_t   ::= /match/   in (keywds);
-	terminal defaultKwd_t ::= /default/ in (keywds);
-	terminal caseKwd_t ::= /case/ in (keywds);
-	terminal ofKwd_t ::= /of/ in (keywds);
-	terminal comprisesKwd_t ::= /comprises/ in (keywds);
-	
     terminal classKwd_t ::= /class/ in (keywds);
 	terminal typeKwd_t 	::= /type/ in (keywds);
 	terminal valKwd_t 	::= /val/ in (keywds);
@@ -301,6 +304,13 @@ import java.net.URI;
 	terminal ifKwd_t 	::= /if/ in (keywds);
  	terminal thenKwd_t   ::= /then/ in (keywds);
  	terminal elseKwd_t   ::= /else/ in (keywds);
+
+	terminal taggedKwd_t  ::= /tagged/  in (keywds);
+    terminal matchKwd_t   ::= /match/   in (keywds);
+    terminal defaultKwd_t ::= /default/ in (keywds);
+    terminal caseKwd_t ::= /case/ in (keywds);
+    terminal ofKwd_t ::= /of/ in (keywds);
+    terminal comprisesKwd_t ::= /comprises/ in (keywds);
 
  	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
  		RESULT = Integer.parseInt(lexeme);
@@ -344,7 +354,8 @@ import java.net.URI;
  	terminal and_t ::= /&/ ;
  	terminal gt_t ::= />/ ;
  	terminal lt_t ::= /</ ;
-
+    terminal oSquareBracket_t ::= /\[/;
+    terminal cSquareBracket_t ::= /\]/;
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = lexeme.substring(1,lexeme.length()-1);
@@ -353,15 +364,15 @@ import java.net.URI;
  	terminal oCurly_t ::= /\{/ {: cl++; :};
  	terminal cCurly_t ::= /\}/ {: cl--; :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
-
- 	terminal oSquareBracket_t ::= /\[/;
- 	terminal cSquareBracket_t ::= /\]/;
-
- 	terminal dslWhitespace_t ::= /(\n[ \t]*)+/ {: nextDsl = true; RESULT = "\n"+lexeme.substring(depths.peek()+1); :};
+	terminal dslWhitespace_t ::= /((\r\n|\n)[ \t]*)+/ {:
+		nextDsl = true;
+		String newWs = getLastMatch(nlRegex, lexeme, 2).substring(depths.peek());
+		RESULT = "\n"+newWs;
+	:};
  	terminal dslLine_t ::= /[^\n]+/ {: nextDsl = false; RESULT = lexeme; :};
 
- 	terminal newSignal_t ::= //;
- 	terminal dslSignal_t ::= //;
+ 	terminal newSignal_t ::= /dgdkfghfugiehri/; //placeholders to make error messages sane
+ 	terminal dslSignal_t ::= /sdfgjtyertdvcx/;
  	terminal caseSignal_t ::= //;
 
  	terminal moduleName_t ::= /[a-zA-Z\.]+/ {: RESULT = lexeme; :};
@@ -384,6 +395,7 @@ import java.net.URI;
 	non terminal objid;
 	non terminal objcd;
 	non terminal tdef;
+	non terminal typemember;
 	non terminal metadata;
 	non terminal e;
 	non terminal term;
@@ -400,10 +412,6 @@ import java.net.URI;
    	non terminal dslInner;
    	non terminal dsle;
    	non terminal newBlock;
-   	non terminal dslce;
-   	non terminal newCBlock;
-   	non terminal obljid;
-   	non terminal objcld;
    	non terminal dslSeq;
    	non terminal import;
    	non terminal fragaddr;
@@ -414,21 +422,8 @@ import java.net.URI;
    	non terminal mnrd;
    	non terminal ptl;
 
-
-   	non terminal matchStatement;
-   	non terminal caseStatements;
-   	non terminal caseStatementsO;
-   	non terminal varStatement;
-   	non terminal defaultStatement;
-   	
-   	non terminal taggedInfo;
-   	non terminal caseOf;
-   	non terminal comprises;
-   	non terminal listTags;
-   	non terminal singleTag;
-
+   	precedence left Dedent_t, Newline_t;
    	precedence right tarrow_t;
-   	precedence left Dedent_t;
     precedence left colon_t;
     precedence left openParen_t;
     precedence left dot_t;
@@ -436,6 +431,18 @@ import java.net.URI;
     precedence left equals_t;
     precedence left plus_t, dash_t;
     precedence left mult_t, divide_t;
+
+	non terminal matchStatement;
+    non terminal caseStatements;
+    non terminal caseStatementsO;
+    non terminal varStatement;
+    non terminal defaultStatement;
+    
+    non terminal taggedInfo;
+    non terminal caseOf;
+    non terminal comprises;
+    non terminal listTags;
+    non terminal singleTag;
 
     non terminal fc2;
 
@@ -445,11 +452,16 @@ import java.net.URI;
 
 	fc ::= import:imp Newline_t fc:nxt {: RESULT = new Sequence((TypedAST)imp, (TypedAST)nxt); :}
 		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos));:}
-		 | p:prog {: RESULT = prog; :};
+		 | p:prog {: RESULT = prog; :}
+		 | {: RESULT = new Sequence(); :};
 
 	ptl ::= import:imp Newline_t ptl:nxt {: RESULT = DeclSequence.simplify(new DeclSequence((TypedAST)imp, (TypedAST)nxt)); :}
 		|   import:imp {: RESULT = imp; :}
 		|   pm:bdy {: RESULT = bdy; :};
+
+	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
+
+	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
 
 	pm ::= dm:ds {: RESULT = ds; :} | {: RESULT = new DeclSequence(); :};
 
@@ -457,22 +469,19 @@ import java.net.URI;
     	| d:de {: RESULT = de; :}
     	;
 
-    elst ::= dslce:ce {: RESULT = ce; :}
-    	|    dsle:ce p:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
-    	| ;
-
 	non terminal pnrd;
 
-    dm ::= prd:res mnrd:after {: RESULT = new DeclSequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
-    	 | prd:res {: RESULT = res; :}
+    dm ::= prd:res Newline_t mnrd:after {: RESULT = new DeclSequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    	 | prd:res Newline_t {: RESULT = res; :}
+    	 | prd:res  {: RESULT = res; :}
     	 | mnrd:res {: RESULT = res; :}
     	;
 
-    mnrd ::= val:vd pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	 |   var:vd pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    mnrd ::= val:vd Newline_t pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	 |   var:vd Newline_t pm:re {: RESULT = new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	 ;
 
-    d ::= prd:res pnrd:after {: RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
+    d ::= prd:res Newline_t pnrd:after {:RESULT = new Sequence(Arrays.asList((TypedAST)res,(TypedAST)after)); :}
     	| prd:res {: RESULT = res; :}
     	| nrd:res {: RESULT = res; :}
     	;
@@ -481,28 +490,19 @@ import java.net.URI;
     lvalue ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
     	|	   term:prev dot_t identifier_t:id {: RESULT = new Invocation((TypedAST)prev, (String)id, null, new FileLocation(currentState.pos)); :};
 
-    nrd ::= val:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	|   var:vd p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	|   lvalue:to equals_t e:va Newline_t p:re {: RESULT = new Sequence(Arrays.asList(new Assignment((TypedAST)to, (TypedAST)va, new FileLocation(currentState.pos)), (TypedAST)re));:}
+    nrd ::= val:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    	|   var:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
     	;
 
-
-    prd ::= rd:vd {: RESULT = vd; :}
-    	  | rd:vd prd:re {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); :}
+    prd ::= prd:re Newline_t rd:vd{: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); :}
+    	  | rd:vd {: RESULT = vd; :}
     	  ;
 
-    pnrd ::= e:ex {: RESULT = ex; :}| nrd:nr {: RESULT = nr; :};
+    pnrd ::= elst:ex {: RESULT = ex; :}| nrd:nr {: RESULT = nr; :};
 
     rd ::= class:res {: RESULT = res; :}
     	|  typedec:res {: RESULT = res; :}
     	|  def:res {: RESULT = res; :}
-    	;
-
-    class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
-    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, (TaggedInfo) tagInfo, "", "",
-    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
-    	|	  classKwd_t identifier_t:id Newline_t {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
 
     otypeasc ::= typeasc:ta {: RESULT = ta; :}
@@ -527,76 +527,67 @@ import java.net.URI;
     var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
     	;
 
-	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
-
-	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
-
-    objd ::= objcd:cds objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
-    	|	 objcld:ld  {: RESULT = ld; :}
-    	|	 objrd:rest {: RESULT = rest; :}
+    class ::= classKwd_t identifier_t:id Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, "", "",
+    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
+    	|	  taggedKwd_t classKwd_t identifier_t:id taggedInfo:tagInfo Indent_t objd:inner Dedent_t {: RESULT = new ClassDeclaration((String)id, (TaggedInfo) tagInfo, "", "",
+    	(inner instanceof DeclSequence)?(DeclSequence)inner : new DeclSequence((Declaration)inner), new FileLocation(currentState.pos)); :}
+    	|	  classKwd_t identifier_t:id {:RESULT = new ClassDeclaration((String)id, "", "", null, new FileLocation(currentState.pos)); :}
     	;
 
-    objrd ::= objid:rd objrd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); :}
-    	|	  obljid:rd {: RESULT = rd; :}
+    objd ::= objcd:cds Newline_t objd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)cds, (TypedAST)rst))); :}
+    	|	 objrd:rest {: RESULT = rest; :}
+    	|	 objcd:cds {: RESULT = cds; :}
+    	;
+
+    objrd ::= objid:rd Newline_t objrd:rst {: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)rd, (TypedAST)rst))); :}
+    	|	  objid:rd {: RESULT = rd; :}
     	;
 
     objcd ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, new FileLocation(currentState.pos));:}
                             	;
 
     non terminal cbval;
-    non terminal ctbval;
 
-    non terminal cbvar;
-    non terminal cbdef;
-    non terminal cbdeclbody;
 
     non terminal cbvalbody;
-    non terminal cbevalbody;
 
-    objid ::= ctbval:va {: RESULT = va; :}
+    objid ::= cbval:va {: RESULT = va; :}
     	|	  var:va {: RESULT = va; :}
-    	|	  def:va {: RESULT = va; :};
+    	|	  def:va {: RESULT = va; :}
+    	|	  class:va {: RESULT = va; :};
 
-    obljid ::= cbval:va {: RESULT = va; :}
-    	|	   cbvar:va {: RESULT = va; :}
-    	|      cbdef:va {: RESULT = va; :}
-    	;
+    cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| {: RESULT = null; :};
 
-    cbdeclbody ::= equals_t dslce:r {: RESULT = r; :} | Indent_t p:r Dedent_t {: RESULT = r; :};
-    cbevalbody ::= cbdeclbody:bdy {: RESULT = bdy; :}| {: RESULT = null; :};
-    cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| Newline_t {: RESULT = null; :};
+    cbval ::= valKwd_t identifier_t:id otypeasc:ty cbvalbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, new FileLocation(currentState.pos)); :};
 
-    objcld ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType cbdeclbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, new FileLocation(currentState.pos));:}
+    objcd ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, new FileLocation(currentState.pos));:}
                             	;
 
-    cbval ::= valKwd_t identifier_t:id otypeasc:ty cbevalbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, new FileLocation(currentState.pos)); :};
-	ctbval ::= valKwd_t identifier_t:id otypeasc:ty cbvalbody:body {: RESULT = new ValDeclaration((String)id, (Type)ty, (TypedAST)body, new FileLocation(currentState.pos)); :};
-
-    cbdef ::= defKwd_t identifier_t:name params:argNames typeasc:fullType cbdeclbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, new FileLocation(currentState.pos));:}
+    typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
+    	|       taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
+    	|	    typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
     	;
 
-    cbvar ::= varKwd_t identifier_t:id typeasc:type cbdeclbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :};
-
-
-    typedec ::= taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
-    	|		typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name Newline_t {: RESULT = new TypeDeclaration((String)name, null, null); :}
-		;
-
-    typed ::= tdef:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
-    	   |  tdef:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
+    typed ::= typemember:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}
+    	   |  typemember:def {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})); :}
     	   |  metadata:md {: RESULT = new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)md})); :}
     	   ;
 
+	typemember ::= tdef:r {: RESULT = r; :} | typedec:r {: RESULT = r; :} | class:r {: RESULT = r; :};
+	
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, new FileLocation(currentState.pos)); :};
 
-    metadata ::= metadataKwd_t typeasc:type equals_t dslce:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); :};
+    metadata ::= metadataKwd_t typeasc:type equals_t dsle:inner {: RESULT = new TypeDeclaration.AttributeDeclaration((TypedAST)inner, (Type)type); :};
 
     non terminal AE;
     non terminal ME;
     non terminal tle;
 
-    dsle ::= tle:exn Newline_t {: RESULT = exn; :}
+    elst ::= dsle:ce {: RESULT = ce; :}
+    	|    dsle:ce Newline_t p:lst {: RESULT = new Sequence((TypedAST)ce,(TypedAST)lst); :}
+    	| ;
+
+    dsle ::= tle:exn {: RESULT = exn; :}
     | tle:exn dslSignal_t dslSeq:dsl {:
     	ASTExplorer exp = new ASTExplorer();
     	exp.transform((TypedAST) exn);
@@ -613,24 +604,6 @@ import java.net.URI;
 		((New)exp.getRef()).setBody((blk instanceof DeclSequence) ? (DeclSequence)blk : new DeclSequence(Arrays.asList((TypedAST)blk)));
 		RESULT = exn;
 	:};
-
-    dslce ::= tle:exn {: RESULT = exn; :}
-    | tle:exn dslSignal_t dslSeq:dsl {:
-		ASTExplorer exp = new ASTExplorer();
-		exp.transform((TypedAST) exn);
-		if (!exp.foundTilde())
-			throw new RuntimeException();
-		((DSLLit)exp.getRef()).setText((String)dsl);
-		RESULT = exn;
-	 :}
-    | tle:exn newSignal_t newCBlock:blk {:
-		ASTExplorer exp = new ASTExplorer();
-		exp.transform((TypedAST) exn);
-		if (!exp.foundNew())
-			throw new RuntimeException();
-		((New)exp.getRef()).setBody((blk instanceof DeclSequence) ? (DeclSequence)blk : new DeclSequence(Arrays.asList((TypedAST)blk)));
-		RESULT = exn;
-	 :};
 
 	non terminal colonApp;
 
@@ -661,8 +634,12 @@ import java.net.URI;
 
 	non terminal EE;
 	non terminal BE;
+	non terminal ASSN;
 
-    a ::= EE:are {: RESULT = are; :};
+    a ::= ASSN:are {: RESULT = are; :};
+
+	ASSN ::= lvalue:to equals_t e:va {:RESULT = new Assignment((TypedAST)to, (TypedAST)va, new FileLocation(currentState.pos));:}
+		 |   EE:va {: RESULT = va; :};
 
     EE ::= EE:l equalsequals_t EE:r {: RESULT = new Invocation((TypedAST)l,"==",(TypedAST)r, new FileLocation(currentState.pos)); :}
     	|  EE:l gt_t EE:r {: RESULT = new Invocation((TypedAST)l,">",(TypedAST)r, new FileLocation(currentState.pos)); :}
@@ -694,7 +671,7 @@ import java.net.URI;
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}
-    	|    matchStatement:stmt {: RESULT = stmt; :} 
+    	|    matchStatement:stmt {: RESULT = stmt; :}
     	;
 
     etuple ::= openParen_t e:first comma_t it:rest closeParen_t {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
@@ -708,83 +685,83 @@ import java.net.URI;
    	it ::= e:first comma_t it:rest {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
    		|  e:el {: RESULT = el; :}
    		;
-	
-	//complete match statement
-	matchStatement ::= matchKwd_t openParen_t term:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
-			{: RESULT = new Match((TypedAST) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
-	
-	//group of 0 or more variable cases, followed by 0 or 1 default case
-	caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 
-				List<Case> cases = new ArrayList<Case>(); 
-				cases.add((Case) mstmt); 
-				cases.addAll((List<Case>) rest);
-				
-				RESULT = cases; 
-			:}
-			//this is actually a syntax error, but letting it parse so can give a more informative
-			//error message to the user later on
-     	  | defaultStatement:dstmt Newline_t caseStatements:rest {:
-     	  		List<Case> cases = new ArrayList<Case>();
-     	  		cases.add((Case) dstmt);
-     	  		cases.addAll((List<Case>) rest);
-     	  		
-     	  		RESULT = cases; :}
-     	  | defaultStatement:dstmt {: 
-     	  		List<Case> cases = new ArrayList<Case>();
-     	  		cases.add((Case) dstmt);
-     	  		RESULT = cases; :}
-		  | varStatement:mstmt {: 
-		  		List<Case> cases = new ArrayList<Case>(); cases.add((Case) mstmt); RESULT = cases; 
-		  	:}
-		  ;
-	
-	//a single match case statement
-	varStatement ::= identifier_t:id arrow_t dslce:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
-    	  ;
+
+   //complete match statement
+    matchStatement ::= matchKwd_t openParen_t term:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
+            {: RESULT = new Match((TypedAST) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
+    
+    //group of 0 or more variable cases, followed by 0 or 1 default case
+    caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 
+                List<Case> cases = new ArrayList<Case>(); 
+                cases.add((Case) mstmt); 
+                cases.addAll((List<Case>) rest);
+                
+                RESULT = cases; 
+            :}
+            //this is actually a syntax error, but letting it parse so can give a more informative
+            //error message to the user later on
+          | defaultStatement:dstmt Newline_t caseStatements:rest {:
+                List<Case> cases = new ArrayList<Case>();
+                cases.add((Case) dstmt);
+                cases.addAll((List<Case>) rest);
+                
+                RESULT = cases; :}
+          | defaultStatement:dstmt {: 
+                List<Case> cases = new ArrayList<Case>();
+                cases.add((Case) dstmt);
+                RESULT = cases; :}
+          | varStatement:mstmt {: 
+                List<Case> cases = new ArrayList<Case>(); cases.add((Case) mstmt); RESULT = cases; 
+            :}
+          ;
+    
+    //a single match case statement
+    varStatement ::= identifier_t:id arrow_t dsle:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
+          ;
     
     //a default match statement
-    defaultStatement ::= defaultKwd_t arrow_t dslce:inner 	{: RESULT = new Case((TypedAST) inner); :}
-    	  ;
+    defaultStatement ::= defaultKwd_t arrow_t dsle:inner   {: RESULT = new Case((TypedAST) inner); :}
+          ;
 
-	// hierarchical tags
+    // hierarchical tags
 
-	taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
-	             | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
-	             | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
-	             |              {: RESULT = new TaggedInfo(); :}
-	             ;
-	
-	// [case of tag]
-   	caseOf ::= oSquareBracket_t caseKwd_t ofKwd_t singleTag:tag cSquareBracket_t 
-   			{: RESULT = tag; :}
-   			;
-   	
-   	// [comprises tag+]
-	comprises ::= oSquareBracket_t comprisesKwd_t listTags:tags cSquareBracket_t
-   	      {: RESULT = tags; :}
-   	      ;
-   	      
-   	//1 or more tags
-   	listTags ::= singleTag:tag comma_t listTags:rest {: 
-   					List<String> tags = new ArrayList<String>();
-   			   		tags.add((String) tag);
-   			   		tags.addAll((List<String>) rest);
-   			   
-   			   		RESULT = tags; 
-   				:}
+    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
+                 | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
+                 | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
+                 |              {: RESULT = new TaggedInfo(); :}
+                 ;
+    
+    // [case of tag]
+    caseOf ::= oSquareBracket_t caseKwd_t ofKwd_t singleTag:tag cSquareBracket_t 
+            {: RESULT = tag; :}
+            ;
+    
+    // [comprises tag+]
+    comprises ::= oSquareBracket_t comprisesKwd_t listTags:tags cSquareBracket_t
+          {: RESULT = tags; :}
+          ;
+          
+    //1 or more tags
+    listTags ::= singleTag:tag comma_t listTags:rest {: 
+                    List<String> tags = new ArrayList<String>();
+                    tags.add((String) tag);
+                    tags.addAll((List<String>) rest);
+               
+                    RESULT = tags; 
+                :}
                | singleTag:tag {: 
-               		List<String> tags = new ArrayList<String>();
-   			   		tags.add((String) tag);
-   			   		
-               		RESULT = tags; 
+                    List<String> tags = new ArrayList<String>();
+                    tags.add((String) tag);
+                    
+                    RESULT = tags; 
                  :}
-   	           ;
-   	           
-   	//a single tag
-   	singleTag ::= identifier_t:id {: RESULT = (String) id; :}
-   	            ;
+               ;
+               
+    //a single tag
+    singleTag ::= identifier_t:id {: RESULT = (String) id; :}
+                ;
 
-	// end hierarchical tags
+    // end hierarchical tags
 
    	type ::= type:t1 tarrow_t type:t2 {: RESULT = new Arrow((Type)t1,(Type)t2); :}
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}
@@ -799,7 +776,6 @@ import java.net.URI;
     precedence left oCurly_t;
 
    	inlinelit ::= oCurly_t innerdsl:idsl cCurly_t {: RESULT = idsl; :};
-
    	innerdsl ::= notCurly_t:str {: RESULT = str; :} | notCurly_t:str oCurly_t innerdsl:idsl cCurly_t innerdsl:stre {: RESULT = str + "{" + idsl + "}" + stre; :} | {: RESULT = ""; :};
 
 	non terminal dslLine;
@@ -812,8 +788,7 @@ import java.net.URI;
    	dslInner ::= dslLine:i {: RESULT = i; :}| dslLine:i dslInner:n {: RESULT = (String)i + (String)n; :};
    	dslLine ::= dslWhitespace_t:ws dslLine_t:ln {: RESULT = (String)ws + (String)ln; :};
 
-   	newBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | Newline_t {: RESULT = new DeclSequence(); :};
-   	newCBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | {: RESULT = new DeclSequence(); :};
+   	newBlock ::= Indent_t objrd:inner Dedent_t {: RESULT = inner; :} | {: RESULT = new DeclSequence(); :};
 
    	//URIs
    	non terminal uri;

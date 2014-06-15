@@ -9,6 +9,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.MetaType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Reference;
 
 import java.lang.reflect.InvocationTargetException;
@@ -65,6 +66,8 @@ public class JavaClassType extends ClassType implements MetaType {
 		if (other instanceof JavaClassType
 				&& ((JavaClassType)other).decl.getClazz().equals(decl.getClazz()))
 			return true;
+		if (other instanceof Str && this.clazz.equals(String.class))
+			return true;//TODO:clean up
 		return super.subtype(other);
 	}
 
@@ -84,5 +87,11 @@ public class JavaClassType extends ClassType implements MetaType {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+
+	@Override
+	public String toString() {
+		return "JavaClass("+decl.getClazz().getName()+")";
 	}
 }

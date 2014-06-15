@@ -4,6 +4,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-public class Tuple extends AbstractTypeImpl implements OperatableType {
+public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResolver.Resolvable {
 	private Type[] types;
 	
 	public Tuple(Type[] types) {
@@ -30,11 +31,30 @@ public class Tuple extends AbstractTypeImpl implements OperatableType {
 		}
 	}
 
-	public Type[] getTypes() {
+	public Type[] getTypeArray() {
 		return types;
 	}
 
-    public Type getFirst() {
+
+	@Override
+	public Map<String, Type> getTypes() {
+		HashMap<String, Type> typesMap = new HashMap<>();
+		int idx = 0;
+		for (Type t : types)
+			typesMap.put(idx++ +"", t);
+		return typesMap;
+	}
+
+	@Override
+	public Type setTypes(Map<String, Type> newTypes) {
+		Type[] res = new Type[newTypes.size()];
+		for (Map.Entry<String,Type> entry : newTypes.entrySet()) {
+			res[Integer.parseInt(entry.getKey())] = entry.getValue();
+		}
+		return new Tuple(res);
+	}
+
+	public Type getFirst() {
         return types[0];
     }
 

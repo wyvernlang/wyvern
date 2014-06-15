@@ -3,6 +3,9 @@ package wyvern.tools.types.extensions;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -17,7 +20,7 @@ public class TypeDeclUtils {
 		Environment tev = Environment.getEmptyEnvironment();
 
 		for (Binding b : src.getBindings()) {
-			if (b instanceof VarBinding) {
+			if (b instanceof AssignableNameBinding) {
 				//Indicates that there is a settable value
 				String name = b.getName();
 				Type type = b.getType();

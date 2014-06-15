@@ -1,5 +1,6 @@
-package wyvern.tools.typedAST.core.binding;
+package wyvern.tools.typedAST.core.binding.typechecking;
 
+import wyvern.tools.typedAST.core.binding.AbstractBinding;
 import wyvern.tools.types.Type;
 
 public class TypeBinding extends AbstractBinding {

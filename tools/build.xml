@@ -1,22 +1,46 @@
 <project name="wyvern" default="copper-generate" basedir=".">
-    <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler-0.7.1.jar"/>
-    <target name="copper-generate">
-        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java">
+    <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
+    <target name="copper-compose-compile">
+        <mkdir dir="copper-composer/bin"/>
+        <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
+            <classpath path="lib/CopperCompiler.jar:lib/ant.jar"/>
+        </javac>
+    </target>
+    <target name="copper-compose" depends="copper-compose-compile">
+        <taskdef name="composer" classname="wyvern.tools.parsing.CopperComposer" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
+        <composer hostgrammar="src/wyvern/tools/parsing/Wyvern.x"
+                  hostgrammarname="Wyvern"
+                  extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
+                  output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
+    </target>
+    <target name="copper-subparsers">
+        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
+        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
+                  hostgrammar="Wyvern"
+                  newfc="objd"
+                  newpackage="wyvern.tools.parsing.parselang"
+                  newname="WyvernDecls"
+                  target="src/wyvern/tools/parsing/parselang/WyvernDecls.java"
+                  extrapackage="wyvern.tools.parsing.*"/>
+        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
+                  hostgrammar="Wyvern"
+                  newfc="type"
+                  newpackage="wyvern.tools.parsing.parselang"
+                  newname="TypeParser"
+                  target="src/wyvern/tools/parsing/parselang/TypeParser.java"
+                  extrapackage="wyvern.tools.parsing.*"/>
+    </target>
+    <target name="copper-generate" depends="copper-compose,copper-subparsers">
+        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" packagename="wyvern.tools.parsing">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
-        </copper>
-        <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java">
-            <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
         </copper>
         <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java">
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
         </copper>
     </target>
     <target name="copper-debug">
-        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt">
+        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt" packagename="wyvern.tools.parsing">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
-        </copper>
-        <copper outputfile="src/wyvern/tools/parsing/quotelang/WyvernQuote.java" dump="ON" dumpfile="copper-quotes-output.txt">
-            <inputs file="src/wyvern/tools/parsing/quotelang/WyvernQuote.x"/>
         </copper>
         <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java" dump="ON" dumpfile="copper-tests-output.txt">
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
