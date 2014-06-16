@@ -112,8 +112,8 @@ public class CopperTSL implements ExtParser {
 
 		final Environment savedNtEnv2 = ntEnv;
 		res.getGrammars().stream().map(res::getGrammar)
-				.flatMap(grm->grm.getElementsOfType(CopperElementType.PRODUCTION).stream().map(grm::getGrammarElement).map(el->(Production)el))
-				.map(prod->new Pair<Production, List<NameBinding>>(prod, CopperTSL.<Type,String,Optional<NameBinding>>
+				.flatMap(grm->grm.getElementsOfType(CopperElementType.PRODUCTION).stream().map(grm::getGrammarElement).<Production>map(el->(Production)el))
+				.<Pair<Production, List<NameBinding>>>map(prod->new Pair<Production, List<NameBinding>>(prod, CopperTSL.<Type,String,Optional<NameBinding>>
 						zip(prod.getRhs().stream().map(cer->savedNtEnv2.lookup(cer.getName().toString()).getType()), prod.getRhsVarNames().stream(),
 						(type, name) -> (name == null)?Optional.empty():Optional.of(new NameBindingImpl(name, type)))
 						.<NameBinding>flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())
@@ -122,7 +122,7 @@ public class CopperTSL implements ExtParser {
 
 		res.getGrammars().stream().map(res::getGrammar)
 				.flatMap(grm->grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement)
-						.map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,methNum));
+						.<Terminal>map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,methNum));
 
 
 		String wyvClassName = res.getClassName();
