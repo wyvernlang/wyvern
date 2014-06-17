@@ -1,7 +1,6 @@
 package wyvern.tools.types.extensions;
 
 import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
@@ -58,13 +57,5 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 
 		return super.subtype(other, subtypes);
 	}
-	@Override
-	public Map<String, Type> getChildren() {
-		return new HashMap<>();
-	}
 
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		return this;
-	}
 }

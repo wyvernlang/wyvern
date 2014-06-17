@@ -6,7 +6,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashSet;
-import java.util.Map;
 
 public class TypeInv implements Type {
 	Type innerType;
@@ -33,16 +32,6 @@ public class TypeInv implements Type {
 
 	@Override
 	public boolean isSimple() {
-		throw new RuntimeException("Invalid operation (forgot to resolve)?");
-	}
-
-	@Override
-	public Map<String, Type> getChildren() {
-		throw new RuntimeException("Invalid operation (forgot to resolve)?");
-	}
-
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		throw new RuntimeException("Invalid operation (forgot to resolve)?");
 	}
 

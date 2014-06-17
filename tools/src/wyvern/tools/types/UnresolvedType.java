@@ -5,9 +5,7 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public class UnresolvedType implements Type {
 	private String typeName;
@@ -49,13 +47,4 @@ public class UnresolvedType implements Type {
 		return true;
 	}
 
-	@Override
-	public Map<String, Type> getChildren() {
-		return new HashMap<>();
-	}
-
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		throw new RuntimeException("Cannot specify a ref type");
-	}
 }

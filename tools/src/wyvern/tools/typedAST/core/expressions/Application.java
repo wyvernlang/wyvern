@@ -45,7 +45,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 		if (fnType instanceof Arrow)
 			argument = ((Arrow) fnType).getArgument();
 		else if (fnType instanceof Intersection) {
-			List<Type> args = fnType.getChildren().values().stream()
+			List<Type> args = ((Intersection)fnType).getTypes().stream()
 					.filter(tpe -> tpe instanceof Arrow).map(tpe->((Arrow)tpe).getArgument())
 					.collect(Collectors.toList());
 			argument = new Intersection(args);

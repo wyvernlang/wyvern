@@ -14,15 +14,4 @@ public interface Type extends TreeWritable {
 	 */
 	public boolean isSimple();
 
-	/**
-	 * Gets the children of a composite node
-	 * @return The children of the node
-	 */
-	Map<String, Type> getChildren();
-	/**
-	 * Clones the current AST node with the given set of children
-	 * @param newChildren The children to create
-	 * @return The deep-copied Type node
-	 */
-	Type cloneWithChildren(Map<String, Type> newChildren);
 }

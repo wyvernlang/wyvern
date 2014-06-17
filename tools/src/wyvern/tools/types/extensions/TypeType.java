@@ -141,14 +141,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	private boolean isParserCheck = false;
 	private boolean isParserValid = false;
 
-	@Override
-	public Map<String, Type> getChildren() {
-		HashMap<String, Type> map = new HashMap<>();
-		List<Binding> bindings = typeDeclEnv.get().getBindings();
-		writeBindings("denv", map, bindings);
-		return map;
-	}
-
 	private void writeBindings(String prefix, HashMap<String, Type> map, List<Binding> bindings) {
 		int i = 0;
 		for (Binding b : bindings) {
@@ -162,22 +154,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 				throw new RuntimeException("Unexpected binding");
 			}
 		}
-	}
-
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		ArrayList<String> denvList = new ArrayList<>(newChildren.keySet());
-		Comparator<String> c = new Comparator<String>() {
-			@Override
-			public int compare(String o1, String o2) {
-				int io1 = Integer.parseInt(o1.split(":")[1]);
-				int io2 = Integer.parseInt(o2.split(":")[1]);
-				return io2 - io1;
-			}
-		};
-		Collections.sort(denvList, c);
-		Environment ndEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), denvList);
-		return new TypeType(new Reference<>(ndEnv));
 	}
 
 	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {

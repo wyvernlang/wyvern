@@ -4,7 +4,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
@@ -166,21 +165,5 @@ public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResol
 			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, opExp.getLocation());
 		return types[num];
 	}
-	@Override
-	public Map<String, Type> getChildren() {
-		HashMap<String, Type> map = new HashMap<>();
-		for (int i = 0; i < types.length; i++) {
-			map.put(i +"", types[i]);
-		}
-		return map;
-	}
 
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		Type[] result = new Type[types.length];
-		for (int i = 0; i < types.length; i++) {
-			result[i] = newChildren.get(i + "");
-		}
-		return new Tuple(result);
-	}
 }

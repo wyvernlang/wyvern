@@ -5,9 +5,7 @@ import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public class Unit extends AbstractTypeImpl {
 	private Unit() { }
@@ -29,13 +27,4 @@ public class Unit extends AbstractTypeImpl {
 		return super.subtype(other, subtypes);
 	}
 
-	@Override
-	public Map<String, Type> getChildren() {
-		return new HashMap<>();
-	}
-
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		return this;
-	}
 }

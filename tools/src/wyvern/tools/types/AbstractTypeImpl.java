@@ -1,8 +1,6 @@
 package wyvern.tools.types;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public abstract class AbstractTypeImpl implements Type {
 
@@ -42,13 +40,5 @@ public abstract class AbstractTypeImpl implements Type {
 	public boolean isSimple() {
 		return true; // default is correct for most types
 	}
-	@Override
-	public Map<String, Type> getChildren() {
-		return new HashMap<>();
-	}
 
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		return this;
-	}
 }
