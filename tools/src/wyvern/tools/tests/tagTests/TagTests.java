@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.Wyvern;
@@ -669,9 +670,9 @@ public class TagTests {
 	 * @param ast
 	 * @param errorMessage
 	 */
-	private void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
+	public static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
 		try {
-			ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		} catch (ToolError toolError) {
 			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
 			
@@ -682,20 +683,30 @@ public class TagTests {
 	}
 	
 	/**
+	 * First typechecks the AST, then executes it.
+	 * 
+	 * Any returned value is discarded, but anything printed to stdout will be visible.
+	 * 
+	 * @param ast
+	 */
+	public static void evaluate(TypedAST ast) {
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		ast.evaluate(Globals.getStandardEnv());
+	}
+	
+	/**
 	 * Completely evaluates the given AST, and compares it to the given value.
 	 * Does typechecking first, then evaluation.
 	 * 
 	 * @param ast
 	 * @param value
 	 */
-	private void evaluateExpecting(TypedAST ast, int value) {
-		ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		ast.evaluate(Environment.getEmptyEnvironment());
-		
-		Value v = ast.evaluate(Environment.getEmptyEnvironment());
+	public static void evaluateExpecting(TypedAST ast, int value) {
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		Value v = ast.evaluate(Globals.getStandardEnv());
 		
 		String expecting = "IntegerConstant(" + value + ")"; 
-		
+
 		Assert.assertEquals(expecting, v.toString());
 	}
 	
@@ -707,7 +718,7 @@ public class TagTests {
 	 * @throws IOException 
 	 * @throws CopperParserException 
 	 */
-	private TypedAST getAST(String program) throws CopperParserException, IOException {
+	public static TypedAST getAST(String program) throws CopperParserException, IOException {
 		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
 	}
 }
