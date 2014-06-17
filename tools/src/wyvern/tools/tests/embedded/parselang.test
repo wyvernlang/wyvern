@@ -1,7 +1,7 @@
 module test singleParser[IntegerConstant(2):Int]
 	file main
 		import wyv:hellolang
-		val helloed:Hellolang.Hello = {helloworld}
+		val helloed:Hellolang.Hello = {hello world}
 		helloed.get()
 	file hellolang
 		module Hellolang
@@ -9,24 +9,33 @@ module test singleParser[IntegerConstant(2):Int]
 		import java:wyvern.tools.parsing.HasParser
 		import java:wyvern.tools.parsing.ExtParser
 		import java:wyvern.tools.parsing.ParseBuffer
+		import java:java.lang.System
 		type Hello
 			def get():Int
 			metadata:HasParser = new
 				def getParser():ExtParser
-					val iparser:ExtParser = ~
-						%%
-						%parser HelloWorld
-						%lex{
-							terminal Int hello_t ::= /hello/ {: 2 :};
-							terminal Int world_t ::= /world/ {: 1 :};
-						%lex}
-						%cf{
-							non terminal Int helloworld;
-							start with helloworld;
-							helloworld ::= hello_t:a world_t:b {: a :};
-						%cf}
 					new
 						def parse(buf:ParseBuffer):TypedAST
+							var depth:Int = 0
+
+							val iparser:ExtParser = ~
+								%%
+								%parser HelloWorld
+								%lex{
+									terminal Int hello_t ::= /hello/ {:
+										depth = depth + 1
+										System.out.println(depth)
+										2
+									:};
+									terminal Int world_t ::= /world/ {: 1 :};
+									terminal Unit space_t ::= / / {: () :};
+								%lex}
+								%cf{
+									non terminal Int helloworld;
+									start with helloworld;
+									helloworld ::= hello_t:a space_t world_t:b {: a :};
+								%cf}
+
 							val parsed = iparser.parse(buf)
 							~
 								new

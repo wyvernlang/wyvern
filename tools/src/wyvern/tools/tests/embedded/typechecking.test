@@ -28,4 +28,4 @@ test typechecking5 [():TYPE()]
 	module TestModule
 		type M
 			class A
-				def create() : A
+				def create() : A = new

@@ -55,7 +55,7 @@ public class LangUtil {
 		}
 	}
 
-	public static TypedAST spliceBinding(ParseBuffer buffer, List<NameBinding> bindings) {
+	public static SpliceBindExn spliceBinding(ParseBuffer buffer, List<NameBinding> bindings) {
 		try {
 			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
 			res = new DSLTransformer().transform(res);

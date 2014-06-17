@@ -40,6 +40,7 @@ import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.ExternalFunction;
+import wyvern.tools.typedAST.extensions.SpliceBindExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -106,23 +107,23 @@ public class CopperTSL implements ExtParser {
 						(a, b) -> a.set(a.get().extend(b.get()))).get();
 
 
-		HashMap<String, TypedAST> toGen = new HashMap<>();
+		HashMap<String, Pair<Type,SpliceBindExn>> toGen = new HashMap<>();
 		HashMap<String, TypedAST> toGenDefs = new HashMap<>();
 		Reference<Integer> methNum = new Reference<>(0);
 
 		final Environment savedNtEnv2 = ntEnv;
 		res.getGrammars().stream().map(res::getGrammar)
-				.flatMap(grm->grm.getElementsOfType(CopperElementType.PRODUCTION).stream().map(grm::getGrammarElement).map(el->(Production)el))
-				.map(prod->new Pair<Production, List<NameBinding>>(prod, CopperTSL.<Type,String,Optional<NameBinding>>
+				.flatMap(grm->grm.getElementsOfType(CopperElementType.PRODUCTION).stream().map(grm::getGrammarElement).<Production>map(el->(Production)el))
+				.<Pair<Production, List<NameBinding>>>map(prod->new Pair<Production, List<NameBinding>>(prod, CopperTSL.<Type,String,Optional<NameBinding>>
 						zip(prod.getRhs().stream().map(cer->savedNtEnv2.lookup(cer.getName().toString()).getType()), prod.getRhsVarNames().stream(),
 						(type, name) -> (name == null)?Optional.empty():Optional.of(new NameBindingImpl(name, type)))
 						.<NameBinding>flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())
 						.collect(Collectors.<NameBinding>toList()))
-				).forEach(updateCode(toGen,methNum));
+				).forEach(updateCode(toGen,ntEnv,methNum, res.getClassName()));
 
 		res.getGrammars().stream().map(res::getGrammar)
 				.flatMap(grm->grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement)
-						.map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,methNum));
+						.<Terminal>map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,ntEnv,methNum, res.getClassName()));
 
 
 		String wyvClassName = res.getClassName();
@@ -156,32 +157,27 @@ public class CopperTSL implements ExtParser {
 				"import wyvern.tools.typedAST.extensions.interop.java.Util;\n" +
 				"");
 
-		String pcac = res.getParserClassAuxCode();
-		TypedAST aux = new DeclSequence();
-		if (pcac == null)
-			pcac = "";
-		if (!pcac.trim().equals(""))
-			try {
-				aux = (TypedAST)new WyvernDecls().parse(new StringReader(pcac), "Parser aux code");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
 		res.setParserClassAuxCode("Value "+PAIRED_OBJECT_NAME+" = null;");
+
 
 		AtomicInteger cdIdx = new AtomicInteger();
 		TypedAST[] classDecls = new TypedAST[toGen.size() + toGenDefs.size() + 1];
 		FileLocation unkLoc = FileLocation.UNKNOWN;
 		toGen.entrySet().stream().forEach(entry->classDecls[cdIdx.getAndIncrement()]
-				= new ValDeclaration(entry.getKey(), entry.getValue(), unkLoc));
+				= new ValDeclaration(entry.getKey(), DefDeclaration.getMethodType(entry.getValue().second().getArgBindings(), entry.getValue().first()), entry.getValue().second(), unkLoc));
+
 		toGenDefs.entrySet().stream().forEach(entry->classDecls[cdIdx.getAndIncrement()]
 				= new DefDeclaration(entry.getKey(), new Arrow(Unit.getInstance(), Unit.getInstance()), new LinkedList<>(), entry.getValue(), false));
+
 		classDecls[cdIdx.getAndIncrement()] = new DefDeclaration("create", new Arrow(Unit.getInstance(),
 				new UnresolvedType(wyvClassName)),
 				Arrays.asList(),
 				new New(new DeclSequence(), unkLoc), true);
 
 
-		TypedAST pairedObj = new ClassDeclaration(wyvClassName, "", "", new DeclSequence(classDecls), unkLoc);
+		ArrayList<TypedAST> pairedObjDecls = new ArrayList<>();
+		pairedObjDecls.addAll(Arrays.asList(classDecls));
+		TypedAST pairedObj = new ClassDeclaration(wyvClassName, "", "", new DeclSequence(pairedObjDecls), unkLoc);
 
 		ParserCompilerParameters pcp = new ParserCompilerParameters();
 
@@ -272,7 +268,6 @@ public class CopperTSL implements ExtParser {
 						Arrays.asList(new NameBindingImpl("buf", parseBufferType)),
 						body,
 						false);
-
 		return new New(new DeclSequence(Arrays.asList(pairedObj, jcd, parseDef)), unkLoc);
 	}
 
@@ -304,23 +299,26 @@ public class CopperTSL implements ExtParser {
 		throw new RuntimeException();
 	}
 
-	private Consumer<Terminal> updateTerminalCode(HashMap<String, TypedAST> toGen, Reference<Integer> methNum) {
+	private Consumer<Terminal> updateTerminalCode(HashMap<String, Pair<Type,SpliceBindExn>> toGen, Environment lhsEnv, Reference<Integer> methNum, String thisTypeName) {
 		return (term) -> {
 			String oCode = term.getCode();
 
-			TypedAST spliced = LangUtil.spliceBinding(new IParseBuffer(oCode), Arrays.asList(new NameBinding[] {new NameBindingImpl("lexeme", Str.getInstance())}));
+			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(oCode), Arrays.asList(new NameBinding[] {
+					new NameBindingImpl("lexeme", Str.getInstance())}));
 
 			String newName = term.getName() + "GEN" + methNum.get();
 			methNum.set(methNum.get() + 1);
 
-			toGen.put(newName, spliced);
+			Type resType = lhsEnv.lookup(term.getName().toString()).getType();
+
+			toGen.put(newName, new Pair<>(resType, spliced));
 
 			String newCode = String.format("RESULT = Util.invokeValueVarargs(%s, \"%s\", %s);", PAIRED_OBJECT_NAME, newName, "new StringConstant(lexeme)");
 			term.setCode(newCode);
 		};
 	}
 
-	private Consumer<Pair<Production, List<NameBinding>>> updateCode(HashMap<String, TypedAST> toGen, Reference<Integer> methNum) {
+	private Consumer<Pair<Production, List<NameBinding>>> updateCode(HashMap<String, Pair<Type,SpliceBindExn>> toGen, Environment lhsEnv, Reference<Integer> methNum, String thisTypeName) {
 		return (Pair<Production, List<NameBinding>> inp) -> {
 			Production prod = inp.first();
 			List<NameBinding> bindings = inp.second();
@@ -330,15 +328,16 @@ public class CopperTSL implements ExtParser {
 			methNum.set(methNum.get()+1);
 
 			//Parse the input code
-			TypedAST spliced = LangUtil.spliceBinding(new IParseBuffer(prod.getCode()), bindings);
+			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(prod.getCode()), bindings);
+
+			Type resType = lhsEnv.lookup(prod.getLhs().getName().toString()).getType();
 
 			//Save it to the external dict
-			toGen.put(newName, spliced);
+			toGen.put(newName, new Pair<>(resType, spliced));
 
 			String args = bindings.stream().map(nb->nb.getName()).reduce((a,b)->a+", "+b).get();
 			//Code to invoke the equivalent function
-			String newCode = "RESULT = Util.invokeValueVarargs("+PAIRED_OBJECT_NAME+", \""+newName+"\", "+
-					args+");";
+			String newCode = "RESULT = Util.invokeValueVarargs("+PAIRED_OBJECT_NAME+", \""+newName+"\", "+args+");";
 
 			prod.setCode(newCode);
 		};
