@@ -4,7 +4,9 @@ import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class JNullType implements Type {
 	@Override
@@ -19,6 +21,16 @@ public class JNullType implements Type {
 	@Override
 	public boolean isSimple() {
 		return true;
+	}
+
+	@Override
+	public Map<String, Type> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return this;
 	}
 
 	@Override

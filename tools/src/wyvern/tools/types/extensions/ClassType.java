@@ -123,6 +123,16 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	public Type checkParameters(List<Type> params) {
 		return null;
 	}
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		List<Binding> bindings = declEnv.get().getBindings();
+		writeBindings("denv", map, bindings);
+		if (typeEquivalentEnv.get() != null) {
+			writeBindings("teenv", map, typeEquivalentEnv.get().getBindings());
+		}
+		return map;
+	}
 
 	private void writeBindings(String prefix, HashMap<String, Type> map, List<Binding> bindings) {
 		int i = 0;
@@ -139,6 +149,34 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 				throw new RuntimeException("Unexpected binding");
 			}
 		}
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		ArrayList<String> denvList = new ArrayList<>();
+		ArrayList<String> teenvList = new ArrayList<>();
+		for (String key : newChildren.keySet()) {
+			if (key.startsWith("denv")) {
+				denvList.add(key);
+			} else if (key.startsWith("teenv")) {
+				teenvList.add(key);
+			} else {
+				throw new RuntimeException("Unexpected Env field");
+			}
+		}
+		Comparator<String> c = new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				int io1 = Integer.parseInt(o1.split(":")[1]);
+				int io2 = Integer.parseInt(o2.split(":")[1]);
+				return io2 - io1;
+			}
+		};
+		Collections.sort(denvList, c);
+		Collections.sort(teenvList, c);
+		Environment ndEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), denvList);
+		Environment nteEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), teenvList);
+		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params, getName());
 	}
 
 	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {

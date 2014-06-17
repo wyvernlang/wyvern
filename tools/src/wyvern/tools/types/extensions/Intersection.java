@@ -103,5 +103,21 @@ public class Intersection implements Type, OperatableType, ApplyableType {
                 toString());
 		return null; //Unreachable
 	}
+	@Override
+	public Map<String, Type> getChildren() {
+		HashMap<String, Type> map = new HashMap<>();
+		for (int i = 0; i < types.size(); i++) {
+			map.put(i +"", types.get(i));
+		}
+		return map;
+	}
 
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		List<Type> result = new ArrayList<>(types.size());
+		for (int i = 0; i < types.size(); i++) {
+			result.add(newChildren.get(i + ""));
+		}
+		return new Intersection(result);
+	}
 }

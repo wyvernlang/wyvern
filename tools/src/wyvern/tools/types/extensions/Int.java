@@ -74,4 +74,13 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 	}
 
 
+	@Override
+	public Map<String, Type> getChildren() {
+		return new HashMap<>();
+	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> newChildren) {
+		return this;
+	}
 }
