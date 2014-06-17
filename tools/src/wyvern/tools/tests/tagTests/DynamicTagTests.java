@@ -31,12 +31,40 @@ public class DynamicTagTests {
 	 */
 	public void nonDynamicTest() throws CopperParserException, IOException {
 		String program = readFile(PATH + "NonDynamicDynamicTag.wyv");
-		System.out.println(program);
 		TypedAST ast = TagTests.getAST(program);
 		
-		TagTests.evaluate(ast);
+		TagTests.evaluateExpecting(ast, 1);
 	}
 
+	@Test
+	public void taggedTypeTest1() throws CopperParserException, IOException {		
+		String input = 
+				"tagged type X                      \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"class C                            \n" +
+				"    class def create() : X = new   \n" +
+				"        def foo() : Int = 15       \n" +
+				"                                   \n" +
+				"val x = C.create()                 \n" +
+				"                                   \n" +
+				"match(x):                          \n" + 
+				//"	ObjJSON => 15                   \n" +
+				//"	StrJSON => 20                   \n" + 
+				"	default => 30                   \n";
+				
+		TypedAST ast = TagTests.getAST(input);
+		TagTests.evaluateExpecting(ast, 30);
+	}
+	
+	@Test
+	public void jsonTest() throws CopperParserException, IOException {
+		String input = readFile(PATH + "TaggedTypeTest.wyv");
+			
+		TypedAST ast = TagTests.getAST(input);
+			
+		TagTests.evaluateExpecting(ast, 25);
+	}
 	
 	private String readFile(String filename) {
 		try {

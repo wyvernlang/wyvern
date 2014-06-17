@@ -30,3 +30,6 @@ val m3a : M.A = m3.createA()
 printInteger(m1a.foo()) // 1
 printInteger(m2a.foo()) // 2
 printInteger(m3a.foo()) // 2
+
+//for testing evaluation purposes
+m2a.foo()

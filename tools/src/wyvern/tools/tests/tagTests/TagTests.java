@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.Wyvern;
@@ -671,7 +672,7 @@ public class TagTests {
 	 */
 	public static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
 		try {
-			ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
+			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		} catch (ToolError toolError) {
 			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
 			
@@ -689,8 +690,8 @@ public class TagTests {
 	 * @param ast
 	 */
 	public static void evaluate(TypedAST ast) {
-		ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		ast.evaluate(Environment.getEmptyEnvironment());
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		ast.evaluate(Globals.getStandardEnv());
 	}
 	
 	/**
@@ -701,11 +702,11 @@ public class TagTests {
 	 * @param value
 	 */
 	public static void evaluateExpecting(TypedAST ast, int value) {
-		ast.typecheck(Environment.getEmptyEnvironment(), Optional.empty());
-		Value v = ast.evaluate(Environment.getEmptyEnvironment());
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		Value v = ast.evaluate(Globals.getStandardEnv());
 		
 		String expecting = "IntegerConstant(" + value + ")"; 
-		
+
 		Assert.assertEquals(expecting, v.toString());
 	}
 	
