@@ -24,12 +24,12 @@ val m1:M = f()
 val m2:M = g(m1)
 val m3:M = g(m1)
 
-val m1a : M.A = m1.createA()
-val m2a : M.A = m2.createA()
-val m3a : M.A = m3.createA()
+val m1a : m1.A = m1.createA()
+val m2a : m2.A = m2.createA()
+val m3a : m3.A = m3.createA()
 
-printInteger(m1a.foo())
-printInteger(m2a.foo())
-printInteger(m3a.foo())
+printInteger(m1a.foo()) // 1
+printInteger(m2a.foo()) // 2
+printInteger(m3a.foo()) // 2
 
 m2a.foo()
