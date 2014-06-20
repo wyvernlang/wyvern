@@ -48,7 +48,6 @@ public class LangUtil {
 	public static TypedAST splice(ParseBuffer buffer) {
 		try {
 			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
-			res = new DSLTransformer().transform(res);
 			return new SpliceExn(res);
 		} catch (IOException | CopperParserException e) {
 			throw new RuntimeException(e);
@@ -58,7 +57,6 @@ public class LangUtil {
 	public static SpliceBindExn spliceBinding(ParseBuffer buffer, List<NameBinding> bindings) {
 		try {
 			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
-			res = new DSLTransformer().transform(res);
 			return new SpliceBindExn(res, bindings);
 		} catch (IOException | CopperParserException e) {
 			throw new RuntimeException(e);
