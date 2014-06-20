@@ -3,11 +3,8 @@ package wyvern.tools.parsing.parselang;
 import com.sun.org.apache.xpath.internal.compiler.OpCodes;
 import edu.umn.cs.melt.copper.compiletime.logging.CompilerLogger;
 import edu.umn.cs.melt.copper.compiletime.logging.PrintCompilerLogHandler;
-import edu.umn.cs.melt.copper.compiletime.skins.cup.CupSkinParser;
 import edu.umn.cs.melt.copper.compiletime.spec.grammarbeans.*;
-import edu.umn.cs.melt.copper.main.CopperIOType;
-import edu.umn.cs.melt.copper.main.ParserCompiler;
-import edu.umn.cs.melt.copper.main.ParserCompilerParameters;
+import edu.umn.cs.melt.copper.main.*;
 import edu.umn.cs.melt.copper.runtime.auxiliary.Pair;
 import edu.umn.cs.melt.copper.runtime.engines.single.SingleDFAEngine;
 import edu.umn.cs.melt.copper.runtime.logging.CopperException;
@@ -35,10 +32,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.expressions.*;
-import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.core.values.StringConstant;
-import wyvern.tools.typedAST.core.values.TupleValue;
-import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.extensions.SpliceBindExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
@@ -48,10 +42,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.Str;
-import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.types.extensions.*;
 import wyvern.tools.util.LangUtil;
 import wyvern.tools.util.Reference;
 
@@ -125,6 +116,9 @@ public class CopperTSL implements ExtParser {
 				.flatMap(grm->grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement)
 						.<Terminal>map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,ntEnv,methNum, res.getClassName()));
 
+		res.getGrammars().stream().map(res::getGrammar).flatMap(grm->grm.getElementsOfType(CopperElementType.DISAMBIGUATION_FUNCTION)
+				.stream().map(grm::getGrammarElement).map(el->(DisambiguationFunction)el)).forEach(this.updateDisambiguationCode(toGen,ntEnv,methNum,res.getClassName()));
+
 
 		String wyvClassName = res.getClassName();
 		String javaClassName = wyvClassName + "$java";
@@ -185,10 +179,24 @@ public class CopperTSL implements ExtParser {
 		pcp.setOutputStream(new PrintStream(target));
 		pcp.setOutputType(CopperIOType.STREAM);
 
+		ByteArrayOutputStream dump = new ByteArrayOutputStream();
+		pcp.setDumpOutputType(CopperIOType.STREAM);
+		pcp.setDumpFormat(CopperDumpType.PLAIN);
+		pcp.setDump(CopperDumpControl.ERROR_ONLY);
+		pcp.setDumpStream(new PrintStream(dump));
+
+
 		try {
 			ParserCompiler.compile(res, pcp);
 		} catch (CopperException e) {
 			throw new BuildException(e);
+		}
+
+		if (target.toString().isEmpty() ) {
+			System.out.println("Parser error! Parser debug dump");
+			System.out.println(dump.toString());
+			throw new RuntimeException();
+
 		}
 
 		JavaCompiler jc = javax.tools.ToolProvider.getSystemJavaCompiler();
@@ -251,12 +259,14 @@ public class CopperTSL implements ExtParser {
 				unkLoc);
 		ClassType emptyType =
 				new ClassType(new Reference<>(Environment.getEmptyEnvironment()), new Reference<>(Environment.getEmptyEnvironment()), new LinkedList<>(), "empty");
-		TypedAST javaObjInit = new Application(new ExternalFunction(new Arrow(emptyType, Util.javaToWyvType(Value.class)), (env,arg)->Util.toWyvObj(arg)),
+		TypedAST javaObjInit = new Application(new ExternalFunction(new Arrow(emptyType, Util.javaToWyvType(Value.class)), (env,arg)->{
+			return Util.toWyvObj(arg);
+		}),
 				new Application(
 						new Invocation(new Variable(new NameBindingImpl(wyvClassName, null), unkLoc), "create", null, unkLoc),
 						UnitVal.getInstance(unkLoc), unkLoc), unkLoc);
 		TypedAST body = new Application(new ExternalFunction(new Arrow(Util.javaToWyvType(Object.class), Util.javaToWyvType(TypedAST.class)),
-					(env,arg)-> arg),
+					(env,arg)-> (Value)Util.toJavaObject(arg,Value.class)),
 				new Application(new Invocation(new Application(
 					new Invocation(new Variable(new NameBindingImpl(javaClassName, null), unkLoc), "create", null, unkLoc),
 					javaObjInit, unkLoc), "parse", null, unkLoc),
@@ -271,10 +281,28 @@ public class CopperTSL implements ExtParser {
 		return new New(new DeclSequence(Arrays.asList(pairedObj, jcd, parseDef)), unkLoc);
 	}
 
+	private Consumer<? super DisambiguationFunction> updateDisambiguationCode(HashMap<String, Pair<Type, SpliceBindExn>> toGen,
+																			  Environment ntEnv, Reference<Integer> methNum, String className) {
+		return (dis) -> {
+			String disambiguationCode = dis.getCode();
+
+			List<NameBinding> argNames = dis.getMembers().stream().map(CopperElementReference::toString)
+					.map(name -> new NameBindingImpl(name, Int.getInstance())).collect(Collectors.toList());
+
+			argNames.add(new NameBindingImpl("lexeme", Str.getInstance()));
+
+			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(disambiguationCode), argNames);
+			CopperElementName newName = dis.getName();
+			toGen.put(getNextName(methNum, newName), new Pair<>(Int.getInstance(),spliced));
+			dis.setCode(String.format("return ((IntegerConstant)Util.invokeValueVarargs(%s, %s, %s)).getValue();", PAIRED_OBJECT_NAME, newName,
+					argNames.stream().map(str->str.getName()).reduce((a,b)->a+", "+b)));
+		};
+	}
+
 	private Pair<String, Type> parseType(NonTerminal elem) {
 		Type parsedType = null;
 		try {
-			parsedType = (Type)new TypeParser().parse(new StringReader(((NonTerminal) elem).getReturnType()), elem.getName() + " type");
+			parsedType = LangUtil.spliceType(new IParseBuffer(elem.getReturnType()));
 			((NonTerminal) elem).setReturnType("Value");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -284,7 +312,7 @@ public class CopperTSL implements ExtParser {
 	private Pair<String, Type> parseType(Terminal elem) {
 		Type parsedType = null;
 		try {
-			parsedType = (Type)new TypeParser().parse(new StringReader((elem).getReturnType()), elem.getName() + " type");
+			parsedType = LangUtil.spliceType(new IParseBuffer(elem.getReturnType()));
 			elem.setReturnType("Value");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -306,8 +334,8 @@ public class CopperTSL implements ExtParser {
 			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(oCode), Arrays.asList(new NameBinding[] {
 					new NameBindingImpl("lexeme", Str.getInstance())}));
 
-			String newName = term.getName() + "GEN" + methNum.get();
-			methNum.set(methNum.get() + 1);
+			CopperElementName termName = term.getName();
+			String newName = getNextName(methNum, termName);
 
 			Type resType = lhsEnv.lookup(term.getName().toString()).getType();
 
@@ -318,14 +346,19 @@ public class CopperTSL implements ExtParser {
 		};
 	}
 
+	private String getNextName(Reference<Integer> methNum, CopperElementName termName) {
+		String newName = termName + "GEN" + methNum.get();
+		methNum.set(methNum.get() + 1);
+		return newName;
+	}
+
 	private Consumer<Pair<Production, List<NameBinding>>> updateCode(HashMap<String, Pair<Type,SpliceBindExn>> toGen, Environment lhsEnv, Reference<Integer> methNum, String thisTypeName) {
 		return (Pair<Production, List<NameBinding>> inp) -> {
 			Production prod = inp.first();
 			List<NameBinding> bindings = inp.second();
 
 			//Generate the new Wyvern method name
-			String newName = prod.getName().toString() + "GEN" + methNum.get();
-			methNum.set(methNum.get()+1);
+			String newName = getNextName(methNum, prod.getName());
 
 			//Parse the input code
 			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(prod.getCode()), bindings);
@@ -335,9 +368,10 @@ public class CopperTSL implements ExtParser {
 			//Save it to the external dict
 			toGen.put(newName, new Pair<>(resType, spliced));
 
-			String args = bindings.stream().map(nb->nb.getName()).reduce((a,b)->a+", "+b).get();
 			//Code to invoke the equivalent function
-			String newCode = "RESULT = Util.invokeValueVarargs("+PAIRED_OBJECT_NAME+", \""+newName+"\", "+args+");";
+			String argsStr = bindings.stream().map(nb->nb.getName()).reduce((a,b)->a+", "+b)
+					.map(arg -> ", " + arg).orElseGet(() -> "");
+			String newCode = "RESULT = Util.invokeValueVarargs(" + PAIRED_OBJECT_NAME + ", \"" + newName +"\"" + argsStr + ");";
 
 			prod.setCode(newCode);
 		};

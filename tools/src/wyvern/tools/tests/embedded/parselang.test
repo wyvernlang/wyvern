@@ -22,16 +22,15 @@ module test singleParser[IntegerConstant(2):Int]
 								%%
 								%parser HelloWorld
 								%lex{
-									terminal Int hello_t ::= /hello/ {:
-										depth = depth + 1
-										System.out.println(depth)
-										2
+									terminal TypedAST hello_t ::= /hello/ {:
+										~
+											2
 									:};
 									terminal Int world_t ::= /world/ {: 1 :};
 									terminal Unit space_t ::= / / {: () :};
 								%lex}
 								%cf{
-									non terminal Int helloworld;
+									non terminal TypedAST helloworld;
 									start with helloworld;
 									helloworld ::= hello_t:a space_t world_t:b {: a :};
 								%cf}
@@ -41,3 +40,84 @@ module test singleParser[IntegerConstant(2):Int]
 								new
 									def get():Int = $parsed
 
+module test uriParser[StringConstant("http"):Str]
+	file main
+		import wyv:uri
+		val githubUri:URI.URI = {http://github.org}
+		githubUri.getProtocol()
+	file uri
+		module URI
+		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.parsing.HasParser
+		import java:wyvern.tools.parsing.ExtParser
+		import java:wyvern.tools.parsing.ParseBuffer
+		import java:java.lang.Integer
+		import java:java.lang.String
+		type URI
+			def getProtocol():Str
+			metadata:HasParser = new
+				def getParser():ExtParser = ~
+					%%
+					%parser URI
+					%lex{
+						terminal Unit plus_t ::= /\+/ {: () :};
+						terminal Unit divide_t ::= /\// {: () :};
+						terminal Unit colon_t ::= /:/ {: () :};
+						terminal Unit pound_t ::= /#/ {: () :};
+
+						terminal Str ialpha_t ::= /[a-zA-Z][a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]*/ {: lexeme :};
+						terminal Str xalphas_t ::= /[a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: lexeme :};
+						terminal Str xpalphas_t ::= /[a-zA-Z0-9\+\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: lexeme :};
+						terminal Int num_t ::= /[0-9]+/ {: Integer.parseInt(String.create(lexeme).trim()) :};
+
+					%lex}
+					%cf{
+						non terminal TypedAST fragaddr;
+						non terminal Str*(Str*Str) uri;
+						non terminal Str path;
+						non terminal Str scheme;
+						non terminal Str fragmentid;
+						non terminal Str search;
+
+						start with fragaddr;
+						precedence right divide_t;
+
+						fragaddr ::= uri:re {:
+							~
+								new
+									def getProtocol():Str = $(re.n0)
+						:}
+						| uri:re pound_t fragmentid:fid {:
+							~
+								new
+									def getProtocol():Str = $(re.n0)
+						:};
+
+						non terminal Str*Str hier_part;
+						non terminal Str opt_path;
+						non terminal Str authority;
+
+						uri ::= scheme:schm colon_t hier_part:part {: (schm,part) :};
+
+						hier_part ::=
+								path:pth {: ("", pth) :}
+							|	divide_t divide_t authority:auth opt_path:pth {: (auth, pth) :};
+
+						opt_path ::= divide_t path:pth {: pth :}
+									| {: "" :};
+
+						non terminal Str ip;
+
+						ip ::= ip:xa divide_t xpalphas_t:xb {: xa + "/" + xb :}
+							|  xpalphas_t:xa {: xa :};
+
+						path ::= xpalphas_t:xa {: xa :}
+							|    ip:xa divide_t xpalphas_t:xb {: xa + "/" + xb :}
+							|    {: "" :};
+
+						authority ::= xpalphas_t:auth {: auth :};
+
+						scheme ::= ialpha_t:sch {: sch :};
+						fragmentid ::= xalphas_t:xa {: xa :};
+						search ::= xalphas_t:xa{: xa :} | xalphas_t:xa plus_t search:sh {: xa + sh :};
+					%cf}
