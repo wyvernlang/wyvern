@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -54,8 +55,11 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 			newBindings.add(new NameBindingImpl(binding.getName(), TypeResolver.resolve(binding.getType(), env)));
 		bindings = newBindings;
 
+
+		Optional<Type> resType = expected.map(type -> ((Arrow) type).getResult());
+
 		outerEnv = outerEnv.extend(bindings.stream().reduce(Environment.getEmptyEnvironment(), Environment::extend, (a,b)->b.extend(a)));
-		Type exnType = exn.typecheck(outerEnv, expected);
+		Type exnType = exn.typecheck(outerEnv, resType);
 		cached = Optional.of(exnType);
 		return getType();
 	}
