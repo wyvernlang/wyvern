@@ -2,6 +2,7 @@ package wyvern.tools.util;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.parsing.ParseBuffer;
+import wyvern.tools.parsing.TypeParser;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.parselang.CopperTSL;
 import wyvern.tools.parsing.transformers.DSLTransformer;
@@ -11,6 +12,7 @@ import wyvern.tools.typedAST.extensions.SpliceExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.SpliceType;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -58,6 +60,15 @@ public class LangUtil {
 		try {
 			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
 			return new SpliceBindExn(res, bindings);
+		} catch (IOException | CopperParserException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static SpliceType spliceType(ParseBuffer inpType) {
+		try {
+			Type res = (Type)new TypeParser().parse(new StringReader(inpType.getSrcString()), "inner type");
+			return new SpliceType(res);
 		} catch (IOException | CopperParserException e) {
 			throw new RuntimeException(e);
 		}
