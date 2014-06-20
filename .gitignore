@@ -14,3 +14,4 @@ tools/copper-composer/copper-composer.iml
 tools/src/wyvern/tools/parsing/parselang/TypeParser.java
 tools/src/wyvern/tools/parsing/parselang/WyvernDecls.java
 .metadata/
+tools/src/wyvern/tools/parsing/TypeParser.java
