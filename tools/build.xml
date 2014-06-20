@@ -25,9 +25,9 @@
         <newstart original="src/wyvern/tools/parsing/Wyvern.x"
                   hostgrammar="Wyvern"
                   newfc="type"
-                  newpackage="wyvern.tools.parsing.parselang"
+                  newpackage="wyvern.tools.parsing"
                   newname="TypeParser"
-                  target="src/wyvern/tools/parsing/parselang/TypeParser.java"
+                  target="src/wyvern/tools/parsing/TypeParser.java"
                   extrapackage="wyvern.tools.parsing.*"/>
     </target>
     <target name="copper-generate" depends="copper-compose,copper-subparsers">
@@ -36,6 +36,9 @@
         </copper>
         <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java">
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
+        </copper>
+        <copper outputfile="src/wyvern/tools/parsing/parselang/CupSkinParser.java" useskin="XML">
+            <inputs file="src/wyvern/tools/parsing/parselang/CupSkinGrammar.xml"/>
         </copper>
     </target>
     <target name="copper-debug">
