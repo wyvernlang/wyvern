@@ -136,6 +136,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		System.out.println("Resolving ValDeclaration using extendName: " + this.getName());
 		Type resolved;
 		if (binding.getType() != null)
 			resolved = TypeResolver.resolve(binding.getType(), against);
