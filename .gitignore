@@ -15,3 +15,4 @@ tools/src/wyvern/tools/parsing/parselang/TypeParser.java
 tools/src/wyvern/tools/parsing/parselang/WyvernDecls.java
 .metadata/
 tools/src/wyvern/tools/parsing/TypeParser.java
+tools/src/wyvern/tools/parsing/parselang/CupSkinParser.java
