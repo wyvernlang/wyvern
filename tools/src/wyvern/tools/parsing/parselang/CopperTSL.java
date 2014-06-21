@@ -82,6 +82,14 @@ public class CopperTSL implements ExtParser {
 
 		ParserBean res = CupSkinParser.parseGrammar(inp, new CompilerLogger(new PrintCompilerLogHandler(System.out)));
 
+		res.getGrammars().stream().map(res::getGrammar)
+				.flatMap(grm -> grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement).map(term->(Terminal)term))
+				.filter(term->term.getCode().isEmpty() && term.getReturnType().isEmpty())
+				.forEach(term-> {
+					term.setCode("()");
+					term.setReturnType("Unit");
+				});
+
 		Environment ntEnv = res.getGrammars().stream().map(res::getGrammar)
 				.flatMap(grm -> grm.getElementsOfType(CopperElementType.NON_TERMINAL).stream().map(grm::getGrammarElement))
 				.map(this::parseType).map(pair->(Pair<String, Type>)pair)

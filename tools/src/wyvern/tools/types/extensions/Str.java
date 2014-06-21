@@ -2,6 +2,7 @@ package wyvern.tools.types.extensions;
 
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
@@ -21,11 +22,18 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	
 	@Override
 	public Type checkOperator(Invocation opExp, Environment env) {
-		Type type2 = opExp.getArgument().typecheck(env, Optional.empty());
 		String operatorName = opExp.getOperationName();
+
 		
-		if (!(legalOperators.contains(operatorName)))
-			reportError(OPERATOR_DOES_NOT_APPLY, opExp, operatorName, this.toString());
+		if (!(legalOperators.contains(operatorName))) {
+			JavaClassDecl strDecl = Util.javaToWyvDecl(String.class);
+			try {
+				return strDecl.getObjType().checkOperator(opExp, env);
+			} catch (Exception e) {
+				reportError(OPERATOR_DOES_NOT_APPLY, opExp, operatorName, this.toString());
+			}
+		}
+		Type type2 = opExp.getArgument().typecheck(env, Optional.empty());
 
 		if (operatorName.equals("+"))
 			if (!((type2 instanceof Str) || (type2 instanceof Int)))
