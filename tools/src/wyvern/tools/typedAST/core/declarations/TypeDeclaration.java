@@ -74,8 +74,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private boolean declGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		// System.out.println("Running extendName for TypeDeclaration: " + this.getName() + " with " + this.getDeclEnv());
+		
 		if (!declGuard) {
 			for (Declaration decl : decls.getDeclIterator()) {
+				
+				// System.out.println("Processing inside " + this.getName() + " member " + decl.getName() + " and decl.getClass " + decl.getClass());
+				
 				declEnv.set(decl.extendName(declEnv.get(), against));
 				if (decl instanceof AttributeDeclaration) {
 					env = env.extend(new NameBindingImpl(getName(), decl.getType()));
@@ -84,7 +89,10 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			}
 			declGuard = true;
 		}
-		return env;
+
+		// System.out.println("Finished running extendName for TypeDeclaration: " + this.getName() + " with " + this.getDeclEnv());
+		
+		return env.extend(new NameBindingImpl(this.getName(), this.getType()));
 	}
 
 	public static class AttributeDeclaration extends Declaration {
@@ -175,14 +183,21 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 	
     public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
+    	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+    	
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
+		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
+
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
+		
+		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
+		
 		this.location = clsNameLine;
 	}
 
@@ -219,7 +234,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env, env);
 		
-		System.out.println("Doing doTypecheck for Type: " + this.getName());
+		// System.out.println("Doing doTypecheck for Type: " + this.getName());
 		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);

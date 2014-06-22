@@ -33,7 +33,7 @@ public class DynamicTagTests {
 		String program = readFile(PATH + "NonDynamicDynamicTag.wyv");
 		TypedAST ast = TagTests.getAST(program);
 		
-		TagTests.evaluateExpecting(ast, 1);
+		TagTests.evaluateExpecting(ast, 2);
 	}
 
 	@Test

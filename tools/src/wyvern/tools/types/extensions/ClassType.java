@@ -48,10 +48,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	
 	@Override
 	public String toString() {
-		if (declEnv.get() != null)
-			return "CLASS(" + "" + ")";
-		else
+		if (declEnv.get() != null) {
+			return "CLASS(" + declEnv.get().toString() + ")";
+		} else {
 			return "CLASS()";
+		}
 	}
 
 	@Override
@@ -101,6 +102,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		}
 
 		if (other instanceof TypeType) {
+			// System.out.println("Is\n" + this.getEquivType() + "\n a subtype of \n" + other + "\n?");
 			return getEquivType().subtype(other);
 		} else if (other instanceof ClassType) {
 			return getEquivType().subtype(((ClassType) other).getEquivType());
