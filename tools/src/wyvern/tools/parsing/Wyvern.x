@@ -564,8 +564,10 @@ import java.net.URI;
                             	;
 
     typedec ::= typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
-    	|       taggedKwd_t typeKwd_t identifier_t:name Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, new FileLocation(currentState.pos)); :}
+    	|       taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo Indent_t typed:body Dedent_t {: RESULT = new TypeDeclaration((String)name, (DeclSequence)body, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
     	|	    typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, new FileLocation(currentState.pos)); :}
+    	|	    taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo {: RESULT = new TypeDeclaration((String)name, null, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
+    	|	    taggedKwd_t typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, new TaggedInfo(), new FileLocation(currentState.pos)); :}
     	;
 
     typed ::= typemember:def Newline_t typed:rest {: RESULT = new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest)); :}

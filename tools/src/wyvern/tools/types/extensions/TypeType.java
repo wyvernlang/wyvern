@@ -20,6 +20,8 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	private Reference<Environment> typeDeclEnv;
 
 	public TypeType(TypeDeclaration decl) {
+		this.decl = decl;
+		
 		typeDeclEnv = decl.getDeclEnv();
 		attrObj = decl.getMetaValue();
 	}
@@ -195,6 +197,15 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		return ndEnv;
 	}
 
+	/**
+	 * Returns the name of this type-type.
+	 * 
+	 * @return
+	 */
+	public String getName() {
+		return decl.getName();
+	}
+	
 	@Override
 	public Value getMetaObj() {
 		return attrObj.get();

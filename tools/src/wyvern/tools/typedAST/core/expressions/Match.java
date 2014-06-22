@@ -21,6 +21,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
@@ -81,10 +82,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 	
 	@Override
-	public Value evaluate(Environment env) {
-		// We've already typechecked, so this cast should be safe 
-		ClassType matchingOverClass = (ClassType) matchingOver.getType();
-		String className = matchingOverClass.getName();
+	public Value evaluate(Environment env) { 
+		String className = getTypeName(matchingOver.getType());
 		
 		TagBinding matchingOverBinding = TagBinding.get(className);
 		//TODO: fix this, replace with real code
@@ -189,13 +188,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// Variable we're matching must exist and be a tagged type
 		Type matchingOverType = matchingOver.getType();
 		
-		if (!(matchingOverType instanceof ClassType)) {
-			//TODO change this to be a typecheck error
-			throw new RuntimeException("variable matching over must be of type ClassType");
-		}
+		String className = getTypeName(matchingOverType);
 		
-		ClassType matchingOverClass = (ClassType) matchingOver.getType();
-		String className = matchingOverClass.getName();
+		if (className == null){
+			//TODO change this to an error message
+			throw new RuntimeException("variable matching over must be a Class or Type");
+		}
 		
 		TagBinding matchBinding = TagBinding.get(className);
 		
@@ -211,7 +209,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 			String tagName = c.getTaggedTypeMatch();
 			
 			Optional<ClassType> type = env.lookupBinding(tagName, ClassType.class);
-			
 			NameBinding binding = env.lookup(tagName);
 			
 			if (binding == null) {
@@ -326,6 +323,19 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return false;
 	}
 
+	
+	private String getTypeName(Type type) {
+		if (type instanceof ClassType) {
+			ClassType matchingOverClass = (ClassType) matchingOver.getType();
+			return matchingOverClass.getName();
+		} else if (type instanceof TypeType) {
+			TypeType matchingOverClass = (TypeType) matchingOver.getType();
+			return matchingOverClass.getName();
+		}
+		
+		return null;
+	}
+	
 	@Override
 	protected TypedAST doClone(Map<String, TypedAST> nc) {
 		// TODO Auto-generated method stub

@@ -49,12 +49,12 @@ public class DynamicTagTests {
 				"val x = C.create()                 \n" +
 				"                                   \n" +
 				"match(x):                          \n" + 
-				//"	ObjJSON => 15                   \n" +
+				"	X => 15                   \n" +
 				//"	StrJSON => 20                   \n" + 
 				"	default => 30                   \n";
 				
 		TypedAST ast = TagTests.getAST(input);
-		TagTests.evaluateExpecting(ast, 30);
+		TagTests.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
