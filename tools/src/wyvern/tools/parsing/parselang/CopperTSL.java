@@ -83,7 +83,7 @@ public class CopperTSL implements ExtParser {
 		ParserBean res = CupSkinParser.parseGrammar(inp, new CompilerLogger(new PrintCompilerLogHandler(System.out)));
 
 		res.getGrammars().stream().map(res::getGrammar)
-				.flatMap(grm -> grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement).map(term->(Terminal)term))
+				.flatMap(grm -> grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement).<Terminal>map(term->(Terminal)term))
 				.filter(term->term.getCode().isEmpty() && term.getReturnType().isEmpty())
 				.forEach(term-> {
 					term.setCode("()");
@@ -125,7 +125,8 @@ public class CopperTSL implements ExtParser {
 						.<Terminal>map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,ntEnv,methNum, res.getClassName()));
 
 		res.getGrammars().stream().map(res::getGrammar).flatMap(grm->grm.getElementsOfType(CopperElementType.DISAMBIGUATION_FUNCTION)
-				.stream().map(grm::getGrammarElement).map(el->(DisambiguationFunction)el)).forEach(this.updateDisambiguationCode(toGen,ntEnv,methNum,res.getClassName()));
+				.stream().map(grm::getGrammarElement).<DisambiguationFunction>map(el->(DisambiguationFunction)el))
+				.forEach(this.updateDisambiguationCode(toGen,ntEnv,methNum,res.getClassName()));
 
 
 		String wyvClassName = res.getClassName();
