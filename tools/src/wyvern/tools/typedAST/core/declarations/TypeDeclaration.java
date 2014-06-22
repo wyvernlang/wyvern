@@ -1,7 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.stdlib.Globals;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
@@ -74,8 +76,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private boolean declGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		// System.out.println("Running extendName for TypeDeclaration: " + this.getName() + " with " + this.getDeclEnv());
+		
 		if (!declGuard) {
 			for (Declaration decl : decls.getDeclIterator()) {
+				
+				// System.out.println("Processing inside " + this.getName() + " member " + decl.getName() + " and decl.getClass " + decl.getClass());
+				
 				declEnv.set(decl.extendName(declEnv.get(), against));
 				if (decl instanceof AttributeDeclaration) {
 					env = env.extend(new NameBindingImpl(getName(), decl.getType()));
@@ -84,7 +91,10 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			}
 			declGuard = true;
 		}
-		return env;
+
+		// System.out.println("Finished running extendName for TypeDeclaration: " + this.getName() + " with " + this.getDeclEnv());
+		
+		return env.extend(new NameBindingImpl(this.getName(), this.getType()));
 	}
 
 	public static class AttributeDeclaration extends Declaration {
@@ -172,17 +182,26 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     	this(name, decls, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
+		this.taggedInfo.setTagName(name);
+		this.taggedInfo.associateTag();
 	}
 	
     public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
+    	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+    	
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
+		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
+
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
+		
+		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
+		
 		this.location = clsNameLine;
 	}
 
@@ -219,7 +238,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		// env = env.extend(new NameBindingImpl("this", nameBinding.getType()));
 		Environment eenv = decls.extend(env, env);
 		
-		System.out.println("Doing doTypecheck for Type: " + this.getName());
+		// System.out.println("Doing doTypecheck for Type: " + this.getName());
 		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
@@ -233,6 +252,56 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
+		
+		//extend with tag information
+		if (isTagged()) {
+			//type-test the tag information
+			
+			//TODO: fix this
+			
+			//first get/ create the binding
+			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
+			newEnv = newEnv.extend(tagBinding);
+			
+			//now handle case-of and comprises clauses
+			if (taggedInfo.getCaseOfTag() != null) {
+				String caseOf = taggedInfo.getCaseOfTag();
+				
+				//TODO: could case-of come before?
+				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
+				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
+				
+				if (caseOfBindingO.isPresent()) {
+					 TagBinding caseOfBinding = caseOfBindingO.get();
+					 
+					 //set up relationship between two bindings
+					 tagBinding.setCaseOfParent(caseOfBinding);
+					 caseOfBinding.addCaseOfDirectChild(tagBinding);
+				} else {
+					ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, caseOf);
+				}
+			}
+			
+			if (!taggedInfo.getComprisesTags().isEmpty()) {
+				//set up comprises tags
+				for (String s : taggedInfo.getComprisesTags()) {
+					// Because comprises refers to tags defined ahead of this, we use the associated tag values
+					
+					Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.getOrCreate(s));
+					//TODO, change to real code: newEnv.lookupBinding(s, TagBinding.class);
+					
+					if (comprisesBindingO.isPresent()) {
+						TagBinding comprisesBinding = comprisesBindingO.get();
+						
+						tagBinding.getComprisesOf().add(comprisesBinding);
+					} else {
+						//TODO throw proper error
+						ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, s);
+					}
+				}
+			}
+		}
+		
 		return newEnv;
 	}
 

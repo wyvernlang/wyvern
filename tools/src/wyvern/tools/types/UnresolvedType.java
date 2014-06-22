@@ -3,6 +3,7 @@ package wyvern.tools.types;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -22,8 +23,24 @@ public class UnresolvedType implements Type {
 	}
 	
 	public Type resolve(Environment env) {
-		if (env.lookupType(typeName) == null)
+		// System.out.println("Looking at: " + this.typeName);
+		
+		if (env.lookup(this.typeName) != null) {
+			NameBinding n = env.lookup(this.typeName);
+		
+			// System.out.println("NameBinding = " + n);
+			// System.out.println("Its type is " + n.getType());
+		}
+		
+		if (env.lookupType(typeName) == null) {
+			if (env.lookup(this.typeName) != null) {
+				// Perhaps its first class?
+				NameBinding n = env.lookup(this.typeName);
+				Type t = n.getType();
+				return t;
+			}
 			throw new RuntimeException("Cannot find "+typeName +" in environment "+env);
+		}
 		return env.lookupType(typeName).getUse();
 	}
 	

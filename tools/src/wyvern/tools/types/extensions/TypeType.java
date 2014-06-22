@@ -20,6 +20,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	private Reference<Environment> typeDeclEnv;
 
 	public TypeType(TypeDeclaration decl) {
+		this.decl = decl;
 		typeDeclEnv = decl.getDeclEnv();
 		attrObj = decl.getMetaValue();
 	}
@@ -93,8 +94,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		if (other instanceof TypeType) {
 			Map<String, Type> thisMembers = this.getMembers();
 			// System.out.println("this (" + this + ") : " + thisMembers);
+			
 			Map<String, Type> otherMembers = ((TypeType) other).getMembers();
 			// System.out.println("other (" + other + ") : " + otherMembers);
+			
 			return checkSubtypeRecursively(this, other, thisMembers, otherMembers, subtypes);
 		}
 		
@@ -135,8 +138,22 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 
 	@Override
 	public Type getInnerType(String name) {
-		System.out.println("Looking up (inside getInnerType) name " + name);
-		return typeDeclEnv.get().lookupType(name).getType();
+		// System.out.println("Looking up (inside getInnerType) name " + name);
+		// System.out.println("Currently inside TypeType: " + this);
+		// System.out.println("this.decl.getName = " + this.decl.getName());
+		// System.out.println("this.getMembers() = " + this.getMembers());
+		
+		TypeBinding tb = typeDeclEnv.get().lookupType(name);
+		if (tb == null) {
+			// System.out.println("Maybe it is a name?");
+			
+			NameBinding nm = typeDeclEnv.get().lookup(name);
+			// System.out.println(nm.getType());
+			
+			return nm.getType();
+		} else {
+			return tb.getType();
+		}
 	}
 
 	private boolean isParserCheck = false;
@@ -196,6 +213,15 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		return ndEnv;
 	}
 
+	/**
+	 * Returns the name of this type-type.
+	 * 
+	 * @return
+	 */
+	public String getName() {
+		return decl.getName();
+	}
+	
 	@Override
 	public Value getMetaObj() {
 		return attrObj.get();

@@ -1,8 +1,10 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashSet;
@@ -12,12 +14,24 @@ public class TypeInv implements Type {
 	Type innerType;
 	String invName;
 
+	public String toString() {
+		return "TypeInv with innerType = " + innerType + " invName = " + invName;
+	}
+	
 	public TypeInv(Type innerType, String invName) {
 		this.innerType = innerType;
 		this.invName = invName;
 	}
 
-	public Type resolve() {
+	public Type resolve(Environment env) {
+		// System.out.println("Inside TypeInv innerType = " + innerType + " and its class is " + innerType.getClass());
+		
+		if (this.innerType instanceof UnresolvedType) {
+			UnresolvedType ut = (UnresolvedType) this.innerType;
+			Type t = ut.resolve(env);
+			
+			// System.out.println("GOT: " + t);
+		}
 		return ((RecordType)innerType).getInnerType(invName);
 	}
 
