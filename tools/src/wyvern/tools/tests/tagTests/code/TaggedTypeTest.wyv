@@ -18,6 +18,7 @@ tagged type IntJSON [case of NumJSON]
 
 tagged type DoubleJSON [case of NumJSON]
 	def value() : Int
+	
 
 def create() : IntJSON = new
     def value() : Int = 50

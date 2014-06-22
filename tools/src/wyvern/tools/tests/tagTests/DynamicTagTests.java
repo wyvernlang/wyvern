@@ -42,19 +42,92 @@ public class DynamicTagTests {
 				"tagged type X                      \n" +
 				"    def foo() : Int                \n" +
 				"                                   \n" +
-				"class C                            \n" +
-				"    class def create() : X = new   \n" +
-				"        def foo() : Int = 15       \n" +
+				"def create() : X = new             \n" +
+				"    def foo() : Int = 15           \n" +
 				"                                   \n" +
-				"val x = C.create()                 \n" +
+				"val x = create()                   \n" +
 				"                                   \n" +
 				"match(x):                          \n" + 
-				"	X => 15                   \n" +
-				//"	StrJSON => 20                   \n" + 
+				"	X => 15                         \n" +
 				"	default => 30                   \n";
 				
 		TypedAST ast = TagTests.getAST(input);
 		TagTests.evaluateExpecting(ast, 15);
+	}
+	
+	@Test
+	public void taggedTypeTest2() throws CopperParserException, IOException {		
+		String input = 
+				"tagged type X                      \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"tagged type Y                      \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"def create() : Y = new             \n" +
+				"    def foo() : Int = 15           \n" +
+				"                                   \n" +
+				"val x = create()                   \n" +
+				"                                   \n" +
+				"match(x):                          \n" + 
+				"	Y => 20                         \n" +
+				"	X => 15                         \n" +
+				"	default => 30                   \n";
+				
+		TypedAST ast = TagTests.getAST(input);
+		TagTests.evaluateExpecting(ast, 20);
+	}
+	
+	@Test
+	public void taggedTypeTest3() throws CopperParserException, IOException {		
+		String input = 
+				"tagged type X [comprises Y, Z]     \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"tagged type Y [case of X]          \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"tagged type Z [case of X]          \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"def create() : X = new             \n" +
+				"    def foo() : Int = 15           \n" +
+				"                                   \n" +
+				"val x : X = create()               \n" +
+				"                                   \n" +
+				"match(x):                          \n" + 
+				"	Y => 20                         \n" +
+				"	Z => 15                         \n" +
+				"	X => 30                         \n";
+				
+		TypedAST ast = TagTests.getAST(input);
+		TagTests.evaluateExpecting(ast, 30);
+	}
+	
+	@Test
+	public void taggedTypeTest4() throws CopperParserException, IOException {		
+		String input = 
+				"tagged type X [comprises Y, Z]     \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"tagged type Y [case of X]          \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"tagged type Z [case of X]          \n" +
+				"    def foo() : Int                \n" +
+				"                                   \n" +
+				"def create() : Y = new             \n" +
+				"    def foo() : Int = 15           \n" +
+				"                                   \n" +
+				"val x : X = create()               \n" +
+				"                                   \n" +
+				"match(x):                          \n" + 
+				"	Y => 20                         \n" +
+				"	Z => 15                         \n" +
+				"	X => 30                         \n";
+				
+		TypedAST ast = TagTests.getAST(input);
+		TagTests.evaluateExpecting(ast, 20);
 	}
 	
 	@Test

@@ -14,7 +14,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 
 public class TagTests {
 	
@@ -505,7 +504,7 @@ public class TagTests {
 			"    class def create() : DynChar             \n" +
 			"        new                                  \n" +
 			"                                             \n" +
-			"val i = Dyn.create()                         \n" +
+			"val i  = Dyn.create()                         \n" +
 			"                                             \n" +
 			"match(i):                                    \n" +
 			"	DynInt => 10                              \n" +
