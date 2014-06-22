@@ -124,10 +124,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			extEnv = extEnv.extend(bind);
 		}
 		if (body != null) {
-			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for meth inside type!
+			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for def inside type!
 			type = TypeResolver.resolve(type, env);
 			
 			Type retType = ((Arrow)type).getResult();
+			
+			// System.out.println("bodyType = " + bodyType);
+			// System.out.println("retType = " + retType);
 			
 			if (bodyType != null && !bodyType.subtype(retType))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());

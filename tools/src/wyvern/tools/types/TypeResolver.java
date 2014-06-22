@@ -25,6 +25,8 @@ public class TypeResolver {
 
 	private static WeakHashMap<Type, Type> resolved = new WeakHashMap<>();
 	public static Type resolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
+		// System.out.println("Resolving... " + input);
+		
 		if (resolved.containsKey(input)) {
 			return resolved.get(input);
 		}
@@ -35,7 +37,8 @@ public class TypeResolver {
 
 
 	private static Type iresolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
-
+		// System.out.println("Resolving: " + input + " of class " + input.getClass());
+		
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);
 
@@ -80,8 +83,10 @@ public class TypeResolver {
 			}
 		}
 
-		if (input instanceof TypeInv)
-			return ((TypeInv)input).resolve();
+		if (input instanceof TypeInv) { // This might be a variable!
+			return ((TypeInv)input).resolve(ctx);
+		}
+		
 		return input;
 	}
 }

@@ -31,6 +31,7 @@ import java.util.stream.StreamSupport;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
+	
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 	boolean isGeneric = false;
 
@@ -75,6 +76,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
 
+		// System.out.println("classVarTypeBinding = " + classVarTypeBinding);
 
 		if (classVarTypeBinding != null) { //In a class method
 			Environment declEnv = classVarTypeBinding.getClassDecl().getObjEnv();
@@ -99,6 +101,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			return classVarType;
 		} else { // Standalone
+			
 			isGeneric = true;
 			Environment innerEnv = seq.extendType(Environment.getEmptyEnvironment(), env);
 			Environment savedInner = env.extend(innerEnv);
@@ -108,7 +111,6 @@ public class New extends CachingTypedAST implements CoreAST {
 			final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 					reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
 			seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
-
 
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
@@ -121,6 +123,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
 			cls = classDeclaration;
 			Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
+			
 			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), null);
 			return ct;
 		}

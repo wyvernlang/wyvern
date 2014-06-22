@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -136,11 +137,22 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		System.out.println("Resolving ValDeclaration using extendName: " + this.getName());
+		// System.out.println("Resolving ValDeclaration using extendName: " + this.getName());
+		
 		Type resolved;
-		if (binding.getType() != null)
+		if (binding.getType() != null) {
+			
+			// System.out.println("Inside ValDeclaration resolving type: " + binding.getType());
+			// System.out.println("Inside ValDeclaration resolving type: " + binding.getType().getClass());
+			
+			if (binding.getType() instanceof TypeInv) {
+				TypeInv ti = (TypeInv) binding.getType();
+				
+				// System.out.println("TypeInv = " + ti);
+				// System.out.println("against = " + against);
+			}
 			resolved = TypeResolver.resolve(binding.getType(), against);
-		else {
+		} else {
 			if (definitionType == null)
 				typecheckSelf(against);
 			resolved = definitionType;
