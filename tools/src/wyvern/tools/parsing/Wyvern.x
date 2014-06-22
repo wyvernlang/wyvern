@@ -554,6 +554,7 @@ import java.net.URI;
     objid ::= cbval:va {: RESULT = va; :}
     	|	  var:va {: RESULT = va; :}
     	|	  def:va {: RESULT = va; :}
+    	|	  typedec:va {: RESULT = va; :}
     	|	  class:va {: RESULT = va; :};
 
     cbvalbody ::= declbody:bdy {: RESULT = bdy; :}| {: RESULT = null; :};

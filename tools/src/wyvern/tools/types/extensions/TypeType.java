@@ -137,6 +137,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 
 	@Override
 	public Type getInnerType(String name) {
+		System.out.println("Looking up (inside getInnerType) name " + name);
 		return typeDeclEnv.get().lookupType(name).getType();
 	}
 
