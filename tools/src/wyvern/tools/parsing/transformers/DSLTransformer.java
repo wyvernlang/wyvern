@@ -11,7 +11,7 @@ public class DSLTransformer extends AbstractASTTransformer {
 	@Override
 	public TypedAST transform(TypedAST input) {
 		if (input instanceof DSLLit) {
-			return defaultTransformation(((DSLLit) input).getAST());
+			return new DSLTransformer().transform(defaultTransformation(((DSLLit) input).getAST()));
 		}
 		return defaultTransformation(input);
 	}

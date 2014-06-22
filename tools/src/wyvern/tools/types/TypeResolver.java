@@ -1,6 +1,8 @@
 package wyvern.tools.types;
 
+import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.extensions.SpliceType;
 import wyvern.tools.types.extensions.TypeInv;
 
 import java.lang.reflect.Field;
@@ -39,6 +41,11 @@ public class TypeResolver {
 		
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);
+
+		if (input instanceof SpliceType)
+			return resolve(((SpliceType) input).getInner(),
+					ctx.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class).orElseThrow(RuntimeException::new)
+							.getStore(), visited);
 
 		if (input instanceof Resolvable) {
 			Map<String, Type> toResolve = ((Resolvable) input).getTypes();

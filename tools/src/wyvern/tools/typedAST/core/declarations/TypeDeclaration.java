@@ -1,7 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.stdlib.Globals;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
@@ -180,6 +182,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     	this(name, decls, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
+		this.taggedInfo.setTagName(name);
+		this.taggedInfo.associateTag();
 	}
 	
     public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
@@ -248,6 +252,56 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
+		
+		//extend with tag information
+		if (isTagged()) {
+			//type-test the tag information
+			
+			//TODO: fix this
+			
+			//first get/ create the binding
+			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
+			newEnv = newEnv.extend(tagBinding);
+			
+			//now handle case-of and comprises clauses
+			if (taggedInfo.getCaseOfTag() != null) {
+				String caseOf = taggedInfo.getCaseOfTag();
+				
+				//TODO: could case-of come before?
+				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
+				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
+				
+				if (caseOfBindingO.isPresent()) {
+					 TagBinding caseOfBinding = caseOfBindingO.get();
+					 
+					 //set up relationship between two bindings
+					 tagBinding.setCaseOfParent(caseOfBinding);
+					 caseOfBinding.addCaseOfDirectChild(tagBinding);
+				} else {
+					ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, caseOf);
+				}
+			}
+			
+			if (!taggedInfo.getComprisesTags().isEmpty()) {
+				//set up comprises tags
+				for (String s : taggedInfo.getComprisesTags()) {
+					// Because comprises refers to tags defined ahead of this, we use the associated tag values
+					
+					Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.getOrCreate(s));
+					//TODO, change to real code: newEnv.lookupBinding(s, TagBinding.class);
+					
+					if (comprisesBindingO.isPresent()) {
+						TagBinding comprisesBinding = comprisesBindingO.get();
+						
+						tagBinding.getComprisesOf().add(comprisesBinding);
+					} else {
+						//TODO throw proper error
+						ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, s);
+					}
+				}
+			}
+		}
+		
 		return newEnv;
 	}
 
