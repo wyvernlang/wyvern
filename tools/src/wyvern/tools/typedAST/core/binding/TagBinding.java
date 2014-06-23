@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
@@ -24,9 +25,13 @@ public class TagBinding implements Binding {
 	
 	//TODO: Remove this giant hack. Currently having a universal tag map because
 	//type checking/ eval is not working properly
+	//FIXME: This should go into some environment!!! (alex)
 	private static Map<String, TagBinding> tagBindings = new HashMap<String, TagBinding>();
-	
 	private static Map<String, TaggedInfo> tagInfos = new HashMap<String, TaggedInfo>();
+	public static void resetHACK() { // TODO: This is going away very very very very soon! :)
+		tagBindings = new HashMap<String, TagBinding>();
+		tagInfos = new HashMap<String, TaggedInfo>();
+	}
 	
 	/**
 	 * Internal constructor to instantiate a TagBinding.
