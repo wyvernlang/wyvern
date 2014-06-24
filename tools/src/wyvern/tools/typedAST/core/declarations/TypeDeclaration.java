@@ -252,12 +252,10 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
-		
+
 		//extend with tag information
 		if (isTagged()) {
 			//type-test the tag information
-			
-			//TODO: fix this
 			
 			//first get/ create the binding
 			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
@@ -268,7 +266,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 				String caseOf = taggedInfo.getCaseOfTag();
 				
 				//TODO: could case-of come before?
-				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
+				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.getOrCreate(caseOf));
 				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
 				
 				if (caseOfBindingO.isPresent()) {
