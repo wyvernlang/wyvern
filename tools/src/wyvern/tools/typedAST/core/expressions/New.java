@@ -167,6 +167,9 @@ public class New extends CachingTypedAST implements CoreAST {
 				reduce(env, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
 		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 		objRef.set(new Obj(objenv.extend(argValEnv)));
+		
+		// System.out.println("Finished evaluating new: " + this);
+		
 		return objRef.get();
 	}
 

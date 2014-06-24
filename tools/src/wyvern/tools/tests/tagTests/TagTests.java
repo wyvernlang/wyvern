@@ -2,6 +2,8 @@ package wyvern.tools.tests.tagTests;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -12,9 +14,10 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.typedAST.core.binding.TagBinding;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 
 public class TagTests {
 	
@@ -505,7 +508,7 @@ public class TagTests {
 			"    class def create() : DynChar             \n" +
 			"        new                                  \n" +
 			"                                             \n" +
-			"val i = Dyn.create()                         \n" +
+			"val i  = Dyn.create()                         \n" +
 			"                                             \n" +
 			"match(i):                                    \n" +
 			"	DynInt => 10                              \n" +
@@ -719,6 +722,7 @@ public class TagTests {
 	 * @throws CopperParserException 
 	 */
 	public static TypedAST getAST(String program) throws CopperParserException, IOException {
+		TagBinding.resetHACK();
 		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
 	}
 }
