@@ -2,8 +2,13 @@ package wyvern.tools.typedAST.core.expressions;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import wyvern.tools.typedAST.core.binding.TagBinding;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeType;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
@@ -13,8 +18,8 @@ import wyvern.tools.typedAST.core.binding.TagBinding;
 public class TaggedInfo {
 
 	private String tagName;
-	private String caseOf;
-	private List<String> comprises;
+	private Type caseOf;
+	private List<Type> comprises;
 	
 	/**
 	 * Constructs an empty TaggedInfo. 
@@ -28,7 +33,7 @@ public class TaggedInfo {
 	 * Constructs a TaggedInfo with the given caseOf, and no comprises.
 	 * @param caseOf
 	 */
-	public TaggedInfo(String caseOf) {
+	public TaggedInfo(Type caseOf) {
 		this(caseOf, null);
 	}
 	
@@ -36,7 +41,7 @@ public class TaggedInfo {
 	 * Constructs a TaggedInfo with the given comprises tags.
 	 * @param comprises
 	 */
-	public TaggedInfo(List<String> comprises) {
+	public TaggedInfo(List<Type> comprises) {
 		this(null, comprises);
 	}
 	
@@ -48,8 +53,8 @@ public class TaggedInfo {
 	 * @param caseOf
 	 * @param comprises
 	 */
-	public TaggedInfo(String caseOf, List<String> comprises) {		
-		if (comprises == null) comprises = new ArrayList<String>();
+	public TaggedInfo(Type caseOf, List<Type> comprises) {		
+		if (comprises == null) comprises = new ArrayList<Type>();
 		
 		this.caseOf = caseOf;
 		this.comprises = comprises;
@@ -104,7 +109,7 @@ public class TaggedInfo {
 	 * @return
 	 */
 	public String getCaseOfTag() {
-		return caseOf;
+		return getTagName(caseOf);
 	}
 	
 	/**
@@ -114,6 +119,18 @@ public class TaggedInfo {
 	 * @return
 	 */
 	public List<String> getComprisesTags() {
-		return comprises;
+		return comprises.stream()
+						.map(TaggedInfo::getTagName)
+						.collect(Collectors.toList());
 	}
+	
+	private static String getTagName(Type t) {
+		if (t == null) return null;
+		if (t instanceof TypeType) return ((TypeType)t).getName();
+		if (t instanceof ClassType) return ((ClassType)t).getName();
+		if (t instanceof UnresolvedType) return ((UnresolvedType)t).getName();
+		
+		throw new IllegalArgumentException("Type [" + t +"] has no proper type");
+	}
+	
 }

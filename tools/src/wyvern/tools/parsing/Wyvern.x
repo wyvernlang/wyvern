@@ -728,9 +728,9 @@ import java.net.URI;
 
     // hierarchical tags
 
-    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
-                 | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
-                 | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
+    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((Type)co, (List<Type>) c); :}
+                 | caseOf:co             {: RESULT = new TaggedInfo((Type) co); :}
+                 | comprises:co          {: RESULT = new TaggedInfo((List<Type>) co); :}
                  |              {: RESULT = new TaggedInfo(); :}
                  ;
     
@@ -746,22 +746,22 @@ import java.net.URI;
           
     //1 or more tags
     listTags ::= singleTag:tag comma_t listTags:rest {: 
-                    List<String> tags = new ArrayList<String>();
-                    tags.add((String) tag);
-                    tags.addAll((List<String>) rest);
+                    List<Type> tags = new ArrayList<Type>();
+                    tags.add((Type) tag);
+                    tags.addAll((List<Type>) rest);
                
                     RESULT = tags; 
                 :}
                | singleTag:tag {: 
-                    List<String> tags = new ArrayList<String>();
-                    tags.add((String) tag);
+                    List<Type> tags = new ArrayList<Type>();
+                    tags.add((Type) tag);
                     
                     RESULT = tags; 
                  :}
                ;
                
     //a single tag
-    singleTag ::= identifier_t:id {: RESULT = (String) id; :}
+    singleTag ::= type:t {: RESULT = (Type) t; :}
                 ;
 
     // end hierarchical tags
