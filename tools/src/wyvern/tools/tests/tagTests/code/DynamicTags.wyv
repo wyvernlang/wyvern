@@ -10,7 +10,7 @@ def f() : M = new
 	tagged type A [case of IA]
 		def foo() : Int
 	def createA() : A = new
-		def foo() = 1
+		def foo() : Int = 1
 
 def g (m:M) : M = new
 	tagged type A [case of m.A]
@@ -27,9 +27,9 @@ val m2a : m2.A = m2.createA()
 val m3a : m3.A = m3.createA()
 
 def matcher(a:IA) : Int = match(a):
-	m2.A =12
-	m1.A =13
-	default =14
+	m2.A => 12
+	m1.A => 13
+	default => 14
 
 printInteger(matcher(m2a)) // 12
 printInteger(matcher(m3a)) // 13
