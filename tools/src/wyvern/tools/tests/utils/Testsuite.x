@@ -58,12 +58,17 @@ import wyvern.tools.util.Pair;
 
 	terminal Dedent_t ::= /(((\r\n)|\n)[ \t]*)+/
 	{:
+		String inp = lexeme;
+
+		if (!inp.startsWith("\n"))
+			inp = "\n" + inp;
+
 		//Need to determine new indentation depth and will treat all but the last "\n[\t ]*" as whitespace
-		String output = getLastMatch(nlRegex, lexeme, 2);
+		String output = getLastMatch(nlRegex, inp, 2);
 		int newDepth = output.length();
 		depths.pop();
 		if(newDepth < depths.peek()) {
-			pushToken(Terminals.Dedent_t,lexeme);
+			pushToken(Terminals.Dedent_t,output);
 		}
 	:};
 	disambiguate dedent2:(Newline_t, Dedent_t)
