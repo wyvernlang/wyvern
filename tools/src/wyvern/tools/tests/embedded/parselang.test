@@ -121,3 +121,80 @@ module test uriParser[StringConstant("http"):Str]
 						fragmentid ::= xalphas_t:xa {: xa :};
 						search ::= xalphas_t:xa{: xa :} | xalphas_t:xa plus_t search:sh {: xa + sh :};
 					%cf}
+
+module test htmlParser[StringConstant("<html><body>Hello <span>World!</span></body></html>"):Str]
+	file main
+		import wyv:html
+		val page:HTML.HTML = ~
+			>html
+				>body
+					Hello World!
+		page.string()
+	file html
+		module HTML
+		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.parsing.HasParser
+		import java:wyvern.tools.parsing.ExtParser
+		import java:wyvern.tools.parsing.ParseBuffer
+		import java:java.util.Stack
+		type HTML
+			def string():Str
+			metadata:HasParser = new
+				def getParser():ExtParser = new
+					def parse(buf:ParseBuffer):TypedAST
+						val depths = Stack.create()
+						val depthRegex = Pattern.compile("(\r\n|\n)([\t ]*)")
+						var curly:Int = 0
+						depths.push(0)
+
+						def getLastMatch(patt:Pattern,str:Str,groupN:Int):Str
+							val inpMatcher = patt.matcher(str)
+							def recurser(last:Str):Str
+								if inpMatcher.find() then recurser(inpMatcher.group(groupN)) else last
+							recurser("")
+
+						val parser:ExtParser = ~
+							%%
+							%parser ExtParser
+							%lex{
+								terminal nose_t ::= />/;
+								terminal Str identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ {: lexeme :};
+								terminal Str usercode_t ::= /[^>{\n\\]+/ {: lexeme :};
+
+								terminal Unit ocurly_t ::= /{/ {:
+									curly = curly + 1
+									()
+								:};
+								terminal Unit ccurly_t ::= /}/ {:
+									curly = curly - 1
+									()
+								:};
+								terminal Str nocurlies_t ::= /[^{}]*/ {: lexeme :};
+
+								terminal Unit Indent_t ::= /(((\r\n)|\n)([ \t]*))+/
+								{:
+									depths.push(getLastMatch(depthRegex, lexeme, 2).length())
+									()
+								:};
+
+								terminal Dedent_t ::= /(((\r\n)|\n)([ \t]*))+/
+								{:
+									int newDepth = getLastMatch(depthRegex, lexeme, 2).length();
+									depths.pop();
+									if(newDepth < depths.peek()) {
+										pushToken(Terminals.Dedent_t,lexeme);
+									} else {
+										pushToken(Terminals.Newline_t,lexeme);
+									}
+								:};
+
+								terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {: :};
+
+								terminal DedentRepair_t ::= /(\n[ \t]*)+/
+								{:
+									pushToken(Terminals.Dedent_t,lexeme);
+								:};
+							%lex}
+							%cf{
+
+							%cf}

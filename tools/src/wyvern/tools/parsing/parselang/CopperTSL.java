@@ -36,6 +36,7 @@ import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.extensions.SpliceBindExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -110,6 +111,9 @@ public class CopperTSL implements ExtParser {
 		HashMap<String, TypedAST> toGenDefs = new HashMap<>();
 		Reference<Integer> methNum = new Reference<>(0);
 
+		String wyvClassName = res.getClassName();
+		String javaClassName = wyvClassName + "$java";
+
 		final Environment savedNtEnv2 = ntEnv;
 		res.getGrammars().stream().map(res::getGrammar)
 				.flatMap(grm->grm.getElementsOfType(CopperElementType.PRODUCTION).stream().map(grm::getGrammarElement).<Production>map(el->(Production)el))
@@ -122,15 +126,12 @@ public class CopperTSL implements ExtParser {
 
 		res.getGrammars().stream().map(res::getGrammar)
 				.flatMap(grm->grm.getElementsOfType(CopperElementType.TERMINAL).stream().map(grm::getGrammarElement)
-						.<Terminal>map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,ntEnv,methNum, res.getClassName()));
+						.<Terminal>map(el->(Terminal)el)).forEach(this.updateTerminalCode(toGen,ntEnv,methNum, res.getClassName(), new TypeInv(new UnresolvedType(javaClassName),"Terminals")));
 
 		res.getGrammars().stream().map(res::getGrammar).flatMap(grm->grm.getElementsOfType(CopperElementType.DISAMBIGUATION_FUNCTION)
 				.stream().map(grm::getGrammarElement).<DisambiguationFunction>map(el->(DisambiguationFunction)el))
 				.forEach(this.updateDisambiguationCode(toGen,ntEnv,methNum,res.getClassName()));
 
-
-		String wyvClassName = res.getClassName();
-		String javaClassName = wyvClassName + "$java";
 		res.setClassName(javaClassName);
 
 		String pic = res.getParserInitCode();
@@ -158,9 +159,27 @@ public class CopperTSL implements ExtParser {
 		res.setPreambleCode("import wyvern.tools.typedAST.interfaces.Value;\n" +
 				"import wyvern.tools.typedAST.core.values.StringConstant;\n" +
 				"import wyvern.tools.typedAST.extensions.interop.java.Util;\n" +
+				"import wyvern.tools.errors.FileLocation;\n" +
+				"import wyvern.tools.typedAST.core.values.IntegerConstant;\n" +
+				"import wyvern.tools.typedAST.core.values.TupleValue;\n" +
+				"import wyvern.tools.typedAST.core.values.UnitVal;\n" +
+				"import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;\n" +
+				"import wyvern.tools.typedAST.extensions.ExternalFunction;\n" +
+				"import wyvern.tools.types.extensions.*;" +
 				"");
 
-		res.setParserClassAuxCode("Value "+PAIRED_OBJECT_NAME+" = null;");
+		res.setParserClassAuxCode(
+				"Value "+PAIRED_OBJECT_NAME+" = null;\n" +
+				"ExternalFunction pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),Str.getInstance()), Unit.getInstance()), (ee,v)->{\n" +
+						"\tpushToken((Terminals)(((JavaObj)((TupleValue)v).getValue(0)).getObj()), ((StringConstant)((TupleValue)v).getValue(1)).getValue());\n" +
+						"\treturn UnitVal.getInstance(FileLocation.UNKNOWN);\n" +
+						"});");
+
+		res.setParserInitCode("pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),Str.getInstance()), Unit.getInstance()), (ee,v)->{\n" +
+				"\tpushToken((Terminals)(((JavaObj)((TupleValue)v).getValue(0)).getObj()), ((StringConstant)((TupleValue)v).getValue(1)).getValue());\n" +
+				"\treturn UnitVal.getInstance(FileLocation.UNKNOWN);\n" +
+				"});");
+
 
 
 		AtomicInteger cdIdx = new AtomicInteger();
@@ -336,12 +355,13 @@ public class CopperTSL implements ExtParser {
 		throw new RuntimeException();
 	}
 
-	private Consumer<Terminal> updateTerminalCode(HashMap<String, Pair<Type,SpliceBindExn>> toGen, Environment lhsEnv, Reference<Integer> methNum, String thisTypeName) {
+	private Consumer<Terminal> updateTerminalCode(HashMap<String, Pair<Type,SpliceBindExn>> toGen, Environment lhsEnv, Reference<Integer> methNum, String thisTypeName, Type termType) {
 		return (term) -> {
 			String oCode = term.getCode();
 
 			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(oCode), Arrays.asList(new NameBinding[] {
-					new NameBindingImpl("lexeme", Str.getInstance())}));
+					new NameBindingImpl("lexeme", Str.getInstance()),
+					new NameBindingImpl("pushToken", new Arrow(new Tuple(termType,Str.getInstance()), Unit.getInstance()))}));
 
 			CopperElementName termName = term.getName();
 			String newName = getNextName(methNum, termName);
@@ -350,7 +370,7 @@ public class CopperTSL implements ExtParser {
 
 			toGen.put(newName, new Pair<>(resType, spliced));
 
-			String newCode = String.format("RESULT = Util.invokeValueVarargs(%s, \"%s\", %s);", PAIRED_OBJECT_NAME, newName, "new StringConstant(lexeme)");
+			String newCode = String.format("RESULT = Util.invokeValueVarargs(%s, \"%s\", %s);", PAIRED_OBJECT_NAME, newName, "new StringConstant(lexeme), pushTokenV");
 			term.setCode(newCode);
 		};
 	}

@@ -62,6 +62,7 @@ public class JavaClassDecl extends ClassDeclaration {
 					sMap.put(m.getName(), list);
 			}
 
+			//Fields
             for (Field f : clazz.getFields()) {
 				Optional<MethodHandle> setter = Optional.empty();
 				if (!Modifier.isFinal(f.getModifiers()))
@@ -69,6 +70,18 @@ public class JavaClassDecl extends ClassDeclaration {
                 decls.add(new JavaField(f,lookup.unreflectGetter(f),setter));
             }
 
+			//Inner classes
+			for (Class c : clazz.getDeclaredClasses()) {
+				int modifiers = c.getModifiers();
+				if (!Modifier.isStatic(modifiers) ||
+						Modifier.isPrivate(modifiers) ||
+						Modifier.isProtected(modifiers) ||
+						Modifier.isAbstract(modifiers))
+					continue;
+				decls.add(new JavaClassDecl(c));
+			}
+
+			//Create real decls
 			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
@@ -165,6 +178,9 @@ public class JavaClassDecl extends ClassDeclaration {
 					continue;
 				}
 				objEnv = decl.extend(objEnv, objEnv);
+			} else if (decl instanceof JavaClassDecl) {
+				declEnv = decl.extend(declEnv, declEnv);
+				objEnv = decl.extend(objEnv, declEnv);
 			} else {
 				throw new RuntimeException();
 			}
@@ -210,11 +226,6 @@ public class JavaClassDecl extends ClassDeclaration {
 	public Environment evaluateDeclarations(Environment addtlEnv) {
 		initalize();
 		return super.evaluateDeclarations(addtlEnv);
-	}
-
-	@Override
-	public Environment extendType(Environment env, Environment against) {
-		return super.extendType(env, against);
 	}
 
 	@Override
