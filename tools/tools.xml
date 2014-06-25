@@ -58,13 +58,6 @@
   
   
   <!-- Project Libraries -->
-  
-  <path id="library.ant-1.9.4.classpath">
-    <fileset dir="${basedir}/../../../Downloads/libs/apache-ant-1.9.4-bin/apache-ant-1.9.4/lib">
-      <patternset refid="library.patterns"/>
-    </fileset>
-  </path>
-  
   <path id="library.hamcrest-core-1.3.classpath">
     <pathelement location="${basedir}/lib/hamcrest-core-1.3.jar"/>
   </path>
@@ -94,29 +87,6 @@
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="copper-composer.module.production.classpath">
-    <path refid="library.ant-1.9.4.classpath"/>
-    <pathelement location="${basedir}/lib/CopperCompiler.jar"/>
-  </path>
-  
-  <path id="copper-composer.runtime.production.module.classpath">
-    <pathelement location="${copper-composer.output.dir}"/>
-    <path refid="library.ant-1.9.4.classpath"/>
-    <pathelement location="${basedir}/lib/CopperCompiler.jar"/>
-  </path>
-  
-  <path id="copper-composer.module.classpath">
-    <pathelement location="${copper-composer.output.dir}"/>
-    <path refid="library.ant-1.9.4.classpath"/>
-    <pathelement location="${basedir}/lib/CopperCompiler.jar"/>
-  </path>
-  
-  <path id="copper-composer.runtime.module.classpath">
-    <pathelement location="${copper-composer.output.dir}"/>
-    <path refid="library.ant-1.9.4.classpath"/>
-    <pathelement location="${basedir}/lib/CopperCompiler.jar"/>
-  </path>
-  
   
   <patternset id="excluded.from.module.copper-composer">
     <patternset refid="ignored.files"/>
@@ -131,29 +101,6 @@
       <include name="src"/>
     </dirset>
   </path>
-  
-  
-  <target name="compile.module.copper-composer" depends="compile.module.copper-composer.production,compile.module.copper-composer.tests" description="Compile module copper-composer"/>
-  
-  <target name="compile.module.copper-composer.production" description="Compile module copper-composer; production classes">
-    <mkdir dir="${copper-composer.output.dir}"/>
-    <javac destdir="${copper-composer.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
-      <compilerarg line="${compiler.args.copper-composer}"/>
-      <bootclasspath refid="copper-composer.module.bootclasspath"/>
-      <classpath refid="copper-composer.module.production.classpath"/>
-      <src refid="copper-composer.module.sourcepath"/>
-      <patternset refid="excluded.from.compilation.copper-composer"/>
-    </javac>
-    
-    <copy todir="${copper-composer.output.dir}">
-      <fileset dir="${module.copper-composer.basedir}/copper-composer/src">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-    </copy>
-  </target>
-  
-  <target name="compile.module.copper-composer.tests" depends="compile.module.copper-composer.production" description="compile module copper-composer; test classes" unless="skip.tests"/>
   
   <target name="clean.module.copper-composer" description="cleanup module">
     <delete dir="${copper-composer.output.dir}"/>
@@ -268,7 +215,7 @@
   
   <target name="clean" depends="clean.module.copper-composer, clean.module.wyvern-tools" description="cleanup all"/>
   
-  <target name="build.modules" depends="init, clean, compile.module.copper-composer, compile.module.wyvern-tools" description="build all modules"/>
+  <target name="build.modules" depends="init, clean, compile.module.wyvern-tools" description="build all modules"/>
   
   <target name="all" depends="build.modules" description="build all"/>
 </project>
