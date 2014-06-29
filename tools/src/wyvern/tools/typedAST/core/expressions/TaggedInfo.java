@@ -120,7 +120,7 @@ public class TaggedInfo {
 	 */
 	public List<String> getComprisesTags() {
 		return comprises.stream()
-						.map(TaggedInfo::getTagName)
+						.<String>map(TaggedInfo::getTagName)
 						.collect(Collectors.toList());
 	}
 	

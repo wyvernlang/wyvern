@@ -258,8 +258,14 @@ import java.net.URI;
 
 	terminal Dedent_t ::= /(((\r\n)|\n)([ \t]*))+/
 	{:
+		String inp = lexeme;
+		//To allow added dedents to recieve lexemes without a \n
+		//Fixes line numbers
+		if (!inp.startsWith("\n"))
+			inp = "\n" + inp;
+
 		//Need to determine new indentation depth and will treat all but the last "\n[\t ]*" as whitespace
-		Matcher inputPattern = nlRegex.matcher(lexeme);
+		Matcher inputPattern = nlRegex.matcher(inp);
 		String output = "";
 		while(inputPattern.find()) {
 			output = inputPattern.group(2);
@@ -267,9 +273,9 @@ import java.net.URI;
 		int newDepth = output.length();
 		depths.pop();
 		if(newDepth < depths.peek()) {
-			pushToken(Terminals.Dedent_t,lexeme);
+			pushToken(Terminals.Dedent_t,output);
 		} else {
-			pushToken(Terminals.Newline_t,lexeme);
+			pushToken(Terminals.Newline_t,output);
 		}
 	:};
 

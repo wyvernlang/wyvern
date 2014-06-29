@@ -76,6 +76,11 @@ public class UnresolvedType implements Type {
 		throw new RuntimeException("Cannot specify a ref type");
 	}
 	
+    /**
+     * Returns the name of this UnresolvedType.
+     * 
+     * @return
+     */
 	public String getName() {
 		return typeName;
 	}
