@@ -340,10 +340,21 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	/**
 	 * Returns true if this Type Declaration is tagged.
+	 * 
+	 * 
 	 * @return
 	 */
 	public boolean isTagged() {
 		return taggedInfo != null;
+	}
+	
+	/**
+	 * Gets the Tag info for this TypeDeclaration.
+	 * 
+	 * @return
+	 */
+	public TaggedInfo getTaggedInfo() {
+		return taggedInfo;
 	}
 	
 	private FileLocation location = FileLocation.UNKNOWN;

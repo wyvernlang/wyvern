@@ -23,7 +23,7 @@ public class DynamicTagTests {
 		
 		TypedAST ast = TagTests.getAST(program);
 		
-		TagTests.evaluate(ast);
+		TagTests.evaluateExpecting(ast, 13);
 	}
 	
 	@Test
@@ -121,12 +121,12 @@ public class DynamicTagTests {
 				"def create() : Y = new             \n" +
 				"    def foo() : Int = 15           \n" +
 				"                                   \n" +
-				"val x : X = create()               \n" +
+				"val x = create()                   \n" +
 				"                                   \n" +
 				"match(x):                          \n" + 
 				"	Y => 20                         \n" +
-				"	Z => 15                         \n" +
-				"	X => 30                         \n";
+				"	X => 30                         \n" +
+				"	default => 30                         \n";
 				
 		TypedAST ast = TagTests.getAST(input);
 		TagTests.evaluateExpecting(ast, 20);

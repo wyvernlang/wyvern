@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -87,12 +88,34 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		TagBinding matchingOverBinding = TagBinding.get(className);
 		//TODO: fix this, replace with real code
+		System.out.println("match eval over val: " + matchingOver.getType());
+
 		
 		for (Case c : cases) {
 			TagBinding binding = TagBinding.get(c.getTaggedTypeMatch());
-			//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
+			System.out.println("match testing " + c.getTaggedTypeMatch() + " over binding: " + binding);
 			
-			if (hasMatch(matchingOverBinding, binding.getName())) {
+			//check for dynamic tag
+			if (c.getTaggedTypeMatch().contains(".")) {
+				//dynamic tag
+				String varName = c.getTaggedTypeMatch().split(Pattern.quote("."))[0];
+				String tagName = c.getTaggedTypeMatch().split(Pattern.quote("."))[1];
+				
+				Value v = env.getValue(varName);
+				
+				System.out.println("Evaluating dynamic tag match...");
+				
+				TaggedInfo caseOfInfo = TagBinding.getDynamicInfo(v);
+				TaggedInfo objInfo = TagBinding.getDynamicObjTagInfo(matchingOver.evaluate(env));
+				
+				//ClassType classType = (ClassType) value.getType();
+				System.out.println("Evaluating dynamic tag match for info: " + objInfo);
+				System.out.println("infos: " + caseOfInfo + ", " + objInfo);
+				System.out.println("infos are equal? : " + (caseOfInfo == objInfo));
+				
+			}  else if (hasMatch(matchingOverBinding, binding.getName())) {
+				//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
+				
 				// We've got a match, evaluate this case
 				return c.getAST().evaluate(env);
 			}
@@ -212,7 +235,16 @@ public class Match extends CachingTypedAST implements CoreAST {
 			NameBinding binding = env.lookup(tagName);
 			
 			if (binding == null) {
+				//check for dynamic tag
+				if (tagName.contains(".")) {
+					//we're using dynamic tags, so currently can't perform type-checking
+					return Unit.getInstance();
+				}
+			}
+			
+			if (binding == null) {
 				// type wasn't declared...
+				System.out.println("match binding: " + tagName);
 				ToolError.reportError(ErrorMessage.UNKNOWN_TAG, matchingOver);
 			}
 			

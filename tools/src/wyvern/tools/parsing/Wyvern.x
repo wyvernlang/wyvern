@@ -725,7 +725,7 @@ import java.net.URI;
           ;
     
     //a single match case statement
-    varStatement ::= identifier_t:id arrow_t dsle:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
+    varStatement ::= type:t arrow_t dsle:inner {: RESULT = new Case((Type) t, (TypedAST) inner); :}
           ;
     
     //a default match statement

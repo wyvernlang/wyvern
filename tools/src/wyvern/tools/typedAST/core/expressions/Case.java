@@ -1,7 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Type;
 
 public class Case {
 	
@@ -23,8 +23,8 @@ public class Case {
 	 * @param caseType
 	 * @param decls
 	 */
-	public Case(String taggedTypeName, TypedAST ast) {
-		this.taggedTypeName = taggedTypeName;
+	public Case(Type matchType, TypedAST ast) {
+		this.taggedTypeName = TaggedInfo.getTagName(matchType);
 		this.ast = ast;
 		
 		caseType = CaseType.TYPED;

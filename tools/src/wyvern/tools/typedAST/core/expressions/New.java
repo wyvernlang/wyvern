@@ -1,16 +1,20 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.targets.Common.wyvernIL.IL.Def.Def;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.TagBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -21,12 +25,14 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 public class New extends CachingTypedAST implements CoreAST {
@@ -36,6 +42,7 @@ public class New extends CachingTypedAST implements CoreAST {
 	boolean isGeneric = false;
 
 	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
+	private static int dynamicTagNum;
 	private static int generic_num = 0;
 	private DeclSequence seq;
 	private Type ct;
@@ -141,23 +148,55 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) {
+		System.out.println("Evaluating new");
+		
 		Environment argValEnv = Environment.getEmptyEnvironment();
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
 
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
+		
 		ClassDeclaration classDecl;
+		
+		TaggedInfo dynamicTagInfo = null;
+		
 		if (classVarTypeBinding != null)
 			classDecl = classVarTypeBinding.getClassDecl();
 		else {
-
+			//check if we are in the context of a Dyntamic Tag binding
+			if (DefDeclaration.lastBindedType instanceof TypeType) {
+				TypeType t = (TypeType) DefDeclaration.lastBindedType;
+				
+				TaggedInfo info = t.getTaggedInfo();
+				
+				if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
+					String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
+					String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
+					
+					Value v = env.getValue(varName);
+					
+					dynamicTagInfo = TagBinding.getOrCreateDynamic(info.getTagName(), tagName, v);
+					
+					if (v != null) {
+						//We are making a dynamic tag
+						System.out.println("Making dynamic tag over: " + v);
+					}
+				}
+			}
+			
+			
 			Environment mockEnv = Environment.getEmptyEnvironment();
 
 			LinkedList<Declaration> decls = new LinkedList<>();
 
 			mockEnv = getGenericDecls(env, mockEnv, decls);
-
-			classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
+			
+			if (dynamicTagInfo == null) {
+				classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
+			} else {
+				classDecl = new ClassDeclaration("generic" + generic_num++, dynamicTagInfo, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
+			}
+			
 		}
 
 		AtomicReference<Value> objRef = new AtomicReference<>();
@@ -166,8 +205,13 @@ public class New extends CachingTypedAST implements CoreAST {
 		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 				reduce(env, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
 		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
-		objRef.set(new Obj(objenv.extend(argValEnv)));
 		
+		Obj obj = new Obj(objenv.extend(argValEnv));
+		objRef.set(obj);
+		
+		if (dynamicTagInfo != null) {
+			TagBinding.associateDynamicTagObj(obj, dynamicTagInfo);
+		}
 		// System.out.println("Finished evaluating new: " + this);
 		
 		return objRef.get();

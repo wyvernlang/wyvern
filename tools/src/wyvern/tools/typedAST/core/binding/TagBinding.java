@@ -1,11 +1,17 @@
 package wyvern.tools.typedAST.core.binding;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
 
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -27,10 +33,16 @@ public class TagBinding implements Binding {
 	//type checking/ eval is not working properly
 	//FIXME: This should go into some environment!!! (alex)
 	private static Map<String, TagBinding> tagBindings = new HashMap<String, TagBinding>();
-	private static Map<String, TaggedInfo> tagInfos = new HashMap<String, TaggedInfo>();
+	private static List<TaggedInfo> tagInfos = new ArrayList<TaggedInfo>();
+	
+	private static Map<Value, TaggedInfo> dynamicTagBindings = new HashMap<Value, TaggedInfo>();
+	private static Map<Obj, TaggedInfo> dynamicTagObjBindings = new HashMap<Obj, TaggedInfo>();
+	
 	public static void resetHACK() { // TODO: This is going away very very very very soon! :)
 		tagBindings = new HashMap<String, TagBinding>();
-		tagInfos = new HashMap<String, TaggedInfo>();
+		tagInfos = new ArrayList<TaggedInfo>();
+		dynamicTagBindings = new HashMap<Value, TaggedInfo>();
+		dynamicTagObjBindings = new HashMap<Obj, TaggedInfo>();
 	}
 	
 	/**
@@ -55,9 +67,9 @@ public class TagBinding implements Binding {
 		if (tagBindings.containsKey(tagName)) {
 			return tagBindings.get(tagName);
 		}
-		
+		System.out.println("Making tagbinding: " + tagName);
 		//If not present, create it, associate it, then return it
-		TagBinding binding = new TagBinding(tagName, tagInfos.get(tagName));
+		TagBinding binding = new TagBinding(tagName, getTaggedInfo(tagName));
 		tagBindings.put(tagName, binding);
 		
 		return binding;
@@ -70,6 +82,33 @@ public class TagBinding implements Binding {
 		}
 		
 		return tagBindings.get(tagName);
+	}
+	
+	private static TaggedInfo getTaggedInfo(String tagName) {
+		if (tagName.contains(".")) return getDynamicTaggedInfo(tagName);
+		
+		for (TaggedInfo i : tagInfos) {
+			if (i.getTagName().equals(tagName)) return i;
+		}
+		
+		return null;
+	}
+	
+	public static TaggedInfo getDynamicTaggedInfo(String tagName) {
+		System.out.println("finding dynamic tagged info: " + tagName);
+		String firstHalf = tagName.split(Pattern.quote("."))[0];
+		String secondHalf = tagName.split(Pattern.quote("."))[1];
+		
+		//first find a tag with the same tagged type name
+		for (TaggedInfo i : tagInfos) {
+			if (i.getTagName().equals(secondHalf)) {
+				//then find one with case-of of the required type
+				
+				if (i.getCaseOfTag().startsWith(firstHalf + ".")) return i;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -129,6 +168,35 @@ public class TagBinding implements Binding {
 	}
 	
 	public static void associate(TaggedInfo taggedInfo) {
-		tagInfos.put(taggedInfo.getTagName(), taggedInfo);
+		System.out.println("Associating: " + taggedInfo);
+		if (!tagInfos.contains(taggedInfo)) tagInfos.add(taggedInfo);
+	}
+	
+	public static TaggedInfo getDynamicInfo(Value val) {
+		return dynamicTagBindings.get(val);
+	}
+	
+	public static void associateDynamicTagObj(Obj obj, TaggedInfo info) {
+		dynamicTagObjBindings.put(obj, info);
+	}
+	
+	public static TaggedInfo getDynamicObjTagInfo(Value obj) {
+		return dynamicTagObjBindings.get(obj);
+	}
+	
+	/**
+	 * Gets or creates a dynamic tag over the given value.
+	 * 
+	 * @param tagName
+	 * @param val
+	 * @return
+	 */
+	public static TaggedInfo getOrCreateDynamic(String tagName, String caseOf, Value val) {
+		TaggedInfo info = new TaggedInfo(caseOf);
+		info.setTagName(tagName);
+		
+		dynamicTagBindings.put(val, info);
+		
+		return info;
 	}
 }

@@ -32,12 +32,15 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
+		//System.out.println("untyped val decl");
+		
 		this.definition=definition;
 		binding = new NameBindingImpl(name, null);
 		this.location = location;
 	}
 	
 	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
+		//System.out.println("typed val decl: " + type);
 		this.definition=definition;
 		binding = new NameBindingImpl(name, type);
 		this.location = location;
@@ -105,7 +108,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		if (declEnv.getValue(binding.getName()) != null)
+		//System.out.println("Evaluating val decl");
+		if (declEnv.getValue(binding.getName()) != null) 
 			return;
 			
 		Value defValue = null;

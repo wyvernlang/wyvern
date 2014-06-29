@@ -31,6 +31,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 
+	public static Type lastBindedType;
+	public static String thing;
+	
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
@@ -164,6 +167,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		Closure closure = new Closure(this, evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(name);
 		vb.setValue(closure);
+		
+		lastBindedType = ((Arrow)type).getResult();
+		thing = "defDecl type: " + lastBindedType;
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

@@ -1,6 +1,7 @@
 package wyvern.tools.types.extensions;
 
 import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -220,6 +221,14 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	 */
 	public String getName() {
 		return decl.getName();
+	}
+	
+	public boolean isTagged() {
+		return decl.isTagged();
+	}
+	
+	public TaggedInfo getTaggedInfo() {
+		return decl.getTaggedInfo();
 	}
 	
 	@Override

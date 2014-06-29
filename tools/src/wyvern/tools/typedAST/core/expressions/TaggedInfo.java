@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.core.binding.TagBinding;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 
 /**
@@ -18,8 +19,11 @@ import wyvern.tools.types.extensions.TypeType;
 public class TaggedInfo {
 
 	private String tagName;
-	private Type caseOf;
+	private String caseOf;
 	private List<Type> comprises;
+	
+	
+	//public static 
 	
 	/**
 	 * Constructs an empty TaggedInfo. 
@@ -35,6 +39,11 @@ public class TaggedInfo {
 	 */
 	public TaggedInfo(Type caseOf) {
 		this(caseOf, null);
+	}
+	
+	public TaggedInfo(String caseOf) {
+		this.comprises = new ArrayList<Type>();
+		this.caseOf = caseOf;
 	}
 	
 	/**
@@ -56,7 +65,7 @@ public class TaggedInfo {
 	public TaggedInfo(Type caseOf, List<Type> comprises) {		
 		if (comprises == null) comprises = new ArrayList<Type>();
 		
-		this.caseOf = caseOf;
+		this.caseOf = getTagName(caseOf);
 		this.comprises = comprises;
 	}
 	
@@ -109,7 +118,7 @@ public class TaggedInfo {
 	 * @return
 	 */
 	public String getCaseOfTag() {
-		return getTagName(caseOf);
+		return caseOf;
 	}
 	
 	/**
@@ -124,13 +133,25 @@ public class TaggedInfo {
 						.collect(Collectors.toList());
 	}
 	
-	private static String getTagName(Type t) {
+	public static String getTagName(Type t) {
 		if (t == null) return null;
 		if (t instanceof TypeType) return ((TypeType)t).getName();
 		if (t instanceof ClassType) return ((ClassType)t).getName();
 		if (t instanceof UnresolvedType) return ((UnresolvedType)t).getName();
+		if (t instanceof TypeInv) {
+			TypeInv inv = (TypeInv) t;
+			
+			return getTagName(inv.getInnerType()) + "." + inv.getInvName();
+		}
 		
-		throw new IllegalArgumentException("Type [" + t +"] has no proper type");
+		
+		throw new IllegalArgumentException("Type [" + t.getClass() +"] has no proper type");
+	}
+
+	@Override
+	public String toString() {
+		return "TaggedInfo [tagName=" + tagName + ", caseOf=" + caseOf
+				+ ", comprises=" + comprises + "]";
 	}
 	
 }

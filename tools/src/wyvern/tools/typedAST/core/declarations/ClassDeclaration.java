@@ -78,6 +78,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			String implementsName,
 			String implementsClassName,
 			DeclSequence decls,
+			Environment declEnv,
+			List<String> typeParams,
+			FileLocation location) {
+		this(name, implementsName, implementsClassName, decls, typeParams, location);
+		declEnvRef.set(declEnv);
+		
+		this.taggedInfo = taggedInfo;
+    }
+	
+	public ClassDeclaration(String name,
+			TaggedInfo taggedInfo,
+			String implementsName,
+			String implementsClassName,
+			DeclSequence decls,
 			FileLocation location) {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 		

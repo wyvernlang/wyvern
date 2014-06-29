@@ -223,6 +223,69 @@ public class TagTests {
 	}
 	
 	@Test
+	public void nestedTagsTest1() throws CopperParserException, IOException {		
+		String input = 
+				"class Z                 \n" +		
+				"    class def create() : Z     \n" +
+				"        new                    \n" +
+				"    tagged class A                    \n" +
+				"        def foo() : Int = 2    \n" +
+				"    tagged class B             \n" +
+				"        class def create() : B \n" +
+				"            new                    \n" +
+				"    class def createVal() : A =     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class W                 \n" +
+				"    class def create() : W     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class V                 \n" +
+				"    class def create() : V     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class U                 \n" +
+				"    class def create() : U     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"tagged class X                 \n" +
+				"    class def create() : X     \n" +
+				"        new                    \n" +
+				"                               \n" +
+				"val x = X.create()             \n" +
+				"                               \n" +
+				"15";
+		
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 15);
+	}
+	
+	@Test
+	public void defTest1() throws CopperParserException, IOException {		
+		String input = 
+				"tagged class X                          \n" +
+				"    class def create() : X              \n" +
+				"        new                             \n" +
+				"                                        \n" +
+				"tagged class Y                          \n" +
+				"    class def create() : Y              \n" +
+				"        new                             \n" +
+				"                                        \n" +
+				"val x = X.create()                      \n" +
+				"                                        \n" +
+				"def matcher(a:X) : Int = match(a):      \n" +
+				"	X => 15                              \n" +
+				"	Y => 23                              \n" +
+				"	default => 50                        \n" +
+				"                                        \n" +
+				"matcher(x)                              \n";
+				
+		
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 15);
+	}
+	
+	@Test
 	public void duplicateCaseTest() throws CopperParserException, IOException {
 		String input = 
 				"tagged class X                 \n" +

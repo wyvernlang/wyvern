@@ -35,6 +35,14 @@ public class TypeInv implements Type {
 		return ((RecordType)innerType).getInnerType(invName);
 	}
 
+	public Type getInnerType() {
+		return innerType;
+	}
+	
+	public String getInvName() {
+		return invName;
+	}
+	
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		throw new RuntimeException("Invalid operation (forgot to resolve)?");
