@@ -248,8 +248,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		if (isTagged()) {
 			//type-test the tag information
 			
-			//TODO: fix this
-			
 			//first get/ create the binding
 			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
 			newEnv = newEnv.extend(tagBinding);
@@ -259,7 +257,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				String caseOf = taggedInfo.getCaseOfTag();
 				
 				//TODO: could case-of come before?
-				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
+				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.getOrCreate(caseOf));
 				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
 				
 				if (caseOfBindingO.isPresent()) {
