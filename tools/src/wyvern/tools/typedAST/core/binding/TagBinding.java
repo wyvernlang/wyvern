@@ -173,6 +173,7 @@ public class TagBinding implements Binding {
 	}
 	
 	public static TaggedInfo getDynamicInfo(Value val) {
+		System.out.println("Map of dynamicTagBindings: " + dynamicTagBindings);
 		return dynamicTagBindings.get(val);
 	}
 	
@@ -181,6 +182,7 @@ public class TagBinding implements Binding {
 	}
 	
 	public static TaggedInfo getDynamicObjTagInfo(Value obj) {
+		System.out.println("Map of dynamicTagObjBingings: " + dynamicTagObjBindings);
 		return dynamicTagObjBindings.get(obj);
 	}
 	

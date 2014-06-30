@@ -212,7 +212,8 @@ public class New extends CachingTypedAST implements CoreAST {
 		if (dynamicTagInfo != null) {
 			TagBinding.associateDynamicTagObj(obj, dynamicTagInfo);
 		}
-		// System.out.println("Finished evaluating new: " + this);
+		
+		System.out.println("Finished evaluating new and created: " + String.format("%x", objRef.get().hashCode()));
 		
 		return objRef.get();
 	}

@@ -44,6 +44,8 @@ public class TaggedInfo {
 	public TaggedInfo(String caseOf) {
 		this.comprises = new ArrayList<Type>();
 		this.caseOf = caseOf;
+		
+		System.out.println("Creating dynamic (from String caseOf) a TaggedInfo: " + this);
 	}
 	
 	/**
@@ -51,7 +53,7 @@ public class TaggedInfo {
 	 * @param comprises
 	 */
 	public TaggedInfo(List<Type> comprises) {
-		this(null, comprises);
+		this((Type) null, comprises);
 	}
 	
 	/**
@@ -67,6 +69,8 @@ public class TaggedInfo {
 		
 		this.caseOf = getTagName(caseOf);
 		this.comprises = comprises;
+		
+		System.out.println("Creating parsing (from Type caseOf and List<Type> comprises) a TaggedInfo: " + this);
 	}
 	
 	/**
@@ -151,7 +155,7 @@ public class TaggedInfo {
 	@Override
 	public String toString() {
 		return "TaggedInfo [tagName=" + tagName + ", caseOf=" + caseOf
-				+ ", comprises=" + comprises + "]";
+				+ ", comprises=" + comprises + ", hashcode: " + String.format("%x", super.hashCode()) + "]";
 	}
 	
 }

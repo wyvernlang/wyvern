@@ -26,8 +26,7 @@ val m1a = m1.createA()
 val m2a = m2.createA()
 val m3a = m3.createA()
 
-match(m1a):
+match(m2a):
 	m2.A => 12
 	m1.A => 13
 	default => 14
-
