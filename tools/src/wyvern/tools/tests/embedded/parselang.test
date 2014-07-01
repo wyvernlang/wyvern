@@ -122,21 +122,30 @@ module test uriParser[StringConstant("http"):Str]
 						search ::= xalphas_t:xa{: xa :} | xalphas_t:xa plus_t search:sh {: xa + sh :};
 					%cf}
 
-module test htmlParser[StringConstant("<html><body>Hello <span>World!</span></body></html>"):Str]
+module test htmlParser[StringConstant("<html><body>Hello<span>World!</span></body></html>"):Str]
 	file main
 		import wyv:html
 		val page:HTML.HTML = ~
 			>html
 				>body
-					Hello World!
+					Hello
+					>span
+						World!
 		page.string()
 	file html
 		module HTML
 		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.typedAST.core.values.StringConstant
 		import java:wyvern.tools.parsing.HasParser
 		import java:wyvern.tools.parsing.ExtParser
 		import java:wyvern.tools.parsing.ParseBuffer
+		import java:wyvern.tools.util.LangUtil
+		import java:java.util.regex.Matcher
+		import java:java.util.regex.Pattern
 		import java:java.util.Stack
+		import java:java.lang.String
+		import java:java.lang.Integer
+		import java:java.lang.System
 		type HTML
 			def string():Str
 			metadata:HasParser = new
@@ -145,10 +154,11 @@ module test htmlParser[StringConstant("<html><body>Hello <span>World!</span></bo
 						val depths = Stack.create()
 						val depthRegex = Pattern.compile("(\r\n|\n)([\t ]*)")
 						var curly:Int = 0
-						depths.push(0)
+						depths.push(Integer.create(0))
 
 						def getLastMatch(patt:Pattern,str:Str,groupN:Int):Str
-							val inpMatcher = patt.matcher(str)
+							val istr = if String.create(str).startsWith("\n") then str else "\n" + str
+							val inpMatcher = patt.matcher(istr)
 							def recurser(last:Str):Str
 								if inpMatcher.find() then recurser(inpMatcher.group(groupN)) else last
 							recurser("")
@@ -173,28 +183,71 @@ module test htmlParser[StringConstant("<html><body>Hello <span>World!</span></bo
 
 								terminal Unit Indent_t ::= /(((\r\n)|\n)([ \t]*))+/
 								{:
-									depths.push(getLastMatch(depthRegex, lexeme, 2).length())
+									depths.push(Integer.create(getLastMatch(depthRegex, lexeme, 2).length()))
 									()
 								:};
 
-								terminal Dedent_t ::= /(((\r\n)|\n)([ \t]*))+/
+								terminal Unit Dedent_t ::= /(((\r\n)|\n)([ \t]*))+/
 								{:
-									int newDepth = getLastMatch(depthRegex, lexeme, 2).length();
-									depths.pop();
-									if(newDepth < depths.peek()) {
-										pushToken(Terminals.Dedent_t,lexeme);
-									} else {
-										pushToken(Terminals.Newline_t,lexeme);
-									}
+									val ostr = getLastMatch(depthRegex, lexeme, 2)
+									val newDepth = String.create(ostr).length()
+									depths.pop()
+									(if(newDepth < LangUtil.castInt(depths.peek())) then
+										pushToken(Terminals.Dedent_t,ostr)
+									else
+										pushToken(Terminals.Newline_t,ostr)
+									)
 								:};
 
-								terminal Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {: :};
+								terminal Unit Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {:
+								:};
 
-								terminal DedentRepair_t ::= /(\n[ \t]*)+/
+								terminal Unit DedentRepair_t ::= /(\n[ \t]*)+/
 								{:
-									pushToken(Terminals.Dedent_t,lexeme);
+									pushToken(Terminals.Dedent_t,lexeme)
+								:};
+
+								disambiguate indent:(Indent_t,Newline_t) {:
+									val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+									(if(newDepth > LangUtil.castInt(depths.peek())) then
+										Indent_t
+									else
+										Newline_t)
+								:};
+								disambiguate dedent:(Dedent_t,Newline_t) {:
+									val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+									(if(newDepth < LangUtil.castInt(depths.peek())) then
+										Dedent_t
+									else
+										Newline_t)
 								:};
 							%lex}
 							%cf{
+								non terminal TypedAST block;
+								non terminal TypedAST blocks;
+								non terminal TypedAST tag;
+								non terminal TypedAST tagbody;
+								non terminal TypedAST fs;
 
+								start with fs;
+								
+								fs ::= block:bl Newline_t {: bl :};
+
+								block ::= tag:tag tagbody:body {:
+									~
+										val itag = $tag
+										"<" + itag + ">" + $body + "</"+itag+">"
+								:} | usercode_t:str {: StringConstant.create(str) :};
+
+								blocks ::= block:bl {: bl :} | blocks:ib Newline_t block:bl {: {$ib + $bl} :};
+
+								tag ::= nose_t identifier_t:id {: StringConstant.create(id) :}
+									|   nose_t ocurly_t nocurlies_t:code ccurly_t {: LangUtil.spliceUnsafe(code) :};
+
+								tagbody ::= Indent_t blocks:blks Dedent_t {: blks :}
+										|   Newline_t {: StringConstant.create("") :};
 							%cf}
+						val parsed = parser.parse(buf.ensureNewline())
+						~
+							new
+								def string():Str = $parsed
