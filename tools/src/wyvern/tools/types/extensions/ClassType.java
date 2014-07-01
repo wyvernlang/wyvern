@@ -18,6 +18,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType, ParameterizableType {
 	private ClassDeclaration decl = null;
 	private Reference<Environment> declEnv;
+	protected Reference<Environment> declEnv;
 	protected Reference<Environment> typeEquivalentEnv = new Reference<>();
 	private List<String> params;
 	private String name;
