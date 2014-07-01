@@ -125,10 +125,15 @@ module test uriParser[StringConstant("http"):Str]
 module test htmlParser[StringConstant("<html><body>Hello<span>World!</span></body></html>"):Str]
 	file main
 		import wyv:html
+		val hello = "Hello"
+		val bod = "body"
 		val page:HTML.HTML = ~
 			>html
-				>body
-					Hello
+				>{bod}
+					{
+					val k = hello
+					k
+					}
 					>span
 						World!
 		page.string()
@@ -199,12 +204,55 @@ module test htmlParser[StringConstant("<html><body>Hello<span>World!</span></bod
 									)
 								:};
 
+								ignore terminal Unit IgnoredNewline_t ::= /((\n|(\r\n))([ \t]*))+/ {: :};
+
 								terminal Unit Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {:
 								:};
 
 								terminal Unit DedentRepair_t ::= /(\n[ \t]*)+/
 								{:
 									pushToken(Terminals.Dedent_t,lexeme)
+								:};
+
+								disambiguate ignoredNewline1:(IgnoredNewline_t,nocurlies_t) {:
+								 	if (curly > 0) then nocurlies_t else IgnoredNewline_t
+								:};
+
+								disambiguate ignoredNewline2:(IgnoredNewline_t,Newline_t) {:
+								 	if (curly > 0) then IgnoredNewline_t else Newline_t
+								:};
+
+								disambiguate ignoredNewline3:(Dedent_t,IgnoredNewline_t,Newline_t) {:
+								 	val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+
+									val res = (if(newDepth < LangUtil.castInt(depths.peek())) then
+													Dedent_t
+											   else
+													Newline_t)
+
+								 	if (curly > 0) then IgnoredNewline_t else res
+								:};
+
+								disambiguate ignoredNewline4:(IgnoredNewline_t,Indent_t,Newline_t) {:
+								 	val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+
+									val res = (if(newDepth > LangUtil.castInt(depths.peek())) then
+													Indent_t
+											   else
+													Newline_t)
+
+								 	if (curly > 0) then IgnoredNewline_t else res
+								:};
+
+								disambiguate ignoredNewline5:(Dedent_t,IgnoredNewline_t,Indent_t,Newline_t) {:
+								 	val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+									val odepth = LangUtil.castInt(depths.peek())
+									val res = (if(newDepth == odepth) then
+													Newline_t
+											   else
+													(if(newDepth > odepth) then Indent_t else Newline_t))
+
+								 	if (curly > 0) then IgnoredNewline_t else res
 								:};
 
 								disambiguate indent:(Indent_t,Newline_t) {:
@@ -229,6 +277,9 @@ module test htmlParser[StringConstant("<html><body>Hello<span>World!</span></bod
 								non terminal TypedAST tagbody;
 								non terminal TypedAST fs;
 
+								non terminal Str inlinelit;
+								non terminal Str innerdsl;
+
 								start with fs;
 								
 								fs ::= block:bl Newline_t {: bl :};
@@ -237,15 +288,22 @@ module test htmlParser[StringConstant("<html><body>Hello<span>World!</span></bod
 									~
 										val itag = $tag
 										"<" + itag + ">" + $body + "</"+itag+">"
-								:} | usercode_t:str {: StringConstant.create(str) :};
+								:}
+								| 		  usercode_t:str {: StringConstant.create(str) :}
+								|		  inlinelit:code {: LangUtil.spliceUnsafe(code) :};
 
 								blocks ::= block:bl {: bl :} | blocks:ib Newline_t block:bl {: {$ib + $bl} :};
 
 								tag ::= nose_t identifier_t:id {: StringConstant.create(id) :}
-									|   nose_t ocurly_t nocurlies_t:code ccurly_t {: LangUtil.spliceUnsafe(code) :};
+									|   nose_t inlinelit:code {: LangUtil.spliceUnsafe(code) :};
 
 								tagbody ::= Indent_t blocks:blks Dedent_t {: blks :}
 										|   Newline_t {: StringConstant.create("") :};
+
+								inlinelit ::= ocurly_t innerdsl:idsl ccurly_t {: idsl :};
+								innerdsl ::= nocurlies_t:str {: str :}
+								| 			 nocurlies_t:str ocurly_t innerdsl:idsl ccurly_t innerdsl:stre {: str + "{" + idsl + "}" + stre :}
+								| 			{: "" :};
 							%cf}
 						val parsed = parser.parse(buf.ensureNewline())
 						~
