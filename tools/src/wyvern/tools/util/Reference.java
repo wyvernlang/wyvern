@@ -2,11 +2,13 @@ package wyvern.tools.util;
 
 import wyvern.tools.typedAST.core.binding.LateBinder;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Reference<T> {
 	private Supplier<T> src;
 	private T value;
+
 	public Reference(T value) {
 		this.value = value;
 		this.src = () -> value;
@@ -21,17 +23,13 @@ public class Reference<T> {
 	public void set(T value) {
 		this.src = () -> value;
 	}
+	public void setSrc(Function<Supplier<T>, Supplier<T>> srcGen) { this.src = srcGen.apply(src); }
 
 	public T get() {
 		return src.get();
 	}
 
 	public LateBinder<T> getBinder() {
-		return new LateBinder<T>() {
-			@Override
-			public T get() {
-				return src.get();
-			}
-		};
+		return src::get;
 	}
 }
