@@ -2,8 +2,11 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.LateBinder;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -11,6 +14,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -113,6 +117,12 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public JavaClassDecl(Class clazz) {
 		super(clazz.getSimpleName(), "", "", null, FileLocation.UNKNOWN);
+		declEnvRef.setSrc((oSrc) -> () -> {
+			initalize();
+
+			//Reset as part of initialization
+			return declEnvRef.get();
+		});
 		this.clazz = clazz;
 	}
 
@@ -138,6 +148,11 @@ public class JavaClassDecl extends ClassDeclaration {
 	public DeclSequence getDecls() {
 		initalize();
 		return decls;
+	}
+
+	public Obj getClassObj() {
+		initalize();
+		return new Obj(getClassEnv(Environment.getEmptyEnvironment()));
 	}
 
 	boolean initalized = false;
@@ -167,13 +182,13 @@ public class JavaClassDecl extends ClassDeclaration {
 			objEnv = Environment.getEmptyEnvironment();
 		for (Declaration decl : this.getDecls().getDeclIterator()) {
 			if (decl instanceof JavaMeth) {
-				if (((JavaMeth) decl).isClass()) {
+				if (decl.isClass()) {
 					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
 				objEnv = decl.extend(objEnv, objEnv);
 			} else if (decl instanceof JavaField) {
-				if (((JavaField) decl).isClass()) {
+				if (decl.isClass()) {
 					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
@@ -188,6 +203,9 @@ public class JavaClassDecl extends ClassDeclaration {
 		getDeclEnvRef().set(declEnv);
 		setObjEnv(objEnv);
 		envDone = true;
+
+		//To generate class env
+		extendName(Environment.getEmptyEnvironment(), Environment.getEmptyEnvironment());
 	}
 
 	private static Method findHighestMethod(Class c, Method m) {
