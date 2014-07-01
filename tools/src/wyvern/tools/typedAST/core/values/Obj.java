@@ -32,7 +32,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	}
 
     public Obj(Reference<Environment> declEnv) {
-        intEnv = declEnv;
+		intEnv = declEnv;
     }
 
     private void updateTee() {

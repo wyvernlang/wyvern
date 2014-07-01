@@ -68,8 +68,11 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		if (other instanceof JavaClassType)
-			return Util.javaToWyvType(Integer.class).subtype(other, subtypes);
+		if (other instanceof JavaClassType) {
+			if (Util.javaToWyvType(Integer.class).subtype(other, subtypes))
+				return true;
+			return ((JavaClassType) other).getInnerClass().equals(Object.class);
+		}
 		return super.subtype(other, subtypes);
 	}
 
