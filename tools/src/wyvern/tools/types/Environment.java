@@ -126,4 +126,22 @@ public class Environment implements TreeWritable {
 		else
 			return this.binding.toString() + ", " + parentEnvironment.toString();
 	}
+
+	public int size() {
+		if (parentEnvironment == null)
+			return 0;
+		else
+			return parentEnvironment.size()+1;
+	}
+
+	public LinkedList<String> getBoundNames() {
+		LinkedList<String> lst;
+		if (parentEnvironment != null) {
+			lst = parentEnvironment.getBoundNames();
+		} else {
+			lst = new LinkedList<>();
+		}
+		lst.addFirst(name);
+		return lst;
+	}
 }
