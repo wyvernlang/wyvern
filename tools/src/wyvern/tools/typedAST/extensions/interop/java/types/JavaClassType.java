@@ -9,6 +9,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.MetaType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Reference;
 
@@ -60,14 +61,28 @@ public class JavaClassType extends ClassType implements MetaType {
 		return decl;
 	}
 
+	private boolean subtypePrim(Class a, Class b) {
+		return (a.isAssignableFrom(Integer.class) && b.isAssignableFrom(int.class)) ||
+				(b.isAssignableFrom(int.class) && a.isAssignableFrom(Integer.class)) ||
+				(a.isAssignableFrom(Double.class) && b.isAssignableFrom(double.class)) ||
+				(a.isAssignableFrom(double.class) && b.isAssignableFrom(Double.class)) ||
+				(a.isAssignableFrom(Character.class) && b.isAssignableFrom(char.class)) ||
+				(a.isAssignableFrom(char.class) && b.isAssignableFrom(Character.class));
+	}
+
 	@Override
 	public boolean subtype(Type other) {
 		decl.initalize();
 		if (other instanceof JavaClassType
 				&& ((JavaClassType)other).decl.getClazz().equals(decl.getClazz()))
 			return true;
-		if (other instanceof Str && this.clazz.equals(String.class))
+		if (other instanceof JavaClassType &&
+				subtypePrim(((JavaClassType) other).getInnerClass(), decl.getClazz()))
+			return true;
+		if (other instanceof Str && this.decl.getClazz().equals(String.class))
 			return true;//TODO:clean up
+		if (other instanceof JavaClassType)
+			return ((JavaClassType) other).decl.getClazz().isAssignableFrom(decl.getClazz());
 		return super.subtype(other);
 	}
 
@@ -94,4 +109,7 @@ public class JavaClassType extends ClassType implements MetaType {
 	public String toString() {
 		return "JavaClass("+decl.getClazz().getName()+")";
 	}
+
+
+
 }
