@@ -46,6 +46,13 @@ public class ParseBuffer extends ScannerBuffer {
 		return new ParseBuffer(res);
 	}
 
+	public ParseBuffer ensureNewline() {
+		if (srcString.endsWith("\n"))
+			return this;
+		else
+			return new ParseBuffer(srcString + "\n");
+	}
+
 	public String getSrcString() {
 		return srcString;
 	}
