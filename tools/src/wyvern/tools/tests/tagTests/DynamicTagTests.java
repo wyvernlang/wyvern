@@ -36,15 +36,6 @@ public class DynamicTagTests {
 	}
 	
 	@Test
-	public void dynamicTagTest3() throws CopperParserException, IOException {
-		String program = readFile(PATH + "DynamicTags3.wyv");
-		
-		TypedAST ast = TagTests.getAST(program);
-		
-		TagTests.evaluateExpecting(ast, 11);
-	}
-	
-	@Test
 	public void test1() throws CopperParserException, IOException {
 		String program = readFile(PATH + "ThisTest.wyv");
 		
