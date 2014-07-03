@@ -97,6 +97,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 			
 			//check for dynamic tag
 			if (c.getTaggedTypeMatch().contains(".")) {
+				System.out.println("-- start dynamic tag match");
+				
 				//dynamic tag
 				String varName = c.getTaggedTypeMatch().split(Pattern.quote("."))[0];
 				String tagName = c.getTaggedTypeMatch().split(Pattern.quote("."))[1];
@@ -116,6 +118,9 @@ public class Match extends CachingTypedAST implements CoreAST {
 				System.out.println("Evaluating dynamic tag match for info: " + objInfo);
 				System.out.println("infos: " + caseOfInfo + ", " + objInfo);
 				System.out.println("infos are equal? : " + (caseOfInfo == objInfo));
+				
+				System.out.println("-- end dynamic tag match");
+				if (caseOfInfo == objInfo) return c.getAST().evaluate(env);
 				
 			}  else if (hasMatch(matchingOverBinding, binding.getName())) {
 				//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();

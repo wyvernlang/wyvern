@@ -108,7 +108,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		//System.out.println("Evaluating val decl");
+		System.out.println("-- Evaluating val decl: " + getName());
 		if (declEnv.getValue(binding.getName()) != null) 
 			return;
 			
@@ -117,6 +117,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			defValue = definition.evaluate(evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(defValue);
+		
+		System.out.println("-- End evaluating val decl\n");
 	}
 
 	@Override

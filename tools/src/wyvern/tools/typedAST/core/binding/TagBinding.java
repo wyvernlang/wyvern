@@ -67,7 +67,6 @@ public class TagBinding implements Binding {
 		if (tagBindings.containsKey(tagName)) {
 			return tagBindings.get(tagName);
 		}
-		System.out.println("Making tagbinding: " + tagName);
 		//If not present, create it, associate it, then return it
 		TagBinding binding = new TagBinding(tagName, getTaggedInfo(tagName));
 		tagBindings.put(tagName, binding);
@@ -168,12 +167,11 @@ public class TagBinding implements Binding {
 	}
 	
 	public static void associate(TaggedInfo taggedInfo) {
-		System.out.println("Associating: " + taggedInfo);
 		if (!tagInfos.contains(taggedInfo)) tagInfos.add(taggedInfo);
 	}
 	
 	public static TaggedInfo getDynamicInfo(Value val) {
-		System.out.println("Map of dynamicTagBindings: " + dynamicTagBindings);
+		//System.out.println("Map of dynamicTagBindings: " + dynamicTagBindings);
 		return dynamicTagBindings.get(val);
 	}
 	
@@ -182,18 +180,19 @@ public class TagBinding implements Binding {
 	}
 	
 	public static TaggedInfo getDynamicObjTagInfo(Value obj) {
-		System.out.println("Map of dynamicTagObjBingings: " + dynamicTagObjBindings);
+		//System.out.println("Map of dynamicTagObjBingings: " + dynamicTagObjBindings);
 		return dynamicTagObjBindings.get(obj);
 	}
 	
 	/**
-	 * Gets or creates a dynamic tag over the given value.
+	 * Creates a dynamic tag with the given values.
 	 * 
 	 * @param tagName
+	 * @param caseOf
 	 * @param val
 	 * @return
 	 */
-	public static TaggedInfo getOrCreateDynamic(String tagName, String caseOf, Value val) {
+	public static TaggedInfo createDynamicTag(String tagName, String caseOf, Value val) {
 		TaggedInfo info = new TaggedInfo(caseOf);
 		info.setTagName(tagName);
 		

@@ -24,6 +24,9 @@ import static wyvern.tools.errors.ToolError.reportError;
 public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	private NameBinding binding;
 	
+	public static Variable thisVariable;
+	public static Value thisValue;
+	
 	public Variable(NameBinding binding, FileLocation location) {
 		this.binding = binding;
 		this.location = location;
@@ -58,10 +61,15 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(Environment env) {		
 		//Value value = binding.getValue(env);
 		Value value = env.getValue(binding.getName());
 		assert value != null;
+		
+		//TODO: fix this hack, because we cannot access 'this' in anonymous types
+		Variable.thisVariable = this;
+		Variable.thisValue = value;
+		
 		if (value instanceof VarValue) {
 			return ((VarValue)value).getValue();
 		}

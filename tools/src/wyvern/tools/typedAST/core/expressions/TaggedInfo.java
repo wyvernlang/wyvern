@@ -69,8 +69,6 @@ public class TaggedInfo {
 		
 		this.caseOf = getTagName(caseOf);
 		this.comprises = comprises;
-		
-		System.out.println("Creating parsing (from Type caseOf and List<Type> comprises) a TaggedInfo: " + this);
 	}
 	
 	/**

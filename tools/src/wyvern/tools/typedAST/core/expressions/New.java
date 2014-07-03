@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TagBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -170,20 +171,17 @@ public class New extends CachingTypedAST implements CoreAST {
 				TaggedInfo info = t.getTaggedInfo();
 				
 				if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
+					//we're creating a dynamic tag. The dynamic tag is bound to 'this'.
+					Value tagOwner = Variable.thisValue;
+					
 					String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
 					String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
 					
-					Value v = env.getValue(varName);
-					
-					dynamicTagInfo = TagBinding.getOrCreateDynamic(info.getTagName(), tagName, v);
-					
-					if (v != null) {
-						//We are making a dynamic tag
-						System.out.println("Making dynamic tag over: " + v);
-					}
+					System.out.println("value1: " + varName + " used to create dynamic tag");
+					//get the dynamic tag instance 
+					dynamicTagInfo = TagBinding.getDynamicInfo(tagOwner);
 				}
 			}
-			
 			
 			Environment mockEnv = Environment.getEmptyEnvironment();
 

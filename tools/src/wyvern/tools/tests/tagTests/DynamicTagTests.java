@@ -18,8 +18,35 @@ public class DynamicTagTests {
 	/**
 	 * This test ensures the dynamic tag example works properly.
 	 */
-	public void dynamicTagTest() throws CopperParserException, IOException {
-		String program = readFile(PATH + "DynamicTags.wyv");
+	public void dynamicTagTest1() throws CopperParserException, IOException {
+		String program = readFile(PATH + "DynamicTags1.wyv");
+		
+		TypedAST ast = TagTests.getAST(program);
+		
+		TagTests.evaluateExpecting(ast, 12);
+	}
+	
+	@Test
+	public void dynamicTagTest2() throws CopperParserException, IOException {
+		String program = readFile(PATH + "DynamicTags2.wyv");
+		
+		TypedAST ast = TagTests.getAST(program);
+		
+		TagTests.evaluateExpecting(ast, 10);
+	}
+	
+	@Test
+	public void dynamicTagTest3() throws CopperParserException, IOException {
+		String program = readFile(PATH + "DynamicTags3.wyv");
+		
+		TypedAST ast = TagTests.getAST(program);
+		
+		TagTests.evaluateExpecting(ast, 11);
+	}
+	
+	@Test
+	public void test1() throws CopperParserException, IOException {
+		String program = readFile(PATH + "ThisTest.wyv");
 		
 		TypedAST ast = TagTests.getAST(program);
 		

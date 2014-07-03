@@ -7,6 +7,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;
@@ -313,7 +315,27 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+		
+		TaggedInfo info = getTaggedInfo();
+		
+		if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
+			//evaluating a dynamic tag
+			
+			//extract the two parts of dynamic tag name
+			String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
+			String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
+			
+			//get the variable that the dynamic tag is created over
+			Value creationVar = evalEnv.getValue(varName);
+			
+			//create the dynamic tag
+			TaggedInfo dynamicTag = TagBinding.createDynamicTag(info.getTagName(), tagName, creationVar);
 
+			System.out.println("create dynamic tag: " + String.format("%x", dynamicTag.hashCode()) + "from var: " + varName);
+			
+			//System.out.println("evaluate decl: value1: " + varName + " used to create dynamic tag with val: " + String.format("%x", creationVar.hashCode()));
+		}
+		
 		Environment attrEnv = Environment.getEmptyEnvironment();
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		evalMeta(evalEnv);
