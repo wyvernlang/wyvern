@@ -164,7 +164,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		Environment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
 		classDecl.evalDecl(evalEnv, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
 		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
-				reduce(env, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
+				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
 		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 		objRef.set(new Obj(objenv.extend(argValEnv)));
 		
