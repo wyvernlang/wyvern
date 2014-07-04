@@ -10,8 +10,6 @@ import edu.umn.cs.melt.copper.main.*;
 import edu.umn.cs.melt.copper.runtime.auxiliary.Pair;
 import edu.umn.cs.melt.copper.runtime.engines.single.SingleDFAEngine;
 import edu.umn.cs.melt.copper.runtime.logging.CopperException;
-import edu.umn.cs.melt.copper.runtime.logging.CopperSyntaxError;
-import org.apache.tools.ant.BuildException;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -240,7 +238,7 @@ public class CopperTSL implements ExtParser {
 		try {
 			ParserCompiler.compile(res, pcp);
 		} catch (CopperException e) {
-			throw new BuildException(e);
+			throw new RuntimeException(e);
 		}
 
 		if (target.toString().isEmpty() ) {
