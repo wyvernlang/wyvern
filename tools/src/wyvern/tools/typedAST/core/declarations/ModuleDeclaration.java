@@ -44,7 +44,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		return inner.typecheck(env, Optional.empty());
+		inner.typecheck(env, Optional.empty());
+		return Unit.getInstance();
 	}
 
 	private Iterable<TypedAST> getInnerIterable() {
