@@ -1,0 +1,32 @@
+tagged type IA
+	def foo() : Int
+
+type M
+	tagged type A [case of IA]
+		def foo() : Int
+	def createA() : A
+
+def f() : M = new
+	tagged type A [case of IA]
+		def foo() : Int
+	def createA() : A = new
+		def foo() : Int = 1
+
+def g (m:M) : M = new
+	tagged type A [case of m.A]
+		def foo() : Int
+	def createA() : A = new
+		def foo() : Int = 2
+
+val m1:M = f()
+val m2:M = g(m1)
+val m3:M = g(m1)
+
+val m1a = m1.createA()
+val m2a = m2.createA()
+val m3a = m3.createA()
+
+match(m2a):
+	m3.A => 11
+	m1.A => 12
+	default => 13
