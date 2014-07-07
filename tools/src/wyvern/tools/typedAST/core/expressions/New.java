@@ -24,6 +24,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
@@ -47,6 +48,8 @@ public class New extends CachingTypedAST implements CoreAST {
 	private static int generic_num = 0;
 	private DeclSequence seq;
 	private Type ct;
+	
+	private Type expectedReturnType;
 
 	public void setBody(DeclSequence seq) {
 		this.seq = seq;
@@ -79,6 +82,9 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		// Assign expected return type that may be used when evaluating new that needs to know the tagged type of the object it creates.
+		if (expected.isPresent()) expectedReturnType = expected.get();
+		
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
 		
@@ -165,10 +171,12 @@ public class New extends CachingTypedAST implements CoreAST {
 			classDecl = classVarTypeBinding.getClassDecl();
 		else {
 			//check if we are in the context of a Dyntamic Tag binding
-			if (DefDeclaration.lastBindedType instanceof TypeType) {
-				TypeType t = (TypeType) DefDeclaration.lastBindedType;
+			if (expectedReturnType instanceof TypeType) {
+				TypeType t = (TypeType) expectedReturnType;
 				
 				TaggedInfo info = t.getTaggedInfo();
+				
+				System.out.println("EXPECTED RETURN: " + t);
 				
 				if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
 					//we're creating a dynamic tag. The dynamic tag is bound to 'this'.

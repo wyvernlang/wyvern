@@ -30,9 +30,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private String name;
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
-
-	public static Type lastBindedType;
-	public static String thing;
 	
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
@@ -127,8 +124,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			extEnv = extEnv.extend(bind);
 		}
 		if (body != null) {
+			// System.out.println("METH RESULT (before): " + Optional.of(((Arrow)type).getResult()));
 			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for def inside type!
 			type = TypeResolver.resolve(type, env);
+			// System.out.println("METH RESULT (after): " + Optional.of(((Arrow)type).getResult()));
 			
 			Type retType = ((Arrow)type).getResult();
 			
@@ -167,9 +166,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		Closure closure = new Closure(this, evalEnv);
 		ValueBinding vb = (ValueBinding) declEnv.lookup(name);
 		vb.setValue(closure);
-		
-		lastBindedType = ((Arrow)type).getResult();
-		thing = "defDecl type: " + lastBindedType;
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
