@@ -36,5 +36,5 @@ val bigWin = bigWinMod.Win.make()
 
 // returns "big"
 match(bigWin):
-	BigWinMod.WiYn =>"big"
+	bigWinMod.Win =>"big"
 	default => "small"
