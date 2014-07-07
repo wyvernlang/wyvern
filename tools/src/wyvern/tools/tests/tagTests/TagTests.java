@@ -777,6 +777,22 @@ public class TagTests {
 	}
 	
 	/**
+	 * Completely evaluates the given AST, and compares it to the given value.
+	 * Does typechecking first, then evaluation.
+	 * 
+	 * @param ast
+	 * @param value
+	 */
+	public static void evaluateExpecting(TypedAST ast, String value) {
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		Value v = ast.evaluate(Globals.getStandardEnv());
+		
+		String expecting = "StringConstant(" + value + ")"; 
+
+		Assert.assertEquals(expecting, v.toString());
+	}
+	
+	/**
 	 * Converts the given program into the AST representation.
 	 * 
 	 * @param program
