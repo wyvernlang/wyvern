@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -21,16 +22,19 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	private Reference<Environment> typeDeclEnv;
 
 	public TypeType(TypeDeclaration decl) {
+		// System.out.println("Creating new TypeType for decl: " + decl.getDecls());
 		this.decl = decl;
 		typeDeclEnv = decl.getDeclEnv();
 		attrObj = decl.getMetaValue();
 	}
 
 	public TypeType(Environment declEnv) {
+		// System.out.println("Creating new TypeType for declEnv: " + declEnv);
 		this.typeDeclEnv = new Reference<>(declEnv);
 	}
 
 	public TypeType(Reference<Environment> declEnv) {
+		// System.out.println("Creating new TypeType for declEnv Ref: " + declEnv);
 		this.typeDeclEnv = declEnv;
 	}
 
@@ -63,6 +67,8 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		assert opExp.getArgument() == null;
 		
 		// the operation should exist
+		DeclSequence ds = this.decl.getDecls();
+		System.out.println("OPERATION: " + ds);
 		String opName = opExp.getOperationName();
 
 		NameBinding m = typeDeclEnv.get().lookup(opName);

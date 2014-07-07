@@ -47,10 +47,18 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		// nothing to write		
 	}
 	
+	private boolean recursive = false;
 	@Override
 	public String toString() {
 		if (declEnv.get() != null) {
-			return "CLASS(" + declEnv.get().toString() + ")";
+			if (!recursive) {
+				recursive = true;
+				String op = "CLASS(" + declEnv.get().toString() + ")";
+				recursive = false;
+				return op;
+			} else {
+				return "CLASS(Recursive)";
+			}
 		} else {
 			return "CLASS()";
 		}

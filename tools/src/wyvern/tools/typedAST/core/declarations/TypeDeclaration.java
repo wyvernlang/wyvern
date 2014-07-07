@@ -189,7 +189,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 	
     public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
-    	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+    	System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
     	
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
