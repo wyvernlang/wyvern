@@ -13,6 +13,24 @@ import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class TypeCheckingTests {
+	
+	@Test
+	public void testWrongTypeName() throws IOException, CopperParserException {
+		String input =
+				"module TestModule\n" +
+				"def foo():Boolean = true\n" +
+				"";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+		
+		// System.out.println(res.typecheck(Globals.getStandardEnv(), Optional.empty()));
+		
+		// Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
+		
+		// System.out.println(res.evaluate(Globals.getStandardEnv()).toString());
+		
+		// Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "()");		
+	}
+
 	@Test
 	public void testTypeMembers1() throws IOException, CopperParserException {
 		String input =
