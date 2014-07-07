@@ -134,6 +134,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			// System.out.println("bodyType = " + bodyType);
 			// System.out.println("retType = " + retType);
 			
+			System.out.println("CHECKING: def decl = " + this);
+			
 			if (bodyType != null && !bodyType.subtype(retType))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
 		}

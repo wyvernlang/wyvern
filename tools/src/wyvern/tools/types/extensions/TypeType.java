@@ -67,11 +67,18 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		assert opExp.getArgument() == null;
 		
 		// the operation should exist
-		DeclSequence ds = this.decl.getDecls();
-		System.out.println("OPERATION: " + ds);
+		// DeclSequence ds = this.decl.getDecls();
+		// System.out.println("OPERATION: " + ds);
+		
 		String opName = opExp.getOperationName();
 
 		NameBinding m = typeDeclEnv.get().lookup(opName);
+		
+		if (m == null) {
+			Environment thisEnv = this.decl.getDecls().extendWithDecls(Environment.getEmptyEnvironment());
+			m = thisEnv.lookup(opName); // FIXME: Are we sure we are looking in the right place???
+			System.out.println("This needs fixing - inside decl there is a decl with this name: " + m);
+		}
 
 		if (m == null)
 			throw new RuntimeException("Invalid operation "+opName+" on type " + this);
