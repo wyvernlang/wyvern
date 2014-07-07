@@ -41,7 +41,7 @@ public class DynamicTagTests {
 		
 		TypedAST ast = TagTests.getAST(program);
 		
-		TagTests.evaluateExpecting(ast, 12);
+		TagTests.evaluateExpecting(ast, 11);
 	}
 	
 	@Test
@@ -54,7 +54,7 @@ public class DynamicTagTests {
 	}
 	
 	@Test
-	public void test1() throws CopperParserException, IOException {
+	public void thisTest1() throws CopperParserException, IOException {
 		String program = readFile(PATH + "ThisTest.wyv");
 		
 		TypedAST ast = TagTests.getAST(program);

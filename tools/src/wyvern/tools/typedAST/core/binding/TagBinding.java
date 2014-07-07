@@ -1,18 +1,14 @@
 package wyvern.tools.typedAST.core.binding;
 
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
-
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
@@ -37,12 +33,14 @@ public class TagBinding implements Binding {
 	
 	private static Map<Value, TaggedInfo> dynamicTagBindings = new HashMap<Value, TaggedInfo>();
 	private static Map<Obj, TaggedInfo> dynamicTagObjBindings = new HashMap<Obj, TaggedInfo>();
+	private static List<TaggedInfo> pendingDynamicTagBindings = new ArrayList<TaggedInfo>();
 	
 	public static void resetHACK() { // TODO: This is going away very very very very soon! :)
 		tagBindings = new HashMap<String, TagBinding>();
 		tagInfos = new ArrayList<TaggedInfo>();
 		dynamicTagBindings = new HashMap<Value, TaggedInfo>();
 		dynamicTagObjBindings = new HashMap<Obj, TaggedInfo>();
+		pendingDynamicTagBindings = new ArrayList<TaggedInfo>();
 	}
 	
 	/**
@@ -196,8 +194,20 @@ public class TagBinding implements Binding {
 		TaggedInfo info = new TaggedInfo(caseOf);
 		info.setTagName(tagName);
 		
-		dynamicTagBindings.put(val, info);
+		pendingDynamicTagBindings.add(info);
 		
 		return info;
+	}
+	
+	public static boolean anyPendingDynamicTags() {
+		return !pendingDynamicTagBindings.isEmpty();
+	}
+	
+	public static void associatePendingDynamicTags(Value v) {
+		for (TaggedInfo i : pendingDynamicTagBindings) {
+			dynamicTagBindings.put(v, i);
+		}
+		
+		pendingDynamicTagBindings.clear();
 	}
 }

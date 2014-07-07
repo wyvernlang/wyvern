@@ -331,7 +331,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			//create the dynamic tag
 			TaggedInfo dynamicTag = TagBinding.createDynamicTag(info.getTagName(), tagName, creationVar);
 
-			System.out.println("create dynamic tag: " + String.format("%x", dynamicTag.hashCode()) + "from var: " + varName);
+			System.out.println("create dynamic tag: " + String.format("%x", dynamicTag.hashCode()) + ", from var: " + varName + String.format("%x", creationVar.hashCode()));
 			
 			//System.out.println("evaluate decl: value1: " + varName + " used to create dynamic tag with val: " + String.format("%x", creationVar.hashCode()));
 		}

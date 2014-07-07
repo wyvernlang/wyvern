@@ -1,21 +1,27 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import wyvern.targets.Common.wyvernIL.IL.Def.Def;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
+
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
-import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.TagBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -24,18 +30,11 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
-import java.util.stream.StreamSupport;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
@@ -44,7 +43,6 @@ public class New extends CachingTypedAST implements CoreAST {
 	boolean isGeneric = false;
 
 	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
-	private static int dynamicTagNum;
 	private static int generic_num = 0;
 	private DeclSequence seq;
 	private Type ct;
@@ -83,8 +81,8 @@ public class New extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		// Assign expected return type that may be used when evaluating new that needs to know the tagged type of the object it creates.
-		if (expected.isPresent()) expectedReturnType = expected.get();
-		
+		expectedReturnType = expected.orElse(null);
+
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
 		
@@ -176,18 +174,18 @@ public class New extends CachingTypedAST implements CoreAST {
 				
 				TaggedInfo info = t.getTaggedInfo();
 				
-				System.out.println("EXPECTED RETURN: " + t);
-				
 				if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
 					//we're creating a dynamic tag. The dynamic tag is bound to 'this'.
 					Value tagOwner = Variable.thisValue;
 					
 					String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
 					String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
-					
-					System.out.println("value1: " + varName + " used to create dynamic tag");
+
 					//get the dynamic tag instance 
 					dynamicTagInfo = TagBinding.getDynamicInfo(tagOwner);
+					
+					System.out.println("value1: " + varName + " used to create dynamically tagged object with tag: " + String.format("%x", dynamicTagInfo.hashCode()));
+
 				}
 			}
 			
@@ -215,11 +213,16 @@ public class New extends CachingTypedAST implements CoreAST {
 		Obj obj = new Obj(objenv.extend(argValEnv));
 		objRef.set(obj);
 		
+		if (TagBinding.anyPendingDynamicTags()) {
+			TagBinding.associatePendingDynamicTags(objRef.get());
+			System.out.println("associated dynamic tag to: " + String.format("%x", objRef.get().hashCode()));
+		}
+		
 		if (dynamicTagInfo != null) {
 			TagBinding.associateDynamicTagObj(obj, dynamicTagInfo);
 		}
 		
-		System.out.println("Finished evaluating new and created: " + String.format("%x", objRef.get().hashCode()));
+		System.out.println("Finished evaluating new and created val: " + String.format("%x", objRef.get().hashCode()));
 		
 		return objRef.get();
 	}
