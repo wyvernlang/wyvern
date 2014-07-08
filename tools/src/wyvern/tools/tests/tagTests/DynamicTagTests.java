@@ -54,6 +54,15 @@ public class DynamicTagTests {
 	}
 	
 	@Test
+	public void dynamicTagTestWindowPaper() throws CopperParserException, IOException {
+		String program = readFile(PATH + "DynamicTagsWindowPaper.wyv");
+		
+		TypedAST ast = TagTests.getAST(program);
+		
+		TagTests.evaluateExpecting(ast, "\"big\"");
+	}
+	
+	@Test
 	public void thisTest1() throws CopperParserException, IOException {
 		String program = readFile(PATH + "ThisTest.wyv");
 		
