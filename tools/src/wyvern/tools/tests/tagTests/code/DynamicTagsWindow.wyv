@@ -3,8 +3,8 @@ tagged type Window
 
 type WindowMod
 	tagged class Win [case of Window]
-		class def make():Win
-		def draw():Unit
+		class def make():Win = new
+		def draw():Str = "" 
 
 val basicWindow:WindowMod = new
 	tagged class Win [case of Window]
@@ -34,7 +34,6 @@ val bigWinMod:WindowMod = makeScrollable(winMod)
 val smallWin:Win = winMod.Win.make()
 val bigWin:Win = bigWinMod.Win.make()
 
-// returns "big"
 match(bigWin):
-	bigWinMod.Win => "big"
+	bigWinMod.Win => "big (is returned)"
 	default => "small"

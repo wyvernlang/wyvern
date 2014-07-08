@@ -243,9 +243,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		// System.out.println("Doing doTypecheck for Type: " + this.getName());
 		
 		for (Declaration decl : decls.getDeclIterator()) {
+			// System.out.println("PROCESSING: " + decl);
 			decl.typecheckSelf(eenv);
+			// System.out.println("FIN FIN FIN");
 		}
 		evalMeta(Globals.getStandardEnv().extend(env.lookupBinding("metaEnv", MetadataInnerBinding.class).orElse(new MetadataInnerBinding())));
+		
+		// System.out.println("Finished doing doTypecheck for Type: " + this.getName());
 
 		return this.typeBinding.getType();
 	}	

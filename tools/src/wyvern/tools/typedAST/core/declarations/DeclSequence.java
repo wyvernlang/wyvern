@@ -141,7 +141,17 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 
 		for (TypedAST d : this) {
+			System.out.println("STARTED TYPE checking: " + d);
+			if (d instanceof TypeDeclaration) {
+				TypeDeclaration td = (TypeDeclaration) d;
+				System.out.println("IT IS: " + td.getName());
+			}
 			d.typecheck(env, Optional.empty());
+			System.out.println("FINISHED checking: " + d);
+			if (d instanceof TypeDeclaration) {
+				TypeDeclaration td = (TypeDeclaration) d;
+				System.out.println("IT IS: " + td.getName());
+			}
 		}
 		
 		return wyvern.tools.types.extensions.Unit.getInstance();

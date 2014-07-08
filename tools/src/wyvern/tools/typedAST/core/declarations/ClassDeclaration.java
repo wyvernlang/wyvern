@@ -166,7 +166,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type doTypecheck(Environment env) {
-
+		// System.out.println("INSIDE doTYpecheck in CLass DECLAration");
+		
+		// System.out.println();
+		// System.out.println(decls);
+		// System.out.println();
 
 		// FIXME: Currently allow this and class in both class and object methods. :(
 
@@ -230,6 +234,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 		}
 		
+		// System.out.println("FINITA FINITA FINITA");
 
 		return Unit.getInstance();
 	}
