@@ -29,6 +29,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls = new DeclSequence(new LinkedList<Declaration>());
@@ -328,6 +329,28 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);
+		
+		
+		TaggedInfo info = getTaggedInfo();
+		
+		if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
+			//evaluating a dynamic tag
+			
+			//extract the two parts of dynamic tag name
+			String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
+			String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
+			
+			//get the variable that the dynamic tag is created over
+			Value creationVar = evalEnv.getValue(varName);
+			
+			//create the dynamic tag
+			TaggedInfo dynamicTag = TagBinding.createDynamicTag(info.getTagName(), tagName, creationVar);
+
+			System.out.println("create dynamic tag: " + String.format("%x", dynamicTag.hashCode()) + ", from var: " + varName + String.format("%x", creationVar.hashCode()));
+			
+			//System.out.println("evaluate decl: value1: " + varName + " used to create dynamic tag with val: " + String.format("%x", creationVar.hashCode()));
+		}
+		
 	}
 	
 	public Environment evaluateDeclarations(Environment addtlEnv) {

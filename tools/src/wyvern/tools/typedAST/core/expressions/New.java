@@ -172,24 +172,26 @@ public class New extends CachingTypedAST implements CoreAST {
 			
 			System.out.println("Exploring dynamic tag creating possibility...");
 			
+			TaggedInfo info = null;
+			
 			if (expectedReturnType instanceof TypeType) {
-				TypeType t = (TypeType) expectedReturnType;
-				
-				TaggedInfo info = t.getTaggedInfo();
-				
-				if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
-					//we're creating a dynamic tag. The dynamic tag is bound to 'this'.
-					Value tagOwner = Variable.thisValue;
+				info  = ((TypeType) expectedReturnType).getTaggedInfo();
+			} else if (expectedReturnType instanceof ClassType) {
+				info  = ((ClassType) expectedReturnType).getTaggedInfo();
+			}
+			
+			if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
+				//we're creating a dynamic tag. The dynamic tag is bound to 'this'.
+				Value tagOwner = Variable.thisValue;
 					
-					String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
-					String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
+				String varName = info.getCaseOfTag().split(Pattern.quote("."))[0];
+				String tagName = info.getCaseOfTag().split(Pattern.quote("."))[1];
 
-					//get the dynamic tag instance 
-					dynamicTagInfo = TagBinding.getDynamicInfo(tagOwner);
+				//get the dynamic tag instance 
+				dynamicTagInfo = TagBinding.getDynamicInfo(tagOwner);
 					
-					System.out.println("value1: " + varName + " used to create dynamically tagged object with tag: " + String.format("%x", dynamicTagInfo.hashCode()));
+				System.out.println("value1: " + varName + " used to create dynamically tagged object with tag: " + String.format("%x", dynamicTagInfo.hashCode()));
 
-				}
 			}
 			
 			Environment mockEnv = Environment.getEmptyEnvironment();
