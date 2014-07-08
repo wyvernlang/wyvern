@@ -178,7 +178,7 @@ public class TagBinding implements Binding {
 	}
 	
 	public static TaggedInfo getDynamicObjTagInfo(Value obj) {
-		//System.out.println("Map of dynamicTagObjBingings: " + dynamicTagObjBindings);
+		System.out.println("Map of dynamicTagObjBingings: " + dynamicTagObjBindings);
 		return dynamicTagObjBindings.get(obj);
 	}
 	

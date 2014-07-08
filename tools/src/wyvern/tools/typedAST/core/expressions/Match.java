@@ -112,6 +112,11 @@ public class Match extends CachingTypedAST implements CoreAST {
 				System.out.println("matchingOver " + matchingOver);
 				System.out.println("matchingOver.evaluate.hashCode " + String.format("%x", matchingOver.evaluate(env).hashCode()));
 				
+				if (matchingOver instanceof Variable) {
+					Variable vv = (Variable) matchingOver;
+					System.out.println("matchingOver's value hash: " + String.format("%x",  env.getValue(vv.getName()).hashCode()));
+				}
+				
 				TaggedInfo objInfo = TagBinding.getDynamicObjTagInfo(matchingOver.evaluate(env));
 				
 				//ClassType classType = (ClassType) value.getType();

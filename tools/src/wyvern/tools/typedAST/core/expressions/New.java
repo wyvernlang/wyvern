@@ -165,10 +165,13 @@ public class New extends CachingTypedAST implements CoreAST {
 		
 		TaggedInfo dynamicTagInfo = null;
 		
-		if (classVarTypeBinding != null)
+		if (classVarTypeBinding != null) {
 			classDecl = classVarTypeBinding.getClassDecl();
-		else {
-			//check if we are in the context of a Dyntamic Tag binding
+		} else {
+			//check if we are in the context of a Dynamic Tag binding
+			
+			System.out.println("Exploring dynamic tag creating possibility...");
+			
 			if (expectedReturnType instanceof TypeType) {
 				TypeType t = (TypeType) expectedReturnType;
 				
@@ -222,7 +225,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			TagBinding.associateDynamicTagObj(obj, dynamicTagInfo);
 		}
 		
-		System.out.println("Finished evaluating new and created val: " + String.format("%x", objRef.get().hashCode()));
+		System.out.println("Finished evaluating new and created val: " + String.format("%x", objRef.get().hashCode()) + " and dTI = " + dynamicTagInfo);
 		
 		return objRef.get();
 	}
