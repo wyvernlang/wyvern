@@ -31,8 +31,8 @@ val winMod:WindowMod =
 		basicWindow
 
 val bigWinMod:WindowMod = makeScrollable(winMod)
-val smallWin:Win = winMod.Win.make()
-val bigWin:Win = bigWinMod.Win.make()
+val smallWin = winMod.Win.make()
+val bigWin = bigWinMod.Win.make()
 
 match(bigWin):
 	bigWinMod.Win => "big (is returned)"

@@ -50,7 +50,7 @@ public class DynamicTagTests {
 		
 		TypedAST ast = TagTests.getAST(program);
 		
-		TagTests.evaluateExpecting(ast, "big");
+		TagTests.evaluateExpecting(ast, "\"big (is returned)\"");
 	}
 	
 	@Test
