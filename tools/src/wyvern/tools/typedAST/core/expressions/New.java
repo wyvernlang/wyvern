@@ -22,6 +22,7 @@ import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -166,7 +167,9 @@ public class New extends CachingTypedAST implements CoreAST {
 		TaggedInfo dynamicTagInfo = null;
 		
 		if (classVarTypeBinding != null) {
+			System.out.println("ClassVarTypeBinding class decl tag info = " + classVarTypeBinding.getClassDecl().getTaggedInfo());
 			classDecl = classVarTypeBinding.getClassDecl();
+			dynamicTagInfo = classVarTypeBinding.getClassDecl().getTaggedInfo();
 		} else {
 			//check if we are in the context of a Dynamic Tag binding
 			
@@ -180,6 +183,22 @@ public class New extends CachingTypedAST implements CoreAST {
 				info  = ((ClassType) expectedReturnType).getTaggedInfo();
 			}
 			
+			System.out.println("Got info = " + info);
+			
+			if (info == null) {
+				for (Declaration d : this.seq.getDeclIterator()) {
+					if (d instanceof TypeDeclaration) {
+						TypeDeclaration td = (TypeDeclaration) d;
+						info = td.getTaggedInfo();
+					} else if (d instanceof ClassDeclaration) {
+						ClassDeclaration cd = (ClassDeclaration) d;
+						info = cd.getTaggedInfo();
+					}
+				}
+			}
+			
+			System.out.println("info became: " + info);
+			
 			if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
 				//we're creating a dynamic tag. The dynamic tag is bound to 'this'.
 				Value tagOwner = Variable.thisValue;
@@ -190,7 +209,8 @@ public class New extends CachingTypedAST implements CoreAST {
 				//get the dynamic tag instance 
 				dynamicTagInfo = TagBinding.getDynamicInfo(tagOwner);
 					
-				System.out.println("value1: " + varName + " used to create dynamically tagged object with tag: " + String.format("%x", dynamicTagInfo.hashCode()));
+				if (dynamicTagInfo != null)
+					System.out.println("value1: " + varName + " used to create dynamically tagged object with tag: " + String.format("%x", dynamicTagInfo.hashCode()));
 
 			}
 			
@@ -210,6 +230,9 @@ public class New extends CachingTypedAST implements CoreAST {
 
 		AtomicReference<Value> objRef = new AtomicReference<>();
 		Environment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
+		
+		System.out.println("Calling evalDecl on classDecl = " + classDecl);
+		
 		classDecl.evalDecl(evalEnv, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
 		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 				reduce(env, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
@@ -221,6 +244,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		if (TagBinding.anyPendingDynamicTags()) {
 			TagBinding.associatePendingDynamicTags(objRef.get());
 			System.out.println("associated dynamic tag to: " + String.format("%x", objRef.get().hashCode()));
+			System.out.println("note: dynamicTagInof = " + dynamicTagInfo);
 		}
 		
 		if (dynamicTagInfo != null) {
