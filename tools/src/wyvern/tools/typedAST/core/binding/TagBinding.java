@@ -43,6 +43,16 @@ public class TagBinding implements Binding {
 		pendingDynamicTagBindings = new ArrayList<TaggedInfo>();
 	}
 	
+	public static void printDebugState() {
+		System.out.println("TAG STATE BEGINS:");
+		System.out.println("tagBindings = " + tagBindings);
+		System.out.println("tagInfos = " + tagInfos);
+		System.out.println("dynamicTagBindings = " + dynamicTagBindings);
+		System.out.println("dynamicTagObjBindings = " + dynamicTagObjBindings);
+		System.out.println("pendingDynamicTagBindings = " + pendingDynamicTagBindings);
+		System.out.println("TAG STATE ENDS");
+	}
+	
 	/**
 	 * Internal constructor to instantiate a TagBinding.
 	 * 
@@ -190,9 +200,9 @@ public class TagBinding implements Binding {
 	 * @param val
 	 * @return
 	 */
-	public static TaggedInfo createDynamicTag(String tagName, String caseOf, Value val) {
+	public static TaggedInfo createDynamicTag(TaggedInfo caseOf) { // (String tagName, TaggedInfo caseOf, Value val) {
 		TaggedInfo info = new TaggedInfo(caseOf);
-		info.setTagName(tagName);
+		info.setTagName(caseOf.getTagName());
 		
 		pendingDynamicTagBindings.add(info);
 		

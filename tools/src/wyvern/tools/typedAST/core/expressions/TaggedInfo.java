@@ -20,6 +20,7 @@ public class TaggedInfo {
 
 	private String tagName;
 	private String caseOf;
+	private TaggedInfo caseOfTag;
 	private List<Type> comprises;
 	
 	
@@ -41,12 +42,22 @@ public class TaggedInfo {
 		this(caseOf, null);
 	}
 	
+	public TaggedInfo(TaggedInfo caseOf) {
+		this.comprises = new ArrayList<Type>();
+		this.caseOfTag = caseOf;
+		this.caseOf = caseOf.getTagName();
+
+		System.out.println("TAGGEDINFO-STATIC CREATED (from caseOf): " + this);
+	}
+	
+	/*
 	public TaggedInfo(String caseOf) {
 		this.comprises = new ArrayList<Type>();
 		this.caseOf = caseOf;
 		
-		System.out.println("Creating dynamic (from String caseOf) a TaggedInfo: " + this);
+		System.out.println("TAGGEDINFO-STATIC CREATED (from caseOf): " + this);
 	}
+	*/
 	
 	/**
 	 * Constructs a TaggedInfo with the given comprises tags.
@@ -69,6 +80,8 @@ public class TaggedInfo {
 		
 		this.caseOf = getTagName(caseOf);
 		this.comprises = comprises;
+		
+		System.out.println("TAGGEDINFO-DYNAMIC CREATED (from caseOf and comprises): " + this);
 	}
 	
 	/**
@@ -149,11 +162,21 @@ public class TaggedInfo {
 		
 		throw new IllegalArgumentException("Type [" + t.getClass() +"] has no proper type");
 	}
+	
+	public boolean isCaseOf(TaggedInfo other) {
+
+		if (this == other) return true;
+		
+		if (this.caseOfTag == null) return false;
+		
+		return this.caseOfTag.isCaseOf(other);
+		
+	}
 
 	@Override
 	public String toString() {
-		return "TaggedInfo [tagName=" + tagName + ", caseOf=" + caseOf
-				+ ", comprises=" + comprises + ", hashcode: " + String.format("%x", super.hashCode()) + "]";
+		return "TaggedInfo [hashcode: " + String.format("%x", super.hashCode()) + ", tagName=" + tagName + ", caseOf=" + caseOf
+				+ ", caseOfTag = " + caseOfTag + ", comprises=" + comprises + "]";
 	}
 	
 }

@@ -183,6 +183,7 @@ public class New extends CachingTypedAST implements CoreAST {
 				info  = ((ClassType) expectedReturnType).getTaggedInfo();
 			}
 			
+			/*
 			System.out.println("Got info = " + info);
 			
 			if (info == null) {
@@ -198,6 +199,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			}
 			
 			System.out.println("info became: " + info);
+			*/
 			
 			if (info != null && info.getCaseOfTag() != null && info.getCaseOfTag().contains(".")) {
 				//we're creating a dynamic tag. The dynamic tag is bound to 'this'.
@@ -250,6 +252,8 @@ public class New extends CachingTypedAST implements CoreAST {
 		if (dynamicTagInfo != null) {
 			TagBinding.associateDynamicTagObj(obj, dynamicTagInfo);
 		}
+		
+		TagBinding.printDebugState();
 		
 		System.out.println("Finished evaluating new and created val: " + String.format("%x", objRef.get().hashCode()) + " and dTI = " + dynamicTagInfo);
 		

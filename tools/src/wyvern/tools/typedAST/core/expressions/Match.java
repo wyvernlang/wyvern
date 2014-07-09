@@ -90,6 +90,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 		//TODO: fix this, replace with real code
 		System.out.println("match eval over val: " + matchingOver.getType());
 
+		TagBinding.printDebugState();
 		
 		for (Case c : cases) {
 			TagBinding binding = TagBinding.get(c.getTaggedTypeMatch());
@@ -124,8 +125,15 @@ public class Match extends CachingTypedAST implements CoreAST {
 				System.out.println("infos: " + caseOfInfo + ", " + objInfo);
 				System.out.println("infos are equal? : " + (caseOfInfo == objInfo));
 				
-				System.out.println("-- end dynamic tag match");
 				if (caseOfInfo == objInfo) return c.getAST().evaluate(env);
+				
+				// See if they match respecting the hierarchy!
+				System.out.println("caseOfInfo.isCaseOf(objInfo) = " + caseOfInfo.isCaseOf(objInfo));
+				System.out.println("objInfo.isCaseOf(caseOfInfo) = " + objInfo.isCaseOf(caseOfInfo));
+				
+				if (caseOfInfo.isCaseOf(objInfo)) return c.getAST().evaluate(env);
+				
+				System.out.println("-- end dynamic tag match");
 				
 			}  else if (hasMatch(matchingOverBinding, binding.getName())) {
 				//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
