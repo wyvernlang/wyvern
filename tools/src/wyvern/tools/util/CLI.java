@@ -20,9 +20,9 @@ public class CLI {
 		if (!file.canRead())
 			throw new RuntimeException("Cannot read main file!");
 
-		System.out.println("Haha");
-		Path path = Paths.get(args[0]);
-		Files.lines(path).forEach(s -> System.out.println(s));
+		// For test.. by Stanley
+		//Path path = Paths.get(args[0]);
+		//Files.lines(path).forEach(s -> System.out.println(s));
 		
 		try (FileInputStream fis = new FileInputStream(file)) {
 			TypedAST res = (TypedAST)new Wyvern().parse(new InputStreamReader(fis), "test input");
