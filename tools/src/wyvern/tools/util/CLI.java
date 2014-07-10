@@ -9,6 +9,9 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class CLI {
@@ -17,6 +20,10 @@ public class CLI {
 		if (!file.canRead())
 			throw new RuntimeException("Cannot read main file!");
 
+		System.out.println("Haha");
+		Path path = Paths.get(args[0]);
+		Files.lines(path).forEach(s -> System.out.println(s));
+		
 		try (FileInputStream fis = new FileInputStream(file)) {
 			TypedAST res = (TypedAST)new Wyvern().parse(new InputStreamReader(fis), "test input");
 			Type checkedType = res.typecheck(Globals.getStandardEnv(), Optional.empty());

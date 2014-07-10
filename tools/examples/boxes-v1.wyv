@@ -1,0 +1,92 @@
+type Box
+	var contents : String
+	prop owner : User			// relationship
+	prop readers : List<User>	// relationship - inverse is box
+
+type User
+	prop name : String
+	prop passwd : String
+	prop box : Box
+
+screen Login
+	Row
+		Label "User:"
+		username : TextInput
+	Row
+		Label "Password:"
+		password : TextInput hashed	// annotate that this is a password
+	Row
+		login : Button "Login"
+
+screen Main
+	Row
+		Label "My Box Contents"
+		contents : TextInput
+	Row
+		Label "Permissions"
+	Row
+		permissionTable : template
+			Row
+				user : Label
+				permission : CheckBox
+	Row
+		Label "Other Boxes"
+	Row
+		boxViews : template
+			Row
+				owner : Label
+				boxContents : Label
+
+page LoginControl : Login
+	login.action()
+		// alternative code
+		displayNewPage(server.validate(username, hash(password, nonce)))
+		
+		// initial code, and/or implementation of server.validate()
+		User? candidate = at server users.find(name == username)
+		if (at server candidate.password == password)
+			principal = candidate	// this is dangerous - need server permission
+			load("/main")			// put this in the architecture, for separation
+		else
+			messageDialog("login error")
+
+page MainControl(users : Table<User>) : Main
+	contents is principal.box.contents
+	generate permissionTable from u : users
+		user is u.name
+		permission is principal.box.readers.memberTest(u)
+	generate boxViews from u : users.select(u | u.box.readers.contains(principal)
+		owner is u.name
+		boxContents is u.box.contents
+
+webapp Boxes
+	template browser client
+		acts for principal : User?
+	
+	template connect client to server with HTTPS
+
+	webserver server
+		acts for server
+		data users : Table<User>
+		urls
+			"/" => loginPage : LoginControl
+			"/main" => MainControl(users)
+
+	policy
+		// only one particular client, and the server, see passwords
+		access [c:client] c.loginPage.password
+			write c
+			read server
+			
+		// restrictions on who reads/writes the contents of the box, and who can change readers
+		access u : users
+			name : any
+			passwd : server
+			box : any
+				contents
+					read readers
+					write u
+				owner : any
+				readers : any
+					read readers
+					write u			// maybe a reader can remove him or herself
