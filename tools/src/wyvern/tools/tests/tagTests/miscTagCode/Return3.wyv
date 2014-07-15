@@ -1,0 +1,17 @@
+tagged class X
+    class def create() : X =
+        new
+
+tagged class Y
+    class def create() : X =
+        new
+
+def matchTest():Str
+	val a = X.create()
+
+	match(a):
+		X => "X-tag"
+		Y => "Y-tag"
+		default => "default"
+
+matchTest()

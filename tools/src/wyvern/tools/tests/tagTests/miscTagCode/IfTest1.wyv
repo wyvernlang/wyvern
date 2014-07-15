@@ -1,0 +1,10 @@
+
+def foo():Int
+	(if (1) then "asd" else "asd")
+	1
+
+def one():Int = 1
+def two():Int = 2
+def string():Str = "hello"
+
+foo()

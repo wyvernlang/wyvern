@@ -2,8 +2,6 @@ package wyvern.tools.tests.tagTests;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -15,10 +13,9 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.core.binding.TagBinding;
-import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-
+ 
 public class TagTests {
 	
 	@Test
@@ -31,7 +28,7 @@ public class TagTests {
 				"    class def create() : X     \n" +
 				"        new                    \n";
 		
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -44,7 +41,7 @@ public class TagTests {
 				"tagged type IntWrapper    \n" +
 				"  def getValue() : Int    \n";
 		
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -60,7 +57,7 @@ public class TagTests {
 				"tagged type Type2          \n" +
 				"  def getValue2() : Int    \n";
 		
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -77,7 +74,7 @@ public class TagTests {
 				"	X => 15                     \n" +
 				"	default => 15               \n";
 		
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -93,8 +90,8 @@ public class TagTests {
 				"match(x):                      \n" +
 				"	default => 15               \n";
 				
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
+		TypedAST ast = TagTestUtil.getAST(input);
+		TagTestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -115,7 +112,7 @@ public class TagTests {
 				"	Y => 23                     \n" +
 				"	default => 50               \n";
 				
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -137,7 +134,7 @@ public class TagTests {
 				"	Y => 23                     \n" +
 				"	default => 50               \n";
 				
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -154,8 +151,8 @@ public class TagTests {
 				"	default => 15               \n";
 				
 		
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
+		TypedAST ast = TagTestUtil.getAST(input);
+		TagTestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -196,8 +193,8 @@ public class TagTests {
 				"	V => 6                     \n" +
 				"	default => 15               \n";
 		
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 1);
+		TypedAST ast = TagTestUtil.getAST(input);
+		TagTestUtil.evaluateExpecting(ast, 1);
 	}
 	
 	@Test
@@ -218,8 +215,8 @@ public class TagTests {
 				"	Y => 23                     \n" +
 				"	default => 50               \n";
 		
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 23);
+		TypedAST ast = TagTestUtil.getAST(input);
+		TagTestUtil.evaluateExpecting(ast, 23);
 	}
 	
 	@Test
@@ -256,8 +253,8 @@ public class TagTests {
 				"                               \n" +
 				"15";
 		
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
+		TypedAST ast = TagTestUtil.getAST(input);
+		TagTestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -281,8 +278,8 @@ public class TagTests {
 				"matcher(x)                              \n";
 				
 		
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
+		TypedAST ast = TagTestUtil.getAST(input);
+		TagTestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -304,9 +301,9 @@ public class TagTests {
 				"	Y => 34                     \n" +	// Y given twice; error
 				"	default => 50               \n";
 				
-		TypedAST res = getAST(input);
+		TypedAST res = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(res, ErrorMessage.DUPLICATE_TAG);
+		TagTestUtil.typeCheckFailWith(res, ErrorMessage.DUPLICATE_TAG);
 	}
 	
 	@Test
@@ -328,9 +325,9 @@ public class TagTests {
 				"	Z => 34                     \n" +	// Z is not declared anywhere; error
 				"	default => 50               \n";
 				
-		TypedAST res = getAST(input);
+		TypedAST res = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
+		TagTestUtil.typeCheckFailWith(res, ErrorMessage.UNKNOWN_TAG);
 	}
 	
 	@Test
@@ -356,9 +353,9 @@ public class TagTests {
 				"	Z => 34                     \n" +	// Z is declared but not a tagged type; error
 				"	default => 50               \n";
 				
-		TypedAST ast = getAST(input);
+		TypedAST ast = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(ast, ErrorMessage.NOT_TAGGED);
+		TagTestUtil.typeCheckFailWith(ast, ErrorMessage.NOT_TAGGED);
 	}
 	
 	@Test
@@ -379,9 +376,9 @@ public class TagTests {
 				"	default => 23               \n" +
 				"	Y => 50                     \n";
 				
-		TypedAST res = getAST(input);
+		TypedAST res = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_LAST);
+		TagTestUtil.typeCheckFailWith(res, ErrorMessage.DEFAULT_NOT_LAST);
 	}
 	
 	@Test
@@ -403,9 +400,9 @@ public class TagTests {
 				"	Y => 50                     \n" +
 				"	default => 23               \n";
 				
-		TypedAST res = getAST(input);
+		TypedAST res = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(res, ErrorMessage.MULTIPLE_DEFAULTS);
+		TagTestUtil.typeCheckFailWith(res, ErrorMessage.MULTIPLE_DEFAULTS);
 	}
 	
 	@Test
@@ -434,9 +431,9 @@ public class TagTests {
 			"	DynChar => 15                                            \n";
 		// DynByte not specified; error
 		
-		TypedAST res = getAST(input);
+		TypedAST res = TagTestUtil.getAST(input);
 	
-		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_PRESENT);
+		TagTestUtil.typeCheckFailWith(res, ErrorMessage.DEFAULT_NOT_PRESENT);
 	}
 	
 	@Test
@@ -468,8 +465,8 @@ public class TagTests {
 				"	default => 30                                            \n";
 			// default specified with exhaustive search; error
 				
-			TypedAST ast = getAST(input);
-			typeCheckfailWith(ast, ErrorMessage.DEFAULT_PRESENT);
+			TypedAST ast = TagTestUtil.getAST(input);
+			TagTestUtil.typeCheckFailWith(ast, ErrorMessage.DEFAULT_PRESENT);
 	}
 	
 	@Test
@@ -494,7 +491,7 @@ public class TagTests {
 			"	DynChar => 15                            \n" +
 			"	default => 23                            \n";
 		
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -521,7 +518,7 @@ public class TagTests {
 			"	default => 15                             \n";
 		
 		
-		getAST(input);
+		TagTestUtil.getAST(input);
 		//reaching here without a parse exception is a pass
 	}
 	
@@ -551,9 +548,9 @@ public class TagTests {
 			"	default => 20                             \n";
 		
 		
-		TypedAST res = getAST(input);
+		TypedAST res = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(res, ErrorMessage.DEFAULT_PRESENT);
+		TagTestUtil.typeCheckFailWith(res, ErrorMessage.DEFAULT_PRESENT);
 	}
 	
 	@Test
@@ -578,10 +575,10 @@ public class TagTests {
 			"	DynChar => 15                             \n" +
 			"	default => 15                             \n";
 		
-		TypedAST ast = getAST(input);
+		TypedAST ast = TagTestUtil.getAST(input);
 		
 		// Should be 15 because D is a subclass of B and will match that
-		evaluateExpecting(ast, 15);
+		TagTestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -611,9 +608,9 @@ public class TagTests {
 			"	C => 25                                   \n" +
 			"	default => 35                             \n";
 		
-		TypedAST ast = getAST(input);
+		TypedAST ast = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
+		TagTestUtil.typeCheckFailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
 	}
 	
 	@Test
@@ -643,9 +640,9 @@ public class TagTests {
 			"	D => 25                                   \n" + 
 			"	A => 25                                   \n";
 		
-		TypedAST ast = getAST(input);
+		TypedAST ast = TagTestUtil.getAST(input);
 		
-		typeCheckfailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
+		TagTestUtil.typeCheckFailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
 	}
 	
 	@Test
@@ -674,10 +671,10 @@ public class TagTests {
 			"	C => 25                                   \n" +
 			"	default => 35                             \n";
 		
-		TypedAST ast = getAST(input);
+		TypedAST ast = TagTestUtil.getAST(input);
 		
 		// Should be 15 because D is a subclass of B and will match that
-		evaluateExpecting(ast, 15);
+		TagTestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -722,86 +719,8 @@ public class TagTests {
 				"	StrJSON => 20                             \n" + 
 				"	default => 30                             \n";
 			
-			TypedAST ast = getAST(input);
+			TypedAST ast = TagTestUtil.getAST(input);
 			
-			evaluateExpecting(ast, 25);
-	}
-	
-	/**
-	 * Attempts to typecheck the given AST and catch the given ErrorMessage.
-	 * This error being thrown indicates the test passed.
-	 * 
-	 * If the error isn't thrown, the test fails.
-	 * 
-	 * @param ast
-	 * @param errorMessage
-	 */
-	public static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
-		try {
-			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		} catch (ToolError toolError) {
-			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
-			
-			return;
-		}
-		
-		Assert.fail("Should have failed with error: " + errorMessage);
-	}
-	
-	/**
-	 * First typechecks the AST, then executes it.
-	 * 
-	 * Any returned value is discarded, but anything printed to stdout will be visible.
-	 * 
-	 * @param ast
-	 */
-	public static void evaluate(TypedAST ast) {
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEnv());
-	}
-	
-	/**
-	 * Completely evaluates the given AST, and compares it to the given value.
-	 * Does typechecking first, then evaluation.
-	 * 
-	 * @param ast
-	 * @param value
-	 */
-	public static void evaluateExpecting(TypedAST ast, int value) {
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		Value v = ast.evaluate(Globals.getStandardEnv());
-		
-		String expecting = "IntegerConstant(" + value + ")"; 
-
-		Assert.assertEquals(expecting, v.toString());
-	}
-	
-	/**
-	 * Completely evaluates the given AST, and compares it to the given value.
-	 * Does typechecking first, then evaluation.
-	 * 
-	 * @param ast
-	 * @param value
-	 */
-	public static void evaluateExpecting(TypedAST ast, String value) {
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		Value v = ast.evaluate(Globals.getStandardEnv());
-		
-		String expecting = "StringConstant(" + value + ")"; 
-
-		Assert.assertEquals(expecting, v.toString());
-	}
-	
-	/**
-	 * Converts the given program into the AST representation.
-	 * 
-	 * @param program
-	 * @return
-	 * @throws IOException 
-	 * @throws CopperParserException 
-	 */
-	public static TypedAST getAST(String program) throws CopperParserException, IOException {
-		TagBinding.resetHACK();
-		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
+			TagTestUtil.evaluateExpecting(ast, 25);
 	}
 }

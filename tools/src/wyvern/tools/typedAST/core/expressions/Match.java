@@ -15,6 +15,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.TagBinding;
+import wyvern.tools.typedAST.core.expressions.IfExpr.IfClause;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -53,6 +54,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		this.matchingOver = matchingOver;
 		this.cases = cases;
+				
+		this.location = location;
 		
 		//find the default case and remove it from the typed cases
 		for (Case c : cases) {
@@ -63,8 +66,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		}
 		
 		cases.remove(defaultCase);
-		
-		this.location = location;
 	}
 	
 	/**
@@ -200,46 +201,23 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		// First typecheck all children
-		matchingOver.typecheck(env, expected);
+		//TODO: currently all errors given use matchingOver because it has a location, change this
 		
-		//Note: currently all errors given use matchingOver because it has a location
-		//TODO: use the actual entity that is responsible for the error
+		checkDefaultCase();
 		
-		matchingOver.typecheck(env, expected);		
-		
-		// Check not more than 1 default
-		for (int numDefaults = 0, i = 0; i < originalCaseList.size(); i++) {
-			Case c = originalCaseList.get(i);
-			
-			if (c.isDefault()) {
-				numDefaults++;
-				
-				if (numDefaults > 1) {
-					ToolError.reportError(ErrorMessage.MULTIPLE_DEFAULTS, matchingOver);
-				}
-			}
-		}
-		
-		//check default is last (do this after counting so user gets more specific error message)
-		for (int i = 0; i < originalCaseList.size(); i++) {
-		
-			if (originalCaseList.get(i).isDefault() && i != originalCaseList.size() - 1) {
-				ToolError.reportError(ErrorMessage.DEFAULT_NOT_LAST, matchingOver);
-			}
-		}
-		
-		
+		// Typecheck all children
+		matchingOver.typecheck(env, expected);	
+	
 		// Variable we're matching must exist and be a tagged type
 		Type matchingOverType = matchingOver.getType();
 		
 		String className = getTypeName(matchingOverType);
 		
-		if (className == null){
+		if (className == null) {
 			//TODO change this to an error message
 			throw new RuntimeException("variable matching over must be a Class or Type");
 		}
-		
+
 		TagBinding matchBinding = TagBinding.get(className);
 		
 		if (matchBinding == null) {
@@ -339,7 +317,61 @@ public class Match extends CachingTypedAST implements CoreAST {
 			}
 		}
 		
-		return Unit.getInstance();
+		return dotypecheckReturnType(env, expected);
+	}
+	
+	/**
+	 * Method determines if the return value of each branch fits with the expected return type.
+	 * 
+	 * An exception is thrown if the type is not valid, otherwise the expected type is returned.
+	 * 
+	 * @param env
+	 * @param expected
+	 * @return
+	 */
+	private Type dotypecheckReturnType(Environment env, Optional<Type> expected) {
+		Type lastType = null;
+		
+		for (Case c : originalCaseList) {	
+			Type clauseType = c.getAST().typecheck(env, expected);
+			
+			if (lastType == null) {
+				lastType = clauseType;
+				continue;
+			}
+			
+			if (!clauseType.subtype(lastType) && !lastType.subtype(clauseType)) {
+				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, this);
+			}
+		}
+		
+		if (lastType == null) ToolError.reportError(ErrorMessage.UNEXPECTED_EMPTY_BLOCK, this);
+		
+		return lastType;
+	}
+
+	/**
+	 * Ensures there is only 0 or 1 'default' case present, and that it is the last case in the list.
+	 */
+	private void checkDefaultCase() {		
+		//first check there are not more than 1 'default' cases
+		if (originalCaseList.stream().filter(c -> c.isDefault()).count() > 1) {;
+			ToolError.reportError(ErrorMessage.MULTIPLE_DEFAULTS, matchingOver);
+		}
+		
+		//now check the default is last
+		for (int i = 0; i < originalCaseList.size(); i++) {
+			Case c = originalCaseList.get(i);
+			
+			if (c.isDefault()) {
+				//must be last
+				if (i != originalCaseList.size() - 1) {
+					ToolError.reportError(ErrorMessage.DEFAULT_NOT_LAST, matchingOver);
+				}	
+				
+				break;
+			}
+		}
 	}
 	
 	private boolean comprisesSatisfied(TagBinding matchBinding) {
@@ -383,8 +415,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 			ClassType matchingOverClass = (ClassType) matchingOver.getType();
 			return matchingOverClass.getName();
 		} else if (type instanceof TypeType) {
-			TypeType matchingOverClass = (TypeType) matchingOver.getType();
-			return matchingOverClass.getName();
+			TypeType matchingOverType = (TypeType) matchingOver.getType();
+			return matchingOverType.getName();
 		}
 		
 		return null;

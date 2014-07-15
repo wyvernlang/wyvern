@@ -1,0 +1,17 @@
+tagged class X
+    class def create() : X =
+        new
+
+tagged class Y
+    class def create() : X =
+        new
+
+def matchTest():Int
+	val a = X.create()
+
+	match(a):
+		X => 15
+		Y => 10
+		default => 5
+
+matchTest()
