@@ -38,6 +38,15 @@ public class MiscTagTests {
 		TagTestUtil.evaluateExpecting(ast, "X-tag");
 	}
 	
+	@Test
+	public void tagParamTest1() throws CopperParserException, IOException {
+		String program = TagTestUtil.readFile(PATH + "TagParamTest1.wyv");
+		
+		TypedAST ast = TagTestUtil.getAST(program);
+		
+		TagTestUtil.evaluateExpecting(ast, 15);
+	}
+	
 	public void ifTest1() throws CopperParserException, IOException {
 		String program = TagTestUtil.readFile(PATH + "IfTest1.wyv");
 		

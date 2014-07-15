@@ -3,7 +3,7 @@ tagged class X
         new
 
 tagged class Y
-    class def create() : X =
+    class def create() : Y =
         new
 
 def matchTest():Int

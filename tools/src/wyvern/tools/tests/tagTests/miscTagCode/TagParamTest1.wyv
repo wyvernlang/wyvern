@@ -6,12 +6,12 @@ tagged class Y
     class def create() : Y =
         new
 
-def matchTest():Str
-	val a = X.create()
-
+def matchTest(a:X):Int
 	match(a):
-		X => "X-tag"
-		Y => "Y-tag"
-		default => "default"
+		X => 15
+		Y => 10
+		default => 5
 
-matchTest()
+val a = X.create()
+
+matchTest(a)

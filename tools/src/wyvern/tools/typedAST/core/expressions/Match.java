@@ -205,11 +205,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		checkDefaultCase();
 		
-		// Typecheck all children
-		matchingOver.typecheck(env, expected);	
-	
 		// Variable we're matching must exist and be a tagged type
-		Type matchingOverType = matchingOver.getType();
+		Type matchingOverType = matchingOver.typecheck(env, expected);
 		
 		String className = getTypeName(matchingOverType);
 		
@@ -217,6 +214,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 			//TODO change this to an error message
 			throw new RuntimeException("variable matching over must be a Class or Type");
 		}
+		
+		System.out.println("class: " + className.length());
 
 		TagBinding matchBinding = TagBinding.get(className);
 		
