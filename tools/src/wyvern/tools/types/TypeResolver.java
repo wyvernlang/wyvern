@@ -28,7 +28,7 @@ public class TypeResolver {
 		// System.out.println("Resolving... " + input);
 		
 		if (resolved.containsKey(input)) {
-			return resolved.get(input);
+			// return resolved.get(input);
 		}
 		Type result = iresolve(input, ctx, visited);
 		resolved.put(input, result);
