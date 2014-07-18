@@ -48,16 +48,16 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	private TypeType equivalentType = null;
 	private TypeType equivalentClassType = null;
 	private Reference<Environment> typeEquivalentEnvironmentRef;
-	protected Reference<Environment> declEnvRef;
+	protected Reference<Environment> classMembersEnv;
 
-	private Reference<Environment> objEnv = new Reference<>(Environment.getEmptyEnvironment());
-	protected Environment getObjEnvV() { return objEnv.get(); }
-	protected void setObjEnv(Environment newEnv) { objEnv.set(newEnv); }
+	private Reference<Environment> instanceMembersEnv = new Reference<>(Environment.getEmptyEnvironment());
+	protected Environment getObjEnvV() { return instanceMembersEnv.get(); }
+	protected void setInstanceMembersEnv(Environment newEnv) { instanceMembersEnv.set(newEnv); }
 
-	private ClassType objType = new ClassType(objEnv, new Reference<>(), new LinkedList<>(), "");
+	private ClassType objType = new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), "");
 
 	public ClassType getOType() {
-		return new ClassType(objEnv, new Reference<>(), new LinkedList<>(), getName());
+		return new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), getName());
 	}
 	
 	private TaggedInfo taggedInfo;
@@ -70,7 +70,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 							List<String> typeParams,
 							FileLocation location) {
         this(name, implementsName, implementsClassName, decls, typeParams, location);
-		declEnvRef.set(declEnv);
+		classMembersEnv.set(declEnv);
     }
 
 	public ClassDeclaration(String name,
@@ -105,7 +105,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this.decls = decls;
 		this.typeParams = typeParams;
 		typeEquivalentEnvironmentRef = new Reference<>();
-		declEnvRef = new Reference<>();
+		classMembersEnv = new Reference<>();
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, getObjType());
 		nameBinding = new NameBindingImpl(name, getClassType());
@@ -167,7 +167,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				typeEquivalentEnvironmentRef.set(TypeDeclUtils.getTypeEquivalentEnvironment(decls,true));
 			for (Declaration decl : decls.getDeclIterator()) {
 				TypeBinding binding = new TypeBinding(nameBinding.getName(), getObjectType());
-				if (decl.isClass()) {
+				if (decl.isClassMember()) {
 					decl.typecheckSelf(genv.extend(binding));
 				} else {
 					decl.typecheckSelf(oenv.extend(binding));
@@ -221,12 +221,12 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	private Type getObjectType() {
-		Environment declEnv = getObjEnv();
+		Environment declEnv = getInstanceMembersEnv();
 		Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(declEnv);
-		return new ClassType(objEnv, new Reference<Environment>(objTee) {
+		return new ClassType(instanceMembersEnv, new Reference<Environment>(objTee) {
 			@Override
 			public Environment get() {
-				return TypeDeclUtils.getTypeEquivalentEnvironment(objEnv.get());
+				return TypeDeclUtils.getTypeEquivalentEnvironment(instanceMembersEnv.get());
 			}
 
 			@Override
@@ -328,7 +328,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			return classEnv;
 
 		for (Declaration decl : decls.getDeclIterator()) {
-			if (decl.isClass()){
+			if (decl.isClassMember()){
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
 		}
@@ -337,7 +337,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		Environment evalEnv = classEnv.extend(thisBinding);
 		
 		for (Declaration decl : decls.getDeclIterator())
-			if (decl.isClass()){
+			if (decl.isClassMember()){
 				decl.bindDecl(extEvalEnv.extend(evalEnv),classEnv);
 			}
 		
@@ -346,8 +346,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return classEnv;
 	}
 
-	public Environment getObjEnv() {
-		return objEnv.get();
+	public Environment getInstanceMembersEnv() {
+		return instanceMembersEnv.get();
 	}
 	
 	public DeclSequence getDecls() {
@@ -386,24 +386,24 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	public Environment getDeclEnv() {
-		return declEnvRef.get();
+		return classMembersEnv.get();
 	}
 
 	public Reference<Environment> getTypeEquivalentEnvironmentReference() {
 		return typeEquivalentEnvironmentRef;
 	}
 
-	public Reference<Environment> getDeclEnvRef() {
-		return declEnvRef;
+	public Reference<Environment> getClassMembersEnv() {
+		return classMembersEnv;
 	}
 
 	public Type getEquivalentClassType() {
 		if (equivalentClassType == null) {
             List<Declaration> declsi = new LinkedList<>();
             for (Declaration d : decls.getDeclIterator()) {
-                if (d.isClass())
+                if (d.isClassMember())
                     declsi.add(d);
-                if (d.isClass())
+                if (d.isClassMember())
                     declsi.add(d);
             }
 			equivalentClassType = new TypeType(TypeDeclUtils.getTypeEquivalentEnvironment(new DeclSequence(declsi), true));
@@ -443,7 +443,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			decls.add(idx, (Declaration)nc.get(key));
 		}
 		return new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
-				new DeclSequence(decls), declEnvRef.get(), typeParams, location);
+				new DeclSequence(decls), classMembersEnv.get(), typeParams, location);
 	}
 
 
@@ -462,12 +462,12 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		TypeBinding objBinding = new LateTypeBinding(nameBinding.getName(), this::getObjectType);
 
 		if (!envGuard && decls != null) {
-			declEnvRef.set(Environment.getEmptyEnvironment());
+			classMembersEnv.set(Environment.getEmptyEnvironment());
 			for (Declaration decl : decls.getDeclIterator()) {
-				if (decl.isClass())
-					declEnvRef.set(decl.extendName(declEnvRef.get(), against.extend(objBinding)));
+				if (decl.isClassMember())
+					classMembersEnv.set(decl.extendName(classMembersEnv.get(), against.extend(objBinding)));
 				else
-					objEnv.set(decl.extendName(objEnv.get(), against.extend(objBinding)));
+					instanceMembersEnv.set(decl.extendName(instanceMembersEnv.get(), against.extend(objBinding)));
 			}
 			envGuard = true;
 		}

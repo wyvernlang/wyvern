@@ -9,11 +9,9 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.MetaType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Reference;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -34,7 +32,7 @@ public class JavaClassType extends ClassType implements MetaType {
 			@Override
 			public Environment get() {
 				cd.initalize();
-				return cd.getObjEnv();
+				return cd.getInstanceMembersEnv();
 			}
 		}, null, new LinkedList<>(), "");
 		this.clazz = cd.getClazz();

@@ -2,11 +2,9 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.LateBinder;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -14,7 +12,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -117,11 +114,11 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public JavaClassDecl(Class clazz) {
 		super(clazz.getSimpleName(), "", "", null, FileLocation.UNKNOWN);
-		declEnvRef.setSrc((oSrc) -> () -> {
+		classMembersEnv.setSrc((oSrc) -> () -> {
 			initalize();
 
 			//Reset as part of initialization
-			return declEnvRef.get();
+			return classMembersEnv.get();
 		});
 		this.clazz = clazz;
 	}
@@ -162,7 +159,7 @@ public class JavaClassDecl extends ClassDeclaration {
 		initalized = true;
 		super.decls = getDecls(this.clazz);
 		Environment emptyEnvironment = Environment.getEmptyEnvironment();
-		super.declEnvRef.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
+		super.classMembersEnv.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
 		super.declEvalEnv = emptyEnvironment;
 		updateEnv();
 	}
@@ -182,13 +179,13 @@ public class JavaClassDecl extends ClassDeclaration {
 			objEnv = Environment.getEmptyEnvironment();
 		for (Declaration decl : this.getDecls().getDeclIterator()) {
 			if (decl instanceof JavaMeth) {
-				if (decl.isClass()) {
+				if (decl.isClassMember()) {
 					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
 				objEnv = decl.extend(objEnv, objEnv);
 			} else if (decl instanceof JavaField) {
-				if (decl.isClass()) {
+				if (decl.isClassMember()) {
 					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
@@ -200,8 +197,8 @@ public class JavaClassDecl extends ClassDeclaration {
 				throw new RuntimeException();
 			}
 		}
-		getDeclEnvRef().set(declEnv);
-		setObjEnv(objEnv);
+		getClassMembersEnv().set(declEnv);
+		setInstanceMembersEnv(objEnv);
 		envDone = true;
 
 		//To generate class env

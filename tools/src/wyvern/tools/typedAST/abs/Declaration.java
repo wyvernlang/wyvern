@@ -85,5 +85,5 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 		return nextDecl;
 	}
 
-	public boolean isClass() { return false; }
+	public boolean isClassMember() { return false; }
 }
