@@ -32,11 +32,11 @@ import java.util.Optional;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;
+	private TypedAST metadata;
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
 	private Environment declEvalEnv;
-	protected Reference<Obj> attrObj = new Reference<>();
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 	
@@ -45,164 +45,54 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
 	private Reference<Value> metaValue = new Reference<>();
 
-	public Reference<Obj> getAttrObjRef() {
-		return attrObj;
-	}
-
-	public Environment getAttrEnv() {
-		return attrEnv.get();
-	}
-
-	public Reference<Value> getMetaValue() {
-		return metaValue;
-	}
-
 	// FIXME: I am not convinced typeGuard is required (alex).
 	private boolean typeGuard = false;
 	@Override
 	public Environment extendType(Environment env, Environment against) {
 		if (!typeGuard) {
 			env = env.extend(typeBinding);
-			for (Declaration decl : decls.getDeclIterator()) {
-				if (decl instanceof EnvironmentExtender) {
-					env = ((EnvironmentExtender) decl).extendType(env, against);
-				}
-			}
+			declEnv.set(decls.extendType(declEnv.get(), against));
 			typeGuard = true;
 		}
-		return env;
+		return env.extend(typeBinding);
 	}
 
 	private boolean declGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		// System.out.println("Running extendName for TypeDeclaration: " + this.getName() + " with " + this.getDeclEnv());
-		
 		if (!declGuard) {
-			for (Declaration decl : decls.getDeclIterator()) {
-				
-				// System.out.println("Processing inside " + this.getName() + " member " + decl.getName() + " and decl.getClass " + decl.getClass());
-				
-				declEnv.set(decl.extendName(declEnv.get(), against));
-				if (decl instanceof AttributeDeclaration) {
-					env = env.extend(new NameBindingImpl(getName(), decl.getType()));
-					nameBinding = new NameBindingImpl(nameBinding.getName(), decl.getType());
-				}
-			}
+			declEnv.set(decls.extendName(declEnv.get(), against.extend(typeBinding)));
 			declGuard = true;
 		}
 
-		// System.out.println("Finished running extendName for TypeDeclaration: " + this.getName() + " with " + this.getDeclEnv());
-		
 		return env.extend(new NameBindingImpl(this.getName(), this.getType()));
 	}
-
-	public static class AttributeDeclaration extends Declaration {
-		private final TypedAST body;
-		private Type rType;
-
-		public AttributeDeclaration(TypedAST body) {
-			this.body = body;
-		}
-		public AttributeDeclaration(TypedAST body, Type result) {
-			this.body = body;
-			this.rType = result;
-		}
-
-		@Override
-		public String getName() {
-			return "";
-		}
-
-		@Override
-		protected Type doTypecheck(Environment env) {
-			Type result = body.typecheck(env, Optional.ofNullable(rType));
-			if (!result.subtype(rType))
-				throw new RuntimeException("Invalid type for metadata");
-			return result;
-		}
-
-		@Override
-		protected Environment doExtend(Environment old, Environment against) {
-			return old;
-		}
-
-		@Override
-		public Environment extendWithValue(Environment old) {
-			return old;
-		}
-
-		@Override
-		public void evalDecl(Environment evalEnv, Environment declEnv) {
-		}
-
-		@Override
-		public Type getType() {
-			return rType;
-		}
-
-		@Override
-		public Map<String, TypedAST> getChildren() {
-			Map<String, TypedAST> childMap = new HashMap<>();
-			childMap.put("body", body);
-			return childMap;
-		}
-
-		@Override
-		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-			return new AttributeDeclaration(newChildren.get("body"), rType);
-		}
-
-		@Override
-		public FileLocation getLocation() {
-			return null;
-		}
-
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-		}
-
-		public TypedAST getBody() {
-			return body;
-		}
-
-		@Override
-		public Environment extendType(Environment env, Environment against) {
-			return env;
-		}
-
-		@Override
-		public Environment extendName(Environment env, Environment against) {
-			rType = TypeResolver.resolve(rType, against);
-			return env;
-		}
-	}
-
-    public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-    	this(name, decls, clsNameLine);
+    public TypeDeclaration(String name, DeclSequence decls, TypedAST metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    	this(name, decls, metadata, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name);
 		this.taggedInfo.associateTag();
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, TypedAST metadata, FileLocation clsNameLine) {
     	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
     	
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
-		typeBinding = new TypeBinding(name, null);
+		typeBinding = new TypeBinding(name, null, metadata);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 
-		typeBinding = new TypeBinding(nameBinding.getName(), objectType);
+		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
 		
 		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 		
 		this.location = clsNameLine;
+		this.metadata = metadata;
 	}
 
 	@Override
@@ -225,12 +115,14 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> childMap = new HashMap<>();
 		childMap.put("decls", decls);
+		if (metadata != null)
+			childMap.put("meta", metadata);
 		return childMap;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), newChildren.get("meta"), location);
 	}
 
 	@Override
@@ -243,7 +135,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
 		}
-		evalMeta(Globals.getStandardEnv().extend(env.lookupBinding("metaEnv", MetadataInnerBinding.class).orElse(new MetadataInnerBinding())));
 
 		return this.typeBinding.getType();
 	}	
@@ -318,17 +209,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		Environment attrEnv = Environment.getEmptyEnvironment();
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
-		evalMeta(evalEnv);
 		vb.setValue(metaValue.get());
-	}
-
-	private void evalMeta(Environment evalEnv) {
-		for (Declaration decl : decls.getDeclIterator()) {
-			if (decl instanceof AttributeDeclaration) {
-				metaValue.set(((AttributeDeclaration) decl).getBody().evaluate( evalEnv.extend(attrEvalEnv.extend(
-						evalEnv.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment())))));
-			}
-		}
 	}
 
 	public DeclSequence getDecls() {
