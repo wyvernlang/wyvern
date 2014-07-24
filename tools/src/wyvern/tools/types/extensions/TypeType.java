@@ -135,7 +135,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	}
 
 	@Override
-	public Type getInnerType(String name) {
+	public TypeBinding getInnerType(String name) {
 		// System.out.println("Looking up (inside getInnerType) name " + name);
 		// System.out.println("Currently inside TypeType: " + this);
 		// System.out.println("this.decl.getName = " + this.decl.getName());
@@ -148,9 +148,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 			NameBinding nm = typeDeclEnv.get().lookup(name);
 			// System.out.println(nm.getType());
 			
-			return nm.getType();
+			return new TypeBinding(nm.getName(), nm.getType());
 		} else {
-			return tb.getType();
+			return tb;
 		}
 	}
 

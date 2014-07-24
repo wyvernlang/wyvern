@@ -11,6 +11,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Reference;
+import wyvern.tools.util.TreeWriter;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -108,6 +109,8 @@ public class JavaClassType extends ClassType implements MetaType {
 		return "JavaClass("+decl.getClazz().getName()+")";
 	}
 
-
-
+	@Override
+	public void writeArgsToTree(TreeWriter writer) {
+		writer.writeArgs(decl.getClazz().getName());
+	}
 }

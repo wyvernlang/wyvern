@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.stdlib.Globals;
+import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -63,14 +64,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		if (!declGuard) {
-			nameBinding = new NameBindingImpl(getName(), metadata.map(md->md.map(mdi->mdi.typecheck(against, Optional.<Type>empty()))).get().orElse(new ClassType()));
 			declEnv.set(decls.extendName(declEnv.get(), against.extend(typeBinding)));
 			declGuard = true;
 		}
 
 		return env.extend(nameBinding);
 	}
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Optional<TypedAST>> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
     	this(name, decls, metadata, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
@@ -78,24 +78,23 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		this.taggedInfo.associateTag();
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Optional<TypedAST>> metadata, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
     	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
-    	Supplier<TypedAST> metaOrElse = () -> new New(new DeclSequence(), clsNameLine);
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
-		typeBinding = new TypeBinding(name, null, metadata.map(mdi->mdi.orElseGet(metaOrElse)));
+		typeBinding = new TypeBinding(name, null, metadata);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 
-		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata.map(mdi->mdi.orElseGet(metaOrElse)));
+		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
 		
 		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 		
 		this.location = clsNameLine;
-		this.metadata = metadata;
+		this.metaValue = metadata;
 	}
 
 	@Override
@@ -123,7 +122,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metadata, location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, location);
 	}
 
 	@Override

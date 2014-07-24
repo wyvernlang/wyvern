@@ -112,6 +112,10 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 			return true;
 		}
 
+		//TODO: Hack.
+		if (other instanceof MetadataWrapper)
+			return subtype(((MetadataWrapper) other).getInner(), subtypes);
+
 		if (other instanceof TypeType) {
 			// System.out.println("Is\n" + this.getEquivType() + "\n a subtype of \n" + other + "\n?");
 			return getEquivType().subtype(other);
@@ -123,8 +127,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	}
 
 	@Override
-	public Type getInnerType(String name) {
-		return declEnv.get().lookupType(name).getType();
+	public TypeBinding getInnerType(String name) {
+		return declEnv.get().lookupType(name);
 	}
 
 

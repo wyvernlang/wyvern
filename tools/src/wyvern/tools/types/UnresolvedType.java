@@ -44,7 +44,7 @@ public class UnresolvedType implements Type {
 			throw new RuntimeException("Cannot find "+typeName +" in environment "+env);
 		}
 		TypeBinding typeBinding = env.lookupType(typeName);
-		if (typeBinding.getMetadata().isPresent())
+		if (typeBinding.getMetadata().isPresent() && typeBinding.getMetadata().get().get() != null)
 			return new MetadataWrapper(typeBinding.getUse(), typeBinding.getMetadata().get());
 		else
 			return typeBinding.getUse();

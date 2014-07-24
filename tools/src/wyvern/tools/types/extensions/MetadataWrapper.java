@@ -1,5 +1,6 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -11,23 +12,28 @@ import wyvern.tools.util.TreeWriter;
 import java.util.HashSet;
 import java.util.Map;
 
-public class MetadataWrapper implements Type, ApplyableType, OperatableType, RecordType, MetaType {
+public class MetadataWrapper extends AbstractTypeImpl implements Type, ApplyableType, OperatableType, RecordType, MetaType {
 	private final Type inner;
-	private final Reference<TypedAST> metadata;
+	private final Reference<Value> metadata;
 
-	public MetadataWrapper(Type inner, Reference<TypedAST> metadata) {
+	public MetadataWrapper(Type inner, Reference<Value> metadata) {
 		this.inner = inner;
 		this.metadata = metadata;
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
+	public String toString() {
+		return TreeWriter.writeToString(this);
+	}
 
+	@Override
+	public void writeArgsToTree(TreeWriter writer) {
+		writer.writeArgs(inner);
 	}
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		return inner.subtype(other);
+		return inner.subtype(other, subtypes);
 	}
 
 	@Override
@@ -68,7 +74,7 @@ public class MetadataWrapper implements Type, ApplyableType, OperatableType, Rec
 	}
 
 	@Override
-	public Type getInnerType(String name) {
+	public TypeBinding getInnerType(String name) {
 		if (inner instanceof RecordType)
 			return ((RecordType) inner).getInnerType(name);
 		else
@@ -79,4 +85,6 @@ public class MetadataWrapper implements Type, ApplyableType, OperatableType, Rec
 	public Value getMetaObj() {
 		return this.metadata.get();
 	}
+
+	public Type getInner() { return inner; }
 }

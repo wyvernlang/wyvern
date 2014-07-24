@@ -1,11 +1,15 @@
 package wyvern.tools.typedAST.core;
 
+import wyvern.stdlib.Globals;
+import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -26,6 +30,7 @@ public class TypeVarDecl extends Declaration {
 	private final EnvironmentExtender body;
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
+	private final Reference<Value> metadataObj;
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
@@ -87,21 +92,24 @@ public class TypeVarDecl extends Declaration {
 	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
-		this.body = new TypeDeclaration(name, body, this.metadata, fileLocation);
+		this.metadataObj = new Reference<>();
+		this.body = new TypeDeclaration(name, body, this.metadataObj, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
-		this.body = new TypeDeclaration(name, body, this.metadata, taggedInfo, fileLocation);
+		this.metadataObj = new Reference<>();
+		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
-	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, FileLocation location) {
+	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {
 		this.name = name;
 		this.body = body;
 		this.metadata = metadata;
+		this.metadataObj = metadataObj;
 		fileLocation = location;
 	}
 
@@ -110,7 +118,7 @@ public class TypeVarDecl extends Declaration {
 		this.body = new EnvironmentExtInner(fileLocation) {
 			@Override
 			public Environment extendType(Environment env, Environment against) {
-				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), TypeVarDecl.this.metadata.map(Optional::get)));
+				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), metadataObj));
 			}
 
 			@Override
@@ -120,6 +128,7 @@ public class TypeVarDecl extends Declaration {
 		};
 		this.fileLocation = fileLocation;
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
+		this.metadataObj = new Reference<>();
 	}
 
 	public TypeVarDecl(String name, EnvironmentExtender body, FileLocation fileLocation) {
@@ -127,6 +136,7 @@ public class TypeVarDecl extends Declaration {
 		this.name = name;
 		this.fileLocation = fileLocation;
 		metadata = new Reference<Optional<TypedAST>>(Optional.empty());
+		this.metadataObj = new Reference<>();
 	}
 
 	@Override
@@ -136,6 +146,7 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		evalMeta(env);
 		return body.typecheck(env, Optional.<Type>empty());
 	}
 
@@ -163,6 +174,13 @@ public class TypeVarDecl extends Declaration {
 	public Environment extendName(Environment env, Environment against) {
 		return body.extendName(env, against);
 	}
+	private void evalMeta(Environment evalEnv) {
+		Environment extMetaEnv = evalEnv.lookupBinding("metaEnv", MetadataInnerBinding.class).map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
+		Environment metaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv);
+		metadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
+
+		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
+	}
 
 	@Override
 	public Type getType() {
@@ -181,7 +199,7 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		metadata.set(Optional.ofNullable(newChildren.get("metadata")));
-		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, fileLocation);
+		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);
 	}
 
 	@Override

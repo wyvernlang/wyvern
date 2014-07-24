@@ -2,6 +2,7 @@ package wyvern.tools.tests;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ToolError;
@@ -184,8 +185,10 @@ public class CopperTests {
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()), Int.getInstance());
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
 	}
-	
+
+
 	@Test
+	@Ignore
 	public void testSimpleMetadata() throws IOException, CopperParserException {
 		String input =
 				"class C\n" +
@@ -405,8 +408,8 @@ public class CopperTests {
 			}
 		};
 
-		TypeDeclaration.attrEvalEnv = Environment.getEmptyEnvironment().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner)));
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("myNumMetadata", metaType)).extend(new TypeBinding("HasParser", metaType)), Optional.empty()), Int.getInstance());
+		TypeDeclaration.attrEvalEnv = Environment.getEmptyEnvironment().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner))).extend(new TypeBinding("HasParser", metaType));
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("myNumMetadata", metaType)), Optional.empty()), Int.getInstance());
 		res = new DSLTransformer().transform(res);
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner)))).toString(), "IntegerConstant(5)");
 	}
@@ -465,6 +468,8 @@ public class CopperTests {
 		Long finalRes = (Long)((JavaObj)out).getObj();
 		Assert.assertEquals(192, (long)finalRes);
 	}
+
+	@Ignore
 	@Test
 	public void testImport3() throws IOException, CopperParserException {
 		String input1 =

@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -129,9 +130,9 @@ public class JavaClassDecl extends ClassDeclaration {
 				.findFirst();
 
 		if (creator.isPresent())
-				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<TypedAST>() {
+				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<Value>() {
 					@Override
-					public TypedAST get() {
+					public Value get() {
 						try {
 							return Util.toWyvObj(creator.get().invoke(null));
 						} catch (Exception e) {
