@@ -22,6 +22,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private List<String> params;
 	private String name;
 
+	public ClassType() {
+		this(new Reference<>(Environment.getEmptyEnvironment()), new Reference<Environment>(Environment.getEmptyEnvironment()), new LinkedList<String>(), "empty");
+	}
 
 	public ClassType(ClassDeclaration td) {
 		this(td.getClassMembersEnv(),

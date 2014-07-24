@@ -36,7 +36,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	// protected DeclSequence classDecls;
 	
 	private NameBinding nameBinding;
-	private TypeBinding typeBinding;
+	protected TypeBinding typeBinding;
 	
 	private String implementsName;
 	private String implementsClassName;

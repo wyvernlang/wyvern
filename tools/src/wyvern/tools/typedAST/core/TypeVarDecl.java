@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -12,6 +13,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -23,7 +25,7 @@ public class TypeVarDecl extends Declaration {
 	private final String name;
 	private final EnvironmentExtender body;
 	private final FileLocation fileLocation;
-	private final Optional<TypedAST> metadata;
+	private final Reference<Optional<TypedAST>> metadata;
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
@@ -83,18 +85,32 @@ public class TypeVarDecl extends Declaration {
 
 
 	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
+		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
-		this.body = new TypeDeclaration(name, body, metadata, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadata, fileLocation);
 		this.fileLocation = fileLocation;
-		this.metadata = Optional.ofNullable(metadata);
 	}
 
-	public TypeVarDecl(String name, Type body, FileLocation fileLocation) {
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation) {
+		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
+		this.name = name;
+		this.body = new TypeDeclaration(name, body, this.metadata, taggedInfo, fileLocation);
+		this.fileLocation = fileLocation;
+	}
+
+	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, FileLocation location) {
+		this.name = name;
+		this.body = body;
+		this.metadata = metadata;
+		fileLocation = location;
+	}
+
+	public TypeVarDecl(String name, Type body, TypedAST metadata, FileLocation fileLocation) {
 		this.name = name;
 		this.body = new EnvironmentExtInner(fileLocation) {
 			@Override
 			public Environment extendType(Environment env, Environment against) {
-				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against)));
+				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), TypeVarDecl.this.metadata.map(Optional::get)));
 			}
 
 			@Override
@@ -103,14 +119,14 @@ public class TypeVarDecl extends Declaration {
 			}
 		};
 		this.fileLocation = fileLocation;
-		metadata = Optional.empty();
+		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 	}
 
 	public TypeVarDecl(String name, EnvironmentExtender body, FileLocation fileLocation) {
 		this.body = body;
 		this.name = name;
 		this.fileLocation = fileLocation;
-		metadata = Optional.empty();
+		metadata = new Reference<Optional<TypedAST>>(Optional.empty());
 	}
 
 	@Override
@@ -135,6 +151,7 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
+		body.evalDecl(declEnv);
 	}
 
 	@Override
@@ -156,12 +173,15 @@ public class TypeVarDecl extends Declaration {
 	public Map<String, TypedAST> getChildren() {
 		HashMap<String,TypedAST> out = new HashMap<>();
 		out.put("body", body);
+		if (metadata.get().isPresent())
+			out.put("metadata", metadata.get().get());
 		return out;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), fileLocation);
+		metadata.set(Optional.ofNullable(newChildren.get("metadata")));
+		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, fileLocation);
 	}
 
 	@Override

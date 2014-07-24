@@ -2,9 +2,11 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -12,13 +14,11 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
+import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 
 public class JavaClassDecl extends ClassDeclaration {
@@ -121,6 +121,25 @@ public class JavaClassDecl extends ClassDeclaration {
 			return classMembersEnv.get();
 		});
 		this.clazz = clazz;
+
+		final Optional<Method> creator = Arrays.asList(getClazz().getDeclaredMethods()).stream()
+				.filter(meth-> Modifier.isStatic(meth.getModifiers()))
+				.filter(meth->meth.getName().equals("meta$get"))
+				.filter(meth -> meth.getParameterCount() == 0)
+				.findFirst();
+
+		if (creator.isPresent())
+				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<TypedAST>() {
+					@Override
+					public TypedAST get() {
+						try {
+							return Util.toWyvObj(creator.get().invoke(null));
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+				});
+
 	}
 
 
