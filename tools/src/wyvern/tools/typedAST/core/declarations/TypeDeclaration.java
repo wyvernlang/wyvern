@@ -7,6 +7,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
@@ -87,7 +88,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
-		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
+		nameBinding = new LateNameBinding(nameBinding.getName(), () -> metadata.get().getType());
 
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
 		

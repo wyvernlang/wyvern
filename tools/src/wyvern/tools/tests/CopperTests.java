@@ -186,27 +186,6 @@ public class CopperTests {
 		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(9)");
 	}
 
-
-	@Test
-	@Ignore
-	public void testSimpleMetadata() throws IOException, CopperParserException {
-		String input =
-				"class C\n" +
-				"  class def create():T\n" +
-				"    new\n" +
-				"  def foo():Int\n" +
-				"    19\n" +
-				"type T\n" +
-				"  def foo():Int\n" +
-				"  metadata:C = new\n" +
-				"    def foo():Int\n" +
-				"      12\n" +
-				"T.foo()";
-		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()), Int.getInstance());
-		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "IntegerConstant(12)");
-	}
-
 	@Test
 	public void testDSL1() throws IOException, CopperParserException {
 		String input =
@@ -469,20 +448,19 @@ public class CopperTests {
 		Assert.assertEquals(192, (long)finalRes);
 	}
 
-	@Ignore
 	@Test
 	public void testImport3() throws IOException, CopperParserException {
 		String input1 =
 				"module A\n" +
-						"val k = 19\n";
+				"val k = 19\n" +
+				"type Tt\n" +
+				"	def t():Int\n";
 
 		String input2 =
 				"module M\n" +
 						"import wyv:in1\n" +
-						"type Tt\n" +
-						"	def t():Int\n" +
 						"type Tp\n" +
-						"	metadata:Tt = new\n" +
+						"	metadata:A.Tt = new\n" +
 						"		def t():Int = A.k\n";
 
 		String input3 =

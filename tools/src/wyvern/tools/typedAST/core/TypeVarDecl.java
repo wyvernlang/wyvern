@@ -4,7 +4,9 @@ import wyvern.stdlib.Globals;
 import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
@@ -118,8 +120,12 @@ public class TypeVarDecl extends Declaration {
 		this.body = new EnvironmentExtInner(fileLocation) {
 			@Override
 			public Environment extendType(Environment env, Environment against) {
-				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), metadataObj));
+				Type type = TypeResolver.resolve(body, against);
+				return env.extend(new TypeBinding(name, type, metadataObj))
+						.extend(new LateNameBinding(name, () -> metadataObj.get().getType()));
 			}
+
+
 
 			@Override
 			public Type getType() {
