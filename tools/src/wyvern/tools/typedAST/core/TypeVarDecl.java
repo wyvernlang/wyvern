@@ -33,6 +33,7 @@ public class TypeVarDecl extends Declaration {
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
 	private final Reference<Value> metadataObj;
+
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
@@ -132,8 +133,9 @@ public class TypeVarDecl extends Declaration {
 				return body;
 			}
 		};
+
 		this.fileLocation = fileLocation;
-		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
+		this.metadata = new Reference<>(Optional.ofNullable(metadata));
 		this.metadataObj = new Reference<>();
 	}
 
@@ -180,8 +182,12 @@ public class TypeVarDecl extends Declaration {
 	public Environment extendName(Environment env, Environment against) {
 		return body.extendName(env, against);
 	}
+
 	private void evalMeta(Environment evalEnv) {
-		Environment extMetaEnv = evalEnv.lookupBinding("metaEnv", MetadataInnerBinding.class).map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
+		Environment extMetaEnv = evalEnv
+				.lookupBinding("metaEnv", MetadataInnerBinding.class)
+				.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
+
 		Environment metaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv);
 		metadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
 

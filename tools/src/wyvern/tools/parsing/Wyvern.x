@@ -696,6 +696,10 @@ import java.net.URI;
 
 
     non terminal etuple;
+    non terminal TypedAST dsllit;
+
+    dsllit ::= inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
+    	|	   tilde_t {: RESULT = new DSLLit(Optional.empty()); :};
 
 
     term ::= lvalue:lv {: RESULT = lv; :}
@@ -708,7 +712,10 @@ import java.net.URI;
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}
     	|    matchStatement:stmt {: RESULT = stmt; :}
+    	|	 term:l dot_t identifier_t:id dsllit:lit {: RESULT = new KeywordInvocation((TypedAST)l,id,lit); :}
     	;
+
+
 
     etuple ::= openParen_t e:first comma_t it:rest closeParen_t {: RESULT = new TupleObject((TypedAST)first,(TypedAST)rest, new FileLocation(currentState.pos)); :}
                    		| openParen_t closeParen_t {: RESULT = UnitVal.getInstance(null); :}
