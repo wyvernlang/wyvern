@@ -28,3 +28,61 @@ The parsing TSL as-implemented differs substantially from the one that we descri
 AST representation
 -------------------
 Wyvern does not implement the typed elaboration mechanism used by TSL Wyvern by having two separate AST representations for typed and untyped abstract syntax elements. Instead, it uses one shared representation that is updated mutably at typecheck type. TSL references are resolved in a separate terminal replacement pass. This sole representation is called TypedAST by Wyvern, and is the return type for all parsers.
+
+
+Example
+---------------
+We will examine a simple TSL for the purposes of illustration.
+
+    import java:wyvern.tools.typedAST.interfaces.TypedAST
+	import java:wyvern.tools.parsing.HasParser
+	import java:wyvern.tools.parsing.ExtParser
+	import java:wyvern.tools.parsing.ParseBuffer
+	
+We import the relevant compiler components from Java. Each will be bound as one expects.
+	
+	type Hello
+	
+The type to add a TSL to
+
+		def get():Int
+
+The method to fetch the TSL value
+
+		metadata:HasParser = new
+			def getParser():ExtParser
+				new
+					def parse(buf:ParseBuffer):TypedAST
+
+This shows the signature for parse. Note the different name from TSL Wyvern.
+
+		    			val iparser:ExtParser = ~
+		    			
+Enter the ExtParser TSL context. This is implemented in Copper from this point onwards.
+		    			
+							%%
+							%parser HelloWorld
+							%lex{
+								terminal TypedAST hello_t ::= /hello/ {:
+									~
+										2
+								:};
+								terminal Int world_t ::= /world/ {: 1 :};
+								terminal Unit space_t ::= / / {: () :};
+							%lex}
+							%cf{
+								non terminal TypedAST helloworld;
+								start with helloworld;
+								helloworld ::= hello_t:a space_t world_t:b {: a :};
+							%cf}
+
+Done with the declarative specification, we now apply the parser to the input.
+
+						val parsed = iparser.parse(buf)
+						
+We now use the splicing mechansiim to embed the output AST into a object creation statement.
+						~
+							new
+								def get():Int = $parsed
+								
+This example parses the string "hello world", and results in an object that returns 2.
