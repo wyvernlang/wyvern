@@ -53,8 +53,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		Type resolved = null;
 		if (binding.getType() != null)
 			resolved = TypeResolver.resolve(binding.getType(), env);
-		if (this.definition != null)
+
+		if (this.definition != null) 
 			this.definitionType = this.definition.typecheck(env, Optional.ofNullable(resolved));
+		
 		if (resolved == null)
 			resolved = definitionType;
 

@@ -36,4 +36,6 @@ public interface CoreASTVisitor {
 	void visit(Match match);
 	void visit(ImportDeclaration importDeclaration);
 	void visit(ModuleDeclaration moduleDeclaration);
+	void visit(KeywordDeclaration keywordDeclaration);
+	void visit(KeywordInvocation keywordInvocation);
 }

@@ -109,4 +109,10 @@ public class BytecodeDefVisitor implements DefVisitor<BytecodeContext> {
 		//TODO
 		return context;
 	}
+
+	@Override
+	public BytecodeContext visit(KeywordDef keywordDef) {
+		// TODO: I supposed we don't need to use keywordDef in run-time? (KWSIG)
+		return context;
+	}
 }

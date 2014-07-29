@@ -4,10 +4,12 @@ import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,9 @@ public class Environment implements TreeWritable {
 	private Environment extEnv = null;
 	private String name;
 	private Binding binding;
+	
+	// Modified by Stanley
+	private HashMap<Type, KeywordDeclaration> keywordMap= new HashMap<Type, KeywordDeclaration>();
 
 	private Environment(Environment environment, Binding binding) {
 		this.parentEnvironment = environment;

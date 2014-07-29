@@ -28,6 +28,7 @@ public class DSLLit extends AbstractTypedAST {
 	Optional<String> dslText = Optional.empty();
 	TypedAST dslAST = null;
 	Type dslASTType = null;
+	boolean isKwDSL = false;
 
 	public void setText(String text) {
 		if (dslText == null)
@@ -42,6 +43,11 @@ public class DSLLit extends AbstractTypedAST {
 	}
 
 	public TypedAST getAST() { return (dslAST); }
+	
+	/* API to set this DSL as a keyword DSL */
+	public void setIsKwDSL() {
+		isKwDSL = true;
+	}
 
 	@Override
 	public Type getType() {
@@ -56,7 +62,7 @@ public class DSLLit extends AbstractTypedAST {
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type dslType = expected.orElseGet(this::getDefaultType);
-
+		
 		Value vparser =
 				Util.invokeValue(((MetaType) dslType).getMetaObj(),
 						"getParser", UnitVal.getInstance(FileLocation.UNKNOWN));

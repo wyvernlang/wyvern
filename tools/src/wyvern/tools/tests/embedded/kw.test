@@ -1,0 +1,7 @@
+test val[IntegerConstant(5):JavaClass(wyvern.tools.typedAST.interfaces.TypedAST)]
+	import java:wyvern.tools.typedAST.interfaces.TypedAST
+	import java:wyvern.tools.typedAST.core.values.IntegerConstant
+	val x:TypedAST = { 5 }
+	val test:TypedAST = ~
+		2
+	test.firstkw {2 + $x}
