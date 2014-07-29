@@ -590,7 +590,7 @@ import java.net.URI;
 
     typeVarBody ::= objtype_t Indent_t typevd:body Dedent_t {: RESULT = body; :};
 
-    typedec ::= typeKwd_t identifier_t:name Indent_t typevd:body Dedent_t {: System.out.println(name + " --> " + body); RESULT = new TypeVarDecl((String)name, body.first, body.second, new FileLocation(currentState.pos)); :}
+    typedec ::= typeKwd_t identifier_t:name Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, body.first, body.second, new FileLocation(currentState.pos)); :}
     	|	    typeKwd_t identifier_t:name {: RESULT = new TypeVarDecl((String)name, (DeclSequence)null, null, new FileLocation(currentState.pos)); :}
     	|       taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, (DeclSequence)body.first, (TaggedInfo) tagInfo, body.second, new FileLocation(currentState.pos)); :}
     	|	    taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo {: RESULT = new TypeDeclaration((String)name, null, null, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
@@ -603,14 +603,14 @@ import java.net.URI;
 
     typed ::= typemember:def Newline_t typed:rest {: RESULT = new Pair<>(new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest.first)), rest.second); :}
     	   |  typemember:def {: RESULT = new Pair<>(new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})), null); :}
-    	   |  metadata:md {: System.out.println("META: ~ " + md); RESULT = new Pair<>(new DeclSequence(), md); :}
+    	   |  metadata:md {: RESULT = new Pair<>(new DeclSequence(), md); :}
  		   ;
 
 
 	typemember ::= tdef:r {: RESULT = r; :}
 		| typedec:r {: RESULT = r; :}
 		| class:r {: RESULT = r; :}
-		| kwdecl:r {: System.out.println("KW: ~ " + r); RESULT = r; :};
+		| kwdecl:r {: RESULT = r; :};
 	
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, new FileLocation(currentState.pos)); :};
 
@@ -701,7 +701,7 @@ import java.net.URI;
 
 
     non terminal etuple;
-    non terminal TypedAST dsllit;
+    non terminal DSLLit dsllit;
 
     dsllit ::= inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
     	|	   tilde_t {: RESULT = new DSLLit(Optional.empty()); :};

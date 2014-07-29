@@ -28,6 +28,7 @@ import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
@@ -81,7 +82,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
     	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
 		this.decls = decls;
-		nameBinding = new NameBindingImpl(name, null);
+		System.out.println("We get Decls Here!!!:\n\t " + decls);
+		System.out.println("We get metas Here!!!:\n\t " + metadata);
+		nameBinding = new NameBindingImpl(name, null); 
 		typeBinding = new TypeBinding(name, null, metadata);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
@@ -207,6 +210,16 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(metaValue.get());
+
+		// Evaluate KeywordDeclration Environment
+		Iterator<Declaration> it = this.getDecls().getDeclIterator().iterator();
+		while (it.hasNext()) {
+			Declaration thisItem = it.next();
+			//(it.next()).evalDecl(evalEnv, declEnv);
+			if (thisItem instanceof KeywordDeclaration) {
+				thisItem.evalDecl(evalEnv, declEnv);
+			}
+		}
 	}
 
 	public DeclSequence getDecls() {
@@ -237,8 +250,19 @@ public class TypeDeclaration extends Declaration implements CoreAST {
         return declEnv.get().lookup(name);
     }
 
-
 	public Reference<Environment> getDeclEnv() {
 		return declEnv;
+	}
+	
+	public KeywordDeclaration getKeywordDecl(String keyword) {
+		Iterator<Declaration> it = decls.getDeclIterator().iterator();
+		while (it.hasNext()) {
+			Declaration tempDecl = it.next();
+			if (tempDecl instanceof KeywordDeclaration) {
+				if (((KeywordDeclaration)tempDecl).getName().equals(keyword))
+					return (KeywordDeclaration)tempDecl;
+			}
+		}
+		return null;
 	}
 }

@@ -91,12 +91,6 @@ public class ExnFromAST implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(KeywordDeclaration keywordDeclaration) {
-		// TODO Auto-generated method stub
-		List<Statement> stmts = getBodyAST(keywordDeclaration.getBody());
-	}
-
-	@Override
 	public void visit(Assignment assignment) {
 		TLFromAST tgt = TLFromASTApply(assignment.getTarget());
 		TLFromAST val = TLFromASTApply(assignment.getValue());

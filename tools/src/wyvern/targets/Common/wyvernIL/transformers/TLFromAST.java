@@ -357,15 +357,6 @@ public class TLFromAST implements CoreASTVisitor {
 		// TODO Auto-generated method stub
 	}
 
-
-	@Override
-	public void visit(KeywordDeclaration keywordDeclaration) {
-		// TODO Auto-generated method stub
-		// TODO KeywordDeclaration stuff...
-		
-	}
-	
-
 	@Override
 	public void visit(KeywordInvocation keywordInvocation) {
 		// TODO Keyword Invocation stuff...

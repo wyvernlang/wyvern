@@ -143,14 +143,7 @@ public class PassThroughVisitor implements CoreASTVisitor {
 	}
 
 	@Override
-	public void visit(KeywordDeclaration keywordDeclaration) {
-		// Add a keyword declaration visitor
-		next.visit(keywordDeclaration);
-	}
-
-	@Override
 	public void visit(KeywordInvocation keywordInvocation) {
-		// TODO Auto-generated method stub
 		next.visit(keywordInvocation);
 	}
 

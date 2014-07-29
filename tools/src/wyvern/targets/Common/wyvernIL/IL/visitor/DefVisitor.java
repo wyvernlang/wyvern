@@ -9,5 +9,4 @@ public interface DefVisitor<R> {
 	R visit(Def def);
 	R visit(ClassDef classDef);
 	R visit(ImportDef importDef);
-	R visit(KeywordDef keywordDef);
 }

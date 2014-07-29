@@ -55,12 +55,6 @@ public class VariableResolver extends BaseASTVisitor {
 	}
 
 	@Override
-	public void visit(KeywordDeclaration keywordDeclaration) {
-		// TODO Auto-generated method stub
-		// TODO (Stanley) Whether visit here?
-	}
-
-	@Override
 	public void visit(KeywordInvocation keywordInvocation) {
 		// TODO Auto-generated method stub
 		// TODO (Stanley) Not sure what to do here visit here?

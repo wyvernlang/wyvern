@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -9,6 +10,8 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.types.extensions.MetadataWrapper;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -17,20 +20,16 @@ import java.util.Optional;
 
 public class KeywordInvocation implements CoreAST {
 	private final TypedAST tgt;
-	private final String id;
-	private final TypedAST lit;
+	private final String keyword;
+	private final DSLLit lit;
 	private FileLocation fileLocation = FileLocation.UNKNOWN;
 	private Type type = null;
 
-	public KeywordInvocation(TypedAST l, String id, TypedAST lit, FileLocation fileLocation) {
+	public KeywordInvocation(TypedAST l, String id, DSLLit lit, FileLocation fileLocation) {
 		this.tgt = l;
-		this.id = id;
+		this.keyword = id;
 		this.lit = lit;
 		this.fileLocation = fileLocation;
-		if (this.lit instanceof DSLLit)
-			((DSLLit) this.lit).setIsKwDSL();
-		else 
-			System.err.println("[ERROR] DSLLit in keyword type incorrect.");
 	}
 
 	@Override
@@ -40,16 +39,26 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		System.out.println("Env: " + env.toString());
-		System.out.println("target type:" + ((Variable)this.tgt).typecheck(env, Optional.empty()));
-		System.out.println("Expect? " + expected);
+		Type tgtType = null;
+		tgtType = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
+		KeywordDeclaration kwdecl = null;
 		
-		Type resolved = null;
-		resolved = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
-		System.out.println("Resolved? + " + resolved);
-		Type dslType = ((DSLLit)this.lit).typecheck(env, Optional.ofNullable(resolved));
-
-		System.out.println("From lit: " + dslType);
+		if (tgtType instanceof MetadataWrapper) {
+			Type innerType = ((MetadataWrapper) tgtType).getInner();
+			if (innerType instanceof TypeType) {
+				kwdecl = ((TypeType) innerType).getDecl().getKeywordDecl(keyword);
+			}
+		} else {
+			// TODO: What are other cases??
+			System.out.println("[TODO] Target type in KeywordInnvocation is : " + tgtType.getClass());
+		}
+		
+		Type dslType = null;
+		
+		if (kwdecl != null) {
+			dslType = ((DSLLit)this.lit).typecheck(env, Optional.ofNullable(kwdecl.getType()));
+		}
+	
 		type = dslType;
 		return dslType;
 	}
@@ -57,7 +66,7 @@ public class KeywordInvocation implements CoreAST {
 	@Override
 	public Value evaluate(Environment env) {
 		System.out.println("Evaluated from kw: ");
-		System.out.println(env);
+		System.out.println("tgt type: " + ((TypeType)((MetadataWrapper)tgt.getType()).getInner()).getDecl().getDecls());
 		return null;
 	}
 
@@ -72,7 +81,7 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new KeywordInvocation(newChildren.get("tgt"), id, lit, fileLocation);
+		return new KeywordInvocation(newChildren.get("tgt"), keyword, lit, fileLocation);
 	}
 
 	@Override
@@ -82,7 +91,7 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(tgt, id, lit);
+		writer.writeArgs(tgt, keyword, lit);
 	}
 
 	@Override

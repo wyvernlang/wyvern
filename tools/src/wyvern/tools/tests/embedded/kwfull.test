@@ -1,0 +1,68 @@
+module test singleParser[IntegerConstant(2):Int]
+	file main
+		import wyv:hellolang
+		val helloed:Hellolang.Hello = {hello world}
+		helloed.firstkw {hello world}.get()
+	file hellolang
+		module Hellolang
+		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.parsing.HasParser
+		import java:wyvern.tools.parsing.ExtParser
+		import java:wyvern.tools.parsing.ParseBuffer
+		import java:java.lang.System
+		type Hello
+			def get():Int
+			keyword firstkw:Int = new
+				def getParser():ExtParser
+					new
+						def parse(buf:ParseBuffer):TypedAST
+							var depth:Int = 0
+
+							val iparser:ExtParser = ~
+								%%
+								%parser HelloWorld
+								%lex{
+									terminal TypedAST hello_t ::= /hello/ {:
+										~
+											2
+									:};
+									terminal Int world_t ::= /world/ {: 1 :};
+									terminal Unit space_t ::= / / {: () :};
+								%lex}
+								%cf{
+									non terminal TypedAST helloworld;
+									start with helloworld;
+									helloworld ::= hello_t:a space_t world_t:b {: a :};
+								%cf}
+
+							val parsed = iparser.parse(buf)
+							~
+								new
+									def get():Int = $parsed
+			metadata:HasParser = new
+				def getParser():ExtParser
+					new
+						def parse(buf:ParseBuffer):TypedAST
+							var depth:Int = 0
+
+							val iparser:ExtParser = ~
+								%%
+								%parser HelloWorld
+								%lex{
+									terminal TypedAST hello_t ::= /hello/ {:
+										~
+											2
+									:};
+									terminal Int world_t ::= /world/ {: 1 :};
+									terminal Unit space_t ::= / / {: () :};
+								%lex}
+								%cf{
+									non terminal TypedAST helloworld;
+									start with helloworld;
+									helloworld ::= hello_t:a space_t world_t:b {: a :};
+								%cf}
+
+							val parsed = iparser.parse(buf)
+							~
+								new
+									def get():Int = $parsed

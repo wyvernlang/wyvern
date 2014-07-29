@@ -19,9 +19,6 @@ public class Environment implements TreeWritable {
 	private Environment extEnv = null;
 	private String name;
 	private Binding binding;
-	
-	// Modified by Stanley
-	private HashMap<Type, KeywordDeclaration> keywordMap= new HashMap<Type, KeywordDeclaration>();
 
 	private Environment(Environment environment, Binding binding) {
 		this.parentEnvironment = environment;

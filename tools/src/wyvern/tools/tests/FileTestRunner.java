@@ -21,7 +21,7 @@ public class FileTestRunner {
 	private static String fileRoot = "wyvern/tools/tests/embedded/";
 
 	//private static String[] files = new String[] { "basic.test", "class.test", "tsl.test", "module.test", "parselang.test", "typechecking.test"};
-	private static String[] files = new String[] {"kw.test"};
+	private static String[] files = new String[] {"kwfull.test"};
 
 	private static Predicate<TestCase> casePredicate = (cas) -> true;
 

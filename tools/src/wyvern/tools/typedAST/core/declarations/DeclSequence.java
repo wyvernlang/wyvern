@@ -22,7 +22,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		this(Arrays.asList(init));
 	}
 
-
 	public static DeclSequence simplify(DeclSequence in) {
 		return new DeclSequence(new Iterable() {
 			@Override

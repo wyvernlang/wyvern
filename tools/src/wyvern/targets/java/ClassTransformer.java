@@ -108,10 +108,4 @@ public class ClassTransformer implements DefVisitor {
 	public void finish() {
 		output.visitEnd();
 	}
-
-	@Override
-	public Object visit(KeywordDef keywordDef) {
-		// TODO Not sure if we need to deal keywordDef here
-		return null;
-	}
 }

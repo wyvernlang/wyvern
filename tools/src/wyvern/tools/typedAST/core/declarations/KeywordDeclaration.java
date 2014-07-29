@@ -9,31 +9,34 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.evaluation.Closure;
-import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
-public class KeywordDeclaration extends Declaration implements CoreAST, TreeWritable {
+public class KeywordDeclaration extends Declaration implements TreeWritable {
 
 	// TODO: Implement white box keywords
 	protected TypedAST body;
 	private String name;
 	private Type type;
 	private FileLocation location = FileLocation.UNKNOWN;
+	private final Reference<Optional<TypedAST>> kwMetadata;
+	private final Reference<Value> kwMetadataObj;
 	
 	public KeywordDeclaration(String name, Type type, TypedAST body, FileLocation location) {
 		this.name = name;
 		this.body = body;
 		this.type = type;
 		this.location = location;
+		this.kwMetadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(body));
+		this.kwMetadataObj = new Reference<>();
 	}
 	
 	public TypedAST getBody() {
@@ -80,12 +83,7 @@ public class KeywordDeclaration extends Declaration implements CoreAST, TreeWrit
 		// Same question: Do I need to extend keyword name here?
 		if (resolvedType == null)
 			resolvedType = TypeResolver.resolve(type, against);
-		return env;
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
+		return env; //env.extend(new KeywordBinding());
 	}
 
 	@Override
@@ -117,14 +115,19 @@ public class KeywordDeclaration extends Declaration implements CoreAST, TreeWrit
 
 	@Override
 	public Environment extendWithValue(Environment old) {
+		System.out.println(old);
 		// Not sure if this kind of keyword is a value?
+		// TODO: Change to keywordBinding
 		Environment newEnv = old.extend(new ValueBinding(name, type));
 		return newEnv;
 	}
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		// Not sure if we should just do nothing?
+		System.out.println("使用前：" + kwMetadataObj.get());
+		if (kwMetadataObj.get() == null)
+			kwMetadataObj.set(kwMetadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
+		System.out.println("使用后：" + kwMetadataObj.get());
 	}
 
 }
