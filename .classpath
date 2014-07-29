@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="tools/src"/>
+	<classpathentry kind="lib" path="tools/lib/ant.jar"/>
+	<classpathentry kind="lib" path="tools/lib/asm-debug-all-5.0.1.jar"/>
+	<classpathentry kind="lib" path="tools/lib/CopperCompiler.jar"/>
+	<classpathentry kind="lib" path="tools/lib/CopperRuntime.jar"/>
+	<classpathentry kind="lib" path="tools/lib/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="tools/lib/javatuples-1.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="tools/lib/javatuples-1.2.jar"/>
+	<classpathentry kind="lib" path="tools/lib/junit-4.11.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="tools/bin"/>
+</classpath>
