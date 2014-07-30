@@ -1,4 +1,6 @@
 The Wyvern project
+==================
+
 
 See COPYING.TXT for the GPLv2 license under which this software is distributed.
 See AUTHORS.TXT for the list of contributing authors.
