@@ -413,7 +413,7 @@ import java.net.URI;
 	non terminal Declaration typedec;
 	non terminal otypeasc;
 	non terminal DeclSequence objrd;
-	non terminal Pair<DeclSequence,TypedAST> typed;
+	non terminal Pair<DeclSequence,Pair<DeclSequence, TypedAST>> typed;
 	non terminal inlinelit;
    	non terminal dslBlock;
    	non terminal dslInner;
@@ -431,7 +431,7 @@ import java.net.URI;
    	non terminal TypedAST impSeq;
 
    	non terminal TypedAST typeVar;
-   	non terminal Pair<DeclSequence, TypedAST> typeVarBody;
+   	non terminal Pair<DeclSequence, Pair<DeclSequence, TypedAST>> typeVarBody;
 
 	non terminal matchStatement;
     non terminal caseStatements;
@@ -581,36 +581,44 @@ import java.net.URI;
     objcd ::= classKwd_t defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, true, new FileLocation(currentState.pos));:}
                             	;
 
-    typeVar ::= typeKwd_t identifier_t:name equals_t typeVarBody:body {: RESULT = new TypeVarDecl(name, body.first, body.second, new FileLocation(currentState.pos)); :}
-           |    typeKwd_t identifier_t:name equals_t type:body {: RESULT = new TypeVarDecl(name, body, null, new FileLocation(currentState.pos)); :}
-           |    typeKwd_t identifier_t:name equals_t type:body Indent_t metadata:meta Dedent_t {: RESULT = new TypeVarDecl(name, body, meta, new FileLocation(currentState.pos)); :};
+	non terminal Pair<DeclSequence, TypedAST> metadataSequence;
+
+    typeVar ::= typeKwd_t identifier_t:name equals_t typeVarBody:body {: RESULT = new TypeVarDecl(name, body.first, body.second.first, body.second.second, new FileLocation(currentState.pos)); :}
+           |    typeKwd_t identifier_t:name equals_t type:body {: RESULT = new TypeVarDecl(name, body, null, null, new FileLocation(currentState.pos)); :}
+           |    typeKwd_t identifier_t:name equals_t type:body Indent_t metadataSequence:meta Dedent_t {: RESULT = new TypeVarDecl(name, body, meta.first, meta.second, new FileLocation(currentState.pos)); :};
 
 
-    non terminal Pair<DeclSequence,TypedAST> typevd;
+    non terminal Pair<DeclSequence, Pair<DeclSequence, TypedAST>> typevd;
+
 
     typeVarBody ::= objtype_t Indent_t typevd:body Dedent_t {: RESULT = body; :};
 
-    typedec ::= typeKwd_t identifier_t:name Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, body.first, body.second, new FileLocation(currentState.pos)); :}
-    	|	    typeKwd_t identifier_t:name {: RESULT = new TypeVarDecl((String)name, (DeclSequence)null, null, new FileLocation(currentState.pos)); :}
-    	|       taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, (DeclSequence)body.first, (TaggedInfo) tagInfo, body.second, new FileLocation(currentState.pos)); :}
-    	|	    taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo {: RESULT = new TypeDeclaration((String)name, null, null, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
-    	|	    taggedKwd_t typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, null, new TaggedInfo(), new FileLocation(currentState.pos)); :}
+    typedec ::= typeKwd_t identifier_t:name Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, body.first, body.second.first, body.second.second, new FileLocation(currentState.pos)); :}
+    	|	    typeKwd_t identifier_t:name {: RESULT = new TypeVarDecl((String)name, (DeclSequence)null, null, null, new FileLocation(currentState.pos)); :}
+    	|       taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, (DeclSequence)body.first, (TaggedInfo) tagInfo, body.second.first, body.second.second, new FileLocation(currentState.pos)); :}
+    	|	    taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo {: RESULT = new TypeDeclaration((String)name, null, null, null, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
+    	|	    taggedKwd_t typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, null, null, new TaggedInfo(), new FileLocation(currentState.pos)); :}
     	;
 
    	typevd ::= typeVar:va Newline_t typevd:rest {: RESULT = new Pair<>(new DeclSequence(Arrays.asList(va, rest.first)), rest.second); :}
    			|  typeVar:va {: RESULT = new Pair<>(new DeclSequence(va), null); :}
-   			|  typed:rest {: RESULT = rest; :};
+   			|  typed:rest {: RESULT = rest; :}
+   			;
 
     typed ::= typemember:def Newline_t typed:rest {: RESULT = new Pair<>(new DeclSequence(Arrays.asList((TypedAST)def, (TypedAST)rest.first)), rest.second); :}
     	   |  typemember:def {: RESULT = new Pair<>(new DeclSequence(Arrays.asList(new TypedAST[] {(TypedAST)def})), null); :}
-    	   |  metadata:md {: RESULT = new Pair<>(new DeclSequence(), md); :}
+    	   |  metadataSequence:metaSeq {: RESULT = new Pair<>(new DeclSequence(), metaSeq); :}
  		   ;
-
 
 	typemember ::= tdef:r {: RESULT = r; :}
 		| typedec:r {: RESULT = r; :}
 		| class:r {: RESULT = r; :}
-		| kwdecl:r {: RESULT = r; :};
+		;
+	
+	metadataSequence ::= kwdecl:kw Newline_t metadataSequence:rest {: RESULT = new Pair<>(new DeclSequence(Arrays.asList(kw, rest.first )), rest.second); :}
+					  |	 kwdecl:kw {: RESULT = new Pair<>(new DeclSequence(Arrays.asList(new TypedAST[]{(TypedAST)kw})), null); :}
+					  |	 metadata:md {: RESULT = new Pair<>(new DeclSequence(), md); :}
+					  ;	
 	
     tdef ::= defKwd_t identifier_t:name params:argNames typeasc:type {: RESULT = new DefDeclaration((String)name, (Type)type, (List<NameBinding>)argNames, null, false, new FileLocation(currentState.pos)); :};
 

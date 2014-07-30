@@ -56,16 +56,16 @@ public class DSLLit extends AbstractTypedAST {
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type dslType = expected.orElseGet(this::getDefaultType);
-
-		System.out.println("What have I done?????!!!!: " + dslType);
 		
-		Value vparser =
-				Util.invokeValue(((MetaType) dslType).getMetaObj(),
-						"getParser", UnitVal.getInstance(FileLocation.UNKNOWN));
-		ExtParser parser = (ExtParser) Util.toJavaObject(vparser, ExtParser.class);
+		Value metaObj = ((MetaType)dslType).getMetaObj();
 
+		Value vparser = Util.invokeValue(metaObj, "getParser", UnitVal.getInstance(FileLocation.UNKNOWN));
+		
+		ExtParser parser = (ExtParser) Util.toJavaObject(vparser, ExtParser.class);
+		
 		try {
-			dslAST = new TSLBlock(parser.parse(new ParseBuffer(dslText.get())));
+			TypedAST inner = parser.parse(new ParseBuffer(dslText.get()));
+			dslAST = new TSLBlock(inner);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

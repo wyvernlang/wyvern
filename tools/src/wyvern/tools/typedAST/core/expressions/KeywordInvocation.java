@@ -56,7 +56,9 @@ public class KeywordInvocation implements CoreAST {
 		Type dslType = null;
 		
 		if (kwdecl != null) {
-			dslType = ((DSLLit)this.lit).typecheck(env, Optional.ofNullable(kwdecl.getType()));
+			Type resolved = null;
+			
+			dslType = ((DSLLit)this.lit).typecheck(env, Optional.ofNullable(kwdecl.getMetaType()));
 		}
 	
 		type = dslType;
@@ -75,7 +77,6 @@ public class KeywordInvocation implements CoreAST {
 		HashMap<String, TypedAST> out = new HashMap<>();
 		out.put("tgt", this.tgt);
 		out.put("lit", this.lit);
-		//System.out.println(":-) This is the kw!!! " + this.tgt + " -- " + id + " -- " + ((DSLLit)lit).getText());
 		return out;
 	}
 

@@ -4,18 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.New;
+import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
@@ -29,6 +33,7 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	private FileLocation location = FileLocation.UNKNOWN;
 	private final Reference<Optional<TypedAST>> kwMetadata;
 	private final Reference<Value> kwMetadataObj;
+	private MetadataWrapper metaType = null;
 	
 	public KeywordDeclaration(String name, Type type, TypedAST body, FileLocation location) {
 		this.name = name;
@@ -46,6 +51,10 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	@Override
 	public Type getType() {
 		return type;
+	}
+	
+	public Type getMetaType() {
+		return metaType;
 	}
 
 	@Override
@@ -97,7 +106,7 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	protected Type doTypecheck(Environment env) {
 		if (body != null) {
 			type = TypeResolver.resolve(type, env);
-			System.out.println("TypeHere: " + type);
+			
 			Type bodyType = body.typecheck(env, Optional.of(type)); // Can be null for def inside type!
 			
 			// Body should always be of HasPareser Type
@@ -124,10 +133,18 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		System.out.println("使用前：" + kwMetadataObj.get());
 		if (kwMetadataObj.get() == null)
 			kwMetadataObj.set(kwMetadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
-		System.out.println("使用后：" + kwMetadataObj.get());
+		metaType = new MetadataWrapper(type, kwMetadataObj);
 	}
+	
+	public void evalMeta(Environment evalEnv) {
+		Environment extMetaEnv = evalEnv
+				.lookupBinding("metaEnv", MetadataInnerBinding.class)
+				.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
 
+		Environment metaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv);
+		kwMetadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
+		kwMetadataObj.set(kwMetadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
+	}
 }

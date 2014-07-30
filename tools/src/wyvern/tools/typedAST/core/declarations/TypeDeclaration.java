@@ -1,7 +1,5 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.stdlib.Globals;
-import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -9,19 +7,15 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Reference;
@@ -32,13 +26,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;
 	private Reference<Optional<TypedAST>> metadata;
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
+	
+	private DeclSequence keywordDecls;
 	
 	private Environment declEvalEnv;
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
@@ -71,19 +66,19 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		return env.extend(nameBinding);
 	}
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-    	this(name, decls, metadata, clsNameLine);
+    public TypeDeclaration(String name, DeclSequence decls, DeclSequence keywordDecls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    	this(name, decls, keywordDecls, metadata, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name);
 		this.taggedInfo.associateTag();
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
-    	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+    public TypeDeclaration(String name, DeclSequence decls, DeclSequence keywordDecls, Reference<Value> metadata, FileLocation clsNameLine) {
+    	
 		this.decls = decls;
-		System.out.println("We get Decls Here!!!:\n\t " + decls);
-		System.out.println("We get metas Here!!!:\n\t " + metadata);
+		this.keywordDecls = keywordDecls;
+
 		nameBinding = new NameBindingImpl(name, null); 
 		typeBinding = new TypeBinding(name, null, metadata);
 		Type objectType = new TypeType(this);
@@ -93,8 +88,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
-		
-		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 		
 		this.location = clsNameLine;
 		this.metaValue = metadata;
@@ -125,14 +118,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), keywordDecls, metaValue, location);
 	}
 
 	@Override
 	public Type doTypecheck(Environment env) {
 		Environment eenv = decls.extend(env, env);
 
-		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
 		}
@@ -208,18 +200,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		declEvalEnv = declEnv;
 		if (metaValue.get() == null)
 			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
+
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(metaValue.get());
-
-		// Evaluate KeywordDeclration Environment
-		Iterator<Declaration> it = this.getDecls().getDeclIterator().iterator();
-		while (it.hasNext()) {
-			Declaration thisItem = it.next();
-			//(it.next()).evalDecl(evalEnv, declEnv);
-			if (thisItem instanceof KeywordDeclaration) {
-				thisItem.evalDecl(evalEnv, declEnv);
-			}
-		}
 	}
 
 	public DeclSequence getDecls() {
@@ -255,13 +238,11 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public KeywordDeclaration getKeywordDecl(String keyword) {
-		Iterator<Declaration> it = decls.getDeclIterator().iterator();
+		Iterator<Declaration> it = keywordDecls.getDeclIterator().iterator();
 		while (it.hasNext()) {
-			Declaration tempDecl = it.next();
-			if (tempDecl instanceof KeywordDeclaration) {
-				if (((KeywordDeclaration)tempDecl).getName().equals(keyword))
-					return (KeywordDeclaration)tempDecl;
-			}
+			KeywordDeclaration tempDecl = (KeywordDeclaration)it.next();
+			if (tempDecl.getName().equals(keyword))
+				return tempDecl;
 		}
 		return null;
 	}
