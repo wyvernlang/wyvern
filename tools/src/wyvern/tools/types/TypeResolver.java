@@ -1,7 +1,11 @@
 package wyvern.tools.types;
 
+import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.SpliceType;
 import wyvern.tools.types.extensions.TypeInv;
 
@@ -22,14 +26,13 @@ public class TypeResolver {
 			throw new RuntimeException(e);
 		}
 	}
+	
 	public static Type resolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
 		Type result = iresolve(input, ctx, visited);
 		return result;
 	}
 
-
 	private static Type iresolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
-		// System.out.println("Resolving: " + input + " of class " + input.getClass());
 		
 		if (input instanceof UnresolvedType)
 			return ((UnresolvedType) input).resolve(ctx);
@@ -52,7 +55,7 @@ public class TypeResolver {
 			return ((Resolvable) input).setTypes(toResolve);
 		}
 
-
+		
 		for (Field f : input.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			if (Type[].class.isAssignableFrom(f.getType())) {
@@ -81,4 +84,13 @@ public class TypeResolver {
 		
 		return input;
 	}
+	
+	public static Type generateKeywordWrapper(Type hostType, Environment ctx, String keyword) throws Exception {
+		KeywordBinding kwBinding = ctx.lookupKeyword(hostType, keyword);
+		if (kwBinding != null) {
+			return new MetadataWrapper(kwBinding.getType(), kwBinding.getMetadata().get());
+		}
+		throw new RuntimeException("Keyword does not exist");
+	}
+	
 }

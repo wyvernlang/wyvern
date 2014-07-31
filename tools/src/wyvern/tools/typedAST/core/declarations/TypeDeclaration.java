@@ -33,8 +33,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
-	private DeclSequence keywordDecls;
-	
 	private Environment declEvalEnv;
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
@@ -48,6 +46,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private boolean typeGuard = false;
 	@Override
 	public Environment extendType(Environment env, Environment against) {
+		System.out.println(this.typeBinding);
 		if (!typeGuard) {
 			env = env.extend(typeBinding);
 			declEnv.set(decls.extendType(declEnv.get(), against));
@@ -66,18 +65,17 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		return env.extend(nameBinding);
 	}
-    public TypeDeclaration(String name, DeclSequence decls, DeclSequence keywordDecls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-    	this(name, decls, keywordDecls, metadata, clsNameLine);
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    	this(name, decls, metadata, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name);
 		this.taggedInfo.associateTag();
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, DeclSequence keywordDecls, Reference<Value> metadata, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
     	
 		this.decls = decls;
-		this.keywordDecls = keywordDecls;
 
 		nameBinding = new NameBindingImpl(name, null); 
 		typeBinding = new TypeBinding(name, null, metadata);
@@ -118,7 +116,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), keywordDecls, metaValue, location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, location);
 	}
 
 	@Override
@@ -135,6 +133,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
+	
 		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
 		
 		//extend with tag information
@@ -235,15 +234,5 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	public Reference<Environment> getDeclEnv() {
 		return declEnv;
-	}
-	
-	public KeywordDeclaration getKeywordDecl(String keyword) {
-		Iterator<Declaration> it = keywordDecls.getDeclIterator().iterator();
-		while (it.hasNext()) {
-			KeywordDeclaration tempDecl = (KeywordDeclaration)it.next();
-			if (tempDecl.getName().equals(keyword))
-				return tempDecl;
-		}
-		return null;
 	}
 }

@@ -25,13 +25,9 @@ public class UnresolvedType implements Type {
 	}
 	
 	public Type resolve(Environment env) {
-		// System.out.println("Looking at: " + this.typeName);
 		
 		if (env.lookup(this.typeName) != null) {
 			NameBinding n = env.lookup(this.typeName);
-		
-			// System.out.println("NameBinding = " + n);
-			// System.out.println("Its type is " + n.getType());
 		}
 		
 		if (env.lookupType(typeName) == null) {

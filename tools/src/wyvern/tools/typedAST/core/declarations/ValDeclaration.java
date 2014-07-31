@@ -51,6 +51,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		Type resolved = null;
+
 		if (binding.getType() != null)
 			resolved = TypeResolver.resolve(binding.getType(), env);
 

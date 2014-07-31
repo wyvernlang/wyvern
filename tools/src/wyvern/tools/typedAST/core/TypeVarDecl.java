@@ -1,9 +1,9 @@
 package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
-import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
@@ -21,11 +21,11 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class TypeVarDecl extends Declaration {
 	private final String name;
@@ -89,7 +89,6 @@ public class TypeVarDecl extends Declaration {
 		public void writeArgsToTree(TreeWriter writer) {
 
 		}
-
 	}
 
 	public TypeVarDecl(String name, DeclSequence body, DeclSequence keywordDecls, TypedAST metadata, FileLocation fileLocation) {
@@ -97,7 +96,7 @@ public class TypeVarDecl extends Declaration {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>();
-		this.body = new TypeDeclaration(name, body, this.keywordDecls, this.metadataObj, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadataObj, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
@@ -106,7 +105,7 @@ public class TypeVarDecl extends Declaration {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>();
-		this.body = new TypeDeclaration(name, body, this.keywordDecls, this.metadataObj, taggedInfo, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
@@ -126,7 +125,6 @@ public class TypeVarDecl extends Declaration {
 			public Environment extendType(Environment env, Environment against) {
 				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), metadataObj));
 			}
-
 			@Override
 			public Type getType() {
 				return body;
@@ -161,7 +159,9 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
-		return body.extend(old, against);
+		
+		Environment retEnv = body.extend(old, against);
+		return retEnv;
 	}
 
 	@Override
@@ -173,7 +173,6 @@ public class TypeVarDecl extends Declaration {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		
 		body.evalDecl(declEnv);
-		
 		// Evaluate KeywordDeclration Environment
 		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
 		while (it.hasNext()) {
@@ -184,6 +183,11 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public Environment extendType(Environment env, Environment against) {
+		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
+		while (it.hasNext()) {
+			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
+			env = thisItem.extendKeyword(env, this.getType());
+		}
 		return body.extendType(env, against);
 	}
 
@@ -193,7 +197,7 @@ public class TypeVarDecl extends Declaration {
 	}
 
 	private void evalMeta(Environment evalEnv) {
-		System.out.println("TypeVar evalEnv: " + evalEnv);
+
 		Environment extMetaEnv = evalEnv
 				.lookupBinding("metaEnv", MetadataInnerBinding.class)
 				.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
@@ -203,11 +207,15 @@ public class TypeVarDecl extends Declaration {
 
 		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
 		
+		System.out.println("This is from metadata: ==============================");
+		System.out.println("metadata: " + metadata.get());
+		System.out.println("metadataObj: " + metadataObj.get().getType());
+		System.out.println("==============================");
 		// Evaluate KeywordDeclration Environment
 		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
 		while (it.hasNext()) {
 			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
-			thisItem.evalMeta(evalEnv);
+			thisItem.evalKeywordMeta(evalEnv, metaEnv);
 		}
 	}
 

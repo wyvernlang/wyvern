@@ -9,7 +9,8 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.values.Obj;
@@ -53,8 +54,8 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 		return type;
 	}
 	
-	public Type getMetaType() {
-		return metaType;
+	public Reference<Value> getMetaObj() {
+		return kwMetadataObj;
 	}
 
 	@Override
@@ -90,14 +91,18 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		// Same question: Do I need to extend keyword name here?
-		if (resolvedType == null)
-			resolvedType = TypeResolver.resolve(type, against);
-		return env; //env.extend(new KeywordBinding());
+		//if (resolvedType == null)
+		//	resolvedType = TypeResolver.resolve(type, against);
+		return env;//.extend(new KeywordBinding(resolvedType, null));
 	}
 
 	@Override
 	public String getName() {
 		return name;
+	}
+	
+	public Environment extendKeyword(Environment env, Type host) {
+		return env.extend(new KeywordBinding(host, this));
 	}
 
 	@Override
@@ -135,16 +140,21 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		if (kwMetadataObj.get() == null)
 			kwMetadataObj.set(kwMetadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
-		metaType = new MetadataWrapper(type, kwMetadataObj);
 	}
 	
-	public void evalMeta(Environment evalEnv) {
-		Environment extMetaEnv = evalEnv
-				.lookupBinding("metaEnv", MetadataInnerBinding.class)
-				.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
+	public void evalKeywordMeta(Environment evalEnv, Environment metadataEnv) {
+		Environment extKwMetaEnv = evalEnv
+				.lookupBinding("keywordEnv", KeywordInnerBinding.class)
+				.map(KeywordInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
 
-		Environment metaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv);
-		kwMetadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
-		kwMetadataObj.set(kwMetadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
+		Environment kwMetaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extKwMetaEnv).extend(metadataEnv);
+		
+		kwMetadata.get().map(obj->obj.typecheck(kwMetaEnv, Optional.<Type>empty()));
+		kwMetadataObj.set(kwMetadata.get().map(obj -> obj.evaluate(kwMetaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
+		
+		System.out.println("This is from metadata: ==============================");
+		System.out.println("metadata: " + kwMetadata.get());
+		System.out.println("metadataObj: " + kwMetadataObj.get().getType());
+		System.out.println("==============================");
 	}
 }

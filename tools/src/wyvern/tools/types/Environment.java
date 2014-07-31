@@ -3,6 +3,8 @@ package wyvern.tools.types;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -63,6 +65,21 @@ public class Environment implements TreeWritable {
 		if (this.name.equals(name) && this.binding instanceof TypeBinding)
 			return (TypeBinding) binding;
 		return parentEnvironment.lookupType(name);
+	}
+	
+	public KeywordBinding lookupKeyword(Type hostType, String keyword) {
+
+		System.out.println("O_O " + this.binding);
+		
+		if (this.binding.getName().equals(keyword) && this.binding instanceof KeywordBinding) {
+			System.out.println(":-) Start looking");
+			if (((KeywordBinding)this.binding).getHostType().equals(hostType)) {
+				System.out.println(":-) Get it!");
+				return (KeywordBinding) this.binding;
+			}
+		}
+		
+		return parentEnvironment.lookupKeyword(hostType, keyword);
 	}
 
 	public Value getValue(String name) {

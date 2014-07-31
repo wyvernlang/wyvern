@@ -39,30 +39,22 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		Type tgtType = null;
-		tgtType = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
-		KeywordDeclaration kwdecl = null;
+		Type tgtType = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
 		
-		if (tgtType instanceof MetadataWrapper) {
-			Type innerType = ((MetadataWrapper) tgtType).getInner();
-			if (innerType instanceof TypeType) {
-				kwdecl = ((TypeType) innerType).getDecl().getKeywordDecl(keyword);
-			}
-		} else {
-			// TODO: What are other cases??
-			System.out.println("[TODO] Target type in KeywordInnvocation is : " + tgtType.getClass());
+		Type metaWrapper = null;
+		try {
+			System.err.println("KWKWKWKW " + env);
+			System.err.println("OOOOOOOO " + env.lookup("Hellolang").getType().getClass());
+			metaWrapper = TypeResolver.generateKeywordWrapper(tgtType, env, keyword);
+		} catch (Exception e) {
+			System.err.println("No keyword available");
 		}
+
+		System.out.println(env);
 		
-		Type dslType = null;
-		
-		if (kwdecl != null) {
-			Type resolved = null;
-			
-			dslType = ((DSLLit)this.lit).typecheck(env, Optional.ofNullable(kwdecl.getMetaType()));
-		}
-	
-		type = dslType;
-		return dslType;
+		this.type = ((DSLLit)this.lit).typecheck(env,Optional.of(metaWrapper));
+
+		return this.type;
 	}
 
 	@Override
