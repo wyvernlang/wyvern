@@ -19,19 +19,24 @@ import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
+	private final String src;
 	protected Reference<Environment> intEnv;
 	private Environment typeEquivEnv;
 	
 	public Obj(Environment declEnv) {
 		this.intEnv = new Reference<>(declEnv);
+		src = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (s,e)->s+"\n"+e, (a,b)->a+b);
 	}
 
     public Obj(Reference<Environment> declEnv) {
+		src = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (s,e)->s+"\n"+e, (a,b)->a+b);
+
 		intEnv = declEnv;
     }
 

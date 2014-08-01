@@ -81,7 +81,7 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new KeywordDeclaration(name, type, newChildren.get(0), location);
+		return new KeywordDeclaration(name, type, newChildren.get("body"), location);
 	}
 
 	@Override

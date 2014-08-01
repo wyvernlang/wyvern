@@ -4,6 +4,7 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.ParseBuffer;
+import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
@@ -32,7 +33,7 @@ import java.util.Optional;
 
 public class TypeVarDecl extends Declaration {
 	private final String name;
-	private final EnvironmentExtender body;
+	private EnvironmentExtender body;
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
 	private final DeclSequence keywordDecls;
@@ -156,8 +157,10 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		Type type = body.typecheck(env, Optional.<Type>empty());
+		body = (EnvironmentExtender)new DSLTransformer().transform(body);
 		evalMeta(env);
-		return body.typecheck(env, Optional.<Type>empty());
+		return type;
 	}
 
 	@Override

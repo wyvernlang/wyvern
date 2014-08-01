@@ -76,7 +76,7 @@ public class DSLLit extends AbstractTypedAST {
 
 	@Override
 	public Value evaluate(Environment env) {
-		return null;
+		throw new RuntimeException();
 	}
 
 	@Override

@@ -68,7 +68,6 @@ public class KeywordInvocation implements CoreAST {
 	public Map<String, TypedAST> getChildren() {
 		HashMap<String, TypedAST> out = new HashMap<>();
 		out.put("tgt", this.tgt);
-		out.put("lit", this.lit);
 		return out;
 	}
 
