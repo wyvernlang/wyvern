@@ -1,6 +1,7 @@
 package wyvern.tools.types;
 
 import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.extensions.TSLBlock;
@@ -86,7 +87,7 @@ public class TypeResolver {
 	}
 	
 	public static Type generateKeywordWrapper(Type hostType, Environment ctx, String keyword) throws Exception {
-		KeywordBinding kwBinding = ctx.lookupKeyword(hostType, keyword);
+		KeywordBinding kwBinding = ctx.lookupBinding("keywordEnv", KeywordInnerBinding.class).get().getInnerEnv().lookupKeyword(hostType, keyword);
 		if (kwBinding != null) {
 			return new MetadataWrapper(kwBinding.getType(), kwBinding.getMetadata().get());
 		}

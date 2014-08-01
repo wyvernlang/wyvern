@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.binding.compiler;
 
+import java.util.List;
+
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -31,6 +33,15 @@ public class KeywordInnerBinding implements Binding{
 	
 	public Environment getInnerEnv() {
 		return innerEnv.get();
+	}
+	
+	public void nameToType(Environment env) {
+		List<Binding> bindings = innerEnv.get().getBindings(); 
+		for (Binding i : bindings) {
+			if (i instanceof KeywordBinding) {
+				((KeywordBinding)i).setHostType(env);
+			}
+		}
 	}
 	
 	@Override

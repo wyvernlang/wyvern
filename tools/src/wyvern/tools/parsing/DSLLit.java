@@ -62,13 +62,15 @@ public class DSLLit extends AbstractTypedAST {
 		Value vparser = Util.invokeValue(metaObj, "getParser", UnitVal.getInstance(FileLocation.UNKNOWN));
 		
 		ExtParser parser = (ExtParser) Util.toJavaObject(vparser, ExtParser.class);
-		
+
 		try {
+			System.out.println(new ParseBuffer(dslText.get()).getSrcString());
 			TypedAST inner = parser.parse(new ParseBuffer(dslText.get()));
 			dslAST = new TSLBlock(inner);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		
 		return dslAST.typecheck(env,expected);
 	}
 

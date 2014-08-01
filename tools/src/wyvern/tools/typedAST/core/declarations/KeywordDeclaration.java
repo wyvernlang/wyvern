@@ -8,12 +8,16 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.ExtParser;
+import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
 import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -35,6 +39,7 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	private final Reference<Optional<TypedAST>> kwMetadata;
 	private final Reference<Value> kwMetadataObj;
 	private MetadataWrapper metaType = null;
+	private Reference<Type> hostType = new Reference<Type>();
 	
 	public KeywordDeclaration(String name, Type type, TypedAST body, FileLocation location) {
 		this.name = name;
@@ -47,6 +52,14 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	
 	public TypedAST getBody() {
 		return body;
+	}
+	
+	public void setHostType(Type hostType) {
+		this.hostType.set(hostType);
+	}
+	
+	public Reference<Type> getHostType() {
+		return this.hostType;
 	}
 	
 	@Override
@@ -101,7 +114,7 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 		return name;
 	}
 	
-	public Environment extendKeyword(Environment env, Type host) {
+	public Environment extendKeyword(Environment env, String host) {
 		return env.extend(new KeywordBinding(host, this));
 	}
 
@@ -156,5 +169,6 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 		System.out.println("metadata: " + kwMetadata.get());
 		System.out.println("metadataObj: " + kwMetadataObj.get().getType());
 		System.out.println("==============================");
+		System.out.println("XX " +  " XX " + kwMetadataObj.get().getType());
 	}
 }

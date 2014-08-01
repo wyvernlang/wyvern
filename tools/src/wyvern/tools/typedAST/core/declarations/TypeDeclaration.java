@@ -22,7 +22,6 @@ import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
@@ -197,10 +196,12 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
-		if (metaValue.get() == null)
+		if (metaValue.get() == null) {
+			System.out.println(" -- " + "RLL");
 			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
-
+		}
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		System.out.println("XX " + vb.getName() + " XX " + metaValue.get().getType());
 		vb.setValue(metaValue.get());
 	}
 

@@ -2,6 +2,8 @@ package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.parsing.ExtParser;
+import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
@@ -12,6 +14,7 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -186,7 +189,7 @@ public class TypeVarDecl extends Declaration {
 		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
 		while (it.hasNext()) {
 			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
-			env = thisItem.extendKeyword(env, this.getType());
+			env = thisItem.extendKeyword(env, this.getName());
 		}
 		return body.extendType(env, against);
 	}
@@ -216,6 +219,7 @@ public class TypeVarDecl extends Declaration {
 		while (it.hasNext()) {
 			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
 			thisItem.evalKeywordMeta(evalEnv, metaEnv);
+			thisItem.setHostType(evalEnv.lookupType(this.name).getType());
 		}
 	}
 

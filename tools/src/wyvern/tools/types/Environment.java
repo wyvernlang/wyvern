@@ -68,15 +68,15 @@ public class Environment implements TreeWritable {
 	}
 	
 	public KeywordBinding lookupKeyword(Type hostType, String keyword) {
-
-		System.out.println("O_O " + this.binding);
-		
+	
 		if (this.binding.getName().equals(keyword) && this.binding instanceof KeywordBinding) {
-			System.out.println(":-) Start looking");
-			if (((KeywordBinding)this.binding).getHostType().equals(hostType)) {
+			System.out.println(":-) Start looking " + ((KeywordBinding)this.binding).getHostType() +  hostType);
+			return (KeywordBinding) this.binding;
+			// How to handle keyword type relation?
+			/*if (((KeywordBinding)this.binding).getHostType().equals(hostType)) {
 				System.out.println(":-) Get it!");
 				return (KeywordBinding) this.binding;
-			}
+			}*/
 		}
 		
 		return parentEnvironment.lookupKeyword(hostType, keyword);

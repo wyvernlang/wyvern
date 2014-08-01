@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -40,11 +41,10 @@ public class KeywordInvocation implements CoreAST {
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type tgtType = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
-		
+
 		Type metaWrapper = null;
 		try {
-			System.err.println("KWKWKWKW " + env);
-			System.err.println("OOOOOOOO " + env.lookup("Hellolang").getType().getClass());
+			//System.out.println("KWKWKWKW " + env.lookupBinding("keywordEnv", KeywordInnerBinding.class).get().getInnerEnv().lookupKeyword(tgtType, keyword));
 			metaWrapper = TypeResolver.generateKeywordWrapper(tgtType, env, keyword);
 		} catch (Exception e) {
 			System.err.println("No keyword available");

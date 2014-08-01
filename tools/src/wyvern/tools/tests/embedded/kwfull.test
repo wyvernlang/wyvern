@@ -2,7 +2,7 @@ module test singleParser[IntegerConstant(2):Int]
 	file main
 		import wyv:hellolang
 		val helloed:Hellolang.Hello = {hello world}
-		helloed.firstkw {hello world}.get()
+		helloed.firstkw {holle rlrdl}.get()
 	file hellolang
 		module Hellolang
 		import java:wyvern.tools.typedAST.interfaces.TypedAST
@@ -22,11 +22,11 @@ module test singleParser[IntegerConstant(2):Int]
 								%%
 								%parser HelloWorld
 								%lex{
-									terminal TypedAST hello_t ::= /hello/ {:
+									terminal TypedAST hello_t ::= /holle/ {:
 										~
 											2
 									:};
-									terminal Int world_t ::= /world/ {: 1 :};
+									terminal Int world_t ::= /rlrdl/ {: 1 :};
 									terminal Unit space_t ::= / / {: () :};
 								%lex}
 								%cf{
