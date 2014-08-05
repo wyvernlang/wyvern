@@ -41,7 +41,11 @@ public class DSLLit extends AbstractTypedAST {
 		this.dslText = (dslText);
 	}
 
-	public TypedAST getAST() { return (dslAST); }
+	public TypedAST getAST() {
+		if (dslAST == null)
+			throw new RuntimeException("Forgot to typecheck, DSLLit not resolved");
+		return (dslAST);
+	}
 	
 	@Override
 	public Type getType() {

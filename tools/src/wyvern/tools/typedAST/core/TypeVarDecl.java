@@ -36,7 +36,7 @@ public class TypeVarDecl extends Declaration {
 	private EnvironmentExtender body;
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
-	private final DeclSequence keywordDecls;
+	private DeclSequence keywordDecls;
 	private final Reference<Value> metadataObj;
 
 	/**
@@ -159,6 +159,8 @@ public class TypeVarDecl extends Declaration {
 	protected Type doTypecheck(Environment env) {
 		Type type = body.typecheck(env, Optional.<Type>empty());
 		body = (EnvironmentExtender)new DSLTransformer().transform(body);
+		keywordDecls.typecheck(env, Optional.<Type>empty());
+		keywordDecls = (DeclSequence)new DSLTransformer().transform(keywordDecls);
 		evalMeta(env);
 		return type;
 	}
@@ -190,6 +192,8 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public Environment extendType(Environment env, Environment against) {
 		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
+
+
 		while (it.hasNext()) {
 			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
 			env = thisItem.extendKeyword(env, this.getName());
