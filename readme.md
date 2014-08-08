@@ -2,7 +2,7 @@ The Wyvern project
 ==================
 The Wyvern programming language is a new language designed to smooth the use of internal DSLs in the form of type-specific languages.
 
-Code examples can be found as part of our [testsuite](tools/src/wyvern/tools/tests/embedded), where TSL use can be seen in both TSL.test and parselang.test.
+Code examples can be found as part of our [testsuite](tools/src/wyvern/tools/tests/embedded), where TSL use can be seen in both tsl.test and parselang.test.
 
 To run Wyvern, run bin/wyvern from the root directory after compiling, or run wyvern.tools.interpreter. No compilation target is currently avaliable.
 
