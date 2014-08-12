@@ -6,6 +6,8 @@ Code examples can be found as part of our [testsuite](tools/src/wyvern/tools/tes
 
 To run Wyvern, run bin/wyvern from the root directory after compiling, or run wyvern.tools.interpreter. No compilation target is currently avaliable.
 
+Documentation is mostly in the form of research papers, which can be found from https://www.cs.cmu.edu/~aldrich/wyvern/.
+
 Layout
 -----------------
 The tools directory contains the Wyvern compiler, the command line interface, and the supported tests.
