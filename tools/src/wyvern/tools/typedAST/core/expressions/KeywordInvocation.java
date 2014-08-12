@@ -44,13 +44,10 @@ public class KeywordInvocation implements CoreAST {
 
 		Type metaWrapper = null;
 		try {
-			//System.out.println("KWKWKWKW " + env.lookupBinding("keywordEnv", KeywordInnerBinding.class).get().getInnerEnv().lookupKeyword(tgtType, keyword));
 			metaWrapper = TypeResolver.generateKeywordWrapper(tgtType, env, keyword);
 		} catch (Exception e) {
 			System.err.println("No keyword available");
 		}
-
-		System.out.println(env);
 		
 		this.type = ((DSLLit)this.lit).typecheck(env,Optional.of(metaWrapper));
 
@@ -59,9 +56,7 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) {
-		System.out.println("Evaluated from kw: ");
-		System.out.println("tgt type: " + ((TypeType)((MetadataWrapper)tgt.getType()).getInner()).getDecl().getDecls());
-		return null;
+		return lit.getAST().evaluate(env);
 	}
 
 	@Override

@@ -216,11 +216,7 @@ public class TypeVarDecl extends Declaration {
 		metadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
 
 		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
-		
-		System.out.println("This is from metadata: ==============================");
-		System.out.println("metadata: " + metadata.get());
-		System.out.println("metadataObj: " + metadataObj.get().getType());
-		System.out.println("==============================");
+	
 		// Evaluate KeywordDeclration Environment
 		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
 		while (it.hasNext()) {

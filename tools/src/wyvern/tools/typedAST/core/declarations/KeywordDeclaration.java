@@ -142,11 +142,8 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 
 	@Override
 	public Environment extendWithValue(Environment old) {
-		System.out.println(old);
-		// Not sure if this kind of keyword is a value?
 		// TODO: Change to keywordBinding
-		Environment newEnv = old.extend(new ValueBinding(name, type));
-		return newEnv;
+		return old;
 	}
 
 	@Override
@@ -164,11 +161,5 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 		
 		kwMetadata.get().map(obj->obj.typecheck(kwMetaEnv, Optional.<Type>empty()));
 		kwMetadataObj.set(kwMetadata.get().map(obj -> obj.evaluate(kwMetaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
-		
-		System.out.println("This is from metadata: ==============================");
-		System.out.println("metadata: " + kwMetadata.get());
-		System.out.println("metadataObj: " + kwMetadataObj.get().getType());
-		System.out.println("==============================");
-		System.out.println("XX " +  " XX " + kwMetadataObj.get().getType());
 	}
 }
