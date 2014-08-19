@@ -1,7 +1,8 @@
-module test singleParser[IntegerConstant(2):Int]
+module test singleParser[IntegerConstant(3):Int]
 	file main
 		import wyv:hellolang
 		val helloed:Hellolang.Hello = {hello world}
+		helloed.get()
 		helloed.firstkw {holle rlrdl}.get()
 	file hellolang
 		module Hellolang
@@ -24,7 +25,7 @@ module test singleParser[IntegerConstant(2):Int]
 								%lex{
 									terminal TypedAST hello_t ::= /holle/ {:
 										~
-											2
+											3
 									:};
 									terminal Int world_t ::= /rlrdl/ {: 1 :};
 									terminal Unit space_t ::= / / {: () :};
@@ -51,7 +52,7 @@ module test singleParser[IntegerConstant(2):Int]
 								%lex{
 									terminal TypedAST hello_t ::= /hello/ {:
 										~
-											2
+											4
 									:};
 									terminal Int world_t ::= /world/ {: 1 :};
 									terminal Unit space_t ::= / / {: () :};

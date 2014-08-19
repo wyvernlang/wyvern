@@ -87,6 +87,8 @@ public class TypeResolver {
 	}
 	
 	public static Type generateKeywordWrapper(Type hostType, Environment ctx, String keyword) throws Exception {
+		System.out.println("Type of host: " + hostType);
+		
 		KeywordBinding kwBinding = ctx.lookupBinding("keywordEnv", KeywordInnerBinding.class).get().getInnerEnv().lookupKeyword(hostType, keyword);
 		if (kwBinding != null) {
 			return new MetadataWrapper(kwBinding.getType(), kwBinding.getMetadata().get());

@@ -40,6 +40,7 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
+		System.out.println("LOOKUP " + env.lookupType("Hello"));
 		Type tgtType = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
 
 		Type metaWrapper = null;
@@ -56,7 +57,7 @@ public class KeywordInvocation implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) {
-		return lit.getAST().evaluate(env);
+		throw new RuntimeException("KeywordInvocation not transformed");
 	}
 
 	@Override
@@ -84,5 +85,9 @@ public class KeywordInvocation implements CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);	
+	}
+	
+	public DSLLit getDSLLit() {
+		return this.lit;
 	}
 }

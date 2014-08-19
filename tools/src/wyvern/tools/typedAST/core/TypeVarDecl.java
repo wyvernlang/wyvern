@@ -2,11 +2,8 @@ package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.ExtParser;
-import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
@@ -15,7 +12,6 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -25,7 +21,6 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -100,7 +95,7 @@ public class TypeVarDecl extends Declaration {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>();
-		this.body = new TypeDeclaration(name, body, this.metadataObj, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadataObj, keywordDecls, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
@@ -109,7 +104,7 @@ public class TypeVarDecl extends Declaration {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>();
-		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadataObj, keywordDecls, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
@@ -127,7 +122,7 @@ public class TypeVarDecl extends Declaration {
 		this.body = new EnvironmentExtInner(fileLocation) {
 			@Override
 			public Environment extendType(Environment env, Environment against) {
-				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), metadataObj));
+				return env.extend(new TypeBinding(name, TypeResolver.resolve(body,against), metadataObj, keywordDecls));
 			}
 			@Override
 			public Type getType() {

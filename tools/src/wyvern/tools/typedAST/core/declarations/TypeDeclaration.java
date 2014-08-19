@@ -40,12 +40,12 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	
 	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
 	private Reference<Value> metaValue = new Reference<>();
+	private DeclSequence keywordDecls = null;
 
 	// FIXME: I am not convinced typeGuard is required (alex).
 	private boolean typeGuard = false;
 	@Override
 	public Environment extendType(Environment env, Environment against) {
-		System.out.println(this.typeBinding);
 		if (!typeGuard) {
 			env = env.extend(typeBinding);
 			declEnv.set(decls.extendType(declEnv.get(), against));
@@ -64,30 +64,32 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		return env.extend(nameBinding);
 	}
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-    	this(name, decls, metadata, clsNameLine);
+	
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, DeclSequence keywordDecls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    	this(name, decls, metadata, keywordDecls, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name);
 		this.taggedInfo.associateTag();
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, DeclSequence keywordDecls, FileLocation clsNameLine) {
     	
 		this.decls = decls;
 
 		nameBinding = new NameBindingImpl(name, null); 
-		typeBinding = new TypeBinding(name, null, metadata);
+		typeBinding = new TypeBinding(name, null, metadata, keywordDecls);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new NameBindingImpl(nameBinding.getName(), classType);
 
-		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
+		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata, keywordDecls);
 		
 		this.location = clsNameLine;
 		this.metaValue = metadata;
+		this.keywordDecls = keywordDecls;
 	}
 
 	@Override
@@ -115,7 +117,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, keywordDecls, location);
 	}
 
 	@Override
@@ -197,11 +199,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
 		if (metaValue.get() == null) {
-			System.out.println(" -- " + "RLL");
 			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
 		}
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
-		System.out.println("XX " + vb.getName() + " XX " + metaValue.get().getType());
 		vb.setValue(metaValue.get());
 	}
 

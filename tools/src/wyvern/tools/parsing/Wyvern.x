@@ -596,8 +596,8 @@ import java.net.URI;
     typedec ::= typeKwd_t identifier_t:name Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, body.first, body.second.first, body.second.second, new FileLocation(currentState.pos)); :}
     	|	    typeKwd_t identifier_t:name {: RESULT = new TypeVarDecl((String)name, (DeclSequence)null, null, null, new FileLocation(currentState.pos)); :}
     	|       taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo Indent_t typevd:body Dedent_t {: RESULT = new TypeVarDecl((String)name, (DeclSequence)body.first, (TaggedInfo) tagInfo, body.second.first, body.second.second, new FileLocation(currentState.pos)); :}
-    	|	    taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo {: RESULT = new TypeDeclaration((String)name, null, null, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
-    	|	    taggedKwd_t typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, null, new TaggedInfo(), new FileLocation(currentState.pos)); :}
+    	|	    taggedKwd_t typeKwd_t identifier_t:name taggedInfo:tagInfo {: RESULT = new TypeDeclaration((String)name, null, null, null, (TaggedInfo) tagInfo, new FileLocation(currentState.pos)); :}
+    	|	    taggedKwd_t typeKwd_t identifier_t:name {: RESULT = new TypeDeclaration((String)name, null, null, null, new TaggedInfo(), new FileLocation(currentState.pos)); :}
     	;
 
    	typevd ::= typeVar:va Newline_t typevd:rest {: RESULT = new Pair<>(new DeclSequence(Arrays.asList(va, rest.first)), rest.second); :}

@@ -58,5 +58,4 @@ public class KeywordInnerBinding implements Binding{
 	public Type getType() {
 		return Unit.getInstance();
 	}
-
 }
