@@ -12,7 +12,6 @@ import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.values.Obj;
@@ -153,12 +152,7 @@ public class KeywordDeclaration extends Declaration implements TreeWritable {
 	}
 	
 	public void evalKeywordMeta(Environment evalEnv, Environment metadataEnv) {
-		Environment extKwMetaEnv = evalEnv
-				.lookupBinding("keywordEnv", KeywordInnerBinding.class)
-				.map(KeywordInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
-
-		Environment kwMetaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extKwMetaEnv).extend(metadataEnv);
-		
+		Environment kwMetaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(metadataEnv);
 		kwMetadata.get().map(obj->obj.typecheck(kwMetaEnv, Optional.<Type>empty()));
 		kwMetadataObj.set(kwMetadata.get().map(obj -> obj.evaluate(kwMetaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
 	}

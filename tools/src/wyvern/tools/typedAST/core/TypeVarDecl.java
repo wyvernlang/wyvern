@@ -157,6 +157,7 @@ public class TypeVarDecl extends Declaration {
 		keywordDecls.typecheck(env, Optional.<Type>empty());
 		keywordDecls = (DeclSequence)new DSLTransformer().transform(keywordDecls);
 		evalMeta(env);
+		env.lookupBinding(this.name, TypeBinding.class).get().setKeywords(keywordDecls);
 		return type;
 	}
 
@@ -174,7 +175,6 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		
 		body.evalDecl(declEnv);
 		// Evaluate KeywordDeclration Environment
 		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();

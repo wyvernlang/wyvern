@@ -1,12 +1,6 @@
 package wyvern.tools.types;
 
-import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.extensions.TSLBlock;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.SpliceType;
 import wyvern.tools.types.extensions.TypeInv;
 
@@ -85,15 +79,4 @@ public class TypeResolver {
 		
 		return input;
 	}
-	
-	public static Type generateKeywordWrapper(Type hostType, Environment ctx, String keyword) throws Exception {
-		System.out.println("Type of host: " + hostType);
-		
-		KeywordBinding kwBinding = ctx.lookupBinding("keywordEnv", KeywordInnerBinding.class).get().getInnerEnv().lookupKeyword(hostType, keyword);
-		if (kwBinding != null) {
-			return new MetadataWrapper(kwBinding.getType(), kwBinding.getMetadata().get());
-		}
-		throw new RuntimeException("Keyword does not exist");
-	}
-	
 }

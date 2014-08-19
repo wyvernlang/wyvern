@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class TypeBinding extends AbstractBinding {
 	private final Reference<Value> metadata;
-	private final Reference<DeclSequence> keywordDecls;
+	private Reference<DeclSequence> keywordDecls;
 
 	public TypeBinding(String name, Type type) {
 		super(name, type);
@@ -41,9 +41,13 @@ public class TypeBinding extends AbstractBinding {
 		return getType(); 
 	}
 	
+	public void setKeywords(DeclSequence kwdecls) {
+		this.keywordDecls = new Reference<DeclSequence>(kwdecls);
+	}
+	
 	public Optional<Reference<Value>> getMetadata() { return Optional.ofNullable(metadata); }
 	
-	public Optional<Reference<DeclSequence>> getKeywordDecsl() { 
+	public Optional<Reference<DeclSequence>> getKeywordDecls() { 
 		return Optional.ofNullable(keywordDecls); 
 	}
 }

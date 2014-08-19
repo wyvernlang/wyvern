@@ -39,10 +39,20 @@ public class UnresolvedType implements Type {
 			}
 			throw new RuntimeException("Cannot find "+typeName +" in environment "+env);
 		}
+		
+		// There can be some problems if there exists keyword but not metadata
 		TypeBinding typeBinding = env.lookupType(typeName);
-		if (typeBinding.getMetadata().isPresent() && typeBinding.getMetadata().get().get() != null)
-			return new MetadataWrapper(typeBinding.getUse(), typeBinding.getMetadata().get());
-		else
+		
+		boolean metadataCond = typeBinding.getMetadata().isPresent() && typeBinding.getMetadata().get().get() != null;
+		boolean keywordsCond = typeBinding.getKeywordDecls().isPresent() && typeBinding.getKeywordDecls().get().get() != null;
+		
+		if (metadataCond && !keywordsCond)
+			return new MetadataWrapper(typeBinding.getUse(), typeBinding.getMetadata().get(), null);
+		else if (keywordsCond && !metadataCond) {
+			return new MetadataWrapper(typeBinding.getUse(), null, typeBinding.getKeywordDecls().get());
+		} else if (keywordsCond && metadataCond) {
+			return new MetadataWrapper(typeBinding.getUse(), typeBinding.getMetadata().get(), typeBinding.getKeywordDecls().get());
+		} else
 			return typeBinding.getUse();
 	}
 	

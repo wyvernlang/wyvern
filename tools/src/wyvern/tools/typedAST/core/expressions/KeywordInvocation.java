@@ -2,8 +2,6 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.DSLLit;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
-import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -12,7 +10,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.MetadataWrapper;
-import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -43,12 +40,8 @@ public class KeywordInvocation implements CoreAST {
 		System.out.println("LOOKUP " + env.lookupType("Hello"));
 		Type tgtType = TypeResolver.resolve(((Variable)this.tgt).typecheck(env, Optional.empty()), env);
 
-		Type metaWrapper = null;
-		try {
-			metaWrapper = TypeResolver.generateKeywordWrapper(tgtType, env, keyword);
-		} catch (Exception e) {
-			System.err.println("No keyword available");
-		}
+		// TODO: Change this into a more natural way.
+		Type metaWrapper = new MetadataWrapper(tgtType, ((MetadataWrapper)tgtType).lookupKeywordMeta(this.keyword), null);
 		
 		this.type = ((DSLLit)this.lit).typecheck(env,Optional.of(metaWrapper));
 

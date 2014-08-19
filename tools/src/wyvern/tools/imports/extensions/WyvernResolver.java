@@ -6,9 +6,6 @@ import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.transformers.DSLTransformer;
-import wyvern.tools.typedAST.core.binding.Binding;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordInnerBinding;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -18,9 +15,7 @@ import wyvern.tools.util.Reference;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.CharBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 public class WyvernResolver implements ImportResolver {
@@ -55,12 +50,8 @@ public class WyvernResolver implements ImportResolver {
 
 		private Environment MiBEnv = Environment.getEmptyEnvironment();
 		private Environment getMiBEnv() { return MiBEnv; }
-		
-		private Environment KiBEnv = Environment.getEmptyEnvironment();
-		private Environment getKiBEnv() { return KiBEnv; }
 
 		private MetadataInnerBinding mib = new MetadataInnerBinding(new Reference<>(this::getMiBEnv));
-		private KeywordInnerBinding kib = new KeywordInnerBinding(new Reference<>(this::getKiBEnv));
 
 		boolean etping = false;
 		@Override
@@ -72,7 +63,6 @@ public class WyvernResolver implements ImportResolver {
 			if (res instanceof EnvironmentExtender) {
 				in = ((EnvironmentExtender) res).extendType(in, Globals.getStandardEnv());
 				MiBEnv = ((EnvironmentExtender) res).extendType(MiBEnv, Globals.getStandardEnv());
-				KiBEnv = ((EnvironmentExtender) res).extendType(KiBEnv, Globals.getStandardEnv());
 			}
 			etping = false;
 			return in;
@@ -88,10 +78,9 @@ public class WyvernResolver implements ImportResolver {
 			if (res instanceof EnvironmentExtender) {
 				in = ((EnvironmentExtender) res).extendName(in, Globals.getStandardEnv());
 				MiBEnv = ((EnvironmentExtender) res).extendName(MiBEnv, Globals.getStandardEnv());
-				KiBEnv = ((EnvironmentExtender) res).extendName(KiBEnv, Globals.getStandardEnv());
 			}
 			enaming = false;
-			return in.extend(mib).extend(kib);
+			return in.extend(mib);
 		}
 
 		boolean extending = false;
@@ -104,7 +93,7 @@ public class WyvernResolver implements ImportResolver {
 			if (res instanceof EnvironmentExtender)
 				in = ((EnvironmentExtender) res).extend(in, in);
 			extending = false;
-			return in.extend(mib.from(in)).extend(kib.from(in));
+			return in.extend(mib.from(in));
 		}
 		
 		boolean typechecking = false;
@@ -118,7 +107,6 @@ public class WyvernResolver implements ImportResolver {
 
 			if (res instanceof EnvironmentExtender) {
 				MiBEnv = ((EnvironmentExtender) res).evalDecl(MiBEnv);
-				KiBEnv = ((EnvironmentExtender) res).evalDecl(KiBEnv);
 			}
 			typechecking = false;
 			return resu;
