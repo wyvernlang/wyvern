@@ -108,7 +108,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		System.out.println("-- Evaluating val decl: " + getName());
+		// System.out.println("-- Evaluating val decl: " + getName());
 		if (declEnv.getValue(binding.getName()) != null) 
 			return;
 			
@@ -118,7 +118,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
 		vb.setValue(defValue);
 		
-		System.out.println("-- End evaluating val decl\n");
+		// System.out.println("-- End evaluating val decl\n");
 	}
 
 	@Override
@@ -143,14 +143,14 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		System.out.println("Resolving ValDeclaration using extendName: " + this.getName());
+		// System.out.println("Resolving ValDeclaration using extendName: " + this.getName());
 		
 		Type resolved;
 		if (binding.getType() != null) {
 			
-			System.out.println("Inside ValDeclaration resolving type: " + binding.getType());
+			// System.out.println("Inside ValDeclaration resolving type: " + binding.getType());
 			// System.out.println("Inside ValDeclaration resolving type: " + binding.getType().getClass());
-			System.out.println("Inside ValDeclaration against = " + against);
+			// System.out.println("Inside ValDeclaration against = " + against);
 			
 			if (binding.getType() instanceof TypeInv) {
 				TypeInv ti = (TypeInv) binding.getType();
