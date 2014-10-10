@@ -1,0 +1,29 @@
+tagged type Type1
+    def getValue1() : Int
+
+tagged type Type2
+    def getValue2() : Int
+
+tagged type Type3
+    def getValue3() : Int
+
+tagged type Type4
+    def getValue4() : Int
+
+tagged type Type5
+    def getValue5() : Int
+
+tagged type Type6
+    def getValue6() : Int
+
+tagged type Type7
+    def getValue7() : Int
+
+tagged type Type8
+    def getValue8() : Int
+
+tagged type Type9
+    def getValue9() : Int
+
+tagged type Type10
+    def getValue10() : Int

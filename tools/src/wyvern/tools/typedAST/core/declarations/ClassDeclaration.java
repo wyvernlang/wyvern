@@ -96,13 +96,17 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 
 	}
+	
     public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
 							DeclSequence decls,
 							List<String> typeParams,
 							FileLocation location) {
-		this.decls = decls;
+		
+    	System.out.println("Made class: " + name);
+    	
+    	this.decls = decls;
 		this.typeParams = typeParams;
 		typeEquivalentEnvironmentRef = new Reference<>();
 		classMembersEnv = new Reference<>();
@@ -153,9 +157,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type doTypecheck(Environment env) {
 
+		System.out.println("typecheck class: " + nameBinding.getName());
 
 		// FIXME: Currently allow this and class in both class and object methods. :(
-
 
 		Environment genv = env.extend(new ClassBinding("class", this));
 		Environment oenv = genv.extend(new NameBindingImpl("this", getObjectType()));
@@ -240,6 +244,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		
+		System.out.println("extend class: " + nameBinding.getName());
+		
 		// FIXME: Currently allow this and class in both class and object methods. :(
 		//newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
 		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
@@ -248,7 +254,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		if (isTagged()) {
 			//type-test the tag information
 			
-			//TODO: fix this
 			
 			//first get/ create the binding
 			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());

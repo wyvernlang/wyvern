@@ -619,8 +619,6 @@ public class TagTests {
 	
 	@Test
 	public void jsonTest() throws CopperParserException, IOException {
-		//TODO, make this test do something useful!
-		
 		String input = 
 				"tagged class JSON                            \n" +
 				"    class def create() : JSON                \n" +

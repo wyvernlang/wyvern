@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
@@ -22,6 +21,7 @@ public class TagBinding implements Binding {
 	private List<TagBinding> directSubtags = new ArrayList<TagBinding>();
 	/** The list of comprises TagBindings. */
 	private List<TagBinding> comprisesTags = new ArrayList<TagBinding>();
+	
 	
 	//TODO: Remove this giant hack. Currently having a universal tag map because
 	//type checking/ eval is not working properly

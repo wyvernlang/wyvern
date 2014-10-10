@@ -139,7 +139,7 @@ public class DynamicTagTests {
 		TagTests.evaluateExpecting(ast, 25);
 	}
 	
-	private String readFile(String filename) {
+	public static String readFile(String filename) {
 		try {
 			StringBuffer b = new StringBuffer();
 			
