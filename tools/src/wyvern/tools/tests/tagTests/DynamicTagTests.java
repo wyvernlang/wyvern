@@ -10,7 +10,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class DynamicTagTests {
 
-	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/";
+	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/dynamic/";
 	
 	@Test
 	/**
@@ -32,100 +32,6 @@ public class DynamicTagTests {
 		TypedAST ast = TestUtil.getAST(program);
 		
 		TestUtil.evaluateExpecting(ast, 2);
-	}
-
-	@Test
-	public void taggedTypeTest1() throws CopperParserException, IOException {		
-		String input = 
-				"tagged type X                      \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"def create() : X = new             \n" +
-				"    def foo() : Int = 15           \n" +
-				"                                   \n" +
-				"val x = create()                   \n" +
-				"                                   \n" +
-				"match(x):                          \n" + 
-				"	X => 15                         \n" +
-				"	default => 30                   \n";
-				
-		TypedAST ast = TestUtil.getAST(input);
-		TestUtil.evaluateExpecting(ast, 15);
-	}
-	
-	@Test
-	public void taggedTypeTest2() throws CopperParserException, IOException {		
-		String input = 
-				"tagged type X                      \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"tagged type Y                      \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"def create() : Y = new             \n" +
-				"    def foo() : Int = 15           \n" +
-				"                                   \n" +
-				"val x = create()                   \n" +
-				"                                   \n" +
-				"match(x):                          \n" + 
-				"	Y => 20                         \n" +
-				"	X => 15                         \n" +
-				"	default => 30                   \n";
-				
-		TypedAST ast = TestUtil.getAST(input);
-		TestUtil.evaluateExpecting(ast, 20);
-	}
-	
-	@Test
-	public void taggedTypeTest3() throws CopperParserException, IOException {		
-		String input = 
-				"tagged type X [comprises Y, Z]     \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"tagged type Y [case of X]          \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"tagged type Z [case of X]          \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"def create() : X = new             \n" +
-				"    def foo() : Int = 15           \n" +
-				"                                   \n" +
-				"val x : X = create()               \n" +
-				"                                   \n" +
-				"match(x):                          \n" + 
-				"	Y => 20                         \n" +
-				"	Z => 15                         \n" +
-				"	X => 30                         \n";
-				
-		TypedAST ast = TestUtil.getAST(input);
-		TestUtil.evaluateExpecting(ast, 30);
-	}
-	
-	@Test
-	public void taggedTypeTest4() throws CopperParserException, IOException {		
-		String input = 
-				"tagged type X [comprises Y, Z]     \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"tagged type Y [case of X]          \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"tagged type Z [case of X]          \n" +
-				"    def foo() : Int                \n" +
-				"                                   \n" +
-				"def create() : Y = new             \n" +
-				"    def foo() : Int = 15           \n" +
-				"                                   \n" +
-				"val x : X = create()               \n" +
-				"                                   \n" +
-				"match(x):                          \n" + 
-				"	Y => 20                         \n" +
-				"	Z => 15                         \n" +
-				"	X => 30                         \n";
-				
-		TypedAST ast = TestUtil.getAST(input);
-		TestUtil.evaluateExpecting(ast, 20);
 	}
 	
 	@Test
