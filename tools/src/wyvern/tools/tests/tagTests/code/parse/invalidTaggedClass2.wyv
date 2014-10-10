@@ -1,0 +1,4 @@
+//here we have a simple typo
+taggd class X
+    class def create() : X
+        new

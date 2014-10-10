@@ -1,8 +1,6 @@
 package wyvern.tools.tests.tagTests;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +17,7 @@ public class DynamicTagTests {
 	 * This test ensures the dynamic tag example works properly.
 	 */
 	public void dynamicTagTest() {
-		String program = readFile(PATH + "DynamicTags.wyv");
+		String program = TestUtil.readFile(PATH + "DynamicTags.wyv");
 		
 		Assert.fail();
 	}
@@ -30,10 +28,10 @@ public class DynamicTagTests {
 	 * dynamic tag features. This is to make sure non-dynamic tag code is working.
 	 */
 	public void nonDynamicTest() throws CopperParserException, IOException {
-		String program = readFile(PATH + "NonDynamicDynamicTag.wyv");
-		TypedAST ast = TagTests.getAST(program);
+		String program = TestUtil.readFile(PATH + "NonDynamicDynamicTag.wyv");
+		TypedAST ast = TestUtil.getAST(program);
 		
-		TagTests.evaluateExpecting(ast, 2);
+		TestUtil.evaluateExpecting(ast, 2);
 	}
 
 	@Test
@@ -51,8 +49,8 @@ public class DynamicTagTests {
 				"	X => 15                         \n" +
 				"	default => 30                   \n";
 				
-		TypedAST ast = TagTests.getAST(input);
-		TagTests.evaluateExpecting(ast, 15);
+		TypedAST ast = TestUtil.getAST(input);
+		TestUtil.evaluateExpecting(ast, 15);
 	}
 	
 	@Test
@@ -74,8 +72,8 @@ public class DynamicTagTests {
 				"	X => 15                         \n" +
 				"	default => 30                   \n";
 				
-		TypedAST ast = TagTests.getAST(input);
-		TagTests.evaluateExpecting(ast, 20);
+		TypedAST ast = TestUtil.getAST(input);
+		TestUtil.evaluateExpecting(ast, 20);
 	}
 	
 	@Test
@@ -100,8 +98,8 @@ public class DynamicTagTests {
 				"	Z => 15                         \n" +
 				"	X => 30                         \n";
 				
-		TypedAST ast = TagTests.getAST(input);
-		TagTests.evaluateExpecting(ast, 30);
+		TypedAST ast = TestUtil.getAST(input);
+		TestUtil.evaluateExpecting(ast, 30);
 	}
 	
 	@Test
@@ -126,32 +124,16 @@ public class DynamicTagTests {
 				"	Z => 15                         \n" +
 				"	X => 30                         \n";
 				
-		TypedAST ast = TagTests.getAST(input);
-		TagTests.evaluateExpecting(ast, 20);
+		TypedAST ast = TestUtil.getAST(input);
+		TestUtil.evaluateExpecting(ast, 20);
 	}
 	
 	@Test
 	public void jsonTest() throws CopperParserException, IOException {
-		String input = readFile(PATH + "TaggedTypeTest.wyv");
+		String input = TestUtil.readFile(PATH + "TaggedTypeTest.wyv");
 			
-		TypedAST ast = TagTests.getAST(input);
+		TypedAST ast = TestUtil.getAST(input);
 			
-		TagTests.evaluateExpecting(ast, 25);
-	}
-	
-	public static String readFile(String filename) {
-		try {
-			StringBuffer b = new StringBuffer();
-			
-			for (String s : Files.readAllLines(new File(filename).toPath())) {
-				//Be sure to add the newline as well
-				b.append(s).append("\n");
-			}
-			
-			return b.toString();
-		} catch (IOException e) {
-			Assert.fail("Failed opening file: " + filename);
-			throw new RuntimeException(e);
-		}
+		TestUtil.evaluateExpecting(ast, 25);
 	}
 }

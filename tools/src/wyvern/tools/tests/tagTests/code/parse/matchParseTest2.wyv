@@ -1,0 +1,8 @@
+tagged class X
+    class def create() : X
+        new
+
+val x = X.create()
+
+match(x):
+   default => 15

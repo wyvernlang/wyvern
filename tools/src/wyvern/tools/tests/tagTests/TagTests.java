@@ -1,9 +1,6 @@
 package wyvern.tools.tests.tagTests;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -13,133 +10,14 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.Wyvern;
-import wyvern.tools.typedAST.core.binding.TagBinding;
-import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+
+import static wyvern.tools.tests.tagTests.TestUtil.getAST;
+import static wyvern.tools.tests.tagTests.TestUtil.evaluateExpecting;
 
 public class TagTests {
 	
-	@Test
-	/**
-	 * Test the tagged keyword works with classes.
-	 */
-	public void taggedClassParseTest1() throws CopperParserException, IOException {		
-		String input = 
-				"tagged class X                 \n" +
-				"    class def create() : X     \n" +
-				"        new                    \n";
-		
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
 	
-	@Test
-	/**
-	 * Test the tagged keyword works with types.
-	 */
-	public void taggedTypeParseTest1() throws CopperParserException, IOException {		
-		String input =
-				"tagged type IntWrapper    \n" +
-				"  def getValue() : Int    \n";
-		
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
-	
-	@Test
-	/**
-	 * Test the tagged keyword works with multiple types.
-	 */
-	public void taggedTypeParseTest2() throws CopperParserException, IOException {		
-		String input = 
-				"tagged type Type1          \n" +
-				"  def getValue1() : Int    \n" + 
-				"                           \n" +
-				"tagged type Type2          \n" +
-				"  def getValue2() : Int    \n";
-		
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
-	
-	@Test
-	public void matchParseTest1() throws CopperParserException, IOException {		
-		String input = 
-				"tagged class X                 \n" +
-				"    class def create() : X     \n" +
-				"        new                    \n" +
-				"                               \n" +
-				"val x = X.create()             \n" +
-				"                               \n" +
-				"match(x):                      \n" +
-				"	X => 15                     \n" +
-				"	default => 15               \n";
-		
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
-	
-	@Test
-	public void matchParseTest2() throws CopperParserException, IOException {		
-		String input = 
-				"tagged class X                 \n" +
-				"    class def create() : X     \n" +
-				"        new                    \n" +
-				"                               \n" +
-				"val x = X.create()             \n" +
-				"                               \n" +
-				"match(x):                      \n" +
-				"	default => 15               \n";
-				
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
-	}
-	
-	@Test
-	public void matchParseTestMulti1() throws CopperParserException, IOException {		
-		String input = 	
-				"tagged class X                 \n" +
-				"    class def create() : X     \n" +
-				"        new                    \n" +
-				"                               \n" +
-				"tagged class Y                 \n" +
-				"    class def create() : Y     \n" +
-				"        new                    \n" +
-				"                               \n" +
-				"val x = X.create()             \n" +
-				"                               \n" +
-				"match(x):                      \n" +
-				"	X => 15                     \n" +
-				"	Y => 23                     \n" +
-				"	default => 50               \n";
-				
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
-	
-	@Test
-	public void matchParseTestMulti2() throws CopperParserException, IOException {		
-		String input = 
-				"tagged class X                 \n" +
-				"    class def create() : X     \n" +
-				"        new                    \n" +
-				"                               \n" +
-				"tagged class Y                 \n" +
-				"    class def create() : Y     \n" +
-				"        new                    \n" +
-				"                               \n" +
-				"val x = X.create()             \n" +
-				"                               \n" +
-				"match(x):                      \n" +
-				"	X => 15                     \n" +
-				"	Y => 23                     \n" +
-				"	default => 50               \n";
-				
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
 	
 	@Test
 	public void matchInterpretTest1() throws CopperParserException, IOException {		
@@ -409,58 +287,8 @@ public class TagTests {
 			typeCheckfailWith(ast, ErrorMessage.DEFAULT_PRESENT);
 	}
 	
-	@Test
-	public void caseOfParseTest() throws CopperParserException, IOException {
-		String input = 
-			"tagged class Dyn                            \n" +
-			"    class def create() : X                  \n" +
-			"        new                                 \n" +
-			"                                            \n" +
-			"tagged class DynInt [case of Dyn]           \n" +
-			"    class def create() : DynInt             \n" +
-			"        new                                 \n" +
-			"                                            \n" +
-			"tagged class DynChar [case of Dyn]          \n" +
-			"    class def create() : DynChar            \n" +
-			"        new                                 \n" +
-			"                                            \n" +
-			"val i = DynInt.create()                     \n" +
-			"                                            \n" +
-			"match(i):                                   \n" +
-			"	DynInt => 10                             \n" +
-			"	DynChar => 15                            \n" +
-			"	default => 23                            \n";
-		
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
 	
-	@Test
-	public void comprisesParseTest() throws CopperParserException, IOException {
-		String input = 
-			"tagged class Dyn [comprises DynInt, DynChar] \n" +
-			"    class def create() : X                   \n" +
-			"        new                                  \n" +
-			"                                             \n" +
-			"tagged class DynInt [case of Dyn]            \n" +
-			"    class def create() : DynInt              \n" +
-			"        new                                  \n" +
-			"                                             \n" +
-			"tagged class DynChar [case of Dyn]           \n" +
-			"    class def create() : DynChar             \n" +
-			"        new                                  \n" +
-			"                                             \n" +
-			"val i = DynInt.create()                      \n" +
-			"                                             \n" +
-			"match(i):                                    \n" +
-			"	DynInt => 10                              \n" +
-			"	DynChar => 15                             \n" +
-			"	default => 15                             \n";
-		
-		
-		getAST(input);
-		//reaching here without a parse exception is a pass
-	}
+	
 	
 	@Test
 	public void defaultPresentFullComprisesTest() throws CopperParserException, IOException {
@@ -681,46 +509,5 @@ public class TagTests {
 		}
 		
 		Assert.fail("Should have failed with error: " + errorMessage);
-	}
-	
-	/**
-	 * First typechecks the AST, then executes it.
-	 * 
-	 * Any returned value is discarded, but anything printed to stdout will be visible.
-	 * 
-	 * @param ast
-	 */
-	public static void evaluate(TypedAST ast) {
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEnv());
-	}
-	
-	/**
-	 * Completely evaluates the given AST, and compares it to the given value.
-	 * Does typechecking first, then evaluation.
-	 * 
-	 * @param ast
-	 * @param value
-	 */
-	public static void evaluateExpecting(TypedAST ast, int value) {
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		Value v = ast.evaluate(Globals.getStandardEnv());
-		
-		String expecting = "IntegerConstant(" + value + ")"; 
-
-		Assert.assertEquals(expecting, v.toString());
-	}
-	
-	/**
-	 * Converts the given program into the AST representation.
-	 * 
-	 * @param program
-	 * @return
-	 * @throws IOException 
-	 * @throws CopperParserException 
-	 */
-	public static TypedAST getAST(String program) throws CopperParserException, IOException {
-		TagBinding.resetHACK();
-		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
 	}
 }

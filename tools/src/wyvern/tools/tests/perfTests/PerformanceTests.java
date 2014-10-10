@@ -1,14 +1,11 @@
 package wyvern.tools.tests.perfTests;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 
 import org.junit.Test;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-import wyvern.tools.tests.tagTests.DynamicTagTests;
-import wyvern.tools.tests.tagTests.TagTests;
+import wyvern.tools.tests.tagTests.TestUtil;
 
 public class PerformanceTests {
 
@@ -23,7 +20,7 @@ public class PerformanceTests {
 			String program = generateTaggedTypes(i);
 			
 			double timeBefore = System.currentTimeMillis();
-			TagTests.getAST(program);
+			TestUtil.getAST(program);
 			double timeAfter = System.currentTimeMillis();
 			
 			double dt = timeAfter - timeBefore;
@@ -39,7 +36,7 @@ public class PerformanceTests {
 			String program = generateTaggedTypes(i);
 			
 			double timeBefore = System.currentTimeMillis();
-			TagTests.getAST(program);
+			TestUtil.getAST(program);
 			double timeAfter = System.currentTimeMillis();
 			
 			double dt = timeAfter - timeBefore;
@@ -47,8 +44,12 @@ public class PerformanceTests {
 			System.out.println("size: " + i + ", dt: " + dt);
 		}
 	}
-
 	
+	@Test
+	public void parseManyHierarchicalTags() throws CopperParserException, IOException {
+		
+	}
+
 	public static String generateTaggedTypes(int numTypes) {
 		StringBuffer toReturn = new StringBuffer();
 		
