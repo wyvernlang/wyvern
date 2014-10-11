@@ -1,0 +1,32 @@
+tagged type Window
+	def draw():Str
+
+type WindowMod
+	tagged class Win [case of Window]
+		class def make():Win = new
+		def draw():Str = "" 
+
+val basicWindow:WindowMod = new
+	tagged class Win [case of Window]
+		class def make():Win = new
+		def draw():Str = "blank window"
+
+def makeBordered(wm: WindowMod):WindowMod = new
+	tagged class Win [case of wm.Win]
+		class def make():Win = new
+		def draw():Str = "bordered window"
+
+val winMod:WindowMod = basicWindow
+val borderedWinMod:WindowMod = makeBordered(winMod)
+
+val win = winMod.Win.make()
+val borderedWin = borderedWinMod.Win.make()
+
+def screenCap(w:Window):Str
+	var r:Str = ""
+	match(w):
+		borderedWinMod.Win => r = "bordered"
+		default => r = "normal"
+	r
+
+screenCap(borderedWin) // result == "bordered"

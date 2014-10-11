@@ -3,7 +3,6 @@ package wyvern.tools.types.extensions;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
-import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.*;
@@ -78,11 +77,11 @@ public class TypeDeclUtils {
 		// Generate an appropriate type member for every class member.
 		for (Declaration d : decls.getDeclIterator()) {
 			if (d instanceof DefDeclaration) {
-				if (((DefDeclaration) d).isClass() != useClassMembers)
+				if (((DefDeclaration) d).isClassMember() != useClassMembers)
 					continue;
 				newEnv = d.extend(newEnv, newEnv);
 			} else if (d instanceof VarDeclaration) {
-				if (((VarDeclaration) d).isClass() != useClassMembers)
+				if (((VarDeclaration) d).isClassMember() != useClassMembers)
 					continue;
 
 				VarDeclaration vd = (VarDeclaration) d;
@@ -97,7 +96,7 @@ public class TypeDeclUtils {
 								"set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
 								new Arrow(type, Unit.getInstance())));
 			} else if (d instanceof ValDeclaration) {
-				if (((ValDeclaration) d).isClass() != useClassMembers)
+				if (((ValDeclaration) d).isClassMember() != useClassMembers)
 					continue;
 
 				ValDeclaration vd = (ValDeclaration) d;

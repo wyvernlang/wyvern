@@ -22,6 +22,8 @@ if $cygwin ; then
 fi
 
 
-WYV_CLASSPATH="$CP_HOME/tools/bin;$CP_HOME/tools/lib/CopperRuntime.jar;$CP_HOME/tools/lib/asm-debug-all-5.0.1.jar"
+WYV_CLASSPATH="$CP_HOME/tools/bin:$CP_HOME/tools/lib/CopperRuntime.jar:$CP_HOME/tools/lib/asm-debug-all-5.0.1.jar"
 
-java -cp "$WYV_CLASSPATH" wyvern/tools/Interpreter $*
+
+
+java -cp "$WYV_CLASSPATH" wyvern.tools.Interpreter $*

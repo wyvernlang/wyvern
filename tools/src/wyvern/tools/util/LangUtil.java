@@ -33,6 +33,9 @@ public class LangUtil {
 		return (String) src;
 	}
 
+	public static int castInt(Object src) { return (Integer)src; }
+
+
 	public static int strCharInt(String src) {
 		if (src.length() != 1)
 			throw new RuntimeException();
@@ -56,9 +59,36 @@ public class LangUtil {
 		}
 	}
 
+	public static TypedAST spliceUnsafe(String str) {
+		try {
+			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(str), "inner");
+			return new SpliceExn(res);
+		} catch (IOException | CopperParserException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static TypedAST splice(ParseBuffer buffer, String filename) {
+		try {
+			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
+			return new SpliceExn(res);
+		} catch (IOException | CopperParserException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static SpliceBindExn spliceBinding(ParseBuffer buffer, List<NameBinding> bindings) {
 		try {
 			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), "inner");
+			return new SpliceBindExn(res, bindings);
+		} catch (IOException | CopperParserException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static SpliceBindExn spliceBinding(ParseBuffer buffer, List<NameBinding> bindings, String filename) {
+		try {
+			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), filename);
 			return new SpliceBindExn(res, bindings);
 		} catch (IOException | CopperParserException e) {
 			throw new RuntimeException(e);

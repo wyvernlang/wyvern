@@ -1,0 +1,21 @@
+tagged class A [case of E]
+    class def create() : A
+        new 
+        
+tagged class B [case of A]
+    class def create() : B
+        new 
+        
+tagged class C [case of B]
+    class def create() : C 
+        new 
+        
+tagged class D [case of C]
+    class def create() : D
+        new 
+
+tagged class E [case of D]
+    class def create() : E
+        new               
+
+15

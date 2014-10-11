@@ -1,0 +1,8 @@
+tagged class Dyn
+    class def create() : X
+        new
+
+//wrong keyword, it is [case of A], not [cases of A]
+tagged class DynInt [cases of Dyn]
+    class def create() : DynInt
+        new

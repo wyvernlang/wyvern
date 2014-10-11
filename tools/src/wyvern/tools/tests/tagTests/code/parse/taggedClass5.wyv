@@ -1,0 +1,15 @@
+tagged class JSON
+    class def create() : JSON
+        new
+        
+tagged class NumJSON
+    class def create() : NumJSON
+        new
+        
+tagged class StringJSON
+    class def create() : StringJSON
+        new
+        
+tagged class BoolJSON
+    class def create() : BoolJSON
+        new

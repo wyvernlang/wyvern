@@ -1,0 +1,10 @@
+tagged class X
+    class def create() : X
+        new
+
+val x = X.create()
+
+//case does not have an arrow
+match (x)
+   case X 15
+   default => 15

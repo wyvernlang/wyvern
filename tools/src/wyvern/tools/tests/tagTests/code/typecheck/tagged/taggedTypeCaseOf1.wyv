@@ -1,0 +1,9 @@
+tagged class X
+    class def create() : X
+        new               
+
+tagged class Y [case of X]
+    class def create() : Y
+        new
+                       
+15

@@ -13,7 +13,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.TagBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -85,14 +85,13 @@ public class Match extends CachingTypedAST implements CoreAST {
 	public Value evaluate(Environment env) { 
 		String className = getTypeName(matchingOver.getType());
 		
-		TagBinding matchingOverBinding = TagBinding.get(className);
-		//TODO: fix this, replace with real code
+		TaggedInfo matchingOverTag = TaggedInfo.lookupTag(className);
 		
 		for (Case c : cases) {
-			TagBinding binding = TagBinding.get(c.getTaggedTypeMatch());
-			//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
+			//String caseTypeName = getTypeName(c.getAST());
+			TaggedInfo caseTag = TaggedInfo.lookupTag(c.getTaggedTypeMatch());
 			
-			if (hasMatch(matchingOverBinding, binding.getName())) {
+			if (hasMatch(matchingOverTag, caseTag)) {
 				// We've got a match, evaluate this case
 				return c.getAST().evaluate(env);
 			}
@@ -101,7 +100,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// No match, evaluate the default case
 		return defaultCase.getAST().evaluate(env);
 	}
-
+	
 	/**
 	 * Searches recursively to see if what we are matching over is a sub-tag of the given target.
 	 * @param tag
@@ -109,11 +108,19 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 * @return
 	 */
 	//TODO: rename this method to something like isSubtag()
-	private boolean hasMatch(TagBinding matchingOver, String matchTarget) {
-		if (matchingOver.getName().equals(matchTarget)) return true;
+	private boolean hasMatch(TaggedInfo matchingOver, TaggedInfo matchTarget) {
+		if (matchingOver == null) throw new NullPointerException("Matching Binding cannot be null");
+		if (matchTarget == null) throw new NullPointerException("match target cannot be null");
 		
-		if (matchingOver.getCaseOfParent() == null) return false;
-		else return hasMatch(matchingOver.getCaseOfParent(), matchTarget);
+		String matchingOverTag = matchingOver.getTagName();
+		String matchTargetTag = matchTarget.getTagName();
+		
+		if (matchingOverTag.equals(matchTargetTag)) return true;
+		
+		String matchingOverCaseOf = matchingOver.getCaseOfTag();
+		
+		if (matchingOverCaseOf == null) return false;
+		else return hasMatch(TaggedInfo.lookupTag(matchingOverCaseOf), matchTarget);
 	}
 	
 	@Override
@@ -160,8 +167,21 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		//Note: currently all errors given use matchingOver because it has a location
 		//TODO: use the actual entity that is responsible for the error
+
+		Type matchOverType = matchingOver.typecheck(env, expected);		
+
+		if (!(matchOverType instanceof ClassType)) {
+			ToolError.reportError(ErrorMessage.MATCH_OVER_TYPETYPE, matchingOver);
+		}
+
+		// Variable we're matching must exist and be a tagged type
+		String typeName = getTypeName(matchOverType);
+
+		TaggedInfo matchTaggedInfo = TaggedInfo.lookupTag(typeName);
 		
-		matchingOver.typecheck(env, expected);		
+		if (matchTaggedInfo == null) {
+			ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver);
+		}
 		
 		// Check not more than 1 default
 		for (int numDefaults = 0, i = 0; i < originalCaseList.size(); i++) {
@@ -178,57 +198,34 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		//check default is last (do this after counting so user gets more specific error message)
 		for (int i = 0; i < originalCaseList.size(); i++) {
-		
 			if (originalCaseList.get(i).isDefault() && i != originalCaseList.size() - 1) {
 				ToolError.reportError(ErrorMessage.DEFAULT_NOT_LAST, matchingOver);
 			}
 		}
 		
-		
-		// Variable we're matching must exist and be a tagged type
-		Type matchingOverType = matchingOver.getType();
-		
-		String className = getTypeName(matchingOverType);
-		
-		if (className == null){
-			//TODO change this to an error message
-			throw new RuntimeException("variable matching over must be a Class or Type");
+		//do actual type-checking on cases
+		for (Case c : cases) {
+			c.getAST().typecheck(env, expected);
 		}
-		
-		TagBinding matchBinding = TagBinding.get(className);
-		
-		if (matchBinding == null) {
-			//TODO change this to a typecheck error
-			throw new RuntimeException("Value is not tagged.");
-		}
-		
+
 		//All things we match over must be tagged types
 		for (Case c : cases) {
 			if (c.isDefault()) continue;
 			
 			String tagName = c.getTaggedTypeMatch();
 			
-			Optional<ClassType> type = env.lookupBinding(tagName, ClassType.class);
-			NameBinding binding = env.lookup(tagName);
+			//check type exists
+			TypeBinding type = env.lookupType(tagName);
 			
-			if (binding == null) {
-				// type wasn't declared...
-				ToolError.reportError(ErrorMessage.UNKNOWN_TAG, matchingOver);
+			if (type == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, tagName);
 			}
 			
-			Type t = binding.getType();
+			//check it is tagged
+			TaggedInfo info = TaggedInfo.lookupTag(tagName);
 			
-			if (t instanceof ClassType) {
-				ClassType classType = (ClassType) t;
-				
-				String name = classType.getName();
-				
-				TagBinding tagBinding = TagBinding.get(name);
-				
-				if (tagBinding == null) {
-					//not tagged
-					ToolError.reportError(ErrorMessage.NOT_TAGGED, matchingOver);
-				}
+			if (info == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, tagName);
 			}
 		}
 		
@@ -246,13 +243,13 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// If we've omitted default, we must included all possible sub-tags
 		if (defaultCase == null) {
 			//first, the variables tag must use comprised-of!
-			if (!matchBinding.hasAnyComprises()) {
+			if (!matchTaggedInfo.hasComprises()) {
 				//TODO change to type-check exception
 				ToolError.reportError(ErrorMessage.NO_COMPRISES, matchingOver);
 			}
 			
 			//next, the match cases must include all those in the comprises-of list
-			if (!comprisesSatisfied(matchBinding)) {
+			if (!comprisesSatisfied(matchTaggedInfo)) {
 				ToolError.reportError(ErrorMessage.DEFAULT_NOT_PRESENT, matchingOver);
 			}
 		}
@@ -260,15 +257,17 @@ public class Match extends CachingTypedAST implements CoreAST {
 		//A tag cannot be earlier than one of its subtags
 		for (int i = 0; i < cases.size() - 1; i++) {
 			Case beforeCase = cases.get(i);
+			TaggedInfo beforeTag = TaggedInfo.lookupTag(beforeCase.getTaggedTypeMatch());
 			
 			for (int j = i + 1; j < cases.size(); j++) {
 				Case afterCase = cases.get(j);
 				
 				if (afterCase.isDefault()) break;
 				
-				TagBinding afterBinding = TagBinding.get(afterCase.getTaggedTypeMatch());
+				TaggedInfo afterTag = TaggedInfo.lookupTag(afterCase.getTaggedTypeMatch());
+				//TagBinding afterBinding = TagBinding.get(afterCase.getTaggedTypeMatch());
 				
-				if (hasMatch(afterBinding, beforeCase.getTaggedTypeMatch())) {
+				if (hasMatch(afterTag, beforeTag)) {
 					ToolError.reportError(ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG, matchingOver);
 				}
 			}
@@ -277,9 +276,9 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// If we've included default, we can't have included all subtags for a tag using comprised-of
 		if (defaultCase != null) {
 			// We only care if tag specifies comprises-of
-			if (matchBinding.hasAnyComprises()) {
+			if (matchTaggedInfo.hasComprises()) {
 				//all subtags were specified, error
-				if (comprisesSatisfied(matchBinding)) {
+				if (comprisesSatisfied(matchTaggedInfo)) {
 					ToolError.reportError(ErrorMessage.DEFAULT_PRESENT, matchingOver);
 				}
 			}
@@ -287,15 +286,15 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		return Unit.getInstance();
 	}
-	
-	private boolean comprisesSatisfied(TagBinding matchBinding) {
-		List<TagBinding> comprisesTags = new ArrayList<TagBinding>(matchBinding.getComprisesOf());
+		
+	private boolean comprisesSatisfied(TaggedInfo matchBinding) {
+		List<String> comprisesTags = matchBinding.getComprisesTags();
 		
 		//add this tag because it needs to be included too
-		comprisesTags.add(matchBinding);
+		comprisesTags.add(matchBinding.getTagName());
 		
 		//check that each tag is present 
-		for (TagBinding t : comprisesTags) {
+		for (String t : comprisesTags) {
 			if (containsTagBinding(cases, t)) continue;
 			
 			//if we reach here the tag wasn't present
@@ -314,15 +313,14 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 * @param binding
 	 * @return
 	 */
-	private boolean containsTagBinding(List<Case> cases, TagBinding binding) {
+	private boolean containsTagBinding(List<Case> cases, String tagName) {
 		for (Case c : cases) {
 			//Found a match, this tag is present
-			if (c.getTaggedTypeMatch().equals(binding.getName())) return true;
+			if (c.getTaggedTypeMatch().equals(tagName)) return true;
 		}
 		
 		return false;
 	}
-
 	
 	private String getTypeName(Type type) {
 		if (type instanceof ClassType) {

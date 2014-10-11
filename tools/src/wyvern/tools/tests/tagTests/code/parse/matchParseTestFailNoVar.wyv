@@ -1,0 +1,9 @@
+tagged class X
+    class def create() : X
+        new
+
+val x = X.create()
+
+//match does not match over a variable
+match ():
+   default => 15

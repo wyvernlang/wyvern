@@ -1,14 +1,9 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
-import wyvern.tools.typedAST.core.binding.TagBinding;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeType;
+import java.util.Map;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
@@ -17,9 +12,17 @@ import wyvern.tools.types.extensions.TypeType;
  */
 public class TaggedInfo {
 
+	private static Map<String, TaggedInfo> globalTagStore = new HashMap<String, TaggedInfo>();
+	private static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
+	
 	private String tagName;
-	private Type caseOf;
-	private List<Type> comprises;
+	
+	private String caseOf;
+	private TaggedInfo caseOfTaggedInfo;
+	
+	private List<String> comprises;
+	private List<TaggedInfo> comprisesTaggedInfos;
+	
 	
 	/**
 	 * Constructs an empty TaggedInfo. 
@@ -33,7 +36,7 @@ public class TaggedInfo {
 	 * Constructs a TaggedInfo with the given caseOf, and no comprises.
 	 * @param caseOf
 	 */
-	public TaggedInfo(Type caseOf) {
+	public TaggedInfo(String caseOf) {
 		this(caseOf, null);
 	}
 	
@@ -41,7 +44,7 @@ public class TaggedInfo {
 	 * Constructs a TaggedInfo with the given comprises tags.
 	 * @param comprises
 	 */
-	public TaggedInfo(List<Type> comprises) {
+	public TaggedInfo(List<String> comprises) {
 		this(null, comprises);
 	}
 	
@@ -53,18 +56,11 @@ public class TaggedInfo {
 	 * @param caseOf
 	 * @param comprises
 	 */
-	public TaggedInfo(Type caseOf, List<Type> comprises) {		
-		if (comprises == null) comprises = new ArrayList<Type>();
+	public TaggedInfo(String caseOf, List<String> comprises) {		
+		if (comprises == null) comprises = new ArrayList<String>();
 		
 		this.caseOf = caseOf;
 		this.comprises = comprises;
-	}
-	
-	/**
-	 * Associate this TaggedInfo with the TagBinding tagset.
-	 */
-	public void associateTag() {
-		TagBinding.associate(this);
 	}
 	
 	/**
@@ -109,7 +105,25 @@ public class TaggedInfo {
 	 * @return
 	 */
 	public String getCaseOfTag() {
-		return getTagName(caseOf);
+		return caseOf;
+	}
+	
+	/**
+	 * Returns true of false if a circular hierarchical relation is detected.
+	 * 
+	 * @return
+	 */
+	public boolean isCircular() {
+		TaggedInfo info = lookupTag(caseOf);
+		String myName = tagName;
+		
+		while (info != null) {	
+			if (info.tagName.equals(myName)) return true;
+			
+			info = lookupTag(info.caseOf);
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -119,18 +133,49 @@ public class TaggedInfo {
 	 * @return
 	 */
 	public List<String> getComprisesTags() {
-		return comprises.stream()
-						.<String>map(TaggedInfo::getTagName)
-						.collect(Collectors.toList());
+		return comprises;
 	}
 	
-	private static String getTagName(Type t) {
-		if (t == null) return null;
-		if (t instanceof TypeType) return ((TypeType)t).getName();
-		if (t instanceof ClassType) return ((ClassType)t).getName();
-		if (t instanceof UnresolvedType) return ((UnresolvedType)t).getName();
-		
-		throw new IllegalArgumentException("Type [" + t +"] has no proper type");
+	public void associateWithClass(String className) {
+		tagName = className;
+		globalTagStore.put(tagName, this);
+		globalTagStoreList.add(this);
 	}
+	
+	public static void clearGlobalTaggedInfos() {
+		globalTagStore = new HashMap<String, TaggedInfo>();
+		globalTagStoreList = new ArrayList<TaggedInfo>();
+	}
+	
+	public static Map<String, TaggedInfo> getGlobalTagStore() {
+		return globalTagStore;
+	}
+	
+	/**
+	 * Returns the global tag store, as a list.
+	 * 
+	 * This has the same contents as the Map<String, TaggedInfo> map, just
+	 * without them being mapped by the tag name.
+	 * 
+	 * @return
+	 */
+	public static List<TaggedInfo> getGlobalTagStoreList() {
+		return globalTagStoreList;
+	}
+	
+	public static TaggedInfo lookupTag(String name) {
+		TaggedInfo info = globalTagStore.get(name);
+		
+		return info;
+	}
+
+	@Override
+	public String toString() {
+		return "TaggedInfo [tagName=" + tagName + ", caseOf=" + caseOf
+				+ ", caseOfTaggedInfo=" + caseOfTaggedInfo + ", comprises="
+				+ comprises + ", comprisesTaggedInfos=" + comprisesTaggedInfos
+				+ "]";
+	}
+	
 	
 }

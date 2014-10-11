@@ -1,0 +1,23 @@
+//here we have a mix of valid and invalid tagged types
+
+tagged class X
+    class def create() : X
+        new
+
+tagged class Abc
+    class def create() : Abc
+        new
+        
+        
+tagged  tagged class Y
+    class def create() : Y
+        new
+        
+taggeed class Answer
+    class def create() : Answer
+        new
+    def asd() : Int = 42
+        
+Tagged class Z
+    class def create() : Z
+        new

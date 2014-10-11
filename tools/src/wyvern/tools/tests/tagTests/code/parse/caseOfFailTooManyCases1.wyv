@@ -1,0 +1,12 @@
+tagged class Dyn
+    class def create() : Dyn
+        new
+
+tagged class Stat
+    class def create() : Stat
+        new
+
+//case of can only have max of 1 case
+tagged class DynInt [case of Dyn, Stat]
+    class def create() : DynInt
+        new

@@ -1,5 +1,6 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -14,15 +15,13 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
-public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType, MetaType {
+public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
-	private Reference<Value> attrObj;
 	private Reference<Environment> typeDeclEnv;
 
 	public TypeType(TypeDeclaration decl) {
 		this.decl = decl;
 		typeDeclEnv = decl.getDeclEnv();
-		attrObj = decl.getMetaValue();
 	}
 
 	public TypeType(Environment declEnv) {
@@ -36,7 +35,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	public TypeDeclaration getDecl() {
 		return this.decl;
 	}
-	public Obj getAttrObj() { return null; }
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
@@ -137,7 +135,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	}
 
 	@Override
-	public Type getInnerType(String name) {
+	public TypeBinding getInnerType(String name) {
 		// System.out.println("Looking up (inside getInnerType) name " + name);
 		// System.out.println("Currently inside TypeType: " + this);
 		// System.out.println("this.decl.getName = " + this.decl.getName());
@@ -150,9 +148,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 			NameBinding nm = typeDeclEnv.get().lookup(name);
 			// System.out.println(nm.getType());
 			
-			return nm.getType();
+			return new TypeBinding(nm.getName(), nm.getType());
 		} else {
-			return tb.getType();
+			return tb;
 		}
 	}
 
@@ -220,10 +218,5 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	 */
 	public String getName() {
 		return decl.getName();
-	}
-	
-	@Override
-	public Value getMetaObj() {
-		return attrObj.get();
 	}
 }

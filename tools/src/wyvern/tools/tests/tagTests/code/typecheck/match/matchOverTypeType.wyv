@@ -1,0 +1,15 @@
+               
+tagged type NumberGen
+	def value() : Int
+	
+
+def create() : NumberGen = new
+    def value() : Int = 50
+
+val numGen = create()
+
+match(numGen):                 
+       X => 15            
+       default => 23      
+       Y => 50            
+       default => 23      

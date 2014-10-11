@@ -27,7 +27,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	NameBinding binding;
 
 	private boolean isClass;
-	public boolean isClass() {
+	public boolean isClassMember() {
 		return isClass;
 	}
 	
