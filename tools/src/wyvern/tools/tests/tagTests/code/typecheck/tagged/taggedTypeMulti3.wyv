@@ -1,0 +1,21 @@
+tagged class Book
+    class def create() : Book
+        new
+
+tagged class CD
+    class def create() : CD
+        new
+        
+tagged class AudioBook
+    class def create() : AudioBook
+        new
+
+tagged class Magazine
+    class def create() : Magazine
+        new        
+        
+tagged class Instrument
+    class def create() : Instrument
+        new
+
+15

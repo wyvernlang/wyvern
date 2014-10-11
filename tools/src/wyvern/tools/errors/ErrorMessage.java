@@ -29,17 +29,19 @@ public enum ErrorMessage {
 	//TODO: these need parameters that give more information
 	
 	//For tagged declaration
+	TYPE_NOT_TAGGED("Type is not tagged: %ARG", 1),
+	CIRCULAR_TAGGED_RELATION("Circular tagged hierarchy found with tag: %ARG, case-of: %ARG", 2),
+	COMPRISES_RELATION_NOT_RECIPROCATED("The tag declared to comprise this tag is not a case-of this tag", 0),
+	COMPRISES_EXCLUDES_TAG("The comprises clause of: %ARG, excludes a tag which is a case-of of this tag: %ARG", 1),
 	
-	
-	//For match statement
+	//For match expression
+	MATCH_OVER_TYPETYPE("Can only match over class-type, found type-type.", 0),
 	DUPLICATE_TAG("Duplicate tag found", 0),
-	UNKNOWN_TAG("No tag declared with given name", 0),
 	DEFAULT_NOT_PRESENT("Default case not present in non-exhaustive match", 0),
 	DEFAULT_PRESENT("Default case present in exhaustive match", 0),
 	DEFAULT_NOT_LAST("Default case present but not last", 0),
 	MULTIPLE_DEFAULTS("More than 1 default case defined", 0),
 	NO_COMPRISES("Value being matched over must specify comprises-of tags", 0),
-	NOT_TAGGED("Type is not tagged", 0),
 	SUPERTAG_PRECEEDS_SUBTAG("Supertag preceeds subtag; will catch everything", 0),
 	
 	// Evaluation errors

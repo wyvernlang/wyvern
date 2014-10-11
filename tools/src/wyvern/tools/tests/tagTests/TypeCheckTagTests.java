@@ -16,96 +16,178 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
 public class TypeCheckTagTests {
 
-	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/typecheck/";
+	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/typecheck/tagged/";
 	
 	@Test
-	public void duplicateCaseTestFail() throws CopperParserException, IOException {
-		String input = readFile("duplicateCaseFail.wyv");
-				
-		TypedAST res = getAST(input);
-		
-		typeCheckfailWith(res, ErrorMessage.DUPLICATE_TAG);
-	}
-	
-	@Test
-	public void unknownCaseTest() throws CopperParserException, IOException {
-		String input = 	readFile("unknownCase.wyv");
-				
-		TypedAST res = getAST(input);
-		
-		typeCheckfailWith(res, ErrorMessage.UNKNOWN_TAG);
-	}
-	
-	@Test
-	public void untaggedCaseTest() throws CopperParserException, IOException {
-		String input = 	readFile("untaggedCase.wyv");
-				
-		TypedAST ast = getAST(input);
-		
-		typeCheckfailWith(ast, ErrorMessage.NOT_TAGGED);
-	}
-	
-	@Test
-	public void defaultNotLastTest() throws CopperParserException, IOException {
-		String input = 	readFile("defaultNotLast.wyv");
-				
-		TypedAST res = getAST(input);
-		
-		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_LAST);
-	}
-	
-	@Test
-	public void multipleDefaultsTest() throws CopperParserException, IOException {
-		String input = 	readFile("multipleDefaults.wyv");
-				
-		TypedAST res = getAST(input);
-		
-		typeCheckfailWith(res, ErrorMessage.MULTIPLE_DEFAULTS);
-	}
-	
-	@Test
-	public void nonExhaustiveErrorTest() throws CopperParserException, IOException {
-		String input = readFile("nonExhaustiveError.wyv");
+	public void taggedTypeSingle() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeSingle.wyv");
 		
 		TypedAST res = getAST(input);
-	
-		typeCheckfailWith(res, ErrorMessage.DEFAULT_NOT_PRESENT);
+		typeCheckSucceed(res);
 	}
 	
 	@Test
-	public void exhaustiveWithDefaultTest() throws CopperParserException, IOException {
-		String input = readFile("exhaustiveWithDefault.wyv"); 
-				
-		TypedAST ast = getAST(input);
-		typeCheckfailWith(ast, ErrorMessage.DEFAULT_PRESENT);
+	public void taggedTypeMulti1() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeMulti1.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
 	}
 	
 	@Test
-	public void defaultPresentFullComprisesTest() throws CopperParserException, IOException {
-		//Checks that an error is caught when a default is included but all comprises tags are included
-		String input = readFile("defaultPresentFullComprises.wyv");
+	public void taggedTypeMulti2() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeMulti2.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
 
+	@Test
+	public void taggedTypeMulti3() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeMulti3.wyv");
+		
 		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
+
+	@Test
+	public void taggedTypeCaseOf1() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeCaseOf1.wyv");
 		
-		typeCheckfailWith(res, ErrorMessage.DEFAULT_PRESENT);
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
 	}
 	
 	@Test
-	public void subtagAfterSupertagTest1() throws CopperParserException, IOException {
-		String input = readFile("subtagAfterSupertag1.wyv");
+	public void taggedTypeCaseOf2() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeCaseOf2.wyv");
 		
-		TypedAST ast = getAST(input);
-		
-		typeCheckfailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
 	}
 	
 	@Test
-	public void subtagAfterSupertagTest2() throws CopperParserException, IOException {
-		String input = readFile("subtagAfterSupertag2.wyv");
+	public void taggedTypeCaseOf3() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeCaseOf3.wyv");
 		
-		TypedAST ast = getAST(input);
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
+
+	@Test
+	public void taggedTypeCaseOfNotTagged1() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeCaseOfNotTagged1.wyv");
 		
-		typeCheckfailWith(ast, ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG);
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.TYPE_NOT_TAGGED);
+	}
+
+	@Test
+	public void taggedTypeCaseOfNotTagged2() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeCaseOfNotTagged2.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.TYPE_NOT_TAGGED);
+	}
+
+	@Test
+	public void taggedTypeUnknownCaseOf1() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeUnknownCaseOf1.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.TYPE_NOT_TAGGED);
+	}
+
+	@Test
+	public void taggedTypeUnknownCaseOf2() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeUnknownCaseOf2.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.TYPE_NOT_TAGGED);
+	}
+
+	@Test
+	public void taggedTypeCaseOfCircular1() throws CopperParserException, IOException {	
+		String input = readFile("taggedTypeCircular1.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.CIRCULAR_TAGGED_RELATION);
+	}
+
+	@Test
+	public void taggedTypeCaseOfCircular2() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeCircular2.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.CIRCULAR_TAGGED_RELATION);
+	}
+	
+	@Test
+	public void taggedTypeCaseOfCircular3() throws CopperParserException, IOException {	
+		String input = readFile("taggedTypeCircular3.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.CIRCULAR_TAGGED_RELATION);
+	}
+	
+	@Test
+	public void taggedTypeComprises() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeComprises.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
+	
+	@Test
+	public void taggedTypeComprisesJSON() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeComprisesJSON.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
+	
+	@Test
+	public void taggedTypeComprisesAnimals() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeComprisesAnimals.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
+	
+	@Test
+	public void taggedTypeComprisesProduce() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeComprisesProduce.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckSucceed(res);
+	}
+	
+	@Test
+	public void taggedTypeComprisesNotReciprocated1() throws CopperParserException, IOException {
+		String input = readFile("taggedTypeComprisesNonReciprocated1.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED);
+	}
+	
+	@Test
+	public void taggedTypeComprisesNotReciprocated2() throws CopperParserException, IOException {
+		//attempts to create a circular tagged hierarchy
+		
+		String input = readFile("taggedTypeComprisesNonReciprocated2.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED);
+	}
+	
+	@Test
+	public void taggedTypeComprisesExcludes1() throws CopperParserException, IOException {
+		//attempts to create a circular tagged hierarchy
+		
+		String input = readFile("taggedTypeComprisesExcludes1.wyv");
+		
+		TypedAST res = getAST(input);
+		typeCheckfailWith(res, ErrorMessage.COMPRISES_EXCLUDES_TAG);
 	}
 	
 	/**
@@ -117,10 +199,11 @@ public class TypeCheckTagTests {
 	 * @param ast
 	 * @param errorMessage
 	 */
-	public static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
+	private static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
 		try {
 			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		} catch (ToolError toolError) {
+			//toolError.printStackTrace();
 			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
 			
 			return;
@@ -128,7 +211,20 @@ public class TypeCheckTagTests {
 		
 		Assert.fail("Should have failed with error: " + errorMessage);
 	}
-
+	
+	/**
+	 * Type checks the AST, ensuring it does so succesfully.
+	 * 
+	 * @param ast
+	 */
+	private static void typeCheckSucceed(TypedAST ast) {
+		try {
+			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		} catch (ToolError toolError) {
+			//toolError.printStackTrace();
+			Assert.fail("Should have succeeded");
+		}
+	}
 	/**
 	 * Helper method to simplify reading a Wyvern file from the code/parse directory.
 	 * 

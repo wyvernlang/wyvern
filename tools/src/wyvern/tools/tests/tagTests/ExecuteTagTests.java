@@ -28,8 +28,7 @@ public class ExecuteTagTests {
 				"                               \n" +
 				"match(x):                      \n" +
 				"	default => 15               \n";
-				
-		
+
 		TypedAST ast = getAST(input);
 		evaluateExpecting(ast, 15);
 	}

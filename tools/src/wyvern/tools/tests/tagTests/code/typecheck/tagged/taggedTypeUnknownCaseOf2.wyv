@@ -1,0 +1,33 @@
+
+
+tagged class Animal
+    class def create() : Animal
+        new               
+
+tagged class Bird [case of Animal]
+    class def create() : Bird
+        new
+
+tagged class Parrot [case of Birdd] 	//Typo here, "Birdd" should be "Bird"
+    class def create() : Parrot
+        new
+
+tagged class Penguin [case of Bird]
+    class def create() : Penguin
+        new
+
+
+tagged class Mammal [case of Animal]
+    class def create() : Mammal
+        new
+
+tagged class Dog [case of Mammal]
+    class def create() : Dog
+        new
+
+tagged class Whale [case of Mammal]
+    class def create() : Whale
+        new
+
+
+15

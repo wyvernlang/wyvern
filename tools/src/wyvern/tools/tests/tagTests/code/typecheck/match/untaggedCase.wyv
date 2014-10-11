@@ -6,7 +6,7 @@ tagged class Y
     class def create() : Y 
         new                
                            
-class Z                    
+class Z
     class def create() : Z 
         new                
                            

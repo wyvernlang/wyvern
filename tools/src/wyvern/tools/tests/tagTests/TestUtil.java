@@ -11,6 +11,7 @@ import org.junit.Assert;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.core.binding.TagBinding;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
@@ -26,7 +27,7 @@ public class TestUtil {
 	 * @throws CopperParserException 
 	 */
 	public static TypedAST getAST(String program) throws CopperParserException, IOException {
-		TagBinding.resetGlobalData();
+		clearGlobalTagInfo();
 		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
 	}
 	
@@ -72,5 +73,12 @@ public class TestUtil {
 			Assert.fail("Failed opening file: " + filename);
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * Removes the global tagged-type data.
+	 */
+	private static void clearGlobalTagInfo() {
+		TaggedInfo.clearGlobalTaggedInfos();
 	}
 }

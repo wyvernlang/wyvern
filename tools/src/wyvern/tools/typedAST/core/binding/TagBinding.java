@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
 
 public class TagBinding implements Binding {
@@ -15,20 +18,22 @@ public class TagBinding implements Binding {
 	private String caseOf;
 	private List<String> comprises = new ArrayList<String>();
 	
+	
 	/** The parent TagBinding if this has a case-of. May be null.  */
 	private TagBinding caseOfParent;
+	
 	/** The list of direct sub-tags of this tag.  */
 	private List<TagBinding> directSubtags = new ArrayList<TagBinding>();
+	
 	/** The list of comprises TagBindings. */
 	private List<TagBinding> comprisesTags = new ArrayList<TagBinding>();
 	
 	
-	//TODO: Remove this giant hack. Currently having a universal tag map because
-	//type checking/ eval is not working properly
-	//FIXME: This should go into some environment!!! (alex)
+	//A bit of a hack, because environment is not working
 	private static Map<String, TagBinding> tagBindings = new HashMap<String, TagBinding>();
 	private static Map<String, TaggedInfo> tagInfos = new HashMap<String, TaggedInfo>();
-	public static void resetHACK() { // TODO: This is going away very very very very soon! :)
+	
+	public static void resetGlobalData() {
 		tagBindings = new HashMap<String, TagBinding>();
 		tagInfos = new HashMap<String, TaggedInfo>();
 	}
@@ -45,13 +50,19 @@ public class TagBinding implements Binding {
 		this.comprises.addAll(taggedInfo.getComprisesTags());
 	}
 	
+	private TagBinding(String tagName, TaggedInfo taggedInfo, NameBinding nameBinding, TypeBinding typeBinding) {		
+		this.tagName = tagName;
+		this.caseOf = taggedInfo.getCaseOfTag();
+		this.comprises.addAll(taggedInfo.getComprisesTags());
+	}
+	
 	/**
 	 * Gets the TagBinding, creating it if necessary.
 	 * 
 	 * @param tagName
 	 * @return
 	 */
-	public static TagBinding getOrCreate(String tagName) {
+	private static TagBinding getOrCreate(String tagName) {
 		if (tagBindings.containsKey(tagName)) {
 			return tagBindings.get(tagName);
 		}
@@ -63,7 +74,7 @@ public class TagBinding implements Binding {
 		return binding;
 	}
 	
-	public static TagBinding get(String tagName) {
+	private static TagBinding get(String tagName) {
 		if (!tagBindings.containsKey(tagName)) {
 			//throw new RuntimeException("Attempted to get non-existant tag: " + tagName);
 			return null;
