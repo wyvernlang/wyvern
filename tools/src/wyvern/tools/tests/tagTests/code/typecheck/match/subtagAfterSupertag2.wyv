@@ -13,7 +13,7 @@ tagged class C [case of A]
 tagged class D [case of B]
     class def create() : D
         new               
-val d = A.create()        
+val d : A = A.create()        
                           
 match(d):                 
        C => 15            

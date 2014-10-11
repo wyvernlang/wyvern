@@ -13,6 +13,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -20,6 +21,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
@@ -165,10 +167,17 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// First typecheck all children
 		matchingOver.typecheck(env, expected);
 		
+		System.out.println("env " + env);
+		System.out.println("static " + getStaticTypeBinding(matchingOver, env));
+		
 		//Note: currently all errors given use matchingOver because it has a location
 		//TODO: use the actual entity that is responsible for the error
 
 		Type matchOverType = matchingOver.typecheck(env, expected);		
+
+		ClassType t = (ClassType) TypeResolver.resolve(matchOverType, env);
+
+		//System.out.println("match: " + t.getName());
 
 		if (!(matchOverType instanceof ClassType)) {
 			ToolError.reportError(ErrorMessage.MATCH_OVER_TYPETYPE, matchingOver);
@@ -179,8 +188,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 		TaggedInfo matchTaggedInfo = TaggedInfo.lookupTag(typeName);
 		
+		//StaticTypeBinding staticBinding = env.lookupStaticType(typeName)
+		
 		if (matchTaggedInfo == null) {
-			ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver);
+			ClassType ct = (ClassType) matchOverType;
+			//System.out.println(ct);
+			ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, typeName);
 		}
 		
 		// Check not more than 1 default
@@ -287,6 +300,18 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return Unit.getInstance();
 	}
 		
+	private StaticTypeBinding getStaticTypeBinding(TypedAST varAST, Environment env) {
+		if (varAST instanceof Variable) {
+			Variable var = (Variable) varAST;
+			
+			StaticTypeBinding binding = env.lookupStaticType(var.getName());
+			
+			return binding;
+		}
+		
+		return null;
+	}
+	
 	private boolean comprisesSatisfied(TaggedInfo matchBinding) {
 		List<String> comprisesTags = matchBinding.getComprisesTags();
 		

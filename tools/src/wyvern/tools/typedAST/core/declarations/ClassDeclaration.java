@@ -292,61 +292,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		
-		//System.out.println("extend class: " + nameBinding.getName());
-		
-		// FIXME: Currently allow this and class in both class and object methods. :(
-		//newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
-		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
-		//newEnv.extend(new NameBindingImpl("asdasd", null));
-		
-		//extend with tag information
-		if (isTagged()) {
-			//type-test the tag information
-			//newEnv = newEnv.extend(taggedBinding);
-			
-			////first get/ create the binding
-			////TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
-			////newEnv = newEnv.extend(tagBinding);
-			
-			//now handle case-of and comprises clauses
-			//if (taggedInfo.getCaseOfTag() != null) {
-				//String caseOf = taggedInfo.getCaseOfTag();
-				
-				//TODO: could case-of come before?
-				//Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
-				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
-				
-				//if (caseOfBindingO.isPresent()) {
-					 //TagBinding caseOfBinding = caseOfBindingO.get();
-					 
-					 //set up relationship between two bindings
-					 //tagBinding.setCaseOfParent(caseOfBinding);
-					 //caseOfBinding.addCaseOfDirectChild(tagBinding);
-				//} else {
-					//ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, caseOf);
-				//}
-			//}
-			
-			//if (!taggedInfo.getComprisesTags().isEmpty()) {
-				//set up comprises tags
-				//for (String s : taggedInfo.getComprisesTags()) {
-					// Because comprises refers to tags defined ahead of this, we use the associated tag values
-					
-					//Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.getOrCreate(s));
-					//TODO, change to real code: newEnv.lookupBinding(s, TagBinding.class);
-					
-					//if (comprisesBindingO.isPresent()) {
-						//TagBinding comprisesBinding = comprisesBindingO.get();
-						
-						//tagBinding.getComprisesOf().add(comprisesBinding);
-					//} else {
-						//TODO throw proper error
-						//ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, s);
-					//}
-				//}
-			//}
-		}
-		
 		return newEnv;
 	}
 

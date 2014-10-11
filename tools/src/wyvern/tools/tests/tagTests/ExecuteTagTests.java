@@ -1,21 +1,16 @@
 package wyvern.tools.tests.tagTests;
 
 import java.io.IOException;
-import java.util.Optional;
-
-import org.junit.Assert;
 import org.junit.Test;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-import wyvern.stdlib.Globals;
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-
 import static wyvern.tools.tests.tagTests.TestUtil.getAST;
 import static wyvern.tools.tests.tagTests.TestUtil.evaluateExpecting;
 
 public class ExecuteTagTests {
+	
+	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/execute/";
 	
 	@Test
 	public void matchInterpretTest1() throws CopperParserException, IOException {		
@@ -24,7 +19,7 @@ public class ExecuteTagTests {
 				"    class def create() : X     \n" +
 				"        new                    \n" +
 				"                               \n" +
-				"val x = X.create()             \n" +
+				"val x : X = X.create()         \n" +
 				"                               \n" +
 				"match(x):                      \n" +
 				"	default => 15               \n";
@@ -60,7 +55,7 @@ public class ExecuteTagTests {
 				"    class def create() : X     \n" +
 				"        new                    \n" +
 				"                               \n" +
-				"val x = X.create()             \n" +
+				"val x : X = X.create()         \n" +
 				"                               \n" +
 				"match(x):                      \n" +
 				"	X => 1                     \n" +
@@ -86,7 +81,7 @@ public class ExecuteTagTests {
 				"    class def create() : Y     \n" +
 				"        new                    \n" +
 				"                               \n" +
-				"val y = Y.create()             \n" +
+				"val y : Y = Y.create()             \n" +
 				"                               \n" +
 				"match(y):                      \n" +
 				"	X => 15                     \n" +
@@ -112,7 +107,7 @@ public class ExecuteTagTests {
 			"    class def create() : DynChar             \n" +
 			"        new                                  \n" +
 			"                                             \n" +
-			"val i  = Dyn.create()                         \n" +
+			"val i : Dyn = Dyn.create()                         \n" +
 			"                                             \n" +
 			"match(i):                                    \n" +
 			"	DynInt => 10                              \n" +
@@ -146,7 +141,7 @@ public class ExecuteTagTests {
 			"    class def create() : D                   \n" +
 			"        new                                  \n" +
 			
-			"val d = D.create()                           \n" +
+			"val d : D = D.create()                           \n" +
 			"                                             \n" +
 			"match(d):                                    \n" +
 			"	B => 15                                   \n" +		//matches B since D is a subtag of B
@@ -190,7 +185,7 @@ public class ExecuteTagTests {
 				"    class def create() : DoubleJSON          \n" +
 				"        new                                  \n" +
 				"                                             \n" +
-				"val json = IntJSON.create()                  \n" +
+				"val json : IntJSON = IntJSON.create()        \n" +
 				"                                             \n" +
 				"match(json):                                 \n" +
 				"	IntJSON => 25                             \n" +
@@ -203,4 +198,24 @@ public class ExecuteTagTests {
 			
 			evaluateExpecting(ast, 25);
 	}
+	
+	@Test
+	public void jsonTest2() throws CopperParserException, IOException {
+		String input = readFile("json.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		evaluateExpecting(ast, 15);
+	}
+	
+	/**
+	 * Helper method to simplify reading a Wyvern file from the code/parse directory.
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	private static String readFile(String filename) {
+		return TestUtil.readFile(PATH + filename);
+	}
+	
 }

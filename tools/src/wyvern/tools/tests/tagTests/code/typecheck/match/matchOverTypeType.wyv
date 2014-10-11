@@ -6,7 +6,7 @@ tagged type NumberGen
 def create() : NumberGen = new
     def value() : Int = 50
 
-val numGen = create()
+val numGen : NumberGen = create()
 
 match(numGen):                 
        X => 15            

@@ -14,7 +14,7 @@ tagged class D [case of B]
     class def create() : D 
         new                
                         
-val d = D.create()         
+val d : D = D.create()         
                            
 match(d):                  
        A => 15             	//Error, this will catch everything

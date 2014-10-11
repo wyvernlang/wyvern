@@ -10,7 +10,7 @@ class Z
     class def create() : Z 
         new                
                            
-val x = X.create()         
+val x : X = X.create()         
                            
 match(x):                  
        X => 15             

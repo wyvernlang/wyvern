@@ -6,7 +6,9 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -14,6 +16,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.TreeWriter;
 
@@ -25,7 +28,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	TypedAST definition;
 	Type definitionType;
 	NameBinding binding;
-
+	
+	String variableName;
+	
+	private boolean staticallyTagged;
+	private String tagName;
+	
 	private boolean isClass;
 	public boolean isClassMember() {
 		return isClass;
@@ -38,6 +46,24 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
+		if (type instanceof UnresolvedType) {
+			UnresolvedType t = (UnresolvedType) type;
+			String typeName = t.getName();
+			
+			TaggedInfo tag = TaggedInfo.lookupTag(typeName);
+			
+			if (tag != null) {
+				//doing a tagged type
+				staticallyTagged = true;
+				tagName = typeName;
+				
+				variableName = name;
+				
+				type = null;
+			}
+		}
+		
+		System.out.println("val decl b: " + type);
 		this.definition=definition;
 		binding = new NameBindingImpl(name, type);
 		this.location = location;
@@ -93,7 +119,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
-		return extendName(old, against);
+		Environment env = extendName(old, against);
+		env = env.extend(new StaticTypeBinding(variableName, tagName));
+		
+		return env;
 	}
 
 	@Override

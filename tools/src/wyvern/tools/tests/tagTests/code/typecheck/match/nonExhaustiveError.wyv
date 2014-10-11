@@ -14,7 +14,7 @@ tagged class DynByte [case of Dyn]
     class def create() : DynByte 
         new                      
                                  
-val i = Dyn.create()             
+val i : Dyn = Dyn.create()             
                                  
 match(i):                        
        DynInt => 10              

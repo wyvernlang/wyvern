@@ -10,7 +10,7 @@ tagged class DynChar [case of Dyn]
     class def create() : DynChar  
         new                       
                                   
-val i = Dyn.create()              
+val i : Dyn = Dyn.create()              
                                   
 match(i):                         
        DynInt => 10               

@@ -76,8 +76,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
 
-		// System.out.println("classVarTypeBinding = " + classVarTypeBinding);
-
+		
 		if (classVarTypeBinding != null) { //In a class method
 			Environment declEnv = classVarTypeBinding.getClassDecl().getInstanceMembersEnv();
 			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
@@ -95,6 +94,8 @@ public class New extends CachingTypedAST implements CoreAST {
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
 			}
 
+			System.out.println("new typecheck " + classVarTypeBinding.getClassDecl().getName());
+			
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
 			cls = classVarTypeBinding.getClassDecl();
 			ct = classVarType;
@@ -145,11 +146,17 @@ public class New extends CachingTypedAST implements CoreAST {
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
 
+		
+		
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
-		ClassDeclaration classDecl;
-		if (classVarTypeBinding != null)
+		ClassDeclaration classDecl;		
+		
+		if (classVarTypeBinding != null) {
 			classDecl = classVarTypeBinding.getClassDecl();
-		else {
+		
+			System.out.println("new eval");
+			
+		} else {
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
 
