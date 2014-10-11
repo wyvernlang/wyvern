@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-import wyvern.tools.typedAST.core.binding.TagBinding;
-
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
  * 
@@ -63,13 +61,6 @@ public class TaggedInfo {
 		
 		this.caseOf = caseOf;
 		this.comprises = comprises;
-	}
-	
-	/**
-	 * Associate this TaggedInfo with the TagBinding tagset.
-	 */
-	public void associateTag() {
-		TagBinding.associate(this);
 	}
 	
 	/**

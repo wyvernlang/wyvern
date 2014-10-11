@@ -102,25 +102,25 @@ public class CopperComposer extends Task {
 		Stream<Stream<GrammarElement>> elements = host.getGrammars().stream().map(host::getGrammar)
 				.map(grammar -> grammar.getGrammarElements().stream().map(grammar::getGrammarElement));
 
-		List<DisambiguationFunction> dfl = elements
-				.map(ielements -> ielements.filter(el -> el instanceof DisambiguationFunction))
-				.flatMap(e->e.map(el->(DisambiguationFunction)el)).collect(Collectors.toList());
-		dfl.stream().forEach(df ->
-				df.setCode(df.getMembers().stream()
-						.map(cen -> "\t\t\tfinal int " + cen.getName() + " = " + nameGetter.apply(cen) + ";")
-						.reduce((l, r) -> l + "\n" + r).orElseGet(() -> "") + "\n" + df.getCode()));
+//		List<DisambiguationFunction> dfl = elements
+//				.map(ielements -> ielements.filter(el -> el instanceof DisambiguationFunction))
+//				.flatMap(e->e.map(el->(DisambiguationFunction)el)).collect(Collectors.toList());
+//		dfl.stream().forEach(df ->
+//				df.setCode(df.getMembers().stream()
+//						.map(cen -> "\t\t\tfinal int " + cen.getName() + " = " + nameGetter.apply(cen) + ";")
+//						.reduce((l, r) -> l + "\n" + r).orElseGet(() -> "") + "\n" + df.getCode()));
 
 
 
-		host.getGrammars().stream().map(host::getGrammar)
-				.map(grammar -> grammar.getGrammarElements().stream().map(grammar::getGrammarElement))
-				.flatMap(els -> els.filter(el -> el instanceof Production).map(el -> (Production) el))
-				.forEach(this::rewriteTerminals);
+//		host.getGrammars().stream().map(host::getGrammar)
+//				.map(grammar -> grammar.getGrammarElements().stream().map(grammar::getGrammarElement))
+//				.flatMap(els -> els.filter(el -> el instanceof Production).map(el -> (Production) el))
+//				.forEach(this::rewriteTerminals);
 
-		host.getGrammars().stream().map(host::getGrammar)
-				.map(grammar -> grammar.getGrammarElements().stream().map(grammar::getGrammarElement))
-				.flatMap(els -> els.filter(el -> el instanceof Terminal).map(el -> (Terminal) el))
-				.forEach(this::rewriteTerminals);
+//		host.getGrammars().stream().map(host::getGrammar)
+//				.map(grammar -> grammar.getGrammarElements().stream().map(grammar::getGrammarElement))
+//				.flatMap(els -> els.filter(el -> el instanceof Terminal).map(el -> (Terminal) el))
+//				.forEach(this::rewriteTerminals);
 		try {
 			CompilerLogger logger = new CompilerLogger(new PrintCompilerLogHandler(System.out));
 			ParserSpecProcessor.normalizeParser(extension, logger);

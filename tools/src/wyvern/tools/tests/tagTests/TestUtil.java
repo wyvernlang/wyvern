@@ -10,7 +10,6 @@ import org.junit.Assert;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.Wyvern;
-import wyvern.tools.typedAST.core.binding.TagBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
