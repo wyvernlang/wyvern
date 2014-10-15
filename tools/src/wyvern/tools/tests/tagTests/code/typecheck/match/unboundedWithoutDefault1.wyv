@@ -1,4 +1,4 @@
-tagged class Dyn [comprises DynInt, DynChar]
+tagged class Dyn
     class def create() : Dyn      
         new                       
                                   
@@ -16,4 +16,3 @@ match(i):
        DynInt => 10               
        DynChar => 15              
        Dyn => 5                   
-       default => 20              

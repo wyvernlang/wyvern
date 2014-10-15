@@ -35,14 +35,14 @@ public enum ErrorMessage {
 	COMPRISES_EXCLUDES_TAG("The comprises clause of: %ARG, excludes a tag which is a case-of of this tag: %ARG", 1),
 	
 	//For match expression
-	MATCH_OVER_TYPETYPE("Can only match over class-type, found type-type.", 0),
+	BOUNDED_EXHAUSTIVE_WITH_DEFAULT("Default cannot be present in satisfied bounded match", 0),
+	BOUNDED_INEXHAUSTIVE_WITHOUT_DEFAULT("Default must be present in inexhaustive bounded match", 0),
 	DUPLICATE_TAG("Duplicate tag found", 0),
-	DEFAULT_NOT_PRESENT("Default case not present in non-exhaustive match", 0),
-	DEFAULT_PRESENT("Default case present in exhaustive match", 0),
-	DEFAULT_NOT_LAST("Default case present but not last", 0),
+	DEFAULT_NOT_LAST("Default case is present but not last", 0),
 	MULTIPLE_DEFAULTS("More than 1 default case defined", 0),
-	NO_COMPRISES("Value being matched over must specify comprises-of tags", 0),
-	SUPERTAG_PRECEEDS_SUBTAG("Supertag preceeds subtag; will catch everything", 0),
+	SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG; unreachable case", 2),
+	UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
+	UNMATCHABLE_CASE("The variable of tag-type %ARG cannot possibly match against case %ARG", 2),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
