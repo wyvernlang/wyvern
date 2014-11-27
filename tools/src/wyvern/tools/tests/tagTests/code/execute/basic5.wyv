@@ -1,0 +1,12 @@
+tagged class TaggedClass            
+    class def create() : TaggedClass
+        new               
+                   
+tagged class OtherClass
+	class def create() : OtherClass
+		new
+
+val obj : OtherClass = OtherClass.create()    
+                          
+match(obj):                 
+   default => 25  

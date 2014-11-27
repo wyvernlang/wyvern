@@ -93,8 +93,6 @@ public class New extends CachingTypedAST implements CoreAST {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
 			}
-
-			System.out.println("new typecheck " + classVarTypeBinding.getClassDecl().getName());
 			
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
 			cls = classVarTypeBinding.getClassDecl();
@@ -152,10 +150,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		ClassDeclaration classDecl;		
 		
 		if (classVarTypeBinding != null) {
-			classDecl = classVarTypeBinding.getClassDecl();
-		
-			System.out.println("new eval");
-			
+			classDecl = classVarTypeBinding.getClassDecl();	
 		} else {
 
 			Environment mockEnv = Environment.getEmptyEnvironment();

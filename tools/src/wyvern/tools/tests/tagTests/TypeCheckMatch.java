@@ -257,6 +257,118 @@ public class TypeCheckMatch {
 		
 		Assert.fail("Should have failed with error: " + errorMessage);
 	}
+		
+	
+	
+	//the following are positive tests for the match
+	@Test
+	public void validBasic1() throws CopperParserException, IOException {
+		String input = readFile("validBasic1.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validBasic2() throws CopperParserException, IOException {
+		String input = readFile("validBasic2.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validBasic3() throws CopperParserException, IOException {
+		String input = readFile("validBasic3.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validHierarchy1() throws CopperParserException, IOException {
+		String input = readFile("validHierarchy1.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validHierarchy2() throws CopperParserException, IOException {
+		String input = readFile("validHierarchy2.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validHierarchy3() throws CopperParserException, IOException {
+		String input = readFile("validHierarchy3.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validUnbounded1() throws CopperParserException, IOException {
+		String input = readFile("validUnbounded1.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validUnbounded2() throws CopperParserException, IOException {
+		String input = readFile("validUnbounded2.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validUnbounded3() throws CopperParserException, IOException {
+		String input = readFile("validUnbounded3.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validBounded1() throws CopperParserException, IOException {
+		String input = readFile("validBounded1.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validBounded2() throws CopperParserException, IOException {
+		String input = readFile("validBounded2.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
+	@Test
+	public void validBounded3() throws CopperParserException, IOException {
+		String input = readFile("validBounded3.wyv");
+		
+		TypedAST ast = getAST(input);
+		
+		typeCheckSucceed(ast);
+	}
+	
 	
 	/**
 	 * Type checks the AST, ensuring it does so succesfully.

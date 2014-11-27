@@ -63,7 +63,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			}
 		}
 		
-		System.out.println("val decl b: " + type);
 		this.definition=definition;
 		binding = new NameBindingImpl(name, type);
 		this.location = location;

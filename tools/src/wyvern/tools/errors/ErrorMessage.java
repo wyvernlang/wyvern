@@ -37,12 +37,12 @@ public enum ErrorMessage {
 	//For match expression
 	BOUNDED_EXHAUSTIVE_WITH_DEFAULT("Default cannot be present in satisfied bounded match", 0),
 	BOUNDED_INEXHAUSTIVE_WITHOUT_DEFAULT("Default must be present in inexhaustive bounded match", 0),
-	DUPLICATE_TAG("Duplicate tag found", 0),
-	DEFAULT_NOT_LAST("Default case is present but not last", 0),
+	DUPLICATE_TAG("Duplicate tag cannot be present", 0),
+	DEFAULT_NOT_LAST("Default case is present, but not last", 0),
 	MULTIPLE_DEFAULTS("More than 1 default case defined", 0),
-	SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG; unreachable case", 2),
+	SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG: unreachable case", 2),
 	UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
-	UNMATCHABLE_CASE("The variable of tag-type %ARG cannot possibly match against case %ARG", 2),
+	UNMATCHABLE_CASE("A variable of tag-type %ARG cannot possibly match against case %ARG", 2),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

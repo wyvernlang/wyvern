@@ -47,6 +47,29 @@ public class TestUtil {
 	}
 	
 	/**
+	 * Completely evaluates the given AST, and compares it to the given value.
+	 * Does typechecking first, then evaluation.
+	 * 
+	 * @param ast
+	 * @param value
+	 */
+	public static void evaluateExpectingPerf(TypedAST ast, int value) {
+		Value v = ast.evaluate(Globals.getStandardEnv());
+		
+		String expecting = "IntegerConstant(" + value + ")"; 
+
+		Assert.assertEquals(expecting, v.toString());
+	}
+	
+	public static void evaluatePerf(TypedAST ast) {
+		Value v = ast.evaluate(Globals.getStandardEnv());
+		
+		//String expecting = "IntegerConstant(" + value + ")"; 
+
+		//Assert.assertEquals(expecting, v.toString());
+	}
+	
+	/**
 	 * First typechecks the AST, then executes it.
 	 * 
 	 * Any returned value is discarded, but anything printed to stdout will be visible.
