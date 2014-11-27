@@ -5,7 +5,8 @@ To compile Wyvern, use Java 8 and JUnit 4, and ant 1.9.0 (or higher).
 Eclipse version 4.3 with Java 8 support works, earlier versions will not.
 To compile, just run ant.
 
-To run Wyvern from the command line, make sure Java 8 is on your path.  Add wyvern\tools\bin to your CLASSPATH, and run "java wyvern.tools.util.CLI filename.wyv"
+To run Wyvern from the command line, make sure Java 8 is on your path.
+Add wyvern\tools\bin to your CLASSPATH, and run "java wyvern.tools.util.CLI filename.wyv"
 
 
 PACKAGE DESCRIPTIONS
