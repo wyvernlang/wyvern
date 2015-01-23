@@ -51,10 +51,14 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		Type resolved = null;
+
 		if (binding.getType() != null)
 			resolved = TypeResolver.resolve(binding.getType(), env);
-		if (this.definition != null)
+
+		
+		if (this.definition != null) 
 			this.definitionType = this.definition.typecheck(env, Optional.ofNullable(resolved));
+		
 		if (resolved == null)
 			resolved = definitionType;
 
@@ -137,19 +141,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		// System.out.println("Resolving ValDeclaration using extendName: " + this.getName());
-		
+	
 		Type resolved;
 		if (binding.getType() != null) {
 			
-			// System.out.println("Inside ValDeclaration resolving type: " + binding.getType());
-			// System.out.println("Inside ValDeclaration resolving type: " + binding.getType().getClass());
-			
 			if (binding.getType() instanceof TypeInv) {
 				TypeInv ti = (TypeInv) binding.getType();
-				
-				// System.out.println("TypeInv = " + ti);
-				// System.out.println("against = " + against);
 			}
 			resolved = TypeResolver.resolve(binding.getType(), against);
 		} else {

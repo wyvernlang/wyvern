@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.KeywordInvocation;
 import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -88,7 +89,6 @@ public class ExnFromAST implements CoreASTVisitor {
 		}
 		return params;
 	}
-
 
 	@Override
 	public void visit(Assignment assignment) {
@@ -314,5 +314,9 @@ public class ExnFromAST implements CoreASTVisitor {
 		// TODO Auto-generated method stub
 		
 	}
-
+	@Override
+	public void visit(KeywordInvocation keywordInvocation) {
+		getSimp(keywordInvocation);
+		
+	}
 }

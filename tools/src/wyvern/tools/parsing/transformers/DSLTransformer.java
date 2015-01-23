@@ -10,9 +10,8 @@ public class DSLTransformer extends AbstractASTTransformer {
 	public TypedAST transform(TypedAST input) {
 		if (input instanceof DSLLit) {
 			return new DSLTransformer().transform(defaultTransformation(((DSLLit) input).getAST()));
-		}
-		if (input instanceof KeywordInvocation) {
-			//TODO
+		} else if (input instanceof KeywordInvocation) {
+			return new DSLTransformer().transform(defaultTransformation(((KeywordInvocation)input).getDSLLit().getAST()));
 		}
 		return defaultTransformation(input);
 	}

@@ -1,7 +1,5 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.stdlib.Globals;
-import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -10,19 +8,15 @@ import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.Reference;
@@ -32,7 +26,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class TypeDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls;
@@ -48,6 +41,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	
 	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
 	private Reference<Value> metaValue = new Reference<>();
+	private DeclSequence keywordDecls = null;
 
 	// FIXME: I am not convinced typeGuard is required (alex).
 	private boolean typeGuard = false;
@@ -71,31 +65,32 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		return env.extend(nameBinding);
 	}
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-    	this(name, decls, metadata, clsNameLine);
+	
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, DeclSequence keywordDecls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+    	this(name, decls, metadata, keywordDecls, clsNameLine);
     	
     	this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name);
 		this.taggedInfo.associateTag();
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
-    	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, DeclSequence keywordDecls, FileLocation clsNameLine) {
+    	
 		this.decls = decls;
-		nameBinding = new NameBindingImpl(name, null);
-		typeBinding = new TypeBinding(name, null, metadata);
+
+		nameBinding = new NameBindingImpl(name, null); 
+		typeBinding = new TypeBinding(name, null, metadata, keywordDecls);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 		
 		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
 		nameBinding = new LateNameBinding(nameBinding.getName(), () -> metadata.get().getType());
 
-		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
-		
-		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
+		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata, keywordDecls);
 		
 		this.location = clsNameLine;
 		this.metaValue = metadata;
+		this.keywordDecls = keywordDecls;
 	}
 
 	@Override
@@ -123,14 +118,13 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, location);
+		return new TypeDeclaration(nameBinding.getName(), (DeclSequence)newChildren.get("decls"), metaValue, keywordDecls, location);
 	}
 
 	@Override
 	public Type doTypecheck(Environment env) {
 		Environment eenv = decls.extend(env, env);
 
-		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);
 		}
@@ -141,6 +135,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
+	
 		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
 		
 		//extend with tag information
@@ -204,8 +199,9 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		declEvalEnv = declEnv;
-		if (metaValue.get() == null)
+		if (metaValue.get() == null) {
 			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
+		}
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(metaValue.get());
 	}
@@ -237,7 +233,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     public NameBinding lookupDecl(String name) {
         return declEnv.get().lookup(name);
     }
-
 
 	public Reference<Environment> getDeclEnv() {
 		return declEnv;

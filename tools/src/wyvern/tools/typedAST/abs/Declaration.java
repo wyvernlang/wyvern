@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.abs;
 
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
