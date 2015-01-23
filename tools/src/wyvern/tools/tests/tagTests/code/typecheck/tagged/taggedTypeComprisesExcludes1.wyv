@@ -1,0 +1,13 @@
+tagged class X [comprises Y]
+    class def create() : X
+        new               
+
+tagged class Y [case of X]
+    class def create() : Y
+        new
+
+tagged class Z [case of X]
+    class def create() : Z
+        new
+                       
+15

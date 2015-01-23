@@ -1,0 +1,9 @@
+tagged class X [comprises Y]
+    class def create() : X
+        new               
+
+tagged class Y
+    class def create() : Y
+        new
+                       
+15

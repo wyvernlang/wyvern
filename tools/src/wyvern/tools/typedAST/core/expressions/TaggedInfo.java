@@ -1,9 +1,9 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-
-import wyvern.tools.typedAST.core.binding.TagBinding;
+import java.util.Map;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
@@ -12,9 +12,17 @@ import wyvern.tools.typedAST.core.binding.TagBinding;
  */
 public class TaggedInfo {
 
+	private static Map<String, TaggedInfo> globalTagStore = new HashMap<String, TaggedInfo>();
+	private static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
+	
 	private String tagName;
+	
 	private String caseOf;
+	private TaggedInfo caseOfTaggedInfo;
+	
 	private List<String> comprises;
+	private List<TaggedInfo> comprisesTaggedInfos;
+	
 	
 	/**
 	 * Constructs an empty TaggedInfo. 
@@ -53,13 +61,6 @@ public class TaggedInfo {
 		
 		this.caseOf = caseOf;
 		this.comprises = comprises;
-	}
-	
-	/**
-	 * Associate this TaggedInfo with the TagBinding tagset.
-	 */
-	public void associateTag() {
-		TagBinding.associate(this);
 	}
 	
 	/**
@@ -108,6 +109,24 @@ public class TaggedInfo {
 	}
 	
 	/**
+	 * Returns true of false if a circular hierarchical relation is detected.
+	 * 
+	 * @return
+	 */
+	public boolean isCircular() {
+		TaggedInfo info = lookupTag(caseOf);
+		String myName = tagName;
+		
+		while (info != null) {	
+			if (info.tagName.equals(myName)) return true;
+			
+			info = lookupTag(info.caseOf);
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Returns a non-null list of what tags are comprised.
 	 * A size of 0 indicates this doesn't have any comprise tags.
 	 * 
@@ -116,4 +135,47 @@ public class TaggedInfo {
 	public List<String> getComprisesTags() {
 		return comprises;
 	}
+	
+	public void associateWithClass(String className) {
+		tagName = className;
+		globalTagStore.put(tagName, this);
+		globalTagStoreList.add(this);
+	}
+	
+	public static void clearGlobalTaggedInfos() {
+		globalTagStore = new HashMap<String, TaggedInfo>();
+		globalTagStoreList = new ArrayList<TaggedInfo>();
+	}
+	
+	public static Map<String, TaggedInfo> getGlobalTagStore() {
+		return globalTagStore;
+	}
+	
+	/**
+	 * Returns the global tag store, as a list.
+	 * 
+	 * This has the same contents as the Map<String, TaggedInfo> map, just
+	 * without them being mapped by the tag name.
+	 * 
+	 * @return
+	 */
+	public static List<TaggedInfo> getGlobalTagStoreList() {
+		return globalTagStoreList;
+	}
+	
+	public static TaggedInfo lookupTag(String name) {
+		TaggedInfo info = globalTagStore.get(name);
+		
+		return info;
+	}
+
+	@Override
+	public String toString() {
+		return "TaggedInfo [tagName=" + tagName + ", caseOf=" + caseOf
+				+ ", caseOfTaggedInfo=" + caseOfTaggedInfo + ", comprises="
+				+ comprises + ", comprisesTaggedInfos=" + comprisesTaggedInfos
+				+ "]";
+	}
+	
+	
 }

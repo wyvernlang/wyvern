@@ -82,10 +82,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 		
 		this.taggedInfo = taggedInfo;
-		
-		//TODO: this will need to be replaced with proper type resolution for tags.
-		this.taggedInfo.setTagName(name);
-		this.taggedInfo.associateTag();
+		this.taggedInfo.associateWithClass(name);
 	}
 	
 	public ClassDeclaration(String name,
@@ -96,13 +93,17 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 
 	}
+	
     public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
 							DeclSequence decls,
 							List<String> typeParams,
 							FileLocation location) {
-		this.decls = decls;
+		
+    	//System.out.println("Made class: " + name);
+    	
+    	this.decls = decls;
 		this.typeParams = typeParams;
 		typeEquivalentEnvironmentRef = new Reference<>();
 		classMembersEnv = new Reference<>();
@@ -152,15 +153,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type doTypecheck(Environment env) {
-
-
 		// FIXME: Currently allow this and class in both class and object methods. :(
-
 
 		Environment genv = env.extend(new ClassBinding("class", this));
 		Environment oenv = genv.extend(new NameBindingImpl("this", getObjectType()));
-
-
 
 		if (decls != null) {
 			if (this.typeEquivalentEnvironmentRef.get() == null)
@@ -216,8 +212,64 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 		}
 		
+		if (isTagged()) typecheckTags(env);
 
 		return Unit.getInstance();
+	}
+	
+	private void typecheckTags(Environment env) {
+		String myTagName = taggedInfo.getTagName();
+		
+		if (taggedInfo.hasCaseOf()) {
+			String caseOfName = taggedInfo.getCaseOfTag();
+			
+			//check the type is tagged
+			TaggedInfo info = TaggedInfo.lookupTag(caseOfName);
+			if (info == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfName);
+			}
+			
+			//now check circular relationship has not been created
+			if (taggedInfo.isCircular()) {
+				ToolError.reportError(ErrorMessage.CIRCULAR_TAGGED_RELATION, this, taggedInfo.getTagName(), caseOfName);
+			}
+		}
+		
+		if (taggedInfo.hasComprises()) {
+			List<String> comprisesTags = taggedInfo.getComprisesTags();
+			
+			//first check that every comprises tag actually is a case-of of this
+			for (String s : comprisesTags) {
+				TaggedInfo info = TaggedInfo.lookupTag(s);
+				
+				//check it exists
+				if (info == null) {
+					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, s);
+				}
+				
+				//then check it is a case-of
+				String comprisesCaseOfName = info.getCaseOfTag();
+				if (!myTagName.equals(comprisesCaseOfName)) {
+					ToolError.reportError(ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED, this, s);
+				}
+			}
+
+			//now check every other case-of does not case-of this tag
+			for (TaggedInfo info : TaggedInfo.getGlobalTagStoreList()) {
+				String othersName = info.getTagName();
+				String caseOf = info.getCaseOfTag();
+				
+				//if tag is ourselves, or one of our comprises, skip it
+				if (othersName.equals(myTagName) || comprisesTags.contains(othersName)) {
+					continue;
+				}
+				
+				//now if the other tag 'case-of's is this, it is an error
+				if (myTagName.equals(caseOf)) {
+					ToolError.reportError(ErrorMessage.COMPRISES_EXCLUDES_TAG, this, myTagName, info.getTagName());
+				}
+			}
+		}
 	}
 
 	private Type getObjectType() {
@@ -240,65 +292,14 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
 		
-		// FIXME: Currently allow this and class in both class and object methods. :(
-		//newEnv = newEnv.extend(new TypeBinding("class", typeBinding.getType()));
-		//newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType()));
-		
-		//extend with tag information
-		if (isTagged()) {
-			//type-test the tag information
-			
-			//TODO: fix this
-			
-			//first get/ create the binding
-			TagBinding tagBinding = TagBinding.getOrCreate(taggedInfo.getTagName());
-			newEnv = newEnv.extend(tagBinding);
-			
-			//now handle case-of and comprises clauses
-			if (taggedInfo.getCaseOfTag() != null) {
-				String caseOf = taggedInfo.getCaseOfTag();
-				
-				//TODO: could case-of come before?
-				Optional<TagBinding> caseOfBindingO = Optional.ofNullable(TagBinding.get(caseOf));
-				//TODO, change to real code: newEnv.lookupBinding(caseOf, TagBinding.class);
-				
-				if (caseOfBindingO.isPresent()) {
-					 TagBinding caseOfBinding = caseOfBindingO.get();
-					 
-					 //set up relationship between two bindings
-					 tagBinding.setCaseOfParent(caseOfBinding);
-					 caseOfBinding.addCaseOfDirectChild(tagBinding);
-				} else {
-					ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, caseOf);
-				}
-			}
-			
-			if (!taggedInfo.getComprisesTags().isEmpty()) {
-				//set up comprises tags
-				for (String s : taggedInfo.getComprisesTags()) {
-					// Because comprises refers to tags defined ahead of this, we use the associated tag values
-					
-					Optional<TagBinding> comprisesBindingO = Optional.of(TagBinding.getOrCreate(s));
-					//TODO, change to real code: newEnv.lookupBinding(s, TagBinding.class);
-					
-					if (comprisesBindingO.isPresent()) {
-						TagBinding comprisesBinding = comprisesBindingO.get();
-						
-						tagBinding.getComprisesOf().add(comprisesBinding);
-					} else {
-						//TODO throw proper error
-						ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, s);
-					}
-				}
-			}
-		}
-		
 		return newEnv;
 	}
 
 	@Override
 	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+		
+		//newEnv = newEnv.extend(taggedBinding);
 		
 		return newEnv;
 	}
@@ -452,13 +453,14 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendType(Environment env, Environment against) {
+	public Environment extendType(Environment env, Environment against) {		
 		return env.extend(typeBinding);
 	}
 
 	boolean envGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
+		
 		TypeBinding objBinding = new LateTypeBinding(nameBinding.getName(), this::getObjectType);
 
 		if (!envGuard && decls != null) {

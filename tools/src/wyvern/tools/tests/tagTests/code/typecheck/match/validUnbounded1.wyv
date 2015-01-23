@@ -1,0 +1,41 @@
+tagged class JSON
+    class def create() : JSON             
+        new                               
+                                          
+tagged class ValueJSON [case of JSON]     
+    class def create() : ValueJSON        
+        new                               
+                                          
+tagged class ObjJSON [case of JSON]       
+    class def create() : ObjJSON          
+        new                               
+                                          
+tagged class StrJSON [case of JSON]       
+    class def create() : StrJSON          
+        new                               
+                                          
+tagged class NumJSON [case of JSON]       
+    class def create() : NumJSON          
+        new                               
+                                          
+tagged class IntJSON [case of NumJSON]    
+    class def create() : IntJSON          
+        new                               
+                                          
+tagged class DoubleJSON [case of NumJSON] 
+    class def create() : DoubleJSON       
+        new                               
+
+def create() : DoubleJSON
+	DoubleJSON.create()
+    	new
+
+val json : JSON = ObjJSON.create()
+                                          
+match(json):                              
+   IntJSON => 25                          
+   NumJSON => 10                           
+   ObjJSON => 15                          
+   StrJSON => 20                           
+   default => 30                         
+  

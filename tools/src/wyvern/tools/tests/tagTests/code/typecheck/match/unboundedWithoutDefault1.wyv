@@ -1,0 +1,18 @@
+tagged class Dyn
+    class def create() : Dyn      
+        new                       
+                                  
+tagged class DynInt [case of Dyn] 
+    class def create() : DynInt   
+        new                       
+                                  
+tagged class DynChar [case of Dyn]
+    class def create() : DynChar  
+        new                       
+                                  
+val i : Dyn = Dyn.create()              
+                                  
+match(i):                         
+       DynInt => 10               
+       DynChar => 15              
+       Dyn => 5                   

@@ -1,0 +1,17 @@
+tagged class X
+    class def create() : X
+        new               
+                          
+tagged class Y            
+    class def create() : Y
+        new               
+                          
+val x : X = X.create()        
+                          
+match(x):                 
+       default => 20
+       default => 35
+       X => 15            
+       default => 25
+       Y => 50            
+       default => 23      

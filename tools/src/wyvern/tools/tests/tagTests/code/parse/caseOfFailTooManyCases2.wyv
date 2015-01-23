@@ -1,0 +1,16 @@
+tagged class IntType
+    class def create() : Dyn
+        new
+
+tagged class DoubleType
+    class def create() : Stat
+        new
+
+tagged class StringType
+    class def create() : Stat
+        new
+
+//case of can only have max of 1 case
+tagged class AllType [case of IntType, DoubleType, StringType]
+    class def create() : DynInt
+        new

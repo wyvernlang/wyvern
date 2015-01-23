@@ -2,6 +2,7 @@ package wyvern.tools.types;
 
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -66,6 +67,7 @@ public class Environment implements TreeWritable {
 		return parentEnvironment.lookupType(name);
 	}
 	
+	
 	public KeywordBinding lookupKeyword(Type hostType, String keyword) {
 	
 		if (this.binding.getName().equals(keyword) && this.binding instanceof KeywordBinding) {
@@ -79,6 +81,14 @@ public class Environment implements TreeWritable {
 		}
 		
 		return parentEnvironment.lookupKeyword(hostType, keyword);
+	}
+
+	public StaticTypeBinding lookupStaticType(String name) {
+		if (this.name == null)
+			return null;
+		if (this.name.equals(name) && this.binding instanceof StaticTypeBinding)
+			return (StaticTypeBinding) binding;
+		return parentEnvironment.lookupStaticType(name);
 	}
 
 	public Value getValue(String name) {

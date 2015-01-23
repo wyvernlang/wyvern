@@ -1,0 +1,29 @@
+tagged class Integer
+    class def create() : Integer
+        new
+
+tagged class Numerical
+    class def create() : Numerical
+        new
+        
+tagged class BooleanValue
+    class def create() : BooleanValue
+        new
+
+tagged class Divisor
+    class def create() : Divisor
+        new        
+        
+tagged class X
+    class def create() : X
+        new               
+
+tagged class Y            
+    class def create() : Y
+        new
+
+tagged class Z            
+    class def create() : Z
+        new
+
+15

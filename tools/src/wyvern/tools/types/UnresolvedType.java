@@ -87,4 +87,8 @@ public class UnresolvedType implements Type {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		throw new RuntimeException("Cannot specify a ref type");
 	}
+
+	public String getName() {
+		return typeName;
+	}
 }

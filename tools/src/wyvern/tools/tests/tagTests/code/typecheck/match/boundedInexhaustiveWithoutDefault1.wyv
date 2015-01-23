@@ -1,0 +1,17 @@
+tagged class A [comprises B, C]
+    class def create() : A      
+        new                       
+                                  
+tagged class B [case of A]
+    class def create() : B   
+        new                       
+                      
+tagged class C [case of A]
+    class def create() : C
+        new                       
+                                  
+val a : A = A.create()              
+                                  
+match(a):
+       B => 15
+       A => 5
