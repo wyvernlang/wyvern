@@ -768,9 +768,9 @@ import java.net.URI;
 
     // hierarchical tags
 
-    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((Type)co, (List<Type>) c); :}
-                 | caseOf:co             {: RESULT = new TaggedInfo((Type) co); :}
-                 | comprises:co          {: RESULT = new TaggedInfo((List<Type>) co); :}
+    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
+                 | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
+                 | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
                  |              {: RESULT = new TaggedInfo(); :}
                  ;
     
