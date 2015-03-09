@@ -20,7 +20,7 @@ public class ParseBuffer extends ScannerBuffer {
 	private final ScannerBuffer ibuffer;
 	private String srcString;
 
-	protected ParseBuffer(String str)
+	public ParseBuffer(String str)
 	{
 		this.srcString = str;
 		this.ibuffer = ScannerBuffer.instantiate(new StringReader(str));

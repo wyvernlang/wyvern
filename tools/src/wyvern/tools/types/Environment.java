@@ -4,11 +4,14 @@ import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +67,22 @@ public class Environment implements TreeWritable {
 		return parentEnvironment.lookupType(name);
 	}
 	
+	
+	public KeywordBinding lookupKeyword(Type hostType, String keyword) {
+	
+		if (this.binding.getName().equals(keyword) && this.binding instanceof KeywordBinding) {
+			System.out.println(":-) Start looking " + ((KeywordBinding)this.binding).getHostType() +  hostType);
+			return (KeywordBinding) this.binding;
+			// How to handle keyword type relation?
+			/*if (((KeywordBinding)this.binding).getHostType().equals(hostType)) {
+				System.out.println(":-) Get it!");
+				return (KeywordBinding) this.binding;
+			}*/
+		}
+		
+		return parentEnvironment.lookupKeyword(hostType, keyword);
+	}
+
 	public StaticTypeBinding lookupStaticType(String name) {
 		if (this.name == null)
 			return null;

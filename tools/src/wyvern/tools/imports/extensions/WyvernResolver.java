@@ -15,7 +15,6 @@ import wyvern.tools.util.Reference;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -35,7 +34,6 @@ public class WyvernResolver implements ImportResolver {
 	private WyvernResolver() {}
 
 	private static class WyvernBinder implements ImportBinder {
-
 
 		private TypedAST res;
 
@@ -97,7 +95,7 @@ public class WyvernResolver implements ImportResolver {
 			extending = false;
 			return in.extend(mib.from(in));
 		}
-
+		
 		boolean typechecking = false;
 		@Override
 		public Type typecheck(Environment env) {
