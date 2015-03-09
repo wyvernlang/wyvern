@@ -119,7 +119,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment env = extendName(old, against);
-		env = env.extend(new StaticTypeBinding(variableName, tagName));
+		if (variableName != null)
+			env = env.extend(new StaticTypeBinding(variableName, tagName));
 		
 		return env;
 	}

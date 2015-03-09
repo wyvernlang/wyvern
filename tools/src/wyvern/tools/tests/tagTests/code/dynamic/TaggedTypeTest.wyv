@@ -23,7 +23,7 @@ tagged type DoubleJSON [case of NumJSON]
 def create() : IntJSON = new
     def value() : Int = 50
 
-val json = C.create()
+val json = create()
 
 match(json):
     IntJSON => 25

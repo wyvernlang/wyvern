@@ -786,22 +786,22 @@ import java.net.URI;
           
     //1 or more tags
     listTags ::= singleTag:tag comma_t listTags:rest {: 
-                    List<Type> tags = new ArrayList<Type>();
-                    tags.add((Type) tag);
-                    tags.addAll((List<Type>) rest);
+                    List<String> tags = new ArrayList<String>();
+                    tags.add((String) tag);
+                    tags.addAll((List<String>) rest);
                
                     RESULT = tags; 
                 :}
                | singleTag:tag {: 
-                    List<Type> tags = new ArrayList<Type>();
-                    tags.add((Type) tag);
+                    List<String> tags = new ArrayList<String>();
+                    tags.add((String) tag);
                     
                     RESULT = tags; 
                  :}
                ;
                
     //a single tag
-    singleTag ::= type:t {: RESULT = (Type) t; :}
+    singleTag ::= identifier_t:id {: RESULT = (String) id; :}
                 ;
 
     // end hierarchical tags

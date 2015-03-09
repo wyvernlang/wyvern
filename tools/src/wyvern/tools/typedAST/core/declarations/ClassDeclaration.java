@@ -250,7 +250,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				//then check it is a case-of
 				String comprisesCaseOfName = info.getCaseOfTag();
 				if (!myTagName.equals(comprisesCaseOfName)) {
-					ToolError.reportError(ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED, this, s);
+					ToolError.reportError(ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED, this);
 				}
 			}
 
