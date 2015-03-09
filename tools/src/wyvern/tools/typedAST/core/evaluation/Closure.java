@@ -14,7 +14,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +22,9 @@ public class Closure extends AbstractValue implements ApplyableValue {
 	private BoundCode function;
 	private Environment env;
 
-	private String src;
-
 	public Closure(BoundCode function, Environment env) {
 		this.function = function;
 		this.env = env;
-
-		src = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (s,e)->s+"\n"+e, (a,b)->a+b);
 	}
 
 	@Override

@@ -1,11 +1,9 @@
 package wyvern.targets.java;
 
 import org.objectweb.asm.*;
-
 import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.commons.GeneratorAdapter;
-
 import wyvern.targets.Common.wyvernIL.IL.Def.*;
 import wyvern.targets.Common.wyvernIL.IL.visitor.DefVisitor;
 import wyvern.targets.java.annotations.Val;

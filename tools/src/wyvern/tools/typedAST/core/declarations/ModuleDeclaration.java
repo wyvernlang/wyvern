@@ -6,7 +6,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.binding.compiler.KeywordBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.*;
@@ -29,7 +28,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
-	private Reference<Environment> keywordEnv = new Reference<>(Environment.getEmptyEnvironment());
 
 	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location) {
 		this.name = name;
@@ -91,17 +89,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 					delta.getBindings().stream()
 							.flatMap(bndg -> (bndg instanceof TypeBinding)? Stream.of((TypeBinding)bndg) : Stream.empty())
 							.forEach(bndg -> typeEnv.set(typeEnv.get().extend(bndg)));
-					// [KW] Extend keyword into environment
-					delta.getBindings().stream()
-							.flatMap(bndg -> (bndg instanceof KeywordBinding)? Stream.of((KeywordBinding)bndg) : Stream.empty())
-							.forEach(bndg -> keywordEnv.set(keywordEnv.get().extend(bndg)));
-					
 				}
 			}
 			typeGuard = true;
 		}
-		System.out.println("EXTEND: " + extend);
-		return extend.extend(keywordEnv.get());
+		return extend;
 	}
 
 	boolean nameGuard = false;
@@ -155,7 +147,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		newDecl.importEnv = importEnv;
 		newDecl.typeEnv = typeEnv;
 		newDecl.dclEnv = dclEnv;
-		newDecl.keywordEnv = keywordEnv;
 		return newDecl;
 	}
 

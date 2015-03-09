@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
-import wyvern.tools.typedAST.core.expressions.KeywordInvocation;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.visitors.BaseASTVisitor;
@@ -52,12 +50,6 @@ public class VariableResolver extends BaseASTVisitor {
 	public void visit(Variable var) {
 		if (externalContext.containsKey(var.getName()))
 			depends.put(var.getName(), var.getType());
-	}
-
-	@Override
-	public void visit(KeywordInvocation keywordInvocation) {
-		// TODO Auto-generated method stub
-		// TODO (Stanley) Not sure what to do here visit here?
 	}
 	
 	//TODO: Declsequence

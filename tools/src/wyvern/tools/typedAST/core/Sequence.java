@@ -19,7 +19,6 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	public static interface MapCallback {
 		public void map(TypedAST elem);
 	}
-	
 	public static void tryMap(TypedAST potential, MapCallback callback) {
 		if (!(potential instanceof Sequence))
 			return;

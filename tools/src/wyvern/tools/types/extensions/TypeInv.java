@@ -35,11 +35,8 @@ public class TypeInv implements Type {
 		}
 		TypeBinding fetched = ((RecordType) innerType).getInnerType(invName);
 
-		// There can be some problems if there exists keyword but not metadata
 		if (fetched.getMetadata().isPresent() && fetched.getMetadata().get().get() != null)
-			return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get(), fetched.getKeywordDecls().get());
-		else if (fetched.getKeywordDecls().isPresent() && fetched.getKeywordDecls().get() != null)
-			return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get(), fetched.getKeywordDecls().get());
+			return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get());
 		else return fetched.getUse();
 	}
 

@@ -1,15 +1,14 @@
 package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
+import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.KeywordDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
@@ -24,16 +23,15 @@ import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class TypeVarDecl extends Declaration {
 	private final String name;
-	private EnvironmentExtender body;
+	private final EnvironmentExtender body;
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
-	private DeclSequence keywordDecls;
 	private final Reference<Value> metadataObj;
 
 	/**
@@ -90,36 +88,35 @@ public class TypeVarDecl extends Declaration {
 		public void writeArgsToTree(TreeWriter writer) {
 
 		}
+
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, DeclSequence keywordDecls, TypedAST metadata, FileLocation fileLocation) {
-		this.keywordDecls = keywordDecls;
+
+	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>();
-		this.body = new TypeDeclaration(name, body, this.metadataObj, keywordDecls, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadataObj, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, DeclSequence keywordDecls, TypedAST metadata, FileLocation fileLocation) {
-		this.keywordDecls = keywordDecls;
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>();
-		this.body = new TypeDeclaration(name, body, this.metadataObj, keywordDecls, taggedInfo, fileLocation);
+		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 	}
 
-	private TypeVarDecl(String name, EnvironmentExtender body, DeclSequence keywordDecls, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {
+	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {
 		this.name = name;
 		this.body = body;
-		this.keywordDecls = keywordDecls;
 		this.metadata = metadata;
 		this.metadataObj = metadataObj;
 		fileLocation = location;
 	}
 
-	public TypeVarDecl(String name, Type body, DeclSequence keywordDecls, TypedAST metadata, FileLocation fileLocation) {
+	public TypeVarDecl(String name, Type body, TypedAST metadata, FileLocation fileLocation) {
 		this.name = name;
 		this.body = new EnvironmentExtInner(fileLocation) {
 			@Override
@@ -128,6 +125,9 @@ public class TypeVarDecl extends Declaration {
 				return env.extend(new TypeBinding(name, type, metadataObj))
 						.extend(new LateNameBinding(name, () -> metadataObj.get().getType()));
 			}
+
+
+
 			@Override
 			public Type getType() {
 				return body;
@@ -135,7 +135,6 @@ public class TypeVarDecl extends Declaration {
 		};
 
 		this.fileLocation = fileLocation;
-		this.keywordDecls = keywordDecls;
 		this.metadata = new Reference<>(Optional.ofNullable(metadata));
 		this.metadataObj = new Reference<>();
 	}
@@ -144,7 +143,6 @@ public class TypeVarDecl extends Declaration {
 		this.body = body;
 		this.name = name;
 		this.fileLocation = fileLocation;
-		this.keywordDecls = new DeclSequence();
 		metadata = new Reference<Optional<TypedAST>>(Optional.empty());
 		this.metadataObj = new Reference<>();
 	}
@@ -156,20 +154,13 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		Type type = body.typecheck(env, Optional.<Type>empty());
-		body = (EnvironmentExtender)new DSLTransformer().transform(body);
-		keywordDecls.typecheck(env, Optional.<Type>empty());
-		keywordDecls = (DeclSequence)new DSLTransformer().transform(keywordDecls);
 		evalMeta(env);
-		env.lookupBinding(this.name, TypeBinding.class).get().setKeywords(keywordDecls);
-		return type;
+		return body.typecheck(env, Optional.<Type>empty());
 	}
 
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
-		
-		Environment retEnv = body.extend(old, against);
-		return retEnv;
+		return body.extend(old, against);
 	}
 
 	@Override
@@ -180,23 +171,10 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		body.evalDecl(declEnv);
-		// Evaluate KeywordDeclration Environment
-		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
-		while (it.hasNext()) {
-			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
-			thisItem.evalDecl(evalEnv, declEnv);
-		}
 	}
 
 	@Override
 	public Environment extendType(Environment env, Environment against) {
-		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
-
-
-		while (it.hasNext()) {
-			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
-			env = thisItem.extendKeyword(env, this.getName());
-		}
 		return body.extendType(env, against);
 	}
 
@@ -206,7 +184,6 @@ public class TypeVarDecl extends Declaration {
 	}
 
 	private void evalMeta(Environment evalEnv) {
-
 		Environment extMetaEnv = evalEnv
 				.lookupBinding("metaEnv", MetadataInnerBinding.class)
 				.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
@@ -215,14 +192,6 @@ public class TypeVarDecl extends Declaration {
 		metadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
 
 		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
-	
-		// Evaluate KeywordDeclration Environment
-		Iterator<Declaration> it = this.keywordDecls.getDeclIterator().iterator();
-		while (it.hasNext()) {
-			KeywordDeclaration thisItem = (KeywordDeclaration)it.next();
-			thisItem.evalKeywordMeta(evalEnv, metaEnv);
-			thisItem.setHostType(evalEnv.lookupType(this.name).getType());
-		}
 	}
 
 	@Override
@@ -236,15 +205,13 @@ public class TypeVarDecl extends Declaration {
 		out.put("body", body);
 		if (metadata.get().isPresent())
 			out.put("metadata", metadata.get().get());
-		if (keywordDecls != null) 
-			out.put("keywordsDecls", keywordDecls);
 		return out;
 	}
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		metadata.set(Optional.ofNullable(newChildren.get("metadata")));
-		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), keywordDecls, metadata, metadataObj, fileLocation);
+		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);
 	}
 
 	@Override
