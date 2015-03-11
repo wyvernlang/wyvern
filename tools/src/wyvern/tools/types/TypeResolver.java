@@ -22,8 +22,16 @@ public class TypeResolver {
 			throw new RuntimeException(e);
 		}
 	}
+
+	private static WeakHashMap<Type, Type> resolved = new WeakHashMap<>();
 	public static Type resolve(Type input, Environment ctx, HashSet<Type> visited) throws IllegalAccessException {
+		// System.out.println("Resolving... " + input);
+		
+		if (resolved.containsKey(input)) {
+			return resolved.get(input);
+		}
 		Type result = iresolve(input, ctx, visited);
+		resolved.put(input, result);
 		return result;
 	}
 

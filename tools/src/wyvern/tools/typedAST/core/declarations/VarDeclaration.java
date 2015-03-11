@@ -29,7 +29,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	NameBinding binding;
 
 	private boolean isClass;
-	public boolean isClassMember() {
+	public boolean isClass() {
 		return isClass;
 	}
 

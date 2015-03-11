@@ -17,17 +17,14 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType, ParameterizableType {
 	private ClassDeclaration decl = null;
-	protected Reference<Environment> declEnv;
+	private Reference<Environment> declEnv;
 	protected Reference<Environment> typeEquivalentEnv = new Reference<>();
 	private List<String> params;
 	private String name;
 
-	public ClassType() {
-		this(new Reference<>(Environment.getEmptyEnvironment()), new Reference<Environment>(Environment.getEmptyEnvironment()), new LinkedList<String>(), "empty");
-	}
 
 	public ClassType(ClassDeclaration td) {
-		this(td.getClassMembersEnv(),
+		this(td.getDeclEnvRef(),
 				td.getTypeEquivalentEnvironmentReference(),
 				td.getTypeParams(),
 				td.getName());
@@ -48,19 +45,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	public void writeArgsToTree(TreeWriter writer) {
 		// nothing to write		
 	}
-
-	private boolean recursive = false;
+	
 	@Override
 	public String toString() {
 		if (declEnv.get() != null) {
-			if (!recursive) {
-				recursive = true;
-				String op = "CLASS(" + declEnv.get().toString() + ")";
-				recursive = false;
-				return op;
-			} else {
-				return "CLASS(Recursive)";
-			}
+			return "CLASS(" + declEnv.get().toString() + ")";
 		} else {
 			return "CLASS()";
 		}
@@ -112,10 +101,6 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 			return true;
 		}
 
-		//TODO: Hack.
-		if (other instanceof MetadataWrapper)
-			return subtype(((MetadataWrapper) other).getInner(), subtypes);
-
 		if (other instanceof TypeType) {
 			// System.out.println("Is\n" + this.getEquivType() + "\n a subtype of \n" + other + "\n?");
 			return getEquivType().subtype(other);
@@ -127,8 +112,8 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	}
 
 	@Override
-	public TypeBinding getInnerType(String name) {
-		return declEnv.get().lookupType(name);
+	public Type getInnerType(String name) {
+		return declEnv.get().lookupType(name).getType();
 	}
 
 

@@ -12,8 +12,8 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.TagBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -33,19 +33,19 @@ import wyvern.tools.util.TreeWriter;
 public class Match extends CachingTypedAST implements CoreAST {
 
 	private TypedAST matchingOver;
-
+	
 	private List<Case> cases;
 	private Case defaultCase;
-
+	
 	/** Original list which preserves the order and contents. Needed for checking. */
 	private List<Case> originalCaseList;
-
+	
 	private FileLocation location;
-
+	
 	public String toString() {
 		return "Match: " + matchingOver + " with " + cases.size() + " cases and default: " + defaultCase;
 	}
-
+	
 	public Match(TypedAST matchingOver, List<Case> cases, FileLocation location) {		
 		//clone original list so we have a canonical copy
 		this.originalCaseList = new ArrayList<Case>(cases);
@@ -65,7 +65,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		this.location = location;
 	}
-
+	
 	/**
 	 * Internal constructor to save from finding the default case again.
 	 * 
@@ -80,18 +80,19 @@ public class Match extends CachingTypedAST implements CoreAST {
 		this.defaultCase = defaultCase;
 		this.location = location;
 	}
-
+	
 	@Override
 	public Value evaluate(Environment env) { 
 		String className = getTypeName(matchingOver.getType());
 		
-		TaggedInfo matchingOverTag = TaggedInfo.lookupTag(className);
+		TagBinding matchingOverBinding = TagBinding.get(className);
+		//TODO: fix this, replace with real code
 		
 		for (Case c : cases) {
-			//String caseTypeName = getTypeName(c.getAST());
-			TaggedInfo caseTag = TaggedInfo.lookupTag(c.getTaggedTypeMatch());
+			TagBinding binding = TagBinding.get(c.getTaggedTypeMatch());
+			//TODO: change to proper code: env.lookupBinding(c.getTaggedTypeMatch(), TagBinding.class).get();
 			
-			if (isSubtag(matchingOverTag, caseTag)) {
+			if (hasMatch(matchingOverBinding, binding.getName())) {
 				// We've got a match, evaluate this case
 				return c.getAST().evaluate(env);
 			}
@@ -100,32 +101,21 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// No match, evaluate the default case
 		return defaultCase.getAST().evaluate(env);
 	}
-	
+
 	/**
-	 * Checks if matchingOver is a subtag of matchTarget.
-	 * 
 	 * Searches recursively to see if what we are matching over is a sub-tag of the given target.
-	 * 
 	 * @param tag
 	 * @param currentBinding
 	 * @return
 	 */
 	//TODO: rename this method to something like isSubtag()
-	private boolean isSubtag(TaggedInfo matchingOver, TaggedInfo matchTarget) {
-		if (matchingOver == null) throw new NullPointerException("Matching Binding cannot be null");
-		if (matchTarget == null) throw new NullPointerException("match target cannot be null");
+	private boolean hasMatch(TagBinding matchingOver, String matchTarget) {
+		if (matchingOver.getName().equals(matchTarget)) return true;
 		
-		String matchingOverTag = matchingOver.getTagName();
-		String matchTargetTag = matchTarget.getTagName();
-		
-		if (matchingOverTag.equals(matchTargetTag)) return true;
-		
-		String matchingOverCaseOf = matchingOver.getCaseOfTag();
-		
-		if (matchingOverCaseOf == null) return false;
-		else return isSubtag(TaggedInfo.lookupTag(matchingOverCaseOf), matchTarget);
+		if (matchingOver.getCaseOfParent() == null) return false;
+		else return hasMatch(matchingOver.getCaseOfParent(), matchTarget);
 	}
-
+	
 	@Override
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> children = new HashMap<>();
@@ -165,72 +155,15 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		Type matchOverType = matchingOver.typecheck(env, expected);
+		// First typecheck all children
+		matchingOver.typecheck(env, expected);
 		
-		if (!(matchingOver instanceof Variable)) {
-			throw new RuntimeException("Can only match over variable");
-		}
-
-		StaticTypeBinding staticBinding = getStaticTypeBinding(matchingOver, env);
+		//Note: currently all errors given use matchingOver because it has a location
+		//TODO: use the actual entity that is responsible for the error
 		
-		if (staticBinding == null) {
-			throw new RuntimeException("variable matching over must be statically tagged");
-		}
+		matchingOver.typecheck(env, expected);		
 		
-		// Variable we're matching must exist and be a tagged type
-		String typeName = getTypeName(matchOverType);
-
-		TaggedInfo matchTaggedInfo = TaggedInfo.lookupTag(staticBinding.getTypeName());
-				
-		if (matchTaggedInfo == null) {
-			ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, typeName);
-		}
-		
-		checkNotMultipleDefaults();
-		
-		checkDefaultLast();		
-		
-		typecheckCases(env, expected);
-
-		checkAllCasesAreTagged(env);
-		
-		checkAllCasesAreUnique();
-
-		checkSubtagsPreceedSupertags();
-			
-		checkBoundedAndUnbounded(matchTaggedInfo);
-
-		checkStaticSubtags(matchTaggedInfo);
-		
-		
-		// If we've omitted default, we must included all possible sub-tags
-		if (defaultCase == null) {
-			//first, the variables tag must use comprised-of!
-			
-			//next, the match cases must include all those in the comprises-of list
-			if (true) {
-				
-			}
-		}
-		
-		// If we've included default, we can't have included all subtags for a tag using comprised-of
-		if (defaultCase != null) {
-			// We only care if tag specifies comprises-of
-			if (matchTaggedInfo.hasComprises()) {
-				//all subtags were specified, error
-				if (comprisesSatisfied(matchTaggedInfo)) {
-					//ToolError.reportError(ErrorMessage.DEFAULT_PRESENT, matchingOver);
-				}
-			}
-		}
-		
-		return Unit.getInstance();
-	}
-
-	/**
-	 * Checks there is not more than one default.
-	 */
-	private void checkNotMultipleDefaults() {
+		// Check not more than 1 default
 		for (int numDefaults = 0, i = 0; i < originalCaseList.size(); i++) {
 			Case c = originalCaseList.get(i);
 			
@@ -242,156 +175,137 @@ public class Match extends CachingTypedAST implements CoreAST {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Checks that if a default is present it is last.
-	 */
-	private void checkDefaultLast() {
+		
 		//check default is last (do this after counting so user gets more specific error message)
 		for (int i = 0; i < originalCaseList.size(); i++) {
+		
 			if (originalCaseList.get(i).isDefault() && i != originalCaseList.size() - 1) {
 				ToolError.reportError(ErrorMessage.DEFAULT_NOT_LAST, matchingOver);
 			}
 		}
-	}
-	
-	private void typecheckCases(Environment env, Optional<Type> expected) {
-		//do actual type-checking on cases
-				for (Case c : cases) {
-					c.getAST().typecheck(env, expected);
-				}
-	}
-	
-	private void checkAllCasesAreTagged(Environment env) {
+		
+		
+		// Variable we're matching must exist and be a tagged type
+		Type matchingOverType = matchingOver.getType();
+		
+		String className = getTypeName(matchingOverType);
+		
+		if (className == null){
+			//TODO change this to an error message
+			throw new RuntimeException("variable matching over must be a Class or Type");
+		}
+		
+		TagBinding matchBinding = TagBinding.get(className);
+		
+		if (matchBinding == null) {
+			//TODO change this to a typecheck error
+			throw new RuntimeException("Value is not tagged.");
+		}
+		
 		//All things we match over must be tagged types
 		for (Case c : cases) {
 			if (c.isDefault()) continue;
 			
 			String tagName = c.getTaggedTypeMatch();
 			
-			//check type exists
-			TypeBinding type = env.lookupType(tagName);
+			Optional<ClassType> type = env.lookupBinding(tagName, ClassType.class);
+			NameBinding binding = env.lookup(tagName);
 			
-			if (type == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, tagName);
+			if (binding == null) {
+				// type wasn't declared...
+				ToolError.reportError(ErrorMessage.UNKNOWN_TAG, matchingOver);
 			}
 			
-			//check it is tagged
-			TaggedInfo info = TaggedInfo.lookupTag(tagName);
+			Type t = binding.getType();
 			
-			if (info == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, tagName);
+			if (t instanceof ClassType) {
+				ClassType classType = (ClassType) t;
+				
+				String name = classType.getName();
+				
+				TagBinding tagBinding = TagBinding.get(name);
+				
+				if (tagBinding == null) {
+					//not tagged
+					ToolError.reportError(ErrorMessage.NOT_TAGGED, matchingOver);
+				}
 			}
 		}
 		
-	}
-	
-	private void checkAllCasesAreUnique() {
 		// All tagged types must be unique
-		Set<String> caseSet = new HashSet<String>();				
-				
+		Set<String> caseSet = new HashSet<String>();
+		
 		for (Case c : cases) {
 			if (c.isTyped()) caseSet.add(c.getTaggedTypeMatch());
 		}
-				
+		
 		if (caseSet.size() != cases.size()) {
 			ToolError.reportError(ErrorMessage.DUPLICATE_TAG, matchingOver);
 		}
-	}
-
-	private void checkSubtagsPreceedSupertags() {
+	
+		// If we've omitted default, we must included all possible sub-tags
+		if (defaultCase == null) {
+			//first, the variables tag must use comprised-of!
+			if (!matchBinding.hasAnyComprises()) {
+				//TODO change to type-check exception
+				ToolError.reportError(ErrorMessage.NO_COMPRISES, matchingOver);
+			}
+			
+			//next, the match cases must include all those in the comprises-of list
+			if (!comprisesSatisfied(matchBinding)) {
+				ToolError.reportError(ErrorMessage.DEFAULT_NOT_PRESENT, matchingOver);
+			}
+		}
+		
 		//A tag cannot be earlier than one of its subtags
 		for (int i = 0; i < cases.size() - 1; i++) {
 			Case beforeCase = cases.get(i);
-			TaggedInfo beforeTag = TaggedInfo.lookupTag(beforeCase.getTaggedTypeMatch());
 			
 			for (int j = i + 1; j < cases.size(); j++) {
 				Case afterCase = cases.get(j);
 				
 				if (afterCase.isDefault()) break;
 				
-				TaggedInfo afterTag = TaggedInfo.lookupTag(afterCase.getTaggedTypeMatch());
-				//TagBinding afterBinding = TagBinding.get(afterCase.getTaggedTypeMatch());
+				TagBinding afterBinding = TagBinding.get(afterCase.getTaggedTypeMatch());
 				
-				if (isSubtag(afterTag, beforeTag)) {
-					ToolError.reportError(ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG, matchingOver, beforeTag.getTagName(), afterTag.getTagName());
+				if (hasMatch(afterBinding, beforeCase.getTaggedTypeMatch())) {
+					ToolError.reportError(ErrorMessage.SUPERTAG_PRECEEDS_SUBTAG, matchingOver);
 				}
 			}
 		}
-	}
-	
-	private void checkBoundedAndUnbounded(TaggedInfo matchTaggedInfo) {
-		// If we're an unbounded type, check default exists
-		if (!matchTaggedInfo.hasComprises()) {
-			if (defaultCase == null) {
-				ToolError.reportError(ErrorMessage.UNBOUNDED_WITHOUT_DEFAULT, matchingOver);
+		
+		// If we've included default, we can't have included all subtags for a tag using comprised-of
+		if (defaultCase != null) {
+			// We only care if tag specifies comprises-of
+			if (matchBinding.hasAnyComprises()) {
+				//all subtags were specified, error
+				if (comprisesSatisfied(matchBinding)) {
+					ToolError.reportError(ErrorMessage.DEFAULT_PRESENT, matchingOver);
+				}
 			}
-		} else {
-			//we're bounded. Check if comprises is satisfied
-			boolean comprisesSatisfied = comprisesSatisfied(matchTaggedInfo);
-			
-			//if comprises is satisfied, default must be excluded
-			if (comprisesSatisfied && defaultCase != null) {
-				ToolError.reportError(ErrorMessage.BOUNDED_EXHAUSTIVE_WITH_DEFAULT, matchingOver);
-			}
-
-			//if comprises is not satisfied, default must be present
-			if (!comprisesSatisfied && defaultCase == null) {
-				ToolError.reportError(ErrorMessage.BOUNDED_INEXHAUSTIVE_WITHOUT_DEFAULT, matchingOver);
-			}
-		}
-	}
-	
-	/**
-	 * Checks that the tag we are matching over is a supertag of 
-	 * every tag in the case-list.
-	 * 
-	 * This ensures that each tag could actually have a match and that case is
-	 * not unreachable code.
-	 * 
-	 * @param matchingOverTag
-	 */
-	private void checkStaticSubtags(TaggedInfo matchingOver) {
-		for (Case c : cases) {
-			TaggedInfo matchTarget = TaggedInfo.lookupTag(c.getTaggedTypeMatch());
-			
-			if (!isSubtag(matchTarget, matchingOver)) {
-				ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, this.matchingOver, matchingOver.getTagName(), matchTarget.getTagName());
-			}
-		}
-	}
-	
-	private StaticTypeBinding getStaticTypeBinding(TypedAST varAST, Environment env) {
-		if (varAST instanceof Variable) {
-			Variable var = (Variable) varAST;
-			
-			StaticTypeBinding binding = env.lookupStaticType(var.getName());
-			
-			return binding;
 		}
 		
-		return null;
+		return Unit.getInstance();
 	}
 	
-	private boolean comprisesSatisfied(TaggedInfo matchBinding) {
-		List<String> comprisesTags = matchBinding.getComprisesTags();
+	private boolean comprisesSatisfied(TagBinding matchBinding) {
+		List<TagBinding> comprisesTags = new ArrayList<TagBinding>(matchBinding.getComprisesOf());
 		
 		//add this tag because it needs to be included too
-		comprisesTags.add(matchBinding.getTagName());
+		comprisesTags.add(matchBinding);
 		
 		//check that each tag is present 
-		for (String t : comprisesTags) {
+		for (TagBinding t : comprisesTags) {
 			if (containsTagBinding(cases, t)) continue;
 			
-			//tag wasn't present
+			//if we reach here the tag wasn't present
 			return false;
 		}
 		
 		//we made it through them all
 		return true;
 	}
-
+	
 	/**
 	 * Helper method to simplify checking for a tag.
 	 * Returns true if the given binding tag is present in the list of cases.
@@ -400,15 +314,16 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 * @param binding
 	 * @return
 	 */
-	private boolean containsTagBinding(List<Case> cases, String tagName) {
+	private boolean containsTagBinding(List<Case> cases, TagBinding binding) {
 		for (Case c : cases) {
 			//Found a match, this tag is present
-			if (c.getTaggedTypeMatch().equals(tagName)) return true;
+			if (c.getTaggedTypeMatch().equals(binding.getName())) return true;
 		}
-
+		
 		return false;
 	}
 
+	
 	private String getTypeName(Type type) {
 		if (type instanceof ClassType) {
 			ClassType matchingOverClass = (ClassType) matchingOver.getType();

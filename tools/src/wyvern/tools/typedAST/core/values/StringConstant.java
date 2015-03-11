@@ -38,11 +38,8 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	public Value evaluateInvocation(Invocation exp, Environment env) {
 		String operator = exp.getOperationName();
 		if (!operator.equals("+") && !operator.equals("==")) {
-			try {
-				return ((Obj) Util.javaToWyvObj(value)).evaluateInvocation(exp, env);
-			} catch (Exception e) {
-				throw new RuntimeException("forgot to typecheck!");
-			}
+
+			throw new RuntimeException("forgot to typecheck!");
 		}
 		Value argValue =  exp.getArgument().evaluate(env);
 
@@ -59,11 +56,9 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 			return new StringConstant(this.value + ((StringConstant) argValue).value);
 		} else	if (argValue instanceof IntegerConstant) {
 			return new StringConstant(this.value + ((IntegerConstant) argValue).getValue());
-		} else if (argValue instanceof JavaObj) {
-			return new StringConstant(this.value + ((JavaObj) argValue).getObj());
 		} else
 		{
-//			shouldn't get here.
+//			shoudn't get here.
 			throw new RuntimeException("forgot to typecheck!");
 		}
 	}

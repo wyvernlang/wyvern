@@ -1,0 +1,33 @@
+tagged type JSON
+	def value() : Int
+
+tagged type ValueJSON [case of JSON]
+	def value() : Int
+
+tagged type ObjJSON [case of JSON]
+	def value() : Int
+
+tagged type StrJSON [case of JSON]
+	def value() : Int
+
+tagged type NumJSON [case of JSON]
+	def value() : Int
+
+tagged type IntJSON [case of NumJSON]
+	def value() : Int
+
+tagged type DoubleJSON [case of NumJSON]
+	def value() : Int
+	
+
+def create() : IntJSON = new
+    def value() : Int = 50
+
+val json = C.create()
+
+match(json):
+    IntJSON => 25
+    NumJSON => 10
+    ObjJSON => 15
+    StrJSON => 20
+    default => 30

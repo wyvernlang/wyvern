@@ -123,7 +123,7 @@ public class ExnFromAST implements CoreASTVisitor {
 			if (decl instanceof DefDeclaration) {
 				List<Statement> bodyAST = getBodyAST(((DefDeclaration) decl).getBody());
 				Def e = new Def(decl.getName(), getParams(((DefDeclaration) decl).getArgBindings()), bodyAST);
-				if (((DefDeclaration) decl).isClassMember())
+				if (((DefDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
 					definitions.add(e);
@@ -137,7 +137,7 @@ public class ExnFromAST implements CoreASTVisitor {
 					expr = gen.getExpr();
 				ValDef e = new ValDef(decl.getName(), expr, decl.getType());
 				initializer.add(new Defn(e));
-				if (((ValDeclaration) decl).isClassMember())
+				if (((ValDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
 					definitions.add(e);
@@ -151,7 +151,7 @@ public class ExnFromAST implements CoreASTVisitor {
 					expr = gen.getExpr();
 				VarDef e = new VarDef(decl.getName(), expr, decl.getType());
 				initializer.add(new Defn(e));
-				if (((VarDeclaration) decl).isClassMember())
+				if (((VarDeclaration) decl).isClass())
 					classDefs.add(e);
 				else
 					definitions.add(e);

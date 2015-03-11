@@ -127,7 +127,7 @@ public class JavaField extends Declaration {
 	}
 
 	@Override
-	public boolean isClassMember() {
+	public boolean isClass() {
 		return isClass;
 	}
 }

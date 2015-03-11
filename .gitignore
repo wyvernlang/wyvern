@@ -3,7 +3,6 @@ bin
 tools/wyvern-tools.iml
 *.class
 *.prefs
-*~
 tools/.classpath
 tools/src/wyvern/tools/parsing/Wyvern.java
 tools/src/wyvern/tools/parsing/quotelang/WyvernQuote.java

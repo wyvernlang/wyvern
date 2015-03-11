@@ -2,7 +2,6 @@ package wyvern.tools.types;
 
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -62,14 +61,6 @@ public class Environment implements TreeWritable {
 		if (this.name.equals(name) && this.binding instanceof TypeBinding)
 			return (TypeBinding) binding;
 		return parentEnvironment.lookupType(name);
-	}
-	
-	public StaticTypeBinding lookupStaticType(String name) {
-		if (this.name == null)
-			return null;
-		if (this.name.equals(name) && this.binding instanceof StaticTypeBinding)
-			return (StaticTypeBinding) binding;
-		return parentEnvironment.lookupStaticType(name);
 	}
 
 	public Value getValue(String name) {
@@ -134,23 +125,5 @@ public class Environment implements TreeWritable {
 			return this.binding.toString();
 		else
 			return this.binding.toString() + ", " + parentEnvironment.toString();
-	}
-
-	public int size() {
-		if (parentEnvironment == null)
-			return 0;
-		else
-			return parentEnvironment.size()+1;
-	}
-
-	public LinkedList<String> getBoundNames() {
-		LinkedList<String> lst;
-		if (parentEnvironment != null) {
-			lst = parentEnvironment.getBoundNames();
-		} else {
-			lst = new LinkedList<>();
-		}
-		lst.addFirst(name);
-		return lst;
 	}
 }

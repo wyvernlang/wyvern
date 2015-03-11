@@ -89,19 +89,13 @@ public class Util {
 	public static Value toWyvObj(Object arg) {
 		if (arg instanceof JavaWyvObject)
 			return ((JavaWyvObject) arg).getInnerObj();
-		if (arg instanceof String)
-			return new StringConstant((String) arg);
+//		if (arg instanceof String)
+//			return new StringConstant((String) arg);
 		if (arg instanceof Integer)
 			return new IntegerConstant((Integer) arg);
-		if (arg instanceof Boolean)
-			return new BooleanConstant((Boolean) arg);
-
-
-		return javaToWyvObj(arg);
-	}
-
-	public static Value javaToWyvObj(Object arg) {
 		JavaClassDecl decl = getDecl(arg.getClass());
+
+
 		AtomicReference<Value> thisRef = new AtomicReference<>();
 		if (pregenerated.containsKey(arg)) {
 			return pregenerated.get(arg);

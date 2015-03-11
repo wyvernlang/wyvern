@@ -1,6 +1,5 @@
 package wyvern.tools.types.extensions;
 
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.SubtypeRelation;
@@ -33,11 +32,7 @@ public class TypeInv implements Type {
 			
 			// System.out.println("GOT: " + t);
 		}
-		TypeBinding fetched = ((RecordType) innerType).getInnerType(invName);
-
-		if (fetched.getMetadata().isPresent() && fetched.getMetadata().get().get() != null)
-			return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get());
-		else return fetched.getUse();
+		return ((RecordType)innerType).getInnerType(invName);
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.TupleValue;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -172,7 +171,7 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 			try {
 				Object result = m.getHandle().invokeWithArguments(jArgs);
 				if (result == null)
-					return UnitVal.getInstance(FileLocation.UNKNOWN);
+					return new Obj(Environment.getEmptyEnvironment());
 				return Util.toWyvObj(result);
 			} catch (Throwable throwable) {
 				throw new RuntimeException(throwable);

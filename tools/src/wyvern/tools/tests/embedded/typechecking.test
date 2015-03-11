@@ -1,10 +1,10 @@
-test typechecking1 [():Unit]
+test typechecking1 [():TYPE()]
 	module TestModule
 		type TestType
 			type TestTypeInner
 				def bar() : Int
 
-test typechecking2 [():Unit]
+test typechecking1 [():Unit]
 	module TestModule
 		type TestType
 			type TestTypeInner
@@ -13,18 +13,18 @@ test typechecking2 [():Unit]
 			type A
 				def create() : Int
 
-test typechecking3 [():Unit]
+test typechecking3 [():TYPE({create : Unit -> TYPE(Repeated)})]
 	module TestModule
 		type A
 			def create() : A
 
-test typechecking4 [():Unit]
+test typechecking4 [():TYPE()]
 	module TestModule
 		type M
 			type A
 				def create() : A
 
-test typechecking5 [():Unit]
+test typechecking5 [():TYPE()]
 	module TestModule
 		type M
 			class A

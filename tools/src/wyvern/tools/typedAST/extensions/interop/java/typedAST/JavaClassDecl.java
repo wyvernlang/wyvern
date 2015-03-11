@@ -2,24 +2,22 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.Reference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class JavaClassDecl extends ClassDeclaration {
@@ -64,7 +62,6 @@ public class JavaClassDecl extends ClassDeclaration {
 					sMap.put(m.getName(), list);
 			}
 
-			//Fields
             for (Field f : clazz.getFields()) {
 				Optional<MethodHandle> setter = Optional.empty();
 				if (!Modifier.isFinal(f.getModifiers()))
@@ -72,18 +69,6 @@ public class JavaClassDecl extends ClassDeclaration {
                 decls.add(new JavaField(f,lookup.unreflectGetter(f),setter));
             }
 
-			//Inner classes
-			for (Class c : clazz.getDeclaredClasses()) {
-				int modifiers = c.getModifiers();
-				if (!Modifier.isStatic(modifiers) ||
-						Modifier.isPrivate(modifiers) ||
-						Modifier.isProtected(modifiers) ||
-						Modifier.isAbstract(modifiers))
-					continue;
-				decls.add(new JavaClassDecl(c));
-			}
-
-			//Create real decls
 			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
@@ -115,32 +100,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public JavaClassDecl(Class clazz) {
 		super(clazz.getSimpleName(), "", "", null, FileLocation.UNKNOWN);
-		classMembersEnv.setSrc((oSrc) -> () -> {
-			initalize();
-
-			//Reset as part of initialization
-			return classMembersEnv.get();
-		});
 		this.clazz = clazz;
-
-		final Optional<Method> creator = Arrays.asList(getClazz().getDeclaredMethods()).stream()
-				.filter(meth-> Modifier.isStatic(meth.getModifiers()))
-				.filter(meth->meth.getName().equals("meta$get"))
-				.filter(meth -> meth.getParameterCount() == 0)
-				.findFirst();
-
-		if (creator.isPresent())
-				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<Value>() {
-					@Override
-					public Value get() {
-						try {
-							return Util.toWyvObj(creator.get().invoke(null));
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}
-				});
-
 	}
 
 
@@ -167,11 +127,6 @@ public class JavaClassDecl extends ClassDeclaration {
 		return decls;
 	}
 
-	public Obj getClassObj() {
-		initalize();
-		return new Obj(getClassEnv(Environment.getEmptyEnvironment()));
-	}
-
 	boolean initalized = false;
 	public void initalize() {
 		if (initalized)
@@ -179,7 +134,7 @@ public class JavaClassDecl extends ClassDeclaration {
 		initalized = true;
 		super.decls = getDecls(this.clazz);
 		Environment emptyEnvironment = Environment.getEmptyEnvironment();
-		super.classMembersEnv.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
+		super.declEnvRef.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
 		super.declEvalEnv = emptyEnvironment;
 		updateEnv();
 	}
@@ -199,30 +154,24 @@ public class JavaClassDecl extends ClassDeclaration {
 			objEnv = Environment.getEmptyEnvironment();
 		for (Declaration decl : this.getDecls().getDeclIterator()) {
 			if (decl instanceof JavaMeth) {
-				if (decl.isClassMember()) {
+				if (((JavaMeth) decl).isClass()) {
 					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
 				objEnv = decl.extend(objEnv, objEnv);
 			} else if (decl instanceof JavaField) {
-				if (decl.isClassMember()) {
+				if (((JavaField) decl).isClass()) {
 					declEnv = decl.extend(declEnv, declEnv);
 					continue;
 				}
 				objEnv = decl.extend(objEnv, objEnv);
-			} else if (decl instanceof JavaClassDecl) {
-				declEnv = decl.extend(declEnv, declEnv);
-				objEnv = decl.extend(objEnv, declEnv);
 			} else {
 				throw new RuntimeException();
 			}
 		}
-		getClassMembersEnv().set(declEnv);
-		setInstanceMembersEnv(objEnv);
+		getDeclEnvRef().set(declEnv);
+		setObjEnv(objEnv);
 		envDone = true;
-
-		//To generate class env
-		extendName(Environment.getEmptyEnvironment(), Environment.getEmptyEnvironment());
 	}
 
 	private static Method findHighestMethod(Class c, Method m) {
@@ -261,6 +210,11 @@ public class JavaClassDecl extends ClassDeclaration {
 	public Environment evaluateDeclarations(Environment addtlEnv) {
 		initalize();
 		return super.evaluateDeclarations(addtlEnv);
+	}
+
+	@Override
+	public Environment extendType(Environment env, Environment against) {
+		return super.extendType(env, against);
 	}
 
 	@Override

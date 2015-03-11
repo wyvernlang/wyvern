@@ -80,7 +80,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	
 
 	private boolean isClass;
-	public boolean isClassMember() {
+	public boolean isClass() {
 		return isClass;
 	}
 
