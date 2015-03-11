@@ -1,0 +1,12 @@
+//comprises requires at least 1 tagged type
+tagged class Dyn [comprises ]
+    class def create() : X             
+        new                            
+                                       
+tagged class DynInt [case of Dyn]      
+    class def create() : DynInt        
+        new                            
+                                       
+tagged class DynChar [case of Dyn]     
+    class def create() : DynChar       
+        new                            

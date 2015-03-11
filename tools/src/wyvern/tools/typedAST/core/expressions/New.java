@@ -76,10 +76,9 @@ public class New extends CachingTypedAST implements CoreAST {
 		
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
 
-		// System.out.println("classVarTypeBinding = " + classVarTypeBinding);
-
+		
 		if (classVarTypeBinding != null) { //In a class method
-			Environment declEnv = classVarTypeBinding.getClassDecl().getObjEnv();
+			Environment declEnv = classVarTypeBinding.getClassDecl().getInstanceMembersEnv();
 			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
 			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName()))), Optional.empty());
 
@@ -94,7 +93,7 @@ public class New extends CachingTypedAST implements CoreAST {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
 			}
-
+			
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
 			cls = classVarTypeBinding.getClassDecl();
 			ct = classVarType;
@@ -145,11 +144,14 @@ public class New extends CachingTypedAST implements CoreAST {
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
 
+		
+		
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
-		ClassDeclaration classDecl;
-		if (classVarTypeBinding != null)
-			classDecl = classVarTypeBinding.getClassDecl();
-		else {
+		ClassDeclaration classDecl;		
+		
+		if (classVarTypeBinding != null) {
+			classDecl = classVarTypeBinding.getClassDecl();	
+		} else {
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
 
@@ -164,7 +166,7 @@ public class New extends CachingTypedAST implements CoreAST {
 		Environment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
 		classDecl.evalDecl(evalEnv, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
 		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
-				reduce(env, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
+				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
 		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 		objRef.set(new Obj(objenv.extend(argValEnv)));
 		

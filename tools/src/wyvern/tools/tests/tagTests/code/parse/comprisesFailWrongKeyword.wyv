@@ -1,0 +1,12 @@
+//comprises shouldn't be capatilised
+tagged class Dyn [Comprises DynInt DynChar]
+    class def create() : X             
+        new                            
+                                       
+tagged class DynInt [case of Dyn]      
+    class def create() : DynInt        
+        new                            
+                                       
+tagged class DynChar [case of Dyn]     
+    class def create() : DynChar       
+        new                            

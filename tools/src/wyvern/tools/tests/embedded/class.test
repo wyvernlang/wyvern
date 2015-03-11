@@ -6,6 +6,15 @@ test classAndField[StringConstant("hello"):Str]
 	val h : Hello = Hello.make()
 	h.hiString
 
+test mutual[IntegerConstant(5):Int]
+	class A
+		class def create():A = new
+		def get():B = B.create()
+	class B
+		class def create():B = new
+		def get():A = A.create()
+	5
+
 test classAndMethod[IntegerConstant(9):Int]
 	class Hello
 		class def make():Hello = new

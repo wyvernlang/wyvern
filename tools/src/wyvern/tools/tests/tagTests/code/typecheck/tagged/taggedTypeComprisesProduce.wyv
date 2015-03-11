@@ -1,0 +1,26 @@
+tagged class Fruit [comprises Banana, Apple]
+    class def create() : Fruit
+        new  
+
+tagged class Banana [case of Fruit]
+    class def create() : Banana
+        new               
+
+tagged class Apple [case of Fruit]
+    class def create() : Apple
+        new 
+
+tagged class Vegetable [comprises Beans, Corn]
+    class def create() : Vegetable
+        new  
+ 
+tagged class Beans [case of Vegetable]
+    class def create() : Beans
+        new               
+
+tagged class Corn [case of Vegetable]
+    class def create() : Corn
+        new  
+
+
+15

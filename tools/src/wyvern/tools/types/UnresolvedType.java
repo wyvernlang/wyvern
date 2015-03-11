@@ -4,6 +4,8 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -41,7 +43,11 @@ public class UnresolvedType implements Type {
 			}
 			throw new RuntimeException("Cannot find "+typeName +" in environment "+env);
 		}
-		return env.lookupType(typeName).getUse();
+		TypeBinding typeBinding = env.lookupType(typeName);
+		if (typeBinding.getMetadata().isPresent() && typeBinding.getMetadata().get().get() != null)
+			return new MetadataWrapper(typeBinding.getUse(), typeBinding.getMetadata().get());
+		else
+			return typeBinding.getUse();
 	}
 	
 	@Override
@@ -74,5 +80,9 @@ public class UnresolvedType implements Type {
 	@Override
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		throw new RuntimeException("Cannot specify a ref type");
+	}
+
+	public String getName() {
+		return typeName;
 	}
 }

@@ -1,0 +1,5 @@
+//we repeat the tagged keyword
+tagged tagged class X
+    class def create() : X
+        new
+        
