@@ -1,0 +1,29 @@
+//tests that parsing of both [case of A] and [comprises ...] fail when
+//they are round the wrong way. [case of A] has to come before [comprises ...]
+
+tagged class Dyn [comprises DynNum, DynChar]
+    class def create() : X             
+        new                            
+           
+tagged class DynNum [comprises DynInt, DynDouble] [case of Dyn]        
+    class def create() : DynNum        
+        new         
+                                       
+tagged class DynInt [case of DynNum]      
+    class def create() : DynInt        
+        new                            
+
+tagged class DynDouble [case of DynNum]      
+    class def create() : DynDouble        
+        new                     
+                                       
+tagged class DynChar [case of Dyn]     
+    class def create() : DynChar       
+        new                            
+                                       
+val i = DynInt.create()                
+                                       
+match(i):                              
+   DynInt => 10
+   DynChar => 15
+   default => 15

@@ -1,0 +1,7 @@
+tagged class X
+    class def create() : X
+        new
+        
+tagged class Y
+    class def create() : Y
+        new

@@ -1,0 +1,38 @@
+//Javascript Object Hierarchy
+
+tagged class Navigator
+    class def create() : Navigator
+        new               
+
+
+tagged class MimeType [case of Navigator]
+    class def create() : MimeType
+        new
+
+tagged class Plugin [case of Navigator]
+    class def create() : Plugin
+        new
+        
+tagged class Window [case of Navigator]
+    class def create() : Window
+        new
+
+
+tagged class Frame [case of Window]
+    class def create() : Frame
+        new
+
+tagged class History [case of Window]
+    class def create() : History
+        new
+
+tagged class Location [case of Window]
+    class def create() : Location
+        new
+
+tagged class Document [case of Window]
+    class def create() : Document
+        new
+
+
+15

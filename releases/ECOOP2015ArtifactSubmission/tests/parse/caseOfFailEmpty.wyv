@@ -1,0 +1,8 @@
+tagged class Dyn
+    class def create() : Dyn
+        new
+
+//case of is empty
+tagged class DynInt [case of ]
+    class def create() : DynInt
+        new
