@@ -16,10 +16,44 @@ public class DynamicTagTests {
 	/**
 	 * This test ensures the dynamic tag example works properly.
 	 */
-	public void dynamicTagTest() {
+	public void dynamicTagTest() throws CopperParserException, IOException {
 		String program = TestUtil.readFile(PATH + "DynamicTags.wyv");
+		TypedAST ast = TestUtil.getAST(program);
 		
-		Assert.fail();
+		TestUtil.evaluateExpecting(ast, 42);
+	}
+	
+	@Test
+	/**
+	 * This test ensures the dynamic tag example works properly.
+	 */
+	public void dynamicTagsWindowTest() throws CopperParserException, IOException {
+		String program = TestUtil.readFile(PATH + "DynamicTagsWindow.wyv");
+		TypedAST ast = TestUtil.getAST(program);
+		
+		TestUtil.evaluateExpecting(ast, 42);
+	}
+	
+	@Test
+	/**
+	 * This test ensures the dynamic tag example works properly.
+	 */
+	public void dynamicTagsWindowPaperTest() throws CopperParserException, IOException {
+		String program = TestUtil.readFile(PATH + "DynamicTagsWindowPaper.wyv");
+		TypedAST ast = TestUtil.getAST(program);
+		
+		TestUtil.evaluateExpecting(ast, 42);
+	}
+	
+	@Test
+	/**
+	 * This test ensures the dynamic tag example works properly.
+	 */
+	public void dynamicTagsWindowSimpleTest() throws CopperParserException, IOException {
+		String program = TestUtil.readFile(PATH + "DynamicTagsWindowSimple.wyv");
+		TypedAST ast = TestUtil.getAST(program);
+		
+		TestUtil.evaluateExpecting(ast, 42);
 	}
 	
 	@Test
