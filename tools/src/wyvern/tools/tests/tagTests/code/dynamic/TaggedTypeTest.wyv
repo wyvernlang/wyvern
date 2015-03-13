@@ -19,15 +19,14 @@ tagged type IntJSON [case of NumJSON]
 tagged type DoubleJSON [case of NumJSON]
 	def value() : Int
 	
-
 def create() : IntJSON = new
     def value() : Int = 50
 
-val json = create()
+val json : JSON = create()
 
 match(json):
+    StrJSON => 20
     IntJSON => 25
     NumJSON => 10
     ObjJSON => 15
-    StrJSON => 20
     default => 30
