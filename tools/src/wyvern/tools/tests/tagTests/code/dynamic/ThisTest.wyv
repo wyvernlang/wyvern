@@ -1,7 +1,7 @@
 class A
     class def createA() : A = new
     def foo() : Int = 10 + this.hiddenFoo()
-    def hiddenFoo() : Int = 3
+    def hiddenFoo() : Int = 2
 
 def g() : A = new
     def foo() : Int = 10 + this.hiddenFoo()

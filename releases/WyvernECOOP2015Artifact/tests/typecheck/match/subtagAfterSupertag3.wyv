@@ -1,0 +1,29 @@
+tagged class A
+    class def create() : A
+        new               
+                          
+tagged class B [case of A]
+    class def create() : B
+        new               
+                          
+tagged class C [case of A]
+    class def create() : C
+        new               
+                          
+tagged class BA [case of B]
+    class def create() : BA
+        new            
+
+tagged class BB [case of B]
+    class def create() : BB
+        new            
+           
+val d : A = A.create()        
+                          
+match(d):      
+       B => 40
+       C => 15            //Error, this will catch the D just below
+       BB => 35
+       BA => 30            
+       A => 25
+       default => 10            

@@ -1,0 +1,37 @@
+tagged class JSON [comprises ValueJSON, ObjJSON, StrJSON, NumJSON]       
+    class def create() : JSON            
+        new                              
+                                         
+tagged class ValueJSON [case of JSON]
+    class def create() : ValueJSON       
+        new                              
+                                         
+tagged class ObjJSON [case of JSON]      
+    class def create() : ObjJSON         
+        new                              
+                                         
+tagged class StrJSON [case of JSON]      
+    class def create() : StrJSON         
+        new                              
+                                         
+tagged class NumJSON [case of JSON] [comprises IntJSON, DoubleJSON]   
+    class def create() : NumJSON         
+        new                              
+                                         
+tagged class IntJSON [case of NumJSON]   
+    class def create() : IntJSON         
+        new                              
+                                         
+tagged class DoubleJSON [case of NumJSON]
+    class def create() : DoubleJSON      
+        new                              
+
+val i : JSON = NumJSON.create()              
+                                  
+match(i):                         
+   ValueJSON => 25
+   ObjJSON => 20
+   StrJSON => 15
+   IntJSON => 12
+   NumJSON => 10
+   JSON => 5                  

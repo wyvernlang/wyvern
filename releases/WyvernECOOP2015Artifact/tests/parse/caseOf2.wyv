@@ -1,0 +1,19 @@
+tagged class Dyn
+    class def create() : X
+        new
+
+tagged class DynInt [case of Dyn]
+    class def create() : DynInt
+        new
+
+tagged class DynChar [case of Dyn]
+    class def create() : DynChar
+        new
+
+tagged class DynString [case of Dyn]
+    class def create() : DynString
+        new
+        
+tagged class DynUnicode [case of DynString]
+    class def create() : DynUnicode
+        new

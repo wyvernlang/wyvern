@@ -1,0 +1,19 @@
+tagged class Number
+    class def create() : Number
+        new
+    def getNum() : Int = 42
+        
+tagged class Name
+    class def create() : Name
+        new
+    def getName() :  String = "Hello, there"
+        
+tagged class TrueBoolean
+    class def create() : TrueBoolean
+        new
+    def getBool() : Bool = true
+        
+tagged class FalseBoolean
+    class def create() : FalseBoolean
+        new
+    def getBool() : Bool = false

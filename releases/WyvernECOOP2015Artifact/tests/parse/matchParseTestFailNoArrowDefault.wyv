@@ -1,0 +1,9 @@
+tagged class X
+    class def create() : X
+        new
+
+val x = X.create()
+
+//default does not have an arrow
+match (x)
+   default 15

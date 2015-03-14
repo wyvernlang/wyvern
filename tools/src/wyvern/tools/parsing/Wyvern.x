@@ -1,4 +1,3 @@
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -439,6 +438,8 @@ import java.net.URI;
     non terminal varStatement;
     non terminal defaultStatement;
     
+    non terminal identifier_with_dots_t;
+    
     non terminal taggedInfo;
     non terminal caseOf;
     non terminal comprises;
@@ -729,11 +730,11 @@ import java.net.URI;
    		|  e:el {: RESULT = el; :}
    		;
 
-   //complete match statement
+    // complete match statement
     matchStatement ::= matchKwd_t openParen_t term:id closeParen_t colon_t Indent_t caseStatements:stmts Dedent_t
             {: RESULT = new Match((TypedAST) id, (List<Case>) stmts, new FileLocation(currentState.pos)); :};
     
-    //group of 0 or more variable cases, followed by 0 or 1 default case
+    // group of 0 or more variable cases, followed by 0 or 1 default case
     caseStatements ::= varStatement:mstmt Newline_t caseStatements:rest {: 
                 List<Case> cases = new ArrayList<Case>(); 
                 cases.add((Case) mstmt); 
@@ -758,11 +759,16 @@ import java.net.URI;
             :}
           ;
     
-    //a single match case statement
-    varStatement ::= identifier_t:id arrow_t dsle:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
+    // identifier with dots
+    identifier_with_dots_t ::= identifier_t:id {: RESULT = (String) id; :}
+    	| identifier_t:id dot_t identifier_with_dots_t:rest {: RESULT = (String) id + "." + (String) rest; :}
+    	;
+    
+    // a single match case statement
+    varStatement ::= identifier_with_dots_t:id arrow_t dsle:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
           ;
     
-    //a default match statement
+    // a default match statement
     defaultStatement ::= defaultKwd_t arrow_t dsle:inner   {: RESULT = new Case((TypedAST) inner); :}
           ;
 
@@ -784,7 +790,7 @@ import java.net.URI;
           {: RESULT = tags; :}
           ;
           
-    //1 or more tags
+    // 1 or more tags
     listTags ::= singleTag:tag comma_t listTags:rest {: 
                     List<String> tags = new ArrayList<String>();
                     tags.add((String) tag);
@@ -800,9 +806,9 @@ import java.net.URI;
                  :}
                ;
                
-    //a single tag
-    singleTag ::= identifier_t:id {: RESULT = (String) id; :}
-                ;
+    // a single tag
+    singleTag ::= identifier_with_dots_t:id {: RESULT = (String) id; :}
+        ;
 
     // end hierarchical tags
 

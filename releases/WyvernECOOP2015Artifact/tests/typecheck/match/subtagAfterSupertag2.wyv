@@ -1,0 +1,22 @@
+tagged class A [comprises B, C]
+    class def create() : A
+        new               
+                          
+tagged class B [case of A]
+    class def create() : B
+        new               
+                          
+tagged class C [case of A]
+    class def create() : C
+        new               
+                          
+tagged class D [case of B]
+    class def create() : D
+        new               
+val d : A = A.create()        
+                          
+match(d):                 
+       C => 15            
+       B => 15            //Error, this will catch the D just below
+       D => 25            
+       A => 25            
