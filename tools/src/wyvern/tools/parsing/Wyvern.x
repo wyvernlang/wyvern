@@ -759,13 +759,8 @@ import java.net.URI;
             :}
           ;
     
-    // identifier with dots
-    identifier_with_dots_t ::= identifier_t:id {: RESULT = (String) id; :}
-    	| identifier_t:id dot_t identifier_with_dots_t:rest {: RESULT = (String) id + "." + (String) rest; :}
-    	;
-    
     // a single match case statement
-    varStatement ::= identifier_with_dots_t:id arrow_t dsle:inner {: RESULT = new Case((String) id, (TypedAST) inner); :}
+    varStatement ::= type:type arrow_t dsle:inner {: RESULT = new Case((Type) type, (TypedAST) inner); :}
           ;
     
     // a default match statement
@@ -774,14 +769,14 @@ import java.net.URI;
 
     // hierarchical tags
 
-    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((String)co, (List<String>) c); :}
-                 | caseOf:co             {: RESULT = new TaggedInfo((String) co); :}
-                 | comprises:co          {: RESULT = new TaggedInfo((List<String>) co); :}
+    taggedInfo ::= caseOf:co comprises:c {: RESULT = new TaggedInfo((Type)co, (List<Type>) c); :}
+                 | caseOf:co             {: RESULT = new TaggedInfo((Type) co); :}
+                 | comprises:co          {: RESULT = new TaggedInfo((List<Type>) co); :}
                  |              {: RESULT = new TaggedInfo(); :}
                  ;
     
     // [case of tag]
-    caseOf ::= oSquareBracket_t caseKwd_t ofKwd_t singleTag:tag cSquareBracket_t 
+    caseOf ::= oSquareBracket_t caseKwd_t ofKwd_t type:tag cSquareBracket_t 
             {: RESULT = tag; :}
             ;
     
@@ -791,24 +786,20 @@ import java.net.URI;
           ;
           
     // 1 or more tags
-    listTags ::= singleTag:tag comma_t listTags:rest {: 
-                    List<String> tags = new ArrayList<String>();
-                    tags.add((String) tag);
-                    tags.addAll((List<String>) rest);
+    listTags ::= type:tag comma_t listTags:rest {: 
+                    List<Type> tags = new ArrayList<Type>();
+                    tags.add((Type) tag);
+                    tags.addAll((List<Type>) rest);
                
                     RESULT = tags; 
                 :}
-               | singleTag:tag {: 
-                    List<String> tags = new ArrayList<String>();
-                    tags.add((String) tag);
+               | type:tag {: 
+                    List<Type> tags = new ArrayList<Type>();
+                    tags.add((Type) tag);
                     
                     RESULT = tags; 
                  :}
                ;
-               
-    // a single tag
-    singleTag ::= identifier_with_dots_t:id {: RESULT = (String) id; :}
-        ;
 
     // end hierarchical tags
 

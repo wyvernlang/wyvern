@@ -46,6 +46,15 @@ public class TestUtil {
 		Assert.assertEquals(expecting, v.toString());
 	}
 	
+	public static void evaluateExpecting(TypedAST ast, String value) {
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		Value v = ast.evaluate(Globals.getStandardEnv());
+		
+		String expecting = "StringConstant(\"" + value + "\")"; 
+
+		Assert.assertEquals(expecting, v.toString());
+	}
+
 	/**
 	 * Completely evaluates the given AST, and compares it to the given value.
 	 * Does typechecking first, then evaluation.

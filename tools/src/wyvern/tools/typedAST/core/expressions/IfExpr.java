@@ -14,6 +14,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.ArrayList;
@@ -205,6 +206,17 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 				lastType = clauseType;
 				continue;
 			}
+			
+			// FIXME:
+			// System.out.println("clauseType = " + clauseType);
+			// System.out.println("lastType = " + lastType);
+			if (clauseType instanceof MetadataWrapper) {
+				clauseType = ((MetadataWrapper) clauseType).getInner();
+			}
+			if (lastType instanceof MetadataWrapper) {
+				lastType = ((MetadataWrapper) lastType).getInner();
+			}
+						
 			if (!clauseType.subtype(lastType) && !lastType.subtype(clauseType)) {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, clause);
 			}

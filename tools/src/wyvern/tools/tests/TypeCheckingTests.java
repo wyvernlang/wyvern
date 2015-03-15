@@ -46,7 +46,7 @@ public class TypeCheckingTests {
 		
 		// System.out.println("typecheck returned: " + res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
+		Assert.assertEquals("TYPE()", res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString());
 		
 		// System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEnv()).toString());
 		

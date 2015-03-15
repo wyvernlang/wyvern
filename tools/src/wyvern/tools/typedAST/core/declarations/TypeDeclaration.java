@@ -69,12 +69,15 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 		return env.extend(nameBinding);
 	}
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+	
+	private TaggedInfo taggedInfo;
+
+	public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
     	this(name, decls, metadata, clsNameLine);
     	
-    	//this.taggedInfo = taggedInfo;
-		//this.taggedInfo.setTagName(name);
-		//this.taggedInfo.associateTag();
+		this.taggedInfo = taggedInfo;
+		this.taggedInfo.setTagName(name);
+		this.taggedInfo.associateWithClassOrType(this.typeBinding);
 	}
 	
     public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
@@ -127,7 +130,6 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Type doTypecheck(Environment env) {
 		Environment eenv = decls.extend(env, env);
-
 		
 		for (Declaration decl : decls.getDeclIterator()) {
 			decl.typecheckSelf(eenv);

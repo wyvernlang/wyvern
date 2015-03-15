@@ -17,6 +17,8 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.TreeWriter;
 
@@ -29,10 +31,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	Type definitionType;
 	NameBinding binding;
 	
+	Type declaredType;
+	String declaredTypeName;
+	
 	String variableName;
 	
-	private boolean staticallyTagged;
-	private String tagName;
+	private TaggedInfo ti;
 	
 	private boolean isClass;
 	public boolean isClassMember() {
@@ -48,19 +52,24 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
 		if (type instanceof UnresolvedType) {
 			UnresolvedType t = (UnresolvedType) type;
-			String typeName = t.getName();
 			
-			TaggedInfo tag = TaggedInfo.lookupTag(typeName);
+			// System.out.println("t = " + t);
 			
-			if (tag != null) {
+			TaggedInfo tag = TaggedInfo.lookupTagByType(t); // FIXME:
+			
+			// System.out.println("tag = " + tag);
+			
+			// if (tag != null) {
 				//doing a tagged type
-				staticallyTagged = true;
-				tagName = typeName;
+				ti = tag;
 				
 				variableName = name;
 				
+				declaredType = type; // Record this.
+				
 				type = null;
-			}
+			// }
+
 		}
 		
 		this.definition=definition;
@@ -82,6 +91,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			this.definitionType = this.definition.typecheck(env, Optional.ofNullable(resolved));
 		if (resolved == null)
 			resolved = definitionType;
+		
+		// FIXME:
+		// System.out.println(resolved);
+		if (resolved instanceof MetadataWrapper) {
+			resolved = ((MetadataWrapper) resolved).getInner();
+		}
 
 		binding = new NameBindingImpl(binding.getName(), resolved);
 		if (binding.getType() == null) {
@@ -89,6 +104,20 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		} else if (this.definitionType != null && !this.definitionType.subtype(resolved)){
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, this.definitionType.toString(), binding.getType().toString());
 		}
+		
+		// System.out.println("dt = " + declaredType);
+		
+		if (declaredType instanceof UnresolvedType) {
+			UnresolvedType ut = (UnresolvedType) declaredType;
+			//System.out.println(ut.getName());
+			this.declaredTypeName = ut.getName();
+			//System.out.println("ut =" + ((ClassType) ut.resolve(env)).getName());
+		}
+		
+		// System.out.println(((ClassType) resolvedDeclaredType).getName());
+		
+		// Update tag.
+		this.ti = TaggedInfo.lookupTagByType(resolved);
 		
 		return binding.getType();
 	}
@@ -120,7 +149,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment env = extendName(old, against);
 		if (variableName != null)
-			env = env.extend(new StaticTypeBinding(variableName, tagName));
+			env = env.extend(new StaticTypeBinding(variableName, this.declaredTypeName)); // FIXME:
 		
 		return env;
 	}

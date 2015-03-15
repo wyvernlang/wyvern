@@ -5,23 +5,104 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.MetadataWrapper;
+import wyvern.tools.types.extensions.TypeInv;
+
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
  * 
  * @author Troy Shaw
+ * @author Alex and Ben fixed it all up after merge in GIT failed :-)
  */
 public class TaggedInfo {
 
-	private static Map<String, TaggedInfo> globalTagStore = new HashMap<String, TaggedInfo>();
+	private static Map<TypeBinding, TaggedInfo> globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
 	private static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
 	
 	private String tagName;
+	private Type tagType;
 	
-	private String caseOf;
+	private Type caseOf;
 	private TaggedInfo caseOfTaggedInfo;
 	
-	private List<String> comprises;
+	private List<Type> comprises;
 	private List<TaggedInfo> comprisesTaggedInfos;
+	
+	
+	public void resolve(Environment env, HasLocation hl) {
+		if (this.tagType instanceof UnresolvedType) {
+			this.tagType = ((UnresolvedType) this.tagType).resolve(env);
+			if (this.tagType instanceof MetadataWrapper) {
+				// System.out.println("Caught one (tagType)!");
+				this.tagType = ((MetadataWrapper) this.tagType).getInner();
+			}
+		}
+		/*
+		if (this.tagType instanceof TypeInv) {
+			// System.out.println("FOUND tagType!" + tagType);
+			this.tagType = ((TypeInv) this.tagType).resolve(env);
+		}
+		*/
+		
+		if (this.caseOf != null && this.caseOf instanceof UnresolvedType) {
+			String name = ((UnresolvedType) this.caseOf).getName();
+			if (env.lookup(name) == null && env.lookupType(name) == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, hl, name);
+			}
+			
+			this.caseOf = ((UnresolvedType) this.caseOf).resolve(env);
+			if (this.caseOf instanceof MetadataWrapper) {
+				// System.out.println("Caught one (caseOf)!");
+				this.caseOf = ((MetadataWrapper) this.caseOf).getInner();
+			}
+		}
+		/*
+		if (this.caseOf != null && this.caseOf instanceof TypeInv) {
+			System.out.println("FOUND caseOf!" + caseOf);
+			((TypeInv) this.caseOf).resolve(env);
+			System.out.println("MADE caseOf!" + caseOf);
+		}
+		*/
+		if (caseOfTaggedInfo != null) caseOfTaggedInfo.resolve(env, hl);
+		
+		List<Type> resolvedComprises = new ArrayList<Type>(comprises.size());
+		for (Type t : comprises) {
+			if (t instanceof UnresolvedType) {
+				Type tt = ((UnresolvedType) t).resolve(env);
+				if (tt instanceof MetadataWrapper) {
+					// System.out.println("Caught one (tt)!");
+					tt = ((MetadataWrapper) tt).getInner();
+				}
+				resolvedComprises.add(tt);
+			} else {
+				// if (t instanceof ClassType)
+				//	System.out.println(((ClassType) t).getName());
+				resolvedComprises.add(t);
+			}
+			/*
+			if (t instanceof TypeInv) {
+				// System.out.println("FOUND comprises one!" + t);
+				Type tt = ((TypeInv) t).resolve(env);
+				resolvedComprises.add(tt);
+			}
+			*/
+		}
+		this.comprises = resolvedComprises;
+		if (comprisesTaggedInfos != null) {
+			for (TaggedInfo ti : comprisesTaggedInfos) {
+				ti.resolve(env, hl);
+			}
+		}
+	}
 	
 	
 	/**
@@ -36,7 +117,7 @@ public class TaggedInfo {
 	 * Constructs a TaggedInfo with the given caseOf, and no comprises.
 	 * @param caseOf
 	 */
-	public TaggedInfo(String caseOf) {
+	public TaggedInfo(Type caseOf) {
 		this(caseOf, null);
 	}
 	
@@ -44,7 +125,7 @@ public class TaggedInfo {
 	 * Constructs a TaggedInfo with the given comprises tags.
 	 * @param comprises
 	 */
-	public TaggedInfo(List<String> comprises) {
+	public TaggedInfo(List<Type> comprises) {
 		this(null, comprises);
 	}
 	
@@ -56,8 +137,8 @@ public class TaggedInfo {
 	 * @param caseOf
 	 * @param comprises
 	 */
-	public TaggedInfo(String caseOf, List<String> comprises) {		
-		if (comprises == null) comprises = new ArrayList<String>();
+	public TaggedInfo(Type caseOf, List<Type> comprises) {		
+		if (comprises == null) comprises = new ArrayList<Type>();
 		
 		this.caseOf = caseOf;
 		this.comprises = comprises;
@@ -79,6 +160,10 @@ public class TaggedInfo {
 	 */
 	public String getTagName() {
 		return tagName;
+	}
+	
+	public Type getTagType() {
+		return tagType;
 	}
 	
 	/**
@@ -104,7 +189,7 @@ public class TaggedInfo {
 	 * 
 	 * @return
 	 */
-	public String getCaseOfTag() {
+	public Type getCaseOfTag() {
 		return caseOf;
 	}
 	
@@ -114,13 +199,15 @@ public class TaggedInfo {
 	 * @return
 	 */
 	public boolean isCircular() {
-		TaggedInfo info = lookupTag(caseOf);
+		// FIXME: Should be using type bindings, not strings.
+		
+		TaggedInfo info = lookupTagByType(caseOf);
 		String myName = tagName;
 		
 		while (info != null) {	
 			if (info.tagName.equals(myName)) return true;
 			
-			info = lookupTag(info.caseOf);
+			info = lookupTagByType(info.caseOf);
 		}
 		
 		return false;
@@ -132,22 +219,23 @@ public class TaggedInfo {
 	 * 
 	 * @return
 	 */
-	public List<String> getComprisesTags() {
+	public List<Type> getComprisesTags() {
 		return comprises;
 	}
 	
-	public void associateWithClass(String className) {
-		tagName = className;
-		globalTagStore.put(tagName, this);
+	public void associateWithClassOrType(TypeBinding t) {
+		this.tagType = t.getType();
+		
+		globalTagStore.put(t, this);
 		globalTagStoreList.add(this);
 	}
 	
 	public static void clearGlobalTaggedInfos() {
-		globalTagStore = new HashMap<String, TaggedInfo>();
+		globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
 		globalTagStoreList = new ArrayList<TaggedInfo>();
 	}
 	
-	public static Map<String, TaggedInfo> getGlobalTagStore() {
+	public static Map<TypeBinding, TaggedInfo> getGlobalTagStore() {
 		return globalTagStore;
 	}
 	
@@ -163,15 +251,36 @@ public class TaggedInfo {
 		return globalTagStoreList;
 	}
 	
-	public static TaggedInfo lookupTag(String name) {
-		TaggedInfo info = globalTagStore.get(name);
+	public static TaggedInfo lookupTag(TypeBinding t) {
+		TaggedInfo info = globalTagStore.get(t);
 		
 		return info;
+	}
+	
+	public static TaggedInfo lookupTagByType(Type t) {
+		if (t == null) { return null; }
+		
+		// System.out.println(globalTagStoreList);
+		
+		for (TaggedInfo i : globalTagStoreList) {
+			if (t instanceof ClassType && i.tagType instanceof ClassType) {
+				ClassType ct = (ClassType) t;
+				ClassType cti = (ClassType) i.tagType;
+				
+				// System.out.println(cti.getName());
+				// System.out.println(ct.getName());
+			
+				if (ct.getName() != null && ct.getName().equals(i.getTagName())) return i; // FIXME:
+			}
+			
+			if (i.tagType.equals(t)) return i;
+		}
+		return null;
 	}
 
 	@Override
 	public String toString() {
-		return "TaggedInfo [tagName=" + tagName + ", caseOf=" + caseOf
+		return "TaggedInfo [tagName=" + tagName + ", tagType=" + tagType + ", caseOf=" + caseOf
 				+ ", caseOfTaggedInfo=" + caseOfTaggedInfo + ", comprises="
 				+ comprises + ", comprisesTaggedInfos=" + comprisesTaggedInfos
 				+ "]";

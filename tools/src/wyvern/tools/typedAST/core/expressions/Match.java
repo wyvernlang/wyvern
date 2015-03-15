@@ -12,6 +12,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -21,6 +22,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
@@ -43,7 +45,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	private FileLocation location;
 
 	public String toString() {
-		return "Match: " + matchingOver + " with " + cases.size() + " cases and default: " + defaultCase;
+		return "Match: " + matchingOver + " with " + cases + " cases and default: " + defaultCase;
 	}
 
 	public Match(TypedAST matchingOver, List<Case> cases, FileLocation location) {		
@@ -83,13 +85,18 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) { 
-		String className = getTypeName(matchingOver.getType());
+		TaggedInfo matchingOverTag = TaggedInfo.lookupTagByType(matchingOver.getType()); // FIXME:
 		
-		TaggedInfo matchingOverTag = TaggedInfo.lookupTag(className);
+		// System.out.println("Evaluating match over tag: " + matchingOverTag + " with matchingOver = " + matchingOver.getType());
+		if (matchingOver.getType() instanceof ClassType) {
+			ClassType ct = (ClassType) matchingOver.getType();
+			// System.out.println("hmm = " + this.matchingOver.typecheck(env, Optional.empty()));
+			// System.out.println("ct = " + ct.getName());
+		}
 		
 		for (Case c : cases) {
 			//String caseTypeName = getTypeName(c.getAST());
-			TaggedInfo caseTag = TaggedInfo.lookupTag(c.getTaggedTypeMatch());
+			TaggedInfo caseTag = TaggedInfo.lookupTagByType(c.getTaggedTypeMatch()); // FIXME:
 			
 			if (isSubtag(matchingOverTag, caseTag)) {
 				// We've got a match, evaluate this case
@@ -120,10 +127,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 		
 		if (matchingOverTag.equals(matchTargetTag)) return true;
 		
-		String matchingOverCaseOf = matchingOver.getCaseOfTag();
+		Type matchingOverCaseOf = matchingOver.getCaseOfTag();
 		
 		if (matchingOverCaseOf == null) return false;
-		else return isSubtag(TaggedInfo.lookupTag(matchingOverCaseOf), matchTarget);
+		else return isSubtag(TaggedInfo.lookupTagByType(matchingOverCaseOf), matchTarget); // FIXME:
 	}
 
 	@Override
@@ -163,44 +170,82 @@ public class Match extends CachingTypedAST implements CoreAST {
 		visitor.visit(this);
 	}
 
+	public void resolve(Environment env) {
+		if (this.defaultCase != null)
+			this.defaultCase.resolve(env, this);
+		
+		for (Case c : this.cases) {
+			c.resolve(env, this);
+		}
+	}
+	
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		this.resolve(env);
+		
 		Type matchOverType = matchingOver.typecheck(env, expected);
+		// System.out.println("env = " + env);
+		// System.out.println("matchingOver = " + matchingOver);
+		// System.out.println("matchOverType = " + matchOverType);
+		
+		if (matchOverType instanceof MetadataWrapper) {
+			matchOverType = ((MetadataWrapper) matchOverType).getInner(); // FIXME:
+		}
 		
 		if (!(matchingOver instanceof Variable)) {
 			throw new RuntimeException("Can only match over variable");
 		}
+		
+		// Variable v = (Variable) matchingOver;
+		// System.out.println("v = " + v);
+		// System.out.println("v.getType()=" + v.getType());
 
 		StaticTypeBinding staticBinding = getStaticTypeBinding(matchingOver, env);
 		
+		// System.out.println(staticBinding);
+		
+		/*
 		if (staticBinding == null) {
 			throw new RuntimeException("variable matching over must be statically tagged");
 		}
+		*/
 		
 		// Variable we're matching must exist and be a tagged type
-		String typeName = getTypeName(matchOverType);
+		// String typeName = getTypeName(matchOverType);
 
-		TaggedInfo matchTaggedInfo = TaggedInfo.lookupTag(staticBinding.getTypeName());
+		TaggedInfo matchTaggedInfo = TaggedInfo.lookupTagByType(matchOverType); // FIXME:
+		
+		// System.out.println(matchOverType);
 				
 		if (matchTaggedInfo == null) {
-			ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, typeName);
+			ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, matchOverType.toString());
 		}
+
+		// System.out.println(matchTaggedInfo);
+		matchTaggedInfo.resolve(env, this);
+		// System.out.println(matchTaggedInfo);
 		
 		checkNotMultipleDefaults();
 		
 		checkDefaultLast();		
 		
-		typecheckCases(env, expected);
+		Type returnType = typecheckCases(env, expected);
 
 		checkAllCasesAreTagged(env);
 		
 		checkAllCasesAreUnique();
 
 		checkSubtagsPreceedSupertags();
-			
-		checkBoundedAndUnbounded(matchTaggedInfo);
 
-		checkStaticSubtags(matchTaggedInfo);
+		// ONLY FOR STATICS FIXME:
+		// System.out.println(env);
+		if (staticBinding != null) {
+			NameBinding nb = env.lookup(staticBinding.getTypeName());
+			if (nb != null) {
+				checkStaticSubtags(TaggedInfo.lookupTagByType(nb.getType())); //matchTaggedInfo
+				checkBoundedAndUnbounded(TaggedInfo.lookupTagByType(nb.getType())); //matchTaggedInfo
+			}
+		}
 		
 		
 		// If we've omitted default, we must included all possible sub-tags
@@ -224,7 +269,22 @@ public class Match extends CachingTypedAST implements CoreAST {
 			}
 		}
 		
-		return Unit.getInstance();
+		// System.out.println(expected);
+		
+		if (returnType == null) {
+			if (defaultCase != null) {
+				if (!expected.equals(Optional.empty())) {
+					// System.out.println(defaultCase.getAST().getType());
+					// System.out.println(expected.get());
+					if (!expected.get().equals(defaultCase.getAST().getType())) {
+						ToolError.reportError(ErrorMessage.MATCH_NO_COMMON_RETURN, this);
+						return null;
+					}
+				}
+			}
+		}
+		
+		return returnType;
 	}
 
 	/**
@@ -256,11 +316,32 @@ public class Match extends CachingTypedAST implements CoreAST {
 		}
 	}
 	
-	private void typecheckCases(Environment env, Optional<Type> expected) {
+	private Type typecheckCases(Environment env, Optional<Type> expected) {
+		Type commonType = null;
 		//do actual type-checking on cases
-				for (Case c : cases) {
-					c.getAST().typecheck(env, expected);
-				}
+		for (Case c : cases) {
+			Type rt = c.getAST().typecheck(env, expected);
+			// System.out.println("rt = " + rt);
+			if (commonType == null) commonType = rt;
+			if (!rt.equals(commonType)) {
+				// System.out.println("WARNING: rt = " + rt + " and commonType = " + commonType);
+				ToolError.reportError(ErrorMessage.MATCH_NO_COMMON_RETURN, this);
+				return null;
+			}
+		}
+		
+		if (expected.equals(Optional.empty())) {
+			return commonType;
+		} else {
+			// System.out.println("expected = " + expected);
+			// System.out.println("commonType = " + commonType);
+			if (commonType == null || expected.equals(commonType)) {
+				return commonType;
+			} else {
+				ToolError.reportError(ErrorMessage.MATCH_NO_COMMON_RETURN, this);
+				return null;
+			}
+		}
 	}
 	
 	private void checkAllCasesAreTagged(Environment env) {
@@ -268,20 +349,22 @@ public class Match extends CachingTypedAST implements CoreAST {
 		for (Case c : cases) {
 			if (c.isDefault()) continue;
 			
-			String tagName = c.getTaggedTypeMatch();
+			Type tagName = c.getTaggedTypeMatch();
+			
+			// System.out.println(tagName);
 			
 			//check type exists
-			TypeBinding type = env.lookupType(tagName);
+			// TypeBinding type = env.lookupType(tagName.toString()); // FIXME:
 			
-			if (type == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, tagName);
-			}
+			// if (type == null) {
+			//	ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, tagName.toString());
+			// }
 			
 			//check it is tagged
-			TaggedInfo info = TaggedInfo.lookupTag(tagName);
+			TaggedInfo info = TaggedInfo.lookupTagByType(tagName); // FIXME:
 			
 			if (info == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, tagName);
+				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchingOver, tagName.toString());
 			}
 		}
 		
@@ -289,7 +372,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	
 	private void checkAllCasesAreUnique() {
 		// All tagged types must be unique
-		Set<String> caseSet = new HashSet<String>();				
+		Set<Type> caseSet = new HashSet<Type>();				
 				
 		for (Case c : cases) {
 			if (c.isTyped()) caseSet.add(c.getTaggedTypeMatch());
@@ -304,14 +387,14 @@ public class Match extends CachingTypedAST implements CoreAST {
 		//A tag cannot be earlier than one of its subtags
 		for (int i = 0; i < cases.size() - 1; i++) {
 			Case beforeCase = cases.get(i);
-			TaggedInfo beforeTag = TaggedInfo.lookupTag(beforeCase.getTaggedTypeMatch());
+			TaggedInfo beforeTag = TaggedInfo.lookupTagByType(beforeCase.getTaggedTypeMatch()); // FIXME:
 			
 			for (int j = i + 1; j < cases.size(); j++) {
 				Case afterCase = cases.get(j);
 				
 				if (afterCase.isDefault()) break;
 				
-				TaggedInfo afterTag = TaggedInfo.lookupTag(afterCase.getTaggedTypeMatch());
+				TaggedInfo afterTag = TaggedInfo.lookupTagByType(afterCase.getTaggedTypeMatch()); // FIXME:
 				//TagBinding afterBinding = TagBinding.get(afterCase.getTaggedTypeMatch());
 				
 				if (isSubtag(afterTag, beforeTag)) {
@@ -322,6 +405,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 	
 	private void checkBoundedAndUnbounded(TaggedInfo matchTaggedInfo) {
+
 		// If we're an unbounded type, check default exists
 		if (!matchTaggedInfo.hasComprises()) {
 			if (defaultCase == null) {
@@ -354,7 +438,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 */
 	private void checkStaticSubtags(TaggedInfo matchingOver) {
 		for (Case c : cases) {
-			TaggedInfo matchTarget = TaggedInfo.lookupTag(c.getTaggedTypeMatch());
+			TaggedInfo matchTarget = TaggedInfo.lookupTagByType(c.getTaggedTypeMatch()); // FIXME:
 			
 			if (!isSubtag(matchTarget, matchingOver)) {
 				ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, this.matchingOver, matchingOver.getTagName(), matchTarget.getTagName());
@@ -375,13 +459,13 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 	
 	private boolean comprisesSatisfied(TaggedInfo matchBinding) {
-		List<String> comprisesTags = matchBinding.getComprisesTags();
+		List<Type> comprisesTags = matchBinding.getComprisesTags();
 		
 		//add this tag because it needs to be included too
-		comprisesTags.add(matchBinding.getTagName());
+		comprisesTags.add(matchBinding.getTagType());
 		
 		//check that each tag is present 
-		for (String t : comprisesTags) {
+		for (Type t : comprisesTags) {
 			if (containsTagBinding(cases, t)) continue;
 			
 			//tag wasn't present
@@ -400,25 +484,13 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 * @param binding
 	 * @return
 	 */
-	private boolean containsTagBinding(List<Case> cases, String tagName) {
-		for (Case c : cases) {
+	private boolean containsTagBinding(List<Case> cases, Type tagName) {
+		for (Case c : cases) {			
 			//Found a match, this tag is present
 			if (c.getTaggedTypeMatch().equals(tagName)) return true;
 		}
 
 		return false;
-	}
-
-	private String getTypeName(Type type) {
-		if (type instanceof ClassType) {
-			ClassType matchingOverClass = (ClassType) matchingOver.getType();
-			return matchingOverClass.getName();
-		} else if (type instanceof TypeType) {
-			TypeType matchingOverClass = (TypeType) matchingOver.getType();
-			return matchingOverClass.getName();
-		}
-		
-		return null;
 	}
 	
 	@Override

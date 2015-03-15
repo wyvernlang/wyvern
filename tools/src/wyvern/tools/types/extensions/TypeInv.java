@@ -32,12 +32,26 @@ public class TypeInv implements Type {
 			Type t = ut.resolve(env);
 			
 			// System.out.println("GOT: " + t);
+			
+			if (t instanceof MetadataWrapper) {
+				t = ((MetadataWrapper) t).getInner();
+			}
+			
+			// System.out.println("OUT: " + t);
+			
+			// return t; // FIXME:
 		}
-		TypeBinding fetched = ((RecordType) innerType).getInnerType(invName);
+		
+		// if (innerType instanceof RecordType) {
+			TypeBinding fetched = ((RecordType) innerType).getInnerType(invName);
 
-		if (fetched.getMetadata().isPresent() && fetched.getMetadata().get().get() != null)
-			return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get());
-		else return fetched.getUse();
+			if (fetched.getMetadata().isPresent() && fetched.getMetadata().get().get() != null)
+				return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get());
+			else return fetched.getUse();
+		// }
+		
+		// System.out.println("Note: returning plain innertype in TypeInv!");
+		// return this.innerType; // FIXME:
 	}
 
 	@Override

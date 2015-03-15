@@ -249,7 +249,7 @@ public class TypeCheckMatch {
 		try {
 			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		} catch (ToolError toolError) {
-			toolError.printStackTrace();
+			// toolError.printStackTrace(); // FIXME:
 			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
 			
 			return;
@@ -379,7 +379,8 @@ public class TypeCheckMatch {
 		try {
 			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		} catch (ToolError toolError) {
-			Assert.fail("Should have succeeded");
+			// toolError.printStackTrace();
+			Assert.fail("Should have succeeded (but: " + toolError.getMessage() + ").");
 		}
 	}
 	/**

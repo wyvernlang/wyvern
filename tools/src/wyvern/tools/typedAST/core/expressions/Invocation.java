@@ -40,7 +40,12 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+		// System.out.println("env = " + env);
+		// System.out.println("receiver = "  + receiver + " : "+ receiver.getClass());
+		
 		Type receiverType = receiver.typecheck(env, Optional.empty());
+		
+		// System.out.println("receiverType = " + receiverType);
 		
 		if (argument != null)
 			argument.typecheck(env, Optional.empty());

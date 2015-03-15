@@ -33,6 +33,12 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	public Type checkApplication(Application application, Environment env) {
 		Type actualType = application.getArgument().typecheck(env, Optional.of(argument));
 		argument = TypeResolver.resolve(argument, env);
+		
+		// System.out.println(argument); //FIXME:
+		if (argument instanceof MetadataWrapper) {
+			argument = ((MetadataWrapper) argument).getInner();
+		}
+		
 		if (!actualType.subtype(argument))
 			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application,actualType.toString(),argument.toString());
 		return result;

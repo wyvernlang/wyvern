@@ -63,12 +63,19 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		String opName = opExp.getOperationName();
 
 		NameBinding m = typeDeclEnv.get().lookup(opName);
-
-		if (m == null)
+		TypeBinding t = typeDeclEnv.get().lookupType(opName);
+		
+		// Accessing type members should be OK!!! // FIXME:
+		if (m == null && t == null)
 			throw new RuntimeException("Invalid operation "+opName+" on type " + this);
 		
 		// TODO Auto-generated method stub
-		return m.getType();
+		
+		if (m != null) {
+			return m.getType();
+		} else {
+			return t.getType();
+		}
 	}
 	
 	public Map<String, Type> getMembers() {

@@ -43,6 +43,7 @@ public enum ErrorMessage {
 	SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG: unreachable case", 2),
 	UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
 	UNMATCHABLE_CASE("A variable of tag-type %ARG cannot possibly match against case %ARG", 2),
+	MATCH_NO_COMMON_RETURN("Match statement does not have a common return type", 0),
 	
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

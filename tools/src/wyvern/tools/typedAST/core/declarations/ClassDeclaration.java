@@ -21,6 +21,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.Pair;
@@ -81,8 +82,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			FileLocation location) {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 		
+		// System.out.println("Creating class declaration for: " + name + " with decls " + decls);
+		
 		this.taggedInfo = taggedInfo;
-		this.taggedInfo.associateWithClass(name);
+		this.taggedInfo.setTagName(name);
+		this.taggedInfo.associateWithClassOrType(this.typeBinding);
 	}
 	
 	public ClassDeclaration(String name,
@@ -218,55 +222,66 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 	
 	private void typecheckTags(Environment env) {
-		String myTagName = taggedInfo.getTagName();
+		taggedInfo.resolve(env, this);
+		
+		// System.out.println("CURRENT ti = " + taggedInfo);
+		
+		Type myTagType = taggedInfo.getTagType();
 		
 		if (taggedInfo.hasCaseOf()) {
-			String caseOfName = taggedInfo.getCaseOfTag();
+			Type caseOfType = taggedInfo.getCaseOfTag();
+			
+			// System.out.println("caseOfType = " + caseOfType);
+			// System.out.println("TaggedInfo Global Store Current State = " + TaggedInfo.getGlobalTagStore());
 			
 			//check the type is tagged
-			TaggedInfo info = TaggedInfo.lookupTag(caseOfName);
-			if (info == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfName);
-			}
-			
-			//now check circular relationship has not been created
-			if (taggedInfo.isCircular()) {
-				ToolError.reportError(ErrorMessage.CIRCULAR_TAGGED_RELATION, this, taggedInfo.getTagName(), caseOfName);
+			if (!(caseOfType instanceof TypeInv)) { // If it is TypeInv - we won't know till runtime! 
+				TaggedInfo info = TaggedInfo.lookupTagByType(caseOfType);
+				//System.out.println("Looked up: " + info);
+				
+				if (info == null) {
+					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfType.toString());
+				}
+				
+				//now check circular relationship has not been created
+				if (taggedInfo.isCircular()) {
+					ToolError.reportError(ErrorMessage.CIRCULAR_TAGGED_RELATION, this, taggedInfo.getTagName(), caseOfType.toString());
+				}
 			}
 		}
 		
 		if (taggedInfo.hasComprises()) {
-			List<String> comprisesTags = taggedInfo.getComprisesTags();
+			List<Type> comprisesTags = taggedInfo.getComprisesTags();
 			
 			//first check that every comprises tag actually is a case-of of this
-			for (String s : comprisesTags) {
-				TaggedInfo info = TaggedInfo.lookupTag(s);
+			for (Type s : comprisesTags) {				
+				TaggedInfo info = TaggedInfo.lookupTagByType(s); // FIXME:
 				
 				//check it exists
 				if (info == null) {
-					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, s);
+					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, s.toString());
 				}
 				
 				//then check it is a case-of
-				String comprisesCaseOfName = info.getCaseOfTag();
-				if (!myTagName.equals(comprisesCaseOfName)) {
+				Type comprisesCaseOfName = info.getCaseOfTag();
+				if (!myTagType.equals(comprisesCaseOfName)) {
 					ToolError.reportError(ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED, this);
 				}
 			}
 
 			//now check every other case-of does not case-of this tag
 			for (TaggedInfo info : TaggedInfo.getGlobalTagStoreList()) {
-				String othersName = info.getTagName();
-				String caseOf = info.getCaseOfTag();
+				Type othersType = info.getTagType();
+				Type caseOf = info.getCaseOfTag();
 				
 				//if tag is ourselves, or one of our comprises, skip it
-				if (othersName.equals(myTagName) || comprisesTags.contains(othersName)) {
+				if (othersType.equals(myTagType) || comprisesTags.contains(othersType)) {
 					continue;
 				}
 				
 				//now if the other tag 'case-of's is this, it is an error
-				if (myTagName.equals(caseOf)) {
-					ToolError.reportError(ErrorMessage.COMPRISES_EXCLUDES_TAG, this, myTagName, info.getTagName());
+				if (myTagType.equals(caseOf)) {
+					ToolError.reportError(ErrorMessage.COMPRISES_EXCLUDES_TAG, this, myTagType.toString(), info.getTagType().toString());
 				}
 			}
 		}

@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -45,7 +46,15 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
+		// System.out.println("In variable: " + binding.getName() + ":" + getType());
+		
 		Type type = getType();
+		
+		if (type instanceof TypeType) {
+			TypeType tt = (TypeType) type;
+			// System.out.println("tt = " + tt.getName());
+		}
+		
 		if (type == null) {
 			String name = binding.getName();
 			binding = env.lookup(name);

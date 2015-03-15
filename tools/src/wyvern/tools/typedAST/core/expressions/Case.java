@@ -1,16 +1,35 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 
 public class Case {
 	
-	private String taggedTypeName;
+	public void resolve(Environment env, Match m) {
+		if (taggedType instanceof UnresolvedType) {
+			String name = ((UnresolvedType) taggedType).getName();
+			if (env.lookup(name) == null && env.lookupType(name) == null) {
+				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, m, name);
+			}
+			
+			this.taggedType = ((UnresolvedType) taggedType).resolve(env);
+		}
+	}
+	
+	private Type taggedType;
 	
 	private TypedAST ast;
 	
 	public String toString() {
-		return "Case " + taggedTypeName + " with expression: " + ast;
+		if (taggedType != null)
+			return "Case " + taggedType.toString() + " with expression: " + ast;
+		else
+			return "Case with null taggedType and ast = " + ast;
 	}
 	
 	//TODO refactor this class into two classes for each type?
@@ -23,8 +42,8 @@ public class Case {
 	 * @param caseType
 	 * @param decls
 	 */
-	public Case(String taggedTypeName, TypedAST ast) {
-		this.taggedTypeName = taggedTypeName;
+	public Case(Type taggedType, TypedAST ast) {
+		this.taggedType = taggedType;
 		this.ast = ast;
 		
 		caseType = CaseType.TYPED;
@@ -41,8 +60,8 @@ public class Case {
 		caseType = CaseType.DEFAULT;
 	}
 	
-	public String getTaggedTypeMatch() {
-		return taggedTypeName;
+	public Type getTaggedTypeMatch() {
+		return taggedType;
 	}
 	
 	public TypedAST getAST() {

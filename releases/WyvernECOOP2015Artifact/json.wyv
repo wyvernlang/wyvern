@@ -37,5 +37,4 @@ match(json):
    NumJSON => 10                           
    ObjJSON => 15                          
    StrJSON => 20                           
-   default => 30                         
-  
+   default => 30
