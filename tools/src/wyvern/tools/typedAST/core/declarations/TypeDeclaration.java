@@ -64,6 +64,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Environment extendName(Environment env, Environment against) {
 		if (!declGuard) {
 			declEnv.set(decls.extendName(declEnv.get(), against.extend(typeBinding)));
+			//declEnv.set(decls.extend(declEnv.get(), against.extend(typeBinding)));
 			declGuard = true;
 		}
 

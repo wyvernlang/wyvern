@@ -1,9 +1,10 @@
 package wyvern.tools;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
@@ -17,20 +18,20 @@ import wyvern.tools.util.TreeWriter;
 public class Interpreter {
 
 	public static void main(String[] args) {
-		if (args.length < 1) {
+		if (args.length != 1) {
 			System.err.println("usage: wyvern <filename>");
 			System.exit(-1);
 		}
 
 		String filename = args[0];
-		File file = new File(filename);
-		if (!file.canRead()) {
+		Path file = Paths.get(filename);
+		if (!Files.isReadable(file)) {
 			System.err.println("Cannot read file " + filename);
 			System.exit(-1);
 		}
 		
 		try {
-			Reader reader = new FileReader(file);
+			StringReader reader = new StringReader(new String(Files.readAllBytes(file), Charset.forName("UTF-8")) + "\n");
 			TypedAST res = (TypedAST) new Wyvern().parse(reader, filename);
 			res.typecheck(Globals.getStandardEnv(), Optional.empty());
 			res = new DSLTransformer().transform(res);

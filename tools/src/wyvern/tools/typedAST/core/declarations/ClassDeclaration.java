@@ -475,12 +475,13 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	boolean envGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		
+
 		TypeBinding objBinding = new LateTypeBinding(nameBinding.getName(), this::getObjectType);
 
 		if (!envGuard && decls != null) {
 			classMembersEnv.set(Environment.getEmptyEnvironment());
 			for (Declaration decl : decls.getDeclIterator()) {
+				instanceMembersEnv.set(decl.extendType(instanceMembersEnv.get(), against.extend(objBinding)));
 				if (decl.isClassMember())
 					classMembersEnv.set(decl.extendName(classMembersEnv.get(), against.extend(objBinding)));
 				else
@@ -488,6 +489,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 			envGuard = true;
 		}
-		return env;
+		return env.extend(nameBinding);
 	}
 }

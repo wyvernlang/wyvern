@@ -67,7 +67,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				
 				declaredType = type; // Record this.
 				
-				type = null;
+				//type = null;
 			// }
 
 		}
@@ -101,7 +101,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		binding = new NameBindingImpl(binding.getName(), resolved);
 		if (binding.getType() == null) {
 			this.binding = new NameBindingImpl(binding.getName(), resolved);
-		} else if (this.definitionType != null && !this.definitionType.subtype(resolved)){
+		} else if (this.definitionType != null &&
+				!this.definitionType.subtype(resolved)){
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, this.definitionType.toString(), binding.getType().toString());
 		}
 		
@@ -111,9 +112,13 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			UnresolvedType ut = (UnresolvedType) declaredType;
 			//System.out.println(ut.getName());
 			this.declaredTypeName = ut.getName();
+			declaredType = ((UnresolvedType) declaredType).resolve(env);
 			//System.out.println("ut =" + ((ClassType) ut.resolve(env)).getName());
 		}
-		
+
+		if (definitionType != null && declaredType != null && !definitionType.subtype(declaredType))
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, definitionType.toString(), declaredType.toString());
+
 		// System.out.println(((ClassType) resolvedDeclaredType).getName());
 		
 		// Update tag.

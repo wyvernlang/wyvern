@@ -52,7 +52,7 @@ public class TypeDeclUtils {
 				continue;
 			}
 			
-			if (b.getType() instanceof TypeType) {
+			if (b.getType() instanceof TypeType || b.getType() instanceof ClassType) {
 				tev = tev.extend(b);
 				continue;
 			}

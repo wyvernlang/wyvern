@@ -85,7 +85,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			Environment environment = seq.extendType(declEnv, declEnv.extend(env));
 			environment = seq.extendName(environment, environment.extend(env));
-			Environment nnames = seq.extend(environment, environment);
+			Environment nnames = environment;//seq.extend(environment, environment);
 
 			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(declEnv));
 			Type classVarType = new ClassType(new Reference<>(nnames.extend(declEnv)), new Reference<>(objTee), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName());
@@ -117,7 +117,10 @@ public class New extends CachingTypedAST implements CoreAST {
 			LinkedList<Declaration> decls = new LinkedList<>();
 
 			mockEnv = getGenericDecls(env, mockEnv, decls);
-			Environment nnames = (seq.extendName(mockEnv,mockEnv.extend(env)));
+
+			Environment nnames = (seq.extendType(mockEnv, mockEnv.extend(env)));
+			nnames = (seq.extendName(nnames,mockEnv.extend(env)));
+			//nnames = seq.extend(nnames, mockEnv.extend(env));
 
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
 			cls = classDeclaration;

@@ -11,15 +11,30 @@ import static wyvern.tools.tests.tagTests.TestUtil.evaluateExpecting;
 public class ExecuteTagTests {
 	
 	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/execute/";
-	
+
 	@Test
-	public void basic1() throws CopperParserException, IOException {		
+	public void basic1() throws CopperParserException, IOException {
 		String input = readFile("basic1.wyv");
 
 		TypedAST ast = getAST(input);
 		evaluateExpecting(ast, 15);
 	}
-	
+
+	@Test
+	public void window() throws CopperParserException, IOException {
+		String input = readFile("../borderedwindow.wyv");
+
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 15);
+	}
+	@Test
+	public void cdt() throws CopperParserException, IOException {
+		String input = readFile("../classdeftest.wyv");
+
+		TypedAST ast = getAST(input);
+		evaluateExpecting(ast, 15);
+	}
+
 	@Test
 	public void basic2() throws CopperParserException, IOException {		
 		String input = readFile("basic2.wyv");

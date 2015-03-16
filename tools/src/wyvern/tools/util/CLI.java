@@ -16,6 +16,10 @@ import java.util.Optional;
 
 public class CLI {
 	public static void main(String[] args) throws IOException, CopperParserException {
+		if (args.length < 1) {
+			throw new RuntimeException("Usage: wyvern <filename>");
+		}
+
 		File file = new File(args[0]);
 		if (!file.canRead())
 			throw new RuntimeException("Cannot read main file!");
