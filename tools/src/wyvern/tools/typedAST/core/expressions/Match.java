@@ -21,8 +21,10 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.MetadataWrapper;
+import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
@@ -85,7 +87,15 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(Environment env) { 
-		TaggedInfo matchingOverTag = TaggedInfo.lookupTagByType(matchingOver.getType()); // FIXME:
+		TaggedInfo.resolveAll(env, this);
+		
+		Type mo = matchingOver.getType();
+		
+		if (mo instanceof MetadataWrapper) {
+			mo = ((MetadataWrapper) mo).getInner();
+		}
+			
+		TaggedInfo matchingOverTag = TaggedInfo.lookupTagByType(mo); // FIXME:
 		
 		// System.out.println("Evaluating match over tag: " + matchingOverTag + " with matchingOver = " + matchingOver.getType());
 		if (matchingOver.getType() instanceof ClassType) {
@@ -95,16 +105,34 @@ public class Match extends CachingTypedAST implements CoreAST {
 		}
 		
 		for (Case c : cases) {
-			//String caseTypeName = getTypeName(c.getAST());
-			TaggedInfo caseTag = TaggedInfo.lookupTagByType(c.getTaggedTypeMatch()); // FIXME:
+			// String caseTypeName = getTypeName(c.getAST());
+			
+			// System.out.println("case = " + c);
+			
+			Type tt = c.getTaggedTypeMatch();
+			
+			// System.out.println("case type = " + tt);
+			
+			if (tt instanceof TypeInv) {
+				TypeInv ti = (TypeInv) tt;
+				// System.out.println("ti = " + ti.resolve(env));
+				tt = ti.resolve(env);
+			}
+			
+			TaggedInfo caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
+			
+			// System.out.println("caseTag = " + caseTag);
+			// System.out.println("matchingOverTag = " + matchingOverTag);
 			
 			if (isSubtag(matchingOverTag, caseTag)) {
 				// We've got a match, evaluate this case
+				// System.out.println("MAAAAATTTCH!");
 				return c.getAST().evaluate(env);
 			}
 		}
 		
 		// No match, evaluate the default case
+		// System.out.println("DEFAULT: " + defaultCase.getAST().evaluate(env));
 		return defaultCase.getAST().evaluate(env);
 	}
 	
@@ -335,7 +363,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 		} else {
 			// System.out.println("expected = " + expected);
 			// System.out.println("commonType = " + commonType);
-			if (commonType == null || expected.equals(commonType)) {
+			if (commonType == null || /*expected.equals(commonType) ||*/ expected.get().equals(commonType)) {
 				return commonType;
 			} else {
 				ToolError.reportError(ErrorMessage.MATCH_NO_COMMON_RETURN, this);
@@ -350,6 +378,21 @@ public class Match extends CachingTypedAST implements CoreAST {
 			if (c.isDefault()) continue;
 			
 			Type tagName = c.getTaggedTypeMatch();
+			
+			if (tagName instanceof UnresolvedType) {
+				UnresolvedType ut = (UnresolvedType) tagName;
+				// System.out.println("ut = " + ut.resolve(env));
+			}
+			
+			if (tagName instanceof TypeInv) {
+				TypeInv ti = (TypeInv) tagName;
+				// System.out.println("ti = " + ti.resolve(env));
+				tagName = ti.resolve(env);
+				if (tagName instanceof UnresolvedType) {
+					tagName = ((UnresolvedType) tagName).resolve(env);
+				}
+				return; // FIXME: Assume TypeInv will sort itself out during runtime.
+			}
 			
 			// System.out.println(tagName);
 			

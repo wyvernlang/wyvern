@@ -86,7 +86,7 @@ public class DynamicTagTests {
 		String program = TestUtil.readFile(PATH + "DynamicTagsWindowPaper.wyv");
 		TypedAST ast = TestUtil.getAST(program);
 		
-		TestUtil.evaluateExpecting(ast, 42);
+		TestUtil.evaluateExpecting(ast, "big");
 	}
 	
 	@Test

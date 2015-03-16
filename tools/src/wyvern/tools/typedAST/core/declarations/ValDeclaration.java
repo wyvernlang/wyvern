@@ -115,6 +115,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			declaredType = ((UnresolvedType) declaredType).resolve(env);
 			//System.out.println("ut =" + ((ClassType) ut.resolve(env)).getName());
 		}
+		
+		if (declaredType instanceof MetadataWrapper) {
+			declaredType = ((MetadataWrapper) declaredType).getInner();
+		}
 
 		if (definitionType != null && declaredType != null && !definitionType.subtype(declaredType))
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, definitionType.toString(), declaredType.toString());

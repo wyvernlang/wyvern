@@ -25,7 +25,7 @@ import wyvern.tools.types.extensions.TypeInv;
  */
 public class TaggedInfo {
 
-	private static Map<TypeBinding, TaggedInfo> globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
+	// private static Map<TypeBinding, TaggedInfo> globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
 	private static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
 	
 	private String tagName;
@@ -38,6 +38,13 @@ public class TaggedInfo {
 	private List<TaggedInfo> comprisesTaggedInfos;
 	
 	
+	public static void resolveAll(Environment env, HasLocation hl) {
+		for (TaggedInfo ti : globalTagStoreList) {
+			ti.resolve(env, hl);
+		}
+	}
+	
+	
 	public void resolve(Environment env, HasLocation hl) {
 		if (this.tagType instanceof UnresolvedType) {
 			this.tagType = ((UnresolvedType) this.tagType).resolve(env);
@@ -46,12 +53,12 @@ public class TaggedInfo {
 				this.tagType = ((MetadataWrapper) this.tagType).getInner();
 			}
 		}
-		/*
+		
 		if (this.tagType instanceof TypeInv) {
-			// System.out.println("FOUND tagType!" + tagType);
-			this.tagType = ((TypeInv) this.tagType).resolve(env);
+			// System.out.println("FOUND TypeInv tagType!" + tagType + " which could be " + ((TypeInv) this.tagType).resolve(env));
+			// this.tagType = ((TypeInv) this.tagType).resolve(env);
 		}
-		*/
+		
 		
 		if (this.caseOf != null && this.caseOf instanceof UnresolvedType) {
 			String name = ((UnresolvedType) this.caseOf).getName();
@@ -65,13 +72,13 @@ public class TaggedInfo {
 				this.caseOf = ((MetadataWrapper) this.caseOf).getInner();
 			}
 		}
-		/*
+
 		if (this.caseOf != null && this.caseOf instanceof TypeInv) {
-			System.out.println("FOUND caseOf!" + caseOf);
+			// System.out.println("FOUND caseOf!" + caseOf);
 			((TypeInv) this.caseOf).resolve(env);
-			System.out.println("MADE caseOf!" + caseOf);
+			// System.out.println("MADE caseOf!" + caseOf);
 		}
-		*/
+
 		if (caseOfTaggedInfo != null) caseOfTaggedInfo.resolve(env, hl);
 		
 		List<Type> resolvedComprises = new ArrayList<Type>(comprises.size());
@@ -226,18 +233,18 @@ public class TaggedInfo {
 	public void associateWithClassOrType(TypeBinding t) {
 		this.tagType = t.getType();
 		
-		globalTagStore.put(t, this);
+		//globalTagStore.put(t, this);
 		globalTagStoreList.add(this);
 	}
 	
 	public static void clearGlobalTaggedInfos() {
-		globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
+		//globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
 		globalTagStoreList = new ArrayList<TaggedInfo>();
 	}
 	
-	public static Map<TypeBinding, TaggedInfo> getGlobalTagStore() {
-		return globalTagStore;
-	}
+	// public static Map<TypeBinding, TaggedInfo> getGlobalTagStore() {
+	//	return globalTagStore;
+	// }
 	
 	/**
 	 * Returns the global tag store, as a list.
@@ -251,15 +258,16 @@ public class TaggedInfo {
 		return globalTagStoreList;
 	}
 	
-	public static TaggedInfo lookupTag(TypeBinding t) {
-		TaggedInfo info = globalTagStore.get(t);
-		
-		return info;
-	}
+	// public static TaggedInfo lookupTag(TypeBinding t) {
+	//	TaggedInfo info = globalTagStore.get(t);
+	//	
+	//	return info;
+	//}
 	
 	public static TaggedInfo lookupTagByType(Type t) {
 		if (t == null) { return null; }
 		
+		// System.out.println("Looking for " + t + " inside:");
 		// System.out.println(globalTagStoreList);
 		
 		for (TaggedInfo i : globalTagStoreList) {

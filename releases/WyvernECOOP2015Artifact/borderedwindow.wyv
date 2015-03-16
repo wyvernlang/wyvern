@@ -3,7 +3,7 @@ tagged type Window
 type WindowMod
 	tagged class Win [case of Window]
 		class def make():Win = new
-		def draw():Str = ""
+		def draw():Str = "" 
 val basicWindow:WindowMod = new
 	tagged class Win [case of Window]
 		class def make():Win = new
@@ -20,14 +20,15 @@ def userWantsBorder():Bool = true
 val winMod:WindowMod =
 	if (userWantsBorder())
 	then
-		makeBordered(basicWindow)
+	    makeBordered(basicWindow)
 	else
-		basicWindow
+	    basicWindow
 val bigWinMod:WindowMod = makeScrollable(winMod)
-val smallWin = 42 // winMod.Win.make()
-val bigWin = 42 // bigWinMod.Win.make()
+val smallWin = winMod.Win.make()
+val bigWin = bigWinMod.Win.make()
 def screenCap(w:Window):Str
 	match(w):
+		bigWinMod.Win => "big"
 		default => "small"
-
-"big" // val result = screenCap(bigWin) // result == "big"
+val result = screenCap(bigWin)
+result // result == "big"
