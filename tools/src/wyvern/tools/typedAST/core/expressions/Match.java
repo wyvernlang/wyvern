@@ -94,6 +94,26 @@ public class Match extends CachingTypedAST implements CoreAST {
 		if (mo instanceof MetadataWrapper) {
 			mo = ((MetadataWrapper) mo).getInner();
 		}
+		
+		/*
+		System.out.println("Evaluating match with matchingOver = " + matchingOver + " its class " + matchingOver.getClass());
+		Variable v = (Variable) matchingOver;
+		System.out.println("v.getType() = " + v.getType());
+		System.out.println("v.getName() = " + v.getName());
+		System.out.println(env);
+		System.out.println(env.lookup(v.getName()));
+
+		System.out.println("mo = " + mo + " and its class is " + mo.getClass());
+		System.out.println(env.lookup(v.getName()).getUse());
+		System.out.println(env.lookup(v.getName()).getValue(env));
+
+		TypeType ttmo = (TypeType) mo;
+		System.out.println("ttmo.getName() is declared but not actual type = " + ttmo.getName());
+		TypeType tttmo = (TypeType) ((MetadataWrapper) v.typecheck(env, Optional.empty())).getInner();
+		System.out.println("v.type = " + tttmo.getName());
+		
+		TaggedInfo.dumpall(env);
+		*/
 			
 		TaggedInfo matchingOverTag = TaggedInfo.lookupTagByType(mo); // FIXME:
 		

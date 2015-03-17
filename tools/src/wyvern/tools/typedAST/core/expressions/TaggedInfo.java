@@ -10,6 +10,7 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
@@ -26,7 +27,7 @@ import wyvern.tools.types.extensions.TypeInv;
 public class TaggedInfo {
 
 	// private static Map<TypeBinding, TaggedInfo> globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
-	private static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
+	/*private*/ static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
 	
 	private String tagName;
 	private Type tagType;
@@ -157,9 +158,16 @@ public class TaggedInfo {
 	 * 
 	 * @param tagName
 	 */
-	public void setTagName(String tagName) {
+	public void setTagName(String tagName, TypeDeclaration td, ClassDeclaration cd) {
 		this.tagName = tagName;
+		
+		// One of these will be null:
+		this.td = td;
+		this.cd = cd;
 	}
+	
+	TypeDeclaration td;
+	ClassDeclaration cd;
 	
 	/**
 	 * Gets the tag's name.
@@ -286,6 +294,22 @@ public class TaggedInfo {
 		return null;
 	}
 
+	public static void dumpall(Environment env) {
+		System.out.println("DUMP OF TAGS:");
+		for (TaggedInfo ti : TaggedInfo.globalTagStoreList) {
+			System.out.println("Tag: " + ti);
+			System.out.println("Tag.td = " + ti.td);
+			if (ti.td!=null) {
+				System.out.println(ti.td.getType());
+			}
+			System.out.println("Tag.cd = " + ti.cd);
+			if (ti.cd!=null) {
+				System.out.println(ti.cd.getType());
+			}
+		}
+		System.out.println("END OF DUMP.");
+	}
+
 	@Override
 	public String toString() {
 		return "TaggedInfo [tagName=" + tagName + ", tagType=" + tagType + ", caseOf=" + caseOf
@@ -293,6 +317,5 @@ public class TaggedInfo {
 				+ comprises + ", comprisesTaggedInfos=" + comprisesTaggedInfos
 				+ "]";
 	}
-	
-	
+
 }

@@ -85,7 +85,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		// System.out.println("Creating class declaration for: " + name + " with decls " + decls);
 		
 		this.taggedInfo = taggedInfo;
-		this.taggedInfo.setTagName(name);
+		this.taggedInfo.setTagName(name, null, this);
 		this.taggedInfo.associateWithClassOrType(this.typeBinding);
 	}
 	
@@ -141,8 +141,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		//TODO: implement me
-		writer.writeArgs(decls);
+		//TODO: implement me`
+		// writer.writeArgs(decls); // This can be recursive!
 	}
 
 	@Override

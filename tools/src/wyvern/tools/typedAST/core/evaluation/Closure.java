@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.BoundCode;
@@ -63,6 +64,17 @@ public class Closure extends AbstractValue implements ApplyableValue {
 				bodyEnv = bodyEnv.extend(new ValueBinding(bindings.get(i).getName(), ((TupleValue)argValue).getValue(i)));
 		else if (bindings.size() != 0)
 			throw new RuntimeException("Something bad happened!");
+		
+		/*
+		if (app.getFunction() instanceof Variable) {
+			Variable v = (Variable) app.getFunction();
+			if (v.getName().equals("screenCap")) {
+				System.out.println("Processing closure with " + v);
+				System.out.println("function = " + function);
+				System.out.println("argValue = " + argValue);
+			}
+		}
+		*/
 		
 		return function.getBody().evaluate(bodyEnv);
 	}

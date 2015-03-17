@@ -77,7 +77,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     	this(name, decls, metadata, clsNameLine);
     	
 		this.taggedInfo = taggedInfo;
-		this.taggedInfo.setTagName(name);
+		this.taggedInfo.setTagName(name, this, null);
 		this.taggedInfo.associateWithClassOrType(this.typeBinding);
 	}
 	

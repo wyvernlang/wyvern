@@ -1,0 +1,12 @@
+type Super
+     def a():Int
+class A
+      class def make():Super = new
+      	    def a():Int = 56
+class B
+      class def make():Super = new
+            def a():Int = 64
+def test(s:Super):Int
+    s.a()
+val r:Int = test(B.make())
+r
