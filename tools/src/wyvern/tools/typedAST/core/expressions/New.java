@@ -80,7 +80,9 @@ public class New extends CachingTypedAST implements CoreAST {
 		if (classVarTypeBinding != null) { //In a class method
 			Environment declEnv = classVarTypeBinding.getClassDecl().getInstanceMembersEnv();
 			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
-			seq.typecheck(env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName()))), Optional.empty());
+			seq.typecheck(env.extend(new NameBindingImpl("this",
+					new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), classVarTypeBinding.getClassDecl().getTaggedInfo(),
+							classVarTypeBinding.getClassDecl().getName()))), Optional.empty());
 
 
 			Environment environment = seq.extendType(declEnv, declEnv.extend(env));
@@ -88,7 +90,8 @@ public class New extends CachingTypedAST implements CoreAST {
 			Environment nnames = environment;//seq.extend(environment, environment);
 
 			Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(declEnv));
-			Type classVarType = new ClassType(new Reference<>(nnames.extend(declEnv)), new Reference<>(objTee), new LinkedList<>(), classVarTypeBinding.getClassDecl().getName());
+			Type classVarType = new ClassType(new Reference<>(nnames.extend(declEnv)), new Reference<>(objTee), new LinkedList<>(),
+					classVarTypeBinding.getClassDecl().getTaggedInfo(), classVarTypeBinding.getClassDecl().getName());
 			if (!(classVarType instanceof ClassType)) {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
@@ -106,7 +109,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			Environment savedInner = env.extend(innerEnv);
 			innerEnv = seq.extendName(innerEnv, savedInner);
 
-			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), null)));
+			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), null, null)));
 			final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 					reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
 			seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
@@ -126,7 +129,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			cls = classDeclaration;
 			Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
 
-			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), null);
+			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), null, null);
 			return ct;
 		}
 	}
@@ -172,7 +175,7 @@ public class New extends CachingTypedAST implements CoreAST {
 				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
 		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 
-		Obj obj = new Obj(objenv.extend(argValEnv));
+		Obj obj = new Obj(objenv.extend(argValEnv), classDecl.getTaggedInfo());
 
 		//FIXME: Record new tag!
 		if (classDecl.isTagged()) {

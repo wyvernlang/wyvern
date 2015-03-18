@@ -35,7 +35,7 @@ public class JavaClassType extends ClassType implements MetaType {
 				cd.initalize();
 				return cd.getInstanceMembersEnv();
 			}
-		}, null, new LinkedList<>(), "");
+		}, null, new LinkedList<>(), null, "");
 		this.clazz = cd.getClazz();
 		decl = cd;
 	}

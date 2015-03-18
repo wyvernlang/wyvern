@@ -169,7 +169,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public Obj getClassObj() {
 		initalize();
-		return new Obj(getClassEnv(Environment.getEmptyEnvironment()));
+		return new Obj(getClassEnv(Environment.getEmptyEnvironment()), null);
 	}
 
 	boolean initalized = false;

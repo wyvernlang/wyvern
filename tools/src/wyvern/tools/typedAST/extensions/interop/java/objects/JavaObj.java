@@ -12,7 +12,7 @@ public class JavaObj extends Obj {
 	private JavaClassDecl jcd;
 
 	public JavaObj(Environment inRef, Object innerJavaObject, JavaClassDecl jcd) {
-		super(inRef);
+		super(inRef, null);
 		this.obj = innerJavaObject;
 		this.jcd = jcd;
 	}

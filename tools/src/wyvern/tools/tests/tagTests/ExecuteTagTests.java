@@ -32,7 +32,7 @@ public class ExecuteTagTests {
 		String input = readFile("../classdeftest.wyv");
 
 		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
+		evaluateExpecting(ast, 42);
 	}
 
 	@Test

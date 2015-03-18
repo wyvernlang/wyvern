@@ -33,8 +33,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
-		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), name);
-		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), name);
+		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), null, name);
+		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), null, name);
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		ValueBinding selfBinding = (ValueBinding) declEnv.lookup(name);
 		Environment objEnv = Environment.getEmptyEnvironment();
-		Value selfV = new Obj(inner.evalDecl(objEnv));
+		Value selfV = new Obj(inner.evalDecl(objEnv), null);
 		selfBinding.setValue(selfV);
 	}
 

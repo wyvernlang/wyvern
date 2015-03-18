@@ -41,7 +41,7 @@ public class TestUtil {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		Value v = ast.evaluate(Globals.getStandardEnv());
 		
-		String expecting = "IntegerConstant(" + value + ")"; 
+		String expecting = "IntegerConstant(" + value + ")";
 
 		Assert.assertEquals(expecting, v.toString());
 	}

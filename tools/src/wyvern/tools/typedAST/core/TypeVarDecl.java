@@ -95,7 +95,7 @@ public class TypeVarDecl extends Declaration {
 	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
-		this.metadataObj = new Reference<>();
+		this.metadataObj = new Reference<>(new Obj(Environment.getEmptyEnvironment(), null));
 		this.body = new TypeDeclaration(name, body, this.metadataObj, fileLocation);
 		this.fileLocation = fileLocation;
 	}
@@ -103,7 +103,7 @@ public class TypeVarDecl extends Declaration {
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
-		this.metadataObj = new Reference<>();
+		this.metadataObj = new Reference<>(new Obj(Environment.getEmptyEnvironment(), null));
 		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 	}
@@ -136,7 +136,7 @@ public class TypeVarDecl extends Declaration {
 
 		this.fileLocation = fileLocation;
 		this.metadata = new Reference<>(Optional.ofNullable(metadata));
-		this.metadataObj = new Reference<>();
+		this.metadataObj = new Reference<>(new Obj(Environment.getEmptyEnvironment(), null));
 	}
 
 	public TypeVarDecl(String name, EnvironmentExtender body, FileLocation fileLocation) {
@@ -144,7 +144,7 @@ public class TypeVarDecl extends Declaration {
 		this.name = name;
 		this.fileLocation = fileLocation;
 		metadata = new Reference<Optional<TypedAST>>(Optional.empty());
-		this.metadataObj = new Reference<>();
+		this.metadataObj = new Reference<>(new Obj(Environment.getEmptyEnvironment(), null));
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class TypeVarDecl extends Declaration {
 		Environment metaEnv = Globals.getStandardEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv);
 		metadata.get().map(obj->obj.typecheck(metaEnv, Optional.<Type>empty()));
 
-		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment())));
+		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(Environment.getEmptyEnvironment(), null)));
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package wyvern.tools.tests.perfTests;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
@@ -11,7 +12,8 @@ import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class PerformanceTests {
-	
+
+	@Ignore
 	@Test
 	public void parseManyTags() throws CopperParserException, IOException {
 		int[] numTags = new int[]{1, 10, 50, 100, 350, 500, 1000, 1500, 2500, 3000, 4000, 5000};
@@ -45,7 +47,8 @@ public class PerformanceTests {
 			System.out.println("size: " + i + ", dt: " + dt);
 		}
 	}
-	
+
+	@Ignore
 	@Test
 	public void parseManyClassTags() throws CopperParserException, IOException {
 		int[] numTags = new int[]{1, 10, 50, 100, 350, 500, 1000, 1500, 2500, 3000, 4000, 5000};
@@ -93,7 +96,8 @@ public class PerformanceTests {
 			System.out.println(i + ", " + dt);
 		}
 	}
-	
+
+	@Ignore
 	@Test
 	public void typecheckManyClassTags() throws CopperParserException, IOException {
 		int[] numTags = new int[]{1, 10, 50, 150, 200, 250, 300, 350, 400, 450, 500};
@@ -146,8 +150,9 @@ public class PerformanceTests {
 			System.out.println(i + ", " + dt);
 		}
 	}
-	
 
+
+	@Ignore
 	@Test
 	public void timeEarlyMatch() throws CopperParserException, IOException {
 		//int[] numTags = new int[]{1, 10, 50, 150, 200, 250, 300, 350, 400, 450, 500};
@@ -183,7 +188,8 @@ public class PerformanceTests {
 			System.out.println(i + ", " + dt + ",");
 		}
 	}
-	
+
+	@Ignore
 	@Test
 	public void timeLateMatch() throws CopperParserException, IOException {
 		//int[] numTags = new int[]{1, 10, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
@@ -221,7 +227,8 @@ public class PerformanceTests {
 		}
 	}
 
-	
+
+	@Ignore
 	@Test
 	public void parseManyHierarchicalTags() throws CopperParserException, IOException {
 		

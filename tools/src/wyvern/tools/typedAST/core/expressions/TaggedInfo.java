@@ -285,6 +285,7 @@ public class TaggedInfo {
 
 	public static TaggedInfo lookupTagByType(Type t) {
 		if (t == null) { return null; }
+		if (t instanceof ClassType) return ((ClassType) t).getTaggedInfo();
 
 		// System.out.println("Looking for " + t + " inside:");
 		// System.out.println(globalTagStoreList);

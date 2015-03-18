@@ -20,4 +20,9 @@ public class LateNameBinding extends NameBindingImpl {
 	public Type getType() {
 		return type.get();
 	}
+
+	@Override
+	public String toString() {
+		return "LateNameBinding("+getName()+")";
+	}
 }

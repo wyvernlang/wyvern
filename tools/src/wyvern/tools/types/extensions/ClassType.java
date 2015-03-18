@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.types.*;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -21,15 +22,20 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	protected Reference<Environment> typeEquivalentEnv = new Reference<>();
 	private List<String> params;
 	private String name;
+	private TaggedInfo tagInfo;
+
+	private String stackTrace;
 
 	public ClassType() {
-		this(new Reference<>(Environment.getEmptyEnvironment()), new Reference<Environment>(Environment.getEmptyEnvironment()), new LinkedList<String>(), "empty");
+		this(new Reference<>(Environment.getEmptyEnvironment()),
+				new Reference<Environment>(Environment.getEmptyEnvironment()), new LinkedList<String>(), null, "empty");
 	}
 
 	public ClassType(ClassDeclaration td) {
 		this(td.getClassMembersEnv(),
 				td.getTypeEquivalentEnvironmentReference(),
 				td.getTypeParams(),
+				td.getTaggedInfo(),
 				td.getName());
 		this.decl = td;
 	}
@@ -37,12 +43,15 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	public ClassType(Reference<Environment> declEnv,
 					 Reference<Environment> typeEquivalentEnv,
 					 List<String> typeParams,
+					 TaggedInfo tagInfo,
 					 String name) {
 		this.declEnv = declEnv;
 		this.typeEquivalentEnv = typeEquivalentEnv;
 		this.params = typeParams;
 		this.name = name;
+		this.tagInfo = tagInfo;
 
+		stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
 		// System.out.println("Creating ClassType with declEnv " + declEnv.get());
 	}
 
@@ -195,7 +204,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		Collections.sort(teenvList, c);
 		Environment ndEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), denvList);
 		Environment nteEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), teenvList);
-		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params, getName());
+		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params, tagInfo, getName());
 	}
 
 	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
@@ -215,5 +224,9 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 
 	public String getName() {
 		return name;
+	}
+
+	public TaggedInfo getTaggedInfo() {
+		return tagInfo;
 	}
 }

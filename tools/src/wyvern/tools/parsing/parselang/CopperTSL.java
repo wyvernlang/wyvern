@@ -341,7 +341,7 @@ public class CopperTSL implements ExtParser {
 				UnitVal.getInstance(unkLoc),
 				unkLoc);
 		ClassType emptyType =
-				new ClassType(new Reference<>(Environment.getEmptyEnvironment()), new Reference<>(Environment.getEmptyEnvironment()), new LinkedList<>(), "empty");
+				new ClassType(new Reference<>(Environment.getEmptyEnvironment()), new Reference<>(Environment.getEmptyEnvironment()), new LinkedList<>(), null, "empty");
 		TypedAST javaObjInit = new Application(new ExternalFunction(new Arrow(emptyType, Util.javaToWyvType(Value.class)), (env,arg)->{
 			return Util.toWyvObj(arg);
 		}),

@@ -95,6 +95,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		if (super.subtype(other, subtypes)) {
 			return true;
 		}
+
+		if (other instanceof MetadataWrapper)
+			return subtype(((MetadataWrapper) other).getInner(), subtypes);
 		
 		if (other instanceof TypeType) {
 			Map<String, Type> thisMembers = this.getMembers();

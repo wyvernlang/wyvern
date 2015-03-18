@@ -15,7 +15,9 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -104,7 +106,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 			// System.out.println("wType = " + wType);
 			// System.out.println("looked up = " + TaggedInfo.lookupTagByType(wType));
 			// System.out.println("but mot = " + matchingOverTag);
-			matchingOverTag = TaggedInfo.lookupTagByType(wType);
+			matchingOverTag = ((Obj)env.getValue(w.getName())).getTaggedInfo();
 		}
 
 		/*
@@ -147,6 +149,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 			Type tt = c.getTaggedTypeMatch();
 
+			TaggedInfo caseTag;
 			if (tt instanceof TypeInv) {
 				TypeInv ti = (TypeInv) tt;
 
@@ -154,36 +157,22 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 				Type ttti = ti.getInnerType();
 				String mbr = ti.getInvName();
+
+
 				if (ttti instanceof UnresolvedType) {
 					UnresolvedType ut = (UnresolvedType) ttti;
-					NameBinding nb = env.lookup(ut.getName());
-					if (nb instanceof ValueBinding) {
-						ValueBinding vb = (ValueBinding) nb;
-						Type vbt = vb.getValue(env).getType();
-						if (vbt instanceof ClassType) {
-							NameBinding member = ((ClassType) vbt).getEnv().lookup(mbr);
-							if (member instanceof ValueBinding) {
-								ValueBinding hack = (ValueBinding) member;
-								System.out.println("hack = " + hack);
-								System.out.println("hack obj type = " + hack.getValue(env).getType());
-							} else {
-								// FIXME:
-							}
-						} else {
-							// FIXME:
-						}
-					} else {
-						// FIXME:
-					}
+					Value objVal = env.getValue(((UnresolvedType) ttti).getName(), env);
+					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().getValue(mbr).getType();
+					caseTag = innerClassType.getTaggedInfo();
 				} else {
 					tt = ti.resolve(env);
-					// System.out.println(" tt is " + tt);
+					caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
 				}
+			} else {
+				caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
 			}
 
 			System.out.println("case " + cnt + " type = " + tt);
-
-			TaggedInfo caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
 
 			// System.out.println("caseTag = " + caseTag);
 

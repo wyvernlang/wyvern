@@ -55,10 +55,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected Environment getObjEnvV() { return instanceMembersEnv.get(); }
 	protected void setInstanceMembersEnv(Environment newEnv) { instanceMembersEnv.set(newEnv); }
 
-	private ClassType objType = new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), "");
+	private ClassType objType;
 
 	public ClassType getOType() {
-		return new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), getName());
+		return objType;
 	}
 
 	private TaggedInfo taggedInfo;
@@ -86,7 +86,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name, null, this);
+		objType = new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), taggedInfo, "");
+		typeBinding = new TypeBinding(name, getObjType());
 		this.taggedInfo.associateWithClassOrType(this.typeBinding);
+		nameBinding = new NameBindingImpl(name, getClassType());
 	}
 
 	public ClassDeclaration(String name,
@@ -112,6 +115,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		typeEquivalentEnvironmentRef = new Reference<>();
 		classMembersEnv = new Reference<>();
 		nameBinding = new NameBindingImpl(name, null);
+		objType = new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), null, "");
 		typeBinding = new TypeBinding(name, getObjType());
 		nameBinding = new NameBindingImpl(name, getClassType());
 		this.implementsName = implementsName;
@@ -300,7 +304,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			public void set(Environment e) {
 				throw new RuntimeException();
 			}
-		}, new LinkedList<>(), this.getName());
+		}, new LinkedList<>(), taggedInfo, this.getName());
 	}
 
 	@Override
@@ -323,7 +327,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(Environment evalEnv, Environment declEnv) {
 		if (declEvalEnv == null)
 			declEvalEnv = declEnv.extend(evalEnv);
-		Obj classObj = new Obj(getClassEnv(evalEnv));
+		Obj classObj = new Obj(getClassEnv(evalEnv), taggedInfo);
 
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);

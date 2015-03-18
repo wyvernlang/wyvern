@@ -74,8 +74,8 @@ public class DynamicTagTests {
 	public void dynamicTagsWindowTest() throws CopperParserException, IOException {
 		String program = TestUtil.readFile(PATH + "DynamicTagsWindow.wyv");
 		TypedAST ast = TestUtil.getAST(program);
-		
-		TestUtil.evaluateExpecting(ast, 42);
+
+		TestUtil.evaluateExpecting(ast, "scrollable");
 	}
 	
 	@Test
@@ -96,8 +96,8 @@ public class DynamicTagTests {
 	public void dynamicTagsWindowSimpleTest() throws CopperParserException, IOException {
 		String program = TestUtil.readFile(PATH + "DynamicTagsWindowSimple.wyv");
 		TypedAST ast = TestUtil.getAST(program);
-		
-		TestUtil.evaluateExpecting(ast, 42);
+
+		TestUtil.evaluateExpecting(ast, "bordered");
 	}
 	
 	@Test

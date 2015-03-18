@@ -3,22 +3,27 @@ package wyvern.tools.util;
 import wyvern.tools.typedAST.core.binding.LateBinder;
 
 import java.sql.Ref;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Reference<T> {
+	private final String stackTrace;
 	private Supplier<T> src;
 	private T value;
 
 	public Reference(T value) {
 		this.value = value;
 		this.src = () -> value;
+		stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
 	}
 	public Reference(Supplier<T> src) {
 		this.src = src;
+		stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
 	}
 	public Reference() {
 		this.src = () -> value;
+		stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
 	}
 
 	public void set(T value) {

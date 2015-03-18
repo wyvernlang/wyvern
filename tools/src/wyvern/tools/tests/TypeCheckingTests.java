@@ -25,7 +25,7 @@ public class TypeCheckingTests {
 		
 		// System.out.println(res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "Unit");
 		
 		// System.out.println(res.evaluate(Globals.getStandardEnv()).toString());
 		
@@ -46,7 +46,7 @@ public class TypeCheckingTests {
 		
 		// System.out.println("typecheck returned: " + res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
-		Assert.assertEquals("TYPE()", res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString());
+		Assert.assertEquals("Unit", res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString());
 		
 		// System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEnv()).toString());
 		
@@ -67,7 +67,7 @@ public class TypeCheckingTests {
 		
 		System.out.println("typecheck returned: " + res.typecheck(Globals.getStandardEnv(), Optional.empty()));
 		
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
+		Assert.assertEquals("Unit", res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString());
 		
 		System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEnv()).toString());
 		

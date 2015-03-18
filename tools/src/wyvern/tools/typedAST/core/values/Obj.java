@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -25,15 +26,18 @@ import java.util.Map;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	protected Reference<Environment> intEnv;
+	private TaggedInfo taggedInfo;
 	private Environment typeEquivEnv;
 	
-	public Obj(Environment declEnv) {
+	public Obj(Environment declEnv, TaggedInfo taggedInfo) {
+		this.taggedInfo = taggedInfo;
 		this.intEnv = new Reference<>(declEnv);
 	}
 
-    public Obj(Reference<Environment> declEnv) {
+    public Obj(Reference<Environment> declEnv, TaggedInfo taggedInfo) {
 		intEnv = declEnv;
-    }
+		this.taggedInfo = taggedInfo;
+	}
 
     private void updateTee() {
         typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv.get());
@@ -42,7 +46,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	@Override
 	public Type getType() {
         updateTee();
-		return new ClassType(intEnv, new Reference<>(typeEquivEnv), new LinkedList<String>(), null);
+		return new ClassType(intEnv, new Reference<>(typeEquivEnv), new LinkedList<String>(), taggedInfo, null);
 	}
 
 	@Override
@@ -97,5 +101,9 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	public TaggedInfo getTaggedInfo() {
+		return taggedInfo;
 	}
 }

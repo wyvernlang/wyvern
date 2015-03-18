@@ -63,7 +63,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Environment extendName(Environment env, Environment against) {
 		if (!declGuard) {
-			declEnv.set(decls.extendName(declEnv.get(), against.extend(typeBinding)));
+			declEnv.set(decls.extendName(declEnv.get(), against.extend(typeBinding).extend(declEnv.get())));
 			//declEnv.set(decls.extend(declEnv.get(), against.extend(typeBinding)));
 			declGuard = true;
 		}
@@ -74,30 +74,33 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private TaggedInfo taggedInfo;
 
 	public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-    	this(name, decls, metadata, clsNameLine);
-    	
-		this.taggedInfo = taggedInfo;
-		this.taggedInfo.setTagName(name, this, null);
-		this.taggedInfo.associateWithClassOrType(this.typeBinding);
-	}
-	
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
-    	// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+
+		// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
 		typeBinding = new TypeBinding(name, null, metadata);
 		Type objectType = new TypeType(this);
 		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
-		
-		Type classType = new ClassType(attrEnv, attrEnv, new LinkedList<String>(), getName()); // TODO set this to a class type that has the class members
-		nameBinding = new LateNameBinding(nameBinding.getName(), () -> metadata.get().getType());
 
+
+		nameBinding = new LateNameBinding(nameBinding.getName(), () ->
+				metadata.get().getType());
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
-		
+
+
+		if (taggedInfo != null) {
+			this.taggedInfo = taggedInfo;
+			this.taggedInfo.setTagName(name, this, null);
+			this.taggedInfo.associateWithClassOrType(this.typeBinding);
+		}
 		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
-		
+
 		this.location = clsNameLine;
 		this.metaValue = metadata;
+	}
+	
+    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
+		this(name, decls, metadata, null, clsNameLine);
 	}
 
 	@Override
