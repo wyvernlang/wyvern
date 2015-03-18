@@ -32,25 +32,13 @@ public class Interpreter {
 		}
 
 		try {
-			// StringReader reader = new StringReader(new String(Files.readAllBytes(file), Charset.forName("UTF-8")) + "\n");
-
-			StringBuffer b = new StringBuffer();
-
-			for (String s : Files.readAllLines(new File(filename).toPath())) {
-				//Be sure to add the newline as well
-				b.append(s).append("\n");
-			}
-			StringReader reader = new StringReader(b.toString());
-
-			TaggedInfo.clearGlobalTaggedInfos(); // FIXME:
-
+			StringReader reader = new StringReader(new String(Files.readAllBytes(file), Charset.forName("UTF-8")) + "\n");
 			TypedAST res = (TypedAST) new Wyvern().parse(reader, filename);
 			res.typecheck(Globals.getStandardEnv(), Optional.empty());
-
-			System.out.println("Result = " + res.evaluate(Globals.getStandardEnv()));
-
-			res = new DSLTransformer().transform(res);
+			// System.out.println("Result 1 = " + res.evaluate(Globals.getStandardEnv()));
+			// res = new DSLTransformer().transform(res); // FIXME: To make to work!
 			Value finalV = res.evaluate(Globals.getStandardEnv());
+			// System.out.println("Result 2 = " + finalV);
 			TreeWriter t = new TreeWriter();
 			finalV.writeArgsToTree(t);
 			System.out.println(t.getResult());

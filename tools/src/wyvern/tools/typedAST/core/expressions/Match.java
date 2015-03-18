@@ -137,7 +137,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 			// System.out.println("ct = " + ct.getName());
 		}
 
-		System.out.println("matchingOverTag (latest) = " + matchingOverTag);
+		// System.out.println("matchingOverTag (latest) = " + matchingOverTag);
 		int cnt = 0;
 
 		for (Case c : cases) {
