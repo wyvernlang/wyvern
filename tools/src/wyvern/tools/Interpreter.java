@@ -11,6 +11,7 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.transformers.DSLTransformer;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWriter;
@@ -29,11 +30,25 @@ public class Interpreter {
 			System.err.println("Cannot read file " + filename);
 			System.exit(-1);
 		}
-		
+
 		try {
-			StringReader reader = new StringReader(new String(Files.readAllBytes(file), Charset.forName("UTF-8")) + "\n");
+			// StringReader reader = new StringReader(new String(Files.readAllBytes(file), Charset.forName("UTF-8")) + "\n");
+
+			StringBuffer b = new StringBuffer();
+
+			for (String s : Files.readAllLines(new File(filename).toPath())) {
+				//Be sure to add the newline as well
+				b.append(s).append("\n");
+			}
+			StringReader reader = new StringReader(b.toString());
+
+			TaggedInfo.clearGlobalTaggedInfos(); // FIXME:
+
 			TypedAST res = (TypedAST) new Wyvern().parse(reader, filename);
 			res.typecheck(Globals.getStandardEnv(), Optional.empty());
+
+			System.out.println("Result = " + res.evaluate(Globals.getStandardEnv()));
+
 			res = new DSLTransformer().transform(res);
 			Value finalV = res.evaluate(Globals.getStandardEnv());
 			TreeWriter t = new TreeWriter();

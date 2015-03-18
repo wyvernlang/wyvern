@@ -146,7 +146,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		//TODO: implement me`
-		// writer.writeArgs(decls); // This can be recursive!
+		writer.writeArgs(decls); // FIXME: This can be recursive! Sometimes crashes with StackOverflow!!!
 	}
 
 	@Override
