@@ -42,11 +42,13 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		this.typeEquivalentEnv = typeEquivalentEnv;
 		this.params = typeParams;
 		this.name = name;
+
+		// System.out.println("Creating ClassType with declEnv " + declEnv.get());
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write		
+		// nothing to write
 	}
 
 	private boolean recursive = false;
@@ -72,14 +74,14 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		if (opExp.getArgument() != null)
 			throw new RuntimeException(opExp.getLocation().toString());
 		assert opExp.getArgument() == null;
-		
+
 		// the operation should exist
 		String opName = opExp.getOperationName();
 		NameBinding m = declEnv.get().lookup(opName);
 
 		if (m == null)
 			reportError(OPERATOR_DOES_NOT_APPLY, opExp, opName, this.toString());
-		
+
 		// TODO Auto-generated method stub
 		return m.getType();
 	}
@@ -122,7 +124,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		} else if (other instanceof ClassType) {
 			return getEquivType().subtype(((ClassType) other).getEquivType());
 		}
-		
+
 		return false;
 	}
 

@@ -35,15 +35,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls = new DeclSequence(new LinkedList<Declaration>());
 	private List<String> typeParams;
 	// protected DeclSequence classDecls;
-	
+
 	private NameBinding nameBinding;
 	protected TypeBinding typeBinding;
-	
+
 	private String implementsName;
 	private String implementsClassName;
-	
+
 	private TypeBinding nameImplements;
-	
+
 	protected Environment declEvalEnv;
 
 	private TypeType equivalentType = null;
@@ -60,9 +60,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public ClassType getOType() {
 		return new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), getName());
 	}
-	
+
 	private TaggedInfo taggedInfo;
-	
+
 	public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
@@ -81,14 +81,14 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			DeclSequence decls,
 			FileLocation location) {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
-		
+
 		// System.out.println("Creating class declaration for: " + name + " with decls " + decls);
-		
+
 		this.taggedInfo = taggedInfo;
 		this.taggedInfo.setTagName(name, null, this);
 		this.taggedInfo.associateWithClassOrType(this.typeBinding);
 	}
-	
+
 	public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
@@ -97,16 +97,16 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		this(name, implementsName, implementsClassName, decls, new LinkedList<String>(), location);
 
 	}
-	
+
     public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
 							DeclSequence decls,
 							List<String> typeParams,
 							FileLocation location) {
-		
+
     	//System.out.println("Made class: " + name);
-    	
+
     	this.decls = decls;
 		this.typeParams = typeParams;
 		typeEquivalentEnvironmentRef = new Reference<>();
@@ -123,8 +123,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return objType;
 	}
 
-	
-	
+
+
 	protected void updateEnv() {
 		typeEquivalentEnvironmentRef.set(TypeDeclUtils.getTypeEquivalentEnvironment(getDecls(), false));
 	}
@@ -174,7 +174,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				}
 			}
 		}
-		
+
 		// check the implements and class implements
 		// FIXME: Should support multiple implements statements!
 		if (!this.implementsName.equals("")) {
@@ -182,11 +182,11 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			if (nameImplements == null) {
 				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, this.implementsName);
 			}
-			
+
 			// since there is a valid implements, check that all methods are indeed present
 			ClassType currentCT = (ClassType) this.nameBinding.getType();
             TypeType implementsTT = (TypeType)nameImplements.getType();
-			
+
 			if (!getEquivalentType().subtype(implementsTT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this,
@@ -194,7 +194,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
                         nameImplements.getName());
 			}
 		}
-		
+
 		if (!this.implementsClassName.equals("")) {
 			NameBinding nameImplementsClass = env.lookup(this.implementsClassName);
 			if (nameImplementsClass == null) {
@@ -207,7 +207,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 					((ClassType)nameImplementsClass.getType())
 							.getEnv()
 							.lookupBinding("type", TypeDeclBinding.class)).get().getType();
-			
+
 			if (!getEquivalentClassType().subtype(implementsCT)) {
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
 						this,
@@ -215,53 +215,53 @@ public class ClassDeclaration extends Declaration implements CoreAST {
                         nameImplementsClass.getName());
 			}
 		}
-		
+
 		if (isTagged()) typecheckTags(env);
 
 		return Unit.getInstance();
 	}
-	
+
 	private void typecheckTags(Environment env) {
 		taggedInfo.resolve(env, this);
-		
+
 		// System.out.println("CURRENT ti = " + taggedInfo);
-		
+
 		Type myTagType = taggedInfo.getTagType();
-		
+
 		if (taggedInfo.hasCaseOf()) {
 			Type caseOfType = taggedInfo.getCaseOfTag();
-			
+
 			// System.out.println("caseOfType = " + caseOfType);
 			// System.out.println("TaggedInfo Global Store Current State = " + TaggedInfo.getGlobalTagStore());
-			
+
 			//check the type is tagged
-			if (!(caseOfType instanceof TypeInv)) { // If it is TypeInv - we won't know till runtime! 
+			if (!(caseOfType instanceof TypeInv)) { // If it is TypeInv - we won't know till runtime!
 				TaggedInfo info = TaggedInfo.lookupTagByType(caseOfType);
 				//System.out.println("Looked up: " + info);
-				
+
 				if (info == null) {
 					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfType.toString());
 				}
-				
+
 				//now check circular relationship has not been created
 				if (taggedInfo.isCircular()) {
 					ToolError.reportError(ErrorMessage.CIRCULAR_TAGGED_RELATION, this, taggedInfo.getTagName(), caseOfType.toString());
 				}
 			}
 		}
-		
+
 		if (taggedInfo.hasComprises()) {
 			List<Type> comprisesTags = taggedInfo.getComprisesTags();
-			
+
 			//first check that every comprises tag actually is a case-of of this
-			for (Type s : comprisesTags) {				
+			for (Type s : comprisesTags) {
 				TaggedInfo info = TaggedInfo.lookupTagByType(s); // FIXME:
-				
+
 				//check it exists
 				if (info == null) {
 					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, s.toString());
 				}
-				
+
 				//then check it is a case-of
 				Type comprisesCaseOfName = info.getCaseOfTag();
 				if (!myTagType.equals(comprisesCaseOfName)) {
@@ -273,12 +273,12 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			for (TaggedInfo info : TaggedInfo.getGlobalTagStoreList()) {
 				Type othersType = info.getTagType();
 				Type caseOf = info.getCaseOfTag();
-				
+
 				//if tag is ourselves, or one of our comprises, skip it
 				if (othersType.equals(myTagType) || comprisesTags.contains(othersType)) {
 					continue;
 				}
-				
+
 				//now if the other tag 'case-of's is this, it is an error
 				if (myTagType.equals(caseOf)) {
 					ToolError.reportError(ErrorMessage.COMPRISES_EXCLUDES_TAG, this, myTagType.toString(), info.getTagType().toString());
@@ -302,20 +302,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			}
 		}, new LinkedList<>(), this.getName());
 	}
-	
+
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
-		
+
 		return newEnv;
 	}
 
 	@Override
 	public Environment extendWithValue(Environment old) {
 		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
-		
+
 		//newEnv = newEnv.extend(taggedBinding);
-		
+
 		return newEnv;
 	}
 
@@ -324,20 +324,20 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		if (declEvalEnv == null)
 			declEvalEnv = declEnv.extend(evalEnv);
 		Obj classObj = new Obj(getClassEnv(evalEnv));
-		
+
 		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
 		vb.setValue(classObj);
 	}
-	
+
 	public Environment evaluateDeclarations(Environment addtlEnv) {
 		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
 		decls.bindDecls(declEvalEnv.extend(addtlEnv), thisEnv);
-		
+
 		return thisEnv;
 	}
-	
+
 	public Environment getClassEnv(Environment extEvalEnv) {
-		
+
 		Environment classEnv = Environment.getEmptyEnvironment();
 
 		if (decls == null)
@@ -348,24 +348,24 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 				classEnv = decl.doExtendWithValue(classEnv);
 			}
 		}
-		
+
 		ClassBinding thisBinding = new ClassBinding("class", this);
 		Environment evalEnv = classEnv.extend(thisBinding);
-		
+
 		for (Declaration decl : decls.getDeclIterator())
 			if (decl.isClassMember()){
 				decl.bindDecl(extEvalEnv.extend(evalEnv),classEnv);
 			}
-		
+
 		classEnv = classEnv.extend(new ClassBinding("claasdasdass", this));
-		
+
 		return classEnv;
 	}
 
 	public Environment getInstanceMembersEnv() {
 		return instanceMembersEnv.get();
 	}
-	
+
 	public DeclSequence getDecls() {
 		return decls;
 	}
@@ -377,25 +377,25 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	/**
 	 * Returns if this class is tagged or not.
-	 * 
+	 *
 	 * @return true if tagged, false otherwise
 	 */
 	public boolean isTagged() {
 		return taggedInfo != null;
 	}
-	
+
 	/**
-	 * Returns the tag information associated with this class. 
+	 * Returns the tag information associated with this class.
 	 * If this class isn't tagged this information will be null.
-	 * 
+	 *
 	 * @return the tag info
 	 */
 	public TaggedInfo getTaggedInfo() {
 		return taggedInfo;
 	}
-	
+
 	private FileLocation location = FileLocation.UNKNOWN;
-	
+
 	@Override
 	public FileLocation getLocation() {
 		return location; // TODO: NOT IMPLEMENTED YET.
@@ -468,7 +468,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendType(Environment env, Environment against) {		
+	public Environment extendType(Environment env, Environment against) {
 		return env.extend(typeBinding);
 	}
 

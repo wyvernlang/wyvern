@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 
 public class New extends CachingTypedAST implements CoreAST {
 	ClassDeclaration cls;
-	
+
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 	boolean isGeneric = false;
 
@@ -73,10 +73,10 @@ public class New extends CachingTypedAST implements CoreAST {
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		// TODO check arg types
 		// Type argTypes = args.typecheck();
-		
+
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
 
-		
+
 		if (classVarTypeBinding != null) { //In a class method
 			Environment declEnv = classVarTypeBinding.getClassDecl().getInstanceMembersEnv();
 			Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
@@ -93,14 +93,14 @@ public class New extends CachingTypedAST implements CoreAST {
 				// System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
 				ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
 			}
-			
+
 			// TODO SMELL: do I really need to store this?  Can get it any time from the type
 			cls = classVarTypeBinding.getClassDecl();
 			ct = classVarType;
 
 			return classVarType;
 		} else { // Standalone
-			
+
 			isGeneric = true;
 			Environment innerEnv = seq.extendType(Environment.getEmptyEnvironment(), env);
 			Environment savedInner = env.extend(innerEnv);
@@ -125,7 +125,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
 			cls = classDeclaration;
 			Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
-			
+
 			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), null);
 			return ct;
 		}
@@ -147,13 +147,13 @@ public class New extends CachingTypedAST implements CoreAST {
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
 
-		
-		
+
+
 		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
-		ClassDeclaration classDecl;		
-		
+		ClassDeclaration classDecl;
+
 		if (classVarTypeBinding != null) {
-			classDecl = classVarTypeBinding.getClassDecl();	
+			classDecl = classVarTypeBinding.getClassDecl();
 		} else {
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
@@ -171,10 +171,21 @@ public class New extends CachingTypedAST implements CoreAST {
 		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
 		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
-		objRef.set(new Obj(objenv.extend(argValEnv)));
-		
+
+		Obj obj = new Obj(objenv.extend(argValEnv));
+
+		//FIXME: Record new tag!
+		if (classDecl.isTagged()) {
+			TaggedInfo ti = classDecl.getTaggedInfo();
+			// System.out.println("Processing ti = " + ti);
+			// System.out.println("obj.getType = " + obj.getType());
+			ti.associateWithObject(obj);
+		}
+
+		objRef.set(obj);
+
 		// System.out.println("Finished evaluating new: " + this);
-		
+
 		return objRef.get();
 	}
 
@@ -203,16 +214,16 @@ public class New extends CachingTypedAST implements CoreAST {
 		//TODO: fix args
 		visitor.visit(this);
 	}
-	
+
 	public Map<String, TypedAST> getArgs() {
 		return args;
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
-	
+
 	@Override
 	public FileLocation getLocation() {
-		return location; 
+		return location;
 	}
 
 	public boolean isGeneric() {

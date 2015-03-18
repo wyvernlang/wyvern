@@ -12,6 +12,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -42,14 +43,14 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		// System.out.println("env = " + env);
 		// System.out.println("receiver = "  + receiver + " : "+ receiver.getClass());
-		
+
 		Type receiverType = receiver.typecheck(env, Optional.empty());
-		
+
 		// System.out.println("receiverType = " + receiverType);
-		
+
 		if (argument != null)
 			argument.typecheck(env, Optional.empty());
-		
+
 		if (receiverType instanceof OperatableType) {
 			return ((OperatableType)receiverType).checkOperator(this,env);
 		} else {
@@ -67,15 +68,27 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	public String getOperationName() {
 		return operationName;
 	}
-	
+
 	@Override
 	public Value evaluate(Environment env) {
+		// System.out.println("Evaluating method invocation: " + this + " with receiver " + this.receiver);
+		/*
+		if (this.receiver instanceof Variable) {
+			Variable w = (Variable) this.receiver;
+			if (w.getName().equals("w")) {
+				System.out.println("Examining w more closely.");
+				System.out.println(((MetadataWrapper) w.getType()).getInner());
+				System.out.println(env.lookup(w.getName()).getType());
+			}
+		}
+		*/
+
 		Value lhs = receiver.evaluate(env);
 		if (!(lhs instanceof InvokableValue))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		InvokableValue receiverValue = (InvokableValue) lhs;
 		Value out = receiverValue.evaluateInvocation(this, env);
-		
+
 		//TODO: bit of a hack
 		if (out instanceof VarValue)
 			out = ((VarValue)out).getValue();
@@ -100,7 +113,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		Value lhs = receiver.evaluate(env);
 		if (!(lhs instanceof Assignable))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
-		
+
 		return ((Assignable)lhs).evaluateAssignment(ass, env);
 	}
 

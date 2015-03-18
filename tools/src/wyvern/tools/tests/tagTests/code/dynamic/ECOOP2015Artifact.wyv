@@ -3,7 +3,7 @@ tagged type Window
 type WindowMod
 	tagged class Win [case of Window]
 		class def make():Win = new
-		def draw():Str = "" 
+		def draw():Str = ""
 val basicWindow:WindowMod = new
 	tagged class Win [case of Window]
 		class def make():Win = new
@@ -27,8 +27,10 @@ val bigWinMod:WindowMod = makeScrollable(winMod)
 val smallWin = winMod.Win.make()
 val bigWin = bigWinMod.Win.make()
 def screenCap(w:Window):Str
+	w.draw()
 	match(w):
 		bigWinMod.Win => "big"
-		default => "small"
+		winMod.Win => "normal"
+		default => "default"
 val result = screenCap(bigWin)
 result // result == "big"
