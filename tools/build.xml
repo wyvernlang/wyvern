@@ -30,7 +30,12 @@
                   target="src/wyvern/tools/parsing/TypeParser.java"
                   extrapackage="wyvern.tools.parsing.*"/>
     </target>
-    <target name="copper-generate" depends="copper-compose,copper-subparsers">
+    <target name="lexer">
+        <copper outputfile="src/wyvern/tools/lexing/WyvernLexer.java" packagename="wyvern.tools.lexing">
+            <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
+        </copper>
+    </target>
+    <target name="copper-generate" depends="copper-compose,copper-subparsers,lexer">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" packagename="wyvern.tools.parsing">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
         </copper>
