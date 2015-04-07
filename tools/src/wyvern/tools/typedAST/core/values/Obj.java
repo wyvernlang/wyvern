@@ -17,6 +17,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -25,28 +26,28 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class Obj extends AbstractValue implements InvokableValue, Assignable {
-	protected Reference<Environment> intEnv;
+	protected Reference<EvaluationEnvironment> intEnv;
 	private TaggedInfo taggedInfo;
 	private Environment typeEquivEnv;
 	
-	public Obj(Environment declEnv, TaggedInfo taggedInfo) {
+	public Obj(EvaluationEnvironment declEnv, TaggedInfo taggedInfo) {
 		this.taggedInfo = taggedInfo;
 		this.intEnv = new Reference<>(declEnv);
 	}
 
-    public Obj(Reference<Environment> declEnv, TaggedInfo taggedInfo) {
+    public Obj(Reference<EvaluationEnvironment> declEnv, TaggedInfo taggedInfo) {
 		intEnv = declEnv;
 		this.taggedInfo = taggedInfo;
 	}
 
     private void updateTee() {
-        typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv.get());
+        typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv.get().toTypeEnv());
     }
 
 	@Override
 	public Type getType() {
         updateTee();
-		return new ClassType(intEnv, new Reference<>(typeEquivEnv), new LinkedList<String>(), taggedInfo, null);
+		return new ClassType(intEnv.map(EvaluationEnvironment::toTypeEnv), new Reference<>(typeEquivEnv), new LinkedList<String>(), taggedInfo, null);
 	}
 
 	@Override
@@ -64,12 +65,13 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	}
 
 	@Override
-	public Value evaluateInvocation(Invocation exp, Environment env) {
+	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		String operation = exp.getOperationName();
-		return getIntEnv().getValue(operation, env.extend(new ValueBinding("this", this)));
+		return getIntEnv().lookup(operation).orElseThrow(() -> new RuntimeException("Cannot find class member"))
+				.getValue(env.extend(new ValueBinding("this", this)));
 	}
 	
-	public Environment getIntEnv() {
+	public EvaluationEnvironment getIntEnv() {
 		return intEnv.get();
 	}
 
@@ -78,13 +80,14 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		if (!(ass.getTarget() instanceof Invocation))
 			throw new RuntimeException("Something really, really weird happened.");
 		String operation = ((Invocation) ass.getTarget()).getOperationName();
-		intEnv.get().lookupBinding(operation, AssignableNameBinding.class).orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
+		intEnv.get().lookupBinding(operation, AssignableValueBinding.class)
+				.orElseThrow(() -> new RuntimeException("Cannot set a non-existent or immutable var"));
 
 		return;
 	}
 
 	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
+	public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
 		if (!(ass.getTarget() instanceof Invocation))
 			throw new RuntimeException("Something really, really weird happened.");
 		String operation = ((Invocation) ass.getTarget()).getOperationName();

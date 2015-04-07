@@ -13,6 +13,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		Value[] evaluatedResults = new Value[objects.length];
 		for (int i = 0; i < objects.length; i++) {
 			evaluatedResults[i] = objects[i].evaluate(env);

@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
@@ -104,8 +105,8 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Environment iEnv = env;
+	public Value evaluate(EvaluationEnvironment env) {
+		EvaluationEnvironment iEnv = env;
 		Value lastVal = UnitVal.getInstance(this.getLocation());
 		for (TypedAST exp : this) {
 			if (exp == null) continue;

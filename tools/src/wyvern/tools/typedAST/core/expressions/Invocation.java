@@ -13,6 +13,7 @@ import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.MetadataWrapper;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -70,7 +71,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		// System.out.println("Evaluating method invocation: " + this + " with receiver " + this.receiver);
 		/*
 		if (this.receiver instanceof Variable) {
@@ -109,7 +110,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
+	public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
 		Value lhs = receiver.evaluate(env);
 		if (!(lhs instanceof Assignable))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);

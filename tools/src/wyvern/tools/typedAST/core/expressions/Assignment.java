@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -63,7 +64,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		if (!(target instanceof Assignable))
 			reportEvalError(VALUE_CANNOT_BE_APPLIED, target.toString(), this);
 		Value evaluated = ((Assignable) target).evaluateAssignment(this, env);

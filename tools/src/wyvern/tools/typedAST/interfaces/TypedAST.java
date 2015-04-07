@@ -6,6 +6,7 @@ import wyvern.tools.parsing.HasParser;
 import wyvern.tools.parsing.quotelang.QuoteParser;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWritable;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	Type typecheck(Environment env, Optional<Type> expected);
 	
 	/** an interpreter */
-	Value evaluate(Environment env);
+	Value evaluate(EvaluationEnvironment env);
 
 	/**
 	 * Gets the children of a composite node

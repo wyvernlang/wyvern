@@ -25,6 +25,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -40,7 +41,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
-	private Environment declEvalEnv;
+	private EvaluationEnvironment declEvalEnv;
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 	
@@ -151,17 +152,17 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 		return newEnv;
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		declEvalEnv = declEnv;
 		if (metaValue.get() == null)
 			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
-		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName()).orElseThrow(() -> new RuntimeException("Internal Error - TypeDeclaration NameBinding broken"));
 		vb.setValue(metaValue.get());
 	}
 

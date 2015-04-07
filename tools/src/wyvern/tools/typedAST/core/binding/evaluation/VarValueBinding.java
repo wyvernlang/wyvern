@@ -8,14 +8,15 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.Optional;
 
-public class VarValueBinding extends ValueBinding implements AssignableValueBinding {
+public class VarValueBinding extends AssignableValueBinding {
 	private Value value;
 
 	public VarValueBinding(String name, Type type, Value value) {
-		super(name, type);
+		super(name, value);
 		this.value = value;
 	}
 
@@ -30,7 +31,7 @@ public class VarValueBinding extends ValueBinding implements AssignableValueBind
 	}
 
 	@Override
-	public Value getValue(Environment env) {
+	public Value getValue(EvaluationEnvironment env) {
 		return value;
 	}
 }

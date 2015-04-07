@@ -11,6 +11,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -58,7 +59,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		return new Closure(this, env);
 	}
 

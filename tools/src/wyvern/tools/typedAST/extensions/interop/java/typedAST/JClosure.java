@@ -14,6 +14,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.lang.invoke.MethodHandle;
@@ -72,9 +73,9 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 	}
 
 	List<JavaInvokableMethod> methods = new ArrayList<>();
-	private Environment evalEnv;
+	private EvaluationEnvironment evalEnv;
 
-	public JClosure(List<JavaInvokableMethod> methods, Environment evalEnv) {
+	public JClosure(List<JavaInvokableMethod> methods, EvaluationEnvironment evalEnv) {
 		this.methods = methods;
 		this.evalEnv = evalEnv;
 		Collections.sort(this.methods, new Comparator<JavaInvokableMethod>() {

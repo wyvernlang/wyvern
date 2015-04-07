@@ -24,6 +24,7 @@ import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -44,7 +45,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	private TypeBinding nameImplements;
 
-	protected Environment declEvalEnv;
+	protected EvaluationEnvironment declEvalEnv;
 
 	private TypeType equivalentType = null;
 	private TypeType equivalentClassType = null;
@@ -315,8 +316,8 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
 
 		//newEnv = newEnv.extend(taggedBinding);
 
@@ -324,25 +325,26 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		if (declEvalEnv == null)
 			declEvalEnv = declEnv.extend(evalEnv);
 		Obj classObj = new Obj(getClassEnv(evalEnv), taggedInfo);
 
-		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		ValueBinding vb = declEnv.lookup(nameBinding.getName())
+				.orElseThrow(() -> new RuntimeException("Internal error - Class NameBinding not initalized"));
 		vb.setValue(classObj);
 	}
 
-	public Environment evaluateDeclarations(Environment addtlEnv) {
-		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+	public EvaluationEnvironment evaluateDeclarations(EvaluationEnvironment addtlEnv) {
+		EvaluationEnvironment thisEnv = decls.extendWithDecls(EvaluationEnvironment.EMPTY);
 		decls.bindDecls(declEvalEnv.extend(addtlEnv), thisEnv);
 
 		return thisEnv;
 	}
 
-	public Environment getClassEnv(Environment extEvalEnv) {
+	public EvaluationEnvironment getClassEnv(EvaluationEnvironment extEvalEnv) {
 
-		Environment classEnv = Environment.getEmptyEnvironment();
+		EvaluationEnvironment classEnv = EvaluationEnvironment.EMPTY;
 
 		if (decls == null)
 			return classEnv;

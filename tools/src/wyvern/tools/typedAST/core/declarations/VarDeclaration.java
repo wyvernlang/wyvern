@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -83,15 +84,14 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new VarValueBinding(binding.getName(), binding.getType(), null));
-		return newEnv;
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		return old.extend(new VarValueBinding(binding.getName(), binding.getType(), null));
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		VarValueBinding vb = (VarValueBinding) declEnv.lookup(binding.getName());
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+		VarValueBinding vb = declEnv.lookupBinding(binding.getName(), VarValueBinding.class).get();
 		if (definition == null) {
             vb.assign(null);
 			return;

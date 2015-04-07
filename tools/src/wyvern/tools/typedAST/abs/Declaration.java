@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	 * Most declarations simply evaluate to unit without any computation
 	 */
 	@Override
-	public final Value evaluate(Environment env) {
+	public final Value evaluate(EvaluationEnvironment env) {
 		// code smell - can we eliminate this function?
 		// throw new RuntimeException("cannot evaluate a decl to a value - use evalDecls to get an updated environment");
 		return UnitVal.getInstance(this.getLocation());
@@ -61,23 +62,23 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	}
 
 	protected abstract Environment doExtend(Environment old, Environment against);
-	public abstract Environment extendWithValue(Environment old);
-	public abstract void evalDecl(Environment evalEnv, Environment declEnv);
+	public abstract EvaluationEnvironment extendWithValue(EvaluationEnvironment old);
+	public abstract void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv);
 	
-	public final Environment bindDecl(Environment evalEnv, Environment declEnv) {
+	public final EvaluationEnvironment bindDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		evalDecl(evalEnv, declEnv);
 		return evalEnv;
 	}
 	
-	public final Environment bindDecl(Environment evalEnv) {
+	public final EvaluationEnvironment bindDecl(EvaluationEnvironment evalEnv) {
 		return bindDecl(evalEnv, evalEnv);
 	}
 	
-	public final Environment evalDecl(Environment env) {
+	public final EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
 		return bindDecl(doExtendWithValue(env));
 	}
-	
-	public final Environment doExtendWithValue(Environment old) {
+
+	public final EvaluationEnvironment doExtendWithValue(EvaluationEnvironment old) {
 		return extendWithValue(old);
 	}
 

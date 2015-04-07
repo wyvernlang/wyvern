@@ -20,6 +20,7 @@ import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -164,21 +165,20 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		if (declEnv.getValue(binding.getName()) != null)
-			return;
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+		if (declEnv.lookup(binding.getName()).isPresent()) return;
 			
 		Value defValue = null;
 		if (definition != null)
 			defValue = definition.evaluate(evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
+		ValueBinding vb = (ValueBinding) declEnv.lookupBinding(binding.getName(), ValueBinding.class).get();
 		vb.setValue(defValue);
 	}
 

@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.*;
 
@@ -156,28 +157,28 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return null;
 	}
 
-	public final Environment extendWithDecls(Environment env) {
-		Environment newEnv = env;
+	public final EvaluationEnvironment extendWithDecls(EvaluationEnvironment env) {
+		EvaluationEnvironment newEnv = env;
 		for (Declaration d : this.getDeclIterator()) {
 			newEnv = d.extendWithValue(newEnv);
 		}
 		return newEnv;
 	}
 	
-	public final Environment evalDecls(Environment env) {
+	public final EvaluationEnvironment evalDecls(EvaluationEnvironment env) {
 		return bindDecls(extendWithDecls(env));
 	}
 	
-	public final Environment bindDecls(Environment env) {
-		Environment newEnv = env;
+	public final EvaluationEnvironment bindDecls(EvaluationEnvironment env) {
+		EvaluationEnvironment newEnv = env;
 		for (Declaration d : this.getDeclIterator()) {
 			d.evalDecl(newEnv, newEnv);
 		}
 		return newEnv;
 	}
 	
-	public final Environment bindDecls(Environment bodyEnv, Environment declEnv) {
-		Environment newEnv = declEnv;
+	public final EvaluationEnvironment bindDecls(EvaluationEnvironment bodyEnv, EvaluationEnvironment declEnv) {
+		EvaluationEnvironment newEnv = declEnv;
 		for (Declaration d : this.getDeclIterator()) {
 			d.evalDecl(bodyEnv, declEnv);
 		}
@@ -211,7 +212,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	}
 
 	@Override
-	public Environment evalDecl(Environment env) {
+	public EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
 		return evalDecls(env);
 	}
 	@Override

@@ -12,8 +12,10 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
+import javax.swing.text.html.Option;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
@@ -67,10 +69,10 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		//Value value = binding.getValue(env);
-		Value value = env.getValue(binding.getName());
-		assert value != null;
+		Value value = env.lookup(binding.getName()).orElseThrow(() -> new RuntimeException("Invalid variable name ")).getValue(env);
+
 		if (value instanceof VarValue) {
 			return ((VarValue)value).getValue();
 		}
@@ -90,7 +92,7 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
+	public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
 		Value value = ass.getValue().evaluate(env);
 		env.lookupBinding(binding.getName(), AssignableValueBinding.class)
 				.orElseThrow(() -> new RuntimeException("Invalid assignment"))

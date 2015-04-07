@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.interfaces;
 
 import wyvern.tools.types.Environment;
+import wyvern.tools.util.EvaluationEnvironment;
 
 public interface EnvironmentExtender extends TypedAST {
 	/**
@@ -23,5 +24,5 @@ public interface EnvironmentExtender extends TypedAST {
 
 	public Environment extend(Environment env, Environment against);
 
-	public Environment evalDecl(Environment env);
+	public EvaluationEnvironment evalDecl(EvaluationEnvironment env);
 }

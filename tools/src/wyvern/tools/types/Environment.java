@@ -72,22 +72,6 @@ public class Environment implements TreeWritable {
 		return parentEnvironment.lookupStaticType(name);
 	}
 
-	public Value getValue(String name) {
-		if (this.name == null)
-			return null;
-		if (this.name.equals(name) && this.binding instanceof ValueBinding)
-			return ((ValueBinding) binding).getValue(this);
-		return parentEnvironment.getValue(name);
-	}
-
-	public Value getValue(String name, Environment env) {
-		if (this.name == null)
-			return null;
-		if (this.name.equals(name) && this.binding instanceof ValueBinding)
-			return ((ValueBinding) binding).getValue(env);
-		return parentEnvironment.getValue(name, env);
-	}
-
 	public <T> Optional<T> lookupBinding(String name, Class<T> bindingType) {
 		if (this.name == null)
 			return Optional.empty();

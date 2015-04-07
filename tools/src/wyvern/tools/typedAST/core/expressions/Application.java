@@ -8,6 +8,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Intersection;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -68,7 +69,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		// System.out.println("Evaluating Application: " + this);
 		
 		TypedAST lhs = function.evaluate(env);
