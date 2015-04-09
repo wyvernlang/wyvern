@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -36,14 +37,20 @@ public class JavaResolver implements ImportResolver {
 
 		@Override
 		public Environment extendNames(Environment in) {
-			Environment oldMetaEnv = in.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment());
-			return resolved.extendName(in, in).extend(new MetadataInnerBinding(bindVal(extendVal(resolved.extend(oldMetaEnv, oldMetaEnv)))));
+			Optional<MetadataInnerBinding> innerBinding = in.lookupBinding("metaEnv", MetadataInnerBinding.class);
+			Environment oldMetaEnv = innerBinding.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
+			EvaluationEnvironment oldEvalEnv = innerBinding.map(MetadataInnerBinding::getInnerEvalEnv).orElse(EvaluationEnvironment.EMPTY);
+			return resolved.extendName(in, in).extend(new MetadataInnerBinding(
+					bindVal(extendVal(oldEvalEnv)), resolved.extend(oldMetaEnv, oldMetaEnv)));
 		}
 
 		@Override
 		public Environment extend(Environment in) {
-			Environment oldMetaEnv = in.lookupBinding("metaEnv", MetadataInnerBinding.class).map(mb -> mb.getInnerEnv()).orElse(Environment.getEmptyEnvironment());
-			return resolved.extend(in, in).extend(new MetadataInnerBinding(bindVal(extendVal(resolved.extend(oldMetaEnv, oldMetaEnv)))));
+			Optional<MetadataInnerBinding> innerBinding = in.lookupBinding("metaEnv", MetadataInnerBinding.class);
+			Environment oldMetaEnv = innerBinding.map(MetadataInnerBinding::getInnerEnv).orElse(Environment.getEmptyEnvironment());
+			EvaluationEnvironment oldEvalEnv = innerBinding.map(MetadataInnerBinding::getInnerEvalEnv).orElse(EvaluationEnvironment.EMPTY);
+			return resolved.extend(in, in).extend(new MetadataInnerBinding(
+					bindVal(extendVal(oldEvalEnv)), resolved.extend(oldMetaEnv, oldMetaEnv)));
 		}
 
 		@Override
@@ -52,12 +59,12 @@ public class JavaResolver implements ImportResolver {
 		}
 
 		@Override
-		public Environment extendVal(Environment env) {
+		public EvaluationEnvironment extendVal(EvaluationEnvironment env) {
 			return resolved.extendWithValue(env);
 		}
 
 		@Override
-		public Environment bindVal(Environment env) {
+		public EvaluationEnvironment bindVal(EvaluationEnvironment env) {
 			return resolved.bindDecl(env);
 		}
 	}

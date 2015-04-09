@@ -37,7 +37,7 @@ public class Interpreter {
 			res.typecheck(Globals.getStandardEnv(), Optional.empty());
 			// System.out.println("Result 1 = " + res.evaluate(Globals.getStandardEnv()));
 			// res = new DSLTransformer().transform(res); // FIXME: To make to work!
-			Value finalV = res.evaluate(Globals.getStandardEnv());
+			Value finalV = res.evaluate(Globals.getStandardEvalEnv());
 			// System.out.println("Result 2 = " + finalV);
 			TreeWriter t = new TreeWriter();
 			finalV.writeArgsToTree(t);

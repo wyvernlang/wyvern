@@ -14,6 +14,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 
@@ -156,7 +157,7 @@ public class JavaClassDecl extends ClassDeclaration {
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		initalize();
 		super.evalDecl(evalEnv, declEnv);
 	}
@@ -169,7 +170,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public Obj getClassObj() {
 		initalize();
-		return new Obj(getClassEnv(Environment.getEmptyEnvironment()), null);
+		return new Obj(getClassEnv(EvaluationEnvironment.EMPTY), null);
 	}
 
 	boolean initalized = false;
@@ -180,7 +181,7 @@ public class JavaClassDecl extends ClassDeclaration {
 		super.decls = getDecls(this.clazz);
 		Environment emptyEnvironment = Environment.getEmptyEnvironment();
 		super.classMembersEnv.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
-		super.declEvalEnv = emptyEnvironment;
+		super.declEvalEnv = EvaluationEnvironment.EMPTY;
 		updateEnv();
 	}
 
@@ -258,7 +259,7 @@ public class JavaClassDecl extends ClassDeclaration {
     }
 
 	@Override
-	public Environment evaluateDeclarations(Environment addtlEnv) {
+	public EvaluationEnvironment evaluateDeclarations(EvaluationEnvironment addtlEnv) {
 		initalize();
 		return super.evaluateDeclarations(addtlEnv);
 	}

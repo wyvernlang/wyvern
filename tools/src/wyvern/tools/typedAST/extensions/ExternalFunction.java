@@ -6,6 +6,7 @@ import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 	}
 
 	@Override
-	public Value evaluateApplication(Application app, Environment env) {
+	public Value evaluateApplication(Application app, EvaluationEnvironment env) {
 		Value argValue = app.getArgument().evaluate(env);
 		return exec.execute(env, argValue);
 	}

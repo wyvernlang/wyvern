@@ -20,6 +20,7 @@ import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 
 public class Globals {
 	public static Environment getStandardEnv() {
@@ -31,11 +32,14 @@ public class Globals {
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
 		env = env.extend(new TypeBinding("Str", Str.getInstance()));
-		
+		return env;
+	}
+	public static EvaluationEnvironment getStandardEvalEnv() {
+		EvaluationEnvironment env = EvaluationEnvironment.EMPTY;
 		env = env.extend(new ValueBinding("null", UnitVal.getInstance(FileLocation.UNKNOWN))); // How to represent  shock/horror  null!?
 		env = env.extend(new ValueBinding("true", new BooleanConstant(true)));
 		env = env.extend(new ValueBinding("false", new BooleanConstant(false)));
-		
+
 		env = env.extend(new ValueBinding("print", new ExternalFunction(arrow(str, unit), (env1, argument) -> {
 			System.out.println(((StringConstant)argument).getValue());
 			return UnitVal.getInstance(FileLocation.UNKNOWN); // Fake line number! FIXME:

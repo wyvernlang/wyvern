@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -54,8 +55,8 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Value value = env.getValue(binding.getName());
+	public Value evaluate(EvaluationEnvironment env) {
+		Value value = env.lookup(binding.getName()).get().getValue(env);
 		assert value != null;
 		return value;
 	}

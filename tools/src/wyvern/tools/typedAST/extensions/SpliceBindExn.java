@@ -9,14 +9,13 @@ import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
-import javax.lang.model.element.Name;
 import java.util.*;
 
 public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
@@ -65,8 +64,8 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+	public Value evaluate(EvaluationEnvironment env) {
+		Environment outerEnv = env.lookupValueBinding("oev", TSLBlock.OuterEnviromentBinding.class)
 				.map(oeb->oeb.getStore())
 				.orElse(Environment.getEmptyEnvironment());
 

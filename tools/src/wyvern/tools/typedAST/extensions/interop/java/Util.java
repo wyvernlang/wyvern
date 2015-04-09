@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.*;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -280,7 +281,7 @@ public class Util {
 	}
 
 	private static volatile int n = 0; //How many classes have been generated
-	private static Class<?> generateJavaWrapper(Environment toWrap, Class javaType) {
+	private static Class<?> generateJavaWrapper(EvaluationEnvironment toWrap, Class javaType) {
 		if (typeCache.containsKey(toWrap)) {
 			Map<Class,Class> innerMap = typeCache.get(toWrap);
 			if (innerMap.containsKey(javaType)) {
@@ -390,12 +391,12 @@ public class Util {
 				new Application(
 						new Invocation(receiver, target, null, FileLocation.UNKNOWN),
 						arguments, FileLocation.UNKNOWN)
-						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
+						.evaluate(EvaluationEnvironment.EMPTY)), null);//Therefore, can only handle strings and ints
 	}
 
 	public static Value getInternalValue(Obj receiver, String target) {
 		return new Invocation(receiver, target, null, FileLocation.UNKNOWN)
-						.evaluate(Environment.getEmptyEnvironment());//Therefore, can only handle strings and ints
+						.evaluate(EvaluationEnvironment.EMPTY);//Therefore, can only handle strings and ints
 	}
 	
 
@@ -405,13 +406,13 @@ public class Util {
 				new Application(
 						new Invocation(receiver, target, null, FileLocation.UNKNOWN),
 						arguments, FileLocation.UNKNOWN)
-						.evaluate(Environment.getEmptyEnvironment())), null);//Therefore, can only handle strings and ints
+						.evaluate(EvaluationEnvironment.EMPTY)), null);//Therefore, can only handle strings and ints
 	}
 
 	public static Value invokeValue(Value reciever, String target, Value args) {
 		return new Application(
 				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
-				args, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
+				args, FileLocation.UNKNOWN).evaluate(EvaluationEnvironment.EMPTY);
 	}
 	public static Value invokeValueVarargs(Value reciever, String target, Value... args) {
 		Value iargs;
@@ -424,6 +425,6 @@ public class Util {
 
 		return new Application(
 				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
-				iargs, FileLocation.UNKNOWN).evaluate(Environment.getEmptyEnvironment());
+				iargs, FileLocation.UNKNOWN).evaluate(EvaluationEnvironment.EMPTY);
 	}
 }

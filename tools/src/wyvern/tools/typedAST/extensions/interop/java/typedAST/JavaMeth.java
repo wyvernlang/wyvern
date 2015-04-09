@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Intersection;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -82,9 +83,9 @@ public class JavaMeth extends DefDeclaration {
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		JClosure closure = new JClosure(methods, evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(getName());
+		ValueBinding vb = (ValueBinding) declEnv.lookup(getName()).get();
 		vb.setValue(closure);
 	}
 	@Override

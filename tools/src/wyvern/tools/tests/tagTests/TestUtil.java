@@ -39,7 +39,7 @@ public class TestUtil {
 	 */
 	public static void evaluateExpecting(TypedAST ast, int value) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		Value v = ast.evaluate(Globals.getStandardEnv());
+		Value v = ast.evaluate(Globals.getStandardEvalEnv());
 		
 		String expecting = "IntegerConstant(" + value + ")";
 
@@ -48,7 +48,7 @@ public class TestUtil {
 	
 	public static void evaluateExpecting(TypedAST ast, String value) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		Value v = ast.evaluate(Globals.getStandardEnv());
+		Value v = ast.evaluate(Globals.getStandardEvalEnv());
 		
 		String expecting = "StringConstant(\"" + value + "\")"; 
 
@@ -63,7 +63,7 @@ public class TestUtil {
 	 * @param value
 	 */
 	public static void evaluateExpectingPerf(TypedAST ast, int value) {
-		Value v = ast.evaluate(Globals.getStandardEnv());
+		Value v = ast.evaluate(Globals.getStandardEvalEnv());
 		
 		String expecting = "IntegerConstant(" + value + ")"; 
 
@@ -71,7 +71,7 @@ public class TestUtil {
 	}
 	
 	public static void evaluatePerf(TypedAST ast) {
-		Value v = ast.evaluate(Globals.getStandardEnv());
+		Value v = ast.evaluate(Globals.getStandardEvalEnv());
 		
 		//String expecting = "IntegerConstant(" + value + ")"; 
 
@@ -87,7 +87,7 @@ public class TestUtil {
 	 */
 	public static void evaluate(TypedAST ast) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEnv());
+		ast.evaluate(Globals.getStandardEvalEnv());
 	}
 	
 	public static String readFile(String filename) {

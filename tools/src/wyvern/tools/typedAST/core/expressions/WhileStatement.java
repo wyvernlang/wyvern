@@ -13,6 +13,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -55,12 +56,12 @@ public class WhileStatement implements TypedAST, CoreAST {
 		return Unit.getInstance();	
 	}
 	
-	private boolean evaluateConditional(Environment env) {
+	private boolean evaluateConditional(EvaluationEnvironment env) {
 		return ((BooleanConstant)conditional.evaluate(env)).getValue();
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		while (evaluateConditional(env)) {
 			body.evaluate(env);
 		}

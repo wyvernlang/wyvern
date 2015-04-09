@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class SpliceExn extends AbstractTypedAST {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterTypecheckBinding.class)
 			.map(oeb->oeb.getStore())
 			.orElse(Environment.getEmptyEnvironment());
 		Type exnType = exn.typecheck(outerEnv, expected);
@@ -37,10 +38,10 @@ public class SpliceExn extends AbstractTypedAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+	public Value evaluate(EvaluationEnvironment env) {
+		EvaluationEnvironment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
 				.map(oeb->oeb.getStore())
-				.orElse(Environment.getEmptyEnvironment());
+				.orElse(EvaluationEnvironment.EMPTY);
 		return exn.evaluate(outerEnv);
 	}
 

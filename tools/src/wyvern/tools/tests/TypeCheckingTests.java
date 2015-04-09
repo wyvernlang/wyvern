@@ -27,9 +27,9 @@ public class TypeCheckingTests {
 		
 		Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "Unit");
 		
-		// System.out.println(res.evaluate(Globals.getStandardEnv()).toString());
+		// System.out.println(res.evaluate(Globals.getStandardEvalEnv()).toString());
 		
-		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "()");		
+		Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv()).toString(), "()");		
 	}
 
 	@Test
@@ -48,9 +48,9 @@ public class TypeCheckingTests {
 		
 		Assert.assertEquals("Unit", res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString());
 		
-		// System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEnv()).toString());
+		// System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEvalEnv()).toString());
 		
-		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "()");		
+		Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv()).toString(), "()");		
 	}
 
 	@Test
@@ -69,9 +69,9 @@ public class TypeCheckingTests {
 		
 		Assert.assertEquals("Unit", res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString());
 		
-		System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEnv()).toString());
+		System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEvalEnv()).toString());
 		
-		Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "()");		
+		Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv()).toString(), "()");		
 	}
 
 	@Test
@@ -106,9 +106,9 @@ public class TypeCheckingTests {
 		
 		// Assert.assertEquals(res.typecheck(Globals.getStandardEnv(), Optional.empty()).toString(), "TYPE()");
 		
-		// System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEnv()).toString());
+		// System.out.println("evaluate returned: " + res.evaluate(Globals.getStandardEvalEnv()).toString());
 		
-		// Assert.assertEquals(res.evaluate(Globals.getStandardEnv()).toString(), "()");		
+		// Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv()).toString(), "()");		
 	}
 }
 

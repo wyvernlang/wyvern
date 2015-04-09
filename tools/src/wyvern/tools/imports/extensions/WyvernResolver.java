@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 
 import java.io.*;
@@ -50,10 +51,14 @@ public class WyvernResolver implements ImportResolver {
 			res = new DSLTransformer().transform(res);
 		}
 
-		private Environment MiBEnv = Environment.getEmptyEnvironment();
-		private Environment getMiBEnv() { return MiBEnv; }
+		private Environment tcMiBEnv = Environment.getEmptyEnvironment();
+		private Environment getTcMiBEnv() { return tcMiBEnv; }
 
-		private MetadataInnerBinding mib = new MetadataInnerBinding(new Reference<>(this::getMiBEnv));
+
+		private EvaluationEnvironment MiBEnv = EvaluationEnvironment.EMPTY;
+		private EvaluationEnvironment getMiBEnv() { return MiBEnv; }
+
+		private MetadataInnerBinding mib = new MetadataInnerBinding(new Reference<>(this::getMiBEnv), new Reference<>(this::getTcMiBEnv));
 
 		boolean etping = false;
 		@Override
@@ -64,7 +69,7 @@ public class WyvernResolver implements ImportResolver {
 			etping = true;
 			if (res instanceof EnvironmentExtender) {
 				in = ((EnvironmentExtender) res).extendType(in, Globals.getStandardEnv());
-				MiBEnv = ((EnvironmentExtender) res).extendType(MiBEnv, Globals.getStandardEnv());
+				tcMiBEnv = ((EnvironmentExtender) res).extendType(tcMiBEnv, Globals.getStandardEnv());
 			}
 			etping = false;
 			return in;
@@ -79,7 +84,7 @@ public class WyvernResolver implements ImportResolver {
 			enaming = true;
 			if (res instanceof EnvironmentExtender) {
 				in = ((EnvironmentExtender) res).extendName(in, Globals.getStandardEnv());
-				MiBEnv = ((EnvironmentExtender) res).extendName(MiBEnv, Globals.getStandardEnv());
+				tcMiBEnv = ((EnvironmentExtender) res).extendName(tcMiBEnv, Globals.getStandardEnv());
 			}
 			enaming = false;
 			return in.extend(mib);
@@ -116,7 +121,7 @@ public class WyvernResolver implements ImportResolver {
 
 		boolean evaling = false;
 		@Override
-		public Environment extendVal(Environment env) {
+		public EvaluationEnvironment extendVal(EvaluationEnvironment env) {
 			if (extending) {
 				throw new RuntimeException("Cyclic dependency");
 			}
@@ -128,7 +133,7 @@ public class WyvernResolver implements ImportResolver {
 		}
 
 		@Override
-		public Environment bindVal(Environment env) {
+		public EvaluationEnvironment bindVal(EvaluationEnvironment env) {
 			//Bound as part of eval
 			return env;
 		}

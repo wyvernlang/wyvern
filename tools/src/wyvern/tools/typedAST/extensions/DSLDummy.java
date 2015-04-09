@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -37,7 +38,7 @@ public class DSLDummy implements TypedAST {
     }
 
     @Override
-    public Value evaluate(Environment env) {
+    public Value evaluate(EvaluationEnvironment env) {
         return dslDef.evaluate(env);
     }
 

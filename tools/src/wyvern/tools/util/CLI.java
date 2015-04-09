@@ -33,7 +33,7 @@ public class CLI {
 			Type checkedType = res.typecheck(Globals.getStandardEnv(), Optional.empty());
 			System.out.println("Result type: "+checkedType);
 			res = new DSLTransformer().transform(res);
-			Value finalV = res.evaluate(Globals.getStandardEnv());
+			Value finalV = res.evaluate(Globals.getStandardEvalEnv());
 			System.out.println("Result: "+finalV);
 		}
 	}

@@ -18,6 +18,7 @@ import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
+import wyvern.tools.util.EvaluationEnvironment;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.

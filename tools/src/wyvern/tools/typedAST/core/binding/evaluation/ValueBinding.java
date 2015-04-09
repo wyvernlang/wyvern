@@ -8,7 +8,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
-public class ValueBinding extends NameBindingImpl {
+public class ValueBinding extends NameBindingImpl implements EvaluationBinding {
 	private Value value;
 	
 	public ValueBinding(String name, Value value) {

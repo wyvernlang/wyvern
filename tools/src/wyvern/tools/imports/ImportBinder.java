@@ -2,6 +2,7 @@ package wyvern.tools.imports;
 
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 public interface ImportBinder {
 	//Typechecking
@@ -11,6 +12,6 @@ public interface ImportBinder {
 	public Type typecheck(Environment env);
 
 	//Evaluation
-	public Environment extendVal(Environment env);
-	public Environment bindVal(Environment env);
+	public EvaluationEnvironment extendVal(EvaluationEnvironment env);
+	public EvaluationEnvironment bindVal(EvaluationEnvironment env);
 }

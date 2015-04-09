@@ -17,7 +17,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -178,7 +177,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		Value defValue = null;
 		if (definition != null)
 			defValue = definition.evaluate(evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookupBinding(binding.getName(), ValueBinding.class).get();
+		ValueBinding vb = (ValueBinding) declEnv.lookupValueBinding(binding.getName(), ValueBinding.class).get();
 		vb.setValue(defValue);
 	}
 

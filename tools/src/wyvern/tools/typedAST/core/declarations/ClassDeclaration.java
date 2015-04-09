@@ -356,7 +356,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		}
 
 		ClassBinding thisBinding = new ClassBinding("class", this);
-		Environment evalEnv = classEnv.extend(thisBinding);
+		EvaluationEnvironment evalEnv = classEnv.extend(thisBinding);
 
 		for (Declaration decl : decls.getDeclIterator())
 			if (decl.isClassMember()){
@@ -433,10 +433,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return equivalentClassType;
 	}
 
-	public Environment getFilledBody(AtomicReference<Value> objRef) {
+	public EvaluationEnvironment getFilledBody(AtomicReference<Value> objRef) {
 		return evaluateDeclarations(
-				Environment
-						.getEmptyEnvironment()
+				EvaluationEnvironment.EMPTY
 						.extend(new LateValueBinding("this", objRef, getType())));
 	}
 

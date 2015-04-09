@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -32,14 +33,14 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env, Optional<Type> expected) {
 		decl.typecheck(env, Optional.empty());
-		Environment newEnv = decl.extendWithDecls(env);
+		Environment newEnv = decl.extend(env,env);
 		Type bodyType = body.typecheck(newEnv, Optional.empty());
 		return bodyType;
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Environment newEnv = decl.evalDecls(env);
+	public Value evaluate(EvaluationEnvironment env) {
+		EvaluationEnvironment newEnv = decl.evalDecls(env);
 		return body.evaluate(newEnv);
 	}
 

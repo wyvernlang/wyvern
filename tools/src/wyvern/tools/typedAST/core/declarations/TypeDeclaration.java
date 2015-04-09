@@ -45,7 +45,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
     protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
 	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
 	
-	public static Environment attrEvalEnv = Environment.getEmptyEnvironment(); // HACK
+	public static EvaluationEnvironment attrEvalEnv = EvaluationEnvironment.EMPTY; // HACK
 	private Reference<Value> metaValue = new Reference<>();
 
 	// FIXME: I am not convinced typeGuard is required (alex).

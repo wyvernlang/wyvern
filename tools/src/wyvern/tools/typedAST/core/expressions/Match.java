@@ -30,6 +30,7 @@ import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 /**
@@ -89,7 +90,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		TaggedInfo.resolveAll(env, this);
 
 		Type mo = matchingOver.getType();
@@ -102,11 +103,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 		if (matchingOver instanceof Variable) {
 			Variable w = (Variable) matchingOver;
-			ClassType wType = (ClassType) env.lookup(w.getName()).getType();
+			//ClassType wType = (ClassType) env.lookup(w.getName()).getType();
 			// System.out.println("wType = " + wType);
 			// System.out.println("looked up = " + TaggedInfo.lookupTagByType(wType));
 			// System.out.println("but mot = " + matchingOverTag);
-			matchingOverTag = ((Obj)env.getValue(w.getName())).getTaggedInfo();
+			matchingOverTag = ((Obj)env.lookup(w.getName()).map(ib -> ib.getValue(env))
+					.orElseThrow(() -> new RuntimeException("Invalid matching over tag"))).getTaggedInfo();
 		}
 
 		/*
@@ -161,7 +163,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 				if (ttti instanceof UnresolvedType) {
 					UnresolvedType ut = (UnresolvedType) ttti;
-					Value objVal = env.getValue(((UnresolvedType) ttti).getName(), env);
+					Value objVal = env.lookup(((UnresolvedType) ttti).getName()).get().getValue(env);
 					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().getValue(mbr).getType();
 					caseTag = innerClassType.getTaggedInfo();
 				} else {
