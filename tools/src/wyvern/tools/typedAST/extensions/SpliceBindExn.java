@@ -45,7 +45,7 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+		Environment outerEnv = env.lookupBinding("oev", TSLBlock.OuterTypecheckBinding.class)
 			.map(oeb->oeb.getStore())
 			.orElse(Environment.getEmptyEnvironment());
 
@@ -65,9 +65,9 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 
 	@Override
 	public Value evaluate(EvaluationEnvironment env) {
-		Environment outerEnv = env.lookupValueBinding("oev", TSLBlock.OuterEnviromentBinding.class)
+		EvaluationEnvironment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
 				.map(oeb->oeb.getStore())
-				.orElse(Environment.getEmptyEnvironment());
+				.orElse(EvaluationEnvironment.EMPTY);
 
 		return new Closure(this, outerEnv);
 	}

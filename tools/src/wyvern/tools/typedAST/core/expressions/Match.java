@@ -91,7 +91,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(EvaluationEnvironment env) {
-		TaggedInfo.resolveAll(env, this);
+		//TaggedInfo.resolveAll(env, this);
 
 		Type mo = matchingOver.getType();
 
@@ -164,10 +164,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 				if (ttti instanceof UnresolvedType) {
 					UnresolvedType ut = (UnresolvedType) ttti;
 					Value objVal = env.lookup(((UnresolvedType) ttti).getName()).get().getValue(env);
-					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().getValue(mbr).getType();
+					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().lookup(mbr).get().getType();
 					caseTag = innerClassType.getTaggedInfo();
 				} else {
-					tt = ti.resolve(env);
+					//tt = ti.resolve(env); TODO: is this valid?
 					caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
 				}
 			} else {
@@ -195,8 +195,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 *
 	 * Searches recursively to see if what we are matching over is a sub-tag of the given target.
 	 *
-	 * @param tag
-	 * @param currentBinding
 	 * @return
 	 */
 	//TODO: rename this method to something like isSubtag()
