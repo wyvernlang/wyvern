@@ -12,7 +12,7 @@ public class ValueBinding extends NameBindingImpl implements EvaluationBinding {
 	private Value value;
 	
 	public ValueBinding(String name, Value value) {
-		super(name, value.getType());
+		super(name, (value != null)?value.getType():null);
 		this.value = value;
 	}
 

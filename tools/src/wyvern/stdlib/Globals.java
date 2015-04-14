@@ -7,6 +7,7 @@ import static wyvern.tools.types.TypeUtils.str;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.JavaResolver;
 import wyvern.tools.imports.extensions.WyvernResolver;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -32,6 +33,11 @@ public class Globals {
 		env = env.extend(new TypeBinding("Int", Int.getInstance()));
 		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
 		env = env.extend(new TypeBinding("Str", Str.getInstance()));
+
+		env = env.extend(new NameBindingImpl("true", Bool.getInstance()));
+		env = env.extend(new NameBindingImpl("false", Bool.getInstance()));
+		env = env.extend(new NameBindingImpl("print", (arrow(str, unit))));
+		env = env.extend(new NameBindingImpl("printInteger", arrow(integer, unit)));
 		return env;
 	}
 	public static EvaluationEnvironment getStandardEvalEnv() {
