@@ -14,6 +14,8 @@ public class MetadataInnerBinding implements Binding {
 	private final Reference<Environment> tcEnv;
 	private final Reference<EvaluationEnvironment> innerEnv;
 
+	public static final MetadataInnerBinding EMPTY = new MetadataInnerBinding(EvaluationEnvironment.EMPTY, Environment.getEmptyEnvironment());
+
 	public MetadataInnerBinding() {
 		innerEnv = new Reference<>(EvaluationEnvironment.EMPTY);
 		tcEnv = new Reference<>(Environment.getEmptyEnvironment());

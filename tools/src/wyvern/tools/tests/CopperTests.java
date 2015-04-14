@@ -252,7 +252,9 @@ public class CopperTests {
 						"test\n";
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
 		res.typecheck(Globals.getStandardEnv(), Optional.empty());
-		Assert.assertEquals("IntegerConstant(7)",res.evaluate(Globals.getStandardEvalEnv()).toString());
+		Value result = res.evaluate(Globals.getStandardEvalEnv());
+		Assert.assertEquals("IntegerConstant(7)",
+				result.toString());
 	}
 	@Test
 	public void testNew3() throws IOException, CopperParserException {

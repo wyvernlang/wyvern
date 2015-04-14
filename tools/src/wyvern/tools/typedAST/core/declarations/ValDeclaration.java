@@ -172,7 +172,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		if (declEnv.lookup(binding.getName()).isPresent()) return;
+		if (!declEnv.lookup(binding.getName()).isPresent()) return;
 			
 		Value defValue = null;
 		if (definition != null)

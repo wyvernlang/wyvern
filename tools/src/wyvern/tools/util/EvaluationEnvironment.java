@@ -64,6 +64,7 @@ public class EvaluationEnvironment {
     }
 
     public Environment toTypeEnv() {
-        return parent.<Environment>map(e -> e.toTypeEnv().extend(binding)).orElse(Environment.getEmptyEnvironment());
+
+        return Optional.ofNullable(parent).<Environment>map(e -> e.toTypeEnv().extend(binding)).orElse(Environment.getEmptyEnvironment());
     }
 }

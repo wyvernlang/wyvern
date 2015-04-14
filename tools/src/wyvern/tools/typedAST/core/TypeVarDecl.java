@@ -184,7 +184,7 @@ public class TypeVarDecl extends Declaration {
 
 	private void evalMeta(Environment evalEnv) {
 		MetadataInnerBinding extMetaEnv = evalEnv
-				.lookupBinding("metaEnv", MetadataInnerBinding.class).get();
+				.lookupBinding("metaEnv", MetadataInnerBinding.class).orElseGet(() -> MetadataInnerBinding.EMPTY);
 
 		Environment metaTcEnv = Globals.getStandardEnv().extend(extMetaEnv.getInnerEnv());
 		EvaluationEnvironment metaEnv = Globals.getStandardEvalEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv.getInnerEvalEnv());
