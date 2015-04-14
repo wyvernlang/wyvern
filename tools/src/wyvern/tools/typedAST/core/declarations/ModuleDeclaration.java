@@ -121,7 +121,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		ValueBinding selfBinding = (ValueBinding) declEnv.lookup(name).get().getValue(evalEnv);
+		ValueBinding selfBinding = declEnv.lookup(name).get();
 		EvaluationEnvironment objEnv = EvaluationEnvironment.EMPTY;
 		Value selfV = new Obj(inner.evalDecl(objEnv), null);
 		selfBinding.setValue(selfV);

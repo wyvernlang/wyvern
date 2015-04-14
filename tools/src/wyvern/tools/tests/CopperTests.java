@@ -11,6 +11,7 @@ import wyvern.tools.parsing.HasParser;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.*;
@@ -312,7 +313,10 @@ public class CopperTests {
 		};
 
 		TypeDeclaration.attrEvalEnv = EvaluationEnvironment.EMPTY.extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner)));
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("myNumMetadata", metaType)), Optional.empty()), Int.getInstance());
+		Assert.assertEquals(res.typecheck(Globals.getStandardEnv().extend(new MetadataInnerBinding(EvaluationEnvironment.EMPTY,
+				Environment.getEmptyEnvironment()
+						.extend(new NameBindingImpl("myNumMetadata", metaType))
+						)), Optional.empty()), Int.getInstance());
 		res = new DSLTransformer().transform(res);
 		Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner)))).toString(), "IntegerConstant(5)");
 	}
@@ -383,15 +387,14 @@ public class CopperTests {
 			return newv;
 		};
 
-		HasParser inner = new HasParser() {
-			@Override
-			public ExtParser getParser() {
-				return parseri;
-			}
-		};
+		HasParser inner = () -> parseri;
 
 		TypeDeclaration.attrEvalEnv =EvaluationEnvironment.EMPTY.extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner)));
-		Assert.assertEquals(res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("myNumMetadata", metaType)).extend(new TypeBinding("HasParser", metaType)), Optional.empty()), Int.getInstance());
+		Assert.assertEquals(res.typecheck(
+				Globals.getStandardEnv().extend(new MetadataInnerBinding(EvaluationEnvironment.EMPTY,
+						Environment.getEmptyEnvironment()
+						.extend(new NameBindingImpl("myNumMetadata", metaType))
+						.extend(new TypeBinding("HasParser", metaType)))), Optional.empty()), Int.getInstance());
 		res = new DSLTransformer().transform(res);
 		Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("myNumMetadata", Util.toWyvObj(inner)))).toString(), "IntegerConstant(5)");
 	}

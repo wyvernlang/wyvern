@@ -36,7 +36,7 @@ public class EvaluationEnvironment {
     }
 
     public <T extends ValueBinding> Optional<T> lookupValueBinding(String name, Class<T> bindingType) {
-        if (binding.getClass().equals(bindingType) && binding.getName().equals(name))
+        if (bindingType.isAssignableFrom(binding.getClass()) && binding.getName().equals(name))
             return Optional.of((T)binding);
         return parent.flatMap(e -> e.lookupValueBinding(name, bindingType));
     }

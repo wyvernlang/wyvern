@@ -32,7 +32,7 @@ public class MetadataInnerBinding implements Binding {
 	}
 
 	public MetadataInnerBinding from(Environment env) {
-		MetadataInnerBinding old = env.lookupBinding("metaVal", MetadataInnerBinding.class).get();
+		MetadataInnerBinding old = env.lookupBinding("metaVal", MetadataInnerBinding.class).orElseGet(() -> MetadataInnerBinding.EMPTY);
 		return new MetadataInnerBinding(
 				old.innerEnv.map(e -> innerEnv.get().extend(e)),
 				old.tcEnv.map(e -> tcEnv.get().extend(e)));
