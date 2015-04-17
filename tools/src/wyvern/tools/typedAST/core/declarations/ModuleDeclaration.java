@@ -46,7 +46,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		inner.typecheck(env, Optional.empty());
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	private Iterable<TypedAST> getInnerIterable() {
@@ -129,7 +129,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override

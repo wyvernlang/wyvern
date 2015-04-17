@@ -48,7 +48,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		} else {
 			nextExpr.typecheck(env, Optional.empty());
 		}
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	public TypedAST getTarget() {

@@ -153,7 +153,7 @@ public class JavaClassDecl extends ClassDeclaration {
 	@Override
 	public Type doTypecheck(Environment env) {
 		updateEnv();
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override

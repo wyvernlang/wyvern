@@ -96,9 +96,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 			return true;
 		}
 
-		if (other instanceof MetadataWrapper)
-			return subtype(((MetadataWrapper) other).getInner(), subtypes);
-		
 		if (other instanceof TypeType) {
 			Map<String, Type> thisMembers = this.getMembers();
 			// System.out.println("this (" + this + ") : " + thisMembers);
@@ -203,7 +200,13 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		};
 		Collections.sort(denvList, c);
 		Environment ndEnv = getEnvForDict(newChildren, Environment.getEmptyEnvironment(), denvList);
+
 		return new TypeType(new Reference<>(ndEnv));
+	}
+
+	@Override
+	public Type cloneWithBinding(TypeBinding binding) {
+		return new TypeType(typeDeclEnv);
 	}
 
 	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {

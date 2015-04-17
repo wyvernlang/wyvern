@@ -1,5 +1,6 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
@@ -8,11 +9,10 @@ import wyvern.tools.util.TreeWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 public class Unit extends AbstractTypeImpl {
-	private Unit() { }
-	private static Unit instance = new Unit();
-	public static Unit getInstance() { return instance; }
+	public Unit() {  }
 	
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
@@ -26,7 +26,7 @@ public class Unit extends AbstractTypeImpl {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		return super.subtype(other, subtypes);
+		return other instanceof Unit;
 	}
 
 	@Override
@@ -38,4 +38,13 @@ public class Unit extends AbstractTypeImpl {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		return this;
 	}
+
+	@Override
+	public Type cloneWithBinding(TypeBinding binding) {
+		return new Unit();
+	}
+
+
+	@Override
+	public boolean equals(Object other) { return other instanceof Unit; }
 }

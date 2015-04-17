@@ -44,7 +44,7 @@ public class WhileStatement implements TypedAST, CoreAST {
 
 	@Override
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class WhileStatement implements TypedAST, CoreAST {
 			ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_APPLIED, conditional);
 		
 		body.typecheck(env, Optional.empty());
-		return Unit.getInstance();	
+		return new Unit();
 	}
 	
 	private boolean evaluateConditional(EvaluationEnvironment env) {

@@ -20,7 +20,7 @@ public class TrivDSLParser implements ExtParser {
 	public TypedAST parse(ParseBuffer input) {
 		New newv = new New(new HashMap<>(), null);
 		TypedAST dbody = new IntegerConstant(Integer.parseInt(input.getSrcString().trim()));
-		newv.setBody(new DeclSequence(Arrays.asList(new DefDeclaration("getValue", new Arrow(Unit.getInstance(), Int.getInstance()), new ArrayList<>(), dbody, false))));
+		newv.setBody(new DeclSequence(Arrays.asList(new DefDeclaration("getValue", new Arrow(new Unit(), new Int()), new ArrayList<>(), dbody, false))));
 		return newv;
 	}
 }

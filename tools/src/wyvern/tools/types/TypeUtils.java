@@ -9,8 +9,8 @@ public class TypeUtils {
 	public static Arrow arrow(Type t1, Type t2) {
 		return new Arrow(t1, t2);
 	}
-	
-	public static Unit unit = Unit.getInstance();
-	public static Int integer = Int.getInstance();
-	public static Str str = Str.getInstance();
+
+	public static Unit unit = new Unit();
+	public static Int integer = new Int();
+	public static Str str = new Str();
 }

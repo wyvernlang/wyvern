@@ -22,7 +22,7 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 
 	@Override
 	public Type getType() {
-		return Int.getInstance();
+		return new Int();
 	}
 	
 	@Override

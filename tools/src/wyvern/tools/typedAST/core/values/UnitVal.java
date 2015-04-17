@@ -12,6 +12,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
 	private UnitVal(FileLocation location) { this.location = location; }
@@ -22,7 +23,7 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	
 	@Override
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 	
 	@Override

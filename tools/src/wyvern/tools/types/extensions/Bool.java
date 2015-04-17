@@ -11,9 +11,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class Bool extends AbstractTypeImpl implements OperatableType {
-	private Bool() { }
-	private static Bool instance = new Bool();
-	public static Bool getInstance() { return instance; }
+	public Bool() { }
 
 	private static final Set<String> legalOperators = new HashSet<String>(Arrays.asList(new String[] {
 			"&&",
@@ -47,7 +45,7 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		return super.subtype(other, subtypes);
+		return other instanceof Bool;
 	}
 
 
@@ -60,4 +58,6 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		return this;
 	}
+	@Override
+	public boolean equals(Object other) { return other instanceof Bool; }
 }

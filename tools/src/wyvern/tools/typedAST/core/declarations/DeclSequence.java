@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.*;
@@ -145,7 +146,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			d.typecheck(env, Optional.empty());
 		}
 		
-		return wyvern.tools.types.extensions.Unit.getInstance();
+		return new Unit();
 	}
 	
 	public static DeclSequence getDeclSeq(TypedAST ast) {

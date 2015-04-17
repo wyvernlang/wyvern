@@ -9,6 +9,8 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.Optional;
+
 public class MetadataInnerBinding implements Binding {
 
 	private final Reference<Environment> tcEnv;
@@ -45,7 +47,7 @@ public class MetadataInnerBinding implements Binding {
 
 	@Override
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override

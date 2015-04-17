@@ -27,7 +27,7 @@ public class TypeDeclUtils {
 				Type type = b.getType();
 				tev = tev.extend(
 						new NameBindingImpl("set" + name.substring(0,1).toUpperCase() + name.substring(1),
-						new Arrow(type, Unit.getInstance())));
+						new Arrow(type, new Unit())));
 				continue;
 			}
 
@@ -94,7 +94,7 @@ public class TypeDeclUtils {
 				newEnv = newEnv.extend(
 						new NameBindingImpl(
 								"set" + propName.substring(0,1).toUpperCase() + propName.substring(1),
-								new Arrow(type, Unit.getInstance())));
+								new Arrow(type, new Unit())));
 			} else if (d instanceof ValDeclaration) {
 				if (((ValDeclaration) d).isClassMember() != useClassMembers)
 					continue;

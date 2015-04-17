@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class JavaClassType extends ClassType implements MetaType {
 	private final Class clazz;
@@ -113,4 +114,7 @@ public class JavaClassType extends ClassType implements MetaType {
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(decl.getClazz().getName());
 	}
+
+	@Override
+	public Type cloneWithChildren(Map<String, Type> children) { return new JavaClassType(decl); }
 }

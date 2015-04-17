@@ -42,7 +42,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 		}
 
 		if (bindings.size() == 0)
-			argType = Unit.getInstance();
+			argType = new Unit();
 		else if (bindings.size() == 1)
 			argType = bindings.get(0).getType();
 		else

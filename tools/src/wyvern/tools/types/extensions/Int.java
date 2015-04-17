@@ -13,9 +13,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class Int extends AbstractTypeImpl implements OperatableType {
-	private Int() { }
-	private static Int instance = new Int();
-	public static Int getInstance() { return instance; }
+	public Int() { }
 	
 	private static final Set<String> legalOperators = new HashSet<String>(Arrays.asList(new String[] {
 			"+",
@@ -42,9 +40,9 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 			reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
 		
 		if (isRelationalOperator(operatorName))
-			return Bool.getInstance(); //relational operations
+			return new Bool(); //relational operations
 		else if ((operatorName.equals("+")) && (type2 instanceof Str)) {
-			return Str.getInstance(); //string concatenation
+			return new Str(); //string concatenation
 		} else {
 			return this; //arithmetic operations
 		}
@@ -73,7 +71,7 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 				return true;
 			return ((JavaClassType) other).getInnerClass().equals(Object.class);
 		}
-		return super.subtype(other, subtypes);
+		return other instanceof Int;
 	}
 
 
@@ -86,4 +84,7 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		return this;
 	}
+
+	@Override
+	public boolean equals(Object other) { return other instanceof Int; }
 }
