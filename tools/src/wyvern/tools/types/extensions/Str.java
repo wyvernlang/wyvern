@@ -14,9 +14,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class Str extends AbstractTypeImpl implements OperatableType {
-	private Str() {}
-	private static Str instance = new Str();
-	public static Str getInstance() { return instance; }
+	public Str() {}
 
 	private static final Set<String> legalOperators = new HashSet<String>(Arrays.asList(new String[] {"+", "=="}));
 	
@@ -40,10 +38,10 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 				reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
 		if (operatorName.equals("==")) {
 			if (type2 instanceof JavaClassType && String.class.isAssignableFrom(((JavaClassType)type2).getInnerClass()))
-				return Bool.getInstance();
-			if (!(type2.subtype(Str.getInstance())))
+				return new Bool();
+			if (!(type2.subtype(new Str())))
 				reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
-			return Bool.getInstance();
+			return new Bool();
 		}
 		
 		return this;
@@ -64,7 +62,7 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 		if (other instanceof JavaClassType)
 			return (((JavaClassType) other).getInnerClass().isAssignableFrom(String.class));
 
-		return super.subtype(other, subtypes);
+		return other instanceof Str;
 	}
 	@Override
 	public Map<String, Type> getChildren() {
@@ -75,4 +73,6 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		return this;
 	}
+	@Override
+	public boolean equals(Object other) { return other instanceof Str; }
 }

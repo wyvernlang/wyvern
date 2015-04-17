@@ -16,7 +16,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 
@@ -51,10 +50,6 @@ public class TaggedInfo {
 	public void resolve(Environment env, HasLocation hl) {
 		if (this.tagType instanceof UnresolvedType) {
 			this.tagType = ((UnresolvedType) this.tagType).resolve(env);
-			if (this.tagType instanceof MetadataWrapper) {
-				// System.out.println("Caught one (tagType)!");
-				this.tagType = ((MetadataWrapper) this.tagType).getInner();
-			}
 		}
 
 		if (this.tagType instanceof TypeInv) {
@@ -70,10 +65,6 @@ public class TaggedInfo {
 			}
 
 			this.caseOf = ((UnresolvedType) this.caseOf).resolve(env);
-			if (this.caseOf instanceof MetadataWrapper) {
-				// System.out.println("Caught one (caseOf)!");
-				this.caseOf = ((MetadataWrapper) this.caseOf).getInner();
-			}
 		}
 
 		if (this.caseOf != null && this.caseOf instanceof TypeInv) {
@@ -88,10 +79,6 @@ public class TaggedInfo {
 		for (Type t : comprises) {
 			if (t instanceof UnresolvedType) {
 				Type tt = ((UnresolvedType) t).resolve(env);
-				if (tt instanceof MetadataWrapper) {
-					// System.out.println("Caught one (tt)!");
-					tt = ((MetadataWrapper) tt).getInner();
-				}
 				resolvedComprises.add(tt);
 			} else {
 				// if (t instanceof ClassType)

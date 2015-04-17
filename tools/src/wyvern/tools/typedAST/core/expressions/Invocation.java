@@ -12,7 +12,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 

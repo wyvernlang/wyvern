@@ -1,6 +1,7 @@
 package wyvern.tools.types.extensions;
 
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.types.*;
@@ -119,5 +120,25 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 			result.add(newChildren.get(i + ""));
 		}
 		return new Intersection(result);
+	}
+
+
+	private Optional<TypeBinding> binding = Optional.empty();
+
+	@Override
+	public Optional<TypeBinding> getResolvedBinding() {
+		return binding;
+	}
+
+	@Override
+	public void setResolvedBinding(TypeBinding binding) {
+		this.binding = Optional.of(binding);
+	}
+
+	@Override
+	public Type cloneWithBinding(TypeBinding binding) {
+		Type cloned = cloneWithChildren(getChildren());
+		cloned.setResolvedBinding(binding);
+		return cloned;
 	}
 }

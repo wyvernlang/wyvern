@@ -17,7 +17,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
@@ -94,9 +93,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		
 		// FIXME:
 		// System.out.println(resolved);
-		if (resolved instanceof MetadataWrapper) {
-			resolved = ((MetadataWrapper) resolved).getInner();
-		}
 
 		binding = new NameBindingImpl(binding.getName(), resolved);
 		if (binding.getType() == null) {
@@ -115,11 +111,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			declaredType = ((UnresolvedType) declaredType).resolve(env);
 			//System.out.println("ut =" + ((ClassType) ut.resolve(env)).getName());
 		}
-		
-		if (declaredType instanceof MetadataWrapper) {
-			declaredType = ((MetadataWrapper) declaredType).getInner();
-		}
-
 		if (definitionType != null && declaredType != null && !definitionType.subtype(declaredType))
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, definitionType.toString(), declaredType.toString());
 

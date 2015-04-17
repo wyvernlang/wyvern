@@ -29,13 +29,13 @@ public class Globals {
 		env = env.extend(new ImportResolverBinding("java",JavaResolver.getInstance()));
 		env = env.extend(new ImportResolverBinding("wyv", WyvernResolver.getInstance()));
 
-		env = env.extend(new TypeBinding("Unit", Unit.getInstance()));
-		env = env.extend(new TypeBinding("Int", Int.getInstance()));
-		env = env.extend(new TypeBinding("Bool", Bool.getInstance()));
-		env = env.extend(new TypeBinding("Str", Str.getInstance()));
+		env = env.extend(new TypeBinding("Unit", new Unit()));
+		env = env.extend(new TypeBinding("Int", new Int()));
+		env = env.extend(new TypeBinding("Bool", new Bool()));
+		env = env.extend(new TypeBinding("Str", new Str()));
 
-		env = env.extend(new NameBindingImpl("true", Bool.getInstance()));
-		env = env.extend(new NameBindingImpl("false", Bool.getInstance()));
+		env = env.extend(new NameBindingImpl("true", new Bool()));
+		env = env.extend(new NameBindingImpl("false", new Bool()));
 		env = env.extend(new NameBindingImpl("print", (arrow(str, unit))));
 		env = env.extend(new NameBindingImpl("printInteger", arrow(integer, unit)));
 		return env;

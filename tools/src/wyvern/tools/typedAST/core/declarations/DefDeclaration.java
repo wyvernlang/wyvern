@@ -70,7 +70,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
 		Type argType = null;
 		if (args.size() == 0) {
-			argType = Unit.getInstance();
+			argType = new Unit();
 		} else if (args.size() == 1) {
 			argType = args.get(0).getType();
 		} else {
@@ -133,7 +133,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			// System.out.println("bodyType = " + bodyType);
 			// System.out.println("retType = " + retType);
 			
-			if (bodyType != null && !bodyType.subtype(retType))
+			if (bodyType != null &&
+					!bodyType.subtype(retType))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
 		}
 		return type;

@@ -22,7 +22,7 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 
 	@Override
 	public Type getType() {
-		return Bool.getInstance();
+		return new Bool();
 	}
 
 	@Override

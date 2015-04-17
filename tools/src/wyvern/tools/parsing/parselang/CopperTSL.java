@@ -207,13 +207,13 @@ public class CopperTSL implements ExtParser {
 
 		res.setParserClassAuxCode(
 				"Value "+PAIRED_OBJECT_NAME+" = null;\n" +
-				"ExternalFunction pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),Str.getInstance()), Unit.getInstance()), (ee,v)->{\n" +
+				"ExternalFunction pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),new Str()), new Unit()), (ee,v)->{\n" +
 						"\tpushToken((Terminals)(((JavaObj)((TupleValue)v).getValue(0)).getObj()), ((StringConstant)((TupleValue)v).getValue(1)).getValue());\n" +
 						"\treturn UnitVal.getInstance(FileLocation.UNKNOWN);\n" +
 						"});\n" +
 				"Value terminals;");
 
-		res.setParserInitCode("pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),Str.getInstance()), Unit.getInstance()), (ee,v)->{\n" +
+		res.setParserInitCode("pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),new Str()), new Unit()), (ee,v)->{\n" +
 				"\tpushToken((Terminals)(((JavaObj)((TupleValue)v).getValue(0)).getObj()), ((StringConstant)((TupleValue)v).getValue(1)).getValue());\n" +
 				"\treturn UnitVal.getInstance(FileLocation.UNKNOWN);\n" +
 				"});\n" +
@@ -320,9 +320,9 @@ public class CopperTSL implements ExtParser {
 				= new ValDeclaration(entry.getKey(), DefDeclaration.getMethodType(entry.getValue().second().getArgBindings(), entry.getValue().first()), entry.getValue().second(), unkLoc));
 
 		toGenDefs.entrySet().stream().forEach(entry->classDecls[cdIdx.getAndIncrement()]
-				= new DefDeclaration(entry.getKey(), new Arrow(Unit.getInstance(), Unit.getInstance()), new LinkedList<>(), entry.getValue(), false));
+				= new DefDeclaration(entry.getKey(), new Arrow(new Unit(), new Unit()), new LinkedList<>(), entry.getValue(), false));
 
-		classDecls[cdIdx.getAndIncrement()] = new DefDeclaration("create", new Arrow(Unit.getInstance(),
+		classDecls[cdIdx.getAndIncrement()] = new DefDeclaration("create", new Arrow(new Unit(),
 				new UnresolvedType(wyvClassName)),
 				Arrays.asList(),
 				new New(new DeclSequence(), unkLoc), true);
@@ -371,15 +371,15 @@ public class CopperTSL implements ExtParser {
 			String disambiguationCode = dis.getCode();
 
 			List<NameBinding> argNames = dis.getMembers().stream().map(cer->cer.getName().toString())
-					.map(name -> new NameBindingImpl(name, Int.getInstance())).collect(Collectors.toList());
+					.map(name -> new NameBindingImpl(name, new Int())).collect(Collectors.toList());
 
-			argNames.add(new NameBindingImpl("lexeme", Str.getInstance()));
+			argNames.add(new NameBindingImpl("lexeme", new Str()));
 
 			SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(disambiguationCode), argNames, dis.getDisplayName());
 
 			CopperElementName newName = dis.getName();
 			String nextName = getNextName(methNum, newName);
-			toGen.put(nextName, new Pair<>(Int.getInstance(),spliced));
+			toGen.put(nextName, new Pair<>(new Int(), spliced));
 			dis.setCode(String.format("return ((IntegerConstant)Util.invokeValueVarargs(%s, \"%s\", %s)).getValue();", PAIRED_OBJECT_NAME, nextName,
 					argNames.stream().map(str -> (str.getType() instanceof Int) ? "new IntegerConstant(" + str.getName() + ")" : "new StringConstant(" + str.getName() + ")").reduce((a, b) -> a + ", " + b).get()));
 		};
@@ -424,8 +424,8 @@ public class CopperTSL implements ExtParser {
 
 			splicers.add((termClassType,termObjType) -> {
 						SpliceBindExn spliced = LangUtil.spliceBinding(new IParseBuffer(oCode), Arrays.asList(new NameBinding[]{
-								new NameBindingImpl("lexeme", Str.getInstance()),
-								new NameBindingImpl("pushToken", new Arrow(new Tuple(termObjType, Str.getInstance()), Unit.getInstance())),
+								new NameBindingImpl("lexeme", new Str()),
+								new NameBindingImpl("pushToken", new Arrow(new Tuple(termObjType, new Str()), new Unit())),
 								new NameBindingImpl("Terminals", termClassType)}), term.getDisplayName());
 
 						toGen.put(newName, new Pair<>(resType, spliced));

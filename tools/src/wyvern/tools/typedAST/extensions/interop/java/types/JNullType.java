@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.interop.java.types;
 
+import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
@@ -8,7 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class JNullType implements Type {
+public class JNullType extends AbstractTypeImpl implements Type {
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
 		return other instanceof JavaClassType;

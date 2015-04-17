@@ -223,7 +223,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		if (isTagged()) typecheckTags(env);
 
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	private void typecheckTags(Environment env) {

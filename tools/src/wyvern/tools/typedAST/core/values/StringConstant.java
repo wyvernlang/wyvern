@@ -22,7 +22,7 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 
 	@Override
 	public Type getType() {
-		return Str.getInstance();
+		return new Str();
 	}
 
 	@Override

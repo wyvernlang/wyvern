@@ -26,7 +26,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
@@ -94,10 +93,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		//TaggedInfo.resolveAll(env, this);
 
 		Type mo = matchingOver.getType();
-
-		if (mo instanceof MetadataWrapper) {
-			mo = ((MetadataWrapper) mo).getInner();
-		}
 
 		TaggedInfo matchingOverTag = TaggedInfo.lookupTagByType(mo); // FIXME:
 
@@ -267,10 +262,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// System.out.println("env = " + env);
 		// System.out.println("matchingOver = " + matchingOver);
 		// System.out.println("matchOverType = " + matchOverType);
-
-		if (matchOverType instanceof MetadataWrapper) {
-			matchOverType = ((MetadataWrapper) matchOverType).getInner(); // FIXME:
-		}
 
 		if (!(matchingOver instanceof Variable)) {
 			throw new RuntimeException("Can only match over variable");

@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
@@ -93,7 +94,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		Type lastType = wyvern.tools.types.extensions.Unit.getInstance();
+		Type lastType = new Unit();
 		for (TypedAST t : exps) {
 			if (t == null) continue;
 			lastType = t.typecheck(env, (exps.getLast() == t)?expected:Optional.empty());
