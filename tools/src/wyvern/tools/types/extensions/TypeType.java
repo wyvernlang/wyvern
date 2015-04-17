@@ -13,6 +13,8 @@ import wyvern.tools.types.*;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
@@ -206,7 +208,9 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 
 	@Override
 	public Type cloneWithBinding(TypeBinding binding) {
-		return new TypeType(typeDeclEnv);
+		TypeType typeType = new TypeType(typeDeclEnv);
+		typeType.setResolvedBinding(binding);
+		return typeType;
 	}
 
 	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
@@ -231,5 +235,10 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	 */
 	public String getName() {
 		return decl.getName();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return other instanceof TypeType && ((TypeType) other).typeDeclEnv.get().equals(typeDeclEnv.get());
 	}
 }

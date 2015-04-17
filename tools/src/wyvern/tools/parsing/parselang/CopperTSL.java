@@ -207,13 +207,13 @@ public class CopperTSL implements ExtParser {
 
 		res.setParserClassAuxCode(
 				"Value "+PAIRED_OBJECT_NAME+" = null;\n" +
-				"ExternalFunction pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),Str.getInstance()), Unit.getInstance()), (ee,v)->{\n" +
+				"ExternalFunction pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),new Str()), new Unit()), (ee,v)->{\n" +
 						"\tpushToken((Terminals)(((JavaObj)((TupleValue)v).getValue(0)).getObj()), ((StringConstant)((TupleValue)v).getValue(1)).getValue());\n" +
 						"\treturn UnitVal.getInstance(FileLocation.UNKNOWN);\n" +
 						"});\n" +
 				"Value terminals;");
 
-		res.setParserInitCode("pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),Str.getInstance()), Unit.getInstance()), (ee,v)->{\n" +
+		res.setParserInitCode("pushTokenV = new ExternalFunction(new Arrow(new Tuple(Util.javaToWyvType(Terminals.class),new Str()), new Unit()), (ee,v)->{\n" +
 				"\tpushToken((Terminals)(((JavaObj)((TupleValue)v).getValue(0)).getObj()), ((StringConstant)((TupleValue)v).getValue(1)).getValue());\n" +
 				"\treturn UnitVal.getInstance(FileLocation.UNKNOWN);\n" +
 				"});\n" +
