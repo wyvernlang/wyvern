@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import wyvern.stdlib.Globals;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.HasParser;
@@ -18,6 +19,8 @@ import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.core.expressions.*;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.typedAST.core.values.TupleValue;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.SpliceExn;
 import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
@@ -28,12 +31,14 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.util.EvaluationEnvironment;
 
+import javax.tools.Tool;
 import java.io.*;
 import java.util.*;
 
@@ -669,6 +674,52 @@ public class CopperTests {
 		Type result = res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		res = new DSLTransformer().transform(res);
 		Value finalV = res.evaluate(Globals.getStandardEvalEnv());
+	}
+
+	@Test(expected = ToolError.class)
+	public void invalidType() throws IOException, CopperParserException {
+		String body = "val x : Str = 2\nx";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(body), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+	@Test(expected = ToolError.class)
+	public void invalidType2() throws IOException, CopperParserException {
+		String body = "val x : Str * Int = (2, \"a\")\nx";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(body), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+	@Test(expected = ToolError.class)
+	public void invalidType3() throws IOException, CopperParserException {
+		String body = "val y : Int = 2\nval x : Str * Int = (y, \"a\")\nx";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(body), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+	@Test(expected = ToolError.class)
+	public void invalidType4() throws IOException, CopperParserException {
+		String body = "class Test\n\tclass def create():Test = new\n\tdef foo():Int = 2\nval s : Str = Test.create().foo()\ns";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(body), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+	@Test(expected = ToolError.class)
+	public void invalidType5() throws IOException, CopperParserException {
+		String body = "class Test\n\tclass def create():Test = new\n\tdef foo():Int = 2\ntype T\n\tdef foo():Str\nval s : T = Test.create()\ns";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(body), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+
+	@Test(expected = ToolError.class)
+	public void invalidType6() throws IOException, CopperParserException {
+		String body = "class Test\n\tclass def create():Test = new\n\tdef foo():Int = 2\ntype T\n\tdef foo():Str\nval s : T = new\ns";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(body), "test input");
+		res.typecheck(Globals.getStandardEnv(), Optional.empty());
+	}
+
+	@Test
+	public void arrays1() throws IOException, CopperParserException {
+		Value equivalent = Util.javaToWyvObj(new int[40]);
+		Util.invokeValue(equivalent, "set", new TupleValue(new Tuple(new Int(), new Int()), new Value[] { new IntegerConstant(0), new IntegerConstant(11) }));
+		Assert.assertEquals(((IntegerConstant) Util.invokeValue(equivalent, "get", new IntegerConstant(0))).getValue(), 11);
+		Assert.assertEquals(((IntegerConstant) Util.invokeValue(equivalent, "length", UnitVal.getInstance(FileLocation.UNKNOWN))).getValue(), 40);
 	}
 }
 

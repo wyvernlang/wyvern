@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import jdk.internal.dynalink.support.Lookup;
+import jdk.nashorn.internal.lookup.MethodHandleFactory;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -51,14 +53,14 @@ public class JavaClassDecl extends ClassDeclaration {
 			HashMap<String, List<Pair<MethodHandle, Method>>> sMap = new HashMap<>();
 			for (Method m : clazz.getMethods()) {
 				if (sMap.containsKey(m.getName()) && Modifier.isStatic(m.getModifiers())) {
-					sMap.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
+					sMap.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz, m)), m));
 					continue;
 				} else if (map.containsKey(m.getName())) {
-					map.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
+					map.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz, m)), m));
 					continue;
 				}
 				ArrayList<Pair<MethodHandle, Method>> list = new ArrayList<>();
-				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)), m));
+				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz, m)), m));
 				if (!Modifier.isStatic(m.getModifiers()))
 					map.put(m.getName(), list);
 				else
@@ -66,12 +68,12 @@ public class JavaClassDecl extends ClassDeclaration {
 			}
 
 			//Fields
-            for (Field f : clazz.getFields()) {
+			for (Field f : clazz.getFields()) {
 				Optional<MethodHandle> setter = Optional.empty();
 				if (!Modifier.isFinal(f.getModifiers()))
 					setter = Optional.of(lookup.unreflectSetter(f));
-                decls.add(new JavaField(f,lookup.unreflectGetter(f),setter));
-            }
+				decls.add(new JavaField(f, lookup.unreflectGetter(f), setter));
+			}
 
 			//Inner classes
 			for (Class c : clazz.getDeclaredClasses()) {
@@ -85,14 +87,38 @@ public class JavaClassDecl extends ClassDeclaration {
 			}
 
 			//Create real decls
-			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
+			for (Map.Entry<String, List<Pair<MethodHandle, Method>>> entry : sMap.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
 
-			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : map.entrySet()) {
+			for (Map.Entry<String, List<Pair<MethodHandle, Method>>> entry : map.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
-		} catch (IllegalAccessException e) {
+
+
+			if (clazz.isArray()) { //add in getter/acessor methods
+				Class elementType = clazz.getComponentType();
+				MethodHandle gethandle = MethodHandles.arrayElementGetter(clazz);
+
+				String postfix = "";
+				switch (elementType.getName()) {
+					case "int": postfix = "Int"; break;
+					case "boolean": postfix = "Boolean"; break;
+					case "byte": postfix = "Byte"; break;
+					case "char": postfix = "Char"; break;
+					case "double": postfix = "Double"; break;
+					case "float": postfix = "Float"; break;
+					case "long": postfix = "Long"; break;
+					case "short": postfix = "Short"; break;
+				}
+
+				MethodHandle sethandle = MethodHandles.arrayElementSetter(clazz);
+				MethodHandle lengthHandle = MethodHandles.lookup().unreflect(Class.forName("java.lang.reflect.Array").getMethod("getLength", Object.class));
+				decls.add(new JavaMeth("length", Arrays.asList(new JClosure.JavaInvokableMethod(new Class[]{}, int.class, lengthHandle, Arrays.asList(), false, clazz))));
+				decls.add(new JavaMeth("get", Arrays.asList(new JClosure.JavaInvokableMethod(new Class[]{int.class}, elementType, gethandle, Arrays.asList("index"), false, clazz))));
+				decls.add(new JavaMeth("set", Arrays.asList(new JClosure.JavaInvokableMethod(new Class[]{int.class, elementType}, void.class, sethandle, Arrays.asList("index", "element"), false, clazz))));
+			}
+		} catch (IllegalAccessException | NoSuchMethodException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		DeclSequence ds = new DeclSequence(decls);
@@ -129,6 +155,7 @@ public class JavaClassDecl extends ClassDeclaration {
 				.filter(meth->meth.getName().equals("meta$get"))
 				.filter(meth -> meth.getParameterCount() == 0)
 				.findFirst();
+
 
 		if (creator.isPresent())
 				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<Value>() {
