@@ -86,7 +86,7 @@ public class DynamicTagTests {
 		String program = TestUtil.readFile(PATH + "DynamicTagsWindow.wyv");
 		TypedAST ast = TestUtil.getAST(program);
 
-		TestUtil.evaluateExpecting(ast, "scrollable");
+		TestUtil.evaluateExpecting(ast, "bordered");
 	}
 	
 	@Test

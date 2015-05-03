@@ -5,6 +5,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -243,7 +244,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			//check the type is tagged
 			if (!(caseOfType instanceof TypeInv)) { // If it is TypeInv - we won't know till runtime!
 				TaggedInfo info = TaggedInfo.lookupTagByType(caseOfType);
+
 				//System.out.println("Looked up: " + info);
+
+				taggedInfo.setCaseOfTaggedInfo(info);
 
 				if (info == null) {
 					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfType.toString());
@@ -318,7 +322,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		EvaluationEnvironment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+		EvaluationEnvironment newEnv = old
+				.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()))
+				.extend(new HackForArtifactTaggedInfoBinding(nameBinding.getName()));
 
 		//newEnv = newEnv.extend(taggedBinding);
 
@@ -330,10 +336,37 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		// System.out.println("Inside evalDecl for something called: " + this.getName());
 		TaggedInfo goodTI = this.taggedInfo;
+		if (goodTI != null) {
+			// FIXME: This is a right place to resolve the TaggedInfo case of for this tag for this class if it happens to use variables.
+			if (goodTI.hasCaseOf()) {
+				Type co = goodTI.getCaseOfTag();
+				if (co instanceof TypeInv) {
+					TypeInv ti = (TypeInv) co;
+					Type ttti = ti.getInnerType();
+					String mbr = ti.getInvName();
+					if (ttti instanceof UnresolvedType) {
+						Value objVal = evalEnv.lookup(((UnresolvedType) ttti).getName()).get().getValue(evalEnv);
+						TaggedInfo caseTag = ((Obj) objVal).getIntEnv().lookupBinding(mbr, HackForArtifactTaggedInfoBinding.class)
+								.map(b->b.getTaggedInfo()).orElseThrow(() -> new RuntimeException("Invalid tag invocation"));
+
+						// FIX THIS TAG:
+						goodTI = new TaggedInfo(caseTag, new ArrayList<TaggedInfo>());
+					}
+				}
+			}
+		}
 
 		if (declEvalEnv == null)
 			declEvalEnv = declEnv.extend(evalEnv);
-		Obj classObj = new Obj(getClassEnv(evalEnv), goodTI); // FIXME: can be tagged too you know, not goodTI!! :)
+		if (goodTI != null) {
+			HackForArtifactTaggedInfoBinding hfatib = new HackForArtifactTaggedInfoBinding("this");
+			hfatib.setTaggedInfo(goodTI);
+			evalEnv = evalEnv.extend(hfatib);
+		}
+		Obj classObj = new Obj(getClassEnv(evalEnv), null); // FIXME: can be tagged too you know, not goodTI!! :)
+
+		final TaggedInfo finalTi = goodTI;
+		declEnv.lookupBinding(nameBinding.getName(), HackForArtifactTaggedInfoBinding.class).ifPresent(b->b.setTaggedInfo(finalTi));
 
 		ValueBinding vb = declEnv.lookup(nameBinding.getName())
 				.orElseThrow(() -> new RuntimeException("Internal error - Class NameBinding not initalized"));

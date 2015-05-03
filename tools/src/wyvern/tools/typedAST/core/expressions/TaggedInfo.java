@@ -1,9 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
@@ -33,11 +30,20 @@ public class TaggedInfo {
 	private String tagName;
 	private Type tagType;
 
+
 	// Note that caseOf and comprises only use Type when parsing, they should all be replaced with appropriate
 	// TaggedInfo during runtime or for type checking of tags to work.
 	private Type caseOf;
 
 	private List<Type> comprises;
+
+	public TaggedInfo getCaseOfTaggedInfo() {
+		return caseOfTaggedInfo;
+	}
+
+	public void setCaseOfTaggedInfo(TaggedInfo caseOfTaggedInfo) {
+		this.caseOfTaggedInfo = caseOfTaggedInfo;
+	}
 
 	// The only thing that matters is TaggedInfo address and caseOf/comprises relation below.
 	private TaggedInfo caseOfTaggedInfo;
@@ -70,7 +76,8 @@ public class TaggedInfo {
 			this.caseOf = ((UnresolvedType) this.caseOf).resolve(env);
 		}
 
-		if (this.caseOf != null && this.caseOf instanceof TypeInv) {
+		if (this.caseOf != null && this.caseOf instanceof TypeInv &&
+				!(((TypeInv)caseOf).getInnerType() instanceof UnresolvedType)) {
 			// System.out.println("FOUND caseOf!" + caseOf);
 			((TypeInv) this.caseOf).resolve(env);
 			// System.out.println("MADE caseOf!" + caseOf);

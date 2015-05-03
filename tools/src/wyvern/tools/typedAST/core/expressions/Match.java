@@ -14,6 +14,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -159,11 +160,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 
 				if (ttti instanceof UnresolvedType) {
-					UnresolvedType ut = (UnresolvedType) ttti;
 					Value objVal = env.lookup(((UnresolvedType) ttti).getName()).get().getValue(env);
-					// caseTag = ((ClassType) ((Obj) objVal).getIntEnv().lookup(mbr).get().getType())
-					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().lookup(mbr).get().getType();
-					caseTag = innerClassType.getTaggedInfo();
+					caseTag = ((Obj) objVal).getIntEnv().lookupBinding(mbr, HackForArtifactTaggedInfoBinding.class)
+							.map(b -> b.getTaggedInfo()).orElseThrow(() -> new RuntimeException("Invalid tag invocation"));
+
 				} else {
 					//tt = ti.resolve(env); TODO: is this valid?
 					caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
@@ -209,12 +209,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// if (matchingOverTag.equals(matchTargetTag)) return true;
 		if (matchingOver == matchTarget) return true;
 
-		// If caseOf is hopelessly broken, this is a "fix": return false; :-)
+		// If caseOf is hopelessly broken, this is a "fix": return false; :-)d
 
-		Type matchingOverCaseOf = matchingOver.getCaseOfTag();
+		TaggedInfo ti = matchingOver.getCaseOfTaggedInfo();
 
-		if (matchingOverCaseOf == null) return false;
-		else return isSubtag(TaggedInfo.lookupTagByType(matchingOverCaseOf), matchTarget); // FIXME:
+		if (ti == null) return false;
+		return isSubtag(ti, matchTarget); // FIXME:
 	}
 
 	@Override

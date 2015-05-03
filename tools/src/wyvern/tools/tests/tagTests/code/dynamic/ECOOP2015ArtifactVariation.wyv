@@ -25,11 +25,11 @@ val winMod:WindowMod =
 	    basicWindow
 val bigWinMod:WindowMod = makeScrollable(winMod)
 val smallWin = winMod.Win.make()
-val bigWin = bigWinMod.Win.make()
+val bigWin = bigWinMod.Win.make() // : {draw : unit -> str}
 def screenCap(w:Window):Str
 	w.draw()
 	match(w):
-		bigWinMod.Win => "big"
+		bigWinMod.Win => "big" //bigWinMod.Win : {make : unit -> Win}
 		winMod.Win => "normal"
 		default => "default"
 val result = screenCap(smallWin)
