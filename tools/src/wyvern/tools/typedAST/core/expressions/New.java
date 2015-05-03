@@ -18,8 +18,10 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -165,7 +167,29 @@ public class New extends CachingTypedAST implements CoreAST {
 				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, EvaluationEnvironment::extend);
 		EvaluationEnvironment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 
-		Obj obj = new Obj(objenv.extend(argValEnv), classDecl.getTaggedInfo());
+		TaggedInfo goodTI = classDecl.getTaggedInfo();
+		if (goodTI != null) {
+			// FIXME: This is a right place to resolve the TaggedInfo case of for this tag for this class if it happens to use variables.
+			if (goodTI.hasCaseOf()) {
+				Type co = goodTI.getCaseOfTag();
+				if (co instanceof TypeInv) {
+					TypeInv ti = (TypeInv) co;
+					Type ttti = ti.getInnerType();
+					String mbr = ti.getInvName();
+					if (ttti instanceof UnresolvedType) {
+						UnresolvedType ut = (UnresolvedType) ttti;
+						Value objVal = evalEnv.lookup(((UnresolvedType) ttti).getName()).get().getValue(evalEnv);
+						ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().lookup(mbr).get().getType();
+						TaggedInfo caseTag = innerClassType.getTaggedInfo();
+
+						// FIX THIS TAG:
+						goodTI = new TaggedInfo(caseTag, new ArrayList<TaggedInfo>());
+					}
+				}
+			}
+		}
+
+		Obj obj = new Obj(objenv.extend(argValEnv), goodTI);
 
 		//FIXME: Record new tag!
 		if (classDecl.isTagged()) {

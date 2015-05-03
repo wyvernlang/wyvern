@@ -106,8 +106,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 					.orElseThrow(() -> new RuntimeException("Invalid matching over tag"))).getTaggedInfo();
 		}
 
-		/*
 		System.out.println("Evaluating match with matchingOver = " + matchingOver + " its class " + matchingOver.getClass());
+		/*
 		Variable v = (Variable) matchingOver;
 		System.out.println("v.getType() = " + v.getType());
 		System.out.println("v.getName() = " + v.getName());
@@ -150,6 +150,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 			if (tt instanceof TypeInv) {
 				TypeInv ti = (TypeInv) tt;
 
+				System.out.println("Processing TypeInv case: " + ti);
+
 				// FIXME: In ECOOP2015Artifact, I am trying to tell the difference between winMod.Win and bigWinMod.Win...
 
 				Type ttti = ti.getInnerType();
@@ -159,6 +161,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 				if (ttti instanceof UnresolvedType) {
 					UnresolvedType ut = (UnresolvedType) ttti;
 					Value objVal = env.lookup(((UnresolvedType) ttti).getName()).get().getValue(env);
+					// caseTag = ((ClassType) ((Obj) objVal).getIntEnv().lookup(mbr).get().getType())
 					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().lookup(mbr).get().getType();
 					caseTag = innerClassType.getTaggedInfo();
 				} else {
@@ -200,7 +203,13 @@ public class Match extends CachingTypedAST implements CoreAST {
 		String matchingOverTag = matchingOver.getTagName();
 		String matchTargetTag = matchTarget.getTagName();
 
-		if (matchingOverTag.equals(matchTargetTag)) return true;
+		System.out.println("matchingOverTag = " + matchingOverTag + " and matchTargetTag = " + matchTargetTag);
+
+		// FIXME: Why do equals when that may not correspond to the tags being the same? Only reference == is safe I guess?
+		// if (matchingOverTag.equals(matchTargetTag)) return true;
+		if (matchingOver == matchTarget) return true;
+
+		// If caseOf is hopelessly broken, this is a "fix": return false; :-)
 
 		Type matchingOverCaseOf = matchingOver.getCaseOfTag();
 

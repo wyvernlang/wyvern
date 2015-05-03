@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeInv;
@@ -326,9 +327,13 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+
+		// System.out.println("Inside evalDecl for something called: " + this.getName());
+		TaggedInfo goodTI = this.taggedInfo;
+
 		if (declEvalEnv == null)
 			declEvalEnv = declEnv.extend(evalEnv);
-		Obj classObj = new Obj(getClassEnv(evalEnv), taggedInfo);
+		Obj classObj = new Obj(getClassEnv(evalEnv), goodTI); // FIXME: can be tagged too you know, not goodTI!! :)
 
 		ValueBinding vb = declEnv.lookup(nameBinding.getName())
 				.orElseThrow(() -> new RuntimeException("Internal error - Class NameBinding not initalized"));

@@ -71,7 +71,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Value evaluate(EvaluationEnvironment env) {
-		// System.out.println("Evaluating method invocation: " + this + " with receiver " + this.receiver);
+		System.out.println("Evaluating method invocation: " + this + " with receiver " + this.receiver);
 		/*
 		if (this.receiver instanceof Variable) {
 			Variable w = (Variable) this.receiver;

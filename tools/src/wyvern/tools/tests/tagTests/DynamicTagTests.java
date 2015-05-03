@@ -22,7 +22,18 @@ public class DynamicTagTests {
 		
 		TestUtil.evaluateExpecting(ast, "big");
 	}
-	
+
+	@Test
+	/**
+	 * This test ensures the dynamic tag example works properly.
+	 */
+	public void ecoop2015ArtifactVariation() throws CopperParserException, IOException {
+		String program = TestUtil.readFile(PATH + "ECOOP2015ArtifactVariation.wyv");
+		TypedAST ast = TestUtil.getAST(program);
+
+		TestUtil.evaluateExpecting(ast, "normal");
+	}
+
 	@Test
 	/**
 	 * This test ensures the dynamic tag example works properly.

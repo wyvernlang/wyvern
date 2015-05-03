@@ -49,6 +49,8 @@ public class TestUtil {
 	public static void evaluateExpecting(TypedAST ast, String value) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
+
+		// System.out.println("Got value: " + v);
 		
 		String expecting = "StringConstant(\"" + value + "\")"; 
 

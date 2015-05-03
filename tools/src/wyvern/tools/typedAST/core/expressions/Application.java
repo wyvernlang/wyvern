@@ -70,7 +70,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Value evaluate(EvaluationEnvironment env) {
-		// System.out.println("Evaluating Application: " + this);
+		System.out.println("Evaluating Application: " + this);
 		
 		TypedAST lhs = function.evaluate(env);
 		if (!(lhs instanceof ApplyableValue))

@@ -33,10 +33,14 @@ public class TaggedInfo {
 	private String tagName;
 	private Type tagType;
 
+	// Note that caseOf and comprises only use Type when parsing, they should all be replaced with appropriate
+	// TaggedInfo during runtime or for type checking of tags to work.
 	private Type caseOf;
-	private TaggedInfo caseOfTaggedInfo;
 
 	private List<Type> comprises;
+
+	// The only thing that matters is TaggedInfo address and caseOf/comprises relation below.
+	private TaggedInfo caseOfTaggedInfo;
 	private List<TaggedInfo> comprisesTaggedInfos;
 
 
@@ -45,7 +49,6 @@ public class TaggedInfo {
 			ti.resolve(env, hl);
 		}
 	}
-
 
 	public void resolve(Environment env, HasLocation hl) {
 		if (this.tagType instanceof UnresolvedType) {
@@ -123,6 +126,11 @@ public class TaggedInfo {
 	 */
 	public TaggedInfo(Type caseOf) {
 		this(caseOf, null);
+	}
+
+	public TaggedInfo(TaggedInfo caseOfTaggedInfo, List<TaggedInfo> comprisesTaggedInfos) {
+		this.caseOfTaggedInfo = caseOfTaggedInfo;
+		this.comprisesTaggedInfos = comprisesTaggedInfos;
 	}
 
 	/**
