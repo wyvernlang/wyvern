@@ -44,7 +44,8 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 
 	@Override
 	public Type getType() {
-        updateTee();
+		if (typeEquivEnv == null)
+        	updateTee();
 		return new ClassType(intEnv.map(EvaluationEnvironment::toTypeEnv), new Reference<>(typeEquivEnv), new LinkedList<String>(), taggedInfo, null);
 	}
 

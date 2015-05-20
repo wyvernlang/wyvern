@@ -502,8 +502,8 @@ import java.net.URI;
     lvalue ::= identifier_t:id {: RESULT = new Variable(new NameBindingImpl((String)id, null), new FileLocation(currentState.pos)); :}
     	|	   term:prev dot_t identifier_t:id {: RESULT = new Invocation((TypedAST)prev, (String)id, null, new FileLocation(currentState.pos)); :};
 
-    nrd ::= val:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
-    	|   var:vd Newline_t p:re {: RESULT = new Sequence(Arrays.asList((TypedAST)vd,(TypedAST)re)); :}
+    nrd ::= val:vd Newline_t p:re {: RESULT = new Sequence((TypedAST)vd,(TypedAST)re); :}
+    	|   var:vd Newline_t p:re {: RESULT = new Sequence((TypedAST)vd,(TypedAST)re); :}
     	;
 
     prd ::= prd:re Newline_t rd:vd{: RESULT = DeclSequence.simplify(new DeclSequence(Arrays.asList((TypedAST)vd,(TypedAST)re))); :}

@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -83,7 +84,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		*/
 
 		Value lhs = receiver.evaluate(env);
-		if (!(lhs instanceof InvokableValue))
+		if (Globals.checkRuntimeTypes && !(lhs instanceof InvokableValue))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		InvokableValue receiverValue = (InvokableValue) lhs;
 		Value out = receiverValue.evaluateInvocation(this, env);

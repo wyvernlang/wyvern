@@ -56,4 +56,6 @@ public class Globals {
 		})));
 		return env;
 	}
+
+	public static final boolean checkRuntimeTypes = false;
 }

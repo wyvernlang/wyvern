@@ -68,14 +68,16 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	public Sequence(TypedAST first, TypedAST second) {
-		if (second instanceof Sequence) {
+		if (first instanceof Sequence) {
+			exps.addAll(((Sequence) first).exps);
+		} else if (first != null) {
 			exps.add(first);
-			exps.addAll(((Sequence) second).exps);
-			return;
 		}
-		exps.add(first);
-		if (second != null)
+		if (second instanceof Sequence) {
+			exps.addAll(((Sequence) second).exps);
+		} else if (second != null) {
 			exps.add(second);
+		}
 	}
 
 	public Sequence() {

@@ -24,7 +24,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private String name;
 	private TaggedInfo tagInfo;
 
-	private String stackTrace;
+	//private String stackTrace;
 
 	public ClassType() {
 		this(new Reference<>(Environment.getEmptyEnvironment()),
@@ -51,7 +51,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		this.name = name;
 		this.tagInfo = tagInfo;
 
-		stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
+		//stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
 		// System.out.println("Creating ClassType with declEnv " + declEnv.get());
 	}
 

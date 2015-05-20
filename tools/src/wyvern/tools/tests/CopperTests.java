@@ -29,10 +29,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Tuple;
-import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.types.extensions.*;
 import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.Wyvern;
@@ -721,5 +718,181 @@ public class CopperTests {
 		Assert.assertEquals(((IntegerConstant) Util.invokeValue(equivalent, "get", new IntegerConstant(0))).getValue(), 11);
 		Assert.assertEquals(((IntegerConstant) Util.invokeValue(equivalent, "length", UnitVal.getInstance(FileLocation.UNKNOWN))).getValue(), 40);
 	}
+	private int[] getTestArr() {
+		int[] out = new int[5];
+		for (int i = 0; i < 5; i++) {
+			out[i] = 5-i;
+		}
+		return out;
+	}
+
+	@Test
+	public void arrays2() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "array.get(0)";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", Util.javaToWyvType(test.getClass()))), Optional.empty());
+		Assert.assertEquals(tc, new Int());
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+		Assert.assertEquals(result.toString(), "IntegerConstant(5)");
+	}
+
+	@Test
+	public void arrays3() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "array.set(0, 100)\narray.get(0)";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", Util.javaToWyvType(test.getClass()))), Optional.empty());
+		Assert.assertEquals(tc, new Int());
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+		Assert.assertEquals(result.toString(), "IntegerConstant(100)");
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void arrays4() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "array.get(100)";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", Util.javaToWyvType(test.getClass()))), Optional.empty());
+		Assert.assertEquals(tc, new Int());
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+	}
+
+	@Test()
+	public void arrays5() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "def isSorted(i:Int):Bool\n" +
+				"\tif (i > array.length()-2) then \n" +
+				"\t\ttrue\n" +
+				"\telse\n" +
+				"\t\t(array.get(i) < array.get(i+1)) && isSorted(i+1)\n" +
+				"isSorted(0)";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", Util.javaToWyvType(test.getClass()))), Optional.empty());
+		Assert.assertEquals(tc, new Bool());
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+		Assert.assertEquals(result.toString(), "BooleanConstant(false)");
+	}
+	@Test()
+	public void arrays6() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "def isSorted(i:Int):Bool\n" +
+				"\tif (i > array.length()-2) then \n" +
+				"\t\ttrue\n" +
+				"\telse\n" +
+				"\t\t(array.get(i) > array.get(i+1)) && isSorted(i+1)\n" +
+				"isSorted(0)";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", Util.javaToWyvType(test.getClass()))), Optional.empty());
+		Assert.assertEquals(tc, new Bool());
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+		Assert.assertEquals(result.toString(), "BooleanConstant(true)");
+	}
+	@Test()
+	public void arrays7() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "def swap(i1:Int, i2:Int):Unit\n" +
+				"\tval temp = array.get(i2)\n" +
+				"\tarray.set(i2, array.get(i1))\n" +
+				"\tarray.set(i1, temp)\n" +
+				"\t()\n" +
+				"swap(0,1)\n" +
+				"array";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type arrayType = Util.javaToWyvType(test.getClass());
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", arrayType)), Optional.empty());
+		Assert.assertEquals(tc, arrayType);
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+		int[] arr = ((int[])((JavaObj)result).getObj());
+
+		Assert.assertEquals(arr[0],4);
+		Assert.assertEquals(arr[1],5);
+	}
+	@Test()
+	public void arrays8() throws IOException, CopperParserException {
+		int[] test = getTestArr();
+
+		String source = "def swap(i1:Int, i2:Int):Unit\n" +
+				"\tval temp = array.get(i2)\n" +
+				"\tarray.set(i2, array.get(i1))\n" +
+				"\tarray.set(i1, temp)\n" +
+				"\t()\n" +
+				"def sortNextStep(i:Int):Unit\n" +
+				"\tswap(i,i+1)\n" +
+				"\tsortStep(i+1)\n"+
+				"def sortStep(i:Int):Unit = if i > array.length()-2 then () else (if array.get(i) > array.get(i+1) then sortNextStep(i) else sortStep(i+1))\n" +
+				"sortStep(0)\n" +
+				"array";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type arrayType = Util.javaToWyvType(test.getClass());
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", arrayType)), Optional.empty());
+		Assert.assertEquals(tc, arrayType);
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+		result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", result)));
+		result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", result)));
+		result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", result)));
+		int[] arr = ((int[])((JavaObj)result).getObj());
+
+		Assert.assertArrayEquals(arr, new int[]{1,2,3,4,5});
+	}
+
+
+	@Test()
+	public void arrays10() throws IOException, CopperParserException {
+		int n = 400;
+		int[] test = new int[n];
+		for (int i = n; i > 0; i--) {
+			test[n-i] = i;
+		}
+
+		String source = "def isSorted(i:Int):Bool\n" +
+				"\tif (i > array.length()-2) then \n" +
+				"\t\ttrue\n" +
+				"\telse\n" +
+				"\t\t(array.get(i) < array.get(i+1)) && isSorted(i+1)\n" +
+				"\n" +
+				"def swap(i1:Int, i2:Int):Unit\n" +
+				"\tval temp = array.get(i2)\n" +
+				"\tarray.set(i2, array.get(i1))\n" +
+				"\tarray.set(i1, temp)\n" +
+				"\t()\n" +
+				"\n" +
+				"def sortNextStep(i:Int):Unit\n" +
+				"\tswap(i,i+1)\n" +
+				"\tsortStep(i+1)\n"+
+				"def sortStep(i:Int):Unit = if i > array.length()-2 then () else (if array.get(i) > array.get(i+1) then sortNextStep(i) else sortStep(i+1))\n" +
+				"def notDone():Unit\n" +
+				"\tsortStep(0)\n" +
+				//"\tprint(\"Iter \" + array.get(0))\n" +
+				"\twhileNotSorted()\n" +
+				"def whileNotSorted():Unit\n" +
+				"\tif isSorted(0) then () else notDone()\n" +
+				"\n" +
+				"whileNotSorted()";
+
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(source), "test input");
+		Type tc = res.typecheck(Globals.getStandardEnv().extend(new NameBindingImpl("array", Util.javaToWyvType(test.getClass()))), Optional.empty());
+		Assert.assertEquals(tc, new Unit());
+
+		Value result = res.evaluate(Globals.getStandardEvalEnv().extend(new ValueBinding("array", Util.javaToWyvObj(test))));
+	}
+
 }
 

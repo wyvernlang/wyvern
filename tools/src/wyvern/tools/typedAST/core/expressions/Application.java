@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
@@ -68,10 +68,11 @@ public class Application extends CachingTypedAST implements CoreAST {
 		return function;
 	}
 
+
 	@Override
 	public Value evaluate(EvaluationEnvironment env) {
 		TypedAST lhs = function.evaluate(env);
-		if (!(lhs instanceof ApplyableValue))
+		if (Globals.checkRuntimeTypes && !(lhs instanceof ApplyableValue))
 			reportEvalError(VALUE_CANNOT_BE_APPLIED, lhs.toString(), this);
 		ApplyableValue fnValue = (ApplyableValue) lhs;
 		
