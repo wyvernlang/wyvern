@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: junit-4.11.jar CopperCompiler.jar hamcrest-core-1.3.jar as
+ m-debug-all-5.0.1.jar javatuples-1.2.jar
+Main-Class: wyvern.tools.Interpreter
+

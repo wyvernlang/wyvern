@@ -107,7 +107,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 					.orElseThrow(() -> new RuntimeException("Invalid matching over tag"))).getTaggedInfo();
 		}
 
-		System.out.println("Evaluating match with matchingOver = " + matchingOver + " its class " + matchingOver.getClass());
+		// System.out.println("Evaluating match with matchingOver = " + matchingOver + " its class " + matchingOver.getClass());
 		/*
 		Variable v = (Variable) matchingOver;
 		System.out.println("v.getType() = " + v.getType());
@@ -151,7 +151,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 			if (tt instanceof TypeInv) {
 				TypeInv ti = (TypeInv) tt;
 
-				System.out.println("Processing TypeInv case: " + ti);
+				// System.out.println("Processing TypeInv case: " + ti);
 
 				// FIXME: In ECOOP2015Artifact, I am trying to tell the difference between winMod.Win and bigWinMod.Win...
 
@@ -200,10 +200,10 @@ public class Match extends CachingTypedAST implements CoreAST {
 		if (matchingOver == null) throw new NullPointerException("Matching Binding cannot be null");
 		if (matchTarget == null) throw new NullPointerException("match target cannot be null");
 
-		String matchingOverTag = matchingOver.getTagName();
-		String matchTargetTag = matchTarget.getTagName();
+		// String matchingOverTag = matchingOver.getTagName();
+		// String matchTargetTag = matchTarget.getTagName();
 
-		System.out.println("matchingOverTag = " + matchingOverTag + " and matchTargetTag = " + matchTargetTag);
+		// System.out.println("matchingOverTag = " + matchingOverTag + " and matchTargetTag = " + matchTargetTag);
 
 		// FIXME: Why do equals when that may not correspond to the tags being the same? Only reference == is safe I guess?
 		// if (matchingOverTag.equals(matchTargetTag)) return true;
