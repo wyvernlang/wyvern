@@ -501,8 +501,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			int idx = Integer.parseInt(key.substring(0,key.length() - 4));
 			decls.add(idx, (Declaration)nc.get(key));
 		}
-		return new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
+		ClassDeclaration classDeclaration = new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
 				new DeclSequence(decls), classMembersEnv.get(), typeParams, location);
+		classDeclaration.taggedInfo = taggedInfo;
+		return classDeclaration;
 	}
 
 
