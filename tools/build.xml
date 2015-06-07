@@ -35,7 +35,14 @@
             <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
         </copper>
     </target>
-    <target name="copper-generate" depends="copper-compose,copper-subparsers,lexer">
+    <target name="javacc-parser" depends="lexer">
+    	<javacc
+    	    target="src/wyvern/tools/parsing/coreparser/WyvernParser.jj"
+    	    outputdirectory="src/wyvern/tools/parsing/coreparser/"
+    	    javacchome="c:/develop/javacc/javacc-6.0"
+    	/>
+    </target>
+    <target name="copper-generate" depends="copper-compose,copper-subparsers,lexer,javacc-parser">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" packagename="wyvern.tools.parsing">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
         </copper>

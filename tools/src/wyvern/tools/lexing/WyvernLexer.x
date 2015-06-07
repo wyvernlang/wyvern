@@ -20,14 +20,116 @@ import java.util.HashMap;
 import java.util.*;
 import wyvern.tools.errors.FileLocation;
 import java.net.URI;
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.parsing.coreparser.Token;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 %%
 %parser WyvernLexer
 
 %aux{
-	boolean foundTilde = false;
-	boolean DSLNext = false;
-	Stack<String> indents = new Stack<String>();
+	/********************** LEXER STATE ************************/
+	boolean foundTilde = false;						// is there a tilde ~ in the current line?
+	boolean DSLNext = false;						// is the next line a DSL?
+	boolean inDSL = false;							// are we in a DSL?
+	Stack<String> indents = new Stack<String>();	// the stack of indents
+	
+	/********************** HELPER FUNCTIONS ************************/
+	
+	/** @returns 1 for an indent, -n for n dedents, or 0 for the same indentation level
+	 */
+	int adjustIndent(String newIndent) throws CopperParserException {
+		String currentIndent = indents.peek();
+		if (newIndent.length() < currentIndent.length()) {
+			// dedent(s)
+			int dedentCount = 0;
+			while (newIndent.length() < currentIndent.length()) {
+				indents.pop();
+				currentIndent = indents.peek();
+				dedentCount--;
+			}
+			if (newIndent.equals(currentIndent))
+				return dedentCount;
+			else
+				throw new CopperParserException("Illegal dedent: does not match any previous indent level");
+		} else if (newIndent.length() > currentIndent.length()) {
+			// indent
+			if (newIndent.startsWith(currentIndent)) {
+				indents.push(newIndent);
+				return 1;
+			} else {
+				throw new CopperParserException("Illegal indent: not a superset of previous indent level");
+			}
+		} else {
+			return 0;
+		}
+	}
+
+	void addDedentsForChange(List<Token> tokenList, int indentChange, Token tokenLoc) {
+		while (indentChange < 0) {
+			Token t = makeToken(DEDENT,"",tokenLoc);
+			tokenList.add(t);
+			indentChange++;
+		}
+	}
+	
+	List<Token> tokensForIndent(Token newIndent) throws CopperParserException {
+		int indent = adjustIndent(newIndent.image);
+		if (indent == 0)
+			return makeList(newIndent);
+		if (indent == 1) {
+			newIndent.kind = INDENT;
+			return makeList(newIndent);
+		}
+		List<Token> tokenList = makeList(newIndent);
+		addDedentsForChange(tokenList, indent, newIndent);
+		return tokenList;
+	}
+	
+	Token makeToken(int kind, String s, Token tokenLoc) {
+		return makeToken(kind, s,tokenLoc.beginLine, tokenLoc.beginColumn);
+	}
+	
+	Token makeToken(int kind, String s, int beginLine, int beginColumn) {
+		Token t = new Token(kind, s);
+		t.beginLine = beginLine;
+		t.beginColumn = beginColumn;
+		return t;
+	}
+	
+	/** Wraps the lexeme s in a Token, setting the begin line/column and kind appropriately */
+	Token token(int kind, String s) {
+		return makeToken(kind, s, virtualLocation.getLine(), virtualLocation.getColumn());
+	}
+	
+	List<Token> emptyList() {
+		return new LinkedList<Token>();
+	}
+	
+	List<Token> makeList(Token t) {
+		List<Token> l = emptyList();
+		l.add(t);
+		return l;
+	}
+	
+	boolean isSpecial(Token t) {
+		switch (t.kind) {
+			case SINGLE_LINE_COMMENT:
+			case MULTI_LINE_COMMENT:
+			case WHITESPACE:
+					return true;
+			default:
+					return false;
+		}
+	}
+	
+	boolean hasNonSpecialToken(List<Token> l) {
+		for (Token t : l)
+			if (!isSpecial(t))
+				return true; 
+		return false;
+	}
+	
 %aux}
 
 %init{
@@ -38,19 +140,19 @@ import java.net.URI;
 	class keywds;
     class specialNumbers;
     
-    terminal whitespace_t ::= /[ \t]+/ {: RESULT = lexeme; :};
-    terminal dsl_indent_t ::= /[ \t]+/ {: RESULT = lexeme; :};
-    terminal indent_t ::= /[ \t]+/ {: RESULT = lexeme; :};
+    terminal Token whitespace_t ::= /[ \t]+/ {: RESULT = token(WHITESPACE,lexeme); :};
+    terminal Token dsl_indent_t ::= /[ \t]+/ {: RESULT = token(WHITESPACE,lexeme); :};
+    terminal Token indent_t ::= /[ \t]+/ {: RESULT = token(WHITESPACE,lexeme); :};
 
-    terminal newline_t ::= /(\n|(\r\n))/ {: RESULT = lexeme; :};
+    terminal Token newline_t ::= /(\n|(\r\n))/ {: RESULT = token(WHITESPACE,lexeme); :};
     
-    terminal continue_line_t ::= /\\(\n|(\r\n))/;
+    terminal Token continue_line_t ::= /\\(\n|(\r\n))/ {: RESULT = token(WHITESPACE,lexeme); :};
 
-	terminal comment_t  ::= /\/\/([^\r\n])*/ {: RESULT = lexeme; :};
-	terminal multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\// {: RESULT = lexeme; :};
+	terminal Token comment_t  ::= /\/\/([^\r\n])*/ {: RESULT = token(SINGLE_LINE_COMMENT,lexeme); :};
+	terminal Token multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\// {: RESULT = token(MULTI_LINE_COMMENT,lexeme); :};
 	
- 	terminal String identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
- 		RESULT = lexeme;
+ 	terminal Token identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
+ 		RESULT = token(IDENTIFIER,lexeme);
  	:};
 
     terminal classKwd_t ::= /class/ in (keywds);
@@ -75,104 +177,141 @@ import java.net.URI;
     terminal ofKwd_t ::= /of/ in (keywds);
     terminal comprisesKwd_t ::= /comprises/ in (keywds);
 
- 	terminal decimalInteger_t ::= /([1-9][0-9]*)|0/ {:
- 		RESULT = Integer.parseInt(lexeme);
- 	:};
+ 	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
 
-	terminal tilde_t ::= /~/ ;
-	terminal plus_t ::= /\+/ ;
-	terminal dash_t ::= /-/ ;
-	terminal mult_t ::= /\*/ ;
-	terminal divide_t ::= /\// ;
-	terminal equals_t ::= /=/ ;
-	terminal equalsequals_t ::= /==/ ;
-	terminal openParen_t ::= /\(/;
- 	terminal closeParen_t ::= /\)/;
- 	terminal comma_t ::= /,/ ;
- 	terminal arrow_t ::= /=\>/ ;
- 	terminal tarrow_t ::= /-\>/ ;
- 	terminal dot_t ::= /\./ ;
- 	terminal colon_t ::= /:/ ;
- 	terminal pound_t ::= /#/ ;
- 	terminal question_t ::= /?/ ;
- 	terminal bar_t ::= /\|/ ;
- 	terminal and_t ::= /&/ ;
- 	terminal gt_t ::= />/ ;
- 	terminal lt_t ::= /</ ;
-    terminal oSquareBracket_t ::= /\[/;
-    terminal cSquareBracket_t ::= /\]/;
+	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); :};
+	terminal Token plus_t ::= /\+/ {: RESULT = token(PLUS,lexeme); :};
+	terminal Token dash_t ::= /-/ {: RESULT = token(DASH,lexeme); :};
+	terminal Token mult_t ::= /\*/ {: RESULT = token(MULT,lexeme); :};
+	terminal Token divide_t ::= /\// {: RESULT = token(DIVIDE,lexeme); :};
+	terminal Token equals_t ::= /=/ {: RESULT = token(EQUALS,lexeme); :};
+	terminal Token equalsequals_t ::= /==/ {: RESULT = token(EQUALSEQUALS,lexeme); :};
+	terminal Token openParen_t ::= /\(/ {: RESULT = token(LPAREN,lexeme); :};
+ 	terminal Token closeParen_t ::= /\)/ {: RESULT = token(RPAREN,lexeme); :};
+ 	terminal Token comma_t ::= /,/  {: RESULT = token(COMMA,lexeme); :};
+ 	terminal Token arrow_t ::= /=\>/  {: RESULT = token(ARROW,lexeme); :};
+ 	terminal Token tarrow_t ::= /-\>/  {: RESULT = token(TARROW,lexeme); :};
+ 	terminal Token dot_t ::= /\./ {: RESULT = token(DOT,lexeme); :};
+ 	terminal Token colon_t ::= /:/ {: RESULT = token(COLON,lexeme); :};
+ 	terminal Token pound_t ::= /#/ {: RESULT = token(POUND,lexeme); :};
+ 	terminal Token question_t ::= /?/ {: RESULT = token(QUESTION,lexeme); :};
+ 	terminal Token bar_t ::= /\|/ {: RESULT = token(BAR,lexeme); :};
+ 	terminal Token and_t ::= /&/ {: RESULT = token(AND,lexeme); :};
+ 	terminal Token gt_t ::= />/ {: RESULT = token(GT,lexeme); :};
+ 	terminal Token lt_t ::= /</ {: RESULT = token(LT,lexeme); :};
+    terminal Token oSquareBracket_t ::= /\[/ {: RESULT = token(LBRACK,lexeme); :};
+    terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = lexeme.substring(1,lexeme.length()-1);
  	:};
 
- 	terminal oCurly_t ::= /\{/;
- 	terminal cCurly_t ::= /\}/;
+ 	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
+ 	terminal Token cCurly_t ::= /\}/ {: RESULT = token(RBRACE,lexeme); :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
  	
- 	terminal dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = lexeme; :};
+ 	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); :};
  	
- 	
+ 	// error if DSLNext but not indented further
+ 	// DSL if DSLNext and indented (unsets DSLNext, sets inDSL)
+ 	// DSL if inDSL and indented
+ 	// intent_t otherwise 
 	disambiguate d1:(dsl_indent_t,indent_t)
 	{:
-		return DSLNext?dsl_indent_t:indent_t;
+		String currentIndent = indents.peek();
+		if (lexeme.length() > currentIndent.length() && lexeme.startsWith(currentIndent)) {
+			// indented
+			if (DSLNext || inDSL) {
+				DSLNext = false;
+				inDSL = true;
+				return dsl_indent_t;
+			} else {
+				return indent_t;
+			}
+		}
+		if (DSLNext)
+			throw new CopperParserException("Indicated DSL with ~ but then did not indent");
+		inDSL = false;
+		return indent_t;
 	:};
 %lex}
 
 %cf{
-	non terminal LinkedList program;
-	non terminal logicalLine;
-	non terminal dslLine;
-	non terminal anyLineElement;
-	non terminal nonWSLineElement;
-	non terminal LinkedList lineElementSequence;
-	non terminal parens;
-	non terminal parenContents;
-	non terminal operator;
-	non terminal aLine;
+	non terminal List<Token> program;
+	non terminal List<Token> logicalLine;
+	non terminal List<Token> dslLine;
+	non terminal List<Token> anyLineElement;
+	non terminal List<Token> nonWSLineElement;
+	non terminal List lineElementSequence;
+	non terminal List<Token> parens;
+	non terminal List<Token> parenContents;
+	non terminal Token operator;
+	non terminal List<Token> aLine;
 
 	start with program;
 	
-	parenContents ::= anyLineElement | newline_t |;
+	parenContents ::= anyLineElement:e {: RESULT = e; :}
+	                | newline_t:t {: RESULT = makeList(t); :}
+	                | {: RESULT = emptyList(); :};
 	
-	parens ::= openParen_t parenContents closeParen_t
-	         | oSquareBracket_t parenContents cSquareBracket_t;
+	parens ::= openParen_t:t1 parenContents:list closeParen_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :}
+	         | oSquareBracket_t:t1 parenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
 	
-	operator ::= tilde_t {: foundTilde = true; :}
-	           | plus_t | dash_t | mult_t | divide_t | equals_t | comma_t
-	           | arrow_t | tarrow_t | dot_t | colon_t | pound_t | question_t | bar_t | and_t
-	           | gt_t | lt_t;
+	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
+	           | plus_t:t {: RESULT = t; :}
+	           | dash_t:t {: RESULT = t; :}
+	           | mult_t:t {: RESULT = t; :}
+	           | divide_t:t {: RESULT = t; :}
+	           | equals_t:t {: RESULT = t; :}
+	           | comma_t:t {: RESULT = t; :}
+	           | arrow_t:t {: RESULT = t; :}
+	           | tarrow_t:t {: RESULT = t; :}
+	           | dot_t:t {: RESULT = t; :}
+	           | colon_t:t {: RESULT = t; :}
+	           | pound_t:t {: RESULT = t; :}
+	           | question_t:t {: RESULT = t; :}
+	           | bar_t:t {: RESULT = t; :}
+	           | and_t:t {: RESULT = t; :}
+	           | gt_t:t {: RESULT = t; :}
+	           | lt_t:t {: RESULT = t; :}
+	           ;
 	           
-	anyLineElement ::= whitespace_t:n {: RESULT = n; :}
+	anyLineElement ::= whitespace_t:n {: RESULT = makeList(n); :}
 	                 | nonWSLineElement:n {: RESULT = n; :};
 	                 
-	nonWSLineElement ::= identifier_t:n {: RESULT = n; :}
-	                   | comment_t:n {: RESULT = n; :}
-	                   | multi_comment_t:n {: RESULT = n; :}
-	                   | continue_line_t
-	                   | operator
-	                   | parens;
+	nonWSLineElement ::= identifier_t:n {: RESULT = makeList(n); :}
+	                   | comment_t:n {: RESULT = makeList(n); :}
+	                   | multi_comment_t:n {: RESULT = makeList(n); :}
+	                   | continue_line_t:t  {: RESULT = makeList(t); :}
+	                   | operator:t {: RESULT = makeList(t); :}
+	                   | parens:l {: RESULT = l; :};
 
-    dslLine ::= dsl_indent_t dslLine_t:line {: RESULT = line; :};
+    dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = makeList(t); RESULT.add(line); :};
 	
 	logicalLine ::= lineElementSequence:list newline_t:n
-					{:	list.add(n);
+					{:	if (hasNonSpecialToken(list))
+							n.kind = NEWLINE;
+						list.add(n);
 					    if (foundTilde) {
 						    DSLNext = true;
 						    foundTilde = false;
 						}
 						RESULT = list;
 					:}
-				  | newline_t:n {: RESULT = "\n"; :};
+				  | newline_t:n {: RESULT = makeList(n); :};
 				  
-	lineElementSequence ::= indent_t:n {: LinkedList l = new LinkedList(); l.add(n); RESULT = l; :}
-	                      | nonWSLineElement:n {: LinkedList l = new LinkedList(); l.add(n); RESULT = l; :}
-	                      | lineElementSequence:list anyLineElement:n {: list.add(n); RESULT = list; :};
+	lineElementSequence ::= indent_t:n {: RESULT = tokensForIndent(n); :}
+	                      | nonWSLineElement:n {:
+	                      		int levelChange = adjustIndent("");
+	                      		RESULT = emptyList(); 
+	                      		addDedentsForChange(RESULT, levelChange, n.get(0));
+	                            RESULT.addAll(n);
+	                        :}
+	                      | lineElementSequence:list anyLineElement:n {: list.addAll(n); RESULT = list; :};
 	
 	aLine ::= dslLine:line {: RESULT = line; :}
 	        | logicalLine:line  {: RESULT = line; :}; 
 	          
-//	program ::= dslLine_t:line {: LinkedList l = new LinkedList(); l.add(line); RESULT = l; :}
-	program ::= logicalLine:line {: LinkedList l = new LinkedList(); l.add(line); RESULT = l; :}
-	          | program:p aLine:line {: p.add(line); RESULT = p; :};
+	program ::= logicalLine:line {: RESULT = line; :}
+	          | program:p aLine:line {: p.addAll(line); RESULT = p; :};
 %cf}
