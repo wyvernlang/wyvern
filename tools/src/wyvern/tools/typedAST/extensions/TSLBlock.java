@@ -4,10 +4,12 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -17,10 +19,37 @@ import java.util.Optional;
 public class TSLBlock extends AbstractTypedAST {
 	private final TypedAST inner;
 
-	public static class OuterEnviromentBinding implements Binding {
+	public static class OuterEnviromentBinding implements EvaluationBinding {
+		private final EvaluationEnvironment store;
+
+		public OuterEnviromentBinding(EvaluationEnvironment store) {
+			this.store = store;
+		}
+
+		@Override
+		public String getName() {
+			return "oev";
+		}
+
+		@Override
+		public Type getType() {
+			return null;
+		}
+
+		@Override
+		public void writeArgsToTree(TreeWriter writer) {
+
+		}
+
+		public EvaluationEnvironment getStore() {
+			return store;
+		}
+	}
+
+	public static class OuterTypecheckBinding implements Binding {
 		private final Environment store;
 
-		public OuterEnviromentBinding(Environment store) {
+		public OuterTypecheckBinding(Environment store) {
 			this.store = store;
 		}
 
@@ -55,12 +84,12 @@ public class TSLBlock extends AbstractTypedAST {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		return inner.typecheck(Globals.getStandardEnv().extend(new OuterEnviromentBinding(env)), expected);
+		return inner.typecheck(Globals.getStandardEnv().extend(new OuterTypecheckBinding(env)), expected);
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		return inner.evaluate(Environment.getEmptyEnvironment().extend(new OuterEnviromentBinding(env)));
+	public Value evaluate(EvaluationEnvironment env) {
+		return inner.evaluate(EvaluationEnvironment.EMPTY.extend(new OuterEnviromentBinding(env)));
 	}
 
 	@Override

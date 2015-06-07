@@ -11,6 +11,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 public class TypeInv implements Type {
 	Type innerType;
@@ -37,12 +38,6 @@ public class TypeInv implements Type {
 
 			// System.out.println("GOT: " + t);
 
-			if (t instanceof MetadataWrapper) {
-				t = ((MetadataWrapper) t).getInner();
-			}
-
-
-
 			// System.out.println("OUT: " + t);
 
 			innerType = t; // FIXME: FIXME: FIXME:
@@ -57,8 +52,9 @@ public class TypeInv implements Type {
 
 			// System.out.println("fetched = " + fetched);
 
-			if (fetched.getMetadata().isPresent() && fetched.getMetadata().get().get() != null)
-				return new MetadataWrapper(fetched.getUse(), fetched.getMetadata().get());
+			if (fetched.getMetadata().isPresent() && fetched.getMetadata().get().get() != null){
+				return fetched.getUse().cloneWithBinding(fetched);
+			}
 			else return fetched.getUse();
 		}
 
@@ -89,6 +85,21 @@ public class TypeInv implements Type {
 	@Override
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		throw new RuntimeException("Invalid operation (forgot to resolve)?");
+	}
+
+	@Override
+	public Optional<TypeBinding> getResolvedBinding() {
+		return Optional.empty();
+	}
+
+	@Override
+	public void setResolvedBinding(TypeBinding binding) {
+		throw new RuntimeException("Cannot resolve to a type invocation");
+	}
+
+	@Override
+	public Type cloneWithBinding(TypeBinding binding) {
+		throw new RuntimeException("Cannot resolve to a type invocation");
 	}
 
 	@Override

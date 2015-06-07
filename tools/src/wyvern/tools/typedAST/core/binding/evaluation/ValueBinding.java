@@ -5,13 +5,14 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
-public class ValueBinding extends NameBindingImpl {
+public class ValueBinding extends NameBindingImpl implements EvaluationBinding {
 	private Value value;
 	
 	public ValueBinding(String name, Value value) {
-		super(name, value.getType());
+		super(name, (value != null)?value.getType():null);
 		this.value = value;
 	}
 
@@ -24,7 +25,7 @@ public class ValueBinding extends NameBindingImpl {
 		return value;
 	}
 	
-	public Value getValue(Environment env) {
+	public Value getValue(EvaluationEnvironment env) {
 		return value;
 	}
 	

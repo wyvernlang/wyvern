@@ -14,7 +14,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
-import wyvern.tools.types.extensions.MetadataWrapper;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.Optional;
 
 public class IfExpr extends CachingTypedAST implements CoreAST {
 	public abstract static class IfClause extends CachingTypedAST implements TypedAST {
-		public abstract boolean satisfied(Environment env);
+		public abstract boolean satisfied(EvaluationEnvironment env);
 		
 		public abstract TypedAST getClause();
 		public abstract TypedAST getBody();
@@ -57,7 +57,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		public boolean satisfied(Environment env) {
+		public boolean satisfied(EvaluationEnvironment env) {
 			return ((BooleanConstant)cond.evaluate(env)).getValue();
 		}
 
@@ -78,13 +78,13 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 
 		@Override
 		protected Type doTypecheck(Environment env, Optional<Type> expected) {
-			if (!(cond.typecheck(env, Optional.of(Bool.getInstance())).equals(Bool.getInstance())))
+			if (!(cond.typecheck(env, Optional.of(new Bool())).equals(new Bool())))
 				throw new RuntimeException();
 			return body.typecheck(env, expected);
 		}
 
 		@Override
-		public Value evaluate(Environment env) {
+		public Value evaluate(EvaluationEnvironment env) {
 			return body.evaluate(env);
 		}
 
@@ -110,7 +110,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		public boolean satisfied(Environment env) {
+		public boolean satisfied(EvaluationEnvironment env) {
 			return true;
 		}
 
@@ -135,7 +135,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		public Value evaluate(Environment env) {
+		public Value evaluate(EvaluationEnvironment env) {
 			return body.evaluate(env);
 		}
 
@@ -159,7 +159,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		for (IfClause clause : clauses) {
 			if (clause.satisfied(env))
 				return clause.evaluate(env);
@@ -210,12 +210,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 			// FIXME:
 			// System.out.println("clauseType = " + clauseType);
 			// System.out.println("lastType = " + lastType);
-			if (clauseType instanceof MetadataWrapper) {
-				clauseType = ((MetadataWrapper) clauseType).getInner();
-			}
-			if (lastType instanceof MetadataWrapper) {
-				lastType = ((MetadataWrapper) lastType).getInner();
-			}
 						
 			if (!clauseType.subtype(lastType) && !lastType.subtype(clauseType)) {
 				ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, clause);

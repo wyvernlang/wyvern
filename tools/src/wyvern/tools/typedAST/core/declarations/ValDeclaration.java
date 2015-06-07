@@ -17,9 +17,8 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -94,9 +93,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		
 		// FIXME:
 		// System.out.println(resolved);
-		if (resolved instanceof MetadataWrapper) {
-			resolved = ((MetadataWrapper) resolved).getInner();
-		}
 
 		binding = new NameBindingImpl(binding.getName(), resolved);
 		if (binding.getType() == null) {
@@ -115,11 +111,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			declaredType = ((UnresolvedType) declaredType).resolve(env);
 			//System.out.println("ut =" + ((ClassType) ut.resolve(env)).getName());
 		}
-		
-		if (declaredType instanceof MetadataWrapper) {
-			declaredType = ((MetadataWrapper) declaredType).getInner();
-		}
-
 		if (definitionType != null && declaredType != null && !definitionType.subtype(declaredType))
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, definitionType.toString(), declaredType.toString());
 
@@ -164,21 +155,20 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old.extend(new ValueBinding(binding.getName(), binding.getType()));
 		return newEnv;
 		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		if (declEnv.getValue(binding.getName()) != null)
-			return;
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+		if (!declEnv.lookup(binding.getName()).isPresent()) return;
 			
 		Value defValue = null;
 		if (definition != null)
 			defValue = definition.evaluate(evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(binding.getName());
+		ValueBinding vb = (ValueBinding) declEnv.lookupValueBinding(binding.getName(), ValueBinding.class).get();
 		vb.setValue(defValue);
 	}
 

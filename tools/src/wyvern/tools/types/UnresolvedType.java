@@ -5,14 +5,14 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
-public class UnresolvedType implements Type {
+public class UnresolvedType extends AbstractTypeImpl implements Type {
 	private String typeName;
 
 	public UnresolvedType(String typeName) {
@@ -45,7 +45,7 @@ public class UnresolvedType implements Type {
 		}
 		TypeBinding typeBinding = env.lookupType(typeName);
 		if (typeBinding.getMetadata().isPresent() && typeBinding.getMetadata().get().get() != null)
-			return new MetadataWrapper(typeBinding.getUse(), typeBinding.getMetadata().get());
+			return typeBinding.getUse().cloneWithBinding(typeBinding);
 		else
 			return typeBinding.getUse();
 	}
@@ -80,6 +80,11 @@ public class UnresolvedType implements Type {
 	@Override
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		throw new RuntimeException("Cannot specify a ref type");
+	}
+
+	@Override
+	public Optional<TypeBinding> getResolvedBinding() {
+		return Optional.empty();
 	}
 
 	public String getName() {

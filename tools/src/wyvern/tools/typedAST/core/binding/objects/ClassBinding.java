@@ -1,15 +1,19 @@
 package wyvern.tools.typedAST.core.binding.objects;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
-public class ClassBinding implements Binding {
+public class ClassBinding extends ValueBinding {
 	private final String name;
 	private final ClassDeclaration cd;
 
 	public ClassBinding(String name, ClassDeclaration cd) {
+		super("classvalue", UnitVal.getInstance(FileLocation.UNKNOWN));
 		this.name = name;
 		this.cd = cd;
 	}

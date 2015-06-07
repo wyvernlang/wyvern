@@ -15,7 +15,7 @@ public class UnitValue implements Operand {
 	}
 	
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 	
 	@Override

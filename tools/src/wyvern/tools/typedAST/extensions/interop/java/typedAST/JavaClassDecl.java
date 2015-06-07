@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import jdk.internal.dynalink.support.Lookup;
+import jdk.nashorn.internal.lookup.MethodHandleFactory;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -14,6 +16,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 
@@ -50,14 +53,14 @@ public class JavaClassDecl extends ClassDeclaration {
 			HashMap<String, List<Pair<MethodHandle, Method>>> sMap = new HashMap<>();
 			for (Method m : clazz.getMethods()) {
 				if (sMap.containsKey(m.getName()) && Modifier.isStatic(m.getModifiers())) {
-					sMap.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
+					sMap.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz, m)), m));
 					continue;
 				} else if (map.containsKey(m.getName())) {
-					map.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)),m));
+					map.get(m.getName()).add(new Pair<>(lookup.unreflect(findHighestMethod(clazz, m)), m));
 					continue;
 				}
 				ArrayList<Pair<MethodHandle, Method>> list = new ArrayList<>();
-				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz,m)), m));
+				list.add(new Pair<>(lookup.unreflect(findHighestMethod(clazz, m)), m));
 				if (!Modifier.isStatic(m.getModifiers()))
 					map.put(m.getName(), list);
 				else
@@ -65,12 +68,12 @@ public class JavaClassDecl extends ClassDeclaration {
 			}
 
 			//Fields
-            for (Field f : clazz.getFields()) {
+			for (Field f : clazz.getFields()) {
 				Optional<MethodHandle> setter = Optional.empty();
 				if (!Modifier.isFinal(f.getModifiers()))
 					setter = Optional.of(lookup.unreflectSetter(f));
-                decls.add(new JavaField(f,lookup.unreflectGetter(f),setter));
-            }
+				decls.add(new JavaField(f, lookup.unreflectGetter(f), setter));
+			}
 
 			//Inner classes
 			for (Class c : clazz.getDeclaredClasses()) {
@@ -84,14 +87,38 @@ public class JavaClassDecl extends ClassDeclaration {
 			}
 
 			//Create real decls
-			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : sMap.entrySet()) {
+			for (Map.Entry<String, List<Pair<MethodHandle, Method>>> entry : sMap.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
 
-			for (Map.Entry<String, List<Pair<MethodHandle,Method>>> entry : map.entrySet()) {
+			for (Map.Entry<String, List<Pair<MethodHandle, Method>>> entry : map.entrySet()) {
 				decls.add(new JavaMeth(entry.getKey(), getJavaInvokableMethods(clazz, entry)));
 			}
-		} catch (IllegalAccessException e) {
+
+
+			if (clazz.isArray()) { //add in getter/acessor methods
+				Class elementType = clazz.getComponentType();
+				MethodHandle gethandle = MethodHandles.arrayElementGetter(clazz);
+
+				String postfix = "";
+				switch (elementType.getName()) {
+					case "int": postfix = "Int"; break;
+					case "boolean": postfix = "Boolean"; break;
+					case "byte": postfix = "Byte"; break;
+					case "char": postfix = "Char"; break;
+					case "double": postfix = "Double"; break;
+					case "float": postfix = "Float"; break;
+					case "long": postfix = "Long"; break;
+					case "short": postfix = "Short"; break;
+				}
+
+				MethodHandle sethandle = MethodHandles.arrayElementSetter(clazz);
+				MethodHandle lengthHandle = MethodHandles.lookup().unreflect(Class.forName("java.lang.reflect.Array").getMethod("getLength", Object.class));
+				decls.add(new JavaMeth("length", Arrays.asList(new JClosure.JavaInvokableMethod(new Class[]{}, int.class, lengthHandle, Arrays.asList(), false, clazz))));
+				decls.add(new JavaMeth("get", Arrays.asList(new JClosure.JavaInvokableMethod(new Class[]{int.class}, elementType, gethandle, Arrays.asList("index"), false, clazz))));
+				decls.add(new JavaMeth("set", Arrays.asList(new JClosure.JavaInvokableMethod(new Class[]{int.class, elementType}, void.class, sethandle, Arrays.asList("index", "element"), false, clazz))));
+			}
+		} catch (IllegalAccessException | NoSuchMethodException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		DeclSequence ds = new DeclSequence(decls);
@@ -129,6 +156,7 @@ public class JavaClassDecl extends ClassDeclaration {
 				.filter(meth -> meth.getParameterCount() == 0)
 				.findFirst();
 
+
 		if (creator.isPresent())
 				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<Value>() {
 					@Override
@@ -152,11 +180,11 @@ public class JavaClassDecl extends ClassDeclaration {
 	@Override
 	public Type doTypecheck(Environment env) {
 		updateEnv();
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		initalize();
 		super.evalDecl(evalEnv, declEnv);
 	}
@@ -169,7 +197,7 @@ public class JavaClassDecl extends ClassDeclaration {
 
 	public Obj getClassObj() {
 		initalize();
-		return new Obj(getClassEnv(Environment.getEmptyEnvironment()), null);
+		return new Obj(getClassEnv(EvaluationEnvironment.EMPTY), null);
 	}
 
 	boolean initalized = false;
@@ -180,7 +208,7 @@ public class JavaClassDecl extends ClassDeclaration {
 		super.decls = getDecls(this.clazz);
 		Environment emptyEnvironment = Environment.getEmptyEnvironment();
 		super.classMembersEnv.set(super.decls.extend(emptyEnvironment, emptyEnvironment));
-		super.declEvalEnv = emptyEnvironment;
+		super.declEvalEnv = EvaluationEnvironment.EMPTY;
 		updateEnv();
 	}
 
@@ -258,7 +286,7 @@ public class JavaClassDecl extends ClassDeclaration {
     }
 
 	@Override
-	public Environment evaluateDeclarations(Environment addtlEnv) {
+	public EvaluationEnvironment evaluateDeclarations(EvaluationEnvironment addtlEnv) {
 		initalize();
 		return super.evaluateDeclarations(addtlEnv);
 	}

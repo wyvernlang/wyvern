@@ -5,13 +5,14 @@ import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 public class JavaObj extends Obj {
 
 	private final Object obj;
 	private JavaClassDecl jcd;
 
-	public JavaObj(Environment inRef, Object innerJavaObject, JavaClassDecl jcd) {
+	public JavaObj(EvaluationEnvironment inRef, Object innerJavaObject, JavaClassDecl jcd) {
 		super(inRef, null);
 		this.obj = innerJavaObject;
 		this.jcd = jcd;

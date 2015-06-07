@@ -54,7 +54,7 @@ public class ModuleTestCase implements TestCase {
 		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(main), "test input");
 		Assert.assertEquals(expectedType, res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty()).toString());
 		res = new DSLTransformer().transform(res);
-		Value finalV = res.evaluate(Globals.getStandardEnv());
+		Value finalV = res.evaluate(Globals.getStandardEvalEnv());
 		Assert.assertEquals(expectedValue, finalV.toString());
 	}
 }

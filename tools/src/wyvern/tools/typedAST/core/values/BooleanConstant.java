@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -21,7 +22,7 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 
 	@Override
 	public Type getType() {
-		return Bool.getInstance();
+		return new Bool();
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 	}
 
 	@Override
-	public Value evaluateInvocation(Invocation exp, Environment env) {
+	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		BooleanConstant argValue = (BooleanConstant) exp.getArgument().evaluate(env);
 		String operator = exp.getOperationName();
 		switch(operator) {

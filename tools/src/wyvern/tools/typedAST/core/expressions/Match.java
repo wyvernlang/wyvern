@@ -14,6 +14,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -26,10 +27,10 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 /**
@@ -89,28 +90,25 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		TaggedInfo.resolveAll(env, this);
+	public Value evaluate(EvaluationEnvironment env) {
+		//TaggedInfo.resolveAll(env, this);
 
 		Type mo = matchingOver.getType();
-
-		if (mo instanceof MetadataWrapper) {
-			mo = ((MetadataWrapper) mo).getInner();
-		}
 
 		TaggedInfo matchingOverTag = TaggedInfo.lookupTagByType(mo); // FIXME:
 
 		if (matchingOver instanceof Variable) {
 			Variable w = (Variable) matchingOver;
-			ClassType wType = (ClassType) env.lookup(w.getName()).getType();
+			//ClassType wType = (ClassType) env.lookup(w.getName()).getType();
 			// System.out.println("wType = " + wType);
 			// System.out.println("looked up = " + TaggedInfo.lookupTagByType(wType));
 			// System.out.println("but mot = " + matchingOverTag);
-			matchingOverTag = ((Obj)env.getValue(w.getName())).getTaggedInfo();
+			matchingOverTag = ((Obj)env.lookup(w.getName()).map(ib -> ib.getValue(env))
+					.orElseThrow(() -> new RuntimeException("Invalid matching over tag"))).getTaggedInfo();
 		}
 
+		// System.out.println("Evaluating match with matchingOver = " + matchingOver + " its class " + matchingOver.getClass());
 		/*
-		System.out.println("Evaluating match with matchingOver = " + matchingOver + " its class " + matchingOver.getClass());
 		Variable v = (Variable) matchingOver;
 		System.out.println("v.getType() = " + v.getType());
 		System.out.println("v.getName() = " + v.getName());
@@ -153,6 +151,8 @@ public class Match extends CachingTypedAST implements CoreAST {
 			if (tt instanceof TypeInv) {
 				TypeInv ti = (TypeInv) tt;
 
+				// System.out.println("Processing TypeInv case: " + ti);
+
 				// FIXME: In ECOOP2015Artifact, I am trying to tell the difference between winMod.Win and bigWinMod.Win...
 
 				Type ttti = ti.getInnerType();
@@ -160,12 +160,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 
 				if (ttti instanceof UnresolvedType) {
-					UnresolvedType ut = (UnresolvedType) ttti;
-					Value objVal = env.getValue(((UnresolvedType) ttti).getName(), env);
-					ClassType innerClassType = (ClassType)((Obj) objVal).getIntEnv().getValue(mbr).getType();
-					caseTag = innerClassType.getTaggedInfo();
+					Value objVal = env.lookup(((UnresolvedType) ttti).getName()).get().getValue(env);
+					caseTag = ((Obj) objVal).getIntEnv().lookupBinding(mbr, HackForArtifactTaggedInfoBinding.class)
+							.map(b -> b.getTaggedInfo()).orElseThrow(() -> new RuntimeException("Invalid tag invocation"));
+
 				} else {
-					tt = ti.resolve(env);
+					//tt = ti.resolve(env); TODO: is this valid?
 					caseTag = TaggedInfo.lookupTagByType(tt); // FIXME:
 				}
 			} else {
@@ -193,8 +193,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 	 *
 	 * Searches recursively to see if what we are matching over is a sub-tag of the given target.
 	 *
-	 * @param tag
-	 * @param currentBinding
 	 * @return
 	 */
 	//TODO: rename this method to something like isSubtag()
@@ -202,15 +200,21 @@ public class Match extends CachingTypedAST implements CoreAST {
 		if (matchingOver == null) throw new NullPointerException("Matching Binding cannot be null");
 		if (matchTarget == null) throw new NullPointerException("match target cannot be null");
 
-		String matchingOverTag = matchingOver.getTagName();
-		String matchTargetTag = matchTarget.getTagName();
+		// String matchingOverTag = matchingOver.getTagName();
+		// String matchTargetTag = matchTarget.getTagName();
 
-		if (matchingOverTag.equals(matchTargetTag)) return true;
+		// System.out.println("matchingOverTag = " + matchingOverTag + " and matchTargetTag = " + matchTargetTag);
 
-		Type matchingOverCaseOf = matchingOver.getCaseOfTag();
+		// FIXME: Why do equals when that may not correspond to the tags being the same? Only reference == is safe I guess?
+		// if (matchingOverTag.equals(matchTargetTag)) return true;
+		if (matchingOver == matchTarget) return true;
 
-		if (matchingOverCaseOf == null) return false;
-		else return isSubtag(TaggedInfo.lookupTagByType(matchingOverCaseOf), matchTarget); // FIXME:
+		// If caseOf is hopelessly broken, this is a "fix": return false; :-)d
+
+		TaggedInfo ti = matchingOver.getCaseOfTaggedInfo();
+
+		if (ti == null) return false;
+		return isSubtag(ti, matchTarget); // FIXME:
 	}
 
 	@Override
@@ -267,10 +271,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		// System.out.println("env = " + env);
 		// System.out.println("matchingOver = " + matchingOver);
 		// System.out.println("matchOverType = " + matchOverType);
-
-		if (matchOverType instanceof MetadataWrapper) {
-			matchOverType = ((MetadataWrapper) matchOverType).getInner(); // FIXME:
-		}
 
 		if (!(matchingOver instanceof Variable)) {
 			throw new RuntimeException("Can only match over variable");

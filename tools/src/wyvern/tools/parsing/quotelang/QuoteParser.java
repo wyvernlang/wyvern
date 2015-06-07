@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import static wyvern.tools.types.TypeUtils.arrow;
 import static wyvern.tools.types.TypeUtils.unit;
@@ -26,9 +27,9 @@ import java.io.IOException;
 
 public class QuoteParser implements ExtParser {
 	private static class ToastExecutor extends AbstractASTTransformer {
-		private final Environment evalEnv;
+		private final EvaluationEnvironment evalEnv;
 
-		public ToastExecutor(Environment evalEnv) {
+		public ToastExecutor(EvaluationEnvironment evalEnv) {
 			this.evalEnv = evalEnv;
 		}
 

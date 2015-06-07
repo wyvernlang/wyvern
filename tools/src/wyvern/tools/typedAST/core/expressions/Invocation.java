@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -12,7 +13,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -70,8 +71,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		// System.out.println("Evaluating method invocation: " + this + " with receiver " + this.receiver);
+	public Value evaluate(EvaluationEnvironment env) {
 		/*
 		if (this.receiver instanceof Variable) {
 			Variable w = (Variable) this.receiver;
@@ -84,7 +84,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		*/
 
 		Value lhs = receiver.evaluate(env);
-		if (!(lhs instanceof InvokableValue))
+		if (Globals.checkRuntimeTypes && !(lhs instanceof InvokableValue))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
 		InvokableValue receiverValue = (InvokableValue) lhs;
 		Value out = receiverValue.evaluateInvocation(this, env);
@@ -109,7 +109,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
+	public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
 		Value lhs = receiver.evaluate(env);
 		if (!(lhs instanceof Assignable))
 			reportEvalError(CANNOT_INVOKE, lhs.toString(), this);

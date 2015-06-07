@@ -5,13 +5,13 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -19,8 +19,11 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.types.extensions.TypeInv;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -119,8 +122,6 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			LinkedList<Declaration> decls = new LinkedList<>();
 
-			mockEnv = getGenericDecls(env, mockEnv, decls);
-
 			Environment nnames = (seq.extendType(mockEnv, mockEnv.extend(env)));
 			nnames = (seq.extendName(nnames,mockEnv.extend(env)));
 			//nnames = seq.extend(nnames, mockEnv.extend(env));
@@ -134,25 +135,19 @@ public class New extends CachingTypedAST implements CoreAST {
 		}
 	}
 
-	private Environment getGenericDecls(Environment env, Environment mockEnv, LinkedList<Declaration> decls) {
-		for (Entry<String, TypedAST> elem : args.entrySet()) {
-			ValDeclaration e = new ValDeclaration(elem.getKey(), elem.getValue(), elem.getValue().getLocation());
-			e.typecheck(env, Optional.empty());
-			mockEnv = e.extend(mockEnv, mockEnv);
-			decls.add(e);
-		}
+	private EvaluationEnvironment getGenericDecls(EvaluationEnvironment env, EvaluationEnvironment mockEnv, LinkedList<Declaration> decls) {
 		return mockEnv;
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Environment argValEnv = Environment.getEmptyEnvironment();
+	public Value evaluate(EvaluationEnvironment env) {
+		EvaluationEnvironment argValEnv = EvaluationEnvironment.EMPTY;
 		for (Entry<String, TypedAST> elem : args.entrySet())
 			argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
 
 
 
-		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
+		ClassBinding classVarTypeBinding = (ClassBinding) env.lookupValueBinding("class", ClassBinding.class).orElse(null);
 		ClassDeclaration classDecl;
 
 		if (classVarTypeBinding != null) {
@@ -163,19 +158,20 @@ public class New extends CachingTypedAST implements CoreAST {
 
 			LinkedList<Declaration> decls = new LinkedList<>();
 
-			mockEnv = getGenericDecls(env, mockEnv, decls);
-
 			classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
 		}
 
 		AtomicReference<Value> objRef = new AtomicReference<>();
-		Environment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
-		classDecl.evalDecl(evalEnv, classDecl.extendWithValue(Environment.getEmptyEnvironment()));
-		final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
-				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, Environment::extend);
-		Environment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
+		EvaluationEnvironment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
+		classDecl.evalDecl(evalEnv, classDecl.extendWithValue(EvaluationEnvironment.EMPTY));
+		final EvaluationEnvironment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
+				reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, EvaluationEnvironment::extend);
+		EvaluationEnvironment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 
-		Obj obj = new Obj(objenv.extend(argValEnv), classDecl.getTaggedInfo());
+		TaggedInfo goodTI = env.lookupBinding("this", HackForArtifactTaggedInfoBinding.class)
+				.map(binding -> binding.getTaggedInfo()).orElse(classDecl.getTaggedInfo());
+
+		Obj obj = new Obj(objenv.extend(argValEnv), goodTI);
 
 		//FIXME: Record new tag!
 		if (classDecl.isTagged()) {

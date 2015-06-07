@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class TupleValue extends AbstractValue implements InvokableValue {
 	}
 
 	@Override
-	public Value evaluateInvocation(Invocation exp, Environment env) {
+	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		String name = exp.getOperationName();
 		if (name.length() < 2)
 			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, exp.getLocation());

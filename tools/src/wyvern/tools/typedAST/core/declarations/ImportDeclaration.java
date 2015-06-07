@@ -4,17 +4,20 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private URI uri;
@@ -48,7 +51,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override
@@ -88,12 +91,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
 		return binder.extendVal(old);
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		binder.bindVal(evalEnv);
 	}
 }

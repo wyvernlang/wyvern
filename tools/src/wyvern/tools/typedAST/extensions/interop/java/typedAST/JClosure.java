@@ -14,6 +14,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.lang.invoke.MethodHandle;
@@ -72,9 +73,9 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 	}
 
 	List<JavaInvokableMethod> methods = new ArrayList<>();
-	private Environment evalEnv;
+	private EvaluationEnvironment evalEnv;
 
-	public JClosure(List<JavaInvokableMethod> methods, Environment evalEnv) {
+	public JClosure(List<JavaInvokableMethod> methods, EvaluationEnvironment evalEnv) {
 		this.methods = methods;
 		this.evalEnv = evalEnv;
 		Collections.sort(this.methods, new Comparator<JavaInvokableMethod>() {
@@ -115,8 +116,8 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 
 
 	@Override
-	public Value evaluateApplication(Application app, Environment env) {
-		Environment iEnv = evalEnv.extend(env);
+	public Value evaluateApplication(Application app, EvaluationEnvironment env) {
+		EvaluationEnvironment iEnv = evalEnv.extend(env);
 		Value[] values = vFromV(app.getArgument().evaluate(env));;
 		Type[] wyvTypes = new Type[values.length];
 		for (int ii = 0; ii < wyvTypes.length; ii++)
@@ -164,7 +165,7 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 					jArgs[i] = Util.toJavaObject(args[i], parameterTypes[i]);
 			} else {
 				jArgs = new Object[parameterTypes.length + 1];
-				jArgs[0] = Util.toJavaObject(evalEnv.getValue("this"), m.getSrcClass());
+				jArgs[0] = Util.toJavaObject(evalEnv.lookup("this").get().getValue(evalEnv), m.getSrcClass());
 				for (int i = 0; i < parameterTypes.length; i++)
 					jArgs[i+1] = Util.toJavaObject(args[i], parameterTypes[i]);
 			}

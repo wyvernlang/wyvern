@@ -36,7 +36,7 @@ public class TypeResolver {
 
 		if (input instanceof SpliceType)
 			return resolve(((SpliceType) input).getInner(),
-					ctx.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class).orElseThrow(RuntimeException::new)
+					ctx.lookupBinding("oev", TSLBlock.OuterTypecheckBinding.class).orElseThrow(RuntimeException::new)
 							.getStore(), visited);
 
 		if (input instanceof Resolvable) {

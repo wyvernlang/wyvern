@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Str;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -21,7 +22,7 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 
 	@Override
 	public Type getType() {
-		return Str.getInstance();
+		return new Str();
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	
 
 	@Override
-	public Value evaluateInvocation(Invocation exp, Environment env) {
+	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		String operator = exp.getOperationName();
 		if (!operator.equals("+") && !operator.equals("==")) {
 			try {

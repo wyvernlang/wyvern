@@ -24,7 +24,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private String name;
 	private TaggedInfo tagInfo;
 
-	private String stackTrace;
+	//private String stackTrace;
 
 	public ClassType() {
 		this(new Reference<>(Environment.getEmptyEnvironment()),
@@ -51,7 +51,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		this.name = name;
 		this.tagInfo = tagInfo;
 
-		stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
+		//stackTrace = Arrays.asList(new Exception().getStackTrace()).stream().reduce("", (a,b)->a+"\n"+b, (a,b)->a + "\n" + b);
 		// System.out.println("Creating ClassType with declEnv " + declEnv.get());
 	}
 
@@ -123,10 +123,6 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 			return true;
 		}
 
-		//TODO: Hack.
-		if (other instanceof MetadataWrapper)
-			return subtype(((MetadataWrapper) other).getInner(), subtypes);
-
 		if (other instanceof TypeType) {
 			// System.out.println("Is\n" + this.getEquivType() + "\n a subtype of \n" + other + "\n?");
 			return getEquivType().subtype(other);
@@ -156,7 +152,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		HashMap<String, Type> map = new HashMap<>();
 		List<Binding> bindings = declEnv.get().getBindings();
 		writeBindings("denv", map, bindings);
-		if (typeEquivalentEnv.get() != null) {
+		if (typeEquivalentEnv != null && typeEquivalentEnv.get() != null) {
 			writeBindings("teenv", map, typeEquivalentEnv.get().getBindings());
 		}
 		return map;

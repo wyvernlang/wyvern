@@ -1,9 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
@@ -16,8 +13,8 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.MetadataWrapper;
 import wyvern.tools.types.extensions.TypeInv;
+import wyvern.tools.util.EvaluationEnvironment;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
@@ -33,10 +30,23 @@ public class TaggedInfo {
 	private String tagName;
 	private Type tagType;
 
+
+	// Note that caseOf and comprises only use Type when parsing, they should all be replaced with appropriate
+	// TaggedInfo during runtime or for type checking of tags to work.
 	private Type caseOf;
-	private TaggedInfo caseOfTaggedInfo;
 
 	private List<Type> comprises;
+
+	public TaggedInfo getCaseOfTaggedInfo() {
+		return caseOfTaggedInfo;
+	}
+
+	public void setCaseOfTaggedInfo(TaggedInfo caseOfTaggedInfo) {
+		this.caseOfTaggedInfo = caseOfTaggedInfo;
+	}
+
+	// The only thing that matters is TaggedInfo address and caseOf/comprises relation below.
+	private TaggedInfo caseOfTaggedInfo;
 	private List<TaggedInfo> comprisesTaggedInfos;
 
 
@@ -46,14 +56,9 @@ public class TaggedInfo {
 		}
 	}
 
-
 	public void resolve(Environment env, HasLocation hl) {
 		if (this.tagType instanceof UnresolvedType) {
 			this.tagType = ((UnresolvedType) this.tagType).resolve(env);
-			if (this.tagType instanceof MetadataWrapper) {
-				// System.out.println("Caught one (tagType)!");
-				this.tagType = ((MetadataWrapper) this.tagType).getInner();
-			}
 		}
 
 		if (this.tagType instanceof TypeInv) {
@@ -69,13 +74,10 @@ public class TaggedInfo {
 			}
 
 			this.caseOf = ((UnresolvedType) this.caseOf).resolve(env);
-			if (this.caseOf instanceof MetadataWrapper) {
-				// System.out.println("Caught one (caseOf)!");
-				this.caseOf = ((MetadataWrapper) this.caseOf).getInner();
-			}
 		}
 
-		if (this.caseOf != null && this.caseOf instanceof TypeInv) {
+		if (this.caseOf != null && this.caseOf instanceof TypeInv &&
+				!(((TypeInv)caseOf).getInnerType() instanceof UnresolvedType)) {
 			// System.out.println("FOUND caseOf!" + caseOf);
 			((TypeInv) this.caseOf).resolve(env);
 			// System.out.println("MADE caseOf!" + caseOf);
@@ -87,10 +89,6 @@ public class TaggedInfo {
 		for (Type t : comprises) {
 			if (t instanceof UnresolvedType) {
 				Type tt = ((UnresolvedType) t).resolve(env);
-				if (tt instanceof MetadataWrapper) {
-					// System.out.println("Caught one (tt)!");
-					tt = ((MetadataWrapper) tt).getInner();
-				}
 				resolvedComprises.add(tt);
 			} else {
 				// if (t instanceof ClassType)
@@ -135,6 +133,11 @@ public class TaggedInfo {
 	 */
 	public TaggedInfo(Type caseOf) {
 		this(caseOf, null);
+	}
+
+	public TaggedInfo(TaggedInfo caseOfTaggedInfo, List<TaggedInfo> comprisesTaggedInfos) {
+		this.caseOfTaggedInfo = caseOfTaggedInfo;
+		this.comprisesTaggedInfos = comprisesTaggedInfos;
 	}
 
 	/**

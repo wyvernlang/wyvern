@@ -13,6 +13,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -21,9 +22,9 @@ import java.util.Map;
 
 public class Closure extends AbstractValue implements ApplyableValue {
 	private BoundCode function;
-	private Environment env;
+	private EvaluationEnvironment env;
 
-	public Closure(BoundCode function, Environment env) {
+	public Closure(BoundCode function, EvaluationEnvironment env) {
 		this.function = function;
 		this.env = env;
 	}
@@ -53,9 +54,9 @@ public class Closure extends AbstractValue implements ApplyableValue {
 	}
 
 	@Override
-	public Value evaluateApplication(Application app, Environment argEnv) {
+	public Value evaluateApplication(Application app, EvaluationEnvironment argEnv) {
 		Value argValue = app.getArgument().evaluate(argEnv);
-		Environment bodyEnv = env;
+		EvaluationEnvironment bodyEnv = env;
 		List<NameBinding> bindings = function.getArgBindings();
 		if (bindings.size() == 1)
 			bodyEnv = bodyEnv.extend(new ValueBinding(bindings.get(0).getName(), argValue));

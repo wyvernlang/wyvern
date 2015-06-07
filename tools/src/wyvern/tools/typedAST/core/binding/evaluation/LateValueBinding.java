@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,7 +37,7 @@ public class LateValueBinding extends ValueBinding {
 	}
 
 	@Override
-	public Value getValue(Environment env) {
+	public Value getValue(EvaluationEnvironment env) {
 		return valueRef.get();
 	}
 

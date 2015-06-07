@@ -94,7 +94,7 @@ public class GenerationContext {
 	@Test
 	public void testSig1() {
 		SignatureWriter sw = new SignatureWriter();
-		wyvern.tools.types.Type toGen = new Arrow(new Tuple(new wyvern.tools.types.Type[] {Int.getInstance(), Int.getInstance(), Bool.getInstance()}), Bool.getInstance());
+		wyvern.tools.types.Type toGen = new Arrow(new Tuple(new wyvern.tools.types.Type[]{new Int(), new Int(), new Bool()}), new Bool());
 		getSignature(toGen, sw, true);
 		String res = sw.toString();
 		ClassSignature mts = sun.reflect.generics.parser.SignatureParser.make().parseClassSig(res);

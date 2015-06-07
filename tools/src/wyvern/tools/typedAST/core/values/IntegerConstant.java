@@ -7,6 +7,7 @@ import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -21,7 +22,7 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 
 	@Override
 	public Type getType() {
-		return Int.getInstance();
+		return new Int();
 	}
 	
 	@Override
@@ -34,7 +35,7 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	}
 
 	@Override
-	public Value evaluateInvocation(Invocation exp, Environment env) {
+	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		IntegerConstant intArgValue = null;
 		String operator = exp.getOperationName();
 

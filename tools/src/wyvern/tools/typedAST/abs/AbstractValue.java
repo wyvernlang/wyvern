@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.abs;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.Optional;
 
@@ -14,7 +15,7 @@ public abstract class AbstractValue extends AbstractTypedAST implements Value {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		return this;
 	}
 }

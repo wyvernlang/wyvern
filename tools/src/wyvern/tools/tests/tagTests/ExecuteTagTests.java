@@ -21,21 +21,6 @@ public class ExecuteTagTests {
 	}
 
 	@Test
-	public void window() throws CopperParserException, IOException {
-		String input = readFile("../borderedwindow.wyv");
-
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 15);
-	}
-	@Test
-	public void cdt() throws CopperParserException, IOException {
-		String input = readFile("../classdeftest.wyv");
-
-		TypedAST ast = getAST(input);
-		evaluateExpecting(ast, 42);
-	}
-
-	@Test
 	public void basic2() throws CopperParserException, IOException {		
 		String input = readFile("basic2.wyv");
 

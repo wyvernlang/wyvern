@@ -8,6 +8,8 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
@@ -66,14 +68,16 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	public Sequence(TypedAST first, TypedAST second) {
-		if (second instanceof Sequence) {
+		if (first instanceof Sequence) {
+			exps.addAll(((Sequence) first).exps);
+		} else if (first != null) {
 			exps.add(first);
-			exps.addAll(((Sequence) second).exps);
-			return;
 		}
-		exps.add(first);
-		if (second != null)
+		if (second instanceof Sequence) {
+			exps.addAll(((Sequence) second).exps);
+		} else if (second != null) {
 			exps.add(second);
+		}
 	}
 
 	public Sequence() {
@@ -92,7 +96,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {
-		Type lastType = wyvern.tools.types.extensions.Unit.getInstance();
+		Type lastType = new Unit();
 		for (TypedAST t : exps) {
 			if (t == null) continue;
 			lastType = t.typecheck(env, (exps.getLast() == t)?expected:Optional.empty());
@@ -104,8 +108,8 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
-		Environment iEnv = env;
+	public Value evaluate(EvaluationEnvironment env) {
+		EvaluationEnvironment iEnv = env;
 		Value lastVal = UnitVal.getInstance(this.getLocation());
 		for (TypedAST exp : this) {
 			if (exp == null) continue;

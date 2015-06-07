@@ -5,6 +5,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -19,11 +20,13 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -44,7 +47,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 	private TypeBinding nameImplements;
 
-	protected Environment declEvalEnv;
+	protected EvaluationEnvironment declEvalEnv;
 
 	private TypeType equivalentType = null;
 	private TypeType equivalentClassType = null;
@@ -222,7 +225,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		if (isTagged()) typecheckTags(env);
 
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	private void typecheckTags(Environment env) {
@@ -241,7 +244,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			//check the type is tagged
 			if (!(caseOfType instanceof TypeInv)) { // If it is TypeInv - we won't know till runtime!
 				TaggedInfo info = TaggedInfo.lookupTagByType(caseOfType);
+
 				//System.out.println("Looked up: " + info);
+
+				taggedInfo.setCaseOfTaggedInfo(info);
 
 				if (info == null) {
 					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfType.toString());
@@ -315,8 +321,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old
+				.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()))
+				.extend(new HackForArtifactTaggedInfoBinding(nameBinding.getName()));
 
 		//newEnv = newEnv.extend(taggedBinding);
 
@@ -324,25 +332,57 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+
+		// System.out.println("Inside evalDecl for something called: " + this.getName());
+		TaggedInfo goodTI = this.taggedInfo;
+		if (goodTI != null) {
+			// FIXME: This is a right place to resolve the TaggedInfo case of for this tag for this class if it happens to use variables.
+			if (goodTI.hasCaseOf()) {
+				Type co = goodTI.getCaseOfTag();
+				if (co instanceof TypeInv) {
+					TypeInv ti = (TypeInv) co;
+					Type ttti = ti.getInnerType();
+					String mbr = ti.getInvName();
+					if (ttti instanceof UnresolvedType) {
+						Value objVal = evalEnv.lookup(((UnresolvedType) ttti).getName()).get().getValue(evalEnv);
+						TaggedInfo caseTag = ((Obj) objVal).getIntEnv().lookupBinding(mbr, HackForArtifactTaggedInfoBinding.class)
+								.map(b->b.getTaggedInfo()).orElseThrow(() -> new RuntimeException("Invalid tag invocation"));
+
+						// FIX THIS TAG:
+						goodTI = new TaggedInfo(caseTag, new ArrayList<TaggedInfo>());
+					}
+				}
+			}
+		}
+
 		if (declEvalEnv == null)
 			declEvalEnv = declEnv.extend(evalEnv);
-		Obj classObj = new Obj(getClassEnv(evalEnv), taggedInfo);
+		if (goodTI != null) {
+			HackForArtifactTaggedInfoBinding hfatib = new HackForArtifactTaggedInfoBinding("this");
+			hfatib.setTaggedInfo(goodTI);
+			evalEnv = evalEnv.extend(hfatib);
+		}
+		Obj classObj = new Obj(getClassEnv(evalEnv), null); // FIXME: can be tagged too you know, not goodTI!! :)
 
-		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName());
+		final TaggedInfo finalTi = goodTI;
+		declEnv.lookupBinding(nameBinding.getName(), HackForArtifactTaggedInfoBinding.class).ifPresent(b->b.setTaggedInfo(finalTi));
+
+		ValueBinding vb = declEnv.lookup(nameBinding.getName())
+				.orElseThrow(() -> new RuntimeException("Internal error - Class NameBinding not initalized"));
 		vb.setValue(classObj);
 	}
 
-	public Environment evaluateDeclarations(Environment addtlEnv) {
-		Environment thisEnv = decls.extendWithDecls(Environment.getEmptyEnvironment());
+	public EvaluationEnvironment evaluateDeclarations(EvaluationEnvironment addtlEnv) {
+		EvaluationEnvironment thisEnv = decls.extendWithDecls(EvaluationEnvironment.EMPTY);
 		decls.bindDecls(declEvalEnv.extend(addtlEnv), thisEnv);
 
 		return thisEnv;
 	}
 
-	public Environment getClassEnv(Environment extEvalEnv) {
+	public EvaluationEnvironment getClassEnv(EvaluationEnvironment extEvalEnv) {
 
-		Environment classEnv = Environment.getEmptyEnvironment();
+		EvaluationEnvironment classEnv = EvaluationEnvironment.EMPTY;
 
 		if (decls == null)
 			return classEnv;
@@ -354,7 +394,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		}
 
 		ClassBinding thisBinding = new ClassBinding("class", this);
-		Environment evalEnv = classEnv.extend(thisBinding);
+		EvaluationEnvironment evalEnv = classEnv.extend(thisBinding);
 
 		for (Declaration decl : decls.getDeclIterator())
 			if (decl.isClassMember()){
@@ -431,10 +471,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return equivalentClassType;
 	}
 
-	public Environment getFilledBody(AtomicReference<Value> objRef) {
+	public EvaluationEnvironment getFilledBody(AtomicReference<Value> objRef) {
 		return evaluateDeclarations(
-				Environment
-						.getEmptyEnvironment()
+				EvaluationEnvironment.EMPTY
 						.extend(new LateValueBinding("this", objRef, getType())));
 	}
 
@@ -462,8 +501,10 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			int idx = Integer.parseInt(key.substring(0,key.length() - 4));
 			decls.add(idx, (Declaration)nc.get(key));
 		}
-		return new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
+		ClassDeclaration classDeclaration = new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
 				new DeclSequence(decls), classMembersEnv.get(), typeParams, location);
+		classDeclaration.taggedInfo = taggedInfo;
+		return classDeclaration;
 	}
 
 

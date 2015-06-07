@@ -10,6 +10,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.lang.invoke.MethodHandle;
@@ -62,13 +63,13 @@ public class JavaField extends Declaration {
 		}
 
 		@Override
-		public Value getValue(Environment env) {
+		public Value getValue(EvaluationEnvironment env) {
 			Object value = null;
 			try {
 				if (Modifier.isStatic(src.getModifiers())) {
 					value = src.get(null);
 				} else {
-					value = src.get(((JavaObj)env.lookup("this").getValue(env)).getObj());
+					value = src.get(((JavaObj) env.lookup("this").get().getValue(env)).getObj());
 				}
 				return Util.toWyvObj(value);
 			} catch (IllegalAccessException e) {
@@ -79,15 +80,15 @@ public class JavaField extends Declaration {
 	}
 
     @Override
-    public Environment extendWithValue(Environment old) {
-        Environment newEnv = old.extend(new JavaFieldValueBinding(nameBinding.getName(), nameBinding.getType()));
+    public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old.extend(new JavaFieldValueBinding(nameBinding.getName(), nameBinding.getType()));
         return newEnv;
     }
 
 
 	private boolean binding = false;
     @Override
-    public void evalDecl(Environment evalEnv, Environment declEnv) {
+    public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		//Not actually needed.
     }
 

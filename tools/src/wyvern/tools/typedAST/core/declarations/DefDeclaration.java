@@ -18,6 +18,7 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
@@ -69,7 +70,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
 		Type argType = null;
 		if (args.size() == 0) {
-			argType = Unit.getInstance();
+			argType = new Unit();
 		} else if (args.size() == 1) {
 			argType = args.get(0).getType();
 		} else {
@@ -132,7 +133,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			// System.out.println("bodyType = " + bodyType);
 			// System.out.println("retType = " + retType);
 			
-			if (bodyType != null && !bodyType.subtype(retType))
+			if (bodyType != null &&
+					!bodyType.subtype(retType))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
 		}
 		return type;
@@ -154,15 +156,15 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
-		Environment newEnv = old.extend(new ValueBinding(name, type));
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+		EvaluationEnvironment newEnv = old.extend(new ValueBinding(name, type));
 		return newEnv;
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		Closure closure = new Closure(this, evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(name);
+		ValueBinding vb = (ValueBinding) declEnv.lookup(name).get();
 		vb.setValue(closure);
 	}
 

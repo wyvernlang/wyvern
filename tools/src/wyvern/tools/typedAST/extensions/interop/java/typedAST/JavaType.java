@@ -2,12 +2,14 @@ package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
@@ -34,7 +36,7 @@ public class JavaType implements EnvironmentExtender {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		return null;
 	}
 
@@ -75,7 +77,7 @@ public class JavaType implements EnvironmentExtender {
 	}
 
 	@Override
-	public Environment evalDecl(Environment env) {
+	public EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
 		return env;
 	}
 }

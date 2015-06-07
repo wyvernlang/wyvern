@@ -5,6 +5,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Map;
@@ -39,12 +40,12 @@ public class PropDeclaration extends Declaration {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
 		return null;
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 
 	}
 

@@ -12,6 +12,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.MetaType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 import wyvern.tools.parsing.ExtParser;
 
@@ -58,7 +59,7 @@ public class DSLLit extends AbstractTypedAST {
 		Type dslType = expected.orElseGet(this::getDefaultType);
 
 		Value vparser =
-				Util.invokeValue(((MetaType) dslType).getMetaObj(),
+				Util.invokeValue(dslType.getResolvedBinding().get().getMetadata().get().get(),
 						"getParser", UnitVal.getInstance(FileLocation.UNKNOWN));
 		ExtParser parser = (ExtParser) Util.toJavaObject(vparser, ExtParser.class);
 
@@ -71,7 +72,7 @@ public class DSLLit extends AbstractTypedAST {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		return null;
 	}
 

@@ -13,6 +13,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -45,7 +46,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	protected Type doTypecheck(Environment env) {
 		inner.typecheck(env, Optional.empty());
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	private Iterable<TypedAST> getInnerIterable() {
@@ -114,21 +115,21 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Environment extendWithValue(Environment old) {
+	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
 		return old.extend(new ValueBinding(name, selfType));
 	}
 
 	@Override
-	public void evalDecl(Environment evalEnv, Environment declEnv) {
-		ValueBinding selfBinding = (ValueBinding) declEnv.lookup(name);
-		Environment objEnv = Environment.getEmptyEnvironment();
+	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+		ValueBinding selfBinding = declEnv.lookup(name).get();
+		EvaluationEnvironment objEnv = EvaluationEnvironment.EMPTY;
 		Value selfV = new Obj(inner.evalDecl(objEnv), null);
 		selfBinding.setValue(selfV);
 	}
 
 	@Override
 	public Type getType() {
-		return Unit.getInstance();
+		return new Unit();
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
@@ -12,6 +11,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.TypeType;
+import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
@@ -67,10 +67,10 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluate(Environment env) {
+	public Value evaluate(EvaluationEnvironment env) {
 		//Value value = binding.getValue(env);
-		Value value = env.getValue(binding.getName());
-		assert value != null;
+		Value value = env.lookup(binding.getName()).orElseThrow(() -> new RuntimeException("Invalid variable name ")).getValue(env);
+
 		if (value instanceof VarValue) {
 			return ((VarValue)value).getValue();
 		}
@@ -90,9 +90,9 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Value evaluateAssignment(Assignment ass, Environment env) {
+	public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
 		Value value = ass.getValue().evaluate(env);
-		env.lookupBinding(binding.getName(), AssignableValueBinding.class)
+		env.lookupValueBinding(binding.getName(), AssignableValueBinding.class)
 				.orElseThrow(() -> new RuntimeException("Invalid assignment"))
 				.assign(value);
 
