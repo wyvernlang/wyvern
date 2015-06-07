@@ -277,6 +277,17 @@ public class CopperTests {
 		Assert.assertEquals("IntegerConstant(3)",res.evaluate(Globals.getStandardEnv()).toString());
 	}
 	
+	@Test
+	public void testComments1() throws IOException, CopperParserException {
+		String input =
+				"exn1\n" +
+				"\n" +
+				"// foo\n" +
+				"\n" +
+				"exn2\n";
+		TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+	}
+	
 	// admittedly this is only a starting point....
 	@Test
 	public void testTrivialDSL() throws IOException, CopperParserException {
