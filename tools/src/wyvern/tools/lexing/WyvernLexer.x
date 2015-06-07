@@ -65,15 +65,26 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		}
 	}
 
-	void addDedentsForChange(List<Token> tokenList, int indentChange, Token tokenLoc) {
+	/*void addDedentsForChange(List<Token> tokenList, int indentChange, Token tokenLoc) {
 		while (indentChange < 0) {
 			Token t = makeToken(DEDENT,"",tokenLoc);
 			tokenList.add(t);
 			indentChange++;
 		}
-	}
+	}*/
 	
-	List<Token> tokensForIndent(Token newIndent) throws CopperParserException {
+	List<Token> possibleDedentList(Token tokenLoc) throws CopperParserException {
+		int levelChange = adjustIndent("");
+  		List<Token> tokenList = emptyList(); 
+		while (levelChange < 0) {
+			Token t = makeToken(DEDENT,"",tokenLoc);
+			tokenList.add(t);
+			levelChange++;
+		}
+  		return tokenList;
+  	}	
+	
+	/*List<Token> tokensForIndent(Token newIndent) throws CopperParserException {
 		int indent = adjustIndent(newIndent.image);
 		if (indent == 0)
 			return makeList(newIndent);
@@ -84,6 +95,37 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		List<Token> tokenList = makeList(newIndent);
 		addDedentsForChange(tokenList, indent, newIndent);
 		return tokenList;
+	}*/
+	
+	/**
+	 * creates indents/dedents at the beginning if necessary
+	 * creates a NEWLINE at the end if necessary
+	 */
+	LinkedList<Token> adjustLogicalLine(LinkedList<Token> aLine) throws CopperParserException {
+		if (hasNonSpecialToken(aLine)) {
+			// it's a logical line...let's adjust it!
+			
+			// find the indent for this line
+			Token firstToken = aLine.getFirst();
+			String lineIndent = "";
+			if (firstToken.kind == WHITESPACE)
+				lineIndent = firstToken.image;
+			
+			// add indents/dedents as needed
+			int levelChange = adjustIndent(lineIndent);
+			if (levelChange == 1)
+				aLine.addFirst(makeToken(INDENT,"",firstToken));
+			while (levelChange < 0) {
+				aLine.addFirst(makeToken(DEDENT,"",firstToken));
+				levelChange++;
+			}
+			
+			// add a NEWLINE at the end
+			Token lastToken = aLine.getLast();
+			Token NL = makeToken(NEWLINE,"",lastToken);
+			aLine.addLast(NL);
+		}
+		return aLine;
 	}
 	
 	Token makeToken(int kind, String s, Token tokenLoc) {
@@ -99,7 +141,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	
 	/** Wraps the lexeme s in a Token, setting the begin line/column and kind appropriately */
 	Token token(int kind, String s) {
-		return makeToken(kind, s, virtualLocation.getLine(), virtualLocation.getColumn());
+		// Copper starts counting columns at 0, but we want to follow convention and count columns starting at 1
+		return makeToken(kind, s, virtualLocation.getLine(), virtualLocation.getColumn()+1);
 	}
 	
 	List<Token> emptyList() {
@@ -238,6 +281,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 %cf{
 	non terminal List<Token> program;
+	non terminal List<Token> lines;
 	non terminal List<Token> logicalLine;
 	non terminal List<Token> dslLine;
 	non terminal List<Token> anyLineElement;
@@ -288,10 +332,16 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
     dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = makeList(t); RESULT.add(line); :};
 	
-	logicalLine ::= lineElementSequence:list newline_t:n
-					{:	if (hasNonSpecialToken(list))
-							n.kind = NEWLINE;
+	lineElementSequence ::= indent_t:n {: RESULT = makeList(n); :}
+	                      | nonWSLineElement:n {:
+	                      		RESULT = n;//possibleDedentList(n.get(0));
+	                            //RESULT.addAll(n);
+	                        :}
+	                      | lineElementSequence:list anyLineElement:n {: list.addAll(n); RESULT = list; :};
+	
+	logicalLine ::= lineElementSequence:list newline_t:n {:
 						list.add(n);
+						List<Token> adjustedList = adjustLogicalLine((LinkedList<Token>)list);
 					    if (foundTilde) {
 						    DSLNext = true;
 						    foundTilde = false;
@@ -300,18 +350,25 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 					:}
 				  | newline_t:n {: RESULT = makeList(n); :};
 				  
-	lineElementSequence ::= indent_t:n {: RESULT = tokensForIndent(n); :}
-	                      | nonWSLineElement:n {:
-	                      		int levelChange = adjustIndent("");
-	                      		RESULT = emptyList(); 
-	                      		addDedentsForChange(RESULT, levelChange, n.get(0));
-	                            RESULT.addAll(n);
-	                        :}
-	                      | lineElementSequence:list anyLineElement:n {: list.addAll(n); RESULT = list; :};
-	
 	aLine ::= dslLine:line {: RESULT = line; :}
 	        | logicalLine:line  {: RESULT = line; :}; 
 	          
-	program ::= logicalLine:line {: RESULT = line; :}
-	          | program:p aLine:line {: p.addAll(line); RESULT = p; :};
+	lines ::= logicalLine:line {: RESULT = line; :}
+	        | lines:p aLine:line {: p.addAll(line); RESULT = p; :};
+	          
+	program ::= lines:p {:
+	             	RESULT = p;
+	             	Token t = ((LinkedList<Token>)p).getLast();
+	             	RESULT.addAll(possibleDedentList(t));
+	           	:}
+	          | lines:p lineElementSequence:list {:
+	          		RESULT = p;
+	          		List<Token> adjustedList = adjustLogicalLine((LinkedList<Token>)list);
+	          		RESULT.addAll(adjustedList);
+	             	Token t = ((LinkedList<Token>)adjustedList).getLast();
+	          		RESULT.addAll(possibleDedentList(t));
+	          	:}
+	          | lineElementSequence:list {: RESULT = list; :}
+	          | /* empty program */ {: RESULT = emptyList(); :};
+	
 %cf}
