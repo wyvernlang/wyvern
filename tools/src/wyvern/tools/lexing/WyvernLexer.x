@@ -65,14 +65,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		}
 	}
 
-	/*void addDedentsForChange(List<Token> tokenList, int indentChange, Token tokenLoc) {
-		while (indentChange < 0) {
-			Token t = makeToken(DEDENT,"",tokenLoc);
-			tokenList.add(t);
-			indentChange++;
-		}
-	}*/
-	
 	List<Token> possibleDedentList(Token tokenLoc) throws CopperParserException {
 		int levelChange = adjustIndent("");
   		List<Token> tokenList = emptyList(); 
@@ -83,19 +75,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		}
   		return tokenList;
   	}	
-	
-	/*List<Token> tokensForIndent(Token newIndent) throws CopperParserException {
-		int indent = adjustIndent(newIndent.image);
-		if (indent == 0)
-			return makeList(newIndent);
-		if (indent == 1) {
-			newIndent.kind = INDENT;
-			return makeList(newIndent);
-		}
-		List<Token> tokenList = makeList(newIndent);
-		addDedentsForChange(tokenList, indent, newIndent);
-		return tokenList;
-	}*/
 	
 	/**
 	 * creates indents/dedents at the beginning if necessary
@@ -192,7 +171,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token continue_line_t ::= /\\(\n|(\r\n))/ {: RESULT = token(WHITESPACE,lexeme); :};
 
 	terminal Token comment_t  ::= /\/\/([^\r\n])*/ {: RESULT = token(SINGLE_LINE_COMMENT,lexeme); :};
-	terminal Token multi_comment_t  ::= /\/\*(.|\n|\r)*?\*\// {: RESULT = token(MULTI_LINE_COMMENT,lexeme); :};
+	terminal Token multi_comment_t  ::= /\/\*([^*]|\*[^/])*\*\// {: RESULT = token(MULTI_LINE_COMMENT,lexeme); :};
+	
+	
 	
  	terminal Token identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = token(IDENTIFIER,lexeme);
@@ -288,18 +269,25 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	non terminal List<Token> nonWSLineElement;
 	non terminal List lineElementSequence;
 	non terminal List<Token> parens;
+	non terminal List<Token> parenContent;
 	non terminal List<Token> parenContents;
+	non terminal List<Token> optParenContents;
 	non terminal Token operator;
 	non terminal List<Token> aLine;
 
 	start with program;
 	
-	parenContents ::= anyLineElement:e {: RESULT = e; :}
-	                | newline_t:t {: RESULT = makeList(t); :}
-	                | {: RESULT = emptyList(); :};
+	parenContent ::= anyLineElement:e {: RESULT = e; :}
+	               | newline_t:t {: RESULT = makeList(t); :};
 	
-	parens ::= openParen_t:t1 parenContents:list closeParen_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :}
-	         | oSquareBracket_t:t1 parenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
+	parenContents ::= parenContent:p {: RESULT = p; :}
+	                | parenContents:ps parenContent:p {: RESULT = ps; ps.addAll(p); :};
+	                
+	optParenContents ::= parenContents:ps {: RESULT = ps; :}
+	                   | {: RESULT = emptyList(); :};
+	
+	parens ::= openParen_t:t1 optParenContents:list closeParen_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :}
+	         | oSquareBracket_t:t1 optParenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
 	           | plus_t:t {: RESULT = t; :}
@@ -334,6 +322,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	
 	lineElementSequence ::= indent_t:n {: RESULT = makeList(n); :}
 	                      | nonWSLineElement:n {:
+								if (DSLNext)
+									throw new CopperParserException("Indicated DSL with ~ but then did not indent");
 	                      		RESULT = n;//possibleDedentList(n.get(0));
 	                            //RESULT.addAll(n);
 	                        :}
