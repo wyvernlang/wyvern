@@ -1,0 +1,147 @@
+options {
+  /* default values here:
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+  FORCE_LA_CHECK = false;
+  */
+  
+  // we define our own token manager
+  USER_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(WyvernParser)
+
+package wyvern.tools.parsing.coreparser;
+
+/** Simple brace matcher. */
+public class WyvernParser {
+
+}
+
+PARSER_END(WyvernParser)
+
+SPECIAL_TOKEN : /* Comments and whitespace */
+{
+  <SINGLE_LINE_COMMENT>
+| <MULTI_LINE_COMMENT>
+| <WHITESPACE>
+}
+
+TOKEN : /* Keywords */
+{
+  < VAL: "val" >
+| < VAR: "var" >
+| < FN: "fn" >
+// more here
+}
+
+TOKEN : /* Logical Formatting */
+{
+  <NEWLINE>
+| <INDENT>
+| <DEDENT>
+| <DSLLINE>
+}
+
+TOKEN : /* Identifiers */
+{
+  <IDENTIFIER>
+}
+
+TOKEN : /* Symbols */
+{
+  <LPAREN>
+| <RPAREN>
+| <TILDE>
+| <PLUS>
+| <DASH>
+| <MULT>
+| <DIVIDE>
+| <EQUALS>
+| <EQUALSEQUALS>
+| <COMMA>
+| <ARROW>
+| <TARROW>
+| <DOT>
+| <COLON>
+| <POUND>
+| <QUESTION>
+| <BAR>
+| <AND>
+| <GT>
+| <LT>
+| <LBRACK>
+| <RBRACK>
+| <LBRACE>
+| <RBRACE>
+//| <>
+}
+
+TOKEN : /* Literals */
+{
+  < STRING_LITERAL >
+| < DECIMAL_LITERAL >
+| < RATIONAL_LITERAL >
+}
+
+/** Root production. */
+void Expression() :
+{}
+{
+  PrimaryExpression()
+|
+  <FN> <IDENTIFIER> <COLON> Type() <ARROW> Expression()
+}
+
+void Type() :
+{}
+{
+  <IDENTIFIER>
+}
+
+void PrimaryExpression() :
+{}
+{
+  PrimaryPrefix() ( PrimarySuffix() )*
+}
+
+void PrimaryPrefix() :
+{}
+{
+  <IDENTIFIER>
+|
+  <LPAREN> Expression() <RPAREN>
+}
+
+void PrimarySuffix() :
+{}
+{
+  <DOT> <IDENTIFIER>
+|
+  Arguments()
+}
+
+void Arguments() :
+{}
+{
+  <LPAREN> [ ArgumentList() ] <RPAREN>
+}
+
+void ArgumentList() :
+{}
+{
+  Expression() ( <COMMA> Expression() )*
+}

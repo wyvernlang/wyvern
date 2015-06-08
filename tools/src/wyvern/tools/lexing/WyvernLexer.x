@@ -134,20 +134,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		return l;
 	}
 	
-	boolean isSpecial(Token t) {
-		switch (t.kind) {
-			case SINGLE_LINE_COMMENT:
-			case MULTI_LINE_COMMENT:
-			case WHITESPACE:
-					return true;
-			default:
-					return false;
-		}
-	}
-	
 	boolean hasNonSpecialToken(List<Token> l) {
 		for (Token t : l)
-			if (!isSpecial(t))
+			if (!LexerUtils.isSpecial(t))
 				return true; 
 		return false;
 	}
@@ -184,7 +173,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal valKwd_t 	::= /val/ in (keywds);
 	terminal defKwd_t 	::= /def/ in (keywds);
 	terminal varKwd_t 	::= /var/ in (keywds);
-	terminal fnKwd_t 	::= /fn/ in (keywds);
+	terminal Token fnKwd_t 	::= /fn/ in (keywds)  {: RESULT = token(FN,lexeme); :};
 	terminal metadataKwd_t 	::= /metadata/ in (keywds);
 	terminal newKwd_t 	::= /new/ in (keywds);
  	terminal importKwd_t   ::= /import/ in (keywds);
@@ -273,6 +262,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	non terminal List<Token> parenContents;
 	non terminal List<Token> optParenContents;
 	non terminal Token operator;
+	non terminal Token keyw;
 	non terminal List<Token> aLine;
 
 	start with program;
@@ -288,6 +278,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	
 	parens ::= openParen_t:t1 optParenContents:list closeParen_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :}
 	         | oSquareBracket_t:t1 optParenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
+	
+	keyw ::= fnKwd_t:t {: RESULT = t; :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
 	           | plus_t:t {: RESULT = t; :}
@@ -316,6 +308,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	                   | multi_comment_t:n {: RESULT = makeList(n); :}
 	                   | continue_line_t:t  {: RESULT = makeList(t); :}
 	                   | operator:t {: RESULT = makeList(t); :}
+	                   | keyw:t {: RESULT = makeList(t); :}
 	                   | parens:l {: RESULT = l; :};
 
     dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = makeList(t); RESULT.add(line); :};
