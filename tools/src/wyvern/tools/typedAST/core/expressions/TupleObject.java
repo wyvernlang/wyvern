@@ -17,14 +17,21 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
 	private TypedAST[] objects;
+	private static TypedAST[] typeObj = new TypedAST[0];
 	
+	public TupleObject(List<TypedAST> objects) {
+		this(objects.toArray(typeObj));
+	}
 	public TupleObject(TypedAST[] objects) {
 		this.objects = objects;
+		if (objects.length > 0)
+			this.location = objects[0].getLocation();
 	}
 	
 	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {

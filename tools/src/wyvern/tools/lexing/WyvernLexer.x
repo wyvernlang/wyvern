@@ -36,7 +36,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	
 	/********************** HELPER FUNCTIONS ************************/
 	
-	/** @returns 1 for an indent, -n for n dedents, or 0 for the same indentation level
+	/** @return 1 for an indent, -n for n dedents, or 0 for the same indentation level
 	 */
 	int adjustIndent(String newIndent) throws CopperParserException {
 		String currentIndent = indents.peek();
@@ -65,6 +65,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		}
 	}
 
+	/** Adjusts the indentation level to the baseline (no indent)
+	 * @return the list of dedent tokens that must be added to the
+	 * stream to reach the baseline indent (empty if no dedents)
+	 */ 
 	List<Token> possibleDedentList(Token tokenLoc) throws CopperParserException {
 		int levelChange = adjustIndent("");
   		List<Token> tokenList = emptyList(); 
@@ -104,13 +108,20 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 			Token NL = makeToken(NEWLINE,"",lastToken);
 			aLine.addLast(NL);
 		}
+		    // ELSE do nothing: this line has only comments/whitespace
+		
 		return aLine;
 	}
 	
+	/** convenient construction function for tokens.  The location of
+	 * the new token is taken from the tokenLoc argument
+	 */
 	Token makeToken(int kind, String s, Token tokenLoc) {
 		return makeToken(kind, s,tokenLoc.beginLine, tokenLoc.beginColumn);
 	}
 	
+	/** convenient construction function for tokens.
+	 */
 	Token makeToken(int kind, String s, int beginLine, int beginColumn) {
 		Token t = new Token(kind, s);
 		t.beginLine = beginLine;
@@ -118,22 +129,30 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		return t;
 	}
 	
-	/** Wraps the lexeme s in a Token, setting the begin line/column and kind appropriately */
+	/** Wraps the lexeme s in a Token, setting the begin line/column and kind appropriately
+	 *  The current lexical location is used.
+	 */
 	Token token(int kind, String s) {
 		// Copper starts counting columns at 0, but we want to follow convention and count columns starting at 1
 		return makeToken(kind, s, virtualLocation.getLine(), virtualLocation.getColumn()+1);
 	}
 	
+	/** Constructor for an empty list of Tokens.
+	 */
 	List<Token> emptyList() {
 		return new LinkedList<Token>();
 	}
 	
+	/** Constructor for a singleton list of Tokens.
+	 */
 	List<Token> makeList(Token t) {
 		List<Token> l = emptyList();
 		l.add(t);
 		return l;
 	}
-	
+
+    /** @return true if there are tokens other than comments and whitespace in this token list
+     */ 	
 	boolean hasNonSpecialToken(List<Token> l) {
 		for (Token t : l)
 			if (!LexerUtils.isSpecial(t))
@@ -144,6 +163,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 %aux}
 
 %init{
+	// start with the baseline indentation level
 	indents.push("");
 %init}
 
@@ -216,7 +236,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
- 		RESULT = lexeme.substring(1,lexeme.length()-1);
+ 		RESULT = token(STRING_LITERAL,lexeme.substring(1,lexeme.length()-1));
  	:};
 
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
@@ -262,6 +282,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	non terminal List<Token> parenContents;
 	non terminal List<Token> optParenContents;
 	non terminal Token operator;
+	non terminal Token literal;
 	non terminal Token keyw;
 	non terminal List<Token> aLine;
 
@@ -280,6 +301,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	         | oSquareBracket_t:t1 optParenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
 	
 	keyw ::= fnKwd_t:t {: RESULT = t; :};
+	
+	literal ::= decimalInteger_t:t {: RESULT = t; :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
 	           | plus_t:t {: RESULT = t; :}
@@ -303,11 +326,13 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	anyLineElement ::= whitespace_t:n {: RESULT = makeList(n); :}
 	                 | nonWSLineElement:n {: RESULT = n; :};
 	                 
+	// a non-whitespace line element 
 	nonWSLineElement ::= identifier_t:n {: RESULT = makeList(n); :}
 	                   | comment_t:n {: RESULT = makeList(n); :}
 	                   | multi_comment_t:n {: RESULT = makeList(n); :}
 	                   | continue_line_t:t  {: RESULT = makeList(t); :}
 	                   | operator:t {: RESULT = makeList(t); :}
+	                   | literal:t {: RESULT = makeList(t); :}
 	                   | keyw:t {: RESULT = makeList(t); :}
 	                   | parens:l {: RESULT = l; :};
 
@@ -315,10 +340,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	
 	lineElementSequence ::= indent_t:n {: RESULT = makeList(n); :}
 	                      | nonWSLineElement:n {:
+	                            // handles lines that start without any indent
 								if (DSLNext)
 									throw new CopperParserException("Indicated DSL with ~ but then did not indent");
-	                      		RESULT = n;//possibleDedentList(n.get(0));
-	                            //RESULT.addAll(n);
+	                      		RESULT = n;
 	                        :}
 	                      | lineElementSequence:list anyLineElement:n {: list.addAll(n); RESULT = list; :};
 	
@@ -331,7 +356,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 						}
 						RESULT = list;
 					:}
-				  | newline_t:n {: RESULT = makeList(n); :};
+				  | newline_t:n {: RESULT = makeList(n); :}; // an empty line
 				  
 	aLine ::= dslLine:line {: RESULT = line; :}
 	        | logicalLine:line  {: RESULT = line; :}; 
@@ -345,13 +370,14 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	             	RESULT.addAll(possibleDedentList(t));
 	           	:}
 	          | lines:p lineElementSequence:list {:
+	          		// handle the case of ending in an incomplete line
 	          		RESULT = p;
 	          		List<Token> adjustedList = adjustLogicalLine((LinkedList<Token>)list);
 	          		RESULT.addAll(adjustedList);
 	             	Token t = ((LinkedList<Token>)adjustedList).getLast();
 	          		RESULT.addAll(possibleDedentList(t));
 	          	:}
-	          | lineElementSequence:list {: RESULT = list; :}
+	          | lineElementSequence:list {: RESULT = list; :} // a single-line program with no carriage return
 	          | /* empty program */ {: RESULT = emptyList(); :};
 	
 %cf}

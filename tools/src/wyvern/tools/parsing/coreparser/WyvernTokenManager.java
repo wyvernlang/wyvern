@@ -48,5 +48,9 @@ public class WyvernTokenManager implements TokenManager {
 		
 		return new Token(WyvernParserConstants.EOF);
 	}
+	
+	public String getFilename() {
+		return filename;
+	}
 
 }

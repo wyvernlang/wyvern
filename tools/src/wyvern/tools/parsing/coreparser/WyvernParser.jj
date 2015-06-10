@@ -3,7 +3,6 @@ options {
   LOOKAHEAD = 1;
   CHOICE_AMBIGUITY_CHECK = 2;
   OTHER_AMBIGUITY_CHECK = 1;
-  STATIC = true;
   DEBUG_PARSER = false;
   DEBUG_LOOKAHEAD = false;
   DEBUG_TOKEN_MANAGER = false;
@@ -20,15 +19,31 @@ options {
   
   // we define our own token manager
   USER_TOKEN_MANAGER = true;
+  STATIC = false;
 }
 
 PARSER_BEGIN(WyvernParser)
 
 package wyvern.tools.parsing.coreparser;
 
+import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.core.values.*;
+import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.expressions.*;
+import wyvern.tools.types.*;
+import wyvern.tools.errors.*;
+
+import java.util.*;
+
 /** Simple brace matcher. */
 public class WyvernParser {
-
+    public FileLocation loc(Token t) {
+    	return new FileLocation(getTM().getFilename(), t.beginLine, t.beginColumn);
+    }
+    
+    public WyvernTokenManager getTM() {
+    	return (WyvernTokenManager) token_source;
+    }
 }
 
 PARSER_END(WyvernParser)
@@ -98,50 +113,80 @@ TOKEN : /* Literals */
 }
 
 /** Root production. */
-void Expression() :
-{}
+TypedAST Expression() :
+{ TypedAST exp; Token id; Type type; }
 {
-  PrimaryExpression()
+  exp = PrimaryExpression()  { return exp; }
 |
-  <FN> <IDENTIFIER> <COLON> Type() <ARROW> Expression()
+  <FN> id = <IDENTIFIER> <COLON> type = Type() <ARROW> exp = Expression() { return new Fn(Arrays.asList(new NameBindingImpl(id.image, type)), exp); }
 }
 
-void Type() :
-{}
+Type Type() :
+{ Token id; }
 {
-  <IDENTIFIER>
+  id = <IDENTIFIER> { return new UnresolvedType(id.image); }
 }
 
-void PrimaryExpression() :
-{}
+TypedAST PrimaryExpression() :
+{ TypedAST exp; }
 {
-  PrimaryPrefix() ( PrimarySuffix() )*
+  exp = PrimaryPrefix() ( exp = PrimarySuffix(exp) )*  { return exp; }
 }
 
-void PrimaryPrefix() :
-{}
+TypedAST PrimaryPrefix() :
+{ TypedAST exp; Token t; }
 {
-  <IDENTIFIER>
+  exp = Literal() { return exp; }
 |
-  <LPAREN> Expression() <RPAREN>
-}
-
-void PrimarySuffix() :
-{}
-{
-  <DOT> <IDENTIFIER>
+  t = <IDENTIFIER> { return new Variable(new NameBindingImpl((String)t.image, null), loc(t)); }
 |
-  Arguments()
+  <LPAREN> exp = Expression() <RPAREN> { return exp; }
 }
 
-void Arguments() :
-{}
+TypedAST Literal() :
+{ Token lit; }
 {
-  <LPAREN> [ ArgumentList() ] <RPAREN>
+  lit = <STRING_LITERAL>  { return new StringConstant(lit.image); }
+|
+  lit = <DECIMAL_LITERAL> { return new IntegerConstant(Integer.parseInt(lit.image)); }
+|
+  <RATIONAL_LITERAL>
 }
 
-void ArgumentList() :
-{}
+TypedAST PrimarySuffix(TypedAST lhs) :
+{ TypedAST rhs; Token t; }
 {
-  Expression() ( <COMMA> Expression() )*
+  <DOT> t = <IDENTIFIER> { return new Invocation(lhs, t.image, null, loc(t)); }
+|
+  rhs = Arguments() { return new Application(lhs, rhs, null); }
+}
+
+TypedAST Arguments() :
+{ TypedAST exp = null; }
+{
+  <LPAREN> [ exp = ArgumentList() ] <RPAREN> {
+  			if (exp == null)
+  				return UnitVal.getInstance(null);
+  			else
+				return exp;
+		}
+}
+
+TypedAST ArgumentList() :
+{ TypedAST exp; TypedAST exp2; LinkedList<TypedAST> expList = null; Token t; }
+{
+  exp = Expression()
+  ( t=<COMMA> exp2 = Expression() {
+  		if (expList == null) {
+  			expList = new LinkedList<TypedAST>();
+  			expList.add(exp);
+  		}
+  		expList.addLast(exp2);
+	}
+  )* {
+  		if (expList != null) {
+  			return new TupleObject(expList); 
+  		}
+  		return exp;
+  	}
 }
