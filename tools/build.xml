@@ -39,7 +39,7 @@
     	<javacc
     	    target="src/wyvern/tools/parsing/coreparser/WyvernParser.jj"
     	    outputdirectory="src/wyvern/tools/parsing/coreparser/"
-    	    javacchome="c:/develop/javacc/javacc-6.0"
+    	    javacchome="lib/"
     	/>
     </target>
     <target name="copper-generate" depends="copper-compose,copper-subparsers,lexer,javacc-parser">
