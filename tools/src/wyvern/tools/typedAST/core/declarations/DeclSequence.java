@@ -1,6 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.targets.java.annotations.Val;
+//import wyvern.targets.java.annotations.Val;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
