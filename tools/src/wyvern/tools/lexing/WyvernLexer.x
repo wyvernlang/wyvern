@@ -188,27 +188,28 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  		RESULT = token(IDENTIFIER,lexeme);
  	:};
 
-    terminal classKwd_t ::= /class/ in (keywds);
-	terminal typeKwd_t 	::= /type/ in (keywds);
-	terminal valKwd_t 	::= /val/ in (keywds);
-	terminal defKwd_t 	::= /def/ in (keywds);
-	terminal varKwd_t 	::= /var/ in (keywds);
-	terminal Token fnKwd_t 	::= /fn/ in (keywds)  {: RESULT = token(FN,lexeme); :};
-	terminal metadataKwd_t 	::= /metadata/ in (keywds);
-	terminal newKwd_t 	::= /new/ in (keywds);
- 	terminal importKwd_t   ::= /import/ in (keywds);
- 	terminal moduleKwd_t   ::= /module/ in (keywds);
-	terminal ifKwd_t 	::= /if/ in (keywds);
- 	terminal thenKwd_t   ::= /then/ in (keywds);
- 	terminal elseKwd_t   ::= /else/ in (keywds);
- 	terminal objtypeKwd_t   ::= /objtype/ in (keywds);
+    terminal Token classKwd_t ::= /class/ in (keywds) {: RESULT = token(TYPE,lexeme); :};
+	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(CLASS,lexeme); :};
+	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
+	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); :};
+	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
+	terminal Token fnKwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
+	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
+	terminal Token metadataKwd_t 	::= /metadata/ in (keywds) {: RESULT = token(METADATA,lexeme); :};
+	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); :};
+ 	terminal Token importKwd_t   ::= /import/ in (keywds) {: RESULT = token(IMPORT,lexeme); :};
+ 	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
+	terminal Token ifKwd_t 	::= /if/ in (keywds);
+ 	terminal Token thenKwd_t   ::= /then/ in (keywds);
+ 	terminal Token elseKwd_t   ::= /else/ in (keywds);
+ 	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
 
-	terminal taggedKwd_t  ::= /tagged/  in (keywds);
-    terminal matchKwd_t   ::= /match/   in (keywds);
-    terminal defaultKwd_t ::= /default/ in (keywds);
-    terminal caseKwd_t ::= /case/ in (keywds);
-    terminal ofKwd_t ::= /of/ in (keywds);
-    terminal comprisesKwd_t ::= /comprises/ in (keywds);
+	terminal Token taggedKwd_t  ::= /tagged/  in (keywds);
+    terminal Token matchKwd_t   ::= /match/   in (keywds);
+    terminal Token defaultKwd_t ::= /default/ in (keywds);
+    terminal Token caseKwd_t ::= /case/ in (keywds);
+    terminal Token ofKwd_t ::= /of/ in (keywds);
+    terminal Token comprisesKwd_t ::= /comprises/ in (keywds);
 
  	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
 
@@ -235,7 +236,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token oSquareBracket_t ::= /\[/ {: RESULT = token(LBRACK,lexeme); :};
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
 
- 	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
+ 	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL,lexeme.substring(1,lexeme.length()-1));
  	:};
 
@@ -300,9 +301,21 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	parens ::= openParen_t:t1 optParenContents:list closeParen_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :}
 	         | oSquareBracket_t:t1 optParenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
 	
-	keyw ::= fnKwd_t:t {: RESULT = t; :};
-	
-	literal ::= decimalInteger_t:t {: RESULT = t; :};
+	keyw ::= classKwd_t:t {: RESULT = t; :}
+	       | typeKwd_t:t {: RESULT = t; :}
+	       | valKwd_t:t {: RESULT = t; :}
+	       | defKwd_t:t {: RESULT = t; :}
+	       | varKwd_t:t {: RESULT = t; :}
+	       | fnKwd_t:t {: RESULT = t; :}
+	       | requireKwd_t:t {: RESULT = t; :}
+	       | metadataKwd_t:t {: RESULT = t; :}
+	       | newKwd_t:t {: RESULT = t; :}
+	       | moduleKwd_t:t {: RESULT = t; :}
+	       | importKwd_t:t {: RESULT = t; :};
+//	       | :t {: RESULT = t; :}
+
+	literal ::= decimalInteger_t:t {: RESULT = t; :}
+	          | shortString_t:t {: RESULT = t; :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
 	           | plus_t:t {: RESULT = t; :}

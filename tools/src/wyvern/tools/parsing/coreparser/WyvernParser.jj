@@ -26,17 +26,22 @@ PARSER_BEGIN(WyvernParser)
 
 package wyvern.tools.parsing.coreparser;
 
+import wyvern.tools.typedAST.abs.*;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.core.*;
 import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.*;
-import wyvern.tools.types.*;
+import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.errors.*;
 
+import java.net.URI;
 import java.util.*;
 
 /** Simple brace matcher. */
-public class WyvernParser {
+public class WyvernParser<AST,Type> {
+    private int number = 0;
+    
     public FileLocation loc(Token t) {
     	return new FileLocation(getTM().getFilename(), t.beginLine, t.beginColumn);
     }
@@ -44,6 +49,13 @@ public class WyvernParser {
     public WyvernTokenManager getTM() {
     	return (WyvernTokenManager) token_source;
     }
+    
+    public String freshName() {
+    	return "ignoreme" + number++;
+    }
+    
+    private ASTBuilder<AST,Type> build;
+    public void setBuilder(ASTBuilder<AST,Type> builder) { build = builder; }
 }
 
 PARSER_END(WyvernParser)
@@ -60,6 +72,15 @@ TOKEN : /* Keywords */
   < VAL: "val" >
 | < VAR: "var" >
 | < FN: "fn" >
+| < DEF: "def" >
+| < TYPE: "type" >
+| < CLASS: "class" >
+| < REQUIRE: "require" >
+| < METADATA: "metadata" >
+| < NEW: "new" >
+| < MODULE: "module" >
+| < IMPORT: "import" >
+//| < : "" >
 // more here
 }
 
@@ -113,79 +134,222 @@ TOKEN : /* Literals */
 }
 
 /** Root production. */
-TypedAST Expression() :
-{ TypedAST exp; Token id; Type type; }
+AST CompilationUnit() :
+{ AST exp; Token id; }
+{
+  exp = ModuleBody(false)  { return exp; }
+|
+  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
+	return build.moduleDecl(id.image, exp, loc(id));
+  }
+}
+
+Type OptType() :
+{ Type t; }
+{
+  <COLON> t = Type()  { return t; }
+|
+  /* nothing */ { return null; }
+}
+
+AST ModuleBody(boolean inModule) :
+{ AST ast; AST decl; }
+{
+  ast = DeclSequence(inModule)  { return ast; }
+|
+  decl = RequireDecl() ast = ModuleBody(inModule) { return build.sequence(decl,ast,inModule); }
+|
+  decl = ImportDecl() ast = ModuleBody(inModule) { return build.sequence(decl,ast,inModule); }
+}
+
+AST RequireDecl() :
+{ URI uri; Token t; }
+{
+  t=<REQUIRE> uri = Uri() <NEWLINE>  { return build.importDecl(uri, loc(t)); }
+}
+
+AST ImportDecl() :
+{ URI uri; Token t; }
+{
+  t=<IMPORT> uri = Uri() <NEWLINE> { return build.importDecl(uri, loc(t)); }
+}
+
+URI Uri() :
+{ Token t; String scheme = null; String s1; String s2; URI uri; }
+{
+	[ LOOKAHEAD(2) t = <IDENTIFIER> <COLON> { scheme = t.image; } ]
+	s1 = Segment() ( <DIVIDE> s2 = Segment() { s1 = s1 + '/' + s2; } )* {
+		if (scheme == null)
+			scheme = "wyv";
+   		try {
+			return new URI(scheme, s1, null);
+   		} catch (Exception e) { throw new RuntimeException(e); }
+	}
+}
+
+String Segment() :
+{ String s; Token t1; }
+{
+	t1 = <IDENTIFIER> { s = t1.image; }	
+	( <DOT> t1 = <IDENTIFIER> { s = s + '.' + t1.image; } )* { return s; }
+}
+
+AST DeclSequence(boolean inModule) :
+{ AST decl1; AST decl2; }
+{
+  decl1 = Declaration(inModule)
+  ( decl2 = Declaration(inModule) { decl1 = build.sequence(decl1, decl2, inModule); } )*
+    { return decl1; }
+}
+
+AST Declaration(boolean inModule) :
+{ AST exp; Token t; }
+{
+  exp = DefDeclaration()  { return exp; }
+|
+  exp = ValDeclaration()  { return exp; }
+|
+  exp = VarDeclaration()  { return exp; }
+|
+  exp = Expression() t=<NEWLINE> {
+    if (!inModule)
+    	return exp;
+  	else
+  		return build.valDecl(freshName(), null, exp, loc(t));
+  }
+}
+
+AST DefDeclaration() :
+{ Type resultType; Token name; AST body; List args; }
+{
+  <DEF> name=<IDENTIFIER> args = Formals() <COLON> resultType = Type() body=DefBody() {
+	return build.defDecl(name.image, resultType, args, body, false, loc(name));
+  }
+}
+
+AST ValDeclaration() :
+{ Type type = null; Token name; AST body; List args; }
+{
+  <VAL> name=<IDENTIFIER> [ <COLON> type = Type() ] <EQUALS> body = Expression() <NEWLINE> {
+	return build.valDecl(name.image, type, body, loc(name));
+  }
+}
+
+AST VarDeclaration() :
+{ Type type; Token name; AST body; List args; }
+{
+  <VAR> name=<IDENTIFIER> <COLON> type = Type() <EQUALS> body = Expression() <NEWLINE> {
+	return build.valDecl(name.image, type, body, loc(name));
+  }
+}
+
+List Formals() :
+{ List args = new LinkedList(); }
+{
+  <LPAREN> [ FormalsList(args) ] <RPAREN> {
+			return args;
+		}
+}
+
+void FormalsList(List args) :
+{ Object formal; }
+{
+  formal = Formal() {
+      args.add(formal);
+  }
+  ( <COMMA> formal = Formal() {
+      args.add(formal);
+	}
+  )*
+}
+
+Object Formal() :
+{ Token id; Type type; }
+{
+  id = <IDENTIFIER> <COLON> type = Type() {
+      return build.formalArg(id.image, type);
+  }
+}
+
+AST DefBody() :
+{ AST exp; }
+{
+  <NEWLINE> <INDENT> exp = Expression() <NEWLINE> <DEDENT> { return exp; }
+}
+
+AST Expression() :
+{ AST exp; Object formal; }
 {
   exp = PrimaryExpression()  { return exp; }
 |
-  <FN> id = <IDENTIFIER> <COLON> type = Type() <ARROW> exp = Expression() { return new Fn(Arrays.asList(new NameBindingImpl(id.image, type)), exp); }
+  <FN> formal = Formal() <ARROW> exp = Expression() { return build.fn(Arrays.asList(formal), exp); }
 }
 
 Type Type() :
 { Token id; }
 {
-  id = <IDENTIFIER> { return new UnresolvedType(id.image); }
+  id = <IDENTIFIER> { return build.nominalType(id.image); }
 }
 
-TypedAST PrimaryExpression() :
-{ TypedAST exp; }
+AST PrimaryExpression() :
+{ AST exp; }
 {
   exp = PrimaryPrefix() ( exp = PrimarySuffix(exp) )*  { return exp; }
 }
 
-TypedAST PrimaryPrefix() :
-{ TypedAST exp; Token t; }
+AST PrimaryPrefix() :
+{ AST exp; Token t; }
 {
   exp = Literal() { return exp; }
 |
-  t = <IDENTIFIER> { return new Variable(new NameBindingImpl((String)t.image, null), loc(t)); }
+  t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
 |
   <LPAREN> exp = Expression() <RPAREN> { return exp; }
 }
 
-TypedAST Literal() :
+AST Literal() :
 { Token lit; }
 {
-  lit = <STRING_LITERAL>  { return new StringConstant(lit.image); }
+  lit = <STRING_LITERAL>  { return build.stringLit(lit.image); }
 |
-  lit = <DECIMAL_LITERAL> { return new IntegerConstant(Integer.parseInt(lit.image)); }
+  lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image)); }
 |
   <RATIONAL_LITERAL>
 }
 
-TypedAST PrimarySuffix(TypedAST lhs) :
-{ TypedAST rhs; Token t; }
+AST PrimarySuffix(AST lhs) :
+{ AST rhs; Token t; }
 {
-  <DOT> t = <IDENTIFIER> { return new Invocation(lhs, t.image, null, loc(t)); }
+  <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
-  rhs = Arguments() { return new Application(lhs, rhs, null); }
+  rhs = Arguments() { return build.application(lhs, rhs, null); }
 }
 
-TypedAST Arguments() :
-{ TypedAST exp = null; }
+AST Arguments() :
+{ AST exp = null; Token t; }
 {
-  <LPAREN> [ exp = ArgumentList() ] <RPAREN> {
+  t = <LPAREN> [ exp = ArgumentList() ] <RPAREN> {
   			if (exp == null)
-  				return UnitVal.getInstance(null);
+  				return build.unitValue(loc(t));
   			else
 				return exp;
 		}
 }
 
-TypedAST ArgumentList() :
-{ TypedAST exp; TypedAST exp2; LinkedList<TypedAST> expList = null; Token t; }
+AST ArgumentList() :
+{ AST exp; AST exp2; LinkedList<AST> expList = null; Token t; }
 {
   exp = Expression()
   ( t=<COMMA> exp2 = Expression() {
   		if (expList == null) {
-  			expList = new LinkedList<TypedAST>();
+  			expList = new LinkedList<AST>();
   			expList.add(exp);
   		}
   		expList.addLast(exp2);
 	}
   )* {
   		if (expList != null) {
-  			return new TupleObject(expList); 
+  			return build.tuple(expList); 
   		}
   		return exp;
   	}
