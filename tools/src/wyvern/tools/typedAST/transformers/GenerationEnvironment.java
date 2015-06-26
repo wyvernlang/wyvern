@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.transformers;
 
 import wyvern.target.corewyvernIL.expression.*;
+import wyvern.tools.errors.WyvernException;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -65,10 +66,11 @@ public class GenerationEnvironment {
         Path lookup = lookup(vname);
         if (lookup instanceof Variable) {
             return (Variable) lookup;
-        } else {
+        } else if (lookup != null) {
             String nvname = generateVariableName();
             writer.wrap(outer -> new Let(nvname, (Expression)lookup, (Expression)outer));
             return new Variable(nvname);
         }
+        throw new WyvernException("Variable not found in codegen.");
     }
 }

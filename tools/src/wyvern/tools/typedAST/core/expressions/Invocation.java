@@ -135,7 +135,9 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	@Override
 	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
 		LinkedList<Expression> arguments = new LinkedList<>();
-		if (!(argument instanceof TupleObject)) {
+        if (argument == null) {
+
+        } else if (!(argument instanceof TupleObject)) {
 			arguments.add(ExpressionWriter.generate(iwriter -> argument.codegenToIL(environment, iwriter)));
 		} else {
 			for (TypedAST arg : ((TupleObject)(argument)).getObjects()) {

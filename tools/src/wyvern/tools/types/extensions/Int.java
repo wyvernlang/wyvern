@@ -1,5 +1,6 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.type.IntegerType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.WyvernException;
@@ -90,7 +91,7 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
     @Override
     public ValueType generateILType() {
-        throw new WyvernException("Primitive type conversion unimplmented"); //TODO
+        return new IntegerType();
     }
 
     @Override

@@ -247,7 +247,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
         String varname = GenerationEnvironment.generateVariableName();
         GenerationEnvironment innerEnv = new GenerationEnvironment(environment, varname);
         for (Declaration ast : this.getDeclIterator()) {
-            outputDecls.addAll(DeclarationWriter.generate(writer, iw -> ast.codegenToIL(innerEnv, writer)));
+            outputDecls.addAll(DeclarationWriter.generate(writer, iw -> ast.codegenToIL(innerEnv, iw)));
         }
         writer.wrap(e->new Let(varname, new New(outputDecls, "this"), (Expression)e));
     }

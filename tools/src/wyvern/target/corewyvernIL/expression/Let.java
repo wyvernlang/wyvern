@@ -53,4 +53,9 @@ public class Let extends Expression{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public String toString() {
+        return "let "+varName+" = " + toReplace + " in " + inExpr + " end";
+    }
 }

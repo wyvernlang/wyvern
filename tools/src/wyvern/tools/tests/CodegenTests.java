@@ -25,6 +25,21 @@ public class CodegenTests {
         TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
         Assert.assertEquals(res.typecheck(getStandardEnv(), empty()), new Int());
         Expression output = ExpressionWriter.generate(iw -> res.codegenToIL(new GenerationEnvironment(), iw));
-        Assert.assertEquals(res.evaluate(Globals.getStandardEvalEnv()).toString(), "IntegerConstant(19)");
+    }
+    @Test
+    public void testDef() throws IOException, CopperParserException {
+        String input =
+                "def test(a:Int):Int\n\ta+1\ntest(1)";
+        TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+        Assert.assertEquals(res.typecheck(getStandardEnv(), empty()), new Int());
+        Expression output = ExpressionWriter.generate(iw -> res.codegenToIL(new GenerationEnvironment(), iw));
+    }
+    @Test
+    public void testNew() throws IOException, CopperParserException {
+        String input =
+                "val t = new\n\tval x:Int = 2\n\tval y:Int = 3\nt.x";
+        TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
+        Assert.assertEquals(res.typecheck(getStandardEnv(), empty()), new Int());
+        Expression output = ExpressionWriter.generate(iw -> res.codegenToIL(new GenerationEnvironment(), iw));
     }
 }

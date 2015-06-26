@@ -104,7 +104,8 @@ public class Application extends CachingTypedAST implements CoreAST {
         if (function instanceof Invocation && ((Invocation) function).getArgument() == null) { // straight MethodCall
             writer.write(new MethodCall(ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw)), ((Invocation) function).getOperationName(), arguments));
         }
-        writer.write(new MethodCall(ExpressionWriter.generate(iw -> function.codegenToIL(environment, writer)), "call", arguments));
+        Expression expr = ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw));
+        writer.write(new MethodCall(expr, "call", arguments));
     }
 
     @Override
