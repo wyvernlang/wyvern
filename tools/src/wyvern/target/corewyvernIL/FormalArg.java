@@ -6,6 +6,11 @@ public class FormalArg extends ASTNode {
 
 	private String name;
 	private ValueType type;
+
+	public FormalArg(String name, ValueType type) {
+		this.name = name;
+		this.type = type;
+	}
 	
 	public String getName() {
 		return name;

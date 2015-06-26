@@ -1,8 +1,11 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -56,7 +59,12 @@ public class DSLDummy implements TypedAST {
 		return dslDummy;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("DSL internal compilation error - DSL literal not resolved" , this);
+    }
+
+    @Override
     public FileLocation getLocation() {
         if (dslDef != null)
             return dslDef.getLocation();

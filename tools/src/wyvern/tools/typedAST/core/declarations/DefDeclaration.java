@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -12,6 +14,9 @@ import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -23,6 +28,7 @@ import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
@@ -118,7 +124,15 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location, true);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
+                argNames.stream().map(nb -> new FormalArg(nb.getName(), nb.getType().generateILType())).collect(Collectors.toList()),
+                        type.generateILType(),
+                        ExpressionWriter.generate(iw->body.codegenToIL(new GenerationEnvironment(environment), iw))));
+    }
+
+    @Override
 	protected Type doTypecheck(Environment env) {
 		Environment extEnv = env;
 		for (NameBinding bind : argNames) {

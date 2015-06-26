@@ -1,6 +1,10 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.errors.WyvernException;
+import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
@@ -141,4 +145,9 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 		cloned.setResolvedBinding(binding);
 		return cloned;
 	}
+
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Invalid interop type, cannot generate IL", FileLocation.UNKNOWN);
+    }
 }

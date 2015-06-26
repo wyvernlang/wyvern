@@ -4,11 +4,11 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitILVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
 
-public class Integer extends Expression implements Value{
+public class StringLiteral extends Literal implements Value{
 	
-	private String value;
-
-	public Integer(String value) {
+	private java.lang.String value;
+	
+	public StringLiteral(java.lang.String value) {
 		super();
 		this.value = value;
 	}

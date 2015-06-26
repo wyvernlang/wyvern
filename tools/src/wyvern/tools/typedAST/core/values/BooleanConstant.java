@@ -1,10 +1,12 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.*;
-import wyvern.tools.types.Environment;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -61,7 +63,12 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 		return new BooleanConstant(value);
 	}
 
-	private FileLocation location = FileLocation.UNKNOWN;
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(new BooleanLiteral(value));
+    }
+
+    private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
 	}

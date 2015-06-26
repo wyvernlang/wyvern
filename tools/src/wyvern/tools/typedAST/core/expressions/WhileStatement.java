@@ -9,6 +9,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
@@ -93,4 +95,9 @@ public class WhileStatement implements TypedAST, CoreAST {
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		return new WhileStatement(newChildren.get("cond"), newChildren.get("body"), location);
 	}
+
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("Not implemented codegen for whilestatement"); //TODO remove this
+    }
 }

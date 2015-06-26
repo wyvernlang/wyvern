@@ -9,6 +9,8 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -149,6 +151,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		newDecl.typeEnv = typeEnv;
 		newDecl.dclEnv = dclEnv;
 		return newDecl;
+	}
+
+	@Override
+	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+		throw new RuntimeException("Cannot codegen modules yet");
 	}
 
 	@Override

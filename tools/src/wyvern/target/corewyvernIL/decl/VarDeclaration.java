@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.emitIL;
 import wyvern.target.corewyvernIL.astvisitor.EmitILVisitor;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -11,9 +12,9 @@ public class VarDeclaration extends Declaration implements emitIL {
 
 	private String fieldName;
 	private ValueType type;
-	private Value value;
+	private Variable value;
 	
-	public VarDeclaration(String fieldName, ValueType type, Value value) {
+	public VarDeclaration(String fieldName, ValueType type, Variable value) {
 		super();
 		this.fieldName = fieldName;
 		this.type = type;
@@ -36,11 +37,11 @@ public class VarDeclaration extends Declaration implements emitIL {
 		this.type = type;
 	}
 	
-	public Value getValue() {
+	public Variable getValue() {
 		return value;
 	}
 	
-	public void setValue(Value value) {
+	public void setValue(Variable value) {
 		this.value = value;
 	}
 

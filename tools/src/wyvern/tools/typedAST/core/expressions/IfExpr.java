@@ -11,6 +11,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
@@ -88,7 +90,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 			return body.evaluate(env);
 		}
 
-		@Override
+        @Override
+        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+            //TODO: match case
+        }
+
+        @Override
 		public FileLocation getLocation() {
 			return location;
 		}
@@ -139,7 +146,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 			return body.evaluate(env);
 		}
 
-		@Override
+        @Override
+        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+            //TODO: match case
+        }
+
+        @Override
 		public FileLocation getLocation() {
 			return location;
 		}
@@ -175,7 +187,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		return childMap;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        //TODO: compile to a match
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		ArrayList<IfClause> clauses = new ArrayList<>(newChildren.size());
 		int i = 0;

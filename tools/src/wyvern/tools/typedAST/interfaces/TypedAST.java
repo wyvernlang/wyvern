@@ -1,9 +1,12 @@
 package wyvern.tools.typedAST.interfaces;
 
+import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.HasParser;
 import wyvern.tools.parsing.quotelang.QuoteParser;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -32,6 +35,8 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 * @return The deep-copied AST node
 	 */
 	TypedAST cloneWithChildren(Map<String, TypedAST> newChildren);
+
+	void codegenToIL(GenerationEnvironment environment, ILWriter writer);
 
 	public static HasParser meta$get() {
 		return () -> new QuoteParser();

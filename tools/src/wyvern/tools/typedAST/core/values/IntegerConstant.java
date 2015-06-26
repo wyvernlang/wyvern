@@ -1,10 +1,12 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.*;
-import wyvern.tools.types.Environment;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -88,7 +90,12 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 		return new IntegerConstant(value);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(new IntegerLiteral(value));
+    }
+
+    @Override
 	public boolean equals(Object o) {
 		if (!(o instanceof IntegerConstant))
 			return false;

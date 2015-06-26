@@ -9,7 +9,7 @@ public class FieldGet extends Expression implements Path {
 	private Expression objectExpr;
 	private String fieldName;
 	
-	public FieldGet(ValueType exprType, Expression objectExpr, String fieldName) {
+	public FieldGet(Expression objectExpr, String fieldName) {
 		super();
 		this.objectExpr = objectExpr;
 		this.fieldName = fieldName;

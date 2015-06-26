@@ -9,6 +9,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Intersection;
@@ -90,7 +92,12 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		return childMap;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("Cannot codegen a tuple");
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		TypedAST[] objs = new TypedAST[newChildren.size()];
 		for (String s : newChildren.keySet()) {

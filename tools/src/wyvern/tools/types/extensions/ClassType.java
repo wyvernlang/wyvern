@@ -1,5 +1,9 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.type.*;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -8,6 +12,7 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.types.*;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -203,7 +208,16 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params, tagInfo, getName());
 	}
 
-	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
+    @Override
+    public wyvern.target.corewyvernIL.type.ValueType generateILType() {
+        if (getTaggedInfo() != null) {
+            TaggedInfo ti = this.tagInfo;
+            return new NominalType(new Variable("this"), getName());
+        }
+        throw new WyvernException("Tagged ClassType conversion not implemented yet", this.getDecl());
+    }
+
+    private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
 		for (String key : list) {
 			String[] kSplit = key.split(":");
 			Type nt = newChildren.get(key);

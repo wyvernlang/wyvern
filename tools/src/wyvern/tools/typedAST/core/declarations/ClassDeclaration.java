@@ -1,5 +1,14 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.target.corewyvernIL.ASTNode;
+import wyvern.target.corewyvernIL.decl.*;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -18,6 +27,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
@@ -33,6 +44,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class ClassDeclaration extends Declaration implements CoreAST {
 	protected DeclSequence decls = new DeclSequence(new LinkedList<Declaration>());
@@ -507,8 +519,56 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return classDeclaration;
 	}
 
+    public List<wyvern.target.corewyvernIL.decl.Declaration> getObjectDecls(GenerationEnvironment environment, ILWriter writer) {
+        //Class declarations
+        LinkedList<wyvern.target.corewyvernIL.decl.Declaration> classMembers = new LinkedList<>();
+        for (Declaration decl : this.decls.getDeclIterator()) {
+            if (!decl.isClassMember()) {
+                ILWriter dwriter = getIlWriter(writer, classMembers);
+                decl.codegenToIL(environment, dwriter);
+            }
+        }
+        return classMembers;
+    }
 
-	public List<String> getTypeParams() {
+    private ILWriter getIlWriter(final ILWriter writer, final LinkedList<wyvern.target.corewyvernIL.decl.Declaration> classMembers) {
+        return new ILWriter() {
+                        @Override
+                        public void write(ASTNode node) {
+                            classMembers.add((wyvern.target.corewyvernIL.decl.Declaration)node);
+                        }
+
+                        @Override
+                        public void writePrefix(ASTNode node) {
+                            classMembers.add((wyvern.target.corewyvernIL.decl.Declaration)node); // Will always go before
+                        }
+
+                        @Override
+                        public void wrap(Function<ASTNode, ASTNode> wrapper) {
+                            writer.wrap(wrapper);
+                        }
+                    };
+    }
+
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        //Class declarations
+        LinkedList<wyvern.target.corewyvernIL.decl.Declaration> classMembers = new LinkedList<>();
+        for (Declaration decl : this.decls.getDeclIterator()) {
+            if (decl.isClassMember()) {
+                decl.codegenToIL(environment, getIlWriter(writer, classMembers));
+            }
+        }
+        String newVar = GenerationEnvironment.generateVariableName();
+        writer.wrap(e->new Let(newVar, new New(classMembers, "this"), (Expression)e));
+        environment.register(nameBinding.getName());
+        //TODO: Tags support
+        writer.write(new TypeDeclaration(nameBinding.getName(), nameBinding.getType().generateILType()));
+        writer.write(new ValDeclaration(nameBinding.getName(), nameBinding.getType().generateILType(), new Variable(newVar)));
+    }
+
+
+    public List<String> getTypeParams() {
 		return typeParams;
 	}
 

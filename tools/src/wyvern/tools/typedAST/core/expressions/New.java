@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -17,12 +19,13 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.DeclarationWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
-import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -195,7 +198,32 @@ public class New extends CachingTypedAST implements CoreAST {
 		return outMap;
 	}
 
-	@Override
+    private static int uniqueCounter = 0;
+    private static Map<String, Expression> variables = new HashMap<>();
+    public static String addNewField(Expression value) {
+        String name = "field " + uniqueCounter++;
+        variables.put(name, value);
+        return name;
+    }
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) { //TODO: support new inside classes
+        List<wyvern.target.corewyvernIL.decl.Declaration> genDecls = new LinkedList<>();
+        for (Declaration decl : getDecls().getDeclIterator()) {
+            genDecls.addAll(DeclarationWriter.generate(writer, dw -> decl.codegenToIL(environment, dw)));
+        }
+        wyvern.target.corewyvernIL.expression.New exn = new wyvern.target.corewyvernIL.expression.New(
+                genDecls,
+                "this"
+        );
+        Expression output = exn;
+        for (String key : variables.keySet()) {
+            output = new Let(key, variables.get(key), output);
+        }
+        variables.clear();
+        writer.write(output);
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 
 		New aNew = new New(new HashMap<>(), location);

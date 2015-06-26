@@ -1,14 +1,18 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
@@ -17,6 +21,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -125,6 +130,19 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		if (argument != null)
 			children.put("argument", argument);
 		return children;
+	}
+
+	@Override
+	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+		LinkedList<Expression> arguments = new LinkedList<>();
+		if (!(argument instanceof TupleObject)) {
+			arguments.add(ExpressionWriter.generate(iwriter -> argument.codegenToIL(environment, iwriter)));
+		} else {
+			for (TypedAST arg : ((TupleObject)(argument)).getObjects()) {
+				arguments.add(ExpressionWriter.generate(iwriter->arg.codegenToIL(environment, iwriter)));
+			}
+		}
+		writer.write(new MethodCall(ExpressionWriter.generate(iwriter->receiver.codegenToIL(environment, iwriter)), operationName, arguments));
 	}
 
 	@Override

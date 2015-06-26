@@ -1,11 +1,19 @@
 package wyvern.tools.typedAST.core;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.New;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.DeclarationWriter;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -141,7 +149,24 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		return new Sequence(result);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        for (TypedAST ast : exps) {
+            if (ast instanceof ValDeclaration) {
+                environment.register(((ValDeclaration)ast).getName());
+                writer.wrap(e->new Let(((ValDeclaration)ast).getName(), ExpressionWriter.generate(iw -> ((ValDeclaration) ast).getDefinition().codegenToIL(environment, iw)), (Expression)e));
+            } else if (ast instanceof Declaration) {
+                String genName = GenerationEnvironment.generateVariableName();
+                List<wyvern.target.corewyvernIL.decl.Declaration> generated =
+                        DeclarationWriter.generate(writer, iw -> ast.codegenToIL(new GenerationEnvironment(environment, genName), iw));
+                writer.wrap(e->new Let(genName, new New(generated, "this"), (Expression)e));
+            } else {
+                ast.codegenToIL(environment, writer);
+            }
+        }
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(exps.toArray());
 		// TODO Auto-generated method stub

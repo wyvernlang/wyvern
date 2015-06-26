@@ -1,12 +1,19 @@
 package wyvern.tools.typedAST.core.declarations;
 
 //import wyvern.targets.java.annotations.Val;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.New;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.transformers.DeclarationWriter;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -234,4 +241,14 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 		return new DeclSequence(result);
 	}
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        List<wyvern.target.corewyvernIL.decl.Declaration> outputDecls = new LinkedList<>();
+        String varname = GenerationEnvironment.generateVariableName();
+        GenerationEnvironment innerEnv = new GenerationEnvironment(environment, varname);
+        for (Declaration ast : this.getDeclIterator()) {
+            outputDecls.addAll(DeclarationWriter.generate(writer, iw -> ast.codegenToIL(innerEnv, writer)));
+        }
+        writer.wrap(e->new Let(varname, new New(outputDecls, "this"), (Expression)e));
+    }
 }

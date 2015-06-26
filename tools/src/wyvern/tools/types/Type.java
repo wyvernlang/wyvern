@@ -32,4 +32,6 @@ public interface Type extends TreeWritable {
 	Optional<TypeBinding> getResolvedBinding();
 	void setResolvedBinding(TypeBinding binding);
 	Type cloneWithBinding(TypeBinding binding);
+
+	wyvern.target.corewyvernIL.type.ValueType generateILType();
 }

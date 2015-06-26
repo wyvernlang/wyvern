@@ -1,9 +1,12 @@
 package wyvern.tools.typedAST.core.values;
 
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
@@ -39,7 +42,12 @@ public class VarValue extends AbstractValue {
 		return new VarValue((Value)newChildren.get("inner"));
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Cannot generate code for runtime values", FileLocation.UNKNOWN);
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(innerValue);
 	}

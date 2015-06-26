@@ -9,6 +9,9 @@ import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -84,7 +87,12 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 		return new SpliceBindExn(newChildren.get("exn"), bindings);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(ExpressionWriter.generate(wi -> exn.codegenToIL(environment, wi)));
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return null;
 	}

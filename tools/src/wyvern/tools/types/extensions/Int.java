@@ -1,5 +1,8 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
@@ -85,6 +88,11 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 		return this;
 	}
 
-	@Override
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Primitive type conversion unimplmented"); //TODO
+    }
+
+    @Override
 	public boolean equals(Object other) { return other instanceof Int; }
 }

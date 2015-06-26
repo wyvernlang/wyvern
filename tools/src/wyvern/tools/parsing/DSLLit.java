@@ -2,23 +2,18 @@ package wyvern.tools.parsing;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.MetaType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-import wyvern.tools.parsing.ExtParser;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -84,6 +79,11 @@ public class DSLLit extends AbstractTypedAST {
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		return null;
+	}
+
+	@Override
+	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+		throw new RuntimeException("DSLLit found when generating code at " + this.getLocation());
 	}
 
 	@Override

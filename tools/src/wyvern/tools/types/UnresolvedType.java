@@ -1,8 +1,7 @@
 package wyvern.tools.types;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.*;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.util.TreeWriter;
@@ -87,7 +86,12 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 		return Optional.empty();
 	}
 
-	public String getName() {
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Cannot generate IL form for unresolved type", FileLocation.UNKNOWN);
+    }
+
+    public String getName() {
 		return typeName;
 	}
 }

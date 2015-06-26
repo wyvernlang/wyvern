@@ -4,12 +4,13 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.emitIL;
 import wyvern.target.corewyvernIL.astvisitor.EmitILVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class ValDeclaration extends Declaration implements emitIL {
 
-	public ValDeclaration(String fieldName, ValueType type, Expression value) {
+	public ValDeclaration(String fieldName, ValueType type, Variable value) {
 		super();
 		this.fieldName = fieldName;
 		this.type = type;
@@ -18,7 +19,7 @@ public class ValDeclaration extends Declaration implements emitIL {
 
 	private String fieldName;
 	private ValueType type;
-	private Expression value;
+	private Variable value;
 	
 	public String getFieldName() {
 		return fieldName;
@@ -36,11 +37,11 @@ public class ValDeclaration extends Declaration implements emitIL {
 		this.type = type;
 	}
 	
-	public Expression getValue() {
+	public Variable getValue() {
 		return value;
 	}
 	
-	public void setValue(Expression value) {
+	public void setValue(Variable value) {
 		this.value = value;
 	}
 

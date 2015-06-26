@@ -23,6 +23,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
@@ -239,7 +241,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return new Match(matchingOver, cases, defaultCase, location);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        //TODO: Part of tags support
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		//TODO: is this meant to be empty?
 	}

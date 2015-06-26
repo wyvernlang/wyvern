@@ -1,8 +1,8 @@
 package wyvern.tools.typedAST.core;
 
-import sun.awt.GlobalCursorManager;
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
@@ -15,6 +15,9 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -36,7 +39,7 @@ public class TypeVarDecl extends Declaration {
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
-	private static abstract class EnvironmentExtInner implements EnvironmentExtender {
+	private abstract class EnvironmentExtInner implements EnvironmentExtender {
 
 		private final FileLocation loc;
 
@@ -87,6 +90,11 @@ public class TypeVarDecl extends Declaration {
 		public void writeArgsToTree(TreeWriter writer) {
 
 		}
+
+        @Override
+        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+            throw new WyvernException("Cannot generate code for a placeholder", TypeVarDecl.this);
+        }
 
 	}
 
@@ -213,7 +221,12 @@ public class TypeVarDecl extends Declaration {
 		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(ExpressionWriter.generate(ow -> new wyvern.target.corewyvernIL.decl.TypeDeclaration(name, body.getType().generateILType()))); // TODO better tag support
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return fileLocation;
 	}
