@@ -3,12 +3,15 @@ package wyvern.targets;
 
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureWriter;
 import org.objectweb.asm.util.ASMifier;
 import org.objectweb.asm.util.TraceClassVisitor;
+
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Pair;
 
@@ -20,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Category(RegressionTests.class)
 public class TargetManager {
 	private static Map<String, Target> targets = new HashMap<>();
 

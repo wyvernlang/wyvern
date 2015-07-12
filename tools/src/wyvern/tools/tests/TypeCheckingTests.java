@@ -6,12 +6,15 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
+@Category(RegressionTests.class)
 public class TypeCheckingTests {
 	@Test
 	public void testTypeMembers1() throws IOException, CopperParserException {

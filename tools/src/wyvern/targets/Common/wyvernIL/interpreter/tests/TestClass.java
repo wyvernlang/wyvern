@@ -1,14 +1,17 @@
 package wyvern.targets.Common.wyvernIL.interpreter.tests;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeInt;
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeValue;
-
+import wyvern.tools.tests.suites.RegressionTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestClass extends TestUtil {
 
+	@Category(RegressionTests.class)
 	@Test 
 	public void defineSimpleClassAndInstance() {
 		
@@ -31,6 +34,7 @@ public class TestClass extends TestUtil {
 		assertTrue(isInContext(names,vals));		
 	}
 
+	@Category(RegressionTests.class)
 	@Test
 	public void defineSimpleClassAndInstance2() {
 		
@@ -78,6 +82,7 @@ public class TestClass extends TestUtil {
 		assertTrue(isInContext(names,vals));
 	}
 	
+	@Category(RegressionTests.class)
 	@Test
 	public void simpleTest() {
 		
@@ -174,6 +179,7 @@ public class TestClass extends TestUtil {
 		assertTrue(isInContext(names,vals));
 	}
 	
+	@Category(RegressionTests.class)
 	@Test
 	public void classAndFieldTest() {
 		

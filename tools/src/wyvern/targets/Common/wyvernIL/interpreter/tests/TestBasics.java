@@ -1,10 +1,13 @@
 package wyvern.targets.Common.wyvernIL.interpreter.tests;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeInt;
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeString;
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeTuple;
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeValue;
+import wyvern.tools.tests.suites.RegressionTests;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 public class TestBasics extends TestUtil {
 
 	@Test
+	@Category(RegressionTests.class)
 	public void assignTest() {
 		
 		PRINTS_ON = false;
@@ -37,6 +41,7 @@ public class TestBasics extends TestUtil {
 		assertTrue(isInContext(names,vals));
 	}
 	
+	@Category(RegressionTests.class)
 	@Test
 	public void divideTest() {
 		
@@ -53,6 +58,7 @@ public class TestBasics extends TestUtil {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void defnTest() {
 		
 		PRINTS_ON = false;
@@ -116,6 +122,7 @@ public class TestBasics extends TestUtil {
 	}	
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void gotoLabelIfstmtTest3() {
 		
 		PRINTS_ON = false;
@@ -177,6 +184,7 @@ public class TestBasics extends TestUtil {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void ifAssignmentTest() {
 		
 		PRINTS_ON = false;

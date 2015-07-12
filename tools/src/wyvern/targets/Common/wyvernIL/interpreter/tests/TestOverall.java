@@ -1,8 +1,10 @@
 package wyvern.targets.Common.wyvernIL.interpreter.tests;
 
 import org.junit.Test;
-import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeValue;
+import org.junit.experimental.categories.Category;
 
+import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeValue;
+import wyvern.tools.tests.suites.RegressionTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -147,6 +149,7 @@ public class TestOverall extends TestUtil {
 		assertTrue(isInContext(names, vals));
 	}
 	
+	@Category(RegressionTests.class)
 	@Test 
 	public void modulus() {
 
@@ -207,6 +210,7 @@ public class TestOverall extends TestUtil {
 	}
 	
 
+	@Category(RegressionTests.class)
 	@Test
 	public void higherOrder() {
 

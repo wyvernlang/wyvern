@@ -2,9 +2,12 @@ package wyvern.targets.Common.wyvernIL.IL.tests;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import wyvern.targets.Common.wyvernIL.transformers.ExnFromAST;
 import wyvern.targets.Common.wyvernIL.IL.Stmt.Statement;
 import wyvern.targets.Common.wyvernIL.transformers.TLFromAST;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -43,6 +46,7 @@ public class TestIL {
 		return sb.toString();
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void testSimple() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("2+2");
@@ -50,6 +54,7 @@ public class TestIL {
 		Assert.assertEquals(join(getResult(pair)),"val temp$0 = 2,val temp$1 = 2,val temp$2 = temp$0 + temp$1,temp$2");;
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void testVal() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("val x : Int = 5\n"
@@ -58,6 +63,7 @@ public class TestIL {
 		Assert.assertEquals(join(getResult(pair)),"val x = 5,x");;
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void testLambdaCall() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("(fn x : Int => (x))(1)");
@@ -65,6 +71,7 @@ public class TestIL {
 		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {x},val temp$0 = 0$lambda,val temp$1 = 1,temp$0(temp$1)");;
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void testLambdaCallWithAdd() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("(fn x : Int => (x + 1))(3)");
@@ -72,6 +79,7 @@ public class TestIL {
 		Assert.assertEquals(join(getResult(pair)),"def 0$lambda(x : Int) {val temp$1 = x,val temp$2 = 1,val temp$3 = temp$1 + temp$2,temp$3},val temp$0 = 0$lambda,val temp$4 = 3,temp$0(temp$4)");;
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void testArithmetic() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("3*4+5*6");
@@ -80,12 +88,14 @@ public class TestIL {
 	}
 
 	@Test
+	@Category(RegressionTests.class)
 	public void testHigherOrderTypes() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("fn f : Int -> Int => (fn x : Int => (f(f(x))))");
 		TypedAST pair = wyvern.stdlib.Compiler.compileSources("in1", strs);
 		Assert.assertEquals(join(getResult(pair)),"def 1$lambda(f : Int -> Int) {def 0$lambda(x : Int) {val temp$0 = f,val temp$1 = f,val temp$2 = x,val temp$3 = temp$1(temp$2),temp$0(temp$3)},0$lambda},1$lambda");
 	}
+	@Category(RegressionTests.class)
 	@Test
 	public void testTupleMethodCalls() {
 		ArrayList<String> strs = new ArrayList<>();
@@ -97,6 +107,7 @@ public class TestIL {
 
 
 	@Test
+	@Category(RegressionTests.class)
 	public void testClassAndField() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("class Hello\n"
@@ -112,6 +123,7 @@ public class TestIL {
 
 
 	@Test
+	@Category(RegressionTests.class)
 	public void testClassAndMethods2() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("class Hello\n"
@@ -127,6 +139,7 @@ public class TestIL {
 	}
 
 	@Test
+	@Category(RegressionTests.class)
 	public void testVarAssignment2() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("var x:Int = 1\nx=2\nvar y:Int = 3\ny=4\nx=y\nx");
@@ -136,6 +149,7 @@ public class TestIL {
 
 
 	@Test
+	@Category(RegressionTests.class)
 	public void testVarAssignmentInClass() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("class Hello\n"
@@ -193,6 +207,7 @@ public class TestIL {
 
 	//TODO: have new autogenerate a correct class to instanciate.
 	@Test
+	@Category(RegressionTests.class)
 	public void testGenericNew2() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("val test = new\n" +
@@ -228,6 +243,7 @@ public class TestIL {
 		Assert.assertEquals("var x = 0,label 1,if (true) goto label 2,goto label 3,label 2,x = 1,val ifRet$0 = (),goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,x = 2,val ifRet$0 = (),goto label 0,label 5,goto label 0,label 0,ifRet$0", join(result));
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void tVin() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("val x = 2\n" +
@@ -238,6 +254,7 @@ public class TestIL {
 		Assert.assertEquals("val x = 2,val y = x,y", join(result));
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void tC() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("class X                         \n"
@@ -269,6 +286,7 @@ public class TestIL {
 		Assert.assertEquals("var a = 4,label 1,val temp$0 = a,val temp$1 = 4,val temp$2 = temp$0 == temp$1,if (temp$2) goto label 2,goto label 3,label 2,a = 2,val ifRet$0 = (),goto label 0,label 3,if (true) goto label 4,goto label 5,label 4,a = 3,val ifRet$0 = (),goto label 0,label 5,goto label 0,label 0,ifRet$0", join(result));
 	}
 	@Test
+	@Category(RegressionTests.class)
 	public void tP() {
 		ArrayList<String> strs = new ArrayList<>();
 		strs.add("val x = (1,2,3)\nx");
