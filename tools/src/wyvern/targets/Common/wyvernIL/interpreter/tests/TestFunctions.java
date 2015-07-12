@@ -1,9 +1,11 @@
 package wyvern.targets.Common.wyvernIL.interpreter.tests;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeInt;
 import wyvern.targets.Common.wyvernIL.interpreter.values.BytecodeValue;
-
+import wyvern.tools.tests.suites.RegressionTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -34,6 +36,7 @@ public class TestFunctions extends TestUtil {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void invokeFunction() {
 		
 		PRINTS_ON = false;
@@ -68,6 +71,7 @@ public class TestFunctions extends TestUtil {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void invokeFunction3() {
 		
 		PRINTS_ON = false;
@@ -85,6 +89,7 @@ public class TestFunctions extends TestUtil {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void invokeFunction4() {
 		
 		PRINTS_ON = false;
@@ -104,6 +109,7 @@ public class TestFunctions extends TestUtil {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	public void invokeFunction5() {
 		
 		PRINTS_ON = false;

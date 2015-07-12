@@ -1,14 +1,19 @@
 package wyvern.tools.tests;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.HasParser;
+import wyvern.tools.tests.suites.CurrentlyBroken;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -36,6 +41,7 @@ import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.util.EvaluationEnvironment;
 
 import javax.tools.Tool;
+
 import java.io.*;
 import java.util.*;
 
@@ -44,6 +50,7 @@ import static wyvern.stdlib.Globals.getStandardEnv;
 import static wyvern.tools.types.Environment.getEmptyEnvironment;
 import static wyvern.tools.util.EvaluationEnvironment.EMPTY;
 
+@Category(RegressionTests.class)
 public class CopperTests {
 	@Test(expected= ToolError.class)
 	public void testVal2() throws IOException, CopperParserException {
@@ -865,6 +872,7 @@ public class CopperTests {
 	}
 
 
+	@Category(CurrentlyBroken.class)
 	@Test()
 	public void arrays10() throws IOException, CopperParserException {
 		int n = 400;

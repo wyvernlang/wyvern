@@ -1,9 +1,13 @@
 package wyvern.tools.tests;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.utils.SingleTestCase;
 import wyvern.tools.tests.utils.TestCase;
 import wyvern.tools.tests.utils.TestSuiteParser;
@@ -17,6 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RunWith(Parameterized.class)
+@Category(RegressionTests.class)
 public class FileTestRunner {
 	private static String fileRoot = "wyvern/tools/tests/embedded/";
 
