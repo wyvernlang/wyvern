@@ -135,15 +135,15 @@ public class TestUtil {
 	 * First typechecks the AST, then executes it.
 	 * If any file is loaded, it is parsed by the new parser.
 	 * 
-	 * Any returned value is discarded, but anything printed to stdout will be visible.
+	 * Any returned value is returned, and anything printed to stdout will be visible.
 	 * 
 	 * @param ast
 	 */
-	public static void evaluateNew(TypedAST ast) {
+	public static Value evaluateNew(TypedAST ast) {
 		boolean oldParserFlag = WyvernResolver.getInstance().setNewParser(true);
 		try {
 			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-			ast.evaluate(Globals.getStandardEvalEnv());
+			return ast.evaluate(Globals.getStandardEvalEnv());
 		} finally {
 			WyvernResolver.getInstance().setNewParser(oldParserFlag);
 		}

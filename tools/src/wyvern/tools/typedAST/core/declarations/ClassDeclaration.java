@@ -34,7 +34,7 @@ import wyvern.tools.util.TreeWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ClassDeclaration extends Declaration implements CoreAST {
+public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	protected DeclSequence decls = new DeclSequence(new LinkedList<Declaration>());
 	private List<String> typeParams;
 	// protected DeclSequence classDecls;
@@ -64,8 +64,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return objType;
 	}
 
-	private TaggedInfo taggedInfo;
-
 	public ClassDeclaration(String name,
 							String implementsName,
 							String implementsClassName,
@@ -87,11 +85,9 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 
 		// System.out.println("Creating class declaration for: " + name + " with decls " + decls);
 
-		this.taggedInfo = taggedInfo;
-		this.taggedInfo.setTagName(name, null, this);
 		objType = new ClassType(instanceMembersEnv, new Reference<>(), new LinkedList<>(), taggedInfo, "");
 		typeBinding = new TypeBinding(name, getObjType());
-		this.taggedInfo.associateWithClassOrType(this.typeBinding);
+		setupTags(name, typeBinding, taggedInfo);
 		nameBinding = new NameBindingImpl(name, getClassType());
 	}
 
@@ -228,75 +224,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return new Unit();
 	}
 
-	private void typecheckTags(Environment env) {
-		taggedInfo.resolve(env, this);
-
-		// System.out.println("CURRENT ti = " + taggedInfo);
-
-		Type myTagType = taggedInfo.getTagType();
-
-		if (taggedInfo.hasCaseOf()) {
-			Type caseOfType = taggedInfo.getCaseOfTag();
-
-			// System.out.println("caseOfType = " + caseOfType);
-			// System.out.println("TaggedInfo Global Store Current State = " + TaggedInfo.getGlobalTagStore());
-
-			//check the type is tagged
-			if (!(caseOfType instanceof TypeInv)) { // If it is TypeInv - we won't know till runtime!
-				TaggedInfo info = TaggedInfo.lookupTagByType(caseOfType);
-
-				//System.out.println("Looked up: " + info);
-
-				taggedInfo.setCaseOfTaggedInfo(info);
-
-				if (info == null) {
-					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, caseOfType.toString());
-				}
-
-				//now check circular relationship has not been created
-				if (taggedInfo.isCircular()) {
-					ToolError.reportError(ErrorMessage.CIRCULAR_TAGGED_RELATION, this, taggedInfo.getTagName(), caseOfType.toString());
-				}
-			}
-		}
-
-		if (taggedInfo.hasComprises()) {
-			List<Type> comprisesTags = taggedInfo.getComprisesTags();
-
-			//first check that every comprises tag actually is a case-of of this
-			for (Type s : comprisesTags) {
-				TaggedInfo info = TaggedInfo.lookupTagByType(s); // FIXME:
-
-				//check it exists
-				if (info == null) {
-					ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, this, s.toString());
-				}
-
-				//then check it is a case-of
-				Type comprisesCaseOfName = info.getCaseOfTag();
-				if (!myTagType.equals(comprisesCaseOfName)) {
-					ToolError.reportError(ErrorMessage.COMPRISES_RELATION_NOT_RECIPROCATED, this);
-				}
-			}
-
-			//now check every other case-of does not case-of this tag
-			for (TaggedInfo info : TaggedInfo.getGlobalTagStoreList()) {
-				Type othersType = info.getTagType();
-				Type caseOf = info.getCaseOfTag();
-
-				//if tag is ourselves, or one of our comprises, skip it
-				if (othersType.equals(myTagType) || comprisesTags.contains(othersType)) {
-					continue;
-				}
-
-				//now if the other tag 'case-of's is this, it is an error
-				if (myTagType.equals(caseOf)) {
-					ToolError.reportError(ErrorMessage.COMPRISES_EXCLUDES_TAG, this, myTagType.toString(), info.getTagType().toString());
-				}
-			}
-		}
-	}
-
 	private Type getObjectType() {
 		Environment declEnv = getInstanceMembersEnv();
 		Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(declEnv);
@@ -310,7 +237,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 			public void set(Environment e) {
 				throw new RuntimeException();
 			}
-		}, new LinkedList<>(), taggedInfo, this.getName());
+		}, new LinkedList<>(), getTaggedInfo(), this.getName());
 	}
 
 	@Override
@@ -335,7 +262,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 
 		// System.out.println("Inside evalDecl for something called: " + this.getName());
-		TaggedInfo goodTI = this.taggedInfo;
+		TaggedInfo goodTI = this.getTaggedInfo();
 		if (goodTI != null) {
 			// FIXME: This is a right place to resolve the TaggedInfo case of for this tag for this class if it happens to use variables.
 			if (goodTI.hasCaseOf()) {
@@ -419,25 +346,6 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		return nameBinding.getName();
 	}
 
-	/**
-	 * Returns if this class is tagged or not.
-	 *
-	 * @return true if tagged, false otherwise
-	 */
-	public boolean isTagged() {
-		return taggedInfo != null;
-	}
-
-	/**
-	 * Returns the tag information associated with this class.
-	 * If this class isn't tagged this information will be null.
-	 *
-	 * @return the tag info
-	 */
-	public TaggedInfo getTaggedInfo() {
-		return taggedInfo;
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 
 	@Override
@@ -503,7 +411,7 @@ public class ClassDeclaration extends Declaration implements CoreAST {
 		}
 		ClassDeclaration classDeclaration = new ClassDeclaration(nameBinding.getName(), implementsName, implementsClassName,
 				new DeclSequence(decls), classMembersEnv.get(), typeParams, location);
-		classDeclaration.taggedInfo = taggedInfo;
+		classDeclaration.setupTags(nameBinding.getName(), classDeclaration.typeBinding, getTaggedInfo());
 		return classDeclaration;
 	}
 

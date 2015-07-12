@@ -2,6 +2,7 @@ package wyvern.tools.types.extensions;
 
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -241,4 +242,14 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	public boolean equals(Object other) {
 		return other instanceof TypeType && ((TypeType) other).typeDeclEnv.get().equals(typeDeclEnv.get());
 	}
+
+	@Override
+	public TypeType getEquivType() {
+		return this;
+	}
+	@Override
+	public TaggedInfo getTaggedInfo() {
+		return decl==null?null:decl.getTaggedInfo();
+	}
+
 }

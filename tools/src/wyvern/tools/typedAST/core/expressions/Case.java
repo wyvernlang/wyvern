@@ -2,6 +2,8 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -24,6 +26,9 @@ public class Case {
 	private Type taggedType;
 
 	private TypedAST ast;
+	
+	/** may be null if we are not binding a name */
+	private NameBinding binding;
 
 	public String toString() {
 		if (taggedType != null)
@@ -34,6 +39,21 @@ public class Case {
 
 	//TODO refactor this class into two classes for each type?
 	private CaseType caseType;
+
+	/**
+	 * Instantiates a new Case statement, which matches over the given tagged type name,
+	 * binding a variable and executing the given AST.
+	 *
+	 * @param caseType
+	 * @param decls
+	 */
+	public Case(String name, Type taggedType, TypedAST ast) {
+		this.taggedType = taggedType;
+		this.ast = ast;
+		this.binding = new NameBindingImpl(name, taggedType);
+
+		caseType = CaseType.TYPED;
+	}
 
 	/**
 	 * Instantiates a new Case statement, which matches over the given tagged type name,

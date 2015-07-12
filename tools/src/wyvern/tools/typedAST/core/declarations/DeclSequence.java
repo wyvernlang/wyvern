@@ -189,7 +189,8 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	@Override
 	public Environment extendType(Environment env, Environment against) {
 		Environment nenv = env;
-		for (Declaration d : this.getDeclIterator()) {
+		for (Iterator<Declaration> iter = this.getDeclIterator().iterator(); iter.hasNext(); ) {
+			Declaration d = iter.next();
 			nenv = d.extendType(nenv, against);
 		}
 		return nenv;

@@ -5,12 +5,14 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.lexing.WyvernLexer;
 import wyvern.tools.parsing.HasParser;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -37,9 +39,11 @@ import wyvern.tools.parsing.Wyvern;
 
 import java.io.*;
 import java.util.*;
+
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 import wyvern.tools.parsing.coreparser.Token;
 
+@Category(RegressionTests.class)
 public class LexingTests {
 	public static String kindToName(int kind) {
 		switch(kind) {

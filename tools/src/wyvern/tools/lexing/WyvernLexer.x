@@ -38,7 +38,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	
 	/** @return 1 for an indent, -n for n dedents, or 0 for the same indentation level
 	 */
-	int adjustIndent(String newIndent) throws CopperParserException {
+	int adjustIndent(String newIndent, Token tokenLoc) throws CopperParserException {
 		String currentIndent = indents.peek();
 		if (newIndent.length() < currentIndent.length()) {
 			// dedent(s)
@@ -51,14 +51,14 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 			if (newIndent.equals(currentIndent))
 				return dedentCount;
 			else
-				throw new CopperParserException("Illegal dedent: does not match any previous indent level");
+				throw new CopperParserException("Illegal dedent at line "+tokenLoc.beginLine+": does not match any previous indent level");
 		} else if (newIndent.length() > currentIndent.length()) {
 			// indent
 			if (newIndent.startsWith(currentIndent)) {
 				indents.push(newIndent);
 				return 1;
 			} else {
-				throw new CopperParserException("Illegal indent: not a superset of previous indent level");
+				throw new CopperParserException("Illegal indent at line "+tokenLoc.beginLine+": not a superset of previous indent level");
 			}
 		} else {
 			return 0;
@@ -70,7 +70,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	 * stream to reach the baseline indent (empty if no dedents)
 	 */ 
 	List<Token> possibleDedentList(Token tokenLoc) throws CopperParserException {
-		int levelChange = adjustIndent("");
+		int levelChange = adjustIndent("", tokenLoc);
   		List<Token> tokenList = emptyList(); 
 		while (levelChange < 0) {
 			Token t = makeToken(DEDENT,"",tokenLoc);
@@ -95,7 +95,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 				lineIndent = firstToken.image;
 			
 			// add indents/dedents as needed
-			int levelChange = adjustIndent(lineIndent);
+			int levelChange = adjustIndent(lineIndent, firstToken);
 			if (levelChange == 1)
 				aLine.addFirst(makeToken(INDENT,"",firstToken));
 			while (levelChange < 0) {
@@ -188,28 +188,31 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  		RESULT = token(IDENTIFIER,lexeme);
  	:};
 
-    terminal Token classKwd_t ::= /class/ in (keywds) {: RESULT = token(TYPE,lexeme); :};
-	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(CLASS,lexeme); :};
+    terminal Token classKwd_t ::= /class/ in (keywds) {: RESULT = token(CLASS,lexeme); :};
+	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(TYPE,lexeme); :};
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
 	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
+	terminal Token delegateKwd_t::= /delegate/ in (keywds) {: RESULT = token(DELEGATE,lexeme); :};
+	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	terminal Token fnKwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
 	terminal Token metadataKwd_t 	::= /metadata/ in (keywds) {: RESULT = token(METADATA,lexeme); :};
 	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); :};
  	terminal Token importKwd_t   ::= /import/ in (keywds) {: RESULT = token(IMPORT,lexeme); :};
  	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
+ 	terminal Token comprisesKwd_t   ::= /comprises/ in (keywds) {: RESULT = token(COMPRISES,lexeme); :};
+ 	terminal Token extendsKwd_t   ::= /extends/ in (keywds) {: RESULT = token(EXTENDS,lexeme); :};
 	terminal Token ifKwd_t 	::= /if/ in (keywds);
  	terminal Token thenKwd_t   ::= /then/ in (keywds);
  	terminal Token elseKwd_t   ::= /else/ in (keywds);
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
 
-	terminal Token taggedKwd_t  ::= /tagged/  in (keywds);
-    terminal Token matchKwd_t   ::= /match/   in (keywds);
+	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
+    terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); :};
     terminal Token defaultKwd_t ::= /default/ in (keywds);
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
-    terminal Token comprisesKwd_t ::= /comprises/ in (keywds);
 
  	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
 
@@ -218,6 +221,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token dash_t ::= /-/ {: RESULT = token(DASH,lexeme); :};
 	terminal Token mult_t ::= /\*/ {: RESULT = token(MULT,lexeme); :};
 	terminal Token divide_t ::= /\// {: RESULT = token(DIVIDE,lexeme); :};
+	terminal Token divide_t ::= /%/ {: RESULT = token(MOD,lexeme); :};
 	terminal Token equals_t ::= /=/ {: RESULT = token(EQUALS,lexeme); :};
 	terminal Token equalsequals_t ::= /==/ {: RESULT = token(EQUALSEQUALS,lexeme); :};
 	terminal Token openParen_t ::= /\(/ {: RESULT = token(LPAREN,lexeme); :};
@@ -306,11 +310,17 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | valKwd_t:t {: RESULT = t; :}
 	       | defKwd_t:t {: RESULT = t; :}
 	       | varKwd_t:t {: RESULT = t; :}
+	       | delegateKwd_t:t {: RESULT = t; :}
+	       | toKwd_t:t {: RESULT = t; :}
 	       | fnKwd_t:t {: RESULT = t; :}
 	       | requireKwd_t:t {: RESULT = t; :}
 	       | metadataKwd_t:t {: RESULT = t; :}
 	       | newKwd_t:t {: RESULT = t; :}
 	       | moduleKwd_t:t {: RESULT = t; :}
+	       | comprisesKwd_t:t {: RESULT = t; :}
+	       | extendsKwd_t:t {: RESULT = t; :}
+	       | matchKwd_t:t {: RESULT = t; :}
+	       | taggedKwd_t:t {: RESULT = t; :}
 	       | importKwd_t:t {: RESULT = t; :};
 //	       | :t {: RESULT = t; :}
 

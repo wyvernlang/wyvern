@@ -56,6 +56,19 @@ public class WyvernParser<AST,Type> {
     
     private ASTBuilder<AST,Type> build;
     public void setBuilder(ASTBuilder<AST,Type> builder) { build = builder; }
+
+	private class ExpFlags {
+		public boolean isEmpty() { return newExp == null; }
+		public void setNewExp(AST a) throws ParseException {
+		  	// error to have two news in one expression
+		  	if (!isEmpty())
+		  		throw new ParseException("May not have two \"new\" or \"DSL literal\" expressions within the same line"); 
+			newExp = a;
+		} 
+		public AST getNewExp() { return newExp; }
+		
+	    private AST newExp;
+	}    
 }
 
 PARSER_END(WyvernParser)
@@ -75,10 +88,16 @@ TOKEN : /* Keywords */
 | < DEF: "def" >
 | < TYPE: "type" >
 | < CLASS: "class" >
+| < DELEGATE: "delegate" >
+| < TO: "to" >
 | < REQUIRE: "require" >
 | < METADATA: "metadata" >
 | < NEW: "new" >
 | < MODULE: "module" >
+| < COMPRISES: "comprises" >
+| < EXTENDS: "extends" >
+| < TAGGED: "tagged" >
+| < MATCH: "match" >
 | < IMPORT: "import" >
 //| < : "" >
 // more here
@@ -106,6 +125,7 @@ TOKEN : /* Symbols */
 | <DASH>
 | <MULT>
 | <DIVIDE>
+| <MOD>
 | <EQUALS>
 | <EQUALSEQUALS>
 | <COMMA>
@@ -203,7 +223,7 @@ AST DeclSequence(boolean inModule) :
 }
 
 AST Declaration(boolean inModule) :
-{ AST exp; Token t; }
+{ AST exp; }
 {
   exp = DefDeclaration()  { return exp; }
 |
@@ -211,12 +231,11 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
-  exp = Expression() t=<NEWLINE> {
-    if (!inModule)
-    	return exp;
-  	else
-  		return build.valDecl(freshName(), null, exp, loc(t));
-  }
+  exp = TypeDeclaration()  { return exp; }
+|
+  exp = DelegateDeclaration()  { return exp; }
+|
+  exp = ExpressionLine(inModule) { return exp; }
 }
 
 AST DefDeclaration() :
@@ -230,7 +249,7 @@ AST DefDeclaration() :
 AST ValDeclaration() :
 { Type type = null; Token name; AST body; List args; }
 {
-  <VAL> name=<IDENTIFIER> [ <COLON> type = Type() ] <EQUALS> body = Expression() <NEWLINE> {
+  <VAL> name=<IDENTIFIER> [ <COLON> type = Type() ] <EQUALS> body = ExpressionLine(false) {
 	return build.valDecl(name.image, type, body, loc(name));
   }
 }
@@ -238,8 +257,65 @@ AST ValDeclaration() :
 AST VarDeclaration() :
 { Type type; Token name; AST body; List args; }
 {
-  <VAR> name=<IDENTIFIER> <COLON> type = Type() <EQUALS> body = Expression() <NEWLINE> {
-	return build.valDecl(name.image, type, body, loc(name));
+  <VAR> name=<IDENTIFIER> <COLON> type = Type() <EQUALS> body = ExpressionLine(false) {
+	return build.varDecl(name.image, type, body, loc(name));
+  }
+}
+
+AST DelegateDeclaration() :
+{ Type type; Token t; AST exp; }
+{
+  t=<DELEGATE> type=Type() <TO> exp=ExpressionLine(false) {
+	return build.delegateDecl(type, exp, loc(t));
+  }
+}
+
+AST TypeDeclaration() :
+{ Token name; AST body = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
+  Object tagInfo = null;
+}
+{
+  [<TAGGED> { isTagged = true; } ]
+  <TYPE> name=<IDENTIFIER>
+  [ <EXTENDS> extendedType=Type() ]
+  [ <COMPRISES> comprisesList=TypeList() ]
+  <NEWLINE> [<INDENT> body=DeclTypes() <DEDENT>] {
+    if (isTagged || (extendedType != null) || (comprisesList != null)) {
+      tagInfo = build.tagInfo(extendedType, comprisesList);
+    } 
+	return build.typeDecl(name.image, body, tagInfo, null, loc(name));
+  }
+}
+
+AST DeclTypes() :
+{ AST decl1; AST decl2; }
+{
+  decl1 = DeclType()
+  ( decl2 = DeclType() { decl1 = build.sequence(decl1, decl2, true); } )*
+    { return decl1; }
+}
+
+AST DeclType() :
+{ AST exp; }
+{
+  exp = DefDeclType()  { return exp; }
+|
+  exp = ValDeclType()  { return exp; }
+}
+
+AST DefDeclType() :
+{ Type resultType; Token name; List args; }
+{
+  <DEF> name=<IDENTIFIER> args = Formals() <COLON> resultType = Type() <NEWLINE> {
+	return build.defDeclType(name.image, resultType, args, loc(name));
+  }
+}
+
+AST ValDeclType() :
+{ Type type; Token name; List args; }
+{
+  <VAL> name=<IDENTIFIER> <COLON> type = Type() <NEWLINE> {
+	return build.valDeclType(name.image, type, loc(name));
   }
 }
 
@@ -274,15 +350,65 @@ Object Formal() :
 AST DefBody() :
 { AST exp; }
 {
-  <NEWLINE> <INDENT> exp = Expression() <NEWLINE> <DEDENT> { return exp; }
+  <NEWLINE> <INDENT> exp = ExpressionLine(false) <DEDENT> { return exp; }
+|
+  <EQUALS> exp = ExpressionLine(false) { return exp; }
 }
 
-AST Expression() :
-{ AST exp; Object formal; }
+AST ExpressionLine(boolean makeValDecl) :
+{ AST exp; AST decls = null; Token t; Object caseArm; List cases; ExpFlags flags = new ExpFlags(); }
 {
-  exp = PrimaryExpression()  { return exp; }
+  exp = Expression(flags) t=<NEWLINE>
+  [ <INDENT> decls = DeclSequence(true) <DEDENT> ]
+  {
+    if (!flags.isEmpty()) {
+    	build.setNewBody(flags.getNewExp(), decls);
+    }
+    
+    // create a decl if requested (e.g. we are within a module)
+    if (!makeValDecl)
+    	return exp;
+  	else
+  		return build.valDecl(freshName(), null, exp, loc(t));
+  }
 |
-  <FN> formal = Formal() <ARROW> exp = Expression() { return build.fn(Arrays.asList(formal), exp); }
+  t=<MATCH> exp=Expression(flags) <COLON> <NEWLINE> { cases = new LinkedList(); }
+  <INDENT>
+  ( caseArm=CaseArm() { cases.add(caseArm); } )*
+  <DEDENT> {
+    return build.match(exp, cases, loc(t));
+  }
+}
+
+Object CaseArm() :
+{ Token id; Token t; AST exp; Type type; }
+{
+  id=<IDENTIFIER> <COLON> type=Type() t=<ARROW> exp=ExpressionLine(false) {
+    return build.caseArm(id.image,type,exp,loc(t));
+  }
+}
+
+AST Expression(ExpFlags flags) :
+{ AST exp; AST exp2 = null; Object formal; Token t = null; }
+{
+  exp = AdditiveExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
+  	if (exp2 != null) {
+  		return build.assignment(exp, exp2, loc(t));
+  	}
+    return exp;
+  }
+|
+  <FN> formal = Formal() <ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp); }
+}
+
+List<Type> TypeList() :
+{ List<Type> types = new LinkedList<Type>(); Type type; }
+{
+  type=Type() { types.add(type); }
+  ( <COMMA> type=Type() { types.add(type); } )*
+  { return types; }
+|
+  { return types; }
 }
 
 Type Type() :
@@ -291,20 +417,60 @@ Type Type() :
   id = <IDENTIFIER> { return build.nominalType(id.image); }
 }
 
-AST PrimaryExpression() :
-{ AST exp; }
+AST AdditiveExpression(ExpFlags flags) :
+{ AST exp; AST exp2 = null; Token t; }
 {
-  exp = PrimaryPrefix() ( exp = PrimarySuffix(exp) )*  { return exp; }
+  exp = MultiplicativeExpression(flags)
+  ( ( t=<PLUS> | t=<DASH> ) exp2=MultiplicativeExpression(flags) {
+    exp = build.invocation(exp, t.image, exp2, loc(t)); 
+  } )*
+  { return exp; }
 }
 
-AST PrimaryPrefix() :
+AST MultiplicativeExpression(ExpFlags flags) :
+{ AST exp; AST exp2 = null; Token t; }
+{
+  exp = UnaryExpression(flags)
+  ( ( t=<MULT> | t=<DIVIDE> | t=<MOD> ) exp2=UnaryExpression(flags) {
+  	exp = build.invocation(exp, t.image, exp2, loc(t));
+  } )*
+  { return exp; }
+}
+
+AST UnaryExpression(ExpFlags flags) :
+{ AST exp; Token t; }
+{
+  <PLUS> exp = UnaryExpression(flags) { return exp; }
+|
+  t=<DASH> exp = UnaryExpression(flags) {
+    return build.invocation(exp, "negate", build.unitValue(loc(t)), loc(t));
+  }
+|
+  exp = PrimaryExpression(flags) { return exp; }
+}
+
+AST PrimaryExpression(ExpFlags flags) :
+{ AST exp; }
+{
+  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )*  { return exp; }
+}
+
+AST PrimaryPrefix(ExpFlags flags) :
 { AST exp; Token t; }
 {
   exp = Literal() { return exp; }
 |
   t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
 |
-  <LPAREN> exp = Expression() <RPAREN> { return exp; }
+  t = <NEW> {
+    exp = build.newObj(loc(t)); 
+    
+    // store a reference to the new expression so we can fill in the fields later!
+    flags.setNewExp(exp);
+    return exp;
+  }
+|
+  <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 }
 
 AST Literal() :
@@ -317,18 +483,18 @@ AST Literal() :
   <RATIONAL_LITERAL>
 }
 
-AST PrimarySuffix(AST lhs) :
+AST PrimarySuffix(AST lhs, ExpFlags flags) :
 { AST rhs; Token t; }
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
-  rhs = Arguments() { return build.application(lhs, rhs, null); }
+  rhs = Arguments(flags) { return build.application(lhs, rhs, null); }
 }
 
-AST Arguments() :
+AST Arguments(ExpFlags flags) :
 { AST exp = null; Token t; }
 {
-  t = <LPAREN> [ exp = ArgumentList() ] <RPAREN> {
+  t = <LPAREN> [ exp = ArgumentList(flags) ] <RPAREN> {
   			if (exp == null)
   				return build.unitValue(loc(t));
   			else
@@ -336,11 +502,11 @@ AST Arguments() :
 		}
 }
 
-AST ArgumentList() :
+AST ArgumentList(ExpFlags flags) :
 { AST exp; AST exp2; LinkedList<AST> expList = null; Token t; }
 {
-  exp = Expression()
-  ( t=<COMMA> exp2 = Expression() {
+  exp = Expression(flags)
+  ( t=<COMMA> exp2 = Expression(flags) {
   		if (expList == null) {
   			expList = new LinkedList<AST>();
   			expList.add(exp);

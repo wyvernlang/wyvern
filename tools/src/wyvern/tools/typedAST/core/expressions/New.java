@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
@@ -112,7 +113,15 @@ public class New extends CachingTypedAST implements CoreAST {
 			Environment savedInner = env.extend(innerEnv);
 			innerEnv = seq.extendName(innerEnv, savedInner);
 
-			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), null, null)));
+			// compute tag info
+			TaggedInfo tagInfo = null;
+			if (expected.isPresent()) {
+				Type t = expected.get();
+				if (t instanceof RecordType)
+					tagInfo = ((RecordType)t).getTaggedInfo();
+			}
+			
+			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), tagInfo, null)));
 			final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 					reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
 			seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
@@ -130,7 +139,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			cls = classDeclaration;
 			Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
 
-			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), null, null);
+			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), tagInfo, null);
 			return ct;
 		}
 	}

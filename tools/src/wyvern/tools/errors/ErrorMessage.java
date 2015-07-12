@@ -15,6 +15,7 @@ public enum ErrorMessage {
 	MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
 	NOT_SUBTYPE("%ARG is not a subtype of %ARG", 2),
 	DUPLICATE_MEMBER("%ARG has more than one member named %ARG", 2),
+	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
 	
 	// Syntax errors
 	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),
