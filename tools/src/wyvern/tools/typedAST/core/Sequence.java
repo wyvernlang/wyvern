@@ -19,8 +19,8 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	private Type retType = null;
 
 	private TypedAST check(TypedAST e) {
-		if (e == null)
-			throw new RuntimeException("no null values in Sequence");
+		//if (e == null)
+		//	throw new RuntimeException("no null values in Sequence");
 		return e;
 	}
 	

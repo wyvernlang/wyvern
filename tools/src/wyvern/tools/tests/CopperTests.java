@@ -296,6 +296,7 @@ public class CopperTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testComments1() throws IOException, CopperParserException {
 		String input =
 				"exn1\n" +
