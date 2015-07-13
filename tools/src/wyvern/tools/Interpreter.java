@@ -21,7 +21,7 @@ import wyvern.tools.tests.*;
 public class Interpreter {
 
 	public static void main(String[] args) {
-		System.load("/media/sda5/home/abhi/wyvernlang/wyvern/tools/src/wyvern/target/llvm/.libs/libWyvernLLVM.so");
+		System.load("../target/llvm/.libs/libWyvernLLVM.so");
 		
 		OIRToLLVMTests tests = new OIRToLLVMTests ();
 		//try {
