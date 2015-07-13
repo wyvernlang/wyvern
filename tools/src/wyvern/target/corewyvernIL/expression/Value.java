@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
-public interface Value {
+import wyvern.target.corewyvernIL.EmitOIR;
+
+public interface Value extends EmitOIR{
 
 }

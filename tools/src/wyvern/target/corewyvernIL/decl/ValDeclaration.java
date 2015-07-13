@@ -1,16 +1,18 @@
 package wyvern.target.corewyvernIL.decl;
 
 import wyvern.target.corewyvernIL.Environment;
-import wyvern.target.corewyvernIL.emitIL;
-import wyvern.target.corewyvernIL.astvisitor.EmitILVisitor;
+import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.oir.OIRAST;
+import wyvern.target.oir.OIREnvironment;
 
-public class ValDeclaration extends Declaration implements emitIL {
+public class ValDeclaration extends Declaration {
 
-	public ValDeclaration(String fieldName, ValueType type, Variable value) {
+	public ValDeclaration(String fieldName, ValueType type, Expression value) {
 		super();
 		this.fieldName = fieldName;
 		this.type = type;
@@ -19,7 +21,7 @@ public class ValDeclaration extends Declaration implements emitIL {
 
 	private String fieldName;
 	private ValueType type;
-	private Variable value;
+	private Expression value;
 	
 	public String getFieldName() {
 		return fieldName;
@@ -37,24 +39,24 @@ public class ValDeclaration extends Declaration implements emitIL {
 		this.type = type;
 	}
 	
-	public Variable getValue() {
+	public Expression getValue() {
 		return value;
 	}
 	
-	public void setValue(Variable value) {
+	public void setValue(Expression value) {
 		this.value = value;
 	}
-
-	@Override
-	public String acceptEmitILVisitor(EmitILVisitor emitILVisitor,
-			Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
+	
 	@Override
 	public Type typeCheck(Environment env) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
+			Environment env, OIREnvironment oirenv) {
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 }

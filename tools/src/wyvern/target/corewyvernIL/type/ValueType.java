@@ -1,4 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
-public abstract class ValueType extends CaseType {
+import wyvern.target.corewyvernIL.EmitOIR;
+
+public abstract class ValueType extends CaseType implements EmitOIR {
 }

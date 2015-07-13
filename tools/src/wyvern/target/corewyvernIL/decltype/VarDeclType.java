@@ -1,8 +1,14 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.oir.OIRAST;
+import wyvern.target.oir.OIREnvironment;
 
-public class VarDeclType extends DeclType {
+public class VarDeclType extends DeclType implements EmitOIR{
 	
 	private String field;
 	private ValueType type;
@@ -31,5 +37,11 @@ public class VarDeclType extends DeclType {
 	public ValueType getType ()
 	{
 		return type;
+	}
+
+	@Override
+	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
+			Environment env, OIREnvironment oirenv) {
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 }

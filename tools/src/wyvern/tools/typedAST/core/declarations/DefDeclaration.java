@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -126,11 +127,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     @Override
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        environment.register(getName());
+    	ValueType valueType = getType ().generateILType();
+        environment.register(getName(), valueType);
         GenerationEnvironment igen = new GenerationEnvironment(environment);
 
         for (NameBinding nb : argNames)
-            igen.register(nb.getName());
+            igen.register(nb.getName(), valueType);
         writer.write(new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
                 argNames.stream().map(nb -> new FormalArg(nb.getName(), nb.getType().generateILType())).collect(Collectors.toList()),
                         type.generateILType(),

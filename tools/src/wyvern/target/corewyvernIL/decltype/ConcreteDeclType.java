@@ -1,6 +1,11 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.oir.OIRAST;
+import wyvern.target.oir.OIREnvironment;
 
 
 public class ConcreteDeclType extends DeclType {
@@ -32,5 +37,12 @@ public class ConcreteDeclType extends DeclType {
 	public ValueType getSourceType ()
 	{
 		return sourceType;
+	}
+
+	@Override
+	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
+			Environment env, OIREnvironment oirenv) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

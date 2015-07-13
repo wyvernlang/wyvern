@@ -559,12 +559,15 @@ public class ClassDeclaration extends Declaration implements CoreAST {
                 decl.codegenToIL(environment, getIlWriter(writer, classMembers));
             }
         }
+        ValueType valueType = nameBinding.getType().generateILType();
+        wyvern.target.corewyvernIL.Environment.getRootEnvironment().extend(
+        		new wyvern.target.corewyvernIL.binding.NewBinding (nameBinding.getName(), valueType));
         String newVar = GenerationEnvironment.generateVariableName();
-        writer.wrap(e->new Let(newVar, new New(classMembers, "this"), (Expression)e));
-        environment.register(nameBinding.getName());
+        writer.wrap(e->new Let(newVar, new New(classMembers, "this", valueType), (Expression)e));
+        environment.register(nameBinding.getName(), valueType);
         //TODO: Tags support
-        writer.write(new TypeDeclaration(nameBinding.getName(), nameBinding.getType().generateILType()));
-        writer.write(new ValDeclaration(nameBinding.getName(), nameBinding.getType().generateILType(), new Variable(newVar)));
+        writer.write(new TypeDeclaration(nameBinding.getName(), valueType));
+        writer.write(new ValDeclaration(nameBinding.getName(), valueType, new Variable(newVar)));
     }
 
 

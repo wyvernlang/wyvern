@@ -213,8 +213,8 @@ public class New extends CachingTypedAST implements CoreAST {
         }
         wyvern.target.corewyvernIL.expression.New exn = new wyvern.target.corewyvernIL.expression.New(
                 genDecls,
-                "this"
-        );
+                "this",
+        null);
         Expression output = exn;
         for (String key : variables.keySet()) {
             output = new Let(key, variables.get(key), output);

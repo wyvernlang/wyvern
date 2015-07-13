@@ -1,4 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
-public interface Path {
+import wyvern.target.corewyvernIL.EmitOIR;
+
+public interface Path extends EmitOIR {
 }

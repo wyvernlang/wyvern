@@ -3,26 +3,31 @@ package wyvern.target.corewyvernIL.decl;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.type.Type;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.oir.OIRAST;
+import wyvern.target.oir.OIREnvironment;
 
 public class DelegateDeclaration extends Declaration{
 
-	private List<DefDeclType> methods;
+	private ValueType valueType;
 	private String fieldName;
 	
-	public DelegateDeclaration(List<DefDeclType> methods, String fieldName) {
+	public DelegateDeclaration(ValueType valueType, String fieldName) {
 		super();
-		this.methods = methods;
+		this.valueType = valueType;
 		this.fieldName = fieldName;
 	}
 
-	public List<DefDeclType> getMethods() {
-		return methods;
+	public ValueType getValueType() {
+		return valueType;
 	}
 	
-	public void setMethods(List<DefDeclType> methods) {
-		this.methods = methods;
+	public void setMethods(ValueType valueType) {
+		this.valueType = valueType;
 	}
 	
 	public String getFieldName() {
@@ -37,5 +42,11 @@ public class DelegateDeclaration extends Declaration{
 	public Type typeCheck(Environment env) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
+			Environment env, OIREnvironment oirenv) {
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 }

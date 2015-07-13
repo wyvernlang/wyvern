@@ -120,10 +120,11 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
     @Override
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        environment.register(getName());
+    	ValueType valType = getType().generateILType();
+        environment.register(getName(), valType);
         String genName = GenerationEnvironment.generateVariableName();
         writer.wrap(e->new Let(genName, Optional.ofNullable(definition).<Expression>map(d -> ExpressionWriter.generate(ew -> d.codegenToIL(environment, ew))).orElse(null), (Expression)e));
-        writer.write(new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), getType().generateILType(), new Variable(genName)));
+        writer.write(new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), valType, new Variable(genName)));
     }
 
     @Override

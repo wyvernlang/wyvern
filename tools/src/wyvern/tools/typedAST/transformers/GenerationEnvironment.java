@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.transformers;
 
 import wyvern.target.corewyvernIL.expression.*;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.WyvernException;
 
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class GenerationEnvironment {
         mapping.put(vname, nb);
     }
 
-    public void register(String vname) {
+    public void register(String vname, ValueType type) {
         getName().ifPresent(name -> parent.ifPresent(p -> p.register(vname, new FieldGet(new Variable(name), vname))));
         mapping.put(vname, basis.<Path>map(b->new FieldGet((Expression)b, vname)).orElse(new Variable(vname)));
     }

@@ -1,5 +1,11 @@
 package wyvern.target.corewyvernIL.type;
 
+import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.oir.OIRAST;
+import wyvern.target.oir.OIREnvironment;
+
 public class TypeApplication extends ValueType {
 
 	private ValueType baseType;
@@ -40,5 +46,12 @@ public class TypeApplication extends ValueType {
 	public String getTypeMember()
 	{
 		return typeMember;
+	}
+
+	@Override
+	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
+			Environment env, OIREnvironment oirenv) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

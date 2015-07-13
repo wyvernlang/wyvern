@@ -153,13 +153,13 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
         for (TypedAST ast : exps) {
             if (ast instanceof ValDeclaration) {
-                environment.register(((ValDeclaration)ast).getName());
+                environment.register(((ValDeclaration)ast).getName(), ast.getType().generateILType());
                 writer.wrap(e->new Let(((ValDeclaration)ast).getName(), ExpressionWriter.generate(iw -> ((ValDeclaration) ast).getDefinition().codegenToIL(environment, iw)), (Expression)e));
             } else if (ast instanceof Declaration) {
                 String genName = GenerationEnvironment.generateVariableName();
                 List<wyvern.target.corewyvernIL.decl.Declaration> generated =
                         DeclarationWriter.generate(writer, iw -> ast.codegenToIL(new GenerationEnvironment(environment, genName), iw));
-                writer.wrap(e->new Let(genName, new New(generated, "this"), (Expression)e));
+                writer.wrap(e->new Let(genName, new New(generated, "this", null), (Expression)e));
             } else {
                 ast.codegenToIL(environment, writer);
             }

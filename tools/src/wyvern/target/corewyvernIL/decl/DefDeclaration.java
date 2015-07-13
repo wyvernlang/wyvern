@@ -3,14 +3,17 @@ package wyvern.target.corewyvernIL.decl;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.emitIL;
-import wyvern.target.corewyvernIL.astvisitor.EmitILVisitor;
+import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.oir.OIRAST;
+import wyvern.target.oir.OIREnvironment;
 
-public class DefDeclaration extends Declaration implements emitIL {
+public class DefDeclaration extends Declaration {
 
 	private String methodName;
 	private List<FormalArg> formalArgs;
@@ -63,9 +66,8 @@ public class DefDeclaration extends Declaration implements emitIL {
 	}
 
 	@Override
-	public String acceptEmitILVisitor(EmitILVisitor emitILVisitor,
-			Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
+			Environment env, OIREnvironment oirenv) {
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 }

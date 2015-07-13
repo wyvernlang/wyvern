@@ -7,41 +7,31 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class Let extends Expression{
-
-	private String varName;
-	private Expression toReplace;
-	private Expression inExpr;
+public class RationalLiteral extends Expression implements Value {
 	
-	public Let(String varName, Expression toReplace, Expression inExpr) {
-		super();
-		this.varName = varName;
-		this.toReplace = toReplace;
-		this.inExpr = inExpr;
+	private int numerator;
+	private int denominator;
+	
+	public RationalLiteral(int numerator, int denominator) {
+		super(null);
+		this.numerator = numerator;
+		this.denominator = denominator;
 	}
 
-	public String getVarName() {
-		return varName;
+	public int getNumerator() {
+		return numerator;
 	}
 	
-	public void setVarName(String varName) {
-		this.varName = varName;
+	public void setNumerator(int numerator) {
+		this.numerator = numerator;
 	}
 	
-	public Expression getToReplace() {
-		return toReplace;
+	public int getDenominator() {
+		return denominator;
 	}
 	
-	public void setToReplace(Expression toReplace) {
-		this.toReplace = toReplace;
-	}
-	
-	public Expression getInExpr() {
-		return inExpr;
-	}
-	
-	public void setInExpr(Expression inExpr) {
-		this.inExpr = inExpr;
+	public void setDenominator(int denominator) {
+		this.denominator = denominator;
 	}
 
 	@Override
