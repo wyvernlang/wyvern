@@ -164,9 +164,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		}
 	}
 
-	private boolean isParserCheck = false;
-	private boolean isParserValid = false;
-
 	@Override
 	public Map<String, Type> getChildren() {
 		HashMap<String, Type> map = new HashMap<>();
