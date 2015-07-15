@@ -56,7 +56,7 @@ public class EmitLLVMNative {
 	public static native void ifThenElseToLLVMIR (OIRIfThenElse let);
 	public static native void literalToLLVMIR (OIRLiteral let);
 	public static native String methodCallToLLVMIR (OIRMethodCall let, String objName, String[] argNames, String returnTypeName);
-	public static native String newToLLVMIR (String className, int classID);
+	public static native String newToLLVMIR (String className, int classID, int[] fieldsToInitialize, String[] initializeValueName, String[] typeNames);
 	public static native void valueToLLVMIR (OIRValue let);
 	public static native String variableToLLVMIR (OIRVariable let);
 }

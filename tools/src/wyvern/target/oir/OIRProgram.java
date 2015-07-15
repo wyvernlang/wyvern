@@ -14,16 +14,14 @@ public class OIRProgram extends OIRAST {
 	private List<OIRType> typeDeclarations;
 	private OIRExpression mainExpression;
 	private static int classID = 0;
-	private HashMap<String, OIRStaticPIC> methodStaticPICMap;
+	private HashMap<Integer, PIC> callSitePICMap;
 	
 	public static OIRProgram program = new OIRProgram ();
 	
 	public static enum DelegateImplementation
 	{
 		HASH_TABLE_NAIVE, /* Every call will do Hash Table Lookup */
-		ONLY_STATIC_PIC, /* Every call will do Hash Table Lookup in Static PIC */
-		PIC_WITH_STATIC_PIC, /* Cache calls using PIC and search only in Static PIC*/
-		DYNAMIC_FIELDS, /* Use in Dynamic Fields also */
+		PIC, /* Using PIC */
 	}
 	
 	private static DelegateImplementation delegateImplementation = 
@@ -60,6 +58,7 @@ public class OIRProgram extends OIRAST {
 	{
 		typeDeclarations = new Vector<OIRType> ();
 		mainExpression = null;
+		callSitePICMap = new HashMap<Integer, PIC> ();
 	}
 
 	@Override
@@ -112,18 +111,70 @@ public class OIRProgram extends OIRAST {
 		{
 			return delegateHashTableNaive (objectAddress, classID, methodName);
 		}
-		
-		for (OIRType decl : typeDeclarations)
+		else if (delegateImplementation == DelegateImplementation.PIC)
 		{
-			if (decl instanceof OIRClassDeclaration)
+			PIC pic;
+			String className;
+			OIRClassDeclaration oirClassDecl;
+
+			oirClassDecl = getClassDeclaration (classID);
+			
+			if (oirClassDecl.isMethodInClass(methodName))
 			{
-				OIRClassDeclaration classDecl = (OIRClassDeclaration)decl;
-				if (classDecl.getClassID() == classID)
-					return classDecl.getName();
+				return oirClassDecl.getName();
 			}
+			
+			pic = callSitePICMap.get(callSiteID);
+			
+			if (pic == null)
+			{
+				pic = new PIC (callSiteID, methodName);
+				callSitePICMap.put(callSiteID, pic);
+			}
+			
+			className = pic.search(classID, objectAddress);
+			
+			return className;
 		}
 		
 		return "";
+	}
+	
+	public String delegateHashTableBuildPICEntry (long objectAddress, 
+			int classID, String methodName, PICEntry classPICEntry)
+	{		
+		OIRClassDeclaration oirClassDecl;
+		PICEntry _entry;
+		
+		_entry = classPICEntry;
+		oirClassDecl = getClassDeclaration (classID);
+		
+		while (true)
+		{
+			int fieldPos;
+			int fieldClassID;
+			PICEntry fieldPICEntry;
+			
+			fieldPos = oirClassDecl.getDelegateMethodFieldHashMap (methodName);
+			
+			if (fieldPos == -1)
+			{
+				System.out.println("Error: Cannot find method");
+				System.exit(-1);
+			}
+			
+			objectAddress = DelegateNative.getFieldAddress(objectAddress, fieldPos);
+			fieldClassID = DelegateNative.getObjectClassID(objectAddress);
+			oirClassDecl = getClassDeclaration (fieldClassID);
+			fieldPICEntry = new PICEntry (fieldClassID);
+			_entry.addNode(fieldPICEntry, fieldPos);
+			_entry = fieldPICEntry;
+			
+			if (oirClassDecl.isMethodInClass(methodName))
+			{
+				return oirClassDecl.getName();
+			}
+		}
 	}
 	
 	public String delegateHashTableNaive (long objectAddress, int classID, String methodName)
@@ -160,40 +211,40 @@ public class OIRProgram extends OIRAST {
 		}		
 	}
 	
-	public void buildStaticPIC ()
-	{
-		methodStaticPICMap = new HashMap<String, OIRStaticPIC> ();
-		
-		for (OIRType decl : typeDeclarations)
-		{
-			if (!(decl instanceof OIRClassDeclaration))
-				continue;
-			
-			OIRClassDeclaration classDecl;
-			
-			classDecl = (OIRClassDeclaration)decl;
-			
-			for (OIRMemberDeclaration memDecl : classDecl.getMembers())
-			{
-				if (!(memDecl instanceof OIRMethod))
-					continue;
-				
-				OIRMethod method = (OIRMethod)memDecl;
-				String name = method.getDeclaration().getName();
-				OIRStaticPIC pic;
-				
-				if (methodStaticPICMap.containsKey(name))
-				{					
-					pic = methodStaticPICMap.get(name);
-				}
-				else
-				{					
-					pic = new OIRStaticPIC (name);
-					methodStaticPICMap.put(name, pic);
-				}
-				
-				pic.addClassName(classDecl.getName());					
-			}
-		}
-	}
+//	public void buildStaticPIC ()
+//	{
+//		methodStaticPICMap = new HashMap<String, OIRStaticPIC> ();
+//		
+//		for (OIRType decl : typeDeclarations)
+//		{
+//			if (!(decl instanceof OIRClassDeclaration))
+//				continue;
+//			
+//			OIRClassDeclaration classDecl;
+//			
+//			classDecl = (OIRClassDeclaration)decl;
+//			
+//			for (OIRMemberDeclaration memDecl : classDecl.getMembers())
+//			{
+//				if (!(memDecl instanceof OIRMethod))
+//					continue;
+//				
+//				OIRMethod method = (OIRMethod)memDecl;
+//				String name = method.getDeclaration().getName();
+//				OIRStaticPIC pic;
+//				
+//				if (methodStaticPICMap.containsKey(name))
+//				{					
+//					pic = methodStaticPICMap.get(name);
+//				}
+//				else
+//				{					
+//					pic = new OIRStaticPIC (name);
+//					methodStaticPICMap.put(name, pic);
+//				}
+//				
+//				pic.addClassName(classDecl.getName());					
+//			}
+//		}
+//	}
 }

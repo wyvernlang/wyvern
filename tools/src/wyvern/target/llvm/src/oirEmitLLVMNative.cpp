@@ -884,7 +884,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVM
 
     for (int i = 0; i < jnienv->GetArrayLength (javaarray); i++)
     {
-        jstring jargName = (jstring)jnienv->GetObjectArrayElement (javaarray, 0);
+        jstring jargName = (jstring)jnienv->GetObjectArrayElement (javaarray, i);
         string argName = jstringToString (jnienv, jargName);
         /*v = Builder.CreateAdd (currentFunction->getNamedValue (argName),
                                currentFunction->getNamedValue ((jstringToString (jnienv, objName))));*/
@@ -925,17 +925,29 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVM
  * Signature: (Ljava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
-  (JNIEnv *jnienv, jclass javaclass, jstring jClassName, jint classID)
+  (JNIEnv *jnienv, jclass javaclass, jstring jClassName, jint classID, jintArray jFieldsToInit, 
+   jobjectArray jValueNames, jobjectArray jTypeNames)
 {
     Type* classType;
+    StructType* structClassType;
     vector<Value*> args;
     Value* allocValue;
     CastInst* castInst;
     string name;
     static int classCast = 0;
     static int newCall = 0;
+    jint* fieldsArray;
     
     classType = strTypeMap[jstringToString (jnienv, jClassName)];
+    
+    if (!classType->isStructTy ())
+    {
+        printf ("Error: In New Expression %s is not a class\n", 
+                jstringToString (jnienv, jClassName).c_str ());
+        return NULL;
+    }
+
+    structClassType = (StructType*)classType;
     args.push_back (ConstantExpr::getSizeOf (classType));
     args.push_back (ConstantInt::get (Type::getInt32Ty(getGlobalContext()),
                                       classID, true));
@@ -949,6 +961,39 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
     name = getConstantString ();
     currentFunction->setNamedValue (name, castInst);
     
+    if (jFieldsToInit && jValueNames && jTypeNames)
+    {
+        fieldsArray = jnienv->GetIntArrayElements (jFieldsToInit, NULL);
+        
+        for (int i = 0; i < jnienv->GetArrayLength (jFieldsToInit); i++)
+        {
+            jint fieldPos;
+            string argName;
+            jstring jTypeName;
+            string typeName;
+            jstring jValueName;
+            string valueName;
+            GetElementPtrInst* gep;
+            vector<Value*> gepIdx;
+            
+            fieldPos = fieldsArray [i];
+            fieldPos += 1;
+            jTypeName = (jstring)jnienv->GetObjectArrayElement (jTypeNames, i);
+            typeName = jstringToString (jnienv, jTypeName);
+            jValueName = (jstring)jnienv->GetObjectArrayElement (jValueNames, i);
+            valueName = jstringToString (jnienv, jValueName);
+            gepIdx.push_back (ConstantInt::get (Type::getInt32Ty(getGlobalContext()),
+                              0, true));
+            gepIdx.push_back (ConstantInt::get (Type::getInt32Ty(getGlobalContext()),
+                              fieldPos, true));
+            gep = GetElementPtrInst::Create (castInst, gepIdx, 
+                                         "gep"+to_string (i), 
+                                         Builder.GetInsertBlock ());
+            Builder.CreateAlignedStore (currentFunction->getNamedValue (valueName),
+                                        gep, true);
+        }
+    }
+
     return jnienv->NewStringUTF (name.c_str());    
 }
 
