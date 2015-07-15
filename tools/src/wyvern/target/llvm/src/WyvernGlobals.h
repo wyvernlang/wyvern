@@ -10,8 +10,6 @@ using namespace std;
 #define TYPE_RATIONAL string ("rational")
 #define TYPE_STRING "string"
 
-typedef unsigned long uint64_t;
-
 string getIfCondName ();
 string getThenBBName ();
 string getElseBBName ();

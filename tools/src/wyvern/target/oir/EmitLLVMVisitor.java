@@ -2,6 +2,7 @@ package wyvern.target.oir;
 
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
+import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
 import wyvern.target.oir.declarations.OIRInterface;
 import wyvern.target.oir.declarations.OIRMemberDeclaration;
@@ -136,12 +137,33 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 		int classID;
 		OIRType type;
 		OIREnvironment oirEnv;
+		OIRClassDeclaration classDecl;
+		int[] fieldsToInitialize = null;
+		String[] initializeValueNames = null;
+		String[] typeNames = null;
+		int i = 0;
 		
 		oirEnv = OIREnvironment.getRootEnvironment();
 		type = oirEnv.lookupType(className);
-		classID = ((OIRClassDeclaration)type).getClassID();
+		classDecl = (OIRClassDeclaration)type;
+		classID = classDecl.getClassID();
+		if (classDecl.getFieldValuePairs() != null)
+		{
+			fieldsToInitialize = new int [classDecl.getFieldValuePairs().size()];
+			initializeValueNames = new String[classDecl.getFieldValuePairs().size()];
+			typeNames = new String[classDecl.getFieldValuePairs().size()];
 		
-		return EmitLLVMNative.newToLLVMIR(className, classID);
+			for (OIRFieldValueInitializePair pair : classDecl.getFieldValuePairs())
+			{
+				initializeValueNames[i] = pair.valueDeclaration.acceptVisitor(this, oirEnv);
+				typeNames[i] = pair.valueDeclaration.typeCheck(oirEnv).getName();
+				fieldsToInitialize[i] = classDecl.getFieldPosition(pair.fieldDeclaration.getName());
+				i++;
+			}
+		}
+		
+		return EmitLLVMNative.newToLLVMIR(className, classID, 
+				fieldsToInitialize, initializeValueNames, typeNames);
 	}
 
 	@Override
