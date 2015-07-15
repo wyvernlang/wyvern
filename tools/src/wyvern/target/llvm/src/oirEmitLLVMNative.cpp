@@ -99,14 +99,12 @@ uint64_t getWyvernFunction (uint64_t obj, uint64_t methodNameAddress,
     oirProgramObject = globalJNIEnv->GetStaticObjectField (oirProgramClass, fieldID);
     methodID = globalJNIEnv->GetMethodID (oirProgramClass, "getClassNameForCallSite", 
                                           "(JIILjava/lang/String;)Ljava/lang/String;");
-                                        cout<<"DFSDFSDF"<<endl;
     jClassName = (jstring)globalJNIEnv->CallObjectMethod (oirProgramObject, 
                                                           methodID,
                                                           obj,
                                                           ((int *)obj)[0],
                                                           callSiteID,
                                                           globalJNIEnv->NewStringUTF (methodName));
-                                                        cout<<"dsfsdfsdf"<<endl;
     className = jstringToString (globalJNIEnv, jClassName);
     jitMethodName = className + string ("_") + string (methodName);
     
