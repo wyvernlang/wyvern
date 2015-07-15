@@ -46,6 +46,7 @@ public class OIRToLLVMTests {
 		EmitLLVMNative.createMainFunction();
 	    String toReturn = oirIfThenElse.acceptVisitor(new EmitLLVMVisitor (), OIREnvironment.getRootEnvironment());
 	    EmitLLVMNative.functionCreated(toReturn);
+	    EmitLLVMNative.executeLLVMJIT();
 		System.out.println ("");
 	}
 	

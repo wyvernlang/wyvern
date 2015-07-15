@@ -21,13 +21,17 @@ import wyvern.tools.tests.*;
 public class Interpreter {
 
 	public static void main(String[] args) {
-		System.load("/media/sda5/home/abhi/wyvernlang/wyvern/tools/src/wyvern/target/llvm/.libs/libWyvernLLVM.so");
+		String currentdir;
+		
+		currentdir = System.getProperty("user.dir");
+		Path p = Paths.get(currentdir);
+		System.load(p.toAbsolutePath().toString() + "/src/wyvern/target/llvm/.libs/libWyvernLLVM.so");
 		
 		OIRToLLVMTests tests = new OIRToLLVMTests ();
 		//try {
 			//tests.ifThenElseTest();
 		//tests.FieldSetTest();
-		tests.MethodCallTest();
+		tests.ifThenElseTest();
 			//tests.testSimpleAdd();
 			//tests.testDef();
 			//tests.testNew();

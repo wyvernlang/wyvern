@@ -19,10 +19,13 @@ public class OIRInterface extends OIRType {
 		this.methods = methods;
 		this.selfName = selfName;
 		
-		for (OIRMethodDeclaration method : methods)
+		if (methods != null)
 		{
-			methodHashSet.add(method.getName());
-		}		
+			for (OIRMethodDeclaration method : methods)
+			{
+				methodHashSet.add(method.getName());
+			}
+		}
 	}
 	
 	public boolean isMethodInClass (String method)
