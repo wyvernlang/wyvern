@@ -20,6 +20,10 @@ public class OIRMethodCall extends OIRExpression{
 			OIRType oirType;
 			
 			oirType = ((OIRClassDeclaration)type).getTypeForMember(methodName);
+			if (oirType == null)
+			{
+				/* TODO: Error */
+			}
 			setExprType (oirType);
 			return getExprType ();
 		}

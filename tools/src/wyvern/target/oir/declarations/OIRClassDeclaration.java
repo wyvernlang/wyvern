@@ -39,7 +39,7 @@ public class OIRClassDeclaration extends OIRType {
 		this.selfName = selfName;
 		this.setFieldValuePairs(fieldValuePairs);
 		constructor = new OIRMethod (null, null);
-		
+		methodToFieldMap = new HashMap <String, String> ();
 		for (OIRDelegate delegate : delegates)
 		{
 			OIRInterface oirInterface;
@@ -76,7 +76,8 @@ public class OIRClassDeclaration extends OIRType {
 	
 	public boolean isMethodInClass (String method)
 	{
-		return methods.contains(method);
+		boolean ans = methods.contains(method); 
+		return ans;
 	}
 	
 	public String getSelfName ()
@@ -99,6 +100,21 @@ public class OIRClassDeclaration extends OIRType {
 			}
 		}
 		
+		/* Not found here, search in the fields 
+		 * that delegate this method */
+		
+		for (OIRDelegate delegate : delegates)
+		{
+			OIRInterface type;
+			OIRType methodType;
+			
+			type = (OIRInterface)delegate.getType();
+			methodType = type.getTypeForMember(fieldName);
+			if (methodType != null)
+			{
+				return methodType;
+			}
+		}
 		/* TODO Throw field not found error */
 		return null;
 	}

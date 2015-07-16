@@ -163,7 +163,8 @@ public class OIRProgram extends OIRAST {
 				System.exit(-1);
 			}
 			
-			objectAddress = DelegateNative.getFieldAddress(objectAddress, fieldPos);
+			objectAddress = DelegateNative.getFieldAddress(oirClassDecl.getName(),
+					objectAddress, fieldPos);
 			fieldClassID = DelegateNative.getObjectClassID(objectAddress);
 			oirClassDecl = getClassDeclaration (fieldClassID);
 			fieldPICEntry = new PICEntry (fieldClassID);
@@ -182,12 +183,13 @@ public class OIRProgram extends OIRAST {
 		OIRClassDeclaration oirClassDecl;
 
 		oirClassDecl = getClassDeclaration (classID);
-		
-		if (oirClassDecl.isMethodInClass(methodName))
+		boolean ans = oirClassDecl.isMethodInClass(methodName);
+		if (ans)
 		{
 			return oirClassDecl.getName();
 		}
-		
+		System.out.println ("dsfsdf");
+
 		while (true)
 		{
 			int fieldPos;
@@ -200,7 +202,8 @@ public class OIRProgram extends OIRAST {
 				System.exit(-1);
 			}
 			
-			objectAddress = DelegateNative.getFieldAddress(objectAddress, fieldPos);
+			objectAddress = DelegateNative.getFieldAddress(oirClassDecl.getName(), 
+					objectAddress, fieldPos);
 			classID = DelegateNative.getObjectClassID(objectAddress);
 			oirClassDecl = getClassDeclaration (classID);
 

@@ -14,6 +14,7 @@ import wyvern.target.oir.OIRTypeBinding;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRDelegate;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
+import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
 import wyvern.target.oir.declarations.OIRIntegerType;
 import wyvern.target.oir.declarations.OIRInterface;
@@ -46,7 +47,6 @@ public class OIRToLLVMTests {
 		EmitLLVMNative.createMainFunction();
 	    String toReturn = oirIfThenElse.acceptVisitor(new EmitLLVMVisitor (), OIREnvironment.getRootEnvironment());
 	    EmitLLVMNative.functionCreated(toReturn);
-	    EmitLLVMNative.executeLLVMJIT();
 		System.out.println ("");
 	}
 	
@@ -111,38 +111,66 @@ public class OIRToLLVMTests {
 	public void DelegateCallTest ()
 	{
 		OIRInterface oirInterface;
-		OIRClassDeclaration oirClass;
+		OIRClassDeclaration oirClass1, oirClass2;
 		List<OIRMemberDeclaration> oirMembers;
 		EmitLLVMVisitor visitor;
 		List<OIRFormalArg> args;
 		OIRNew oirNew;
 		OIRLet oirLet;
+		List<OIRDelegate> oirDelegate;
+		List<OIRMethodDeclaration> oirMethDeclForInterface;
 		
 		args = new Vector<OIRFormalArg> ();
 		visitor = new EmitLLVMVisitor ();
 		oirMembers = new Vector <OIRMemberDeclaration> ();
-		oirInterface = new OIRInterface ("interface1", "this", new Vector<OIRMethodDeclaration> ());
+		oirMethDeclForInterface = new Vector<OIRMethodDeclaration> ();
+		args.add(new OIRFormalArg ("x", OIRIntegerType.getIntegerType()));
+		oirMethDeclForInterface.add(new OIRMethodDeclaration (OIRIntegerType.getIntegerType(), "me2",  args));
+		oirInterface = new OIRInterface ("interface1", "this", oirMethDeclForInterface);
+		OIRProgram.program.addTypeDeclaration(oirInterface);
+		OIREnvironment.getRootEnvironment().extend(new OIRTypeBinding("interface1", oirInterface));
+		
+		//Class2
+		oirMembers.add(
+				new OIRMethod (
+						new OIRMethodDeclaration (OIRIntegerType.getIntegerType(), "me2",  args),
+		     			new OIRInteger (1234)));
+						
+		oirClass2 = new OIRClassDeclaration ("class2", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		OIRProgram.program.addTypeDeclaration(oirClass2);
+		OIREnvironment.getRootEnvironment().setBinding(new OIRTypeBinding("class2", oirClass2));
+		
+		//Class1
+		oirMembers = new Vector<OIRMemberDeclaration> ();
 		oirMembers.add(new OIRFieldDeclaration ("field", oirInterface));
+		args = new Vector<OIRFormalArg> ();
 		args.add(new OIRFormalArg ("x", oirInterface));
 		oirMembers.add(
 				new OIRMethod (
 						new OIRMethodDeclaration (oirInterface, "method",  args),
 						new OIRInteger (34)));
-						
-		oirClass = new OIRClassDeclaration ("class1", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		oirDelegate = new Vector<OIRDelegate> ();
+		oirDelegate.add(new OIRDelegate (oirInterface, "field"));
+		
+		List<OIRFieldValueInitializePair> oirInit;
+		oirInit = new Vector<OIRFieldValueInitializePair> ();
+		oirInit.add(new OIRFieldValueInitializePair((OIRFieldDeclaration)oirMembers.get(0), 
+				new OIRNew (new Vector<OIRExpression> (), "class2")));
+		oirClass1 = new OIRClassDeclaration ("class1", "this", oirDelegate, oirMembers, oirInit);
+		OIRProgram.program.addTypeDeclaration(oirClass1);
+		OIREnvironment.getRootEnvironment().extend(new OIRTypeBinding("class1", oirClass1));
+		
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, 
-				new OIRMethodCall (new OIRVariable ("o"), "method", 
+				new OIRMethodCall (new OIRVariable ("o"), "me2", 
 						new Vector<OIRExpression> ()));
-		OIRProgram.program.addTypeDeclaration(oirInterface);
-		OIRProgram.program.addTypeDeclaration(oirClass);
-		OIREnvironment.getRootEnvironment().setBinding(new OIRTypeBinding("class1", oirClass));
-		OIREnvironment.getRootEnvironment().extend(new OIRTypeBinding("interface1", oirInterface));
-		OIREnvironment.getRootEnvironment().extend(new OIRNameBinding ("o", oirClass));
+		
+		OIREnvironment.getRootEnvironment().extend(new OIRNameBinding ("o", oirClass1));
 		oirLet.typeCheck(OIREnvironment.getRootEnvironment());
 		EmitLLVMNative.oirProgramToLLVMIR(OIRProgram.program);
 		oirInterface.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
-		oirClass.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
+		oirClass2.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
+		oirClass1.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
 		
 		EmitLLVMNative.createMainFunction();
 		String s = oirLet.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
@@ -159,21 +187,25 @@ public class OIRToLLVMTests {
 		List<OIRMemberDeclaration> oirMembers;
 		EmitLLVMVisitor visitor;
 		List<OIRFormalArg> args;
+		List<OIRFieldValueInitializePair> oirInits;
 		OIRNew oirNew;
 		OIRLet oirLet;
+		OIRFieldDeclaration fieldDecl;
 		
 		args = new Vector<OIRFormalArg> ();
 		visitor = new EmitLLVMVisitor ();
 		oirMembers = new Vector <OIRMemberDeclaration> ();
+		fieldDecl = new OIRFieldDeclaration ("field", OIRIntegerType.getIntegerType());
 		oirInterface = new OIRInterface ("interface1", "this", new Vector<OIRMethodDeclaration> ());
-		oirMembers.add(new OIRFieldDeclaration ("field", OIRIntegerType.getIntegerType()));
+		oirMembers.add(fieldDecl);
 		args.add(new OIRFormalArg ("x", oirInterface));
 		oirMembers.add(
 				new OIRMethod (
 						new OIRMethodDeclaration (oirInterface, "method",  args),
 						new OIRInteger (34)));
-						
-		oirClass = new OIRClassDeclaration ("class1", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		oirInits = new Vector<OIRFieldValueInitializePair> ();
+		oirInits.add(new OIRFieldValueInitializePair (fieldDecl, new OIRInteger(12)));
+		oirClass = new OIRClassDeclaration ("class1", "this", new Vector<OIRDelegate> (), oirMembers, oirInits);
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, new OIRFieldGet (new OIRVariable ("o"), "field"));
 		OIRProgram.program.addTypeDeclaration(oirInterface);

@@ -15060,6 +15060,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+case $host_os in
+	darwin*)
+ 		#Please edit here. Change $JAVA_HOME/include/linux to the directory present on your system
+                CXXFLAGS="$CXXFLAGS -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
+		;;
+	linux*)
+		CXXFLAGS="$CXXFLAGS -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
+		;;
+esac
 ac_config_files="$ac_config_files Makefile"
 
 #PKG_CHECK_MODULES([DEPS], [])

@@ -36,6 +36,9 @@
 
 /* TODO: Free the method C strings passed to getWyvernFunction
  * */
+/* NOTE: When getting field position either using StructLayout in LLVM or
+ * by using OIR. Do not add 1 to the returned value
+ */
 using namespace std;
 
 extern LLVMContext &Context;
@@ -107,7 +110,7 @@ uint64_t getWyvernFunction (uint64_t obj, uint64_t methodNameAddress,
                                                           globalJNIEnv->NewStringUTF (methodName));
     className = jstringToString (globalJNIEnv, jClassName);
     jitMethodName = className + string ("_") + string (methodName);
-    
+
     return execEngine->getFunctionAddress (string (jitMethodName));
 }
 
@@ -938,6 +941,12 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
     
     classType = strTypeMap[jstringToString (jnienv, jClassName)];
     
+    if (classType == NULL)
+    {
+        printf ("Error: No type with name '%s' present\n",
+                jstringToString (jnienv, jClassName).c_str());
+    }
+    
     if (!classType->isStructTy ())
     {
         printf ("Error: In New Expression %s is not a class\n", 
@@ -958,7 +967,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
                                             Builder.GetInsertBlock());
     name = getConstantString ();
     currentFunction->setNamedValue (name, castInst);
-    
+
     if (jFieldsToInit && jValueNames && jTypeNames)
     {
         fieldsArray = jnienv->GetIntArrayElements (jFieldsToInit, NULL);
@@ -973,9 +982,9 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
             string valueName;
             GetElementPtrInst* gep;
             vector<Value*> gepIdx;
-            
+
+            /* field pos is according to OIR. 1 field Pos for first field */
             fieldPos = fieldsArray [i];
-            fieldPos += 1;
             jTypeName = (jstring)jnienv->GetObjectArrayElement (jTypeNames, i);
             typeName = jstringToString (jnienv, jTypeName);
             jValueName = (jstring)jnienv->GetObjectArrayElement (jValueNames, i);
@@ -984,9 +993,10 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
                               0, true));
             gepIdx.push_back (ConstantInt::get (Type::getInt32Ty(getGlobalContext()),
                               fieldPos, true));
+            
             gep = GetElementPtrInst::Create (castInst, gepIdx, 
-                                         "gep"+to_string (i), 
-                                         Builder.GetInsertBlock ());
+                                             "gep"+to_string (i), 
+                                             Builder.GetInsertBlock ());
             Builder.CreateAlignedStore (currentFunction->getNamedValue (valueName),
                                         gep, true);
         }

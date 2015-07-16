@@ -18,13 +18,14 @@ public class OIRInterface extends OIRType {
 		this.name = name;
 		this.methods = methods;
 		this.selfName = selfName;
+		methodHashSet = new HashSet <String> ();
 		
 		if (methods != null)
 		{
 			for (OIRMethodDeclaration method : methods)
 			{
 				methodHashSet.add(method.getName());
-			}
+			}		
 		}
 	}
 	

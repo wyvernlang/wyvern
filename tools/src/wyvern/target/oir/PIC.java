@@ -38,7 +38,7 @@ public class PIC {
 			int fieldClassID;
 			
 			listEntries = entry.getPICEntriesForField(fieldPos);
-			fieldAddress = DelegateNative.getFieldAddress(objectAddress, 
+			fieldAddress = DelegateNative.getFieldAddress("LL", objectAddress, 
 					fieldPos);
 			fieldClassID = DelegateNative.getObjectClassID(fieldAddress); 
 			

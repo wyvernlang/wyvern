@@ -100,12 +100,12 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 				
 				if (decl instanceof VarDeclaration)
 				{
-					OIRValue oirvalue;
+					OIRExpression oirvalue;
 					OIRFieldValueInitializePair pair;
 					VarDeclaration varDecl;
 					
 					varDecl = (VarDeclaration)decl;
-					oirvalue = (OIRValue) varDecl.acceptVisitor(this,
+					oirvalue = (OIRExpression) varDecl.acceptVisitor(this,
 							env, oirenv);
 					pair = new OIRFieldValueInitializePair (
 							(OIRFieldDeclaration)oirMemDecl, oirvalue);
@@ -114,12 +114,12 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 				}
 				else if (decl instanceof ValDeclaration)
 				{
-					OIRValue oirvalue;
+					OIRExpression oirvalue;
 					OIRFieldValueInitializePair pair;
 					ValDeclaration varDecl;
 					
 					varDecl = (ValDeclaration)decl;
-					oirvalue = (OIRValue) varDecl.acceptVisitor(this,
+					oirvalue = (OIRExpression) varDecl.acceptVisitor(this,
 							env, oirenv);
 					pair = new OIRFieldValueInitializePair (
 							(OIRFieldDeclaration)oirMemDecl, oirvalue);

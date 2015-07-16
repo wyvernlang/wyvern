@@ -12,32 +12,29 @@ import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.declarations.OIRType;
 
 public class OIREnvironment {
-	private OIREnvironment parentEnvironment;
-	private OIREnvironment extEnv = null;
+	private OIREnvironment nextEnvironment;
 	private String name;
 	private OIRBinding binding;
 	
-	private static OIREnvironment rootEnvironment = new OIREnvironment(null, null, null);
+	private static OIREnvironment rootEnvironment = new OIREnvironment(null, null);
 	
 	public static OIREnvironment getRootEnvironment ()
 	{
 		return rootEnvironment;
 	}
 	
-	public OIREnvironment (OIREnvironment parent, OIRBinding binding)
+	public OIREnvironment (OIREnvironment prev, OIRBinding binding)
 	{
-		if (parent != null)
-			parent.parentEnvironment = this;
-		this.binding = binding;
-		if (binding != null)
-			this.name = binding.getName();
-	}
-	
-	public OIREnvironment (OIREnvironment parent, OIRBinding binding, OIREnvironment extEnv)
-	{
-		if (parent != null)
-			parent.parentEnvironment = this;
-		this.extEnv = extEnv;
+		if (prev != null)
+		{
+			if (prev.nextEnvironment != null)
+			{
+				this.nextEnvironment = prev.nextEnvironment;
+			}
+			
+			prev.nextEnvironment = this;
+		}
+		
 		this.binding = binding;
 		if (binding != null)
 			this.name = binding.getName();
@@ -55,14 +52,14 @@ public class OIREnvironment {
 		return binding;
 	}
 	public OIREnvironment extend(OIRBinding binding) {
-		return new OIREnvironment(this, binding, extEnv);
+		return new OIREnvironment(this, binding);
 	}
 	
 	public OIREnvironment extend(OIREnvironment env) {
 		if (env.binding == null)
 			return this;
 		
-		return new OIREnvironment(extend(env.parentEnvironment), env.binding, extEnv);
+		return new OIREnvironment(extend(env.nextEnvironment), env.binding);
 	}
 
 	public static OIREnvironment getEmptyEnvironment() {
@@ -129,7 +126,7 @@ public class OIREnvironment {
 			}
 		}
 		
-		return parentEnvironment.lookup(name);
+		return nextEnvironment.lookup(name);
 	}
 
 	public OIRType lookupType(String name) {
@@ -137,16 +134,7 @@ public class OIREnvironment {
 			return null;
 		if (this.name.equals(name) && this.binding instanceof OIRTypeBinding)
 			return binding.getType();
-		return parentEnvironment.lookupType(name);
-	}
-	
-	public OIREnvironment setInternalEnv(OIREnvironment internalEnv) {
-		internalEnv.extEnv = this;
-		return internalEnv;
-	}
-
-	public OIREnvironment getExternalEnv() {
-		return extEnv;
+		return nextEnvironment.lookupType(name);
 	}
 
 	public List<OIRBinding> getBindings() {
@@ -158,7 +146,7 @@ public class OIREnvironment {
 	private void writeBinding(List<OIRBinding> binding) {
 		if (this.binding != null)
 			binding.add(this.binding);
-		if (parentEnvironment != null)
-			parentEnvironment.writeBinding(binding);
+		if (nextEnvironment != null)
+			nextEnvironment.writeBinding(binding);
 	}
 }
