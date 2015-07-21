@@ -10,7 +10,7 @@ public class OIRStringType extends OIRType{
 	
 	protected OIRStringType ()
 	{
-		
+		super (new OIREnvironment (null));
 	}
 	
 	public static OIRStringType getStringType ()

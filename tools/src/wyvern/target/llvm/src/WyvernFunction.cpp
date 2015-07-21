@@ -12,6 +12,7 @@
 
 extern map <string, Type*> strTypeMap;
 extern IRBuilder<> Builder;
+extern LLVMContext &Context;
 
 WyvernFunction::WyvernFunction (Type* returnType, vector<Type*> typeArgs, 
                                 vector<string> nameArgs, bool isVarArg, 
@@ -38,7 +39,7 @@ WyvernFunction::WyvernFunction (Type* returnType, vector<Type*> typeArgs,
     IRBuilder<> TmpB(&llvmFunction->getEntryBlock(),
                      llvmFunction->getEntryBlock().begin());
 
-    for (int i = 0; i < typeArgs.size (); i++)
+    for (uint64_t i = 0; i < typeArgs.size (); i++)
     {
         this->typeArgs.push_back (typeArgs[i]);
         this->nameArgs.push_back (nameArgs[i]);
@@ -48,6 +49,23 @@ WyvernFunction::WyvernFunction (Type* returnType, vector<Type*> typeArgs,
         AllocaInst* inst =  TmpB.CreateAlloca(PointerType::getUnqual (typeArgs[i]));
         namedValues[nameArgs[i]] = inst;
     }
+}
+
+AllocaInst *WyvernFunction::CreateAlloca (Type* type, 
+                                          const string &VarName)
+{    
+    IRBuilder<> TmpB(&llvmFunction->getEntryBlock(),
+                     llvmFunction->getEntryBlock().begin());
+    AllocaInst *allocaInst;
+
+    if (namedValues[VarName] != NULL)
+        return static_cast<AllocaInst*> (namedValues[VarName]);
+        
+    allocaInst = TmpB.CreateAlloca(type, 0, VarName);
+    
+    setNamedValue (VarName, allocaInst);
+    
+    return allocaInst;
 }
 
 AllocaInst *WyvernFunction::CreateAlloca (const string type, 
@@ -110,4 +128,9 @@ Value* WyvernFunction::getNamedValue (string name)
         return value;
         
     return Builder.CreateLoad (value);
+}
+
+Value* WyvernFunction::getNamedValueWithoutLoad (string name)
+{   
+    return namedValues[name];
 }

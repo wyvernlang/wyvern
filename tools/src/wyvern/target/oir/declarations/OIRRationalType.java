@@ -10,7 +10,7 @@ public class OIRRationalType extends OIRType {
 	
 	protected OIRRationalType ()
 	{
-		
+		super (new OIREnvironment (null));
 	}
 	
 	public static OIRRationalType getRationalType ()

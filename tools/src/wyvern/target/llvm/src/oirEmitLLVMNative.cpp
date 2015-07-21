@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "wyvern_target_oir_EmitLLVMNative.h"
 #include "WyvernFunction.h"
@@ -45,6 +47,7 @@ extern LLVMContext &Context;
 extern Module *TheModule;
 extern IRBuilder<> Builder;
 extern map<string, Type*> strTypeMap;
+extern unordered_set <string> arithOpsSet;
 
 static WyvernFunction* currentFunction;
 static WyvernClass* currentClass;
@@ -76,7 +79,7 @@ unsigned long __allocWyvernObject (unsigned int size, unsigned int classID)
     void* obj;
     
     obj = malloc(size);
-    for (int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size; i++)
     {
         ((char *)obj)[i] = 0;
     }
@@ -87,7 +90,7 @@ unsigned long __allocWyvernObject (unsigned int size, unsigned int classID)
 }
 
 uint64_t getWyvernFunction (uint64_t obj, uint64_t methodNameAddress,
-                            uint64_t callSiteID)
+                            uint64_t callSiteID, uint64_t* addressToPass)
 {
     char* methodName = (char *)methodNameAddress;
     jmethodID methodID;
@@ -95,21 +98,30 @@ uint64_t getWyvernFunction (uint64_t obj, uint64_t methodNameAddress,
     jstring jClassName;
     string className;
     string jitMethodName;
+    jobject methodAddress;
+    jclass javaclass;
 
     oirProgramClass = globalJNIEnv->FindClass ("wyvern/target/oir/OIRProgram");
     fieldID = globalJNIEnv->GetStaticFieldID (oirProgramClass, "program", 
                                               "Lwyvern/target/oir/OIRProgram;");
     oirProgramObject = globalJNIEnv->GetStaticObjectField (oirProgramClass, fieldID);
     methodID = globalJNIEnv->GetMethodID (oirProgramClass, "getClassNameForCallSite", 
-                                          "(JIILjava/lang/String;)Ljava/lang/String;");
-    jClassName = (jstring)globalJNIEnv->CallObjectMethod (oirProgramObject, 
-                                                          methodID,
-                                                          obj,
-                                                          ((int *)obj)[0],
-                                                          callSiteID,
-                                                          globalJNIEnv->NewStringUTF (methodName));
+                                          "(JIILjava/lang/String;)Lwyvern/target/oir/MethodAddress;");
+    methodAddress = globalJNIEnv->CallObjectMethod (oirProgramObject,
+                                                      methodID,
+                                                      obj,
+                                                      ((int *)obj)[0],
+                                                      callSiteID,
+                                                      globalJNIEnv->NewStringUTF (methodName));
+    javaclass = globalJNIEnv->GetObjectClass (methodAddress);
+    methodID = globalJNIEnv->GetMethodID (javaclass, "getClassName",
+                                          "()Ljava/lang/String;");
+    jClassName = (jstring)globalJNIEnv->CallObjectMethod (methodAddress, methodID);
     className = jstringToString (globalJNIEnv, jClassName);
     jitMethodName = className + string ("_") + string (methodName);
+    methodID = globalJNIEnv->GetMethodID (javaclass, "getObjectAddress",
+                                          "()J");
+    *addressToPass = globalJNIEnv->CallIntMethod (methodAddress, methodID);
 
     return execEngine->getFunctionAddress (string (jitMethodName));
 }
@@ -264,8 +276,6 @@ Value* GetFunctionToCall (unsigned long address, FunctionType* funcType)
      * I know it is a hack but there is no other way because of 
      * C++ name mangling */
     Value* iv;
-    Value* toCall;
-    Type* ptrFuncType;
     static int castNum = 0;
     Value *castInst;
     
@@ -323,7 +333,7 @@ JNIEXPORT jlong JNICALL Java_wyvern_target_oir_DelegateNative_getFieldAddress
     
     if (structType->isStructTy () == false)
     {
-        printf ("Error accessing field %d: StructType is not valid for class %s\n",
+        printf ("Error accessing field %ld: StructType is not valid for class %s\n",
                 fieldPos, className.c_str ());
         return -1;
     }
@@ -364,7 +374,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_letToLLVMIR
     cStr = (jnienv)->GetStringUTFChars (valueString, NULL);
     n = cStr;
     jnienv->ReleaseStringUTFChars (valueString, cStr);
-    value = ((WyvernFunction* )currentFunction)->getNamedValue (n);
+    value = currentFunction->getNamedValue (n);
     javaclass = jnienv->GetObjectClass (javaobject);
     varNameFID = (jnienv)->GetMethodID (javaclass, "getVarName", 
                                         "()Ljava/lang/String;");
@@ -389,9 +399,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_integerToLLVMIR
   (JNIEnv *jnienv, jclass javaclass, jobject javaobject)
 {
     Value *value;
-    const char *cStr;
     string n;
-    jstring toReturn;
     jmethodID valueIntFID;
     jint valueInt;
     
@@ -418,9 +426,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_booleanToLLVMIR
   (JNIEnv *jnienv, jclass javaclass, jobject javaobject)
 {
     Value *value;
-    const char *cStr;
     string n;
-    jstring toReturn;
     jmethodID valueIntFID;
     jint valueInt;
     
@@ -489,11 +495,8 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_createElseBasicB
   (JNIEnv *jnienv, jclass javaclass)
 {
     BasicBlock *elseBB;
-    Function *TheFunction;
     string strElseBB;
-    
-    TheFunction = Builder.GetInsertBlock()->getParent ();
-    
+        
     strElseBB = getElseBBName ();
     elseBB = BasicBlock::Create (getGlobalContext (), strElseBB);
     currentFunction->setBasicBlockForString (strElseBB, elseBB);
@@ -509,11 +512,8 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_createMergeBasic
   (JNIEnv *jnienv, jclass, jstring strCondExpr, jstring strThenBB, jstring strElseBB)
 {
     BasicBlock *mergeBB;
-    Function *TheFunction;
     string strMergeBB;
-    
-    TheFunction = Builder.GetInsertBlock()->getParent ();
-    
+        
     strMergeBB = getMergeBBName ();
     mergeBB = BasicBlock::Create (getGlobalContext (), strMergeBB);
     currentFunction->setBasicBlockForString (strMergeBB, mergeBB);
@@ -698,8 +698,6 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_fieldSetToLLVMIR
     Type* fieldType;
     vector<Value*> stubArgs;
     char* argFieldName;
-    Value* stubRetValue;
-    Value* fieldGetValue;
     static int fieldGetNum = 0;
     Value* valueToSet;
     
@@ -749,7 +747,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_fieldSetToLLVMIR
                                                      "valueToIntCast" + to_string (fieldGetNum),
                                                      Builder.GetInsertBlock()));
 
-    stubRetValue = CallInst::Create (GetFunctionToCall ((unsigned long)setFieldForObject, 
+    CallInst::Create (GetFunctionToCall ((unsigned long)setFieldForObject, 
                                                         setFieldForObjectFunctionType),
                                       stubArgs, "", 
                                       Builder.GetInsertBlock ());
@@ -844,18 +842,188 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_fieldGetToLLVMIR
     return jnienv->NewStringUTF (fieldGetName.c_str ());
 }
 
+jstring convertOperatorsForInteger (JNIEnv* jnienv, string methodName, Value* left, Value* right)
+{
+    string toReturn;
+    static int intArith = 0;
+    Value* v;
+    
+    intArith++;
+    v = NULL;
+    toReturn = "intArithResult" + to_string (intArith);
+    
+    if (methodName == ARITH_ADD)
+    {
+        v = Builder.CreateAdd (left, right);
+    }
+    else if (methodName == ARITH_SUBTRACT)
+    {
+        v = Builder.CreateSub (left, right);
+    }
+    else if (methodName == ARITH_MULTIPLY)
+    {
+        v = Builder.CreateMul (left, right);
+    }
+    else if (methodName == ARITH_DIVIDE)
+    {
+        v = Builder.CreateSDiv (left, right);
+    }
+    else if (methodName == ARITH_MODULO)
+    {
+        v = Builder.CreateSRem (left, right);
+    }
+    else if (methodName == UNARY_NEGATE)
+    {
+        v = Builder.CreateNeg (left);
+    }
+    else if (methodName == LOGICAL_NOT)
+    {
+        v = Builder.CreateNot (left);
+    }
+    else if (methodName == BITWISE_AND)
+    {
+        v = Builder.CreateAnd (left, right);
+    }
+    else if (methodName == BITWISE_OR)
+    {
+        v = Builder.CreateOr (left, right);
+    }
+    else if (methodName == BITWISE_XOR)
+    {
+        v = Builder.CreateXor (left, right);
+    }
+    else if (methodName == BITWISE_LEFT_SHIFT)
+    {
+        v = Builder.CreateShl (left, right);
+    }
+    else if (methodName == BITWISE_RIGHT_SHIFT)
+    {
+        v = Builder.CreateLShr (left, right);
+    }
+
+    if (v != NULL)
+    {
+        currentFunction->setNamedValue (toReturn, v);
+        return jnienv->NewStringUTF (toReturn.c_str ());
+    }
+
+    return NULL;    
+}
+
+jstring convertOperatorsForBoolean (JNIEnv* jnienv, string methodName, Value* left, Value* right)
+{
+    string toReturn;
+    static int intArith = 0;
+    Value* v;
+    
+    intArith++;
+    v = NULL;
+    toReturn = "boolArithResult" + to_string (intArith);
+    
+    if (methodName == LOGICAL_NOT)
+    {
+        v = Builder.CreateNot (left);
+    }
+    else if (methodName == LOGICAL_AND)
+    {
+        v = Builder.CreateAnd (left, right);
+    }
+    else if (methodName == LOGICAL_OR)
+    {
+        v = Builder.CreateOr (left, right);
+    }
+
+    if (v != NULL)
+    {
+        currentFunction->setNamedValue (toReturn, v);
+        return jnienv->NewStringUTF (toReturn.c_str ());
+    }
+
+    return NULL;    
+}
+
+jstring convertOperatorsForRational (JNIEnv* jnienv, string methodName, Value* left, Value* right)
+{
+    string toReturn;
+    static int intArith = 0;
+    Value* v;
+    
+    intArith++;
+    toReturn = "intArithResult" + to_string (intArith);
+    v = NULL;
+    
+    if (methodName == ARITH_ADD)
+    {
+        v = Builder.CreateFAdd (left, right);
+    }
+    else if (methodName == ARITH_SUBTRACT)
+    {
+        v = Builder.CreateFSub (left, right);
+    }
+    else if (methodName == ARITH_MULTIPLY)
+    {
+        v = Builder.CreateFMul (left, right);
+    }
+    else if (methodName == ARITH_DIVIDE)
+    {
+        v = Builder.CreateFDiv (left, right);
+    }
+    else if (methodName == ARITH_MODULO)
+    {
+        v = Builder.CreateFRem (left, right);
+    }
+    else if (methodName == UNARY_NEGATE)
+    {
+        v = Builder.CreateFNeg (left);
+    }
+    else if (methodName == LOGICAL_NOT)
+    {
+        v = Builder.CreateNot (left);
+    }
+    else if (methodName == BITWISE_AND)
+    {
+        v = Builder.CreateAnd (left, right);
+    }
+    else if (methodName == BITWISE_OR)
+    {
+        v = Builder.CreateOr (left, right);
+    }
+    else if (methodName == BITWISE_XOR)
+    {
+        v = Builder.CreateXor (left, right);
+    }
+    else if (methodName == BITWISE_LEFT_SHIFT)
+    {
+        v = Builder.CreateShl (left, right);
+    }
+    else if (methodName == BITWISE_RIGHT_SHIFT)
+    {
+        v = Builder.CreateLShr (left, right);
+    }
+
+    if (v != NULL)
+    {
+        currentFunction->setNamedValue (toReturn, v);
+        return jnienv->NewStringUTF (toReturn.c_str ());
+    }
+
+    return NULL;
+}
 /*
  * Class:     wyvern_target_oir_EmitLLVMNative
  * Method:    methodCallToLLVMIR
  * Signature: (Lwyvern/target/oir/expressions/OIRMethodCall;)V
  */
 JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVMIR
-  (JNIEnv *jnienv, jclass javaclass, jobject javaobject, jstring jobjName, jobjectArray javaarray, jstring jReturnTypeName)
+  (JNIEnv *jnienv, jclass javaclass, jobject javaobject, jstring jobjName, jobjectArray javaarray, jstring jReturnTypeName,
+   jobjectArray jArgTypeArray, jstring jObjTypeName)
 {
     jmethodID methodNameFID;
     jstring jMethodName;
     vector<Value*> args;
     string objName;
+    string objTypeName;
+    string firstArgTypeName;
     string methodName;
     char *argMethodName;
     vector<Value*> stubArgs;
@@ -869,15 +1037,91 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVM
     FunctionType* methodType;
 
     methodCallNum++;
+    currentFunction->CreateAlloca (Type::getInt64Ty(Context), METHOD_CALL_ADDRESS);
+    currentFunction->CreateAlloca (Type::getInt64Ty(Context), METHOD_CALL_OBJ_ADDRESS);
     javaclass = jnienv->GetObjectClass (javaobject);
-    methodNameFID = (jnienv)->GetMethodID (javaclass, "getMethodName", "()Ljava/lang/String;");
-    jMethodName = (jstring)(jnienv)->CallObjectMethod (javaobject, methodNameFID);
+    methodNameFID = jnienv->GetMethodID (javaclass, "getMethodName",
+                                         "()Ljava/lang/String;");
+    jMethodName = (jstring)jnienv->CallObjectMethod (javaobject, methodNameFID);
     methodName = jstringToString (jnienv, jMethodName);
     objName = jstringToString (jnienv, jobjName);
     returnTypeName = jstringToString (jnienv, jReturnTypeName);
-    args.push_back (currentFunction->getNamedValue (objName));
     returnType = strTypeMap [returnTypeName];
+    
+    if ((jnienv->GetArrayLength (jArgTypeArray) == 1 &&
+        (arithOpsSet.find (methodName) != arithOpsSet.end ())) ||
+        (jnienv->GetArrayLength (jArgTypeArray) == 0 &&
+        (methodName == UNARY_NEGATE || methodName == LOGICAL_NOT)))
+    {
+        Value* left;
+        Value* right;
+        string firstArg;
+        jstring toReturn;
+        
+        toReturn = NULL;
+        firstArgTypeName = jstringToString (jnienv, 
+                                            (jstring)jnienv->GetObjectArrayElement (jArgTypeArray, 0));
+        objTypeName = jstringToString (jnienv, jObjTypeName);
+        firstArg = jstringToString (jnienv, 
+                                    (jstring)jnienv->GetObjectArrayElement (javaarray, 0));
+        left = currentFunction->getNamedValue (objName);
+        
+        if (methodName == UNARY_NEGATE || methodName == LOGICAL_NOT)
+        {
+            right = NULL;
+        }
+        else
+        {
+            right = currentFunction->getNamedValue (firstArg);
+        }
+        
+        if (firstArgTypeName == TYPE_BOOLEAN && 
+            objTypeName == TYPE_BOOLEAN)
+        {
+            toReturn = convertOperatorsForInteger (jnienv, methodName, left, right);
+        }
+        else if (firstArgTypeName == TYPE_INT && 
+                 objTypeName == TYPE_INT)
+        {
+            toReturn = convertOperatorsForInteger (jnienv, methodName, left, right);
+        }
+        else if (firstArgTypeName == TYPE_RATIONAL && 
+                 objTypeName == TYPE_RATIONAL)
+        {
+            toReturn = convertOperatorsForInteger (jnienv, methodName, left, right);
+        }
+        else if (firstArgTypeName == TYPE_STRING && 
+                 objTypeName == TYPE_STRING)
+        {
+            toReturn = convertOperatorsForInteger (jnienv, methodName, left, right);
+        }
+    
+        if (toReturn)
+        {
+            return toReturn;
+        }        
+    }
+    
+    methodType = FunctionType::get (returnType, true);
+    argMethodName = new char [methodName.length ()];
+    strcpy (argMethodName, methodName.c_str ());
+    stubArgs.push_back (CastInst::CreateIntegerCast (currentFunction->getNamedValue (objName),
+                                                     Type::getInt64Ty (Context),
+                                                     false,
+                                                     "objToIntCast" + to_string (methodCallNum),
+                                                     Builder.GetInsertBlock()));
+    stubArgs.push_back (ConstantInt::get (Type::getInt64Ty(getGlobalContext()),
+                                          (unsigned long) argMethodName, true));
+    stubArgs.push_back (ConstantInt::get (Type::getInt64Ty(getGlobalContext()),
+                                          (unsigned long) methodCallNum, true));
+    stubArgs.push_back (currentFunction->getNamedValueWithoutLoad (METHOD_CALL_OBJ_ADDRESS));
 
+    methodAddress = CallInst::Create (GetFunctionToCall ((unsigned long)getWyvernFunction, getWyvernFunctionFuncType),
+                                     stubArgs, "methodAddress"+to_string(methodCallNum), 
+                                     Builder.GetInsertBlock ());
+
+    args.push_back (currentFunction->getNamedValue (METHOD_CALL_OBJ_ADDRESS));
+        
     if (returnType->isStructTy ())
     {
         returnType = PointerType::getUnqual (returnType);
@@ -887,27 +1131,10 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVM
     {
         jstring jargName = (jstring)jnienv->GetObjectArrayElement (javaarray, i);
         string argName = jstringToString (jnienv, jargName);
-        /*v = Builder.CreateAdd (currentFunction->getNamedValue (argName),
-                               currentFunction->getNamedValue ((jstringToString (jnienv, objName))));*/
+        
         args.push_back (currentFunction->getNamedValue (argName));
     }
-    
-    methodType = FunctionType::get (returnType, true);
-    argMethodName = new char [methodName.length ()];
-    strcpy (argMethodName, methodName.c_str ());
-    stubArgs.push_back (CastInst::CreateIntegerCast (args.at(0),
-                                                     Type::getInt64Ty (Context),
-                                                     false,
-                                                     "objToIntCast" + to_string (methodCallNum),
-                                                     Builder.GetInsertBlock()));
-    stubArgs.push_back (ConstantInt::get (Type::getInt64Ty(getGlobalContext()),
-                                          (unsigned long) argMethodName, true));
-    stubArgs.push_back (ConstantInt::get (Type::getInt64Ty(getGlobalContext()),
-                                          (unsigned long) methodCallNum, true));
 
-    methodAddress = CallInst::Create (GetFunctionToCall ((unsigned long)getWyvernFunction, getWyvernFunctionFuncType),
-                                     stubArgs, "methodAddress"+to_string(methodCallNum), 
-                                     Builder.GetInsertBlock ());
     methodToCall = CastInst::CreatePointerCast (methodAddress, 
                                                 PointerType::getUnqual (methodType),
                                                 "methodPtrCast" + to_string(methodCallNum),
@@ -917,6 +1144,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVM
                                     Builder.GetInsertBlock ());
     returnValueName = "returnValue" + to_string (methodCallNum);
     currentFunction->setNamedValue (returnValueName , returnValue);
+
     return jnienv->NewStringUTF (returnValueName.c_str ());
 }
 
@@ -930,7 +1158,6 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
    jobjectArray jValueNames, jobjectArray jTypeNames)
 {
     Type* classType;
-    StructType* structClassType;
     vector<Value*> args;
     Value* allocValue;
     CastInst* castInst;
@@ -954,7 +1181,6 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_newToLLVMIR
         return NULL;
     }
 
-    structClassType = (StructType*)classType;
     args.push_back (ConstantExpr::getSizeOf (classType));
     args.push_back (ConstantInt::get (Type::getInt32Ty(getGlobalContext()),
                                       classID, true));
@@ -1014,9 +1240,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_rationalToLLVMIR
   (JNIEnv *jnienv, jclass javaclass, jobject javaobject)
 {
     Value *value;
-    const char *cStr;
     string n;
-    jstring toReturn;
     jmethodID valueIntFID;
     jint valueInt;
     
@@ -1092,6 +1316,8 @@ JNIEXPORT void JNICALL Java_wyvern_target_oir_EmitLLVMNative_interfaceToLLVMIR
 JNIEXPORT void JNICALL Java_wyvern_target_oir_EmitLLVMNative_oirProgramToLLVMIR
   (JNIEnv *jnienv, jclass javaclass, jobject oirProgram)
 {
+    vector<Type*> argsType;
+    
     oirProgramObject = oirProgram;
     oirProgramClass = jnienv->GetObjectClass (oirProgram);
     
@@ -1099,6 +1325,37 @@ JNIEXPORT void JNICALL Java_wyvern_target_oir_EmitLLVMNative_oirProgramToLLVMIR
     strTypeMap[TYPE_INT] = Type::getInt32Ty (Context);
     strTypeMap[TYPE_RATIONAL] = Type::getDoubleTy (Context);
     //strTypeMap[TYPE_STRING] = Type::getInt8Ty (Context);
+
+    arithOpsSet.emplace (TYPE_BOOLEAN);
+    arithOpsSet.emplace (TYPE_INT);
+    arithOpsSet.emplace (TYPE_RATIONAL);
+    arithOpsSet.emplace (TYPE_STRING);
+    
+    arithOpsSet.emplace (ARITH_ADD);
+    arithOpsSet.emplace (ARITH_SUBTRACT);
+    arithOpsSet.emplace (ARITH_MULTIPLY);
+    arithOpsSet.emplace (ARITH_DIVIDE);
+    arithOpsSet.emplace (ARITH_MODULO);
+    
+    arithOpsSet.emplace (UNARY_NEGATE);
+    
+    arithOpsSet.emplace (LOGICAL_NOT);
+    arithOpsSet.emplace (LOGICAL_AND);
+    arithOpsSet.emplace (LOGICAL_OR);
+    
+    arithOpsSet.emplace (BITWISE_AND);
+    arithOpsSet.emplace (BITWISE_OR);
+    arithOpsSet.emplace (BITWISE_XOR);
+    arithOpsSet.emplace (BITWISE_LEFT_SHIFT);
+    arithOpsSet.emplace (BITWISE_RIGHT_SHIFT);
+
+    argsType.push_back (Type::getInt64Ty (Context));
+    argsType.push_back (Type::getInt64Ty (Context));
+    argsType.push_back (Type::getInt64Ty (Context));
+    argsType.push_back (PointerType::getUnqual (Type::getInt64Ty (Context)));
+    
+    getWyvernFunctionFuncType = FunctionType::get (Type::getInt64Ty (Context),
+                                                   argsType, false);
 }
 
 /*

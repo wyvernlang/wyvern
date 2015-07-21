@@ -13,8 +13,9 @@ public class OIRInterface extends OIRType {
 	private String selfName;
 	private HashSet <String> methodHashSet;
 	
-	public OIRInterface(String name, String selfName, List<OIRMethodDeclaration> methods) {
-		super();
+	public OIRInterface(OIREnvironment environment, 
+			String name, String selfName, List<OIRMethodDeclaration> methods) {
+		super(environment);
 		this.name = name;
 		this.methods = methods;
 		this.selfName = selfName;

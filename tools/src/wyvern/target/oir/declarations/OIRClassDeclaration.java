@@ -14,17 +14,16 @@ public class OIRClassDeclaration extends OIRType {
 	private String name;
 	private List<OIRDelegate> delegates;
 	private List<OIRMemberDeclaration> members;
-	private OIRMethod constructor;
 	private String selfName;
 	private List<OIRFieldValueInitializePair> fieldValuePairs;
 	private int classID;
 	private HashSet <String> methods;
 	private HashMap <String, String> methodToFieldMap;
 	
-	public OIRClassDeclaration(String name, String selfName, List<OIRDelegate> delegates,
+	public OIRClassDeclaration(OIREnvironment environment, String name, String selfName, List<OIRDelegate> delegates,
 			List<OIRMemberDeclaration> members, List<OIRFieldValueInitializePair> fieldValuePairs)
 	{
-		super();
+		super(environment);
 		this.name = name;
 		this.delegates = delegates;
 		this.members = members;
@@ -34,11 +33,16 @@ public class OIRClassDeclaration extends OIRType {
 			if (member instanceof OIRMethod)
 			{
 				methods.add(((OIRMethod) member).getDeclaration().getName());
+				environment.addName(((OIRMethod) member).getDeclaration().getName(), 
+						((OIRMethod) member).getDeclaration().getReturnType());
+			}
+			else if (member instanceof OIRFieldDeclaration)
+			{
+				environment.addName (member.getName(), member.getType());
 			}
 		}
 		this.selfName = selfName;
 		this.setFieldValuePairs(fieldValuePairs);
-		constructor = new OIRMethod (null, null);
 		methodToFieldMap = new HashMap <String, String> ();
 		for (OIRDelegate delegate : delegates)
 		{
@@ -58,6 +62,26 @@ public class OIRClassDeclaration extends OIRType {
 		return getFieldPosition (methodToFieldMap.get(method));
 	}
 	
+	public OIRFieldDeclaration getFieldDeclarationForPos (int fieldPos)
+	{
+		int i;
+		/* Field Positions are numbered from 1, 2, 3, ... */
+		i = 0;
+		for (OIRMemberDeclaration memDecl : members)
+		{
+			if (memDecl instanceof OIRFieldDeclaration)
+			{
+				i++;
+				
+				if (fieldPos == i)
+				{
+					return (OIRFieldDeclaration)memDecl;
+				}
+			}
+		}
+		
+		return null;
+	}
 	/* This method is for searching the method delegated to field sequentially */
 	public int getDelegateMethodFieldPosNaive (String method)
 	{

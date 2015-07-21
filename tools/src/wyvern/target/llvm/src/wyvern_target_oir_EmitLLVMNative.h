@@ -245,7 +245,7 @@ JNIEXPORT void JNICALL Java_wyvern_target_oir_EmitLLVMNative_literalToLLVMIR
  * Signature: (Lwyvern/target/oir/expressions/OIRMethodCall;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodCallToLLVMIR
-  (JNIEnv *, jclass, jobject, jstring, jobjectArray, jstring);
+  (JNIEnv *, jclass, jobject, jstring, jobjectArray, jstring, jobjectArray, jstring);
 
 /*
  * Class:     wyvern_target_oir_EmitLLVMNative

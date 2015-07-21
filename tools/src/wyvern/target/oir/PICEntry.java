@@ -6,86 +6,155 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-class PICNode
+import wyvern.target.oir.declarations.OIRClassDeclaration;
+import wyvern.tools.errors.WyvernException;
+
+public class PICEntry
 {
 	private int classID;
-	//private int fieldPos;
-		
-	public PICNode(int type) {
-		super();
-		this.classID = type;
-		//this.fieldPos = fieldPos;
-		//children = new HashMap<Integer, LinkedList<PICEntry>> ();
-	}
+	private int fieldPos;
+	private HashMap<Integer, PICEntry> mapClassIDPICEntry; 
+	private PICEntry[] vectorPICEntry;
+	private int entries;
+	protected boolean isFinal;
+	private OIRClassDeclaration classDecl;
 	
-	public int getType() {
-		return classID;
-	}
-	public void setType(int type) {
-		this.classID = type;
-	}
-	public int getClassID() {
-		return 0;//return fieldPos;
-	}
-	public void setFieldPos(int fieldPos) {
-		//this.fieldPos = fieldPos;
-	}
-}
-
-public class PICEntry {
-
-	/* Map for one field to many PICEntry*/
-	private HashMap<Integer, LinkedList<PICEntry>> entryMap;
-	private PICNode node;
+	/* Members instantiated only if isFinal is valid */
+	private HashMap<Long, FinalPICNode> objectAddresses;
 	
-	public PICEntry (int classID)
+	public PICEntry (int classID, int fieldPos, OIRClassDeclaration classDecl)
 	{
-		entryMap = new HashMap<Integer, LinkedList<PICEntry>> ();
-		node = new PICNode (classID);
+		isFinal = false;
+		entries = 0;
+		this.classID = classID;
+		this.fieldPos = fieldPos;
+		this.classDecl = classDecl;
+		mapClassIDPICEntry = new HashMap<Integer, PICEntry> ();
+		vectorPICEntry = new PICEntry[PIC.getLinkedListMapThreshold()];
 	}
 	
-	public void addNode (int type, int fieldPos)
+	public PICEntry (int classID, OIRClassDeclaration classDecl)
 	{
-		LinkedList<PICEntry> listEntry;
-		
-		listEntry = entryMap.get(fieldPos);
-		
-		if (listEntry == null)
+		entries = 0;
+		this.classID = classID;
+		this.classDecl = classDecl;
+		this.fieldPos = -1;
+		mapClassIDPICEntry = new HashMap<Integer, PICEntry> ();
+		vectorPICEntry = new PICEntry[PIC.getLinkedListMapThreshold()];
+	}
+	
+	public FinalPICNode containsObjectAddress (long objectAddress)
+	{
+		return objectAddresses.get(objectAddress);
+	}
+	
+	public void setFinalObjectAddress (long objectAddress, long fieldAddress, PICEntry picEntry)
+	{
+		objectAddresses.put(objectAddress, new FinalPICNode (fieldAddress, picEntry));
+	}
+	
+	public void setIsFinal (boolean isFinal)
+	{
+		if (this.isFinal == true)
 		{
-			listEntry = new LinkedList<PICEntry> ();
-			entryMap.put(fieldPos, listEntry);
+			throw new WyvernException ("Cannot set isFinal if it is already set to true");
 		}
 		
-		listEntry.add(new PICEntry (type));	
+		this.isFinal = isFinal;
+		objectAddresses = new HashMap<Long, FinalPICNode> ();
 	}
 	
-	public void addNode (PICEntry entry, int fieldPos)
+	public int getFieldPos ()
 	{
-		LinkedList<PICEntry> listEntry;
-		
-		listEntry = entryMap.get(fieldPos);
-		
-		if (listEntry == null)
+		return fieldPos;
+	}
+	
+	public void setFeildPos (int fieldPos)
+	{
+		if (fieldPos != -1)
 		{
-			listEntry = new LinkedList<PICEntry> ();
-			entryMap.put(fieldPos, listEntry);
+			throw new WyvernException ("Cannot set field position more than once");
 		}
 		
-		listEntry.add(entry);	
+		this.fieldPos = fieldPos;
 	}
 	
-	public LinkedList<PICEntry> getPICEntriesForField (int fieldPos)
+	public PICEntry getEntry (int classID)
 	{
-		return entryMap.get(fieldPos);
-	}
-	
-	public Set<Integer> getFieldPosSet ()
-	{
-		return entryMap.keySet();
+		if (entries < PIC.getLinkedListMapThreshold())
+		{
+			for (int i = 0; i < entries; i++)
+			{
+				if (vectorPICEntry[i].getClassID() == classID)
+				{
+					return vectorPICEntry[i];
+				}
+			}
+			
+			return null;
+		}
+		else
+		{
+			return mapClassIDPICEntry.get(classID);
+		}
 	}
 	
 	public int getClassID ()
 	{
-		return node.getClassID();
+		return classID;
+	}
+	
+	public void addChildEntry (int fieldPos, int entryClassID, OIRClassDeclaration classDecl)
+	{
+		PICEntry entry;
+		
+		entry = new PICEntry (entryClassID, classDecl);
+		if (entries < PIC.getLinkedListMapThreshold())
+		{
+			vectorPICEntry[entries] = entry;
+		}
+		
+		entries++;
+		this.fieldPos = fieldPos;
+		mapClassIDPICEntry.put(entryClassID, entry);
+	}
+	
+	public void addChildEntry (int entryClassID, OIRClassDeclaration classDecl)
+	{
+		if (fieldPos == -1)
+		{
+			throw new WyvernException ("Field Position for this class is not set. "
+					+ "Please set it first");
+		}
+		
+		PICEntry entry;
+		
+		entry = new PICEntry (entryClassID, classDecl);
+		if (entries < PIC.getLinkedListMapThreshold())
+		{
+			vectorPICEntry[entries] = entry;
+		}
+		
+		entries++;
+		mapClassIDPICEntry.put(entryClassID, entry);
+	}
+	
+	public void addChildEntry (int classID, PICEntry entry)
+	{
+		if (entries < PIC.getLinkedListMapThreshold())
+		{
+			vectorPICEntry[entries] = entry;
+		}
+		
+		entries++;
+		mapClassIDPICEntry.put(classID, entry);
+	}
+
+	public OIRClassDeclaration getClassDecl() {
+		return classDecl;
+	}
+
+	public boolean getIsFinal() {
+		return isFinal;
 	}
 }

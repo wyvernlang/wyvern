@@ -21,6 +21,8 @@
 #include "llvm/IR/TypeBuilder.h"
 
 #include <jni.h>
+#include <unordered_set>
+#include <unordered_map>
 
 /* TODO: Conversion of String
  * Cast Expression
@@ -34,6 +36,7 @@ LLVMContext &Context = getGlobalContext();
 Module *TheModule = new Module("wyvern", Context);
 IRBuilder<> Builder(getGlobalContext());
 map <string, Type*> strTypeMap;
+unordered_set <string> arithOpsSet;
 
 static int ifElseThenCount = 0;
 

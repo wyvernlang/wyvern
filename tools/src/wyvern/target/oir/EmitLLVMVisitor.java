@@ -118,17 +118,21 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 		OIRType retType;
 		String objName;
 		String [] argNames = new String [oirMethodCall.getArgs().size()];
+		String [] argTypeNames = new String [argNames.length];
+		String objTypeName;
 		
 		for (OIRExpression arg : oirMethodCall.getArgs())
 		{
 			argNames[i] = arg.acceptVisitor(this, oirenv);
+			argTypeNames[i] = arg.typeCheck(oirenv).getName();
 			i++;
 		}
 		
 		objName = oirMethodCall.getObjectExpr().acceptVisitor(this, oirenv);
+		objTypeName = oirMethodCall.getObjectExpr().typeCheck(oirenv).getName();
 		retType = oirMethodCall.getExprType();
 		return EmitLLVMNative.methodCallToLLVMIR(oirMethodCall, objName, argNames, 
-				retType.getName());
+				retType.getName(), argTypeNames, objTypeName);
 	}
 
 	@Override
@@ -205,7 +209,7 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 		}
 		
 		/* TODO Add main expression conversion here */
-		return "";
+		return oirProgram.getMainExpression().acceptVisitor(this, oirenv);
 	}
 	@Override
 	public String visit(OIREnvironment oirenv, OIRInterface oirInterface) {

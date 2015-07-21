@@ -38,4 +38,8 @@ public class OIRFieldDeclaration extends OIRMemberDeclaration {
 	public <T> T acceptVisitor(ASTVisitor<T> visitor, OIREnvironment oirenv) {
 		return visitor.visit(oirenv, this);
 	}
+
+	public boolean isFinal() {
+		return isFinal;
+	}
 }

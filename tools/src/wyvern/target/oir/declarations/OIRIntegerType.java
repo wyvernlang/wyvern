@@ -10,7 +10,7 @@ public class OIRIntegerType extends OIRInterface {
 	
 	protected OIRIntegerType ()
 	{
-		super ("", "x", null);
+		super (new OIREnvironment (null), "int", "this", null);
 	}
 	
 	public static OIRIntegerType getIntegerType ()

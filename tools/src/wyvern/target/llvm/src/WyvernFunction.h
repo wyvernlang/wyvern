@@ -34,15 +34,17 @@ class WyvernFunction
         WyvernFunction (Type* returnType, vector<Type*> argsType, vector<string> nameArgs,
                         bool isVarArg, std::string name, Module* module);
         
-        AllocaInst *CreateAlloca (string type,
+        AllocaInst* CreateAlloca (string type,
                                   const std::string &VarName);
+        AllocaInst* CreateAlloca (Type* type, 
+                                  const string &VarName);
         void setNamedValue (string name, Value *value)
         {
             namedValues[name] = value;
         }
         
         Value* getNamedValue (string name);
-        
+        Value* getNamedValueWithoutLoad (string name);
         void setBasicBlockForString (string name, BasicBlock *value)
         {
             strBasicBlockMap [name] = value;

@@ -9,11 +9,19 @@ public class OIRMethod extends OIRMemberDeclaration {
 	
 	private OIRMethodDeclaration declaration;
 	private OIRExpression body;
+	private OIREnvironment environment; 
 	
-	public OIRMethod(OIRMethodDeclaration declaration, OIRExpression body) {
+	public OIRMethod(OIREnvironment environment,
+			OIRMethodDeclaration declaration, OIRExpression body) {
 		super();
+		this.environment = environment;
 		this.declaration = declaration;
 		this.body = body;
+		
+		for (OIRFormalArg formalArg : declaration.getArgs())
+		{
+			environment.addName(formalArg.getName(), formalArg.getType());
+		}
 	}
 	public OIRMethodDeclaration getDeclaration() {
 		return declaration;
@@ -30,5 +38,12 @@ public class OIRMethod extends OIRMemberDeclaration {
 	@Override
 	public <T> T acceptVisitor(ASTVisitor<T> visitor, OIREnvironment oirenv) {
 		return visitor.visit(oirenv, this);
+	}
+	@Override
+	public OIRType getType() {
+		return declaration.getReturnType();
+	}
+	public OIREnvironment getEnvironment() {
+		return environment;
 	}
 }

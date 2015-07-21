@@ -75,7 +75,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		exprType = newExpr.getExprType();
 		if (exprType != null)
 			oirtype = (OIRType) exprType.acceptVisitor(this, env, oirenv);
-		classenv = new OIREnvironment (oirenv, null);
+		classenv = new OIREnvironment (oirenv);
 		oirMemDecls = new Vector<OIRMemberDeclaration> ();
 		delegates = new Vector<OIRDelegate> ();
 		fieldValuePairs = new Vector<OIRFieldValueInitializePair> ();
@@ -127,15 +127,16 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 					args.add((OIRExpression) oirvalue);
 				}
 				
+				classenv.addName(oirMemDecl.getName (), oirMemDecl.getType ());
 				oirMemDecls.add(oirMemDecl);
 			}
 		}
 		
 		className = generateClassName ();
-		cd = new OIRClassDeclaration (className, newExpr.getSelfName(),
+		cd = new OIRClassDeclaration (classenv, className, newExpr.getSelfName(),
 				delegates, oirMemDecls, fieldValuePairs);
-		oirTypeBinding = new OIRTypeBinding (className, cd);
-		classenv.setBinding(oirTypeBinding);
+		oirenv.addType(className, cd);
+		classenv.addName(newExpr.getSelfName(), cd);
 		OIRProgram.program.addTypeDeclaration(cd);
 		oirexpr = new OIRNew (args, className);
 		
@@ -231,10 +232,11 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		toReplace = let.getToReplace();
 		oirToReplace = (OIRExpression)toReplace.acceptVisitor(this, 
 				env, oirenv);
+		oirenv.addName(let.getVarName(), oirToReplace.typeCheck(oirenv));
 		inExpr = let.getInExpr();
 		oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, env, oirenv);
 		oirLet = new OIRLet (let.getVarName(), oirToReplace, oirInExpr);
-
+		
 		return oirLet;
 	}
 
@@ -303,15 +305,18 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		OIRType oirReturnType;
 		List<OIRFormalArg> listOIRFormalArgs;
 		OIRExpression oirBody;
+		OIREnvironment defEnv;
 		
 		listOIRFormalArgs = new Vector <OIRFormalArg> ();
-		
+		defEnv = new OIREnvironment (oirenv);
+
 		for (FormalArg arg : defDecl.getFormalArgs())
 		{
 			OIRFormalArg formalArg;
 			
 			formalArg = (OIRFormalArg) arg.acceptVisitor(this, env,
 					oirenv);
+			defEnv.addName(formalArg.getName(), formalArg.getType());
 			listOIRFormalArgs.add(formalArg);
 		}
 		
@@ -320,8 +325,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		oirMethodDecl = new OIRMethodDeclaration (oirReturnType, 
 				defDecl.getMethodName(), listOIRFormalArgs);
 		oirBody = (OIRExpression) defDecl.getBody().acceptVisitor(this,
-				env, oirenv);
-		oirMethod = new OIRMethod (oirMethodDecl, oirBody);
+				env, defEnv);
+		oirMethod = new OIRMethod (defEnv, oirMethodDecl, oirBody);
 		
 		return oirMethod;
 	}
@@ -466,7 +471,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		
 		interfaceName = generateInterfaceName();
 		methodDecls = new Vector<OIRMethodDeclaration> ();
-		oirInterfaceEnv = new OIREnvironment (oirenv, null);
+		oirInterfaceEnv = new OIREnvironment (oirenv);
+		
 		for (DeclType declType : structuralType.getDeclTypes())
 		{
 			OIRMethodDeclarationGroup declTypeGroup;
@@ -475,15 +481,17 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 					this, env, oirenv);
 			for (int i = 0; i < declTypeGroup.size(); i++)
 			{
+				oirInterfaceEnv.addName(declTypeGroup.elementAt(i).getName(), 
+						declTypeGroup.elementAt(i).getReturnType());
 				methodDecls.add (declTypeGroup.elementAt(i));
 			}
 		}
 		
-		oirinterface = new OIRInterface (interfaceName, 
+		oirinterface = new OIRInterface (oirInterfaceEnv, interfaceName, 
 				structuralType.getSelfName(), methodDecls);
+		oirenv.addType(interfaceName, oirinterface);
 		OIRProgram.program.addTypeDeclaration(oirinterface);
-		oirInterfaceEnv.setBinding(new OIRTypeBinding (interfaceName,
-				oirinterface));
+		
 		return oirinterface;
 	}
 

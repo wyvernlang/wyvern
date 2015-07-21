@@ -1,5 +1,6 @@
 package wyvern.target.oir;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,141 +13,68 @@ import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.declarations.OIRType;
 
 public class OIREnvironment {
-	private OIREnvironment nextEnvironment;
-	private String name;
-	private OIRBinding binding;
+	private OIREnvironment parent;
+	private HashMap<String, OIRType> nameTable;
+	private HashMap<String, OIRType> typeTable;
+	private LinkedList<OIREnvironment> children;
 	
-	private static OIREnvironment rootEnvironment = new OIREnvironment(null, null);
+	private static OIREnvironment rootEnvironment = new OIREnvironment(null);
 	
 	public static OIREnvironment getRootEnvironment ()
 	{
 		return rootEnvironment;
 	}
 	
-	public OIREnvironment (OIREnvironment prev, OIRBinding binding)
+	public OIREnvironment (OIREnvironment parent)
 	{
-		if (prev != null)
+		children = new LinkedList<OIREnvironment> ();
+		nameTable = new HashMap<String, OIRType> ();
+		typeTable = new HashMap<String, OIRType> ();
+		this.parent = parent;
+		
+		if (parent != null)
 		{
-			if (prev.nextEnvironment != null)
-			{
-				this.nextEnvironment = prev.nextEnvironment;
-			}
-			
-			prev.nextEnvironment = this;
+			parent.addChild(this);
 		}
-		
-		this.binding = binding;
-		if (binding != null)
-			this.name = binding.getName();
 	}
 	
-	public void setBinding (OIRBinding binding)
+	public void addChild (OIREnvironment environment)
 	{
-		this.binding = binding;
-		if (binding != null)
-			this.name = binding.getName ();
+		children.add (environment);
 	}
 	
-	public OIRBinding getBinding ()
+	public void addName (String name, OIRType type)
 	{
-		return binding;
-	}
-	public OIREnvironment extend(OIRBinding binding) {
-		return new OIREnvironment(this, binding);
+		nameTable.put(name, type);
 	}
 	
-	public OIREnvironment extend(OIREnvironment env) {
-		if (env.binding == null)
-			return this;
-		
-		return new OIREnvironment(extend(env.nextEnvironment), env.binding);
+	public void addType (String name, OIRType type)
+	{
+		nameTable.put(name, type);
 	}
 
-	public static OIREnvironment getEmptyEnvironment() {
-		return emptyEnvironment;
-	}
-
-	private static OIREnvironment emptyEnvironment = new OIREnvironment(null, null);
-
-	public OIRType lookup(String name) {
+	public OIRType lookup(String name) 
+	{
 		if (name == null)
 			return null;
-		if (name.equals(name) && binding instanceof OIRNameBinding)
-			return binding.getType();
-		if (binding.getType() instanceof OIRClassDeclaration)
-		{
-			OIRClassDeclaration classDecl;
-			OIRType toReturn;
-			
-			classDecl = ((OIRClassDeclaration)binding.getType());
 		
-			if (classDecl.getSelfName() == name)
-				return binding.getType();
-			
-			toReturn = classDecl.getTypeForMember(name);
-			if (toReturn != null)
-				return toReturn;
-			
-			for (OIRMemberDeclaration memDecl : classDecl.getMembers())
-			{
-				if (memDecl instanceof OIRMethod)
-				{
-					OIRMethodDeclaration methDecl = ((OIRMethod)memDecl).getDeclaration();
-					
-					for (OIRFormalArg arg : methDecl.getArgs())
-					{
-						if (arg.getName() == name)
-							return arg.getType();
-					}
-				}
-			}
-		}
+		OIRType type;
 		
-		if (binding.getType() instanceof OIRInterface)
-		{
-			OIRInterface classDecl;
-			OIRType toReturn;
-			
-			classDecl = ((OIRInterface)binding.getType());
-		
-			if (classDecl.getSelfName() == name)
-				return binding.getType();
-			
-			toReturn = classDecl.getTypeForMember(name);
-			if (toReturn != null)
-				return toReturn;
-			
-			for (OIRMethodDeclaration methDecl : classDecl.getMethods())
-			{
-				for (OIRFormalArg arg : methDecl.getArgs())
-				{
-					if (arg.getName() == name)
-						return arg.getType();
-				}
-			}
-		}
-		
-		return nextEnvironment.lookup(name);
+		type = nameTable.get(name);
+		if (type == null)
+			return parent.lookup(name);
+		return type;
 	}
 
 	public OIRType lookupType(String name) {
-		if (this.name == null)
+		if (name == null)
 			return null;
-		if (this.name.equals(name) && this.binding instanceof OIRTypeBinding)
-			return binding.getType();
-		return nextEnvironment.lookupType(name);
-	}
-
-	public List<OIRBinding> getBindings() {
-		LinkedList<OIRBinding> bindings = new LinkedList<>();
-		writeBinding(bindings);
-		return bindings;
-	}
-
-	private void writeBinding(List<OIRBinding> binding) {
-		if (this.binding != null)
-			binding.add(this.binding);
-		if (nextEnvironment != null)
-			nextEnvironment.writeBinding(binding);
+		
+		OIRType type;
+		
+		type = nameTable.get(name);
+		if (type == null)
+			return parent.lookup(name);
+		return type;
 	}
 }

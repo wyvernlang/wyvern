@@ -10,7 +10,7 @@ public class OIRBooleanType extends OIRType{
 	
 	protected OIRBooleanType ()
 	{
-		
+		super (new OIREnvironment (null));
 	}
 	
 	public static OIRBooleanType getBooleanType ()

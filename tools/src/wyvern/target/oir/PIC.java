@@ -3,7 +3,10 @@ package wyvern.target.oir;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import wyvern.target.oir.declarations.OIRClassDeclaration;
+
 public class PIC {
+	private static byte linkedListMapThreshold = 10;
 	private int callSiteNum;
 	private String methodName;
 	/* To represents PICEntry for different classIDs */
@@ -16,6 +19,18 @@ public class PIC {
 		classIDEntryMap = new HashMap<Integer, PICEntry> ();
 	}
 	
+	public PIC (int callSiteNum)
+	{
+		this.callSiteNum = callSiteNum;
+		this.methodName = "";
+		classIDEntryMap = new HashMap<Integer, PICEntry> ();
+	}
+	
+	public void setMethodName (String methName)
+	{
+		this.methodName = methName;
+	}
+	
 	public void addPICEntry (int classID, PICEntry entry)
 	{
 		classIDEntryMap.put(classID, entry);
@@ -24,53 +39,73 @@ public class PIC {
 	/* Returns classID if found the hit 
 	 * Otherwise returns empty string 
 	 * */
-	private int searchMethod (PICEntry entry, long objectAddress)
+	private MethodAddress searchMethod (int classID, PICEntry entry, long objectAddress)
 	{
-		int classID;
-		long objectAddressToContinueIn;
+		OIRClassDeclaration classDecl;
 		
-		objectAddressToContinueIn = objectAddress;
+		classDecl = OIRProgram.program.getClassDeclaration(classID);
 		
-		for (Integer fieldPos : entry.getFieldPosSet())
+		while (true)
 		{
-			LinkedList<PICEntry> listEntries;
-			long fieldAddress;
-			int fieldClassID;
+			String className;
+			PICEntry fieldEntry;
+			int fieldPos;
+			long fieldAddress = 0;
+			int fieldClassID = 0;
 			
-			listEntries = entry.getPICEntriesForField(fieldPos);
-			fieldAddress = DelegateNative.getFieldAddress("LL", objectAddress, 
-					fieldPos);
-			fieldClassID = DelegateNative.getObjectClassID(fieldAddress); 
-			
-			for (PICEntry _entry : listEntries)
-			{				
-				if (fieldClassID == _entry.getClassID())
+			if (entry.getIsFinal ())
+			{
+				/* Entry is of the type FinalPICEntry */
+				FinalPICNode finalNode;
+				
+				/* First search for an object address */
+				finalNode = entry.containsObjectAddress(objectAddress);
+				if (finalNode != null)
 				{
-					if (_entry.getFieldPosSet().isEmpty())
-					{
-						return fieldClassID;
-					}
-					
-					classID = searchMethod (_entry, fieldAddress);
-
-					if (classID != -1)
-					{
-						return classID;
-					}
+					/* this object address was present */
+					entry = finalNode.getPicEntry();
+					classID = entry.getClassID();
+					classDecl = entry.getClassDecl();
 				}
 			}
+			
+			fieldEntry = null;
+			className = classDecl.getName();
+			fieldPos = entry.getFieldPos();
+			
+			if (fieldPos == -1)
+			{
+				/* fieldPos is NULL would mean, we have found the 
+				 * last class */
+				return new MethodAddress (className, objectAddress);
+			}
+
+			fieldAddress = DelegateNative.getFieldAddress (className, 
+														   objectAddress, 
+														   fieldPos);
+			fieldClassID = DelegateNative.getObjectClassID(fieldAddress);
+			fieldEntry = entry.getEntry(fieldClassID);
+			
+			if (fieldEntry == null)
+			{
+				/* Couldn't find method, do HashTable search */
+				return OIRProgram.program.delegateHashTableBuildPICEntry(objectAddress, classID, classDecl,
+						methodName, entry, fieldAddress, fieldPos, fieldClassID);
+			}
+			else
+			{
+				entry = fieldEntry;
+				classID = fieldClassID;
+				classDecl = fieldEntry.getClassDecl();
+				objectAddress = fieldAddress;
+			}
+			
 		}
-		
-		/* Couldn't find Delegated Method 
-		 * in this field */
-		
-		return -1;
 	}
 	
-	public String search (int classID, long objectAddress)
+	public MethodAddress search (int classID, long objectAddress)
 	{
 		PICEntry entry;
-		int _classID;
 		
 		entry = classIDEntryMap.get(classID);
 		if (entry == null)
@@ -78,26 +113,20 @@ public class PIC {
 			/* PICEntry for this class not present. 
 			 * Find the method
 			 * */
-			entry = new PICEntry (classID);
-			return OIRProgram.program.delegateHashTableBuildPICEntry(objectAddress, classID, 
-					methodName, entry);
+			OIRClassDeclaration classDecl;
+			
+			classDecl = OIRProgram.program.getClassDeclaration(classID);
+			entry = new PICEntry (classID, classDecl);
+			return OIRProgram.program.delegateHashTableBuildPICEntry(objectAddress, classID, classDecl,
+					methodName, entry, -1, -1, -1);
 		}
 		else
 		{
-			_classID = searchMethod (entry, objectAddress);
-			if (_classID == -1)
-			{
-				/* Method cannot be find in PIC 
-				 * Do HashTable Lookup 
-				 * */
-				
-				return OIRProgram.program.delegateHashTableBuildPICEntry(objectAddress, classID, 
-						methodName, entry);
-			}
-			else
-			{
-				return OIRProgram.program.getClassName(_classID);
-			}
+			return searchMethod (classID, entry, objectAddress);
 		}
+	}
+
+	public static byte getLinkedListMapThreshold() {
+		return linkedListMapThreshold;
 	}
 }
