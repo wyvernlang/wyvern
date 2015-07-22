@@ -32,3 +32,5 @@ tools/src/wyvern/target/llvm/src/libWyvernLLVM_la-WyvernClass.o
 tools/src/wyvern/target/llvm/src/.libs/libWyvernLLVM_la-WyvernGlobals.o
 
 tools/src/wyvern/target/llvm/src/.libs/libWyvernLLVM_la-WyvernClass.o
+
+tools/src/wyvern/target/llvm/autom4te.cache/traces.1
