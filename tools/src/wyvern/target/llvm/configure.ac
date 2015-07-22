@@ -5,8 +5,6 @@ LT_INIT
 AC_CANONICAL_HOST
 case $host_os in
 	darwin*)
- 		#Please edit here. Change $JAVA_HOME/include/linux to the directory present on your system
-		JAVA_HOME=$(/usr/libexec/java_home)
                 CXXFLAGS="$CXXFLAGS -I$JAVA_HOME/include -I$JAVA_HOME/include/darwin"
 		;;
 	linux*)
