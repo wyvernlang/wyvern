@@ -23,3 +23,12 @@ tools/out/artifacts/wyvern_jar/javatuples-1.2.jar
 tools/out/artifacts/wyvern_jar/hamcrest-core-1.3.jar
 tools/out/artifacts/wyvern_jar/CopperCompiler.jar
 tools/out/artifacts/wyvern_jar/asm-debug-all-5.0.1.jar
+tools/src/wyvern/target/llvm/autom4te.cache/*
+
+tools/src/wyvern/target/llvm/src/libWyvernLLVM_la-WyvernGlobals.o
+
+tools/src/wyvern/target/llvm/src/libWyvernLLVM_la-WyvernClass.o
+
+tools/src/wyvern/target/llvm/src/.libs/libWyvernLLVM_la-WyvernGlobals.o
+
+tools/src/wyvern/target/llvm/src/.libs/libWyvernLLVM_la-WyvernClass.o
