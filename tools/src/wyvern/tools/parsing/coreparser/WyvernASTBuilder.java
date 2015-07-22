@@ -54,13 +54,13 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
     
 	@Override
-	public TypedAST moduleDecl(String name, TypedAST ast, FileLocation loc) {
-		return new ModuleDeclaration(name, (EnvironmentExtender)ast, loc);
+	public TypedAST moduleDecl(String name, TypedAST ast, FileLocation loc, boolean isResource) {
+		return  new ModuleDeclaration(name, (EnvironmentExtender)ast, loc, isResource);
 	}
 
 	@Override
-	public TypedAST importDecl(URI uri, FileLocation loc) {
-		return new ImportDeclaration(uri, loc);
+	public TypedAST importDecl(URI uri, FileLocation loc, boolean isRequire) {
+		return new ImportDeclaration(uri, loc, isRequire);
 	}
 
 	@Override

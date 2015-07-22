@@ -101,6 +101,7 @@ TOKEN : /* Keywords */
 | < IMPORT: "import" >
 //| < : "" >
 // more here
+| < RESOURCE : "resource" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -160,7 +161,11 @@ AST CompilationUnit() :
   exp = ModuleBody(false)  { return exp; }
 |
   <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
-	return build.moduleDecl(id.image, exp, loc(id));
+	return build.moduleDecl(id.image, exp, loc(id), false);
+  }
+  
+| <RESOURCE> <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
+	return build.moduleDecl(id.image, exp, loc(id), true);
   }
 }
 
@@ -185,13 +190,13 @@ AST ModuleBody(boolean inModule) :
 AST RequireDecl() :
 { URI uri; Token t; }
 {
-  t=<REQUIRE> uri = Uri() <NEWLINE>  { return build.importDecl(uri, loc(t)); }
+  t=<REQUIRE> uri = Uri() <NEWLINE>  { return build.importDecl(uri, loc(t), true); }
 }
 
 AST ImportDecl() :
 { URI uri; Token t; }
 {
-  t=<IMPORT> uri = Uri() <NEWLINE> { return build.importDecl(uri, loc(t)); }
+  t=<IMPORT> uri = Uri() <NEWLINE> { return build.importDecl(uri, loc(t), false); }
 }
 
 URI Uri() :

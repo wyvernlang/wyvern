@@ -207,6 +207,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token thenKwd_t   ::= /then/ in (keywds);
  	terminal Token elseKwd_t   ::= /else/ in (keywds);
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
+ 	
+ 	terminal Token resourceKwd_t    ::= /resource/ in (keywds) {: RESULT = token(RESOURCE,lexeme); :};
 
 	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
     terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); :};
@@ -321,7 +323,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | extendsKwd_t:t {: RESULT = t; :}
 	       | matchKwd_t:t {: RESULT = t; :}
 	       | taggedKwd_t:t {: RESULT = t; :}
-	       | importKwd_t:t {: RESULT = t; :};
+	       | importKwd_t:t {: RESULT = t; :}
+	       | resourceKwd_t:t {: RESULT = t; :};
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}

@@ -460,7 +460,7 @@ import java.net.URI;
 	start with fc;
 
 	fc ::= impSeq:imp Newline_t fc:nxt {: RESULT = new Sequence(imp, (TypedAST)nxt); :}
-		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos));:}
+		 | module:mod ptl:prog {: RESULT = new ModuleDeclaration((String)mod, (EnvironmentExtender)prog, new FileLocation(currentState.pos), false);:}
 		 | p:prog {: RESULT = prog; :}
 		 | {: RESULT = new Sequence(); :};
 
@@ -471,7 +471,7 @@ import java.net.URI;
 	impSeq ::= impSeq:a Newline_t import:b {: RESULT = DeclSequence.simplify(new DeclSequence(a,b)); :}
 			|  import:a {: RESULT = a; :};
 
-	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos)); :};
+	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos), false); :};
 
 	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
 
