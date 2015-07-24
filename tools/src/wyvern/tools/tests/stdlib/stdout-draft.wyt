@@ -1,0 +1,4 @@
+// TODO: move me to platform/java/stdlib
+
+type stdout
+    def print(text:Str):Unit

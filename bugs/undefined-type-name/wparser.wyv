@@ -1,0 +1,21 @@
+module CalcParser
+
+import wyv:tokenizer.wyv
+
+import java:java.lang.String
+import java:java.io.StringReader
+import java:wyvern.tools.typedAST.interfaces.TypedAST
+
+class CalculatorParser
+	class def create(s:String):CalculatorParser
+		val itkzr = Tokenizer.TokenizerWrapper.create(StringReader.create(s))
+		itkzr.next()
+		new
+			val tkzr:Tokenizer.TokenizerWrapper = itkzr
+	val tkzr : Tokenizer.TokenizerWrapper
+	def Exp():TypedAST
+		val tok = this.tkzr.nextTok()
+		{$(10)}
+	
+	
+//		{($(tok.getNum()))}

@@ -1,0 +1,51 @@
+module CalcParser
+
+import wyv:tokenizer.wyv
+
+import java:java.lang.String
+import java:java.io.StringReader
+
+class CalculatorParser
+	class def create(s:String):CalculatorParser
+		val itkzr = Tokenizer.TokenizerWrapper.create(StringReader.create(s))
+		itkzr.next()
+		new
+			val tkzr:Tokenizer.TokenizerWrapper = itkzr
+	val tkzr : Tokenizer.TokenizerWrapper
+	def checkNextStr(s:Str):Bool
+		val nt = this.tkzr.nextTok()
+		(nt.typeOf() == 0) && (s == nt.getStr())
+	def E():Int
+		def recurser(iv:Int):Int
+			val nt = this.tkzr.nextTok()
+			def ithen():Int
+				val opstr = nt.getStr()
+				this.tkzr.next()
+				val t1 = this.T()
+				if "+" == opstr then recurser(iv+t1) else recurser(iv-t1)
+			if nt.typeOf() == 0 then (if ("+" == nt.getStr()) || ("-" == nt.getStr()) then ithen() else iv) else iv
+		recurser(this.T())
+	def T():Int
+		def recurser(iv:Int):Int
+			val nt = this.tkzr.nextTok()
+			def ithen():Int
+				val opstr = nt.getStr()
+				this.tkzr.next()
+				val t1 = this.P()
+				if "*" == opstr then recurser(iv*t1) else recurser(iv/t1)
+			if nt.typeOf() == 0 then (if ("/" == nt.getStr()) || ("*" == nt.getStr()) then ithen() else iv) else iv
+		recurser(this.P())
+	def P():Int
+		val nt = this.tkzr.nextTok()
+		def num():Int
+			this.tkzr.next()
+			nt.getNum()
+		def paren():Int
+			this.tkzr.next()
+			val res = this.E()
+			val nt2 = this.tkzr.nextTok()
+			if nt2.typeOf() == 0 then if  ")" == nt.getStr() then res else 1/0 else 1/0
+		def neg():Int
+			this.tkzr.next()
+			0-this.P()
+		if nt.typeOf() == Tokenizer.NUM then num() else if "(" == nt.getStr() then paren() else 				if "-" == nt.getStr() then neg() else 1/0

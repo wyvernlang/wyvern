@@ -1,0 +1,30 @@
+module CalculatorType
+
+import wyv:wparser.wyv
+
+import java:wyvern.tools.parsing.ExtParser
+import java:wyvern.tools.parsing.HasParser
+import java:wyvern.tools.parsing.ParseBuffer
+import java:wyvern.tools.typedAST.interfaces.TypedAST
+
+type Calculator
+	def eval():Int
+	metadata:HasParser = new
+		def getParser():ExtParser = new
+			def parse(buf:ParseBuffer):TypedAST
+				val x:TypedAST = { 5 }
+				val oNumAsAST : TypeAST = { 6 }
+				val oNum : Int = 6
+				~
+					new
+						def eval():Int = $oNum
+
+
+// test
+//				val oNum = CalcParser.CalculatorParser.create(buf.getSrcString()).E()
+//				~
+//					new
+//						def eval():Int = $oNum
+//
+//				CalcParser.CalculatorParser.create(buf.getSrcString()).Exp()
+//

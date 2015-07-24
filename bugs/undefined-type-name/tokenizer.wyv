@@ -1,0 +1,43 @@
+module Tokenizer
+
+import java:java.lang.String
+import java:java.io.StringReader
+import java:java.io.StreamTokenizer
+import java:wyvern.tools.util.LangUtil
+
+val s : Str = "2+3"
+val NUM = 1
+type Token
+	def typeOf():Int
+	def getStr():String
+	def getNum():Int
+class StrTok
+	class def create(s:String):StrTok = new
+		val s:String = s
+	val s:String
+	def typeOf():Int = 0
+	def getStr():String = this.s
+	def getNum():Int = 1/0
+class NumTok
+	class def create(n:Int):NumTok = new
+		val n:Int = n
+	val n : Int
+	def typeOf():Int = NUM
+	def getStr():String
+		val in : Int = 1/0
+		""
+	def getNum():Int = this.n
+class TokenizerWrapper
+	class def create(str:StringReader):TokenizerWrapper = new
+		val jtok = StreamTokenizer.create(str)
+	val jtok : StreamTokenizer
+	def next():Bool = this.jtok.nextToken() == StreamTokenizer.TT_EOF
+	def nextTok():Token =
+		if this.jtok.ttype == StreamTokenizer.TT_NUMBER then
+			NumTok.create(LangUtil.doubleToInt(this.jtok.nval))
+		else if this.jtok.ttype == StreamTokenizer.TT_WORD then
+			(StrTok.create(this.jtok.sval) : Token)
+		else if this.jtok.ttype > 0 then
+			(StrTok.create(LangUtil.intToStr(this.jtok.ttype)) : Token)
+		else
+			NumTok.create(0-1)
