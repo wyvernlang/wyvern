@@ -2,10 +2,12 @@ package wyvern.target.corewyvernIL.expression;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class BooleanLiteral extends Literal implements Value{
+public class BooleanLiteral extends Value {
 
     private boolean value;
 
@@ -23,7 +25,7 @@ public class BooleanLiteral extends Literal implements Value{
     }
 
     @Override
-    public ValueType typeCheck(wyvern.tools.types.Environment env) {
+    public ValueType typeCheck(TypeContext env) {
         // TODO Auto-generated method stub
         return null;
     }

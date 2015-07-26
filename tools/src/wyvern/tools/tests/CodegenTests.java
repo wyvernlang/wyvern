@@ -36,9 +36,9 @@ public class CodegenTests {
         OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), null, OIREnvironment.getRootEnvironment());
         OIRProgram oirprogram = OIRProgram.program;
         System.out.println ("");
-        EmitLLVMNative.createMainFunction();
-        String toReturn = oirast.acceptVisitor(new EmitLLVMVisitor (), OIREnvironment.getRootEnvironment());
-        EmitLLVMNative.functionCreated(toReturn);
+        //EmitLLVMNative.createMainFunction();
+        //String toReturn = oirast.acceptVisitor(new EmitLLVMVisitor (), OIREnvironment.getRootEnvironment());
+        //EmitLLVMNative.functionCreated(toReturn);
     }
     @Test
     public void testDef() throws IOException, CopperParserException {

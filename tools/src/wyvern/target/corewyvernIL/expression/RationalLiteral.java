@@ -3,11 +3,13 @@ package wyvern.target.corewyvernIL.expression;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class RationalLiteral extends Expression implements Value {
+public class RationalLiteral extends Value {
 	
 	private int numerator;
 	private int denominator;
@@ -35,7 +37,7 @@ public class RationalLiteral extends Expression implements Value {
 	}
 
 	@Override
-	public ValueType typeCheck(wyvern.tools.types.Environment env) {
+	public ValueType typeCheck(TypeContext env) {
 		// TODO Auto-generated method stub
 		return null;
 	}
