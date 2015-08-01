@@ -6,6 +6,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.declarations.AbstractTypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
@@ -172,16 +173,14 @@ public class TaggedInfo {
 	 *
 	 * @param tagName
 	 */
-	public void setTagName(String tagName, TypeDeclaration td, ClassDeclaration cd) {
+	public void setTagName(String tagName, AbstractTypeDeclaration td) {
 		this.tagName = tagName;
 
 		// One of these will be null:
 		this.td = td;
-		this.cd = cd;
 	}
 
-	TypeDeclaration td;
-	ClassDeclaration cd;
+	AbstractTypeDeclaration td;
 
 	/**
 	 * Gets the tag's name.
@@ -335,10 +334,6 @@ public class TaggedInfo {
 			System.out.println("Tag.td = " + ti.td);
 			if (ti.td!=null) {
 				System.out.println(ti.td.getType());
-			}
-			System.out.println("Tag.cd = " + ti.cd);
-			if (ti.cd!=null) {
-				System.out.println(ti.cd.getType());
 			}
 		}
 		System.out.println("END OF DUMP.");

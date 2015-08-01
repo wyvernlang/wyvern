@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class TypeDeclaration extends Declaration implements CoreAST {
+public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	protected DeclSequence decls;
 	private Reference<Optional<TypedAST>> metadata;
 	private NameBinding nameBinding;
@@ -64,10 +64,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		return env.extend(nameBinding);
 	}
 	
-	private TaggedInfo taggedInfo;
-
 	public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-
 		// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
@@ -81,12 +78,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 				metadata.get().getType());
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
 
-
-		if (taggedInfo != null) {
-			this.taggedInfo = taggedInfo;
-			this.taggedInfo.setTagName(name, this, null);
-			this.taggedInfo.associateWithClassOrType(this.typeBinding);
-		}
+		setupTags(name, typeBinding, taggedInfo);
 		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 
 		this.location = clsNameLine;
@@ -122,8 +114,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		TypeDeclaration decls1 = new TypeDeclaration(nameBinding.getName(), (DeclSequence) newChildren.get("decls"), metaValue, location);
-		decls1.taggedInfo = taggedInfo;
+		TypeDeclaration decls1 = new TypeDeclaration(nameBinding.getName(), (DeclSequence) newChildren.get("decls"), metaValue, getTaggedInfo(), location);
 		return decls1;
 	}
 
@@ -141,6 +132,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			decl.typecheckSelf(eenv);
 		}
 
+		if (isTagged()) typecheckTags(env);
+		
 		return this.typeBinding.getType();
 	}	
 	
@@ -191,4 +184,5 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Reference<Environment> getDeclEnv() {
 		return declEnv;
 	}
+	
 }

@@ -57,6 +57,9 @@ public class TypeDeclUtils {
 				continue;
 			}
 			
+			/* used to assume it was a getter here, but that seemed unjustified.
+			 * Fixed to instead just copy the binding over
+
 			// System.out.println("Assume it is a getter even if it is wrong! :-)");
 			
 			String propName = b.getName();
@@ -66,6 +69,8 @@ public class TypeDeclUtils {
 					new LinkedList<NameBinding>(), null, false, FileLocation.UNKNOWN);
 
 			tev = getter.extend(tev, tev);
+			 */
+			tev = tev.extend(b);
 		}
 		return tev;
 	}

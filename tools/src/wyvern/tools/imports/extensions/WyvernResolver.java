@@ -5,6 +5,12 @@ import wyvern.stdlib.Globals;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.parsing.coreparser.ParseUtils;
+import wyvern.tools.parsing.coreparser.TokenManager;
+import wyvern.tools.parsing.coreparser.WyvernASTBuilder;
+import wyvern.tools.parsing.coreparser.WyvernParser;
+import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
@@ -18,13 +24,29 @@ import java.io.*;
 import java.net.URI;
 import java.nio.CharBuffer;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 public class WyvernResolver implements ImportResolver {
 	private static WyvernResolver instance;
+	private LinkedList<String> paths = new LinkedList<String>();
+	private boolean useNewParser = false;
 	private static HashMap<String, String> savedResolutions = new HashMap<>();
 	public static void addFile(String name, String source) {
 		savedResolutions.put(name, source);
+	}
+	public void resetPaths() {
+		paths = new LinkedList<String>();
+	}
+	public void addPath(String name) {
+		paths.addLast(name);
+	}
+	/** Sets a flag to use the new parser.  Returns the old value of the flag. */
+	public boolean setNewParser(boolean useNewParser) {
+		boolean oldValue = this.useNewParser;
+		this.useNewParser = useNewParser;
+		return oldValue;
 	}
 	public static void clearFiles() {savedResolutions.clear(); getInstance().savedBinders.clear();}
 
@@ -34,8 +56,8 @@ public class WyvernResolver implements ImportResolver {
 		return instance;
 	}
 	private WyvernResolver() {}
-
-	private static class WyvernBinder implements ImportBinder {
+	
+	private class WyvernBinder implements ImportBinder {
 
 
 		private TypedAST res;
@@ -43,8 +65,11 @@ public class WyvernResolver implements ImportResolver {
 		public WyvernBinder(String filename, Reader source) {
 			res = null;
 			try {
-				res = (TypedAST)new Wyvern().parse(source, filename);
-			} catch (IOException | CopperParserException e) {
+				if (useNewParser)
+					res = ParseUtils.makeParser(filename, source).CompilationUnit();
+				else
+					res = (TypedAST)new Wyvern().parse(source, filename);
+			} catch (IOException | CopperParserException | ParseException e) {
 				throw new RuntimeException(e);
 			}
 			res.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
@@ -144,22 +169,47 @@ public class WyvernResolver implements ImportResolver {
 		savedBinders.put(name, binder);
 		return binder;
 	}
-
-	@Override
-	public ImportBinder resolveImport(URI uri) {
-		String filename = uri.getSchemeSpecificPart();
+	
+	ImportBinder tryOpen(String filename) {
 		if (savedBinders.containsKey(filename))
 			return savedBinders.get(filename);
 		if (savedResolutions.containsKey(filename))
 			return addAndBind(filename, new WyvernBinder(filename,new StringReader(savedResolutions.get(filename))));
-
 		File fsFile = new File(filename);
 		if (!fsFile.exists() || !fsFile.canRead())
-			throw new RuntimeException("Cannot read file " + filename);
+			return null;
 		try (FileInputStream fis = new FileInputStream(fsFile)) {
 			return addAndBind(filename, new WyvernBinder(filename, new InputStreamReader(fis)));
 		} catch (Exception e) {
 			throw new RuntimeException("Opening file "+filename+" failed with exception", e);
 		}
+	}
+
+	ImportBinder tryExtensions(String filename) {
+		ImportBinder result = tryOpen(filename);
+		
+		if (result == null && !filename.contains(".")) {
+			result = tryOpen(filename + ".wyt");
+			if (result == null)
+				result = tryOpen(filename + ".wyv");
+		}
+		return result;
+	}
+	
+	@Override
+	public ImportBinder resolveImport(URI uri) {
+		String filename = uri.getSchemeSpecificPart();
+		ImportBinder result = tryExtensions(filename);
+		
+		if (result != null)
+			return result;
+		
+		for (String p : paths) {
+			result = tryExtensions(p + filename);
+			if (result != null)
+				return result;
+		}
+		
+		throw new RuntimeException("Cannot read file " + filename);
 	}
 }

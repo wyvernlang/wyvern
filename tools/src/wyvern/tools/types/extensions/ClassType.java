@@ -236,6 +236,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		return name;
 	}
 
+	@Override
 	public TaggedInfo getTaggedInfo() {
 		return tagInfo;
 	}

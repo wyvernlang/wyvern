@@ -1,0 +1,13 @@
+/** The standard output module implementation for Java */
+module stdout : stdout // TODO: check against this spec
+
+// TODO: make the line below work
+// TODO: only allow main() to require this, or someone else to
+// instantiate it
+//require ffi/java
+
+// TODO (eventually): only allow this if ffi/java was required
+import java:java.lang.System
+
+def print(text:Str):Unit
+	System.out.print(text)

@@ -7,13 +7,16 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
+@Category(RegressionTests.class)
 public class TypeCheckTagTests {
 
 	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/typecheck/tagged/";

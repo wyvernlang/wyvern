@@ -1,0 +1,10 @@
+run "wyvern user.wyv" from DOS command shell in wyvern\demo\calc
+or run "wyvern.bat user.wyv" from Cygwin
+
+Show code in user.wyv
+Show different forms of delimiters in user.wyv
+	{ }
+	~ and next line
+Show code in type.wyv - in particular note the metadata, the parser object, and the call into parser.wyv
+Show code in parser.wyv - recursive descent parser
+Swap - and + in parser.wyv to deomonstrate that it is actually parsing!

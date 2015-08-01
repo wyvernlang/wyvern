@@ -4,14 +4,17 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class DynamicTagTests {
 
 	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/dynamic/";
 	
+	@Category(RegressionTests.class)
 	@Test
 	/**
 	 * This test ensures the dynamic tag example works properly.
@@ -23,6 +26,7 @@ public class DynamicTagTests {
 		TestUtil.evaluateExpecting(ast, "big");
 	}
 
+	@Category(RegressionTests.class)
 	@Test
 	/**
 	 * This test ensures the dynamic tag example works properly.
@@ -79,6 +83,7 @@ public class DynamicTagTests {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	/**
 	 * This test ensures the dynamic tag example works properly.
 	 */
@@ -89,6 +94,7 @@ public class DynamicTagTests {
 		TestUtil.evaluateExpecting(ast, "bordered");
 	}
 	
+	@Category(RegressionTests.class)
 	@Test
 	/**
 	 * This test ensures the dynamic tag example works properly.
@@ -100,6 +106,7 @@ public class DynamicTagTests {
 		TestUtil.evaluateExpecting(ast, "big");
 	}
 	
+	@Category(RegressionTests.class)
 	@Test
 	/**
 	 * This test ensures the dynamic tag example works properly.
@@ -111,6 +118,7 @@ public class DynamicTagTests {
 		TestUtil.evaluateExpecting(ast, "bordered");
 	}
 	
+	@Category(RegressionTests.class)
 	@Test
 	/**
 	 * Test test ensures the dynamic tag example works properly when stripped of actual
@@ -124,6 +132,7 @@ public class DynamicTagTests {
 	}
 	
 	@Test
+	@Category(RegressionTests.class)
 	/**
 	 * Test test ensures the dynamic tag example works properly when stripped of actual
 	 * dynamic tag features. This is to make sure non-dynamic tag code is working.

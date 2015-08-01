@@ -35,6 +35,7 @@ public class TypeVarDecl extends Declaration {
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
 	private final Reference<Value> metadataObj;
+	private TaggedInfo taggedInfo = null;
 
 	/**
 	 * Helper class to allow easy variation of bound types
@@ -113,6 +114,7 @@ public class TypeVarDecl extends Declaration {
 		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
 		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
+		this.taggedInfo = taggedInfo;
 	}
 
 	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {

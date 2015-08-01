@@ -26,6 +26,12 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	private LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
 	private Type retType = null;
 
+	private TypedAST check(TypedAST e) {
+		//if (e == null)
+		//	throw new RuntimeException("no null values in Sequence");
+		return e;
+	}
+	
 	public static interface MapCallback {
 		public void map(TypedAST elem);
 	}
@@ -67,24 +73,24 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	public Sequence(TypedAST first) {
-		exps.add(first);
+		exps.add(check(first));
 	}
 	public Sequence(Iterable<TypedAST> first) {
 		exps = new LinkedList<TypedAST>();
 		for (TypedAST elem : first)
-			exps.add(elem);
+			exps.add(check(elem));
 	}
 
 	public Sequence(TypedAST first, TypedAST second) {
 		if (first instanceof Sequence) {
 			exps.addAll(((Sequence) first).exps);
 		} else if (first != null) {
-			exps.add(first);
+			exps.add(check(first));
 		}
 		if (second instanceof Sequence) {
 			exps.addAll(((Sequence) second).exps);
 		} else if (second != null) {
-			exps.add(second);
+			exps.add(check(second));
 		}
 	}
 
@@ -92,7 +98,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		// TODO Auto-generated constructor stub
 	}
 	public void append(TypedAST exp) {
-		this.exps.add(exp);
+		this.exps.add(check(exp));
 	}
 	
 	@Override
@@ -286,6 +292,10 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 						return hasNext();
 					}
 					lookahead = iterstack.peek().next();
+					if (lookahead == null) {
+						iterstack.peek().hasNext();
+						throw new RuntimeException("null lookahead!");
+					}
 					if (lookahead instanceof Sequence) {
 						iterstack.push(((Sequence) lookahead).iterator());
 						lookahead = null;

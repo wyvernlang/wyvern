@@ -6,9 +6,12 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import wyvern.tools.tests.suites.RegressionTests;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
+@Category(RegressionTests.class)
 public class ParseTagTests {
 
 	private static final String PATH = "src/wyvern/tools/tests/tagTests/code/parse/";

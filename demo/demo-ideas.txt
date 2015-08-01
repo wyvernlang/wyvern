@@ -1,0 +1,20 @@
+From earlier plans
+
+Demo of Wyvern Web App
+	Representative of current practice
+		Java + JavaScript mobile web app
+			demo integer overflow
+			demo command injection (SQL or xQuery)
+			demo authentication/auth/direct obj ref/session mgmt
+				from using a third-party library that isn't visible at top level
+	Wyvern equivalent
+		integers don't overflow (simply the "right model")
+		commands aren't strings (easier than if they were)
+		doesn't compile with third-party library
+			replace with correct library
+			OR change architecture - but then visible
+		
+	Why unique
+		usability (integers, commands)
+		comprehensiveness (architectural approach)
+	Why this is science (for NSA)
