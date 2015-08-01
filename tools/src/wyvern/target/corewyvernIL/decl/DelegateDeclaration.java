@@ -5,7 +5,9 @@ import java.util.List;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
@@ -39,14 +41,14 @@ public class DelegateDeclaration extends Declaration{
 	}
 
 	@Override
-	public Type typeCheck(Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
 		return emitILVisitor.visit(env, oirenv, this);
+	}
+
+	@Override
+	public DeclType typeCheck(TypeContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

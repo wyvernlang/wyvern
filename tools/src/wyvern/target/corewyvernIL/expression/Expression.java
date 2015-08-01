@@ -10,7 +10,6 @@ public abstract class Expression extends ASTNode implements EmitOIR {
 	
 	private ValueType exprType;
 	public abstract ValueType typeCheck(TypeContext ctx);
-	// TODO: cheating, but I'll fix it later!
 	public abstract Value interpret(EvalContext ctx);
 
 	protected Expression (ValueType exprType)
