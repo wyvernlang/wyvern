@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
@@ -102,5 +104,10 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 		if (((IntegerConstant) o).getValue() != this.getValue())
 			return false;
 		return true;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		return new IntegerLiteral(value);
 	}
 }

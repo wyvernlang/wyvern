@@ -3,6 +3,8 @@ package wyvern.tools.typedAST.core;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -316,5 +318,15 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 				return iterstack.peek().next();
 			}
 		};
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		Iterator<TypedAST> ai = exps.iterator();
+		
+		if (!ai.hasNext())
+			throw new RuntimeException("expected an expression in the list");
+		
+		return GenUtil.doGenIL(ctx, ai);
 	}
 }

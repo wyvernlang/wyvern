@@ -4,6 +4,9 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -122,6 +125,24 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented yet");
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

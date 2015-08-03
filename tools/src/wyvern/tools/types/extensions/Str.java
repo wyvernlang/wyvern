@@ -1,5 +1,6 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
@@ -83,4 +84,10 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 
     @Override
 	public boolean equals(Object other) { return other instanceof Str; }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -85,5 +87,11 @@ public class TupleValue extends AbstractValue implements InvokableValue {
 		if (num >= values.length)
 			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, exp.getLocation());
 		return values[num];
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

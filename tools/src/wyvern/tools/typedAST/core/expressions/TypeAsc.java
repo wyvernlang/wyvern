@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -74,5 +76,11 @@ public class TypeAsc extends AbstractTypedAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(exn, should);
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

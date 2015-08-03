@@ -14,7 +14,9 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.EmitLLVMNative;
@@ -23,6 +25,9 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -49,4 +54,34 @@ public class ILTests {
 		Value v = letExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(five, v);
     }
+    
+    @Test
+    public void testLetValWithParse() throws ParseException {
+        String input =
+                  "val x = 5\n"
+        		+ "x\n";
+		TypedAST ast = TestUtil.getNewAST(input);
+		Expression program = ast.generateIL(GenContext.empty());
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+    }
+	@Test
+	public void testFieldRead() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    val v = 5\n"
+				     + "obj.v\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		Expression program = ast.generateIL(GenContext.empty());
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
 }

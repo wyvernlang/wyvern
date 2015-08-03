@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -86,5 +88,11 @@ public class JavaType implements EnvironmentExtender {
 	@Override
 	public EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
 		return env;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

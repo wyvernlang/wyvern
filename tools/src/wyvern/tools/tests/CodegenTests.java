@@ -4,6 +4,7 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -14,6 +15,7 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
 import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -51,6 +53,7 @@ public class CodegenTests {
         OIRProgram oirprogram = OIRProgram.program;
         System.out.println ("");
     }
+	@Category(CurrentlyBroken.class)
     @Test
     public void testNew() throws IOException, CopperParserException {
         String input =

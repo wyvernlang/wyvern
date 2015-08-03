@@ -7,7 +7,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class BooleanLiteral extends Value {
+public class BooleanLiteral extends AbstractValue {
 
     private boolean value;
 

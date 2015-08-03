@@ -1,5 +1,7 @@
 package wyvern.tools.types;
 
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWritable;
@@ -34,4 +36,5 @@ public interface Type extends TreeWritable {
 	Type cloneWithBinding(TypeBinding binding);
 
 	wyvern.target.corewyvernIL.type.ValueType generateILType();
+	public ValueType getILType(GenContext ctx);
 }

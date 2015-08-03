@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
@@ -211,5 +213,11 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

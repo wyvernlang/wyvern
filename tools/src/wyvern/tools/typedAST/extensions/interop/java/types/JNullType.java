@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.extensions.interop.java.types;
 
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
@@ -45,5 +46,11 @@ public class JNullType extends AbstractTypeImpl implements Type {
 
     @Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

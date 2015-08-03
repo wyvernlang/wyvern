@@ -1,5 +1,6 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -150,4 +151,10 @@ public class Intersection implements Type, OperatableType, ApplyableType {
     public ValueType generateILType() {
         throw new WyvernException("Invalid interop type, cannot generate IL", FileLocation.UNKNOWN);
     }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

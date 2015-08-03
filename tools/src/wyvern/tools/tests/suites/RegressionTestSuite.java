@@ -6,6 +6,7 @@ import org.junit.experimental.categories.Categories;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
+import wyvern.tools.tests.CodegenTests;
 import wyvern.tools.tests.CopperTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
@@ -29,7 +30,8 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				DynamicTagTests.class, FileTestRunner.class,
 				ParseTagTests.class, ExecuteTagTests.class,
 				CopperTests.class, PerformanceTests.class,
-				TypeCheckMatch.class, TypeCheckingTests.class
+				TypeCheckMatch.class, TypeCheckingTests.class,
+				CodegenTests.class,
 				})
 public class RegressionTestSuite {
 

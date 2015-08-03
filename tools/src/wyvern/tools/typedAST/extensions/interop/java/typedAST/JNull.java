@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -55,5 +57,11 @@ public class JNull implements TypedAST {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

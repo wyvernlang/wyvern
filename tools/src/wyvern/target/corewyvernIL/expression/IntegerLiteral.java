@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class IntegerLiteral extends Value {
+public class IntegerLiteral extends AbstractValue {
 	
 	@Override
 	public int hashCode() {
@@ -33,7 +33,7 @@ public class IntegerLiteral extends Value {
 
 	@Override
 	public String toString() {
-		return "IntegerLiteral [value=" + value + "]";
+		return Integer.toString(value);
 	}
 
 	private int value;

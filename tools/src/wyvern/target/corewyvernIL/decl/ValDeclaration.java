@@ -5,7 +5,10 @@ import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -13,6 +16,11 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class ValDeclaration extends Declaration {
+
+	@Override
+	public String toString() {
+		return "ValDeclaration[" + fieldName + " : " + type + " = " + value + "]";
+	}
 
 	public ValDeclaration(String fieldName, ValueType type, Expression value) {
 		super();
@@ -58,7 +66,13 @@ public class ValDeclaration extends Declaration {
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ValDeclType(fieldName, type);
 	}
+	
+	@Override
+	public Declaration interpret(EvalContext ctx) {
+		Expression newValue = (Expression) value.interpret(ctx);
+		return new ValDeclaration(fieldName, type, newValue);
+	}
+
 }

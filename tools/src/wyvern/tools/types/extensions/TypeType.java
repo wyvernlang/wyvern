@@ -2,6 +2,7 @@ package wyvern.tools.types.extensions;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.*;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.expressions.Invocation;
@@ -260,6 +261,12 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	@Override
 	public TaggedInfo getTaggedInfo() {
 		return decl==null?null:decl.getTaggedInfo();
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

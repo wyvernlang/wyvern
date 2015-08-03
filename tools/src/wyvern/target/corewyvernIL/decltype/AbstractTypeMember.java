@@ -1,22 +1,20 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 
-public class ConcreteDeclType extends DeclType {
-	
+public abstract class AbstractTypeMember extends DeclType implements EmitOIR{
+
 	private String typeName;
-	private ValueType sourceType;
 	
-	public ConcreteDeclType(String typeName, ValueType sourceType) {
+	public AbstractTypeMember(String typeName) {
 		super();
 		this.typeName = typeName;
-		this.sourceType = sourceType;
 	}
 
 	public String getTypeName ()
@@ -28,21 +26,10 @@ public class ConcreteDeclType extends DeclType {
 	{
 		typeName = _typeName;
 	}
-	
-	public void setSourceType (ValueType _type)
-	{
-		sourceType = _type;
-	}
-	
-	public ValueType getSourceType ()
-	{
-		return sourceType;
-	}
 
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
-		// TODO Auto-generated method stub
-		return null;
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 }

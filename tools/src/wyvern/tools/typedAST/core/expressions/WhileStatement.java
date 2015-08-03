@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -100,4 +102,10 @@ public class WhileStatement implements TypedAST, CoreAST {
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
         throw new RuntimeException("Not implemented codegen for whilestatement"); //TODO remove this
     }
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

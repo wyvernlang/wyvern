@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -62,5 +64,10 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
     private FileLocation location;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

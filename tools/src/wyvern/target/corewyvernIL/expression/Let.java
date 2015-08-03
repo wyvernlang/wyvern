@@ -9,7 +9,12 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class Let extends Expression{
+public class Let extends Expression {
+
+	@Override
+	public String toString() {
+		return "Le[" + varName + " = " + toReplace + " in " + inExpr + "]";
+	}
 
 	private String varName;
 	private Expression toReplace;

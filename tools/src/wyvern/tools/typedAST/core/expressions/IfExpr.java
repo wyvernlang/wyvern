@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -104,6 +106,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		public void writeArgsToTree(TreeWriter writer) {
 
 		}
+
+		@Override
+		public Expression generateIL(GenContext ctx) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class UncondClause extends IfClause {
@@ -159,6 +167,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		@Override
 		public void writeArgsToTree(TreeWriter writer) {
 
+		}
+
+		@Override
+		public Expression generateIL(GenContext ctx) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -239,6 +253,12 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 	
 	public Iterable<IfClause> getClauses() {
 		return clauses;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

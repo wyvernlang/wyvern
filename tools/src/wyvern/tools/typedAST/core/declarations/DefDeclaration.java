@@ -1,7 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -213,5 +215,26 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (resolvedType == null)
 			resolvedType = TypeResolver.resolve(type, against);
 		return env.extend(new NameBindingImpl(name, resolvedType));
+	}
+
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

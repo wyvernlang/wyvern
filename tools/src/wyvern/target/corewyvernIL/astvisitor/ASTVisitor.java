@@ -6,9 +6,8 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.decltype.AbstractDeclType;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.DependentType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -24,7 +23,6 @@ import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public abstract class ASTVisitor<T> {
@@ -44,9 +42,9 @@ public abstract class ASTVisitor<T> {
 	public abstract T visit(Environment env, OIREnvironment oirenv, FormalArg formalArg);
 	public abstract T visit(Environment env, OIREnvironment oirenv, VarDeclType varDeclType);
 	public abstract T visit(Environment env, OIREnvironment oirenv, ValDeclType valDeclType);
-	public abstract T visit(Environment env, OIREnvironment oirenv, DependentType dependentType);
+	//public abstract T visit(Environment env, OIREnvironment oirenv, DependentType dependentType);
 	public abstract T visit(Environment env, OIREnvironment oirenv, DefDeclType defDeclType);
-	public abstract T visit(Environment env, OIREnvironment oirenv, AbstractDeclType abstractDeclType);
+	public abstract T visit(Environment env, OIREnvironment oirenv, AbstractTypeMember abstractDeclType);
 	public abstract T visit(Environment env, OIREnvironment oirenv, NominalType nominalType);
 	public abstract T visit(Environment env, OIREnvironment oirenv, StructuralType structuralType);
 	public abstract T visit(Environment env, OIREnvironment oirenv, StringLiteral stringLiteral);

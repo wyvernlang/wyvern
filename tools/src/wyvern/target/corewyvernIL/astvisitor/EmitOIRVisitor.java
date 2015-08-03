@@ -11,10 +11,9 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.decltype.AbstractDeclType;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.DependentType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -409,12 +408,6 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		return methoDecls;
 	}
 
-	public OIRAST visit(Environment env, OIREnvironment oirenv,
-			DependentType dependentType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	public OIRAST visit(Environment env, OIREnvironment oirenv,
 			DefDeclType defDeclType) {
@@ -448,7 +441,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
 
 	public OIRAST visit(Environment env, OIREnvironment oirenv,
-			AbstractDeclType abstractDeclType) {
+			AbstractTypeMember abstractDeclType) {
 		OIRType oirtype;
 		OIRMethodDeclaration methDecl;
 		OIRMethodDeclarationGroup methodDecls;

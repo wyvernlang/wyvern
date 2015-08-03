@@ -3,6 +3,7 @@ package wyvern.tools.types.extensions;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -124,5 +125,10 @@ public class TypeInv implements Type {
 
     @Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -597,6 +599,12 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected TypedAST doClone(Map<String, TypedAST> nc) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
 	}

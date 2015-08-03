@@ -1,6 +1,9 @@
 package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -141,6 +144,14 @@ public class TypeVarDecl extends Declaration {
 			public Type getType() {
 				return body;
 			}
+
+
+
+			@Override
+			public Expression generateIL(GenContext ctx) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 
 		this.fileLocation = fileLocation;
@@ -236,5 +247,23 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

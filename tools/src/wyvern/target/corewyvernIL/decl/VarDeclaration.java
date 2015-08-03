@@ -5,21 +5,23 @@ import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 
 public class VarDeclaration extends Declaration {
 
 	private String fieldName;
 	private ValueType type;
-	private Variable value;
+	private Expression value;
 	
-	public VarDeclaration(String fieldName, ValueType type, Variable value) {
+	public VarDeclaration(String fieldName, ValueType type, Expression value) {
 		super();
 		this.fieldName = fieldName;
 		this.type = type;
@@ -42,11 +44,11 @@ public class VarDeclaration extends Declaration {
 		this.type = type;
 	}
 	
-	public Variable getValue() {
+	public Expression getValue() {
 		return value;
 	}
 	
-	public void setValue(Variable value) {
+	public void setValue(Expression value) {
 		this.value = value;
 	}
 
@@ -61,4 +63,11 @@ public class VarDeclaration extends Declaration {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public Declaration interpret(EvalContext ctx) {
+		Expression newValue = (Expression) value.interpret(ctx);
+		return new VarDeclaration(fieldName, type, newValue);
+	}
+
 }

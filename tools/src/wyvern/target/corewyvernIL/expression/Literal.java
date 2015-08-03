@@ -2,7 +2,7 @@ package wyvern.target.corewyvernIL.expression;
 
 import wyvern.target.corewyvernIL.type.ValueType;
 
-public abstract class Literal extends Value {
+public abstract class Literal extends AbstractValue {
 
 	protected Literal(ValueType exprType) {
 		super(exprType);

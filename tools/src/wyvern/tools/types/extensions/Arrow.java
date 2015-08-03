@@ -3,6 +3,7 @@ package wyvern.tools.types.extensions;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -111,4 +112,10 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
     public ValueType generateILType() {
         return new StructuralType("this", Arrays.asList(new DefDeclType("call", result.generateILType(), Arrays.asList(new FormalArg("arg1", argument.generateILType())))));
     }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

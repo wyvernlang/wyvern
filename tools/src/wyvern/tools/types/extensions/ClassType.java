@@ -2,6 +2,7 @@ package wyvern.tools.types.extensions;
 
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.*;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
@@ -239,5 +240,11 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	@Override
 	public TaggedInfo getTaggedInfo() {
 		return tagInfo;
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

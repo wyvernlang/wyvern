@@ -1,5 +1,6 @@
 package wyvern.tools.types;
 
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.*;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -93,5 +94,11 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 
     public String getName() {
 		return typeName;
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
