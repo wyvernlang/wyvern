@@ -209,6 +209,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
  	
  	terminal Token resourceKwd_t    ::= /resource/ in (keywds) {: RESULT = token(RESOURCE,lexeme); :};
+ 	terminal Token asKwd_t ::= /as/ in (keywds) {: RESULT = token(AS,lexeme); :};
+ 	terminal Token instantiateKwd_t ::= /instantiate/ in (keywds) {: RESULT = token(INSTANTIATE,lexeme); :};
 
 	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
     terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); :};
@@ -324,6 +326,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | matchKwd_t:t {: RESULT = t; :}
 	       | taggedKwd_t:t {: RESULT = t; :}
 	       | importKwd_t:t {: RESULT = t; :}
+	       | instantiateKwd_t:t {: RESULT = t; :}
+	       | asKwd_t:t {: RESULT = t; :}
 	       | resourceKwd_t:t {: RESULT = t; :};
 //	       | :t {: RESULT = t; :}
 

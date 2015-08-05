@@ -43,6 +43,15 @@ public class ModuleSystemTests {
     }
 
 	@Test
+	public void testResource() throws ParseException {
+		String program = TestUtil.readFile(PATH + "testModule.wyv");
+		TypedAST ast = TestUtil.getNewAST(program);
+		WyvernResolver.getInstance().setNewParser(true);
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		ast.evaluate(Globals.getStandardEvalEnv());
+	}
+    
+	@Test
 	public void testImport() throws ParseException {
 		String program = TestUtil.readFile(PATH + "import.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);
@@ -59,6 +68,20 @@ public class ModuleSystemTests {
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
 	
+	@Test
+	public void testRsType() throws ParseException {
+		String program = TestUtil.readFile(PATH + "rsType.wyv");
+		TypedAST ast = TestUtil.getNewAST(program);
+		WyvernResolver.getInstance().setNewParser(true);
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		ast.evaluate(Globals.getStandardEvalEnv());
+	}
+	
+	@Test
+	public void testInst() throws ParseException {
+		String program = TestUtil.readFile(PATH + "inst.wyv");
+		TypedAST ast = TestUtil.getNewAST(program);
+	}
 	/**
 	 * Attempts to typecheck the given AST and catch the given ErrorMessage.
 	 * This error being thrown indicates the test passed.

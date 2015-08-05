@@ -102,6 +102,8 @@ TOKEN : /* Keywords */
 //| < : "" >
 // more here
 | < RESOURCE : "resource" >
+| < INSTANTIATE : "instantiate" >
+| < AS : "as" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -156,17 +158,14 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
-{ AST exp; Token id; }
+{ AST exp; Token id; boolean isResource = false; }
 {
-  exp = ModuleBody(false)  { return exp; }
-|
+  [<RESOURCE> {isResource = true;} ]
   <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
-	return build.moduleDecl(id.image, exp, loc(id), false);
+	return build.moduleDecl(id.image, exp, loc(id), isResource);
   }
-  
-| <RESOURCE> <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
-	return build.moduleDecl(id.image, exp, loc(id), true);
-  }
+|
+  exp = ModuleBody(false)  { return exp; }
 }
 
 Type OptType() :
@@ -241,6 +240,8 @@ AST Declaration(boolean inModule) :
   exp = DelegateDeclaration()  { return exp; }
 |
   exp = ExpressionLine(inModule) { return exp; }
+|
+  exp = Instantiation() {return exp; }
 }
 
 AST DefDeclaration() :
@@ -277,10 +278,11 @@ AST DelegateDeclaration() :
 
 AST TypeDeclaration() :
 { Token name; AST body = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
-  Object tagInfo = null;
+  Object tagInfo = null; boolean isResource = false;
 }
 {
   [<TAGGED> { isTagged = true; } ]
+  [<RESOURCE> { isResource = true; } ]
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
@@ -288,7 +290,7 @@ AST TypeDeclaration() :
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     } 
-	return build.typeDecl(name.image, body, tagInfo, null, loc(name));
+	return build.typeDecl(name.image, body, tagInfo, null, loc(name), isResource);
   }
 }
 
@@ -524,4 +526,12 @@ AST ArgumentList(ExpFlags flags) :
   		}
   		return exp;
   	}
+ }
+  	
+  	
+AST Instantiation() :
+{ URI uri; Token name; AST arg;}
+{
+<INSTANTIATE> uri = Uri() arg = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
+{return build.instantiation(uri, arg, loc(name));}
 }

@@ -14,7 +14,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST valDecl(String name, Type type, AST exp, FileLocation loc);
 	public AST varDecl(String name, Type type, AST exp, FileLocation loc);
 	public AST defDecl(String name, Type type, List args, AST body, boolean isClassDef, FileLocation loc);
-	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc);
+	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource);
 	public AST delegateDecl(Type type, AST exp, FileLocation loc);
 	
 	public AST defDeclType(String name, Type type, List args, FileLocation loc);
@@ -39,5 +39,7 @@ public interface ASTBuilder<AST,Type> {
 	public Type nominalType(String name);
 	
 	public void setNewBody(AST newExp, AST decls);
+
+	public AST instantiation(URI uri, AST arg, FileLocation loc);
 
 }

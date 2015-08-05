@@ -23,6 +23,7 @@ import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Case;
 import wyvern.tools.typedAST.core.expressions.Fn;
+import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.expressions.New;
@@ -91,7 +92,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 	
 	@Override
-	public TypedAST typeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc) {
+	public TypedAST typeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource) {
 		if (body == null) {
 			body = new DeclSequence();
 		}
@@ -100,7 +101,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		}
 		//Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);
 		//return new TypeDeclaration(name, (DeclSequence) body, null, (TaggedInfo) tagInfo, loc);
-		return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc);
+		return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource);
 	}
 
 	@Override
@@ -195,6 +196,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	@Override
 	public Object tagInfo(Type type, List<Type> comprises) {
 		return new TaggedInfo(type, comprises);
+	}
+
+	@Override
+	public TypedAST instantiation(URI uri, TypedAST arg, FileLocation loc) {
+		return new Instantiation(uri, arg, loc);
 	}
 
 }
