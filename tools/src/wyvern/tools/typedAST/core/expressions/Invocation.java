@@ -1,9 +1,14 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -160,7 +165,18 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		Expression re = receiver.generateIL(ctx);
+		ValueType rt = re.typeCheck(ctx);
+		DeclType dt = rt.findDecl(operationName);
+		if (dt == null)
+			throw new RuntimeException("typechecking error: operation not found");
+		if (dt instanceof ValDeclType || dt instanceof VarDeclType) {
+			if (argument != null)
+				throw new RuntimeException("type error: unexpected argument");				
+			return new FieldGet(re, operationName);
+		} else {
+			Expression ae = argument == null ? null : argument.generateIL(ctx);
+			throw new RuntimeException("method calls not implemented");			
+		}
 	}
 }

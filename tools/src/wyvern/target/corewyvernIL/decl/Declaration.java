@@ -20,4 +20,7 @@ public abstract class Declaration extends ASTNode implements EmitOIR {
 	public Declaration interpret(EvalContext ctx) {
 		return this;
 	}
+
+	/** Returns the name of this declaration, or null if this declaration is not named */
+	public abstract String getName();
 }

@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
@@ -69,6 +70,11 @@ public class NominalType extends ValueType{
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
 		return emitILVisitor.visit(env, oirenv, this);
+	}
+
+	@Override
+	public ValueType adapt(View v) {
+		return new NominalType(path.adapt(v), typeMember);
 	}
 	
 }

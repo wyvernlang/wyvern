@@ -214,7 +214,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		object = fieldGet.getObjectExpr();
 		oirObject = (OIRExpression) object.acceptVisitor(this, 
 				env, oirenv);
-		oirFieldGet = new OIRFieldGet (oirObject, fieldGet.getFieldName());
+		oirFieldGet = new OIRFieldGet (oirObject, fieldGet.getName());
 		
 		return oirFieldGet;
 	}
@@ -294,7 +294,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		
 		_type = varDecl.getType();
 		type = (OIRType)_type.acceptVisitor(this, env, oirenv);
-		oirMember = new OIRFieldDeclaration (varDecl.getFieldName(), type);
+		oirMember = new OIRFieldDeclaration (varDecl.getName(), type);
 		return oirMember;
 	}
 	
@@ -322,7 +322,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		oirReturnType = (OIRType) defDecl.getType().acceptVisitor(this,
 				env, oirenv);
 		oirMethodDecl = new OIRMethodDeclaration (oirReturnType, 
-				defDecl.getMethodName(), listOIRFormalArgs);
+				defDecl.getName(), listOIRFormalArgs);
 		oirBody = (OIRExpression) defDecl.getBody().acceptVisitor(this,
 				env, defEnv);
 		oirMethod = new OIRMethod (defEnv, oirMethodDecl, oirBody);
@@ -337,7 +337,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
 		_type = valDecl.getType();
 		type = (OIRType)_type.acceptVisitor(this, env, oirenv);
-		oirMember = new OIRFieldDeclaration (valDecl.getFieldName(), type, true);
+		oirMember = new OIRFieldDeclaration (valDecl.getName(), type, true);
 		
 		return oirMember;
 	}
@@ -377,9 +377,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		List<OIRFormalArg> args;
 		String fieldName;
 		
-		fieldName = varDeclType.getField();
+		fieldName = varDeclType.getName();
 		methoDecls = new OIRMethodDeclarationGroup ();
-		type = varDeclType.getType();
+		type = varDeclType.getRawResultType();
 		oirtype = (OIRInterface)type.acceptVisitor(this, env, oirenv);
 		methoDecls.addMethodDeclaration(new OIRMethodDeclaration (oirtype, 
 				"get"+fieldName, null));
@@ -398,10 +398,10 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		OIRMethodDeclaration methodDecl;
 		OIRMethodDeclarationGroup methoDecls;
 		
-		type = valDeclType.getType();
+		type = valDeclType.getRawResultType();
 		oirtype = (OIRInterface)type.acceptVisitor(this, env, oirenv);
 		methodDecl = new OIRMethodDeclaration (oirtype, 
-				"set"+valDeclType.getField(), null);
+				"set"+valDeclType.getName(), null);
 		methoDecls = new OIRMethodDeclarationGroup ();
 		methoDecls.addMethodDeclaration(methodDecl);
 		
@@ -428,11 +428,11 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 			listOIRFormalArgs.add(formalArg);
 		}
 		
-		returnType = defDeclType.getReturnType();
+		returnType = defDeclType.getRawResultType();
 		oirReturnType = (OIRType)returnType.acceptVisitor(this,
 				env, oirenv);
 		oirMethodDecl = new OIRMethodDeclaration (oirReturnType, 
-				defDeclType.getMethod(), listOIRFormalArgs);
+				defDeclType.getName(), listOIRFormalArgs);
 		methodDecls = new OIRMethodDeclarationGroup ();
 		methodDecls.addMethodDeclaration(oirMethodDecl);
 		
@@ -448,7 +448,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
 		oirtype = (OIRType) abstractDeclType.acceptVisitor(this,
 				env, oirenv);
-		methDecl = new OIRMethodDeclaration (oirtype, "get"+abstractDeclType.getTypeName(), null);
+		methDecl = new OIRMethodDeclaration (oirtype, "get"+abstractDeclType.getName(), null);
 		methodDecls = new OIRMethodDeclarationGroup ();
 		methodDecls.addMethodDeclaration(methDecl);
 

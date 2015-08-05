@@ -10,25 +10,13 @@ import wyvern.target.oir.OIREnvironment;
 
 public abstract class ConcreteTypeMember extends DeclType {
 	
-	private String typeName;
 	private ValueType sourceType;
 	
-	public ConcreteTypeMember(String typeName, ValueType sourceType) {
-		super();
-		this.typeName = typeName;
+	public ConcreteTypeMember(String name, ValueType sourceType) {
+		super(name);
 		this.sourceType = sourceType;
 	}
 
-	public String getTypeName ()
-	{
-		return typeName;
-	}
-	
-	public void setTypeName (String _typeName)
-	{
-		typeName = _typeName;
-	}
-	
 	public void setSourceType (ValueType _type)
 	{
 		sourceType = _type;

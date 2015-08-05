@@ -1,12 +1,15 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
@@ -60,18 +63,31 @@ public class StructuralType extends ValueType {
 		StructuralType st = (StructuralType) t;
 		
 		for (DeclType dt : st.declTypes) {
-			boolean found = false;
-			for (DeclType mdt : declTypes) {
-				if (mdt.isSubtypeOf(dt, ctx)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found)
+			DeclType candidateDT = findDecl(dt.getName());
+			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, ctx)) {
 				return false;
+			}
 		}
 		
 		return true;
 	}
 
+	@Override
+	public DeclType findDecl(String declName) {
+		for (DeclType mdt : declTypes) {
+			if (mdt.getName().equals(declName)) {
+				return mdt;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public ValueType adapt(View v) {
+		List<DeclType> newDTs = new LinkedList<DeclType>();
+		for (DeclType dt : declTypes) {
+			newDTs.add(dt.adapt(v));
+		}
+		return new StructuralType(selfName, newDTs);
+	}
 }

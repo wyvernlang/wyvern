@@ -51,4 +51,9 @@ public class DelegateDeclaration extends Declaration{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getName() {
+		return null;
+	}
 }

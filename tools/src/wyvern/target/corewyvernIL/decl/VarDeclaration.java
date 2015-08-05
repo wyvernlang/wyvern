@@ -15,25 +15,15 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 
-public class VarDeclaration extends Declaration {
+public class VarDeclaration extends NamedDeclaration {
 
-	private String fieldName;
 	private ValueType type;
 	private Expression value;
 	
-	public VarDeclaration(String fieldName, ValueType type, Expression value) {
-		super();
-		this.fieldName = fieldName;
+	public VarDeclaration(String name, ValueType type, Expression value) {
+		super(name);
 		this.type = type;
 		this.value = value;
-	}
-	
-	public String getFieldName() {
-		return fieldName;
-	}
-	
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
 	}
 	
 	public ValueType getType() {
@@ -67,7 +57,7 @@ public class VarDeclaration extends Declaration {
 	@Override
 	public Declaration interpret(EvalContext ctx) {
 		Expression newValue = (Expression) value.interpret(ctx);
-		return new VarDeclaration(fieldName, type, newValue);
+		return new VarDeclaration(getName(), type, newValue);
 	}
 
 }

@@ -47,6 +47,16 @@ public class New extends Expression {
 		this.selfName = selfName;
 	}
 
+	/** Returns a declaration of the proper name, or null if not found */
+	public Declaration findDecl(String name) {
+		for (Declaration d : decls) {
+			if (name.equals(d.getName())) {
+				return d;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

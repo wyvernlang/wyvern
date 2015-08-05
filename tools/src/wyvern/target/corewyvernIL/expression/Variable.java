@@ -5,6 +5,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
@@ -70,5 +71,10 @@ public class Variable extends Expression implements Path {
 	@Override
 	public Value interpret(EvalContext ctx) {
 		return ctx.lookup(name);
+	}
+
+	@Override
+	public Path adapt(View v) {
+		return v.adapt(this);
 	}
 }

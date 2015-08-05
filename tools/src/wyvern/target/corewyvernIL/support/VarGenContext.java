@@ -12,9 +12,20 @@ public class VarGenContext extends GenContext {
 	public VarGenContext(String var, Expression expr, ValueType type, GenContext genContext) {
 		this.var = var;
 		this.expr = expr;
+		this.type = type;
 		this.genContext = genContext;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "GenContext[" + endToString();
+	}
+	
+	@Override
+	public String endToString() {
+		return var + " : " + type + " = " + expr + ", " + genContext.endToString();
+	}
+	
 	@Override
 	public Expression lookupExp(String varName) {
 		if (varName.equals(var))

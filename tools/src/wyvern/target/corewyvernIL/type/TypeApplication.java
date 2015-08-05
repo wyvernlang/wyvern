@@ -3,17 +3,18 @@ package wyvern.target.corewyvernIL.type;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class TypeApplication extends ValueType {
 
 	private ValueType baseType;
-	private Type typeArgument;
+	private ValueType typeArgument;
 	private String typeMember;
 	
 	
-	public TypeApplication(ValueType baseType, Type typeArgument,
+	public TypeApplication(ValueType baseType, ValueType typeArgument,
 			String typeMember) {
 		super();
 		this.baseType = baseType;
@@ -25,7 +26,7 @@ public class TypeApplication extends ValueType {
 		this.baseType = baseType;
 	}
 
-	public void setTypeArgument(Type typeArgument) {
+	public void setTypeArgument(ValueType typeArgument) {
 		this.typeArgument = typeArgument;
 	}
 
@@ -53,5 +54,10 @@ public class TypeApplication extends ValueType {
 			Environment env, OIREnvironment oirenv) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public ValueType adapt(View v) {
+		return new TypeApplication(baseType.adapt(v), typeArgument.adapt(v), typeMember);
 	}
 }

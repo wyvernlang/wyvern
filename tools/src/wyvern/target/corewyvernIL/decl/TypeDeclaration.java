@@ -10,24 +10,14 @@ import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class TypeDeclaration extends Declaration {
+public class TypeDeclaration extends NamedDeclaration {
 
 	public TypeDeclaration(String typeName, Type sourceType) {
-		super();
-		this.typeName = typeName;
+		super(typeName);
 		this.sourceType = sourceType;
 	}
 
-	private String typeName;
 	private Type sourceType;
-	
-	public String getTypeName() {
-		return typeName;
-	}
-	
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
 	
 	public Type getSourceType() {
 		return sourceType;

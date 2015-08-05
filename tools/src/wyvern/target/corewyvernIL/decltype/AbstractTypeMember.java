@@ -8,23 +8,10 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 
-public abstract class AbstractTypeMember extends DeclType implements EmitOIR{
+public abstract class AbstractTypeMember extends DeclType implements EmitOIR {
 
-	private String typeName;
-	
-	public AbstractTypeMember(String typeName) {
-		super();
-		this.typeName = typeName;
-	}
-
-	public String getTypeName ()
-	{
-		return typeName;
-	}
-	
-	public void setTypeName (String _typeName)
-	{
-		typeName = _typeName;
+	public AbstractTypeMember(String name) {
+		super(name);
 	}
 
 	@Override

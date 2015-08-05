@@ -15,4 +15,9 @@ public class EmptyGenContext extends GenContext {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}
 
+	@Override
+	String endToString() {
+		return "]";
+	}
+
 }

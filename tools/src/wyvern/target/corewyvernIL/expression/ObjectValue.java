@@ -9,5 +9,4 @@ public class ObjectValue extends New implements Value {
 	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType) {
 		super(decls, selfName, exprType);
 	}
-
 }

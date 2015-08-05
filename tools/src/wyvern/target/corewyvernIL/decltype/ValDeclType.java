@@ -5,39 +5,15 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class ValDeclType extends DeclType implements EmitOIR{
+public class ValDeclType extends DeclTypeWithResult implements EmitOIR{
 
-	private String field;
-	private ValueType type;
-	
 	public ValDeclType(String field, ValueType type) {
-		super();
-		this.field = field;
-		this.type = type;
-	}
-
-	public String getField ()
-	{
-		return field;
-	}
-	
-	public void setField (String _field)
-	{
-		field = _field;
-	}
-	
-	public void setType (ValueType _type)
-	{
-		type = _type;
-	}
-	
-	public ValueType getType ()
-	{
-		return type;
+		super(field, type);
 	}
 
 	@Override
@@ -51,15 +27,15 @@ public class ValDeclType extends DeclType implements EmitOIR{
 		if (!(dt instanceof ValDeclType))
 			return false;
 		ValDeclType vdt = (ValDeclType) dt;
-		return vdt.field.equals(field) && type.isSubtypeOf(vdt.type, ctx);
+		return vdt.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(vdt.getRawResultType(), ctx);
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((field == null) ? 0 : field.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+		result = prime * result + ((getRawResultType() == null) ? 0 : getRawResultType().hashCode());
 		return result;
 	}
 
@@ -72,21 +48,26 @@ public class ValDeclType extends DeclType implements EmitOIR{
 		if (getClass() != obj.getClass())
 			return false;
 		ValDeclType other = (ValDeclType) obj;
-		if (field == null) {
-			if (other.field != null)
+		if (getName() == null) {
+			if (other.getName() != null)
 				return false;
-		} else if (!field.equals(other.field))
+		} else if (!getName().equals(other.getName()))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (getRawResultType() == null) {
+			if (other.getRawResultType() != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!getRawResultType().equals(other.getRawResultType()))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Val[" + field + " : " + type + "]";
+		return "Val[" + getName() + " : " + getRawResultType() + "]";
+	}
+
+	@Override
+	public DeclType adapt(View v) {
+		return new ValDeclType(getName(), this.getRawResultType().adapt(v));
 	}
 }

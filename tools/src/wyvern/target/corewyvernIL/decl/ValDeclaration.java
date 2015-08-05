@@ -15,31 +15,19 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class ValDeclaration extends Declaration {
+public class ValDeclaration extends DeclarationWithRHS {
 
 	@Override
 	public String toString() {
-		return "ValDeclaration[" + fieldName + " : " + type + " = " + value + "]";
+		return "ValDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
 	}
 
 	public ValDeclaration(String fieldName, ValueType type, Expression value) {
-		super();
-		this.fieldName = fieldName;
+		super(fieldName, value);
 		this.type = type;
-		this.value = value;
 	}
 
-	private String fieldName;
 	private ValueType type;
-	private Expression value;
-	
-	public String getFieldName() {
-		return fieldName;
-	}
-	
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
 	
 	public ValueType getType() {
 		return type;
@@ -49,15 +37,6 @@ public class ValDeclaration extends Declaration {
 		this.type = type;
 	}
 	
-	public Expression getValue() {
-		return value;
-	}
-	
-	public void setValue(Expression value) {
-		this.value = value;
-	}
-	
-	
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -66,13 +45,13 @@ public class ValDeclaration extends Declaration {
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx) {
-		return new ValDeclType(fieldName, type);
+		return new ValDeclType(getName(), type);
 	}
 	
 	@Override
 	public Declaration interpret(EvalContext ctx) {
-		Expression newValue = (Expression) value.interpret(ctx);
-		return new ValDeclaration(fieldName, type, newValue);
+		Expression newValue = (Expression) getDefinition().interpret(ctx);
+		return new ValDeclaration(getName(), type, newValue);
 	}
 
 }

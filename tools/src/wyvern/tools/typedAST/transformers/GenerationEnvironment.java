@@ -31,7 +31,7 @@ public class GenerationEnvironment {
     private Optional<String> getName() {
         return basis.map(b->{
             if (b instanceof FieldGet) {
-                return ((FieldGet)b).getFieldName();
+                return ((FieldGet)b).getName();
             } else {
                 return ((Variable)b).getName();
             }
@@ -40,7 +40,7 @@ public class GenerationEnvironment {
 
     private Path addFirst(String newVar, Path oldpath) {
         if (oldpath instanceof FieldGet) {
-            return new FieldGet((Expression)addFirst(newVar, (Path)((FieldGet) oldpath).getObjectExpr()), ((FieldGet) oldpath).getFieldName());
+            return new FieldGet((Expression)addFirst(newVar, (Path)((FieldGet) oldpath).getObjectExpr()), ((FieldGet) oldpath).getName());
         } else {
             Variable old = (Variable)oldpath;
             return new FieldGet(new Variable(newVar), old.getName());

@@ -18,7 +18,7 @@ public class GenUtil {
 		if (ai.hasNext()) {
 			if (ast instanceof ValDeclaration) {
 				ValDeclaration vd = (ValDeclaration) ast;
-				ValueType type = ((ValDeclType)vd.genILType(ctx)).getType();
+				ValueType type = ((ValDeclType)vd.genILType(ctx)).getRawResultType();
 				String name = vd.getName();
 				GenContext newCtx = ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name), type);
 				Expression dfn = vd.getDefinition().generateIL(ctx);

@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.type;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
 
 /**
@@ -30,5 +31,10 @@ public class IntegerType extends ValueType {
 			OIREnvironment oirenv) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public ValueType adapt(View v) {
+		return this;
 	}
 }

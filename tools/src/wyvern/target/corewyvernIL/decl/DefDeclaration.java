@@ -16,30 +16,20 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
-public class DefDeclaration extends Declaration {
+public class DefDeclaration extends NamedDeclaration {
 
-	private String methodName;
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
 	
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body) {
-		super();
-		this.methodName = methodName;
+		super(methodName);
 		this.formalArgs = formalArgs;
 		this.type = type;
 		this.body = body;
 	}
 
-	public String getMethodName() {
-		return methodName;
-	}
-	
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
-	
 	public List<FormalArg> getFormalArgs() {
 		return formalArgs;
 	}
