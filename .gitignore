@@ -58,3 +58,5 @@ tools/src/wyvern/target/llvm/depcomp
 tools/src/wyvern/target/llvm/config.sub
 tools/src/wyvern/target/llvm/config.guess
 tools/src/wyvern/target/llvm/compile
+tools/src/wyvern/target/llvm/aclocal.m4
+tools/src/wyvern/target/llvm/configure
