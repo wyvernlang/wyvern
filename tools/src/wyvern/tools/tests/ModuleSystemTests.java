@@ -78,6 +78,14 @@ public class ModuleSystemTests {
 	}
 	
 	@Test
+	public void testWyt() throws ParseException {
+		String program = TestUtil.readFile(PATH + "Log.wyt");
+		TypedAST ast = TestUtil.getNewAST(program);
+		WyvernResolver.getInstance().setNewParser(true);
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		ast.evaluate(Globals.getStandardEvalEnv());
+	}
+	@Test
 	public void testInst() throws ParseException {
 		String program = TestUtil.readFile(PATH + "inst.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);

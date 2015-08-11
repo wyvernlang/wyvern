@@ -160,7 +160,12 @@ TOKEN : /* Literals */
 AST CompilationUnit() :
 { AST exp; Token id; boolean isResource = false; }
 {
-  [<RESOURCE> {isResource = true;} ]
+  LOOKAHEAD(2)
+  <RESOURCE> {isResource = true;} 
+  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
+	return build.moduleDecl(id.image, exp, loc(id), isResource);
+  }
+|
   <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
 	return build.moduleDecl(id.image, exp, loc(id), isResource);
   }
