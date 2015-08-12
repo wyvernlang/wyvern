@@ -247,6 +247,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	public ValueType getILType(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
 	
 	/** Added by shiyqw, for module declaration and type checking **/
 	public void setAsModule() {
@@ -260,6 +261,5 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	}
 	public boolean isModule() {
 		return this.moduleType != 0;
->>>>>>> newlexer
 	}
 }

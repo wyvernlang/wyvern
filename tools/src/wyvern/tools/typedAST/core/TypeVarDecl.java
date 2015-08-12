@@ -275,6 +275,7 @@ public class TypeVarDecl extends Declaration {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
 		return null;
+	}
 	
 	public boolean isResource() {
 		return this.resourceFlag;

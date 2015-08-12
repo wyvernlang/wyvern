@@ -1,10 +1,14 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -66,6 +70,18 @@ public class Instantiation extends CachingTypedAST implements CoreAST {
 	@Override
 	protected TypedAST doClone(Map<String, TypedAST> nc) {
 		return new Instantiation(uri, nc.get("arg"), location);
+	}
+
+	@Override
+	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

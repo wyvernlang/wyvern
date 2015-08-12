@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
 import static wyvern.tools.errors.ToolError.reportError;
->>>>>>> newlexer
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private URI uri;
@@ -144,10 +143,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
 		return null;
-=======
+	}
 	
 	public boolean isRequire() {
 		return this.requireFlag;
->>>>>>> newlexer
 	}
 }
