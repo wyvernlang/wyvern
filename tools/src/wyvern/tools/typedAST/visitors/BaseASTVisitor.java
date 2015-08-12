@@ -197,5 +197,9 @@ public abstract class BaseASTVisitor implements CoreASTVisitor {
 	public void visit(ModuleDeclaration decl) {
 
 	}
+	
+	@Override
+	public void visit(Instantiation instantiation) {
+	}
 
 }

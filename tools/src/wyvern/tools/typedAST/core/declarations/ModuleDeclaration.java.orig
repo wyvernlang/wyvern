@@ -185,6 +185,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
 	}
+<<<<<<< HEAD
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
@@ -202,8 +203,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
 		return null;
+=======
 	
 	public boolean isResource() {
 		return this.resourceFlag;
+>>>>>>> newlexer
 	}
 }

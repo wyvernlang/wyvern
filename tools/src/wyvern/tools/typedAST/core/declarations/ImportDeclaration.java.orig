@@ -22,6 +22,8 @@ import wyvern.tools.util.TreeWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+<<<<<<< HEAD
+=======
 import java.util.Optional;
 import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
 import static wyvern.tools.errors.ToolError.reportError;
@@ -127,6 +129,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		binder.bindVal(evalEnv);
 	}
+<<<<<<< HEAD
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
