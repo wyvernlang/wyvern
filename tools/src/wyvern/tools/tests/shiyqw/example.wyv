@@ -1,0 +1,3 @@
+resource type Log
+	val f : Int
+	def m(y: Int) : Int

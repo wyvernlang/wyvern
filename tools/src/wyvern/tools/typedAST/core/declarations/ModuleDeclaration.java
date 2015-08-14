@@ -189,6 +189,17 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	public Expression generateIL(GenContext ctx) {
 		// TODO Auto-generated method stub
+		/* design 
+		TypedAST reqSeq = filterRequires();
+		TypedAST impInstSeq = filterImportInstantiates();
+		Expression reqList = trans(reqSeq);
+		Expression innerSeq = filterNormal();
+		Expression newExp = Newexp(name, innerSeq);
+		Type reqTypes = GenUtil.getTypes(reqList);
+		letExp = GenUtil.genLetWrap(imInstSeq, NewExp);
+		fnVal = fnexp(reqTypes, LetExp);
+		return ValExp(name, reqTypes, fnVal);
+		*/
 		return null;
 	}
 

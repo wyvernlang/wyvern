@@ -3,6 +3,7 @@ package wyvern.tools.tests;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import wyvern.stdlib.Globals;
@@ -24,6 +25,7 @@ import wyvern.target.oir.EmitLLVMVisitor;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
+import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
@@ -36,12 +38,22 @@ import wyvern.tools.types.extensions.Int;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Optional;
 
 import static java.util.Optional.empty;
 import static wyvern.stdlib.Globals.getStandardEnv;
 
 public class ILTests {
-    @Test
+    	
+	private static final String BASE_PATH = TestUtil.BASE_PATH;
+	private static final String PATH = BASE_PATH + "shiyqw/";
+	
+    @BeforeClass public static void setupResolver() {
+    	TestUtil.setPaths();
+		WyvernResolver.getInstance().addPath(PATH);
+    }
+
+	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
     	Variable x = new Variable("x");
@@ -83,5 +95,13 @@ public class ILTests {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
+	}
+	
+	@Test
+	public void testWyt() throws ParseException {
+		String source = TestUtil.readFile(PATH + "example.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+		System.out.println(ast);
+		Expression program = ast.generateIL(GenContext.empty());
 	}
 }

@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.core;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
@@ -261,13 +262,18 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
+		/* design 
+		 
+		ILType type = new ILType();
+		type.addbody(body);
+		ctx.addType(type);
+		 
+		 */
 		return null;
 	}
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
