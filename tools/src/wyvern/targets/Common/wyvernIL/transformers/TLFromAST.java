@@ -6,10 +6,6 @@ import wyvern.targets.Common.wyvernIL.IL.Def.ValDef;
 import wyvern.targets.Common.wyvernIL.IL.Expr.*;
 import wyvern.targets.Common.wyvernIL.IL.Imm.*;
 import wyvern.targets.Common.wyvernIL.IL.Stmt.*;
-import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.typedAST.core.expressions.Assignment;
-import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.*;
@@ -354,5 +350,12 @@ public class TLFromAST implements CoreASTVisitor {
 	@Override
 	public void visit(Match match) {
 		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void visit(Instantiation instantiation) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -4,10 +4,6 @@ import wyvern.targets.Common.wyvernIL.IL.Def.*;
 import wyvern.targets.Common.wyvernIL.IL.Expr.Expression;
 import wyvern.targets.Common.wyvernIL.IL.Stmt.*;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.typedAST.core.expressions.Assignment;
-import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.declarations.*;
@@ -311,6 +307,11 @@ public class ExnFromAST implements CoreASTVisitor {
 	}
 	@Override
 	public void visit(Match match) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void visit(Instantiation instantiation) {
 		// TODO Auto-generated method stub
 		
 	}
