@@ -39,6 +39,7 @@ public class TypeVarDecl extends Declaration {
 	private final Reference<Optional<TypedAST>> metadata;
 	private final Reference<Value> metadataObj;
 	private TaggedInfo taggedInfo = null;
+	private boolean resourceFlag = false;
 
 	/**
 	 * Helper class to allow easy variation of bound types
@@ -111,15 +112,24 @@ public class TypeVarDecl extends Declaration {
 		this.fileLocation = fileLocation;
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation) {
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource ){
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
 		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 		this.taggedInfo = taggedInfo;
+		this.resourceFlag = isResource;
 	}
 
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation){
+		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
+		this.name = name;
+		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
+		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
+		this.fileLocation = fileLocation;
+	}
+	
 	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {
 		this.name = name;
 		this.body = body;
@@ -265,5 +275,9 @@ public class TypeVarDecl extends Declaration {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public boolean isResource() {
+		return this.resourceFlag;
 	}
 }

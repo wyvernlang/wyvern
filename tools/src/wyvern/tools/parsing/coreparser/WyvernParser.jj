@@ -101,6 +101,9 @@ TOKEN : /* Keywords */
 | < IMPORT: "import" >
 //| < : "" >
 // more here
+| < RESOURCE : "resource" >
+| < INSTANTIATE : "instantiate" >
+| < AS : "as" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -155,13 +158,19 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
-{ AST exp; Token id; }
+{ AST exp; Token id; boolean isResource = false; }
 {
-  exp = ModuleBody(false)  { return exp; }
+  LOOKAHEAD(2)
+  <RESOURCE> {isResource = true;} 
+  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
+	return build.moduleDecl(id.image, exp, loc(id), isResource);
+  }
 |
   <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
-	return build.moduleDecl(id.image, exp, loc(id));
+	return build.moduleDecl(id.image, exp, loc(id), isResource);
   }
+|
+  exp = ModuleBody(false)  { return exp; }
 }
 
 Type OptType() :
@@ -185,13 +194,13 @@ AST ModuleBody(boolean inModule) :
 AST RequireDecl() :
 { URI uri; Token t; }
 {
-  t=<REQUIRE> uri = Uri() <NEWLINE>  { return build.importDecl(uri, loc(t)); }
+  t=<REQUIRE> uri = Uri() <NEWLINE>  { return build.importDecl(uri, loc(t), true); }
 }
 
 AST ImportDecl() :
 { URI uri; Token t; }
 {
-  t=<IMPORT> uri = Uri() <NEWLINE> { return build.importDecl(uri, loc(t)); }
+  t=<IMPORT> uri = Uri() <NEWLINE> { return build.importDecl(uri, loc(t), false); }
 }
 
 URI Uri() :
@@ -236,6 +245,8 @@ AST Declaration(boolean inModule) :
   exp = DelegateDeclaration()  { return exp; }
 |
   exp = ExpressionLine(inModule) { return exp; }
+|
+  exp = Instantiation() {return exp; }
 }
 
 AST DefDeclaration() :
@@ -272,10 +283,11 @@ AST DelegateDeclaration() :
 
 AST TypeDeclaration() :
 { Token name; AST body = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
-  Object tagInfo = null;
+  Object tagInfo = null; boolean isResource = false;
 }
 {
   [<TAGGED> { isTagged = true; } ]
+  [<RESOURCE> { isResource = true; } ]
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
@@ -283,7 +295,7 @@ AST TypeDeclaration() :
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     } 
-	return build.typeDecl(name.image, body, tagInfo, null, loc(name));
+	return build.typeDecl(name.image, body, tagInfo, null, loc(name), isResource);
   }
 }
 
@@ -519,4 +531,12 @@ AST ArgumentList(ExpFlags flags) :
   		}
   		return exp;
   	}
+ }
+  	
+  	
+AST Instantiation() :
+{ URI uri; Token name; AST arg;}
+{
+<INSTANTIATE> uri = Uri() arg = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
+{return build.instantiation(uri, arg, loc(name));}
 }

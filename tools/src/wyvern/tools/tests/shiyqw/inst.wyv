@@ -1,0 +1,3 @@
+instantiate testModule() as t1
+instantiate testModule(testArg) as t2
+instantiate testModule(testArg1, testArg2, testArg3) as t3

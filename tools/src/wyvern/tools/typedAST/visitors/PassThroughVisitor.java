@@ -1,8 +1,5 @@
 package wyvern.tools.typedAST.visitors;
 
-import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.typedAST.core.expressions.Assignment;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.typedAST.core.expressions.*;
@@ -139,6 +136,11 @@ public class PassThroughVisitor implements CoreASTVisitor {
 	@Override
 	public void visit(ModuleDeclaration moduleDeclaration) {
 		next.visit(moduleDeclaration);
+	}
+
+	@Override
+	public void visit(Instantiation instantiation) {
+		next.visit(instantiation);
 	}
 
 }

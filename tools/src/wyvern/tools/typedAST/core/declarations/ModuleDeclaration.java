@@ -34,14 +34,24 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
+	private boolean resourceFlag;
 
-	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location) {
+	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
+		this.resourceFlag = isResource;
 		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), null, name);
 		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), null, name);
+		if (isResource) {
+			selfType.setAsResource();
+			subTypeType.setAsResource();
+		} else {
+			selfType.setAsModule();
+			subTypeType.setAsModule();
+		}
 	}
+
 
 	@Override
 	public String getName() {
@@ -147,7 +157,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), getLocation());
+		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), getLocation(), isResource());
 		newDecl.selfType = selfType;
 		newDecl.subTypeType = subTypeType;
 		newDecl.importEnv = importEnv;
@@ -192,5 +202,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public boolean isResource() {
+		return this.resourceFlag;
 	}
 }

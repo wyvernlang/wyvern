@@ -29,6 +29,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private List<String> params;
 	private String name;
 	private TaggedInfo tagInfo;
+	private int moduleType = 0; // 0:Not Module, 1: Simple Module, 2: Resource Module
 
 	//private String stackTrace;
 
@@ -246,5 +247,19 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	public ValueType getILType(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/** Added by shiyqw, for module declaration and type checking **/
+	public void setAsModule() {
+		this.moduleType = 1;
+	}
+	public void setAsResource() {
+		this.moduleType = 2;
+	}
+	public boolean isResource() {
+		return this.moduleType == 2;
+	}
+	public boolean isModule() {
+		return this.moduleType != 0;
 	}
 }
