@@ -5,6 +5,8 @@ import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.type.Type;
@@ -15,15 +17,19 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 
-public class VarDeclaration extends NamedDeclaration {
+public class VarDeclaration extends DeclarationWithRHS {
 
 	private ValueType type;
-	private Expression value;
 	
+	@Override
+	public String toString() {
+		return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
+	}
+
 	public VarDeclaration(String name, ValueType type, Expression value) {
-		super(name);
+		super(name, value);
+		if (type == null) throw new RuntimeException();
 		this.type = type;
-		this.value = value;
 	}
 	
 	public ValueType getType() {
@@ -34,14 +40,6 @@ public class VarDeclaration extends NamedDeclaration {
 		this.type = type;
 	}
 	
-	public Expression getValue() {
-		return value;
-	}
-	
-	public void setValue(Expression value) {
-		this.value = value;
-	}
-
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -50,13 +48,12 @@ public class VarDeclaration extends NamedDeclaration {
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VarDeclType(getName(), type);
 	}
 	
 	@Override
 	public Declaration interpret(EvalContext ctx) {
-		Expression newValue = (Expression) value.interpret(ctx);
+		Expression newValue = (Expression) getDefinition().interpret(ctx);
 		return new VarDeclaration(getName(), type, newValue);
 	}
 

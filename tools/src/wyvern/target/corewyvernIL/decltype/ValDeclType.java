@@ -24,8 +24,9 @@ public class ValDeclType extends DeclTypeWithResult implements EmitOIR{
 
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
-		if (!(dt instanceof ValDeclType))
+		if (!(dt instanceof ValDeclType)) {
 			return false;
+		}
 		ValDeclType vdt = (ValDeclType) dt;
 		return vdt.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(vdt.getRawResultType(), ctx);
 	}

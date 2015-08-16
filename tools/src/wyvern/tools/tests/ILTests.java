@@ -84,4 +84,21 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	@Test
+	public void testVarFieldRead() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    var v : system.Int = 5\n"
+				     + "obj.v\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
 }
