@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -57,11 +58,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		//System.out.println(env);
 		//System.out.println(uri.getScheme());
 		if(uri.getScheme().equals("wyv")) {
-			ClassType moduleType = (ClassType) env.lookup(uri.getSchemeSpecificPart()).getType();
+			String schemeSpecificPart = uri.getSchemeSpecificPart();
+			NameBinding envModule = env.lookup(schemeSpecificPart);
+			if (envModule == null)
+				return binder.typecheck(env);				
+			ClassType moduleType = (ClassType) envModule.getType();
 			if(!moduleType.isModule()) {
-				reportError(MODULE_TYPE_ERROR, this, uri.getSchemeSpecificPart());
+				reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
 			} else if (!isRequire() && moduleType.isResource()) {
-				reportError(MODULE_TYPE_ERROR, this, uri.getSchemeSpecificPart());
+				reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
 			}
 		}
 		return binder.typecheck(env);
