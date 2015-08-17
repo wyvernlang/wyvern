@@ -5,6 +5,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -245,9 +246,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
+		GenContext methodContext = thisContext;
 		for (NameBinding b : argNames) {
-			args.add(new FormalArg(b.getName(), b.getType().getILType(ctx)));
+			ValueType argType = b.getType().getILType(ctx);
+			args.add(new FormalArg(b.getName(), argType));
+			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
 		}
-		return new wyvern.target.corewyvernIL.decl.DefDeclaration(getName(), args, getResultILType(ctx), body.generateIL(ctx));
+		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
+				        getName(), args, getResultILType(ctx), body.generateIL(methodContext));
 	}
 }
