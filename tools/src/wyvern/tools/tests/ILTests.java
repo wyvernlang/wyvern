@@ -75,6 +75,7 @@ public class ILTests {
 		TypedAST ast = TestUtil.getNewAST(input);
 		Expression program = ast.generateIL(GenContext.empty());
     	TypeContext ctx = TypeContext.empty();
+    	System.out.println(program);
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
 		Value v = program.interpret(EvalContext.empty());
