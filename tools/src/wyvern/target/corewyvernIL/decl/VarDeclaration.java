@@ -32,6 +32,7 @@ public class VarDeclaration extends DeclarationWithRHS {
 		this.type = type;
 	}
 	
+	@Override
 	public ValueType getType() {
 		return type;
 	}
@@ -47,7 +48,7 @@ public class VarDeclaration extends DeclarationWithRHS {
 	}
 
 	@Override
-	public DeclType typeCheck(TypeContext ctx) {
+	public DeclType getDeclType() {
 		return new VarDeclType(getName(), type);
 	}
 	
