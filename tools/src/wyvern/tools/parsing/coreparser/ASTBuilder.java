@@ -37,6 +37,7 @@ public interface ASTBuilder<AST,Type> {
 	public Object tagInfo(Type type, List<Type> comprises);
 	
 	public Type nominalType(String name);
+	public Type qualifiedType(AST base, String name);
 	
 	public void setNewBody(AST newExp, AST decls);
 

@@ -210,6 +210,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+<<<<<<< HEAD
 		/* design 
 		TypedAST reqSeq = filterRequires();
 		TypedAST impInstSeq = filterImportInstantiates();
@@ -231,6 +232,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(ctx);
 		// non resource to be implemented 
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body);
+=======
+		// TODO Auto-generated method stub
+		return null;
+>>>>>>> upstream/SimpleWyvern-devel
 	}
 	
 	private New innerTranslate(DeclSequence normalSeq, GenContext ctx, GenContext thisContext) {
@@ -289,6 +294,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	public boolean isResource() {
 		return this.resourceFlag;
+<<<<<<< HEAD
 	}
 
 
@@ -296,5 +302,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+=======
+>>>>>>> upstream/SimpleWyvern-devel
 	}
 }

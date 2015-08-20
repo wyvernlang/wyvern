@@ -67,9 +67,11 @@ public class New extends Expression {
 	public ValueType typeCheck(TypeContext ctx) {
 		List<DeclType> dts = new LinkedList<DeclType>();
 		
+		TypeContext thisCtx = ctx.extend(selfName, getExprType());
+		
 		// check that all decls are well-typed
 		for (Declaration d : decls) {
-			DeclType dt = d.typeCheck(ctx);
+			DeclType dt = d.typeCheck(ctx, thisCtx);
 			dts.add(dt);
 		}
 		

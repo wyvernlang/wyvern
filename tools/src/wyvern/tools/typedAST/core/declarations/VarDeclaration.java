@@ -1,6 +1,8 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -155,14 +157,13 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		ValueType vt = binding.getType().getILType(ctx);
+		return new VarDeclType(getName(), vt);
 	}
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
-		return null;
+		return new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), binding.getType().getILType(ctx), definition.generateIL(ctx));
 	}
 
 	@Override

@@ -29,6 +29,7 @@ public class ValDeclaration extends DeclarationWithRHS {
 
 	private ValueType type;
 	
+	@Override
 	public ValueType getType() {
 		return type;
 	}
@@ -44,7 +45,7 @@ public class ValDeclaration extends DeclarationWithRHS {
 	}
 
 	@Override
-	public DeclType typeCheck(TypeContext ctx) {
+	public DeclType getDeclType() {
 		return new ValDeclType(getName(), type);
 	}
 	

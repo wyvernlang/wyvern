@@ -6,6 +6,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -22,12 +23,9 @@ import wyvern.tools.util.TreeWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-<<<<<<< HEAD
-=======
 import java.util.Optional;
 import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
 import static wyvern.tools.errors.ToolError.reportError;
->>>>>>> newlexer
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private URI uri;
@@ -64,11 +62,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		//System.out.println(env);
 		//System.out.println(uri.getScheme());
 		if(uri.getScheme().equals("wyv")) {
-			ClassType moduleType = (ClassType) env.lookup(uri.getSchemeSpecificPart()).getType();
+			String schemeSpecificPart = uri.getSchemeSpecificPart();
+			NameBinding envModule = env.lookup(schemeSpecificPart);
+			if (envModule == null)
+				return binder.typecheck(env);				
+			ClassType moduleType = (ClassType) envModule.getType();
 			if(!moduleType.isModule()) {
-				reportError(MODULE_TYPE_ERROR, this, uri.getSchemeSpecificPart());
+				reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
 			} else if (!isRequire() && moduleType.isResource()) {
-				reportError(MODULE_TYPE_ERROR, this, uri.getSchemeSpecificPart());
+				reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
 			}
 		}
 		return binder.typecheck(env);
@@ -129,7 +131,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		binder.bindVal(evalEnv);
 	}
-<<<<<<< HEAD
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
@@ -147,10 +148,19 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
 		return null;
-=======
+	}
 	
 	public boolean isRequire() {
 		return this.requireFlag;
->>>>>>> newlexer
+<<<<<<< HEAD
+	}
+
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+=======
+>>>>>>> upstream/SimpleWyvern-devel
 	}
 }

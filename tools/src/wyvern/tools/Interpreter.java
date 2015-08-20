@@ -26,7 +26,7 @@ public class Interpreter {
 		currentdir = System.getProperty("user.dir");
 		Path p = Paths.get(currentdir);
 		System.load(p.toAbsolutePath().toString() + "/src/wyvern/target/llvm/.libs/libWyvernLLVM.so");
-	
+		
 		OIRToLLVMTests tests = new OIRToLLVMTests ();
 		//try {
 			//tests.ifThenElseTest();

@@ -19,7 +19,7 @@ public abstract class Expression extends ASTNode implements EmitOIR {
 	
 	protected Expression ()
 	{
-		this.exprType = exprType;
+		// if this constructor is used, exprType must be set later!
 	}
 	
 	public ValueType getExprType() {

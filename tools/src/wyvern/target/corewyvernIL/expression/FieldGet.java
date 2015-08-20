@@ -58,7 +58,8 @@ public class FieldGet extends Expression implements Path {
 			throw new RuntimeException("typechecking error: operation not found");
 		if (!(dt instanceof ValDeclType || dt instanceof VarDeclType))
 			throw new RuntimeException("typechecking error: can't treat a method or type member as a field");
-		return ((DeclTypeWithResult)dt).getResultType(View.from(objectExpr, ctx));
+		this.setExprType(((DeclTypeWithResult)dt).getResultType(View.from(objectExpr, ctx)));
+		return getExprType();
 	}
 
 	@Override

@@ -25,4 +25,8 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	}
 
 	public abstract ValueType adapt(View v);
+
+	public boolean equalsInContext(ValueType otherType, TypeContext ctx) {
+		return this.isSubtypeOf(otherType, ctx) && otherType.isSubtypeOf(this, ctx);
+	}
 }

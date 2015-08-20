@@ -24,6 +24,7 @@ public class Let extends Expression {
 		super();
 		this.varName = varName;
 		this.toReplace = toReplace;
+		if (inExpr == null) throw new RuntimeException();
 		this.inExpr = inExpr;
 	}
 
@@ -54,7 +55,8 @@ public class Let extends Expression {
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType t = toReplace.typeCheck(ctx);
-		return inExpr.typeCheck(ctx.extend(varName, t));
+		this.setExprType(inExpr.typeCheck(ctx.extend(varName, t)));
+		return getExprType();
 	}
 
 	@Override

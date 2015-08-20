@@ -36,6 +36,7 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.Reference;
@@ -118,6 +119,12 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	public Type nominalType(String name) {
 		return new UnresolvedType(name);
 	}
+	
+	@Override
+	public Type qualifiedType(TypedAST base, String name) {
+		return new QualifiedType(base, name);
+	}
+
 
 	@Override
 	public TypedAST var(String name, FileLocation loc) {

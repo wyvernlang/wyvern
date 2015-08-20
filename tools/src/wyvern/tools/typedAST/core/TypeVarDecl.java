@@ -287,20 +287,28 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+<<<<<<< HEAD
 		if (body instanceof TypeDeclaration) {
 			return ((TypeDeclaration) body).generateDecl(ctx, thisContext);
 		} else {
 			return null;
 		}
+=======
+		// TODO Auto-generated method stub
+		return null;
+>>>>>>> upstream/SimpleWyvern-devel
 	}
 	
 	public boolean isResource() {
 		return this.resourceFlag;
+<<<<<<< HEAD
 	}
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+=======
+>>>>>>> upstream/SimpleWyvern-devel
 	}
 }
