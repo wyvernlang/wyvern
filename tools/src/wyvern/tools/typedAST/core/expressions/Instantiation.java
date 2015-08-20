@@ -83,12 +83,9 @@ public class Instantiation extends CachingTypedAST implements CoreAST {
 		// TODO Auto-generated method stub
 		return null;
 	}
-<<<<<<< HEAD
 	
 	public URI getUri() {
 		return this.uri;
 	}
-=======
->>>>>>> upstream/SimpleWyvern-devel
 
 }

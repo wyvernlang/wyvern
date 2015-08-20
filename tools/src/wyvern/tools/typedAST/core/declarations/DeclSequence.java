@@ -287,10 +287,4 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return normalSeq;
 	}
 	
-	/*
-	@Override
-	public Expression generateIL(GenContext ctx) {
-		return null;
-	}
-	*/
 }

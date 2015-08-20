@@ -99,16 +99,7 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-<<<<<<< HEAD
 	
-	@Test
-	public void testWyt() throws ParseException {
-		String source = TestUtil.readFile(PATH + "example.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
-		System.out.println(ast instanceof Sequence);
-		Expression program = ast.generateIL(GenContext.empty());
-		System.out.println(program);
-=======
 	@Test
 	public void testVarFieldRead() throws ParseException {
 		String input = "val obj = new\n"
@@ -160,6 +151,13 @@ public class ILTests {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
->>>>>>> upstream/SimpleWyvern-devel
+	}
+	@Test
+	public void testWyt() throws ParseException {
+		String source = TestUtil.readFile(PATH + "example.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+		System.out.println(ast instanceof Sequence);
+		Expression program = ast.generateIL(GenContext.empty());
+		System.out.println(program);
 	}
 }
