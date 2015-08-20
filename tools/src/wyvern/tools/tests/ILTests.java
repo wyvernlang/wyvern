@@ -29,6 +29,8 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -102,7 +104,8 @@ public class ILTests {
 	public void testWyt() throws ParseException {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
-		System.out.println(ast);
+		System.out.println(ast instanceof Sequence);
 		Expression program = ast.generateIL(GenContext.empty());
+		System.out.println(program);
 	}
 }

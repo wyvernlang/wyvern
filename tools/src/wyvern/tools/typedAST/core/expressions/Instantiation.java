@@ -83,5 +83,9 @@ public class Instantiation extends CachingTypedAST implements CoreAST {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public URI getUri() {
+		return this.uri;
+	}
 
 }

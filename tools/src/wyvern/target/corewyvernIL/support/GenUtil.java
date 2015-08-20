@@ -1,12 +1,18 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 

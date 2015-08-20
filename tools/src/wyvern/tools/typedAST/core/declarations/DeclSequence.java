@@ -4,10 +4,12 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.DeclarationWriter;
@@ -252,4 +254,43 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
         }
         writer.wrap(e->new Let(varname, new New(outputDecls, "this", null), (Expression)e));
     }
+
+	public DeclSequence filterRequires() {
+		
+		DeclSequence reqSeq = new DeclSequence();
+		for (Declaration d : this.getDeclIterator()) {
+			if(d instanceof ImportDeclaration && ((ImportDeclaration) d).isRequire()) {
+				Sequence.append(reqSeq, d);
+			}
+		}
+		return reqSeq;
+	}
+
+	public DeclSequence filterImportInstantiates() {
+		DeclSequence impInstSeq = new DeclSequence();
+		for (TypedAST d : this.getDeclIterator()) {
+			if(d instanceof ImportDeclaration && !((ImportDeclaration) d).isRequire()
+					|| d instanceof Instantiation) {
+				Sequence.append(impInstSeq, d);
+			}
+		}
+		return impInstSeq;
+	}
+
+	public DeclSequence filterNormal() {
+		DeclSequence normalSeq = new DeclSequence();
+		for (TypedAST d : this.getDeclIterator()) {
+			if(!(d instanceof ImportDeclaration) && !(d instanceof Instantiation)) {
+				Sequence.append(normalSeq, d);
+			}
+		}
+		return normalSeq;
+	}
+	
+	/*
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		return null;
+	}
+	*/
 }

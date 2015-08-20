@@ -153,4 +153,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	public boolean isRequire() {
 		return this.requireFlag;
 	}
+
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

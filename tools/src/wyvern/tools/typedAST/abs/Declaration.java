@@ -93,4 +93,6 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	public abstract DeclType genILType(GenContext ctx);
 
 	public abstract wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext);
+	
+	public abstract wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx);
 }

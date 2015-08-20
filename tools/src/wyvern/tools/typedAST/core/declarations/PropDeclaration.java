@@ -112,4 +112,10 @@ public class PropDeclaration extends Declaration {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
