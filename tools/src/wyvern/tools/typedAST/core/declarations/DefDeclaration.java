@@ -259,7 +259,16 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		/*
+		List<FormalArg> args = new LinkedList<FormalArg>();
+		GenContext methodContext = ctx;
+		for (NameBinding b : argNames) {
+			ValueType argType = b.getType().getILType(ctx);
+			args.add(new FormalArg(b.getName(), argType));
+			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
+		}
+		return new wyvern.target.corewyvernIL.decl.DefDeclaration(getName(), args, getResultILType(ctx), body.generateIL(ctx));
+		*/
+		return generateDecl(ctx, ctx);
 	}
 }

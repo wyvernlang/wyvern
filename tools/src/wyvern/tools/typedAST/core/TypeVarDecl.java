@@ -297,7 +297,8 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
-		// TODO Auto-generated method stub
+		TypeDeclaration td = (TypeDeclaration) this.body;
+		StructuralType type = new StructuralType(this.name, td.genDeclTypeSeq(ctx));
 		return null;
 	}
 }

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
@@ -231,6 +232,15 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public List<DeclType> genDeclTypeSeq(GenContext ctx){
+		List<DeclType> declts = new LinkedList<DeclType>();
+		for(Declaration d : decls.getDeclIterator()) {
+			declts.add(d.genILType(ctx));
+		}
+		
+		return declts;
 	}
 	
 }
