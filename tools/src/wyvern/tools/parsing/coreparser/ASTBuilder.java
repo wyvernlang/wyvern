@@ -41,6 +41,6 @@ public interface ASTBuilder<AST,Type> {
 	
 	public void setNewBody(AST newExp, AST decls);
 
-	public AST instantiation(URI uri, AST arg, FileLocation loc);
+	public AST instantiation(URI uri, AST arg, Token name, FileLocation loc);
 
 }

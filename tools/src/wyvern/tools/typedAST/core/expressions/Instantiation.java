@@ -27,11 +27,13 @@ public class Instantiation extends CachingTypedAST implements CoreAST {
 	private URI uri;
 	private TypedAST arg;
 	private FileLocation location;
+	private String name;
 	
-	public Instantiation(URI uri, TypedAST arg, FileLocation loc) {
+	public Instantiation(URI uri, TypedAST arg, String image, FileLocation loc) {
 		this.uri = uri;
 		this.arg = arg;
 		this.location = loc;
+		this.name = image;
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class Instantiation extends CachingTypedAST implements CoreAST {
 
 	@Override
 	protected TypedAST doClone(Map<String, TypedAST> nc) {
-		return new Instantiation(uri, nc.get("arg"), location);
+		return new Instantiation(uri, nc.get("arg"), name, location);
 	}
 
 	@Override
@@ -86,6 +88,14 @@ public class Instantiation extends CachingTypedAST implements CoreAST {
 	
 	public URI getUri() {
 		return this.uri;
+	}
+
+	public TypedAST getArgs() {
+		return this.arg;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }

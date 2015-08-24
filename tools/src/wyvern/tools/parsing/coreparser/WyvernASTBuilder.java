@@ -206,8 +206,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST instantiation(URI uri, TypedAST arg, FileLocation loc) {
-		return new Instantiation(uri, arg, loc);
+	public TypedAST instantiation(URI uri, TypedAST arg, Token name, FileLocation loc) {
+		return new Instantiation(uri, arg, name.image, loc);
 	}
 
 }

@@ -140,7 +140,15 @@ public class Application extends CachingTypedAST implements CoreAST {
 			methodName = i.getOperationName();
 			receiver = i.getReceiver().generateIL(ctx);
 		} else {
-			throw new RuntimeException("calls with no receiver are not implemented");
+			// must be variable
+			Variable v = (Variable) function;
+			methodName = v.getName();
+			String objName = (ctx.getMethod(methodName));  
+			if (objName != null) {
+				receiver = new wyvern.target.corewyvernIL.expression.Variable(objName);
+			} else {
+				throw new RuntimeException("calls with no receiver are not implemented");
+			}
 		}
 		
 		return new MethodCall(receiver, methodName, args);

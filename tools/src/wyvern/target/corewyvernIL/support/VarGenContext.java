@@ -1,6 +1,12 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarGenContext extends GenContext {
@@ -30,8 +36,13 @@ public class VarGenContext extends GenContext {
 	public Expression lookupExp(String varName) {
 		if (varName.equals(var))
 			return expr;
-		else
+		else if (super.getType(varName) != null) {
+			String objName = super.getType(varName);
+			return new FieldGet(new Variable(objName), varName);
+		}
+		else {
 			return genContext.lookupExp(varName);
+		}
 	}
 
 	@Override
@@ -41,4 +52,13 @@ public class VarGenContext extends GenContext {
 		else
 			return genContext.lookup(varName);
 	}
+	
+	@Override
+	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclTypeSeq() {
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = super.genDeclTypeSeq();
+	    VarDeclaration decl = new VarDeclaration(var, type, expr);
+		decls.add(decl);
+		return decls;
+	} 
+	
 }

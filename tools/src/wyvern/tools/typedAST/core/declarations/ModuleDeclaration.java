@@ -16,6 +16,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
+import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.*;
@@ -222,7 +223,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 
-	private Expression wrapLet(DeclSequence impInstSeq, Expression e) {
+	private Expression wrapLet(DeclSequence impInstSeq, Expression e, GenContext ctx) {
 		Iterator<TypedAST> ai = impInstSeq.iterator();
 		if(!ai.hasNext()) {
 			return null;
@@ -236,11 +237,22 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			} else {
 				// must be instantiate
 				Instantiation inst = (Instantiation) ast;
+				// generate arguments		
+				TypedAST argument = inst.getArgs();
+				List<Expression> args = new LinkedList<Expression>();
+			    if (argument instanceof TupleObject) {
+			    	for (TypedAST arg : ((TupleObject) argument).getObjects()) {
+			    		args.add(arg.generateIL(ctx));
+			    	}
+			    } else {
+			    	args.add(argument.generateIL(ctx));
+			    }
+		
 				MethodCall instValue = 
 						new MethodCall(
 								new wyvern.target.corewyvernIL.expression.Variable(inst.getUri().toString()) /*path*/,
-								this.name, null /* Args.gen */);
-				e = new Let(null /* as name */, instValue, e);
+								this.name, args );
+				e = new Let(inst.getName(), instValue, e);
 			}			
 		} 
 		return e;
@@ -248,7 +260,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 
 	private List<FormalArg> getTypes(DeclSequence reqSeq, GenContext ctx) {
-		List<FormalArg> types = new ArrayList<FormalArg>();
+		List<FormalArg> types = new LinkedList<FormalArg>();
 		for(Declaration d : reqSeq.getDeclIterator()) {
 			wyvern.target.corewyvernIL.type.ValueType type = d.getType().getILType(ctx);
 			types.add(new FormalArg(d.getName(), type));
@@ -278,12 +290,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		DeclSequence reqSeq = ((DeclSequence) inner).filterRequires();
 		DeclSequence impInstSeq = ((DeclSequence) inner).filterImportInstantiates();
 		DeclSequence normalSeq = ((DeclSequence) inner).filterNormal();
-		List<FormalArg> formalArgs = new ArrayList<FormalArg>();
+		List<FormalArg> formalArgs = new LinkedList<FormalArg>();
 		formalArgs = getTypes(reqSeq, ctx);
 		wyvern.target.corewyvernIL.expression.Expression newValue = innerTranslate(normalSeq, ctx);
-		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, newValue);
+		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, newValue, ctx);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(ctx);
 		// non resource to be implemented 
+		// no require to be implemented
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body);
 	}
 }

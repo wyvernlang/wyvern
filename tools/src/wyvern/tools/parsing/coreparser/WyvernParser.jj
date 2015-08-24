@@ -550,5 +550,5 @@ AST Instantiation() :
 { URI uri; Token name; AST arg;}
 {
 <INSTANTIATE> uri = Uri() arg = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
-{return build.instantiation(uri, arg, loc(name));}
+{return build.instantiation(uri, arg, name, loc(name));}
 }
