@@ -213,19 +213,8 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		String selfName = this.name;
-		
-		List<DeclType> declts = 
-				new ArrayList<wyvern.target.corewyvernIL.decltype.DeclType>();
-		for(Declaration d : decls.getDeclIterator()) {
-			DeclType declt = ((Declaration) d).genILType(ctx);
-			declts.add(declt);
-		}
-		
- 		StructuralType type = new StructuralType(selfName, declts);
-		wyvern.target.corewyvernIL.decl.TypeDeclaration decl =
-				new wyvern.target.corewyvernIL.decl.TypeDeclaration(this.name, type);
-		return decl;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

@@ -296,7 +296,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, newValue, ctx);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(ctx);
 		// non resource to be implemented 
-		// no require to be implemented
+		if(isResource() == false) {
+			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body);
+		}
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body);
 	}
 }
