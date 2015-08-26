@@ -217,23 +217,24 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		return null;
 	}
 	
-	private Expression innerTranslate(DeclSequence normalSeq, GenContext ctx) {
+	private Expression innerTranslate(Sequence normalSeq, GenContext ctx) {
 		/* Sequence.innerTranslate */
-		return normalSeq.generateIL(ctx);
+		return normalSeq.generateModuleIL(ctx);
 	}
 
 
-	private Expression wrapLet(DeclSequence impInstSeq, Expression e, GenContext ctx) {
+	private Expression wrapLet(Sequence impInstSeq, Expression e, GenContext ctx) {
 		Iterator<TypedAST> ai = impInstSeq.iterator();
 		if(!ai.hasNext()) {
-			return null;
+			return e;
 		} 
 		while (ai.hasNext()) {
 			TypedAST ast = ai.next();
 			if (ast instanceof ImportDeclaration) {
 				// must be import
 				ImportDeclaration imp = (ImportDeclaration) ast;
-				e = new Let(imp.getName(), new wyvern.target.corewyvernIL.expression.Variable(imp.getName()), e);
+				
+				e = new Let(imp.getUri().getSchemeSpecificPart(), new wyvern.target.corewyvernIL.expression.Variable(imp.getUri().getSchemeSpecificPart()), e);
 			} else {
 				// must be instantiate
 				Instantiation inst = (Instantiation) ast;
@@ -259,7 +260,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 
-	private List<FormalArg> getTypes(DeclSequence reqSeq, GenContext ctx) {
+	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx) {
 		List<FormalArg> types = new LinkedList<FormalArg>();
 		for(Declaration d : reqSeq.getDeclIterator()) {
 			wyvern.target.corewyvernIL.type.ValueType type = d.getType().getILType(ctx);
@@ -287,13 +288,15 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		fnVal = fnexp(reqTypes, LetExp);
 		return ValExp(name, reqTypes, fnVal);
 		*/
-		DeclSequence reqSeq = ((DeclSequence) inner).filterRequires();
-		DeclSequence impInstSeq = ((DeclSequence) inner).filterImportInstantiates();
-		DeclSequence normalSeq = ((DeclSequence) inner).filterNormal();
+		Sequence reqSeq = ((DeclSequence) inner).filterRequires();
+		Sequence impInstSeq = ((DeclSequence) inner).filterImportInstantiates();
+		Sequence normalSeq = ((DeclSequence) inner).filterNormal();
+		System.out.println("ns " + normalSeq);
 		List<FormalArg> formalArgs = new LinkedList<FormalArg>();
 		formalArgs = getTypes(reqSeq, ctx);
 		wyvern.target.corewyvernIL.expression.Expression newValue = innerTranslate(normalSeq, ctx);
 		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, newValue, ctx);
+		System.out.println(body);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(ctx);
 		// non resource to be implemented 
 		if(isResource() == false) {

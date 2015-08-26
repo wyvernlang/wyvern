@@ -255,9 +255,9 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
         writer.wrap(e->new Let(varname, new New(outputDecls, "this", null), (Expression)e));
     }
 
-	public DeclSequence filterRequires() {
+	public Sequence filterRequires() {
 		
-		DeclSequence reqSeq = new DeclSequence();
+		Sequence reqSeq = new DeclSequence();
 		for (Declaration d : this.getDeclIterator()) {
 			if(d instanceof ImportDeclaration && ((ImportDeclaration) d).isRequire()) {
 				Sequence.append(reqSeq, d);
@@ -266,22 +266,22 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return reqSeq;
 	}
 
-	public DeclSequence filterImportInstantiates() {
-		DeclSequence impInstSeq = new DeclSequence();
+	public Sequence filterImportInstantiates() {
+		Sequence impInstSeq = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {
 			if(d instanceof ImportDeclaration && !((ImportDeclaration) d).isRequire()
 					|| d instanceof Instantiation) {
-				Sequence.append(impInstSeq, d);
+				impInstSeq = Sequence.append(impInstSeq, d);
 			}
 		}
 		return impInstSeq;
 	}
 
-	public DeclSequence filterNormal() {
-		DeclSequence normalSeq = new DeclSequence();
+	public Sequence filterNormal() {
+		Sequence normalSeq = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {
 			if(!(d instanceof ImportDeclaration) && !(d instanceof Instantiation)) {
-				Sequence.append(normalSeq, d);
+				normalSeq = Sequence.append(normalSeq, d);
 			}
 		}
 		return normalSeq;

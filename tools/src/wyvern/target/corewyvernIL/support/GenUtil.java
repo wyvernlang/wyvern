@@ -23,24 +23,11 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public class GenUtil {
 
 	/** Precondition: the passed-in iterator must have at least one element */
+	/** Precondition: the passed-in iterator must have at least one element */
 	public static Expression doGenIL(GenContext ctx, Iterator<? extends TypedAST> ai) {
+		TypedAST ast = ai.next();
 		if (ai.hasNext()) {
-			TypedAST ast = ai.next(); 
-			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
-				String newName = GenContext.generateName();
-				GenContext newCtx = ctx.rec(newName, ast);
-				Expression e = doGenIL(newCtx, ai);
-				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(newCtx);
-				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
-						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
-						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
-				decls.add(decl);
-				declts.add(((Declaration) ast).genILType(newCtx));
-				ValueType type = new StructuralType(newName, declts);
-				Expression newExp = new New(decls, newName, type);
-				return new Let(newName, newExp, e);
-			} else if (ast instanceof ValDeclaration) {
+			if (ast instanceof ValDeclaration) {
 				ValDeclaration vd = (ValDeclaration) ast;
 				ValueType type = ((ValDeclType)vd.genILType(ctx)).getRawResultType();
 				String name = vd.getName();
@@ -50,12 +37,47 @@ public class GenUtil {
 			} else {
 				Expression e1 = ast.generateIL(ctx);
 				Expression e2 = doGenIL(ctx, ai);
+				return new Let(ctx.generateName(), e1, e2);
+			}			
+		} else {
+			return ast.generateIL(ctx);
+		}
+	}
+	
+	public static Expression doGenModuleIL(GenContext ctx, Iterator<? extends TypedAST> ai) {
+		if (ai.hasNext()) {
+			TypedAST ast = ai.next(); 
+			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
+				String newName = GenContext.generateName();
+				ctx.rec(newName, ast);
+				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(ctx);
+				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+				decls.add(decl);
+				declts.add(((Declaration) ast).genILType(ctx));
+				ValueType type = new StructuralType(newName, declts);
+				Expression newExp = new New(decls, newName, type);
+				Expression e = doGenModuleIL(ctx, ai);
+				return new Let(newName, newExp, e);
+			} else if (ast instanceof ValDeclaration) {
+				ValDeclaration vd = (ValDeclaration) ast;
+				ValueType type = ((ValDeclType)vd.genILType(ctx)).getRawResultType();
+				//System.out.print("typegen: " + type);
+				String name = vd.getName();
+				GenContext newCtx = ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name), type);
+				Expression dfn = vd.getDefinition().generateIL(ctx);
+				return new Let(name, dfn, doGenModuleIL(newCtx, ai));
+			} else {
+				Expression e1 = ast.generateIL(ctx);
+				Expression e2 = doGenModuleIL(ctx, ai);
 				return new Let(GenContext.generateName(), e1, e2);
 			}			
 		} else {
 			String newName = GenContext.generateName();
-			return new New(ctx.genDeclTypeSeq(), newName, ctx.genDeclSeq());
+			//System.out.println(ctx);
+			return new New(ctx.genDeclSeq(), newName, new StructuralType(newName, ctx.genDeclTypeSeq()));
 		}
 	}
-
 }

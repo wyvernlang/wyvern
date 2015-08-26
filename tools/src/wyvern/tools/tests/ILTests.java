@@ -29,6 +29,7 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
@@ -55,7 +56,7 @@ public class ILTests {
 		WyvernResolver.getInstance().addPath(PATH);
     }
 
-	@Test
+/*	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
     	Variable x = new Variable("x");
@@ -152,12 +153,26 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	*/
 	@Test
 	public void testWyt() throws ParseException {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
-		System.out.println(ast instanceof Sequence);
-		Expression program = ast.generateIL(GenContext.empty());
-		System.out.println(program);
+		/* design for multiple modules and types 
+		 
+		 for(file : fileList) {
+		 	String source = TestUtil.readFile();
+		 	ast = getNewAst();
+		 	typedecl = ast.gendecl() | ast.toplevelgen;
+		 	decllist.add(typedecl);
+		 }
+		 
+		 return new New(decllist);
+		 	
+		  */
+		
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null).extend("D",  new Variable("D"), null);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+		System.out.println(decl);
 	}
 }

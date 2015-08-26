@@ -1,7 +1,5 @@
-resource type Log
-	val f : Int
-	def m(y: Int) : Int
-	
-resource type Log2
-	val f : Int
-	def m(y: Int) : Int
+resource module A : sigA
+import D
+require system
+val f : system.Int = 3
+def m(y : system.Int) : system.Int = y
