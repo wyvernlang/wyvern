@@ -21,17 +21,18 @@ import wyvern.tools.tests.tagTests.ParseTagTests;
 import wyvern.tools.tests.tagTests.TypeCheckMatch;
 import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 
+/**
+ * This test suite includes all working tests (as of this writing).  It
+ * adds to the Ant test suites those that work in Eclipse.
+ * 
+ * @author aldrich
+ *
+ */
 @RunWith(Categories.class)
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
-@SuiteClasses( { DemoTests.class, RossettaCodeTests.class,
-				CoreParserTests.class, LexingTests.class,
-				TypeCheckTagTests.class, 
-				DynamicTagTests.class, FileTestRunner.class,
-				ParseTagTests.class, ExecuteTagTests.class,
-				CopperTests.class, PerformanceTests.class,
-				TypeCheckMatch.class, TypeCheckingTests.class,
-				CodegenTests.class,
+@SuiteClasses( { AntRegressionTestSuite.class,
+				FileTestRunner.class,
 				})
 public class RegressionTestSuite {
 
