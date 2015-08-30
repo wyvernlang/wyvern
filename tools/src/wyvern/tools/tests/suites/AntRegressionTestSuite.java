@@ -13,12 +13,12 @@ import wyvern.targets.Common.wyvernIL.interpreter.tests.TestClass;
 import wyvern.targets.Common.wyvernIL.interpreter.tests.TestFunctions;
 import wyvern.targets.Common.wyvernIL.interpreter.tests.TestOverall;
 import wyvern.tools.tests.CopperTests;
+import wyvern.tools.tests.FileTestRunner;
+import wyvern.tools.tests.TypeCheckingTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
-import wyvern.tools.tests.FileTestRunner;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.RossettaCodeTests;
-import wyvern.tools.tests.TypeCheckingTests;
 import wyvern.tools.tests.perfTests.PerformanceTests;
 import wyvern.tools.tests.tagTests.DynamicTagTests;
 import wyvern.tools.tests.tagTests.ExecuteTagTests;
@@ -27,8 +27,9 @@ import wyvern.tools.tests.tagTests.TypeCheckMatch;
 import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 
 /**
- * This test suite includes all working tests (as of this writing).  It
- * adds to the Ant test suites those that work in Eclipse.
+ * This test suite includes all working tests (as of this writing) that
+ * can be run successfully with Ant.  Some tests are commented out as
+ * they are currently broken.
  * 
  * @author aldrich
  *
@@ -36,10 +37,17 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @RunWith(Categories.class)
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
-@SuiteClasses( { AntRegressionTestSuite.class,
-				TargetManager.class,
-				FileTestRunner.class,
+@SuiteClasses( { DemoTests.class, RossettaCodeTests.class,
+				CoreParserTests.class, LexingTests.class,
+				TypeCheckTagTests.class, TestOverall.class,
+				TestClass.class,
+				TestIL.class, TestFunctions.class,
+				DynamicTagTests.class,
+				ParseTagTests.class, ExecuteTagTests.class,
+				CopperTests.class, PerformanceTests.class,
+				TypeCheckMatch.class, TestBasics.class,
+				TypeCheckingTests.class
 				})
-public class RegressionTestSuite {
+public class AntRegressionTestSuite {
 
 }
