@@ -6,12 +6,6 @@ import org.junit.experimental.categories.Categories;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import wyvern.targets.TargetManager;
-import wyvern.targets.Common.wyvernIL.IL.tests.TestIL;
-import wyvern.targets.Common.wyvernIL.interpreter.tests.TestBasics;
-import wyvern.targets.Common.wyvernIL.interpreter.tests.TestClass;
-import wyvern.targets.Common.wyvernIL.interpreter.tests.TestFunctions;
-import wyvern.targets.Common.wyvernIL.interpreter.tests.TestOverall;
 import wyvern.tools.tests.CopperTests;
 import wyvern.tools.tests.FileTestRunner;
 import wyvern.tools.tests.TypeCheckingTests;
@@ -42,13 +36,11 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @ExcludeCategory(CurrentlyBroken.class)
 @SuiteClasses( { DemoTests.class, RossettaCodeTests.class,
 				CoreParserTests.class, LexingTests.class,
-				TypeCheckTagTests.class, TestOverall.class,
-				TestClass.class,
-				TestIL.class, TestFunctions.class,
+				TypeCheckTagTests.class, 
 				DynamicTagTests.class,
 				ParseTagTests.class, ExecuteTagTests.class,
 				CopperTests.class, PerformanceTests.class,
-				TypeCheckMatch.class, TestBasics.class,
+				TypeCheckMatch.class, 
 				TypeCheckingTests.class,
 				CodegenTests.class, ILTests.class,
 				})
