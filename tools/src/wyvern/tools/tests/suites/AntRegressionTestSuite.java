@@ -22,15 +22,23 @@ import wyvern.tools.tests.tagTests.ParseTagTests;
 import wyvern.tools.tests.tagTests.TypeCheckMatch;
 import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 
+/**
+ * This test suite includes all working tests (as of this writing) that
+ * can be run successfully with Ant.  Some tests are commented out as
+ * they are currently broken.
+ * 
+ * @author aldrich
+ *
+ */
 @RunWith(Categories.class)
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
 @SuiteClasses( { //DemoTests.class, RossettaCodeTests.class,
 				//CoreParserTests.class, LexingTests.class,
 				TypeCheckTagTests.class, TestOverall.class,
-				TestClass.class, //TargetManager.class,
+				TestClass.class,
 				TestIL.class, TestFunctions.class,
-				DynamicTagTests.class, //FileTestRunner.class,
+				DynamicTagTests.class,
 				ParseTagTests.class, ExecuteTagTests.class,
 				CopperTests.class, PerformanceTests.class,
 				TypeCheckMatch.class, TestBasics.class,
