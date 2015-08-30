@@ -1,4 +1,17 @@
+<?xml version="1.0"?> 
 <project name="wyvern" default="copper-generate" basedir=".">
+    <property name="build.dir" value="build/" />  
+    <property name="src.dir" value="src" />
+	
+	<path id="classpath.base">
+		<pathelement location="lib/junit-4.11.jar" />
+		<pathelement location="lib/asm-debug-all-5.0.1.jar" />
+		<pathelement location="lib/CopperCompiler.jar" />
+		<pathelement location="lib/CopperRuntime.jar" />
+		<pathelement location="lib/hamcrest-core-1.3.jar" />
+		<pathelement location="lib/javatuples-1.2.jar" />
+	</path>
+	
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
     <target name="copper-compose-compile">
         <mkdir dir="copper-composer/bin"/>
@@ -49,4 +62,25 @@
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
         </copper>
     </target>
+	
+	<target name="build" depends="copper-generate">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <classpath refid="classpath.base"/>
+        </javac>
+        <echo message="Build done" />	
+    </target>
+	
+	<target name="test" depends="build">
+		<junit printsummary="on" haltonfailure="yes">
+			<classpath>
+				<path refid="classpath.base" />
+				<pathelement location="${build.dir}"/>
+			</classpath>
+        <formatter type="brief" usefile="false" />
+        <batchtest>
+            <fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
+        </batchtest>
+    </junit>
+  </target>
 </project>

@@ -25,10 +25,17 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @RunWith(Categories.class)
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
-@SuiteClasses( { AntRegressionTestSuite.class,
-				TargetManager.class,
-				FileTestRunner.class,
+@SuiteClasses( { //DemoTests.class, RossettaCodeTests.class,
+				//CoreParserTests.class, LexingTests.class,
+				TypeCheckTagTests.class, TestOverall.class,
+				TestClass.class, //TargetManager.class,
+				TestIL.class, TestFunctions.class,
+				DynamicTagTests.class, //FileTestRunner.class,
+				ParseTagTests.class, ExecuteTagTests.class,
+				CopperTests.class, PerformanceTests.class,
+				TypeCheckMatch.class, TestBasics.class,
+				TypeCheckingTests.class
 				})
-public class RegressionTestSuite {
+public class AntRegressionTestSuite {
 
 }
