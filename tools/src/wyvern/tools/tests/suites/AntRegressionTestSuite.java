@@ -20,6 +20,7 @@ import wyvern.tools.tests.DemoTests;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.CodegenTests;
+import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.TypeCheckingTests;
 import wyvern.tools.tests.perfTests.PerformanceTests;
 import wyvern.tools.tests.tagTests.DynamicTagTests;
@@ -48,8 +49,8 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				ParseTagTests.class, ExecuteTagTests.class,
 				CopperTests.class, PerformanceTests.class,
 				TypeCheckMatch.class, TestBasics.class,
-	    TypeCheckingTests.class,
-	    CodegenTests.class,
+				TypeCheckingTests.class,
+				CodegenTests.class, ILTests.class,
 				})
 public class AntRegressionTestSuite {
 

@@ -424,9 +424,21 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Token id; }
+{ Token id = null; Token id2 = null; AST exp = null; }
 {
-  id = <IDENTIFIER> { return build.nominalType(id.image); }
+  id = <IDENTIFIER> (<DOT> id2 = <IDENTIFIER> {
+	if (exp == null) {
+	  	exp = build.var(id.image, loc(id));
+	} else {
+		exp = build.invocation(exp, id.image, null, loc(id));
+	}
+  	id = id2;
+  })* {
+	if (exp == null)
+		return build.nominalType(id.image);
+  	else
+  		return build.qualifiedType(exp, id2.image);
+  }
 }
 
 AST AdditiveExpression(ExpFlags flags) :

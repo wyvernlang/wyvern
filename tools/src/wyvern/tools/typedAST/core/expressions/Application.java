@@ -121,7 +121,28 @@ public class Application extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		// generate arguments		
+		List<Expression> args = new LinkedList<Expression>();
+        if (argument instanceof TupleObject) {
+        	for (TypedAST ast : ((TupleObject) argument).getObjects()) {
+        		args.add(ast.generateIL(ctx));
+        	}
+        } else {
+        	args.add(argument.generateIL(ctx));
+        }
+		
+		// generate the call
+		String methodName = null;
+		Expression receiver = null;
+		
+		if (function instanceof Invocation) {
+			Invocation i = (Invocation) function;
+			methodName = i.getOperationName();
+			receiver = i.getReceiver().generateIL(ctx);
+		} else {
+			throw new RuntimeException("calls with no receiver are not implemented");
+		}
+		
+		return new MethodCall(receiver, methodName, args);
 	}
 }

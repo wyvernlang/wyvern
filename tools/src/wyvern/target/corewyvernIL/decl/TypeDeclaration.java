@@ -35,7 +35,7 @@ public class TypeDeclaration extends NamedDeclaration {
 	}
 
 	@Override
-	public DeclType typeCheck(TypeContext ctx) {
+	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
 		// TODO Auto-generated method stub
 		return null;
 	}

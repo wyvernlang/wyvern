@@ -11,6 +11,7 @@ import wyvern.tools.tests.CopperTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
 import wyvern.tools.tests.FileTestRunner;
+import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.TypeCheckingTests;

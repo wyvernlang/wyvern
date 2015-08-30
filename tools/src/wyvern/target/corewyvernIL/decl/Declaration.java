@@ -11,7 +11,7 @@ import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class Declaration extends ASTNode implements EmitOIR {
-	public abstract DeclType typeCheck(TypeContext ctx);
+	public abstract DeclType typeCheck(TypeContext ctx, TypeContext thisCtx);
 
 	/**
 	 * Interprets val and var declarations down to a value binding.

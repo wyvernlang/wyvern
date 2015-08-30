@@ -2,7 +2,10 @@ package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -227,14 +230,29 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		List<FormalArg> args = new LinkedList<FormalArg>();
+		for (NameBinding b : argNames) {
+			args.add(new FormalArg(b.getName(), b.getType().getILType(ctx)));
+		}
+		return new DefDeclType(getName(), getResultILType(ctx), args);
+	}
+
+
+	private ValueType getResultILType(GenContext ctx) {
+		return ((Arrow)type).getResult().getILType(ctx);
 	}
 
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
-		return null;
+		List<FormalArg> args = new LinkedList<FormalArg>();
+		GenContext methodContext = thisContext;
+		for (NameBinding b : argNames) {
+			ValueType argType = b.getType().getILType(ctx);
+			args.add(new FormalArg(b.getName(), argType));
+			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
+		}
+		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
+				        getName(), args, getResultILType(ctx), body.generateIL(methodContext));
 	}
 }

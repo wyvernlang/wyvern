@@ -39,7 +39,7 @@ public class IntegerLiteral extends AbstractValue {
 	private int value;
 
 	public IntegerLiteral(int value) {
-		super(null);
+		super(Util.intType());
 		this.value = value;
 	}
 
