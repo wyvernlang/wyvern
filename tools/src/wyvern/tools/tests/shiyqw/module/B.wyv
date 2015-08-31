@@ -1,0 +1,4 @@
+resource module B : sigB
+import D
+require sigA
+val k : system.Int = assigA.m(3)

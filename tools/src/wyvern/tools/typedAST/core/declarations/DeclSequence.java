@@ -260,7 +260,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		Sequence reqSeq = new DeclSequence();
 		for (Declaration d : this.getDeclIterator()) {
 			if(d instanceof ImportDeclaration && ((ImportDeclaration) d).isRequire()) {
-				Sequence.append(reqSeq, d);
+				reqSeq = Sequence.append(reqSeq, d);
 			}
 		}
 		return reqSeq;

@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -31,6 +33,7 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -49,7 +52,7 @@ import static wyvern.stdlib.Globals.getStandardEnv;
 public class ILTests {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "shiyqw/";
+	private static final String PATH = BASE_PATH + "shiyqw/module/";
 	
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();
@@ -154,25 +157,41 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	*/
+    
+   /*
 	@Test
-	public void testWyt() throws ParseException {
+	public void testSingleModule() throws ParseException {
+		
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
-		/* design for multiple modules and types 
-		 
-		 for(file : fileList) {
-		 	String source = TestUtil.readFile();
-		 	ast = getNewAst();
-		 	typedecl = ast.gendecl() | ast.toplevelgen;
-		 	decllist.add(typedecl);
-		 }
-		 
-		 return new New(decllist);
-		 	
-		  */
 		
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null).extend("D",  new Variable("D"), null);
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
 		System.out.println(decl);
+	}
+	*/
+	
+	@Test
+	public void testMultipleModules() throws ParseException {
+		
+		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv"};
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			System.out.println("result decl : " + decl);
+			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
+				ValDeclaration vd = (ValDeclaration) decl;
+				System.out.println("vd: " + vd);
+				genCtx = genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType());
+			} else if (decl instanceof TypeDeclaration) {
+				TypeDeclaration td = (TypeDeclaration) decl;
+				genCtx = genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType());
+			}
+		}
+		
 	}
 }

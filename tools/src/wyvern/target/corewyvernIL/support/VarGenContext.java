@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.support;
 import java.util.LinkedList;
 import java.util.List;
 
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -57,8 +58,9 @@ public class VarGenContext extends GenContext {
 	
 	@Override
 	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq() {
+		System.out.println("in vd" + var + " " + type + " " + expr);
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = super.genDeclSeq();
-	    VarDeclaration decl = new VarDeclaration(var, type, expr);
+	    ValDeclaration decl = new ValDeclaration(var, type, expr);
 		decls.add(decl);
 		return decls;
 	} 

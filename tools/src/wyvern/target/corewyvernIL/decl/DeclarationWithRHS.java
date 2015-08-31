@@ -27,6 +27,8 @@ public abstract class DeclarationWithRHS extends NamedDeclaration {
 	
 	@Override
 	public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
+		System.out.println(definition);
+		System.out.println(definition.typeCheck(ctx));
 		if (!definition.typeCheck(ctx).isSubtypeOf(getType(), ctx))
 			throw new RuntimeException("definition doesn't match declared type");
 		return getDeclType();
