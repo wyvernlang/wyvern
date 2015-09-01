@@ -65,10 +65,7 @@ public class MethodCall extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext env) {
-		System.out.println(this);
 		ValueType ot = objectExpr.typeCheck(env);
-		// system.int
-		System.out.println("ot is" + ot);
 		StructuralType st = ot.getStructuralType();
 		DeclType dt = st.findDecl(methodName);
 		if (dt == null)
@@ -81,8 +78,6 @@ public class MethodCall extends Expression {
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
 			Type argType = ddt.getFormalArgs().get(i).getType().adapt(v);
-			System.out.println(e.typeCheck(env));
-			System.out.println(argType);
 			if (!e.typeCheck(env).isSubtypeOf(argType, env))
 				throw new RuntimeException("argument type doesn't match");
 		}

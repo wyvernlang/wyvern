@@ -90,4 +90,14 @@ public class StructuralType extends ValueType {
 		}
 		return new StructuralType(selfName, newDTs);
 	}
+	
+	@Override
+	public String toString() {
+		String ret = "st:\n";
+		for(DeclType declt : declTypes) {
+			ret += declt.toString();
+			ret += "\n";
+		}
+		return ret;
+	}
 }

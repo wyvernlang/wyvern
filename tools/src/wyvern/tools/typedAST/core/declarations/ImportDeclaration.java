@@ -32,11 +32,13 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	private ImportBinder binder;
 	private FileLocation location;
 	private boolean requireFlag;
+	private String asName;
 
-	public ImportDeclaration(URI inputURI, FileLocation location, boolean isRequire) {
+	public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire) {
 		this.uri = inputURI;
 		this.location = location;
 		this.requireFlag = isRequire;
+		this.asName = image;
 	}
 
 
@@ -57,10 +59,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
-		//System.out.println(uri);
-		//System.out.println("uri is " + uri.getSchemeSpecificPart());
-		//System.out.println(env);
-		//System.out.println(uri.getScheme());
 		if(uri.getScheme().equals("wyv")) {
 			String schemeSpecificPart = uri.getSchemeSpecificPart();
 			NameBinding envModule = env.lookup(schemeSpecificPart);
@@ -159,5 +157,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	public String getAsName() {
+		return asName;
 	}
 }

@@ -255,7 +255,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
 		}
 		this.returnILType = this.getResultILType(ctx);
-		System.out.println(this.returnILType);
 		this.argILTypes = args;
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
 				        getName(), args, getResultILType(ctx), body.generateIL(methodContext));
@@ -264,17 +263,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
-		System.out.println("here");
-		/*
-		List<FormalArg> args = new LinkedList<FormalArg>();
-		GenContext methodContext = ctx;
-		for (NameBinding b : argNames) {
-			ValueType argType = b.getType().getILType(ctx);
-			args.add(new FormalArg(b.getName(), argType));
-			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
-		}
-		return new wyvern.target.corewyvernIL.decl.DefDeclaration(getName(), args, getResultILType(ctx), body.generateIL(ctx));
-		*/
 		return generateDecl(ctx, ctx);
 	}
 

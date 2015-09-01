@@ -8,11 +8,13 @@ import org.junit.Test;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -21,6 +23,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.EmitLLVMNative;
 import wyvern.target.oir.EmitLLVMVisitor;
@@ -44,6 +47,8 @@ import wyvern.tools.types.extensions.Int;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.empty;
@@ -59,7 +64,7 @@ public class ILTests {
 		WyvernResolver.getInstance().addPath(PATH);
     }
 
-/*	@Test
+	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
     	Variable x = new Variable("x");
@@ -81,7 +86,6 @@ public class ILTests {
 		TypedAST ast = TestUtil.getNewAST(input);
 		Expression program = ast.generateIL(GenContext.empty());
     	TypeContext ctx = TypeContext.empty();
-    	System.out.println(program);
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
 		Value v = program.interpret(EvalContext.empty());
@@ -156,9 +160,7 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	*/
     
-   /*
 	@Test
 	public void testSingleModule() throws ParseException {
 		
@@ -167,29 +169,36 @@ public class ILTests {
 		
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null).extend("D",  new Variable("D"), null);
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		System.out.println(decl);
 	}
-	*/
 	
 	@Test
 	public void testMultipleModules() throws ParseException {
 		
-		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv"};
+		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv", "main.wyv"};
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		
 		for(String fileName : fileList) {
-			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-			System.out.println("result decl : " + decl);
 			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
 				ValDeclaration vd = (ValDeclaration) decl;
-				System.out.println("vd: " + vd);
 				genCtx = genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType());
 			} else if (decl instanceof TypeDeclaration) {
 				TypeDeclaration td = (TypeDeclaration) decl;
 				genCtx = genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType());
+			} else if (decl instanceof DefDeclaration) {
+				DefDeclaration methodDecl = (DefDeclaration) decl;
+				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+				decls.add(methodDecl);
+				declts.add(methodDecl.typeCheck(genCtx, genCtx));
+				ValueType type = new StructuralType(decl.getName(), declts);
+				Expression newExp = new New(decls, decl.getName(), type);
+				
+				genCtx = genCtx.extend(decl.getName(), newExp, type);
 			}
 		}
 		

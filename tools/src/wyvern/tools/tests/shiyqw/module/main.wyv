@@ -1,0 +1,4 @@
+resource module main
+instantiate A() as copyA
+instantiate B(copyA) as copyB
+val x : Int = 3

@@ -58,7 +58,6 @@ public class VarGenContext extends GenContext {
 	
 	@Override
 	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq() {
-		System.out.println("in vd" + var + " " + type + " " + expr);
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = super.genDeclSeq();
 	    ValDeclaration decl = new ValDeclaration(var, type, expr);
 		decls.add(decl);

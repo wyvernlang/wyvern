@@ -65,7 +65,6 @@ public abstract class GenContext extends TypeContext {
 	private static int count = 0;
 
 	public void rec(String newName, TypedAST ast) {
-		System.out.println("rec" + ast.hashCode());
 		if(ast instanceof TypeVarDecl) {
 			String typeName = ((TypeVarDecl) ast).getName();
 			typeBinding.put(typeName, newName);

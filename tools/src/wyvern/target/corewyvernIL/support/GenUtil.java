@@ -64,7 +64,6 @@ public class GenUtil {
 			} else if (ast instanceof ValDeclaration) {
 				ValDeclaration vd = (ValDeclaration) ast;
 				ValueType type = ((ValDeclType)vd.genILType(ctx)).getRawResultType();
-				//System.out.print("typegen: " + type);
 				String name = vd.getName();
 				GenContext newCtx = ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name), type);
 				Expression dfn = vd.getDefinition().generateIL(ctx);
@@ -76,7 +75,6 @@ public class GenUtil {
 			}			
 		} else {
 			String newName = GenContext.generateName();
-			//System.out.println(ctx);
 			return new New(ctx.genDeclSeq(), newName, new StructuralType(newName, ctx.genDeclTypeSeq()));
 		}
 	}
