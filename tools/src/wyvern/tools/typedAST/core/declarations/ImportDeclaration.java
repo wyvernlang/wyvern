@@ -1,15 +1,21 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
@@ -18,16 +24,21 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
+import static wyvern.tools.errors.ToolError.reportError;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private URI uri;
 	private ImportBinder binder;
 	private FileLocation location;
+	private boolean requireFlag;
 
-	public ImportDeclaration(URI inputURI, FileLocation location) {
+	public ImportDeclaration(URI inputURI, FileLocation location, boolean isRequire) {
 		this.uri = inputURI;
 		this.location = location;
+		this.requireFlag = isRequire;
 	}
+
 
 	public URI getUri() {
 		return uri;
@@ -46,6 +57,22 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	protected Type doTypecheck(Environment env) {
+		//System.out.println(uri);
+		//System.out.println("uri is " + uri.getSchemeSpecificPart());
+		//System.out.println(env);
+		//System.out.println(uri.getScheme());
+		if(uri.getScheme().equals("wyv")) {
+			String schemeSpecificPart = uri.getSchemeSpecificPart();
+			NameBinding envModule = env.lookup(schemeSpecificPart);
+			if (envModule == null)
+				return binder.typecheck(env);				
+			ClassType moduleType = (ClassType) envModule.getType();
+			if(!moduleType.isModule()) {
+				reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
+			} else if (!isRequire() && moduleType.isResource()) {
+				reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
+			}
+		}
 		return binder.typecheck(env);
 	}
 
@@ -80,7 +107,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		return this;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("I'm scared"); //TODO implement me
+    }
+
+    @Override
 	public String getName() {
 		return "";
 	}
@@ -98,5 +130,27 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		binder.bindVal(evalEnv);
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public boolean isRequire() {
+		return this.requireFlag;
 	}
 }

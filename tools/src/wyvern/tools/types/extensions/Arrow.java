@@ -1,14 +1,17 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
 import static wyvern.tools.errors.ToolError.reportError;
@@ -102,6 +105,17 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 
 	@Override
 	public Type cloneWithBinding(TypeBinding binding) {
+		return null;
+	}
+
+    @Override
+    public ValueType generateILType() {
+        return new StructuralType("this", Arrays.asList(new DefDeclType("call", result.generateILType(), Arrays.asList(new FormalArg("arg1", argument.generateILType())))));
+    }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

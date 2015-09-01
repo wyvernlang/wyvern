@@ -1,10 +1,14 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.interfaces.*;
-import wyvern.tools.types.Environment;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
@@ -36,7 +40,12 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 		return this;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Cannot generate IL for an external function", this);
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		// no arguments at the moment; also not intended for serialization		
 	}
@@ -55,5 +64,11 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

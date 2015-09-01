@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -9,6 +11,9 @@ import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -84,7 +89,12 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 		return new SpliceBindExn(newChildren.get("exn"), bindings);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(ExpressionWriter.generate(wi -> exn.codegenToIL(environment, wi)));
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return null;
 	}
@@ -92,5 +102,11 @@ public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,18 +1,21 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Optional;
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
 	private UnitVal(FileLocation location) { this.location = location; }
@@ -52,8 +55,19 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 		return new UnitVal(location);
 	}
 
-	private FileLocation location;
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        //TODO: Design this component
+        throw new RuntimeException("What to do here?");
+    }
+
+    private FileLocation location;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

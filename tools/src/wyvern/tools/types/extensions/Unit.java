@@ -1,5 +1,8 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.SubtypeRelation;
@@ -44,7 +47,18 @@ public class Unit extends AbstractTypeImpl {
 		return new Unit();
 	}
 
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Primitive type conversion unimplmented"); //TODO
+    }
+
+
+    @Override
+	public boolean equals(Object other) { return other instanceof Unit; }
 
 	@Override
-	public boolean equals(Object other) { return other instanceof Unit; }
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -9,6 +11,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Intersection;
@@ -17,14 +21,21 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
 	private TypedAST[] objects;
+	private static TypedAST[] typeObj = new TypedAST[0];
 	
+	public TupleObject(List<TypedAST> objects) {
+		this(objects.toArray(typeObj));
+	}
 	public TupleObject(TypedAST[] objects) {
 		this.objects = objects;
+		if (objects.length > 0)
+			this.location = objects[0].getLocation();
 	}
 	
 	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {
@@ -90,7 +101,12 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		return childMap;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("Cannot codegen a tuple");
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		TypedAST[] objs = new TypedAST[newChildren.size()];
 		for (String s : newChildren.keySet()) {
@@ -106,5 +122,10 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	private FileLocation location;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

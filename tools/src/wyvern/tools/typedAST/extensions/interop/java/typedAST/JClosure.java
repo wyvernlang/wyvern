@@ -1,16 +1,19 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
@@ -198,12 +201,23 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 		return this;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Cannot generate a IL equivalent for a Java object", this);
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return null;
 	}
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

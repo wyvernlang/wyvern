@@ -1,5 +1,10 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.*;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -8,6 +13,7 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.types.*;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -23,6 +29,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	private List<String> params;
 	private String name;
 	private TaggedInfo tagInfo;
+	private int moduleType = 0; // 0:Not Module, 1: Simple Module, 2: Resource Module
 
 	//private String stackTrace;
 
@@ -203,7 +210,16 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		return new ClassType(new Reference<>(ndEnv), new Reference<>(nteEnv), params, tagInfo, getName());
 	}
 
-	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
+    @Override
+    public wyvern.target.corewyvernIL.type.ValueType generateILType() {
+        if (getTaggedInfo() != null) {
+            TaggedInfo ti = this.tagInfo;
+            return new NominalType(new Variable("this"), getName());
+        }
+        throw new WyvernException("Tagged ClassType conversion not implemented yet", this.getDecl());
+    }
+
+    private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
 		for (String key : list) {
 			String[] kSplit = key.split(":");
 			Type nt = newChildren.get(key);
@@ -222,7 +238,28 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		return name;
 	}
 
+	@Override
 	public TaggedInfo getTaggedInfo() {
 		return tagInfo;
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/** Added by shiyqw, for module declaration and type checking **/
+	public void setAsModule() {
+		this.moduleType = 1;
+	}
+	public void setAsResource() {
+		this.moduleType = 2;
+	}
+	public boolean isResource() {
+		return this.moduleType == 2;
+	}
+	public boolean isModule() {
+		return this.moduleType != 0;
 	}
 }

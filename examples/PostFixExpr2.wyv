@@ -1,0 +1,68 @@
+type PostFixExpr
+  def eval(stack:NumberStack):Int
+  metadata = new : HasTSL
+    val parser:Parser = ~
+      start <- p::prim next::start		// punted: should p and next be bound in the TSL or in the Wyvern exp
+        'SeqExpr.make(%p%,%next%)'		// could use $p as an abbreviation for %p%
+      start <- p::prim
+        p
+      prim <- '*'
+        'MultExpr.make()'
+      prim <- '+'
+        'AddExpr.make()'
+      prim <- n::number			// assume number is built in from the standard Wyvern lexer
+        'NumExpr.make(%n%)'
+                                // extension: could add an escape to refer to a Wyvern variable/expression
+	
+class SeqExpr implements PostFixExpr
+  val left:PostFixExpr
+  val right:PostFixExpr
+  def eval(stack:NumberStack):Int
+    val leftVal = left.eval(stack)
+    right.eval(stack.push(leftVal))
+  class def make(l:PostFixExpr,r:PostFixExpr)
+    new
+      left = l
+      right = r
+  
+class AddExpr implements PostFixExpr
+  def eval(stack:NumberStack):Int
+    val n1 = stack.pop()
+    val n2 = stack.pop()
+    n1+n2
+  class def make() = new
+  
+class MultExpr implements PostFixExpr
+  def eval(stack:NumberStack):Int
+    val n1 = stack.pop()
+    val n2 = stack.pop()
+    n1*n2
+  class def make() = new
+  
+class NumExpr implements PostFixExpr
+  val num:Int
+  def eval(stack:NumberStack):Int = num
+  class def make(n:Int) = new
+    num = n
+
+type NumberStack
+  def push():NumberStack
+  def pop():Int
+
+class EmptyStack implements NumberStack
+  def push(n:Int):NumberStack = NonEmptyStack.make(n,this)
+  def pop():Int = 0 // really should throw an exception...
+  class def make():EmptyStack = new
+
+class NonEmptyStack implements NumberStack  
+  val top:Int
+  val rest:NumberStack
+  def push(n:Int):NumberStack = NonEmptyStack.make(n,this)
+  def pop():Int = 0 // really should throw an exception...
+  class def make(n:Int, s:NumberStack):EmptyStack = new
+    top = n
+    rest = s
+
+val anExpression : PostFixExpr = '2 3 4 * +'
+val result = anExpression.eval(EmptyStack.make())
+// assert result == 14

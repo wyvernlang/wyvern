@@ -1,5 +1,9 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.types.*;
 import wyvern.tools.util.TreeWriter;
@@ -58,6 +62,18 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		return this;
 	}
-	@Override
+
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Boolean primitive not implemented", FileLocation.UNKNOWN); //TODO
+    }
+
+    @Override
 	public boolean equals(Object other) { return other instanceof Bool; }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

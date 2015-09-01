@@ -1,6 +1,9 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -11,6 +14,8 @@ import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -59,7 +64,12 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		return this;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Value conversion to IL not possible", this);
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 	}
 
@@ -107,5 +117,11 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 
 	public TaggedInfo getTaggedInfo() {
 		return taggedInfo;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

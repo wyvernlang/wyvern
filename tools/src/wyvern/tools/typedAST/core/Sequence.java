@@ -1,11 +1,21 @@
 package wyvern.tools.typedAST.core;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.DeclarationWriter;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -18,6 +28,12 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	private LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
 	private Type retType = null;
 
+	private TypedAST check(TypedAST e) {
+		//if (e == null)
+		//	throw new RuntimeException("no null values in Sequence");
+		return e;
+	}
+	
 	public static interface MapCallback {
 		public void map(TypedAST elem);
 	}
@@ -59,24 +75,24 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	public Sequence(TypedAST first) {
-		exps.add(first);
+		exps.add(check(first));
 	}
 	public Sequence(Iterable<TypedAST> first) {
 		exps = new LinkedList<TypedAST>();
 		for (TypedAST elem : first)
-			exps.add(elem);
+			exps.add(check(elem));
 	}
 
 	public Sequence(TypedAST first, TypedAST second) {
 		if (first instanceof Sequence) {
 			exps.addAll(((Sequence) first).exps);
 		} else if (first != null) {
-			exps.add(first);
+			exps.add(check(first));
 		}
 		if (second instanceof Sequence) {
 			exps.addAll(((Sequence) second).exps);
 		} else if (second != null) {
-			exps.add(second);
+			exps.add(check(second));
 		}
 	}
 
@@ -84,7 +100,7 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		// TODO Auto-generated constructor stub
 	}
 	public void append(TypedAST exp) {
-		this.exps.add(exp);
+		this.exps.add(check(exp));
 	}
 	
 	@Override
@@ -141,7 +157,24 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		return new Sequence(result);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        for (TypedAST ast : exps) {
+            if (ast instanceof ValDeclaration) {
+                environment.register(((ValDeclaration)ast).getName(), ast.getType().generateILType());
+                writer.wrap(e->new Let(((ValDeclaration)ast).getName(), ExpressionWriter.generate(iw -> ((ValDeclaration) ast).getDefinition().codegenToIL(environment, iw)), (Expression)e));
+            } else if (ast instanceof Declaration) {
+                String genName = GenerationEnvironment.generateVariableName();
+                List<wyvern.target.corewyvernIL.decl.Declaration> generated =
+                        DeclarationWriter.generate(writer, iw -> ast.codegenToIL(new GenerationEnvironment(environment, genName), iw));
+                writer.wrap(e->new Let(genName, new New(generated, "this", null), (Expression)e));
+            } else {
+                ast.codegenToIL(environment, writer);
+            }
+        }
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(exps.toArray());
 		// TODO Auto-generated method stub
@@ -261,6 +294,10 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 						return hasNext();
 					}
 					lookahead = iterstack.peek().next();
+					if (lookahead == null) {
+						iterstack.peek().hasNext();
+						throw new RuntimeException("null lookahead!");
+					}
 					if (lookahead instanceof Sequence) {
 						iterstack.push(((Sequence) lookahead).iterator());
 						lookahead = null;
@@ -281,5 +318,15 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 				return iterstack.peek().next();
 			}
 		};
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		Iterator<TypedAST> ai = exps.iterator();
+		
+		if (!ai.hasNext())
+			throw new RuntimeException("expected an expression in the list");
+		
+		return GenUtil.doGenIL(ctx, ai);
 	}
 }

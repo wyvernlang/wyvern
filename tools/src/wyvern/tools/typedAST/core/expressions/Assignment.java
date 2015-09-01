@@ -1,10 +1,17 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.*;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -87,7 +94,23 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		return children;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        Expression objectExpr = null;
+        String fieldName = null;
+        if (target instanceof Invocation) {
+            objectExpr = ExpressionWriter.generate(iwriter->((Invocation)target).getReceiver().codegenToIL(environment, iwriter));
+            fieldName = ((Invocation) target).getOperationName();
+        } else if (target instanceof wyvern.tools.typedAST.core.expressions.Variable) {
+            objectExpr = new Variable("this");
+            fieldName = ((wyvern.tools.typedAST.core.expressions.Variable) target).getName();
+        } else {
+            throw new RuntimeException("Invalid assignment for codegen");
+        }
+        writer.write(new FieldSet(value.getType().generateILType(), objectExpr, fieldName, ExpressionWriter.generate(iwriter->value.codegenToIL(environment, iwriter))));
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> nc) {
 		return new Assignment(nc.get("target"), nc.get("value"), location);
 	}
@@ -95,5 +118,11 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

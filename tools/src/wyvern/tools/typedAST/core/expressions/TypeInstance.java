@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -7,6 +9,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -76,8 +80,19 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 		return new TypeInstance(binding);
 	}
 
-	private FileLocation location = FileLocation.UNKNOWN;
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("Invalid type instance"); // TODO is this used?
+    }
+
+    private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

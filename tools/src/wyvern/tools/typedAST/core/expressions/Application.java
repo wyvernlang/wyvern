@@ -1,9 +1,15 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
@@ -12,10 +18,7 @@ import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
@@ -91,7 +94,22 @@ public class Application extends CachingTypedAST implements CoreAST {
 		return children;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        List<Expression> arguments;
+        if (argument instanceof TupleObject) {
+            arguments = Arrays.stream(((TupleObject) argument).getObjects()).map(a -> ExpressionWriter.generate(iw -> a.codegenToIL(environment, iw))).collect(Collectors.toList());
+        } else {
+            arguments = Arrays.asList(ExpressionWriter.generate(iw->argument.codegenToIL(environment, iw)));
+        }
+        if (function instanceof Invocation && ((Invocation) function).getArgument() == null) { // straight MethodCall
+            writer.write(new MethodCall(ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw)), ((Invocation) function).getOperationName(), arguments));
+        }
+        Expression expr = ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw));
+        writer.write(new MethodCall(expr, "call", arguments));
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> nc) {
 		return new Application(nc.get("function"), nc.get("argument"), location);
 	}
@@ -99,5 +117,32 @@ public class Application extends CachingTypedAST implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// generate arguments		
+		List<Expression> args = new LinkedList<Expression>();
+        if (argument instanceof TupleObject) {
+        	for (TypedAST ast : ((TupleObject) argument).getObjects()) {
+        		args.add(ast.generateIL(ctx));
+        	}
+        } else {
+        	args.add(argument.generateIL(ctx));
+        }
+		
+		// generate the call
+		String methodName = null;
+		Expression receiver = null;
+		
+		if (function instanceof Invocation) {
+			Invocation i = (Invocation) function;
+			methodName = i.getOperationName();
+			receiver = i.getReceiver().generateIL(ctx);
+		} else {
+			throw new RuntimeException("calls with no receiver are not implemented");
+		}
+		
+		return new MethodCall(receiver, methodName, args);
 	}
 }

@@ -1,0 +1,25 @@
+/** Wyvern example: a Stack **/
+
+interface Stack
+	type T
+	prop top : T?
+	def push(T)
+	def pop() : T?
+	
+class StackImpl implements Stack
+	var list : T Link?
+	
+	def top = list.data
+	
+	def push(x)
+		list = Link(x, link)
+	
+	def pop()
+		val result = list.data
+		list = list.next
+		result
+		
+class Link
+	type T
+	val data : T
+	val next : T Link?

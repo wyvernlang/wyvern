@@ -1,5 +1,13 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -12,6 +20,9 @@ import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -23,6 +34,7 @@ import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
@@ -118,7 +130,23 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location, true);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+    	ValueType valueType = getType ().generateILType();
+        environment.register(getName(), valueType);
+        GenerationEnvironment igen = new GenerationEnvironment(environment);
+
+        for (NameBinding nb : argNames)
+            igen.register(nb.getName(), valueType);
+        writer.write(new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
+                argNames.stream().map(nb -> new FormalArg(nb.getName(), nb.getType().generateILType())).collect(Collectors.toList()),
+                        type.generateILType(),
+                        ExpressionWriter.generate(iw -> {
+                            body.codegenToIL(igen, iw);
+                        })));
+    }
+
+    @Override
 	protected Type doTypecheck(Environment env) {
 		Environment extEnv = env;
 		for (NameBinding bind : argNames) {
@@ -190,5 +218,41 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (resolvedType == null)
 			resolvedType = TypeResolver.resolve(type, against);
 		return env.extend(new NameBindingImpl(name, resolvedType));
+	}
+
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		List<FormalArg> args = new LinkedList<FormalArg>();
+		for (NameBinding b : argNames) {
+			args.add(new FormalArg(b.getName(), b.getType().getILType(ctx)));
+		}
+		return new DefDeclType(getName(), getResultILType(ctx), args);
+	}
+
+
+	private ValueType getResultILType(GenContext ctx) {
+		return ((Arrow)type).getResult().getILType(ctx);
+	}
+
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		List<FormalArg> args = new LinkedList<FormalArg>();
+		GenContext methodContext = thisContext;
+		for (NameBinding b : argNames) {
+			ValueType argType = b.getType().getILType(ctx);
+			args.add(new FormalArg(b.getName(), argType));
+			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
+		}
+		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
+				        getName(), args, getResultILType(ctx), body.generateIL(methodContext));
 	}
 }

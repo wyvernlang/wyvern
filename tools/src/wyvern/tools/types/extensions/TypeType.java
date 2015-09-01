@@ -1,7 +1,12 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.*;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -10,12 +15,14 @@ import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.*;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;
@@ -163,9 +170,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		}
 	}
 
-	private boolean isParserCheck = false;
-	private boolean isParserValid = false;
-
 	@Override
 	public Map<String, Type> getChildren() {
 		HashMap<String, Type> map = new HashMap<>();
@@ -213,7 +217,15 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		return typeType;
 	}
 
-	private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
+    @Override
+    public wyvern.target.corewyvernIL.type.ValueType generateILType() {
+        LinkedList<DeclType> declTypes = typeDeclEnv.get().getBindings().stream()
+                .map(b -> new ValDeclType(b.getName(), (ValueType) b.getType().generateILType()))
+                .collect(Collectors.toCollection(LinkedList::new));
+        return new StructuralType(getName(), declTypes);
+    }
+
+    private Environment getEnvForDict(Map<String, Type> newChildren, Environment ndEnv, ArrayList<String> list) {
 		for (String key : list) {
 			String[] kSplit = key.split(":");
 			Type nt = newChildren.get(key);
@@ -241,4 +253,20 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	public boolean equals(Object other) {
 		return other instanceof TypeType && ((TypeType) other).typeDeclEnv.get().equals(typeDeclEnv.get());
 	}
+
+	@Override
+	public TypeType getEquivType() {
+		return this;
+	}
+	@Override
+	public TaggedInfo getTaggedInfo() {
+		return decl==null?null:decl.getTaggedInfo();
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

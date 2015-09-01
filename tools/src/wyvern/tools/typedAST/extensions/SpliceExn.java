@@ -1,10 +1,13 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -57,7 +60,12 @@ public class SpliceExn extends AbstractTypedAST {
 		return new SpliceExn(newChildren.get("exn"));
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("How do we handle splice expressions in code generation?");
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return null;
 	}
@@ -65,5 +73,11 @@ public class SpliceExn extends AbstractTypedAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

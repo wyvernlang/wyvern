@@ -1,7 +1,11 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -182,5 +186,16 @@ public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResol
 			result[i] = newChildren.get(i + "");
 		}
 		return new Tuple(result);
+	}
+
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Tuple type unimplemented", FileLocation.UNKNOWN); //TODO
+    }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

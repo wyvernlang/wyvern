@@ -1,5 +1,8 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
@@ -73,6 +76,18 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	public Type cloneWithChildren(Map<String, Type> newChildren) {
 		return this;
 	}
-	@Override
+
+    @Override
+    public ValueType generateILType() {
+        throw new WyvernException("Primitive type conversion unimplmented"); //TODO
+    }
+
+    @Override
 	public boolean equals(Object other) { return other instanceof Str; }
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

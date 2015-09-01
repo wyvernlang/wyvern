@@ -15,6 +15,7 @@ public enum ErrorMessage {
 	MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
 	NOT_SUBTYPE("%ARG is not a subtype of %ARG", 2),
 	DUPLICATE_MEMBER("%ARG has more than one member named %ARG", 2),
+	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
 	
 	// Syntax errors
 	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),
@@ -53,7 +54,9 @@ public enum ErrorMessage {
 	//Verification errors
 	IMPORT_CYCLE("Import cycles have been found, with cycles\n%ARG", 1),
 
-	ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2);// end of error list
+	ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2),// end of error list
+	
+	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1);
 	
 	private ErrorMessage(String message, int numArgs) {
 		this.errorMessage = message;

@@ -1,10 +1,15 @@
 package wyvern.tools.typedAST.extensions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -50,7 +55,12 @@ public class ToastExpression extends AbstractTypedAST {
 		return new ToastExpression(newChildren.get("exn"));
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Cannot generate code for a toast - run at compile time", this); //TODO: fixme for compiler
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return null;
 	}
@@ -58,5 +68,11 @@ public class ToastExpression extends AbstractTypedAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

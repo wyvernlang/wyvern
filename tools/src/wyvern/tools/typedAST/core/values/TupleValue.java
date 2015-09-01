@@ -1,14 +1,18 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -49,7 +53,12 @@ public class TupleValue extends AbstractValue implements InvokableValue {
 		return new TupleValue(tuple, ast);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Cannot generate IL for a runtime object", FileLocation.UNKNOWN);
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(values);
 	}
@@ -78,5 +87,11 @@ public class TupleValue extends AbstractValue implements InvokableValue {
 		if (num >= values.length)
 			ToolError.reportError(ErrorMessage.CANNOT_INVOKE, exp.getLocation());
 		return values[num];
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,12 +1,17 @@
 package wyvern.tools.typedAST.extensions;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -104,7 +109,12 @@ public class TSLBlock extends AbstractTypedAST {
 		return new TSLBlock(newChildren.get("inner"));
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(ExpressionWriter.generate(wr -> inner.codegenToIL(environment, wr)));
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return null;
 	}
@@ -112,5 +122,11 @@ public class TSLBlock extends AbstractTypedAST {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
