@@ -17,11 +17,19 @@ public class StructuralType extends ValueType {
 
 	private String selfName;
 	private List<DeclType> declTypes;
+	private boolean resourceFlag = false;
 	
 	public StructuralType(String selfName, List<DeclType> declTypes) {
 		super();
 		this.selfName = selfName;
 		this.declTypes = declTypes;
+	}
+
+	public StructuralType(String selfName, List<DeclType> declTypes, boolean resourceFlag) {
+		super();
+		this.selfName = selfName;
+		this.declTypes = declTypes;
+		this.resourceFlag = resourceFlag;
 	}
 
 	public String getSelfName() {

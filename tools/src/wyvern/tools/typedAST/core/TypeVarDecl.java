@@ -298,7 +298,7 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		StructuralType type = new StructuralType(this.name, td.genDeclTypeSeq(ctx));
+		StructuralType type = new StructuralType(this.name, td.genDeclTypeSeq(ctx), this.resourceFlag);
 		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
 	}
 }
