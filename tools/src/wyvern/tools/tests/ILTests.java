@@ -63,7 +63,7 @@ public class ILTests {
     	TestUtil.setPaths();
 		WyvernResolver.getInstance().addPath(PATH);
     }
-
+    
 	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
@@ -167,10 +167,9 @@ public class ILTests {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null).extend("D",  new Variable("D"), null);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
 	}
-	
 	@Test
 	public void testMultipleModules() throws ParseException {
 		
@@ -178,6 +177,7 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		
 		for(String fileName : fileList) {
+			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);

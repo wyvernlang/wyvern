@@ -73,6 +73,8 @@ public class StructuralType extends ValueType {
 		for (DeclType dt : st.declTypes) {
 			DeclType candidateDT = findDecl(dt.getName());
 			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, ctx)) {
+				System.out.println(candidateDT);
+				System.out.println(dt);
 				return false;
 			}
 		}
@@ -101,11 +103,11 @@ public class StructuralType extends ValueType {
 	
 	@Override
 	public String toString() {
-		String ret = "st:\n";
-		for(DeclType declt : declTypes) {
-			ret += declt.toString();
-			ret += "\n";
-		}
+		String ret = "st:" + selfName;
+		//for(DeclType declt : declTypes) {
+		//	ret += declt.toString();
+		//	ret += ";";
+		//}
 		return ret;
 	}
 }

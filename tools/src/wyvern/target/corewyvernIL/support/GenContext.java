@@ -22,7 +22,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public abstract class GenContext extends TypeContext {
 	
-	class ILMethod {
+	public class ILMethod {
 		String objName;
 		wyvern.tools.typedAST.core.declarations.DefDeclaration defDecl;
 		
@@ -42,14 +42,13 @@ public abstract class GenContext extends TypeContext {
 		}
 	}
 	
-	private Map<String, ILMethod> methodBinding = new HashMap<String, ILMethod>();
-	private Map<String, String> typeBinding = new HashMap<String, String>();
-	
 	public GenContext extend(String var, Expression expr, ValueType type) {
 		return new VarGenContext(var, expr, type, this);
 	}
 	
 	public abstract Expression lookupExp(String varName);
+	public abstract String getType(String varName);
+	public abstract ILMethod getMethod(String varName);
 	
 	public static GenContext empty() {
 		return theEmpty;
@@ -64,25 +63,28 @@ public abstract class GenContext extends TypeContext {
 	} 
 	private static int count = 0;
 
-	public void rec(String newName, TypedAST ast) {
+	public GenContext rec(String newName, TypedAST ast) {
 		if(ast instanceof TypeVarDecl) {
 			String typeName = ((TypeVarDecl) ast).getName();
-			typeBinding.put(typeName, newName);
+			return new TypeGenContext(typeName, newName, this);
 		} else {
 			assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
 			wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
 			String methodName = methodDecl.getName();
-			
-			methodBinding.put(methodName, new ILMethod(newName, methodDecl));
+			ILMethod method = new ILMethod(newName, methodDecl);
+			return new MethodGenContext(methodName, method, this);
 		}
-		return;
+		
 	}
+	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq();
+	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq();
 
+	/*
 	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq() {
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = 
 				new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
-		for(Map.Entry<String, ILMethod> entry : methodBinding.entrySet()) {
+		for(Map.Entry<String, ILMethod> entry : methodBinding.entrySet()) { for(Map.Entry<String, ILMethod> entry : methodBinding.entrySet()) {
 			String methodName = entry.getKey();
 			ILMethod method = entry.getValue();
 			List<Expression> args = new LinkedList<Expression>();
@@ -128,12 +130,6 @@ public abstract class GenContext extends TypeContext {
 		}
 		return declts;
 	}
+	*/
 	
-	public String getMethod(String methodName) {
-		return methodBinding.get(methodName).getObjName();
-	}
-	
-	public String getType(String typeName) {
-		return typeBinding.get(typeName);
-	}
 }

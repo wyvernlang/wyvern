@@ -49,17 +49,17 @@ public class GenUtil {
 			TypedAST ast = ai.next(); 
 			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
 				String newName = GenContext.generateName();
-				ctx.rec(newName, ast);
-				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(ctx);
+				GenContext newCtx = ctx.rec(newName, ast);
+				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(newCtx);
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
 						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
 						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
 				decls.add(decl);
-				declts.add(((Declaration) ast).genILType(ctx));
+				declts.add(((Declaration) ast).genILType(newCtx));
 				ValueType type = new StructuralType(newName, declts);
 				Expression newExp = new New(decls, newName, type);
-				Expression e = doGenModuleIL(ctx, ai);
+				Expression e = doGenModuleIL(newCtx, ai);
 				return new Let(newName, newExp, e);
 			} else if (ast instanceof ValDeclaration) {
 				ValDeclaration vd = (ValDeclaration) ast;

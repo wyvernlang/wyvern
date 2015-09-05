@@ -321,8 +321,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
 		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext);
+		System.out.println(body);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(methodContext);
-		// non resource to be implemented 
 		if(isResource() == false) {
 			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body);
 		}
