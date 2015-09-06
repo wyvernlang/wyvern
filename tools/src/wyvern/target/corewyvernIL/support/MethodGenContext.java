@@ -48,7 +48,8 @@ public class MethodGenContext extends GenContext {
 
 	@Override
 	public ILMethod getMethod(String varName) {
-		if(this.methodName == varName) return method;
+		System.out.println(this.methodName + " vs " + varName);
+		if(this.methodName.equals(varName)) return method;
 		else return genContext.getMethod(varName);
 	}
 

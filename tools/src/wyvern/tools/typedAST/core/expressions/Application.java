@@ -143,6 +143,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 			// must be variable
 			Variable v = (Variable) function;
 			methodName = v.getName();
+			System.out.println(ctx.getClass());
 			String objName = ctx.getMethod(methodName).getObjName();  
 			if (objName != null) {
 				receiver = new wyvern.target.corewyvernIL.expression.Variable(objName);

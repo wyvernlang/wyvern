@@ -29,7 +29,7 @@ public class TypeGenContext extends GenContext {
 
 	@Override
 	public String getType(String varName) {
-		if(this.typeName == varName) return objName;
+		if(this.typeName.equals(varName)) return objName;
 		else return genContext.getType(varName);
 	}
 

@@ -50,6 +50,8 @@ public class GenUtil {
 			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
 				String newName = GenContext.generateName();
 				GenContext newCtx = ctx.rec(newName, ast);
+				System.out.println("newCtx " + newCtx.hashCode());
+				System.out.println("Ctx    " + ctx.hashCode());
 				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(newCtx);
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
 						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();

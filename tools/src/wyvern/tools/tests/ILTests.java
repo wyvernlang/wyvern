@@ -63,7 +63,6 @@ public class ILTests {
     	TestUtil.setPaths();
 		WyvernResolver.getInstance().addPath(PATH);
     }
-    
 	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
@@ -202,5 +201,14 @@ public class ILTests {
 			}
 		}
 		
+	}
+	@Test
+	public void testRecursiveMethod() throws ParseException {
+		
+		String source = TestUtil.readFile(PATH + "recursive.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+		
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
 	}
 }
