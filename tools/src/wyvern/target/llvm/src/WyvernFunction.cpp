@@ -38,7 +38,18 @@ WyvernFunction::WyvernFunction (Type* returnType, vector<Type*> typeArgs,
                                      name, module);
     
     cout << "About to crash on a Mac!" << endl;
-
+    
+    cout << "llvmFunction block size is " << llvmFunction->getBasicBlockList().size() << endl;
+    /*
+    llvmFunction->getEntryBlock();
+    
+    cout << "Not yet 1" << endl;
+    
+    llvmFunction->getEntryBlock().begin();
+    
+    cout << "Not yet 2" << endl;
+    */
+    
     IRBuilder<> TmpB(&llvmFunction->getEntryBlock(),
                      llvmFunction->getEntryBlock().begin());
     
