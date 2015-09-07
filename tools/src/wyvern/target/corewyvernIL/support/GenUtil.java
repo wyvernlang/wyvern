@@ -44,14 +44,16 @@ public class GenUtil {
 		}
 	}
 	
+	/* doModuleIL 
+	 * ModuleDelaration.toplevelGen falls into here
+	 * Generating the declaration sequence inside the module. 
+	 */
 	public static Expression doGenModuleIL(GenContext ctx, Iterator<? extends TypedAST> ai) {
 		if (ai.hasNext()) {
 			TypedAST ast = ai.next(); 
 			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
 				String newName = GenContext.generateName();
-				GenContext newCtx = ctx.rec(newName, ast);
-				System.out.println("newCtx " + newCtx.hashCode());
-				System.out.println("Ctx    " + ctx.hashCode());
+				GenContext newCtx = ctx.rec(newName, ast); // extend the environment 
 				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(newCtx);
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
 						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
@@ -60,10 +62,12 @@ public class GenUtil {
 				decls.add(decl);
 				declts.add(((Declaration) ast).genILType(newCtx));
 				ValueType type = new StructuralType(newName, declts);
+				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
-				Expression e = doGenModuleIL(newCtx, ai);
+				Expression e = doGenModuleIL(newCtx, ai); // generate the rest part 
 				return new Let(newName, newExp, e);
 			} else if (ast instanceof ValDeclaration) {
+				/* same as doGenIL */
 				ValDeclaration vd = (ValDeclaration) ast;
 				ValueType type = ((ValDeclType)vd.genILType(ctx)).getRawResultType();
 				String name = vd.getName();
@@ -71,11 +75,13 @@ public class GenUtil {
 				Expression dfn = vd.getDefinition().generateIL(ctx);
 				return new Let(name, dfn, doGenModuleIL(newCtx, ai));
 			} else {
+				/* same as doGenIL */
 				Expression e1 = ast.generateIL(ctx);
 				Expression e2 = doGenModuleIL(ctx, ai);
 				return new Let(GenContext.generateName(), e1, e2);
 			}			
 		} else {
+			/* when declaration sequence come to the end, create a new object for this module */
 			String newName = GenContext.generateName();
 			return new New(ctx.genDeclSeq(), newName, new StructuralType(newName, ctx.genDeclTypeSeq()));
 		}

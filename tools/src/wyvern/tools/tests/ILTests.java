@@ -176,16 +176,16 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		
 		for(String fileName : fileList) {
-			System.out.println(fileName);
+			//System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
 			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
 				ValDeclaration vd = (ValDeclaration) decl;
-				genCtx = genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType());
+				genCtx = genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType()); // manually adding instead of linking
 			} else if (decl instanceof TypeDeclaration) {
 				TypeDeclaration td = (TypeDeclaration) decl;
-				genCtx = genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType());
+				genCtx = genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType()); // manually adding instead of linking
 			} else if (decl instanceof DefDeclaration) {
 				DefDeclaration methodDecl = (DefDeclaration) decl;
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
@@ -195,9 +195,11 @@ public class ILTests {
 				decls.add(methodDecl);
 				declts.add(methodDecl.typeCheck(genCtx, genCtx));
 				ValueType type = new StructuralType(decl.getName(), declts);
+				
+				/* manually wrap the method into an object*/
 				Expression newExp = new New(decls, decl.getName(), type);
 				
-				genCtx = genCtx.extend(decl.getName(), newExp, type);
+				genCtx = genCtx.extend(decl.getName(), newExp, type); // adding the object into the environment, instead of linking 
 			}
 		}
 		

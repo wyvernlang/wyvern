@@ -232,6 +232,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 
+	/* wrapLet:
+	 * import A as copyA => let copyA = A in {rest}
+	 * instantiate B(...) as copyB => let copyB = B(...) in {rest}
+	 */
 	private Expression wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx) {
 		if(!ai.hasNext()) {
 			return innerTranslate(normalSeq, ctx);
@@ -257,8 +261,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		    	}
 		    } else {
 		    	if(! (argument instanceof UnitVal)) {
+		    		/* single argument */
 			    	args.add(argument.generateIL(ctx));
 		    	}
+		    	/* no argument */
 		    }
 	
 			MethodCall instValue = 
@@ -274,6 +280,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 
 	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx) {
+		/* generate the formal arguments by requiring sequence */
 		List<FormalArg> types = new LinkedList<FormalArg>();
 		for(Declaration d : reqSeq.getDeclIterator()) {
 			ImportDeclaration req = (ImportDeclaration) d;
@@ -308,24 +315,32 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		Sequence impInstSeq = new DeclSequence();
 		Sequence normalSeq = new DeclSequence();
 		if(inner instanceof Sequence || inner instanceof DeclSequence) {
+			/* classify declarations */
 			reqSeq = ((DeclSequence) inner).filterRequires();
 			impInstSeq = ((DeclSequence) inner).filterImportInstantiates();
 			normalSeq = ((DeclSequence) inner).filterNormal();
 		} else {
+			/* single declaration in module */
 			if(inner instanceof Instantiation) impInstSeq = Sequence.append(impInstSeq, inner);
 			else normalSeq = Sequence.append(normalSeq, inner);
 		}
+		
 		List<FormalArg> formalArgs = new LinkedList<FormalArg>();
-		formalArgs = getTypes(reqSeq, ctx);
+		formalArgs = getTypes(reqSeq, ctx); // translate requiring modules to method parameters
+		
+		/* adding parameters to environments */
 		for(FormalArg arg : formalArgs) {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
-		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext);
-		System.out.println(body);
+	    /* importing modules and instantiations are translated into let sentence */
+		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext);  
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(methodContext);
+		
 		if(isResource() == false) {
+			/* non resource module translated into value */
 			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body);
 		}
+		/* resource module translated into method */
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body);
 	}
 }
