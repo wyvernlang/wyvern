@@ -1,7 +1,14 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.SubtypeRelation;
@@ -102,7 +109,26 @@ public class TypeInv implements Type {
 		throw new RuntimeException("Cannot resolve to a type invocation");
 	}
 
-	@Override
+    private Expression resolvePath() {
+        if (innerType instanceof TypeInv) {
+            return new FieldGet(((TypeInv) innerType).resolvePath(), invName);
+        } else if (innerType instanceof Variable) {
+            return new wyvern.target.corewyvernIL.expression.Variable(((Variable) innerType).getName());
+        }
+        throw new RuntimeException("Unreachable");
+    }
+
+    @Override
+    public ValueType generateILType() {
+        return new NominalType((Path)resolvePath(), invName);
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
+	}
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

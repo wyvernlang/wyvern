@@ -1,8 +1,11 @@
 package wyvern.tools.typedAST.core;
 
-import sun.awt.GlobalCursorManager;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
@@ -15,6 +18,9 @@ import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -32,11 +38,13 @@ public class TypeVarDecl extends Declaration {
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
 	private final Reference<Value> metadataObj;
+	private TaggedInfo taggedInfo = null;
+	private boolean resourceFlag = false;
 
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
-	private static abstract class EnvironmentExtInner implements EnvironmentExtender {
+	private abstract class EnvironmentExtInner implements EnvironmentExtender {
 
 		private final FileLocation loc;
 
@@ -88,6 +96,11 @@ public class TypeVarDecl extends Declaration {
 
 		}
 
+        @Override
+        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+            throw new WyvernException("Cannot generate code for a placeholder", TypeVarDecl.this);
+        }
+
 	}
 
 
@@ -99,14 +112,24 @@ public class TypeVarDecl extends Declaration {
 		this.fileLocation = fileLocation;
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation) {
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource ){
+		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
+		this.name = name;
+		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
+		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
+		this.fileLocation = fileLocation;
+		this.taggedInfo = taggedInfo;
+		this.resourceFlag = isResource;
+	}
+
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation){
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
 		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 	}
-
+	
 	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {
 		this.name = name;
 		this.body = body;
@@ -130,6 +153,14 @@ public class TypeVarDecl extends Declaration {
 			@Override
 			public Type getType() {
 				return body;
+			}
+
+
+
+			@Override
+			public Expression generateIL(GenContext ctx) {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		};
 
@@ -213,7 +244,12 @@ public class TypeVarDecl extends Declaration {
 		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(ExpressionWriter.generate(ow -> new wyvern.target.corewyvernIL.decl.TypeDeclaration(name, body.getType().generateILType()))); // TODO better tag support
+    }
+
+    @Override
 	public FileLocation getLocation() {
 		return fileLocation;
 	}
@@ -221,5 +257,27 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
 
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public boolean isResource() {
+		return this.resourceFlag;
 	}
 }

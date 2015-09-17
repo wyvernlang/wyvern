@@ -1,41 +1,36 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.stdlib.Globals;
-import wyvern.targets.java.annotations.Val;
-import wyvern.tools.errors.ErrorMessage;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeType;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-public class TypeDeclaration extends Declaration implements CoreAST {
+public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	protected DeclSequence decls;
 	private Reference<Optional<TypedAST>> metadata;
 	private NameBinding nameBinding;
@@ -72,10 +67,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 		return env.extend(nameBinding);
 	}
 	
-	private TaggedInfo taggedInfo;
-
 	public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-
 		// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
 		this.decls = decls;
 		nameBinding = new NameBindingImpl(name, null);
@@ -89,12 +81,7 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 				metadata.get().getType());
 		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
 
-
-		if (taggedInfo != null) {
-			this.taggedInfo = taggedInfo;
-			this.taggedInfo.setTagName(name, this, null);
-			this.taggedInfo.associateWithClassOrType(this.typeBinding);
-		}
+		setupTags(name, typeBinding, taggedInfo);
 		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 
 		this.location = clsNameLine;
@@ -130,12 +117,17 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		TypeDeclaration decls1 = new TypeDeclaration(nameBinding.getName(), (DeclSequence) newChildren.get("decls"), metaValue, location);
-		decls1.taggedInfo = taggedInfo;
+		TypeDeclaration decls1 = new TypeDeclaration(nameBinding.getName(), (DeclSequence) newChildren.get("decls"), metaValue, getTaggedInfo(), location);
 		return decls1;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Unimplemented", this);
+        //return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), null); //TODO
+    }
+
+    @Override
 	public Type doTypecheck(Environment env) {
 		Environment eenv = decls.extend(env, env);
 		
@@ -143,6 +135,8 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 			decl.typecheckSelf(eenv);
 		}
 
+		if (isTagged()) typecheckTags(env);
+		
 		return this.typeBinding.getType();
 	}	
 	
@@ -193,4 +187,23 @@ public class TypeDeclaration extends Declaration implements CoreAST {
 	public Reference<Environment> getDeclEnv() {
 		return declEnv;
 	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

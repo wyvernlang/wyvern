@@ -1,0 +1,104 @@
+Criteria for Runtime System
+	simple
+		1> design a core calculus
+			features
+				objects
+				types
+				hierarchical tags
+					including open or closed list of sub-tags
+				metadata (see #4 below)
+				type members and simple dependent types
+				intersections?
+					convenient, as described in Odersky OOPSLA 2014 paper
+					also could maybe substitute for type bounds
+					looks like without bounds, the problems with intersections
+						in Odersky OOPSLA 2014 go away
+			non-features
+				functions
+				classes
+			straightforward translation from Wyvern source
+			semantics (at least static, ideally dynamic too)
+				dynamics: substitution highly problematic
+					see Odersky OOPSLA 2014, FOOL 2012
+						1) lose abstraction - poor model
+						2) causes various soundness problems
+							"environmental narrowing"
+					Odersky 2014 uses big-step
+					better, perhaps: small-step with an environment
+						e.g. Garcia-style
+						Odersky FOOL 2012 also uses an environment!
+							but does not preserve source-level types
+			easily printable as Wyvern source
+	debuggable
+		2> at source level
+			and at bytecode level
+		stepping through source code
+		inspecting state
+	?efficiently serializable
+		use Apache Thrift
+			Prot. buffers great too, but RPC impl is nice
+			performance, size comparable
+			containers in Thrift may be useful
+		only caveat: thrift/protocolbuf not great for trees
+			JSON, YAML?  but these don't have a standard typed IDL.  sigh.
+			see protocol buffers ideas for handling unions
+				https://developers.google.com/protocol-buffers/docs/techniques#union
+	4> includes full source-level metadata
+	3> full source-level types are reconstructable
+		Note: means I need to define what are source-level types!
+
+Criteria for Overall Compilation System
+	comprehensible compiler errors
+	tests
+	REPL
+	assertions
+	wyverndoc
+	Smalltalk-like IDE support
+
+
+=======================
+
+Example Design: the Lambda Calculus
+
+Expression
+	location		// source location
+
+Variable extends Expression
+	name : String
+
+Lambda extends Expression
+	varName : String
+	varType : Type
+	body : Expression
+	
+Application extends Expression
+	function : String
+	argument : String
+	
+Unit extends Expression
+
+Type
+
+UnitType extends Type
+
+Arrow extends Type
+	argType : Type
+	resultType : Type
+
+====================================
+
+Execution
+	run()		// until error
+	step()		// next step
+	stack : Stack[Frame]	// frames with distinct variable contexts
+	
+Frame
+	evalContexts : Stack[EvalContext]
+	varContext		// variables in scope and the values to which they map
+
+EvalContext
+	expression		// the executing expression
+	values			// the list of values computed so far
+	
+Closure			// a Lambda and a varContext - the value a lambda evaluates to
+

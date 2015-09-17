@@ -1,0 +1,2 @@
+resource module testModule
+val x = "5"

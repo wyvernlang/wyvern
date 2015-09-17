@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.abs;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
@@ -87,4 +89,8 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 	}
 
 	public boolean isClassMember() { return false; }
+
+	public abstract DeclType genILType(GenContext ctx);
+
+	public abstract wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext);
 }

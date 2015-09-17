@@ -1,18 +1,27 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,7 +61,12 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 		return childMap;
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new RuntimeException("Let expression translation not implemented");
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
 	}
@@ -82,5 +96,41 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		final Iterator<Declaration> declIter = decl.getDeclIterator().iterator();
+		Iterator<TypedAST> myIter = new Iterator<TypedAST>() {
+			boolean returnedBody = false;
+			
+			@Override
+			public boolean hasNext() {
+				return !returnedBody;
+			}
+
+			@Override
+			public TypedAST next() {
+				if (declIter.hasNext())
+					return declIter.next();
+				returnedBody = true;
+				return body;
+			}			
+		};
+		return GenUtil.doGenIL(ctx, myIter);
+		
+		/*if (!declIter.hasNext())
+			throw new RuntimeException("oops, no decls in the let");
+		Declaration d = declIter.next();
+		if (declIter.hasNext())
+			throw new RuntimeException("only handle lets with one decl for now");
+		if (d instanceof ValDeclaration) {
+			ValDeclaration vd = (ValDeclaration) d;
+			String name = vd.getName();
+			return new Let(name, vd.getDefinition().generateIL(ctx), body.generateIL(ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name))));
+		} else {
+			throw new RuntimeException("only handle val decls for now");			
+		}
+		*/
 	}
 }

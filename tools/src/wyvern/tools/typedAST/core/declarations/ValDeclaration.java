@@ -1,5 +1,12 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -13,6 +20,9 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.ExpressionWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -187,7 +197,16 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		return new ValDeclaration(getName(), binding.getType(), null, location);
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+    	ValueType valueType = getType ().generateILType();
+        environment.register(getName(), valueType);
+        String genName = GenerationEnvironment.generateVariableName();
+        writer.wrap(e->new Let(genName, Optional.ofNullable(definition).<Expression>map(d ->ExpressionWriter.generate(ew->d.codegenToIL(environment, ew))).orElse(null), (Expression)e));
+        writer.write(new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), getType().generateILType(), new Variable(genName)));
+    }
+
+    @Override
 	public Environment extendType(Environment env, Environment against) {
 		return env;
 	}
@@ -222,5 +241,34 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location; //TODO
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		ValueType vt = getILValueType(ctx);
+		return new ValDeclType(getName(), vt);
+	}
+
+	private ValueType getILValueType(GenContext ctx) {
+		ValueType vt;
+		if (declaredType != null) {
+			// convert the declared type if there is one
+			vt = declaredType.getILType(ctx);
+		} else {
+			// convert the declaration and typecheck it
+			vt = definition.generateIL(ctx).typeCheck(ctx);
+		}
+		return vt;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), getILValueType(ctx), definition.generateIL(ctx));
 	}
 }

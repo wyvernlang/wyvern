@@ -1,5 +1,7 @@
 package wyvern.tools.types.extensions;
 
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
@@ -63,12 +65,23 @@ public class SpliceType implements Type {
 		return cloned;
 	}
 
-	@Override
+    @Override
+    public ValueType generateILType() {
+        return inner.generateILType(); // Todo: validate me - fails for bindings that are shadowed
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 
 	}
 
 	public Type getInner() {
 		return inner;
+	}
+
+	@Override
+	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

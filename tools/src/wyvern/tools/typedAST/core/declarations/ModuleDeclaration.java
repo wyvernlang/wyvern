@@ -1,6 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
@@ -9,6 +12,8 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
@@ -29,14 +34,24 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
+	private boolean resourceFlag;
 
-	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location) {
+	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
+		this.resourceFlag = isResource;
 		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), null, name);
 		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), null, name);
+		if (isResource) {
+			selfType.setAsResource();
+			subTypeType.setAsResource();
+		} else {
+			selfType.setAsModule();
+			subTypeType.setAsModule();
+		}
 	}
+
 
 	@Override
 	public String getName() {
@@ -142,13 +157,18 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), getLocation());
+		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), getLocation(), isResource());
 		newDecl.selfType = selfType;
 		newDecl.subTypeType = subTypeType;
 		newDecl.importEnv = importEnv;
 		newDecl.typeEnv = typeEnv;
 		newDecl.dclEnv = dclEnv;
 		return newDecl;
+	}
+
+	@Override
+	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+		throw new RuntimeException("Cannot codegen modules yet");
 	}
 
 	@Override
@@ -164,5 +184,27 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void accept(CoreASTVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public boolean isResource() {
+		return this.resourceFlag;
 	}
 }

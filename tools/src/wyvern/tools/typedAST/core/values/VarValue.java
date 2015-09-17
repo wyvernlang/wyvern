@@ -1,9 +1,14 @@
 package wyvern.tools.typedAST.core.values;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
@@ -39,7 +44,12 @@ public class VarValue extends AbstractValue {
 		return new VarValue((Value)newChildren.get("inner"));
 	}
 
-	@Override
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        throw new WyvernException("Cannot generate code for runtime values", FileLocation.UNKNOWN);
+    }
+
+    @Override
 	public void writeArgsToTree(TreeWriter writer) {
 		writer.writeArgs(innerValue);
 	}
@@ -51,5 +61,11 @@ public class VarValue extends AbstractValue {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location; //TODO
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

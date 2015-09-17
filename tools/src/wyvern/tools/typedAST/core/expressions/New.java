@@ -1,5 +1,11 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -17,12 +23,14 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.transformers.DeclarationWriter;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
-import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -112,7 +120,15 @@ public class New extends CachingTypedAST implements CoreAST {
 			Environment savedInner = env.extend(innerEnv);
 			innerEnv = seq.extendName(innerEnv, savedInner);
 
-			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), null, null)));
+			// compute tag info
+			TaggedInfo tagInfo = null;
+			if (expected.isPresent()) {
+				Type t = expected.get();
+				if (t instanceof RecordType)
+					tagInfo = ((RecordType)t).getTaggedInfo();
+			}
+			
+			Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), tagInfo, null)));
 			final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
 					reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
 			seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
@@ -130,7 +146,7 @@ public class New extends CachingTypedAST implements CoreAST {
 			cls = classDeclaration;
 			Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
 
-			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), null, null);
+			ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), tagInfo, null);
 			return ct;
 		}
 	}
@@ -195,7 +211,32 @@ public class New extends CachingTypedAST implements CoreAST {
 		return outMap;
 	}
 
-	@Override
+    private static int uniqueCounter = 0;
+    private static Map<String, Expression> variables = new HashMap<>();
+    public static String addNewField(Expression value) {
+        String name = "field " + uniqueCounter++;
+        variables.put(name, value);
+        return name;
+    }
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) { //TODO: support new inside classes
+        List<wyvern.target.corewyvernIL.decl.Declaration> genDecls = new LinkedList<>();
+        for (Declaration decl : getDecls().getDeclIterator()) {
+            genDecls.addAll(DeclarationWriter.generate(writer, dw -> decl.codegenToIL(environment, dw)));
+        }
+        wyvern.target.corewyvernIL.expression.New exn = new wyvern.target.corewyvernIL.expression.New(
+                genDecls,
+                "this",
+        null);
+        Expression output = exn;
+        for (String key : variables.keySet()) {
+            output = new Let(key, variables.get(key), output);
+        }
+        variables.clear();
+        writer.write(output);
+    }
+
+    @Override
 	public TypedAST doClone(Map<String, TypedAST> newChildren) {
 
 		New aNew = new New(new HashMap<>(), location);
@@ -227,5 +268,27 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	public boolean isGeneric() {
 		return isGeneric;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		// TODO see if the user specified a different self name
+		String selfName = "this";
+		// compute the structural type for this
+		List<DeclType> declTypes = new LinkedList<DeclType>();
+		for (TypedAST d : seq) {
+			DeclType t = ((Declaration) d).genILType(ctx);
+			declTypes.add(t);
+		}
+		ValueType type = new StructuralType(selfName, declTypes);
+		// TODO translate the ascribed type, if any
+		// translate the declarations
+		GenContext thisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), type);
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		for (TypedAST d : seq) {
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
+			decls.add(decl);
+		}
+		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
 	}
 }

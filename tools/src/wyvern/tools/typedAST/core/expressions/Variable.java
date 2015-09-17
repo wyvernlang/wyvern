@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
@@ -7,6 +9,8 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
+import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
@@ -109,8 +113,18 @@ public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
 		return new Variable(binding, location);
 	}
 
-	private FileLocation location = FileLocation.UNKNOWN;
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(environment.lookupVar(binding.getName(), writer));
+    }
+
+    private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
+	}
+
+	@Override
+	public Expression generateIL(GenContext ctx) {
+		return ctx.lookupExp(getName());
 	}
 }
