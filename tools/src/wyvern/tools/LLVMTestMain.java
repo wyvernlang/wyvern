@@ -18,7 +18,7 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWriter;
 import wyvern.tools.tests.*;
 
-public class Interpreter {
+public class LLVMTestMain {
 
 	public static void main(String[] args) {
 		String currentdir;
