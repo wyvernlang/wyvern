@@ -43,6 +43,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private String name;
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
+	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
+	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
 
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
@@ -252,7 +254,24 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			args.add(new FormalArg(b.getName(), argType));
 			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
 		}
+		this.returnILType = this.getResultILType(ctx);
+		this.argILTypes = args;
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
 				        getName(), args, getResultILType(ctx), body.generateIL(methodContext));
+	}
+
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		return generateDecl(ctx, ctx);
+	}
+
+
+	public List<FormalArg> getArgILTypes() {
+		return argILTypes;
+	}
+
+	public wyvern.target.corewyvernIL.type.ValueType getReturnILType() {
+		return returnILType;
 	}
 }

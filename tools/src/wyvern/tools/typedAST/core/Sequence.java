@@ -329,4 +329,13 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		
 		return GenUtil.doGenIL(ctx, ai);
 	}
+	
+	public Expression generateModuleIL(GenContext ctx) {
+		Iterator<TypedAST> ai = exps.iterator();
+		
+		if (!ai.hasNext())
+			throw new RuntimeException("expected an expression in the list");
+		
+		return GenUtil.doGenModuleIL(ctx, ai);
+	}
 }

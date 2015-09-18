@@ -192,15 +192,15 @@ AST ModuleBody(boolean inModule) :
 }
 
 AST RequireDecl() :
-{ URI uri; Token t; }
+{ URI uri; Token t; Token name = null;}
 {
-  t=<REQUIRE> uri = Uri() <NEWLINE>  { return build.importDecl(uri, loc(t), true); }
+  t=<REQUIRE> uri = Uri() [<AS> name = <IDENTIFIER>] <NEWLINE>  { return build.importDecl(uri, loc(t), name, true); }
 }
 
 AST ImportDecl() :
-{ URI uri; Token t; }
+{ URI uri; Token t; Token name = null;}
 {
-  t=<IMPORT> uri = Uri() <NEWLINE> { return build.importDecl(uri, loc(t), false); }
+  t=<IMPORT> uri = Uri() [<AS> name=<IDENTIFIER>] <NEWLINE> { return build.importDecl(uri, loc(t), name, false); }
 }
 
 URI Uri() :
@@ -550,5 +550,5 @@ AST Instantiation() :
 { URI uri; Token name; AST arg;}
 {
 <INSTANTIATE> uri = Uri() arg = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
-{return build.instantiation(uri, arg, loc(name));}
+{return build.instantiation(uri, arg, name, loc(name));}
 }

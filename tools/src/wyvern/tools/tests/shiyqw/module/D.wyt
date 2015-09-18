@@ -1,0 +1,2 @@
+resource type sigD
+	def m(y : Int) : Int

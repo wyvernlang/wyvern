@@ -165,4 +165,10 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		return new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), binding.getType().getILType(ctx), definition.generateIL(ctx));
 	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
