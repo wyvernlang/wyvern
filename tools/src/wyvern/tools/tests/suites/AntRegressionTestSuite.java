@@ -34,15 +34,25 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @RunWith(Categories.class)
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
-@SuiteClasses( { DemoTests.class, RossettaCodeTests.class,
-				CoreParserTests.class, LexingTests.class,
+@SuiteClasses( {
+				// these tests use the old parser
 				TypeCheckTagTests.class, 
 				DynamicTagTests.class,
 				ParseTagTests.class, ExecuteTagTests.class,
 				CopperTests.class, PerformanceTests.class,
 				TypeCheckMatch.class, 
 				TypeCheckingTests.class,
-				CodegenTests.class, ILTests.class,
+				
+				
+				// these tests use the new parser but old IL
+				RossettaCodeTests.class,
+				DemoTests.class,
+				
+				CodegenTests.class,		// tests the old translation to the new IL
+				
+				LexingTests.class,		// tests the new lexer
+				CoreParserTests.class,	// tests the new parser
+				ILTests.class,			// tests the new IL
 				})
 public class AntRegressionTestSuite {
 

@@ -71,11 +71,10 @@ public class FieldGet extends Expression implements Path {
 	@Override
 	public Value interpret(EvalContext ctx) {
 		Value receiver = objectExpr.interpret(ctx);
-		if (!(receiver instanceof ObjectValue))
-			throw new RuntimeException("expected object value at field get");
-		ObjectValue ov = (ObjectValue) receiver;
-		DeclarationWithRHS decl = (DeclarationWithRHS) ov.findDecl(fieldName);
-		return (Value) decl.getDefinition();
+		if (!(receiver instanceof Invokable))
+			throw new RuntimeException("expected an object value at field get");
+		Invokable ov = (Invokable) receiver;
+		return ov.getField(fieldName, ctx);
  	}
 
 	@Override

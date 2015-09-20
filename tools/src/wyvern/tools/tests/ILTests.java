@@ -4,6 +4,7 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -26,6 +27,8 @@ import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -40,6 +43,7 @@ import java.io.StringReader;
 import static java.util.Optional.empty;
 import static wyvern.stdlib.Globals.getStandardEnv;
 
+@Category(RegressionTests.class)
 public class ILTests {
     @Test
     public void testLetVal() {
@@ -102,6 +106,25 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	@Test
+	@Category(CurrentlyBroken.class)
+	public void testVarFieldWrite() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    var v : system.Int = 2\n"
+				     + "obj.v = 5\n"
+				     + "obj.v\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	@Test
 	public void testDefDecl() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    val v : system.Int = 5\n"
@@ -136,4 +159,65 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testType() throws ParseException {
+		String input = "type IntResult\n"
+					 + "    def getResult():system.Int\n\n"
+					 + "val r : IntResult = new\n"
+					 + "    def getResult():system.Int = 5\n\n"
+					 + "r.getResult()\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTypeAbbrev() throws ParseException {
+		String input = "type Int = system.Int\n\n"
+					 + "val i : Int = 5\n\n"
+					 + "i\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testSimpleDelegation() throws ParseException {
+		String input = "type IntResult\n"
+					 + "    def getResult():system.Int\n\n"
+					 + "val r : IntResult = new\n"
+					 + "    def getResult():system.Int = 5\n\n"
+					 + "val r2 : IntResult = new\n"
+					 + "    delegate IntResult to r\n\n"
+					 + "r2.getResult()\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
 }

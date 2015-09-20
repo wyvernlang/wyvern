@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -93,13 +94,12 @@ public class MethodCall extends Expression {
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		ObjectValue receiver = (ObjectValue)objectExpr.interpret(ctx);
-		DefDeclaration dd = (DefDeclaration) receiver.findDecl(methodName);
-		EvalContext methodCtx = ctx;
+		Invokable receiver = (Invokable)objectExpr.interpret(ctx);
+		List<Value> argValues = new ArrayList<Value>(args.size());
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
-			methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getName(), e.interpret(ctx));
+			argValues.add(e.interpret(ctx));
 		}
-		return dd.getBody().interpret(methodCtx);
+		return receiver.invoke(methodName, argValues, ctx);		
 	}
 }

@@ -53,7 +53,8 @@ public class TestUtil {
 	}
 	
 	/**
-	 * Converts the given program into the AST representation.
+	 * Converts the given program into the TypedAST representation, using the
+	 * new Wyvern parser.
 	 * 
 	 * @param program
 	 * @return

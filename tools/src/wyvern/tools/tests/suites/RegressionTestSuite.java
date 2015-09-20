@@ -33,7 +33,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
 @SuiteClasses( { AntRegressionTestSuite.class,
-				FileTestRunner.class,
+				FileTestRunner.class,	// uses the old parser
 				})
 public class RegressionTestSuite {
 
