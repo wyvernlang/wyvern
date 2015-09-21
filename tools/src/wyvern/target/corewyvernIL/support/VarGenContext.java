@@ -40,10 +40,17 @@ public class VarGenContext extends GenContext {
 	public Expression lookupExp(String varName) {
 		if (varName.equals(var))
 			return expr;
+		/*
 		else if (genContext.getType(varName) != null) {
 			String objName = genContext.getType(varName);
 			return new FieldGet(new Variable(objName), varName);
 		}
+		
+		Actually, the test still pass when this part is moved.
+		My origin consideration is that while replace T -> y.T into inner context. 
+		Then T.x should be replace to y.T.x then T should be translate to a field get of T.
+		
+		*/
 		else {
 			return genContext.lookupExp(varName);
 		}

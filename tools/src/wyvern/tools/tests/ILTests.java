@@ -20,7 +20,9 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -63,6 +65,7 @@ public class ILTests {
     	TestUtil.setPaths();
 		WyvernResolver.getInstance().addPath(PATH);
     }
+    /*
 	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
@@ -169,41 +172,26 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
 	}
+	*/
 	@Test
 	public void testMultipleModules() throws ParseException {
 		
 		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv", "main.wyv"};
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
 		
 		for(String fileName : fileList) {
-			//System.out.println(fileName);
+			
+			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
-				ValDeclaration vd = (ValDeclaration) decl;
-				genCtx = genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType()); // manually adding instead of linking
-			} else if (decl instanceof TypeDeclaration) {
-				TypeDeclaration td = (TypeDeclaration) decl;
-				genCtx = genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType()); // manually adding instead of linking
-			} else if (decl instanceof DefDeclaration) {
-				DefDeclaration methodDecl = (DefDeclaration) decl;
-				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
-						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
-						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
-				decls.add(methodDecl);
-				declts.add(methodDecl.typeCheck(genCtx, genCtx));
-				ValueType type = new StructuralType(decl.getName(), declts);
-				
-				/* manually wrap the method into an object*/
-				Expression newExp = new New(decls, decl.getName(), type);
-				
-				genCtx = genCtx.extend(decl.getName(), newExp, type); // adding the object into the environment, instead of linking 
-			}
+			genCtx = GenUtil.link(genCtx, decl);
 		}
 		
 	}
+	
+	/*
 	@Test
 	public void testRecursiveMethod() throws ParseException {
 		
@@ -213,4 +201,5 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
 	}
+	*/
 }

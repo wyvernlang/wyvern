@@ -86,4 +86,30 @@ public class GenUtil {
 			return new New(ctx.genDeclSeq(), newName, new StructuralType(newName, ctx.genDeclTypeSeq()));
 		}
 	}
+
+	public static GenContext link(GenContext genCtx, wyvern.target.corewyvernIL.decl.Declaration decl) {
+		if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
+			wyvern.target.corewyvernIL.decl.ValDeclaration vd = (wyvern.target.corewyvernIL.decl.ValDeclaration) decl;
+			return genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType()); // manually adding instead of linking
+		} else if (decl instanceof wyvern.target.corewyvernIL.decl.TypeDeclaration) {
+			wyvern.target.corewyvernIL.decl.TypeDeclaration td = (wyvern.target.corewyvernIL.decl.TypeDeclaration) decl;
+			return genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType()); // manually adding instead of linking
+		} else if (decl instanceof wyvern.target.corewyvernIL.decl.DefDeclaration) {
+			wyvern.target.corewyvernIL.decl.Declaration methodDecl = (wyvern.target.corewyvernIL.decl.DefDeclaration) decl;
+			List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+					new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+			List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+					new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+			decls.add(methodDecl);
+			declts.add(methodDecl.typeCheck(genCtx, genCtx));
+			ValueType type = new StructuralType(decl.getName(), declts);
+			
+			/* manually wrap the method into an object*/
+			Expression newExp = new New(decls, decl.getName(), type);
+			
+			return genCtx.extend(decl.getName(), newExp, type); // adding the object into the environment, instead of linking 
+		}
+		
+		return genCtx;
+	}
 }

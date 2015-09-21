@@ -100,9 +100,11 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 	@Override
 	public ValueType getILType(GenContext ctx) {
 		// TODO Auto-generated method stub
+		/*
 		if(typeName.equals("Int")) {
 			return new NominalType("system", "Int");
 		}
+		*/
 		
 		String objName = ctx.getType(typeName);
 		return new NominalType(objName, typeName);

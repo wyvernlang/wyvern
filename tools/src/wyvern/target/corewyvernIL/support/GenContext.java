@@ -23,7 +23,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public abstract class GenContext extends TypeContext {
 	
 	/* ILMethod: the type of an IL method */
-	public class ILMethod {
+	public static class ILMethod {
 		String objName;
 		wyvern.tools.typedAST.core.declarations.DefDeclaration defDecl;
 		

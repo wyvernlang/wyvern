@@ -54,7 +54,7 @@ public class TypeGenContext extends GenContext {
 		DeclType declt = new ValDeclType(typeName, new NominalType(objName, typeName)); 
 		declts.add(declt);
 		
-		return null;
+		return declts;
 	}
 
 	@Override
