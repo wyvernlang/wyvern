@@ -48,7 +48,23 @@ public abstract class GenContext extends TypeContext {
 	}
 	
 	public abstract Expression lookupExp(String varName);
+	
+	/**
+	 * Getting the outer object name of a type.
+	 * For a mapping T -> y.T, getType(T) = y;
+	 * 
+	 * @param varName the type name
+	 * @return the outer object name of the of the type
+	 */
 	public abstract String getType(String varName);
+	
+	/**
+	 * Getting the outer object name of a type.
+	 * For a mapping f -> y.f, getMethod(f) = y;
+	 * 
+	 * @param varName the method name
+	 * @return the outer object name of the of the method
+	 */
 	public abstract ILMethod getMethod(String varName);
 	
 	public static GenContext empty() {
@@ -64,20 +80,39 @@ public abstract class GenContext extends TypeContext {
 	} 
 	private static int count = 0;
 
+	/**
+	 * Adding mapping for a declaration may include recursive calls.
+	 * if ast is a method declaration f then add f->y.f in the mapping
+	 * if ast is a type declaration T then add T->y.T in the mapping
+	 * where y is an object:
+	 * 	y = new { IL declarations };
+	 * 
+	 * @param newName the generated new name to symbolize the outer object
+	 * @param ast the declaration of Wyvern Module System
+	 * @return a new functional environment which extends the mapping
+	 */
 	public GenContext rec(String newName, TypedAST ast) {
 		if(ast instanceof TypeVarDecl) {
 			String typeName = ((TypeVarDecl) ast).getName();
-			return new TypeGenContext(typeName, newName, this); // extend the environment with a new type environment
+			return new TypeGenContext(typeName, newName, this); 
 		} else {
 			assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
 			wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
 			String methodName = methodDecl.getName();
 			ILMethod method = new ILMethod(newName, methodDecl);
-			return new MethodGenContext(methodName, method, this); // extend the environment with a new method environment
+			return new MethodGenContext(methodName, method, this); 
 		}
 		
 	}
-	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(); // generate the declarations, used to create a new object when declaration sequence come to the end
-	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(); // generate the decltypes, used to create a new object when declaration sequence come to the end
+	/**
+	 * Generate the Wyvern IL declaration list for all mapping in the context
+	 * @return the Wyvern IL declaration list for all mapping inside the context
+	 */
+	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(); 
+	/**
+	 * Generate the Wyvern IL declType list for all mapping in the context
+	 * @return the Wyvern IL declType list for all mapping inside the context
+	 */
+	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(); 
 	
 }

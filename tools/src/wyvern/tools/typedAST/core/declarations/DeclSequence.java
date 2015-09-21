@@ -255,6 +255,10 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
         writer.wrap(e->new Let(varname, new New(outputDecls, "this", null), (Expression)e));
     }
 
+    /**
+     * 
+     * @return the sequence of require 
+     */
 	public Sequence filterRequires() {
 		
 		Sequence reqSeq = new DeclSequence();
@@ -266,6 +270,10 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return reqSeq;
 	}
 
+	/**
+	 * 
+	 * @return the sequence of import/instantiate
+	 */
 	public Sequence filterImportInstantiates() {
 		Sequence impInstSeq = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {
@@ -277,6 +285,10 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return impInstSeq;
 	}
 
+	/**
+	 * 
+	 * @return the sequence of simple declarations, not require/import/instantiate
+	 */
 	public Sequence filterNormal() {
 		Sequence normalSeq = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {

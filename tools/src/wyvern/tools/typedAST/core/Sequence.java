@@ -330,6 +330,13 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		return GenUtil.doGenIL(ctx, ai);
 	}
 	
+	/**
+	 * Generate IL expression for declaration sequence in a module</br>
+	 * @see GenUtil.doGenModuleIL
+	 * 
+	 * @param ctx the context
+	 * @return the IL expression of a module
+	 */
 	public Expression generateModuleIL(GenContext ctx) {
 		Iterator<TypedAST> ai = exps.iterator();
 		

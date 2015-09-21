@@ -94,5 +94,14 @@ public abstract class Declaration extends AbstractTypedAST implements Environmen
 
 	public abstract wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext);
 	
+	/**
+	 * Generate IL declaration for top level Module System declaration </br>
+	 * 
+	 * The difference between topLevelGen and generateDecl is: there is no this context in top level declarations of a module.</br>
+	 * Actually I think we can combine generateDecl and topLevelGen. </br>
+	 * 
+	 * @param ctx the context
+	 * @return the declaration generated 
+	 */
 	public abstract wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx);
 }

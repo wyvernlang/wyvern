@@ -199,13 +199,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		/*
-		wyvern.target.corewyvernIL.decl.Declaration valDecl = this.generateDecl(ctx, null);
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls=
-			new ArrayList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(valDecl);
-		return new wyvern.target.corewyvernIL.expression.New(decls, ctx.generateName(), null); // type to be implemented
-		*/
 		return null;
 	}
 
@@ -220,21 +213,42 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		return null;
 	}
 	
+	/** 
+	 * Generate the rest part of a module (not import/instantiate/require)
+	 * 
+	 * @param normalSeq the declaration sequence
+	 * @param ctx the context
+	 * @return the IL expression
+	 */
 	private Expression innerTranslate(Sequence normalSeq, GenContext ctx) {
 		/* Sequence.innerTranslate */
 		return normalSeq.generateModuleIL(ctx);
 	}
 
 
+	/**
+	 * @see wraoLetWithIterator
+	 * 
+	 * @param impInstSeq the sequence of import and instantiate
+	 * @param normalSeq the rest sequence
+	 * @param ctx the context
+	 * @return new IL expression
+	 */
 	private Expression wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx) {
 		Iterator<TypedAST> ai = impInstSeq.iterator();
-		return wrapLetWithIterator(ai, normalSeq, ctx);
+		return wrapLetWithIterator(ai, normalSeq, ctx); 
 	}
 
 
-	/* wrapLet:
-	 * import A as copyA => let copyA = A in {rest}
-	 * instantiate B(...) as copyB => let copyB = B(...) in {rest}
+	/**
+	 * translate import/instantiate sequence into a let sequence and wrap the rest part inside the sequence. </br>
+	 * import A as copyA => let copyA = A in {rest} </br>
+	 * instantiate B(...) as copyB => let copyB = B(...) in {rest} </br>
+	 * 
+	 * @param ai the declaration iterator
+	 * @param normalSeq the rest part of the module (not instantiate/import/require)
+	 * @param ctx the context
+	 * @return the whole expression
 	 */
 	private Expression wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx) {
 		if(!ai.hasNext()) {
@@ -297,19 +311,17 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 
+	/**
+	 * For resource module: translate into def method(list of require types) : </br> 
+	 * resource type { let (sequences of instantiate/import) in rest}; </br>
+	 * @see filterRequires
+	 * @see filterImportInstantiates
+	 * @see filterNormal
+	 * @see wrapLet
+	 * For non-resource module: translate into a value
+	 */
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
-		/* design 
-		TypedAST reqSeq = eilterRequires();
-		TypedAST impInstSeq = filterImportInstantiates();
-		Expression reqList = trans(reqSeq);
-		Expression innerSeq = filterNormal();
-		Expression newExp = Newexp(name, innerSeq);
-		Type reqTypes = GenUtil.getTypes(reqList);
-		letExp = GenUtil.genLetWrap(imInstSeq, NewExp);
-		fnVal = fnexp(reqTypes, LetExp);
-		return ValExp(name, reqTypes, fnVal);
-		*/
 		GenContext methodContext = ctx;
 		Sequence reqSeq = new DeclSequence();
 		Sequence impInstSeq = new DeclSequence();
