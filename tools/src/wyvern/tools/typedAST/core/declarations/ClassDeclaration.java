@@ -524,4 +524,9 @@ public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

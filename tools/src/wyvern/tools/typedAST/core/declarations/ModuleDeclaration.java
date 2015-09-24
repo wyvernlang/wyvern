@@ -1,16 +1,27 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.expressions.Instantiation;
+import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -188,7 +199,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -200,11 +210,149 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
+	/** 
+	 * Generate the rest part of a module (not import/instantiate/require)
+	 * 
+	 * @param normalSeq the declaration sequence
+	 * @param ctx the context
+	 * @return the IL expression
+	 */
+	private Expression innerTranslate(Sequence normalSeq, GenContext ctx) {
+		/* Sequence.innerTranslate */
+		return normalSeq.generateModuleIL(ctx);
+	}
+
+
+	/**
+	 * @see wraoLetWithIterator
+	 * 
+	 * @param impInstSeq the sequence of import and instantiate
+	 * @param normalSeq the rest sequence
+	 * @param ctx the context
+	 * @return new IL expression
+	 */
+	private Expression wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx) {
+		Iterator<TypedAST> ai = impInstSeq.iterator();
+		return wrapLetWithIterator(ai, normalSeq, ctx); 
+	}
+
+
+	/**
+	 * translate import/instantiate sequence into a let sequence and wrap the rest part inside the sequence. </br>
+	 * import A as copyA => let copyA = A in {rest} </br>
+	 * instantiate B(...) as copyB => let copyB = B(...) in {rest} </br>
+	 * 
+	 * @param ai the declaration iterator
+	 * @param normalSeq the rest part of the module (not instantiate/import/require)
+	 * @param ctx the context
+	 * @return the whole expression
+	 */
+	private Expression wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx) {
+		if(!ai.hasNext()) {
+			return innerTranslate(normalSeq, ctx);
+		} 
+		
+		TypedAST ast = ai.next();
+		if (ast instanceof ImportDeclaration) {
+			
+			// must be import
+			ImportDeclaration imp = (ImportDeclaration) ast;
+			Expression e = wrapLetWithIterator(ai, normalSeq, ctx);
+			return new Let(imp.getUri().getSchemeSpecificPart(), new wyvern.target.corewyvernIL.expression.Variable(imp.getUri().getSchemeSpecificPart()), e);
+		} else {
+			// must be instantiate
+			
+			Instantiation inst = (Instantiation) ast;
+			// generate arguments		
+			TypedAST argument = inst.getArgs();
+			List<Expression> args = new LinkedList<Expression>();
+		    if (argument instanceof TupleObject) {
+		    	for (TypedAST arg : ((TupleObject) argument).getObjects()) {
+		    		args.add(arg.generateIL(ctx));
+		    	}
+		    } else {
+		    	if(! (argument instanceof UnitVal)) {
+		    		/* single argument */
+			    	args.add(argument.generateIL(ctx));
+		    	}
+		    	/* no argument */
+		    }
+	
+			MethodCall instValue = 
+					new MethodCall(
+							new wyvern.target.corewyvernIL.expression.Variable(inst.getUri().getSchemeSpecificPart().toString()) /*path*/,
+							inst.getUri().getSchemeSpecificPart().toString(), args );
+			GenContext newContext = ctx.extend(inst.getName(), instValue, instValue.typeCheck(ctx));
+			
+			Expression e = wrapLetWithIterator(ai, normalSeq, newContext);
+			return new Let(inst.getName(), instValue, e);
+		}			
+	}
+
+
+	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx) {
+		/* generate the formal arguments by requiring sequence */
+		List<FormalArg> types = new LinkedList<FormalArg>();
+		for(Declaration d : reqSeq.getDeclIterator()) {
+			ImportDeclaration req = (ImportDeclaration) d;
+			String name = req.getUri().getSchemeSpecificPart();
+			wyvern.target.corewyvernIL.type.ValueType type = ctx.lookup(name);
+			types.add(new FormalArg(req.getAsName(), type));
+		}
+		return types;
+	}
+
+
 	public boolean isResource() {
 		return this.resourceFlag;
+	}
+
+
+	/**
+	 * For resource module: translate into def method(list of require types) : </br> 
+	 * resource type { let (sequences of instantiate/import) in rest}; </br>
+	 * @see filterRequires
+	 * @see filterImportInstantiates
+	 * @see filterNormal
+	 * @see wrapLet
+	 * For non-resource module: translate into a value
+	 */
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		GenContext methodContext = ctx;
+		Sequence reqSeq = new DeclSequence();
+		Sequence impInstSeq = new DeclSequence();
+		Sequence normalSeq = new DeclSequence();
+		if(inner instanceof Sequence || inner instanceof DeclSequence) {
+			/* classify declarations */
+			reqSeq = ((DeclSequence) inner).filterRequires();
+			impInstSeq = ((DeclSequence) inner).filterImportInstantiates();
+			normalSeq = ((DeclSequence) inner).filterNormal();
+		} else {
+			/* single declaration in module */
+			if(inner instanceof Instantiation) impInstSeq = Sequence.append(impInstSeq, inner);
+			else normalSeq = Sequence.append(normalSeq, inner);
+		}
+		
+		List<FormalArg> formalArgs = new LinkedList<FormalArg>();
+		formalArgs = getTypes(reqSeq, ctx); // translate requiring modules to method parameters
+		
+		/* adding parameters to environments */
+		for(FormalArg arg : formalArgs) {
+			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
+		}
+	    /* importing modules and instantiations are translated into let sentence */
+		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext);  
+		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(methodContext);
+		
+		if(isResource() == false) {
+			/* non resource module translated into value */
+			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body);
+		}
+		/* resource module translated into method */
+		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body);
 	}
 }
