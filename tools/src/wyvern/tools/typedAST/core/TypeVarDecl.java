@@ -2,8 +2,15 @@ package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -11,7 +18,9 @@ import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -27,10 +36,17 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
+import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decl.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringType;
 
 public class TypeVarDecl extends Declaration {
 	private final String name;
@@ -261,13 +277,11 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return body.generateIL(ctx);
 	}
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -279,5 +293,12 @@ public class TypeVarDecl extends Declaration {
 	
 	public boolean isResource() {
 		return this.resourceFlag;
+	}
+
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+		TypeDeclaration td = (TypeDeclaration) this.body;
+		StructuralType type = new StructuralType(this.name, td.genDeclTypeSeq(ctx), this.resourceFlag);
+		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
 	}
 }

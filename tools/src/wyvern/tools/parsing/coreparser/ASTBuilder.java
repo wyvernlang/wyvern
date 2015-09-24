@@ -9,7 +9,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST sequence(AST t1, AST t2, boolean inModule);
 	
 	public AST moduleDecl(String name, AST ast, FileLocation loc, boolean isResource);
-	public AST importDecl(URI uri, FileLocation loc, boolean isRequire);
+	public AST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire);
 	/** if type is null, it will be inferred*/
 	public AST valDecl(String name, Type type, AST exp, FileLocation loc);
 	public AST varDecl(String name, Type type, AST exp, FileLocation loc);
@@ -41,6 +41,6 @@ public interface ASTBuilder<AST,Type> {
 	
 	public void setNewBody(AST newExp, AST decls);
 
-	public AST instantiation(URI uri, AST arg, FileLocation loc);
+	public AST instantiation(URI uri, AST arg, Token name, FileLocation loc);
 
 }

@@ -61,8 +61,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST importDecl(URI uri, FileLocation loc, boolean isRequire) {
-		return new ImportDeclaration(uri, loc, isRequire);
+	public TypedAST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire) {
+		if(name == null) {
+		return new ImportDeclaration(uri, loc, null, isRequire);
+		}
+		return new ImportDeclaration(uri, loc, name.image, isRequire);
 	}
 
 	@Override
@@ -206,8 +209,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST instantiation(URI uri, TypedAST arg, FileLocation loc) {
-		return new Instantiation(uri, arg, loc);
+	public TypedAST instantiation(URI uri, TypedAST arg, Token name, FileLocation loc) {
+		return new Instantiation(uri, arg, name.image, loc);
 	}
 
 }
