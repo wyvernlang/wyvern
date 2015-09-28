@@ -362,7 +362,7 @@ Object Formal() :
 AST DefBody() :
 { AST exp; }
 {
-  <NEWLINE> <INDENT> exp = ExpressionLine(false) <DEDENT> { return exp; }
+  <NEWLINE> <INDENT> exp = DeclSequence(false) <DEDENT> { return exp; }
 |
   <EQUALS> exp = ExpressionLine(false) { return exp; }
 }

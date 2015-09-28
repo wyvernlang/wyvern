@@ -38,12 +38,12 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	public List<Declaration> genDeclSeq() {
+	public List<Declaration> genDeclSeq(GenContext origCtx) {
 		return new LinkedList<Declaration>();
 	}
 
 	@Override
-	public List<DeclType> genDeclTypeSeq() {
+	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
 		return new LinkedList<DeclType>();
 	}
 

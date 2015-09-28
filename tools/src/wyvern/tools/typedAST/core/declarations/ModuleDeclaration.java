@@ -222,7 +222,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 */
 	private Expression innerTranslate(Sequence normalSeq, GenContext ctx) {
 		/* Sequence.innerTranslate */
-		return normalSeq.generateModuleIL(ctx);
+		return normalSeq.generateModuleIL(ctx, true);
 	}
 
 

@@ -10,8 +10,9 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 
 	/**
 	 * Returns the equivalent structural type, or null if the structural type is unknown
+	 * @param ctx TODO
 	 */
-	public StructuralType getStructuralType() {
+	public StructuralType getStructuralType(TypeContext ctx) {
 		return null;
 	}
 

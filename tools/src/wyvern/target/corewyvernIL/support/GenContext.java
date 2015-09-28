@@ -108,11 +108,11 @@ public abstract class GenContext extends TypeContext {
 	 * Generate the Wyvern IL declaration list for all mapping in the context
 	 * @return the Wyvern IL declaration list for all mapping inside the context
 	 */
-	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(); 
+	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx); 
 	/**
 	 * Generate the Wyvern IL declType list for all mapping in the context
 	 * @return the Wyvern IL declType list for all mapping inside the context
 	 */
-	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(); 
+	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(GenContext origCtx); 
 	
 }

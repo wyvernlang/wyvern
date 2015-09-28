@@ -33,6 +33,9 @@ public class MethodCall extends Expression {
 		this.objectExpr = objectExpr;
 		this.methodName = methodName;
 		this.args = args;
+		// sanity check
+		if (args.size() > 0 && args.get(0) == null)
+			throw new NullPointerException("invariant: no null args");
 	}
 	
 	@Override
@@ -60,26 +63,26 @@ public class MethodCall extends Expression {
 		return args;
 	}
 	
-	public void setArgs(List<Expression> args) {
+	/*public void setArgs(List<Expression> args) {
 		this.args = args;
-	}
+	}*/
 
 	@Override
-	public ValueType typeCheck(TypeContext env) {
-		ValueType ot = objectExpr.typeCheck(env);
-		StructuralType st = ot.getStructuralType();
+	public ValueType typeCheck(TypeContext ctx) {
+		ValueType ot = objectExpr.typeCheck(ctx);
+		StructuralType st = ot.getStructuralType(ctx);
 		DeclType dt = st.findDecl(methodName);
 		if (dt == null)
 			throw new RuntimeException("method not found");
 		if (!(dt instanceof DefDeclType))
 			throw new RuntimeException("invoking a non-method");
 		DefDeclType ddt = (DefDeclType)dt;
-		View v = View.from(objectExpr, env);
+		View v = View.from(objectExpr, ctx);
 		// check argument compatibility
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
 			Type argType = ddt.getFormalArgs().get(i).getType().adapt(v);
-			if (!e.typeCheck(env).isSubtypeOf(argType, env))
+			if (!e.typeCheck(ctx).isSubtypeOf(argType, ctx))
 				throw new RuntimeException("argument type doesn't match");
 		}
 		// compute result type

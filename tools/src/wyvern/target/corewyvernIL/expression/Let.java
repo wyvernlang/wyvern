@@ -13,7 +13,7 @@ public class Let extends Expression {
 
 	@Override
 	public String toString() {
-		return "Le[" + varName + " = " + toReplace + " in " + inExpr + "]";
+		return "Let[" + varName + " = " + toReplace + " in " + inExpr + "]";
 	}
 
 	private String varName;
