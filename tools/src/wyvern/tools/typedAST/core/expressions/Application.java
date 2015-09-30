@@ -6,6 +6,7 @@ import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -127,6 +128,8 @@ public class Application extends CachingTypedAST implements CoreAST {
         	for (TypedAST ast : ((TupleObject) argument).getObjects()) {
         		args.add(ast.generateIL(ctx));
         	}
+        } else if (argument instanceof UnitVal) {
+        	// leave args empty
         } else {
         	args.add(argument.generateIL(ctx));
         }

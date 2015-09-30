@@ -20,14 +20,16 @@ public class StructuralType extends ValueType {
 	private boolean resourceFlag = false;
 	
 	public StructuralType(String selfName, List<DeclType> declTypes) {
-		super();
-		this.selfName = selfName;
-		this.declTypes = declTypes;
+		this(selfName, declTypes, false);
 	}
 
 	public StructuralType(String selfName, List<DeclType> declTypes, boolean resourceFlag) {
 		super();
 		this.selfName = selfName;
+		// check a sanity condition
+		if (declTypes != null && declTypes.size()>0)
+			if (declTypes.get(0) == null)
+				throw new NullPointerException("invariant: decl types should not be null");
 		this.declTypes = declTypes;
 		this.resourceFlag = resourceFlag;
 	}
@@ -44,9 +46,9 @@ public class StructuralType extends ValueType {
 		return declTypes;
 	}
 	
-	public void setDeclTypes(List<DeclType> declTypes) {
+	/*public void setDeclTypes(List<DeclType> declTypes) {
 		this.declTypes = declTypes;
-	}
+	}*/
 
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
@@ -55,15 +57,19 @@ public class StructuralType extends ValueType {
 	}
 
 	@Override
-	public StructuralType getStructuralType() {
+	public StructuralType getStructuralType(TypeContext ctx) {
 		return this;
 	}
 	
 	@Override
 	public boolean isSubtypeOf(Type t, TypeContext ctx) {
-		if (t instanceof NominalType)
-			// TODO: see if NominalType is equal to a known StructuralType first!
-			return false;
+		if (t instanceof NominalType) {
+			StructuralType st = ((NominalType) t).getStructuralType(ctx);
+			if (st == null) 
+				return false; // abstract type; I am not a subtype of this
+			else
+				return isSubtypeOf(st, ctx);
+		}
 		
 		if (!(t instanceof StructuralType))
 			return false;

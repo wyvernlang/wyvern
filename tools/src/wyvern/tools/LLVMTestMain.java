@@ -9,21 +9,40 @@ import java.util.Optional;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.oir.EmitLLVMNative;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWriter;
+import wyvern.tools.tests.*;
 
-public class Interpreter {
+public class LLVMTestMain {
 
 	public static void main(String[] args) {
+		String currentdir;
+		
+		currentdir = System.getProperty("user.dir");
+		Path p = Paths.get(currentdir);
+		System.load(p.toAbsolutePath().toString() + "/src/wyvern/target/llvm/.libs/libWyvernLLVM.so");
+		
+		OIRToLLVMTests tests = new OIRToLLVMTests ();
+		//try {
+			//tests.ifThenElseTest();
+		//tests.FieldSetTest();
+		tests.DelegateCallTest();
+			//tests.testSimpleAdd();
+			//tests.testDef();
+			//tests.testNew();
+		//} catch (CopperParserException | IOException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+		//}
 		if (args.length != 1) {
 			System.err.println("usage: wyvern <filename>");
 			System.exit(-1);
 		}
-
 		String filename = args[0];
 		Path file = Paths.get(filename);
 		if (!Files.isReadable(file)) {

@@ -5,14 +5,28 @@ import java.util.Arrays;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class NominalType extends ValueType{
 	
+	@Override
+	public StructuralType getStructuralType(TypeContext ctx) {
+		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember);
+		if (dt instanceof ConcreteTypeMember) {
+			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+			return vt.getStructuralType(ctx);
+		} else {
+			return super.getStructuralType(ctx);
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(new Object[] {

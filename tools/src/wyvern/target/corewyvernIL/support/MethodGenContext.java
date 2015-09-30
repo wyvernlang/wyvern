@@ -53,8 +53,8 @@ public class MethodGenContext extends GenContext {
 	}
 
 	@Override
-	public List<Declaration> genDeclSeq() {
-		List<Declaration> decls = genContext.genDeclSeq();
+	public List<Declaration> genDeclSeq(GenContext origCtx) {
+		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
 		List<Expression> args = new LinkedList<Expression>();
 		for(FormalArg arg : method.getArgsILType()) {
 			args.add(new Variable(arg.getName()));
@@ -67,8 +67,8 @@ public class MethodGenContext extends GenContext {
 	}
 
 	@Override
-	public List<DeclType> genDeclTypeSeq() {
-		List<DeclType> declts = genContext.genDeclTypeSeq();
+	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
+		List<DeclType> declts = genContext == origCtx ? new LinkedList<DeclType>():genContext.genDeclTypeSeq(origCtx);
 		List<Expression> args = new LinkedList<Expression>();
 		for(FormalArg arg : method.getArgsILType()) {
 			args.add(new Variable(arg.getName()));

@@ -22,7 +22,7 @@ class CalculatorParser
 				val opstr = nt.getStr()
 				this.tkzr.next()
 				val t1 = this.T()
-				if "+" == opstr then recurser(iv-t1) else recurser(iv+t1)
+				if "+" == opstr then recurser(iv+t1) else recurser(iv-t1)
 			if nt.typeOf() == 0 then (if ("+" == nt.getStr()) || ("-" == nt.getStr()) then ithen() else iv) else iv
 		recurser(this.T())
 	def T():Int

@@ -3,8 +3,10 @@ package wyvern.target.corewyvernIL.support;
 import java.util.LinkedList;
 import java.util.List;
 
+import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -40,13 +42,6 @@ public class VarGenContext extends GenContext {
 	public Expression lookupExp(String varName) {
 		if (varName.equals(var))
 			return expr;
-		/*
-		else if (genContext.getType(varName) != null) {
-			String objName = genContext.getType(varName);
-			return new FieldGet(new Variable(objName), varName);
-		}  
-		*/
-		// You are right, we do not need this.
 		else {
 			return genContext.lookupExp(varName);
 		}
@@ -61,16 +56,16 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq() {
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = genContext.genDeclSeq();
+	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx) {
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
 	    ValDeclaration decl = new ValDeclaration(var, type, expr);
 		decls.add(decl);
 		return decls;
 	} 
 	
 	@Override
-	public List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq() {
-		List<wyvern.target.corewyvernIL.decltype.DeclType> declts = genContext.genDeclTypeSeq();
+	public List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(GenContext origCtx) {
+		List<wyvern.target.corewyvernIL.decltype.DeclType> declts = genContext == origCtx ? new LinkedList<DeclType>():genContext.genDeclTypeSeq(origCtx);
 	    wyvern.target.corewyvernIL.decltype.DeclType declt = new ValDeclType(var, type);
 		declts.add(declt);
 		return declts;

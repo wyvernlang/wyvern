@@ -5,12 +5,14 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -35,6 +37,8 @@ import wyvern.target.oir.OIRProgram;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
+import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
@@ -56,6 +60,7 @@ import java.util.Optional;
 import static java.util.Optional.empty;
 import static wyvern.stdlib.Globals.getStandardEnv;
 
+@Category(RegressionTests.class)
 public class ILTests {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
@@ -65,7 +70,7 @@ public class ILTests {
     	TestUtil.setPaths();
 		WyvernResolver.getInstance().addPath(PATH);
     }
-    /*
+
 	@Test
     public void testLetVal() {
     	NominalType Int = new NominalType("system", "Int");
@@ -128,11 +133,48 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	@Test
+	@Category(CurrentlyBroken.class)
+	public void testVarFieldWrite() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    var v : system.Int = 2\n"
+				     + "obj.v = 5\n"
+				     + "obj.v\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	@Test
 	public void testDefDecl() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    val v : system.Int = 5\n"
 				     + "    def m() : system.Int = 5\n"
 				     + "obj.v\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	@Test
+	public void testDefWithValInside() throws ParseException {
+		String input = "def foo() : system.Int\n"
+				     + "    val v : system.Int = 5\n"
+				     + "    v\n"
+				     + "foo()\n"
 				     ;
 		TypedAST ast = TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
@@ -162,7 +204,71 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-    
+
+	@Test
+	public void testType() throws ParseException {
+		String input = "type IntResult\n"
+					 + "    def getResult():system.Int\n\n"
+					 + "val r : IntResult = new\n"
+					 + "    def getResult():system.Int = 5\n\n"
+					 + "r.getResult()\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ((Sequence) ast).generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+				
+		Assert.assertEquals(Util.intType(), t);
+		
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTypeAbbrev() throws ParseException {
+		String input = "type Int = system.Int\n\n"
+					 + "val i : Int = 5\n\n"
+					 + "i\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testSimpleDelegation() throws ParseException {
+		String input = "type IntResult\n"
+					 + "    def getResult():system.Int\n\n"
+					 + "val r : IntResult = new\n"
+					 + "    def getResult():system.Int = 5\n\n"
+					 + "val r2 : IntResult = new\n"
+					 + "    delegate IntResult to r\n\n"
+					 + "r2.getResult()\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
 	@Test
 	public void testSingleModule() throws ParseException {
 		
@@ -171,8 +277,15 @@ public class ILTests {
 		
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+    	
+    	// TODO: uncomment what's below and make it typecheck!
+    	/*
+		DeclType t = decl.typeCheck(ctx, ctx);
+		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
+		*/
 	}
-	*/
+
 	@Test
 	public void testMultipleModules() throws ParseException {
 		
@@ -189,9 +302,9 @@ public class ILTests {
 			genCtx = GenUtil.link(genCtx, decl);
 		}
 		
+		// TODO: link into a single expression and show that it successfully typechecks and evaluates
 	}
 	
-	/*
 	@Test
 	public void testRecursiveMethod() throws ParseException {
 		
@@ -200,6 +313,58 @@ public class ILTests {
 		
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		DeclType t = decl.typeCheck(ctx, ctx);
+		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
 	}
-	*/
+	
+	@Test
+	public void testRecursiveTypes() throws ParseException {
+		
+		String source = TestUtil.readFile(PATH + "recursivetypes.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testRecursiveFunctions() throws ParseException {
+		
+		String source = TestUtil.readFile(PATH + "recursivefunctions.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testLambda() throws ParseException {
+		
+		String source = TestUtil.readFile(PATH + "lambdatest.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
 }

@@ -1440,7 +1440,7 @@ JNIEXPORT jstring JNICALL Java_wyvern_target_oir_EmitLLVMNative_methodDeclToLLVM
         argTypes.insert (argTypes.begin (), strTypeMap [argTypeName]);
         argNames.insert (argNames.begin (), argName);
     }
-
+    
     currentFunction = new WyvernFunction (strTypeMap [returnTypeName],
                                           argTypes, argNames, false, 
                                           methodName, TheModule);

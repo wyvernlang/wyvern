@@ -1,5 +1,4 @@
 resource module A : sigA
-import D
 val f : system.Int = 3
 def m(y : system.Int) : system.Int = m(y)
 

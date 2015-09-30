@@ -275,10 +275,13 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 			i+=2;
 		}
 		
+		System.out.println("EmitLLVMVisitor.java:278 - About to crash on a Mac with:");
+		System.out.println("Assertion failed: (!empty() && \"Called front() on empty list!\"), function front, file /usr/local/include/llvm/ADT/ilist.h, line 391.");
 		EmitLLVMNative.methodDeclToLLVMIR (
 				oirMethodDecl.getReturnType().getName(),
 				oirMethodDecl.getName(),
 				args);
+		System.out.println("Congratulations for not using a Mac or fixing this bug!");
 		
 		return "";
 	}

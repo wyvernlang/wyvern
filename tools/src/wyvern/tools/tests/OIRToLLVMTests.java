@@ -206,10 +206,7 @@ public class OIRToLLVMTests {
 		OIRProgram.program.typeCheck(rootEnv);
 		EmitLLVMNative.oirProgramToLLVMIR(OIRProgram.program);
 		oirInterface.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
-		System.out.println("About to crash on a Mac with:");
-		System.out.println("Assertion failed: (!empty() && \"Called front() on empty list!\"), function front, file /usr/local/include/llvm/ADT/ilist.h, line 391.");
 		oirClass2.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
-		System.out.println("Congratulations for not using a Mac or fixing this bug!");
 		oirClass1.acceptVisitor(visitor, OIREnvironment.getRootEnvironment());
 		
 		EmitLLVMNative.createMainFunction();

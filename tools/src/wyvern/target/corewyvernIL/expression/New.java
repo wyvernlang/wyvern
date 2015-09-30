@@ -77,7 +77,7 @@ public class New extends Expression {
 		
 		// check that everything in the claimed structural type was accounted for
 		ValueType t = getExprType();
-		StructuralType requiredT = t.getStructuralType();
+		StructuralType requiredT = t.getStructuralType(ctx);
 		StructuralType actualT = new StructuralType(selfName, dts);
 		if (!actualT.isSubtypeOf(requiredT, ctx)) {
 			throw new RuntimeException("typechecking error: not a subtype");

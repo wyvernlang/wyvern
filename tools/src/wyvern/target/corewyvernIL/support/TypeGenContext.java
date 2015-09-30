@@ -1,9 +1,11 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -49,9 +51,9 @@ public class TypeGenContext extends GenContext {
 	}
 
 	@Override
-	public List<DeclType> genDeclTypeSeq() {
-		List<DeclType> declts = genContext.genDeclTypeSeq();
-		DeclType declt = new ValDeclType(typeName, new NominalType(objName, typeName)); 
+	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
+		List<DeclType> declts = genContext == origCtx ? new LinkedList<DeclType>():genContext.genDeclTypeSeq(origCtx);
+		DeclType declt = new ConcreteTypeMember(typeName, new NominalType(objName, typeName)); 
 		declts.add(declt);
 		
 		return declts;
@@ -63,8 +65,8 @@ public class TypeGenContext extends GenContext {
 	}
 
 	@Override
-	public List<Declaration> genDeclSeq() {
-		List<Declaration> decls = genContext.genDeclSeq();
+	public List<Declaration> genDeclSeq(GenContext origCtx) {
+		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
 		TypeDeclaration decl = new TypeDeclaration(typeName, new NominalType(objName, typeName));
 		decls.add(decl);
 		return decls;

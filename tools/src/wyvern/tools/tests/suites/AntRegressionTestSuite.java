@@ -6,14 +6,15 @@ import org.junit.experimental.categories.Categories;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import wyvern.tools.tests.CodegenTests;
 import wyvern.tools.tests.CopperTests;
+import wyvern.tools.tests.FileTestRunner;
+import wyvern.tools.tests.TypeCheckingTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
-import wyvern.tools.tests.FileTestRunner;
-import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.RossettaCodeTests;
+import wyvern.tools.tests.CodegenTests;
+import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.TypeCheckingTests;
 import wyvern.tools.tests.perfTests.PerformanceTests;
 import wyvern.tools.tests.tagTests.DynamicTagTests;
@@ -23,8 +24,9 @@ import wyvern.tools.tests.tagTests.TypeCheckMatch;
 import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 
 /**
- * This test suite includes all working tests (as of this writing).  It
- * adds to the Ant test suites those that work in Eclipse.
+ * This test suite includes all working tests (as of this writing) that
+ * can be run successfully with Ant.  Some tests are commented out as
+ * they are currently broken.
  * 
  * @author aldrich
  *
@@ -32,9 +34,26 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @RunWith(Categories.class)
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
-@SuiteClasses( { AntRegressionTestSuite.class,
-				FileTestRunner.class,	// uses the old parser
+@SuiteClasses( {
+				// these tests use the old parser
+				TypeCheckTagTests.class, 
+				DynamicTagTests.class,
+				ParseTagTests.class, ExecuteTagTests.class,
+				CopperTests.class, PerformanceTests.class,
+				TypeCheckMatch.class, 
+				TypeCheckingTests.class,
+				
+				
+				// these tests use the new parser but old IL
+				RossettaCodeTests.class,
+				DemoTests.class,
+				
+				CodegenTests.class,		// tests the old translation to the new IL
+				
+				LexingTests.class,		// tests the new lexer
+				CoreParserTests.class,	// tests the new parser
+				ILTests.class,			// tests the new IL
 				})
-public class RegressionTestSuite {
+public class AntRegressionTestSuite {
 
 }

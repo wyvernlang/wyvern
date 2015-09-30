@@ -322,27 +322,30 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		Iterator<TypedAST> ai = exps.iterator();
+		/*Iterator<TypedAST> ai = exps.iterator();
 		
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
 		
-		return GenUtil.doGenIL(ctx, ai);
+		return GenUtil.doGenIL(ctx, ai);*/
+		return generateModuleIL(ctx, false);
 	}
 	
 	/**
-	 * Generate IL expression for declaration sequence in a module</br>
+	 * Generate IL expression for a top-level declaration sequence</br>
 	 * @see GenUtil.doGenModuleIL
 	 * 
 	 * @param ctx the context
+	 * @param isModule whether is is actually a module expression:
+	 * 			true for the body of a module, false for the body of a script 
 	 * @return the IL expression of a module
 	 */
-	public Expression generateModuleIL(GenContext ctx) {
+	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
 		Iterator<TypedAST> ai = exps.iterator();
 		
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
 		
-		return GenUtil.doGenModuleIL(ctx, ai);
+		return GenUtil.doGenModuleIL(ctx, ctx, ai, isModule);
 	}
 }

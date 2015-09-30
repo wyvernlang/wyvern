@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -280,9 +281,15 @@ public class TypeVarDecl extends Declaration {
 		return body.generateIL(ctx);
 	}
 
+	private StructuralType computeInternalILType(GenContext ctx) {		
+		TypeDeclaration td = (TypeDeclaration) this.body;
+		return new StructuralType(this.name, td.genDeclTypeSeq(ctx), this.resourceFlag);
+	}
+	
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		return null;
+		StructuralType type = computeInternalILType(ctx);
+		return new ConcreteTypeMember(getName(), type);
 	}
 
 	@Override
@@ -297,8 +304,7 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
-		TypeDeclaration td = (TypeDeclaration) this.body;
-		StructuralType type = new StructuralType(this.name, td.genDeclTypeSeq(ctx), this.resourceFlag);
+		StructuralType type = computeInternalILType(ctx);
 		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
 	}
 }

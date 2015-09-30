@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.decl;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -39,7 +40,7 @@ public class TypeDeclaration extends NamedDeclaration {
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		DeclType declt = new ValDeclType(super.getName(), (ValueType) this.sourceType); 
+		DeclType declt = new ConcreteTypeMember(super.getName(), (ValueType) this.sourceType); 
 		return declt;
 	}
 }

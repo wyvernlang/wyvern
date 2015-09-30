@@ -34,10 +34,17 @@ WyvernFunction::WyvernFunction (Type* returnType, vector<Type*> typeArgs,
                                           vector<Type*> (), isVarArg);
     }
     
-    llvmFunction = Function::Create (functionType, Function::ExternalLinkage, 
+    llvmFunction = Function::Create (functionType, Function::ExternalLinkage,
                                      name, module);
+    
+    cout << "About to crash on a Mac!" << endl;
+    
+    assert(false); // This line "works" on Linux but not on Mac! Go figure whose fault is this? :-)
+    
     IRBuilder<> TmpB(&llvmFunction->getEntryBlock(),
                      llvmFunction->getEntryBlock().begin());
+    
+    cout << "Good on you for not using a Mac!" << endl;
 
     for (uint64_t i = 0; i < typeArgs.size (); i++)
     {
