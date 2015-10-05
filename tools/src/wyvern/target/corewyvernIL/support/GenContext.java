@@ -92,6 +92,7 @@ public abstract class GenContext extends TypeContext {
 	 * @return a new functional environment which extends the mapping
 	 */
 	public GenContext rec(String newName, TypedAST ast) {
+		System.out.println("in rec : " + newName);
 		if(ast instanceof TypeVarDecl) {
 			String typeName = ((TypeVarDecl) ast).getName();
 			return new TypeGenContext(typeName, newName, this); 

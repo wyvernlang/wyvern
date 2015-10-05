@@ -43,4 +43,9 @@ public class TypeDeclaration extends NamedDeclaration {
 		DeclType declt = new ConcreteTypeMember(super.getName(), (ValueType) this.sourceType); 
 		return declt;
 	}
+	
+	@Override
+	public String toString() {
+		return "type declaration " + super.getName() + " = " + sourceType.toString();
+	}
 }

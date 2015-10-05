@@ -54,6 +54,8 @@ public class Let extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
+		System.out.println("check ctx : " + ctx);
+		System.out.println(toReplace);
 		ValueType t = toReplace.typeCheck(ctx);
 		this.setExprType(inExpr.typeCheck(ctx.extend(varName, t)));
 		return getExprType();

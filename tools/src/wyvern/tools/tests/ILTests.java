@@ -318,6 +318,8 @@ public class ILTests {
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
 	}
 	
+	
+	
 	@Test
 	public void testRecursiveTypes() throws ParseException {
 		
@@ -327,6 +329,7 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
     	TypeContext ctx = TypeContext.empty();
+    	System.out.println("pro:" + program);
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
 		Value v = program.interpret(EvalContext.empty());
@@ -334,8 +337,8 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	
+	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testRecursiveFunctions() throws ParseException {
 		
 		String source = TestUtil.readFile(PATH + "recursivefunctions.wyv");
@@ -367,4 +370,5 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	
 }
