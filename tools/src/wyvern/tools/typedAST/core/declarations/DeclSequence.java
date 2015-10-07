@@ -295,7 +295,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		Sequence normalSeq = new Sequence();
 		Sequence recSequence = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {
-			System.out.println("ishere " + d);
 			if(d instanceof TypeVarDecl || d instanceof DefDeclaration) {
 				if(recBlock == false) {
 					recBlock = true;

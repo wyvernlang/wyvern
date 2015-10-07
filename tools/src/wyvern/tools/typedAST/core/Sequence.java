@@ -347,7 +347,6 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
 		Sequence seqWithBlocks = combine();
 		Iterator<TypedAST> ai = seqWithBlocks.iterator();
-		System.out.println("ite " + seqWithBlocks);
 		
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
@@ -356,13 +355,10 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	}
 
 	private Sequence combine() {
-		System.out.println(this);
 		boolean recBlock = false;
 		Sequence normalSeq = new Sequence();
 		Sequence recSequence = new DeclSequence();
 		for (TypedAST ast : this.getIterator()) {
-			System.out.println(ast);
-			System.out.println(recBlock);
 			
 			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
 				Declaration d = (Declaration) ast;
@@ -378,12 +374,10 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 				normalSeq = Sequence.append(normalSeq, ast);
 			    recBlock = false;
 			}
-			System.out.println("in comb " + normalSeq);
 		}
 		
 		if (recBlock == true) {
 			normalSeq = Sequence.append(normalSeq, recSequence);
-			System.out.println("in comb " + normalSeq);
 		}
 		return normalSeq;
 	}

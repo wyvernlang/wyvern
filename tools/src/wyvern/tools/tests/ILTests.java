@@ -329,7 +329,6 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
     	TypeContext ctx = TypeContext.empty();
-    	System.out.println("pro:" + program);
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
 		Value v = program.interpret(EvalContext.empty());

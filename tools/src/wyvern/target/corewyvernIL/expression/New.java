@@ -65,7 +65,6 @@ public class New extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		System.out.println("togere:"+this);
 		List<DeclType> dts = new LinkedList<DeclType>();
 		
 		TypeContext thisCtx = ctx.extend(selfName, getExprType());

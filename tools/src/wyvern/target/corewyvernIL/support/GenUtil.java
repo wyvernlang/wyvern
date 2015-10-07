@@ -49,7 +49,6 @@ public class GenUtil {
 	public static Expression doGenModuleIL(GenContext ctx, GenContext origCtx, Iterator<? extends TypedAST> ai, boolean isModule) {
 		if (ai.hasNext()) {
 			TypedAST ast = ai.next(); 
-			System.out.println("yuabjia" + ast.getClass());
 			// TODO (BUG): the approach of wrapping at the end won't work for VarDeclarations!
 			// because the var in the object wrapper is not the same as the var in the original module
 			// Maybe fix by translation of var into getters/setters?
@@ -78,7 +77,6 @@ public class GenUtil {
 				Expression dfn = vd.getDefinition().generateIL(ctx);
 				return new Let(name, dfn, doGenModuleIL(newCtx, origCtx, ai, isModule));
 			} else if (ast instanceof DeclSequence || ast instanceof Sequence) {
-				System.out.println("indeclseq");
 				String newName = GenContext.generateName();
 				
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
@@ -96,7 +94,6 @@ public class GenUtil {
 				}
 				
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
-					System.out.println("in seq");
 					Declaration d = (Declaration) seq_ast;
 					newCtx = newCtx.rec(newName, d); // extend the environment 
 					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(newCtx);

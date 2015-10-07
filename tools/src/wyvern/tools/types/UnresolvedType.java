@@ -105,9 +105,7 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 			return new NominalType("system", "Int");
 		}
 		*/
-		System.out.println(ctx);
 		String objName = ctx.getType(typeName);
-		System.out.println("gt:" + objName);
 		return new NominalType(objName, typeName);
 	}
 }
