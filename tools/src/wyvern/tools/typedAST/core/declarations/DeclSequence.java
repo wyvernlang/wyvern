@@ -9,6 +9,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -290,11 +291,27 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	 * @return the sequence of simple declarations, not require/import/instantiate
 	 */
 	public Sequence filterNormal() {
-		Sequence normalSeq = new DeclSequence();
+		boolean recBlock = false;
+		Sequence normalSeq = new Sequence();
+		Sequence recSequence = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {
-			if(!(d instanceof ImportDeclaration) && !(d instanceof Instantiation)) {
+			if(d instanceof TypeVarDecl || d instanceof DefDeclaration) {
+				if(recBlock == false) {
+					recBlock = true;
+					recSequence = new DeclSequence();
+				}
+				recSequence = Sequence.append(recSequence, d);
+			} else if(!(d instanceof ImportDeclaration) && !(d instanceof Instantiation)) {
+				if(recBlock == false) {
+					normalSeq = Sequence.append(normalSeq, recSequence);
+				}
 				normalSeq = Sequence.append(normalSeq, d);
+			    recBlock = true;
 			}
+		}
+		
+		if (recBlock == true) {
+			normalSeq = Sequence.append(normalSeq, recSequence);
 		}
 		return normalSeq;
 	}

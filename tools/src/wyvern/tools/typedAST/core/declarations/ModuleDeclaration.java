@@ -325,7 +325,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		GenContext methodContext = ctx;
 		Sequence reqSeq = new DeclSequence();
 		Sequence impInstSeq = new DeclSequence();
-		Sequence normalSeq = new DeclSequence();
+		Sequence normalSeq = new Sequence();
 		if(inner instanceof Sequence || inner instanceof DeclSequence) {
 			/* classify declarations */
 			reqSeq = ((DeclSequence) inner).filterRequires();

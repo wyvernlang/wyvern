@@ -108,10 +108,10 @@ public class StructuralType extends ValueType {
 	@Override
 	public String toString() {
 		String ret = "st:" + selfName;
-		//for(DeclType declt : declTypes) {
-		//	ret += declt.toString();
-		//	ret += ";";
-		//}
+		for(DeclType declt : declTypes) {
+			ret += declt.toString();
+			ret += ";";
+		}
 		return ret;
 	}
 }

@@ -236,7 +236,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		for (NameBinding b : argNames) {
 			args.add(new FormalArg(b.getName(), b.getType().getILType(ctx)));
 		}
-		return new DefDeclType(getName(), getResultILType(ctx), args);
+		DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args);
+		return ret;
 	}
 
 

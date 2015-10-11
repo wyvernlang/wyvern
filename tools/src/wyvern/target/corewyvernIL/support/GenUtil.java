@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
@@ -75,6 +76,36 @@ public class GenUtil {
 				GenContext newCtx = ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name), type);
 				Expression dfn = vd.getDefinition().generateIL(ctx);
 				return new Let(name, dfn, doGenModuleIL(newCtx, origCtx, ai, isModule));
+			} else if (ast instanceof DeclSequence || ast instanceof Sequence) {
+				String newName = GenContext.generateName();
+				
+				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+				
+				GenContext newCtx = ctx;
+				
+				Sequence seq = (Sequence) ast;
+				
+				for(TypedAST seq_ast : seq.getDeclIterator()) {
+					Declaration d = (Declaration) seq_ast;
+					newCtx = newCtx.rec(newName, d); // extend the environment 
+				}
+				
+				for(TypedAST seq_ast : seq.getDeclIterator()) {
+					Declaration d = (Declaration) seq_ast;
+					newCtx = newCtx.rec(newName, d); // extend the environment 
+					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(newCtx);
+					decls.add(decl);
+					declts.add(d.genILType(newCtx));
+				}
+		
+				ValueType type = new StructuralType(newName, declts);
+				/* wrap the declaration into an object */
+				Expression newExp = new New(decls, newName, type);
+				Expression e = doGenModuleIL(newCtx, origCtx, ai, isModule); // generate the rest part 
+				return new Let(newName, newExp, e);
 			} else {
 				/* same as doGenIL */
 				Expression e1 = ast.generateIL(ctx);

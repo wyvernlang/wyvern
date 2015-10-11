@@ -9,7 +9,11 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.typedAST.transformers.DeclarationWriter;
@@ -341,11 +345,40 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 	 * @return the IL expression of a module
 	 */
 	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
-		Iterator<TypedAST> ai = exps.iterator();
+		Sequence seqWithBlocks = combine();
+		Iterator<TypedAST> ai = seqWithBlocks.iterator();
 		
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
 		
 		return GenUtil.doGenModuleIL(ctx, ctx, ai, isModule);
+	}
+
+	private Sequence combine() {
+		boolean recBlock = false;
+		Sequence normalSeq = new Sequence();
+		Sequence recSequence = new DeclSequence();
+		for (TypedAST ast : this.getIterator()) {
+			
+			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
+				Declaration d = (Declaration) ast;
+				if(recBlock == false) {
+					recBlock = true;
+					recSequence = new DeclSequence();
+				}
+				recSequence = Sequence.append(recSequence, d);
+			} else {
+				if(recBlock == true) {
+					normalSeq = Sequence.append(normalSeq, recSequence);
+				}
+				normalSeq = Sequence.append(normalSeq, ast);
+			    recBlock = false;
+			}
+		}
+		
+		if (recBlock == true) {
+			normalSeq = Sequence.append(normalSeq, recSequence);
+		}
+		return normalSeq;
 	}
 }
