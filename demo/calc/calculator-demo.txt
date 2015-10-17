@@ -1,6 +1,14 @@
 run "wyvern user.wyv" from DOS command shell in wyvern\demo\calc
 or run "wyvern.bat user.wyv" from Cygwin
 
+manual setup instructions for Windows
+	
+set CLASSPATH=C:\vcs\wyvern\demo\calc\wyvern-snapshot-for-calc.jar;C:\vcs\wyvern\tools\lib\CopperRuntime.jar;C:\vcs\wyvern\tools\lib\javatuples-1.2.jar;C:\vcs\wyvern\tools\lib\asm-debug-all-5.0.1.jar;C:\vcs\wyvern\tools\lib\CopperCompiler.jar;C:\vcs\wyvern\tools\lib\hamcrest-core-1.3.jar
+
+java wyvern.tools.Interpreter user.wyv
+
+==================
+
 Show code in user.wyv
 Show different forms of delimiters in user.wyv
 	{ }
