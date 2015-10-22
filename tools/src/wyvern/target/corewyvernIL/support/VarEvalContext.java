@@ -22,4 +22,25 @@ public class VarEvalContext extends EvalContext {
 			return previous.lookup(varName);
 		}
 	}
+
+	@Override
+	public EvalContext combine(EvalContext ctx) {
+		if(ctx instanceof EmptyValContext) {
+			return this;
+		} else {
+			// must be VarEvalContext
+			VarEvalContext vCtx = (VarEvalContext) ctx;
+			return this.extend(vCtx.varName, vCtx.v).combine(vCtx.previous);
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return "EvalContext[" + endToString();
+	}
+	
+	@Override
+	public String endToString() {
+		return varName  + " = " + v + ", " + previous.endToString();
+	}
 }

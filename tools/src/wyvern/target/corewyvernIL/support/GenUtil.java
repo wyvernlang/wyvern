@@ -30,7 +30,7 @@ public class GenUtil {
 	 * for a valdeclaration v = e:
 	 * 	wrap it into let v = e in rest</br>
 	 * 
-	 * for a method or type declaration d: 
+	 * for a method or type declaration block d (declaration sequence): 
 	 * 	wrap it into an object y, 
 	 * 	and translate to wrap let y = new { d to IL declaration } in rest,
 	 *  adding mapping f->y.f or T->y.T into context </br>
@@ -95,7 +95,6 @@ public class GenUtil {
 				
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
 					Declaration d = (Declaration) seq_ast;
-					newCtx = newCtx.rec(newName, d); // extend the environment 
 					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(newCtx);
 					decls.add(decl);
 					declts.add(d.genILType(newCtx));
@@ -163,5 +162,52 @@ public class GenUtil {
 		}
 		
 		return genCtx;
+	}
+
+	public static Expression genExp(List<wyvern.target.corewyvernIL.decl.Declaration> decls, GenContext genCtx) {
+		Expression program = null;
+		Iterator<wyvern.target.corewyvernIL.decl.Declaration> ai = decls.iterator();
+		
+		if (!ai.hasNext())
+			throw new RuntimeException("expected an expression in the list");
+		
+		return GenUtil.genExpByIterator(genCtx, ai);
+	}
+
+	private static Expression genExpByIterator(GenContext genCtx, Iterator<wyvern.target.corewyvernIL.decl.Declaration> ai) {
+		if (ai.hasNext()) {
+			wyvern.target.corewyvernIL.decl.Declaration decl = ai.next();
+			Expression program = null;
+			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
+				wyvern.target.corewyvernIL.decl.ValDeclaration vd = (wyvern.target.corewyvernIL.decl.ValDeclaration) decl;
+				return new Let(vd.getName(), vd.getDefinition(), genExpByIterator(genCtx, ai));
+			} else if (decl instanceof wyvern.target.corewyvernIL.decl.TypeDeclaration) {
+				wyvern.target.corewyvernIL.decl.TypeDeclaration td = (wyvern.target.corewyvernIL.decl.TypeDeclaration) decl;
+				//return new Let(td.getName(), new Variable(td.getName()), genExpByIterator(genCtx, ai)); // manually adding instead of linking
+				return genExpByIterator(genCtx, ai);
+			} else if (decl instanceof wyvern.target.corewyvernIL.decl.DefDeclaration) {
+				wyvern.target.corewyvernIL.decl.Declaration methodDecl = (wyvern.target.corewyvernIL.decl.DefDeclaration) decl;
+				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+				decls.add(methodDecl);
+				declts.add(methodDecl.typeCheck(genCtx, genCtx));
+				ValueType type = new StructuralType(decl.getName(), declts);
+				
+				/* manually wrap the method into an object*/
+				Expression newExp = new New(decls, decl.getName(), type);
+				if(!ai.hasNext()) {
+					//return newExp;
+					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>()));
+				} else {
+					return new Let(decl.getName(), newExp, genExpByIterator(genCtx, ai));
+				}
+			}			
+		} else {
+			// Cannot happen
+			return null;
+		}
+		return null;
 	}
 }
