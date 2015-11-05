@@ -388,11 +388,14 @@ public class ILTests {
         Expression program = ast.generateIL(genCtx);
         TypeContext ctx = TypeContext.empty();
 
+
+        ValueType t = null;
         try {
-            System.out.println(program.toString());
-            ValueType t = program.typeCheck(ctx);
+
+            t = program.typeCheck(ctx);
         } catch(NullPointerException e) {
             e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
         }
 
         Assert.assertEquals(Util.intType(), t);
