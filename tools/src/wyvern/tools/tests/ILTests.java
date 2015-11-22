@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
@@ -268,22 +269,19 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	
+    
 	@Test
 	public void testSingleModule() throws ParseException {
 		
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-    	TypeContext ctx = TypeContext.empty();
+    	TypeContext ctx = TypeContext.empty().extend("D", null);
     	
-    	// TODO: uncomment what's below and make it typecheck!
-    	/*
 		DeclType t = decl.typeCheck(ctx, ctx);
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
-		*/
 	}
 
 	@Test
@@ -293,16 +291,27 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
 		for(String fileName : fileList) {
 			
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
 		
-		// TODO: link into a single expression and show that it successfully typechecks and evaluates
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral three = new IntegerLiteral(3);
+		Assert.assertEquals(three, v);
 	}
 	
 	@Test
@@ -369,5 +378,4 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	
 }

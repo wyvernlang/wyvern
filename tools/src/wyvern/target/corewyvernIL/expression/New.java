@@ -90,10 +90,12 @@ public class New extends Expression {
 	public Value interpret(EvalContext ctx) {
 		// evaluate all decls
 		List<Declaration> ds = new LinkedList<Declaration>();
-		for (Declaration d : decls) {
+		for (Declaration d : decls) {;
 			Declaration newD = d.interpret(ctx);
 			ds.add(newD);
 		}
-		return new ObjectValue(ds, selfName, getExprType());
+		ObjectValue objValue = new ObjectValue(ds, selfName, getExprType());
+		objValue.captureContext(ctx); //capture eval context
+		return objValue;
 	}
 }

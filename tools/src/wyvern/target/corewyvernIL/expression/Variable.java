@@ -70,7 +70,8 @@ public class Variable extends Expression implements Path {
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		return ctx.lookup(name);
+		Value exp =  ctx.lookup(name);
+		return exp;
 	}
 
 	@Override

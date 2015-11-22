@@ -351,9 +351,15 @@ public class Sequence implements CoreAST, Iterable<TypedAST> {
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
 		
-		return GenUtil.doGenModuleIL(ctx, ctx, ai, isModule);
+		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ai, isModule);
+		return decl;
 	}
 
+	/**
+	 * A filter for the sequence </br>
+	 * Combines the sequential type and method declarations into a block </br>
+	 * @return return the sequence after combination.
+	 */
 	private Sequence combine() {
 		boolean recBlock = false;
 		Sequence normalSeq = new Sequence();
