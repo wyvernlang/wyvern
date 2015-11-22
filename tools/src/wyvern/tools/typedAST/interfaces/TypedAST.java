@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.interfaces;
 
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.parsing.ExtParser;
@@ -51,4 +52,6 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 * @return
 	 */
 	Expression generateIL(GenContext ctx);
+	
+	CallableExprGenerator getCallableExpr(GenContext ctx);
 }

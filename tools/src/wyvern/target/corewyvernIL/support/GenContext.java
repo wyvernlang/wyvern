@@ -47,7 +47,9 @@ public abstract class GenContext extends TypeContext {
 		return new VarGenContext(var, expr, type, this);
 	}
 	
-	public abstract Expression lookupExp(String varName);
+	public final Expression lookupExp(String varName) {
+		return getCallableExpr(varName).genExpr();
+	}
 	
 	/**
 	 * Getting the outer object name of a type.
@@ -57,15 +59,6 @@ public abstract class GenContext extends TypeContext {
 	 * @return the outer object name of the of the type
 	 */
 	public abstract String getType(String varName);
-	
-	/**
-	 * Getting the outer object name of a type.
-	 * For a mapping f -> y.f, getMethod(f) = y;
-	 * 
-	 * @param varName the method name
-	 * @return the outer object name of the of the method
-	 */
-	public abstract ILMethod getMethod(String varName);
 	
 	public static GenContext empty() {
 		return theEmpty;
@@ -113,6 +106,27 @@ public abstract class GenContext extends TypeContext {
 	 * Generate the Wyvern IL declType list for all mapping in the context
 	 * @return the Wyvern IL declType list for all mapping inside the context
 	 */
-	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(GenContext origCtx); 
+	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(GenContext origCtx);
+
+	/**
+	 * Internal recursive version.
+	 * 
+	 * @param varName the method name
+	 * @param origCtx the original context the lookup was performed in
+	 * @return the CallableExprGenerator
+	 */
+	abstract CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx);
 	
+	/**
+	 * Gets a CallableExprGenerator for the variable.
+	 * This is used to produce more efficient code in the case where
+	 * the variable is a method, so that the method does not need to
+	 * be eta-expanded when it is to be called directly.
+	 * 
+	 * @param varName the method name
+	 * @return the CallableExprGenerator
+	 */
+	public final CallableExprGenerator getCallableExpr(String varName) {
+		return getCallableExprRec(varName, this);
+	}
 }

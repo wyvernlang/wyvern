@@ -55,6 +55,7 @@ public class GenUtil {
 			// or just don't support top-level vars
 			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
 				String newName = GenContext.generateName();
+				// TODO: code smell: this code is a lot like the case below that also calls ctx.rec(...)
 				GenContext newCtx = ctx.rec(newName, ast); // extend the environment 
 				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(newCtx);
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
@@ -66,7 +67,7 @@ public class GenUtil {
 				ValueType type = new StructuralType(newName, declts);
 				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
-				Expression e = doGenModuleIL(newCtx, origCtx, ai, isModule); // generate the rest part 
+				Expression e = doGenModuleIL(newCtx.extend(newName, new Variable(newName), type), origCtx, ai, isModule); // generate the rest part 
 				return new Let(newName, newExp, e);
 			} else if (ast instanceof ValDeclaration) {
 				/* same as doGenIL */
@@ -91,16 +92,18 @@ public class GenUtil {
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
 					Declaration d = (Declaration) seq_ast;
 					newCtx = newCtx.rec(newName, d); // extend the environment 
+					declts.add(d.genILType(newCtx));
 				}
+				
+				ValueType type = new StructuralType(newName, declts);
+				newCtx = newCtx.extend(newName, new Variable(newName), type);
 				
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
 					Declaration d = (Declaration) seq_ast;
 					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(newCtx);
 					decls.add(decl);
-					declts.add(d.genILType(newCtx));
 				}
 		
-				ValueType type = new StructuralType(newName, declts);
 				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
 				Expression e = doGenModuleIL(newCtx, origCtx, ai, isModule); // generate the rest part 

@@ -77,7 +77,7 @@ public class StructuralType extends ValueType {
 		StructuralType st = (StructuralType) t;
 		
 		for (DeclType dt : st.declTypes) {
-			DeclType candidateDT = findDecl(dt.getName());
+			DeclType candidateDT = findDecl(dt.getName(), ctx);
 			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, ctx)) {
 				return false;
 			}
@@ -87,7 +87,7 @@ public class StructuralType extends ValueType {
 	}
 
 	@Override
-	public DeclType findDecl(String declName) {
+	public DeclType findDecl(String declName, TypeContext ctx) {
 		for (DeclType mdt : declTypes) {
 			if (mdt.getName().equals(declName)) {
 				return mdt;

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class IfExpr extends CachingTypedAST implements CoreAST {
-	public abstract static class IfClause extends CachingTypedAST implements TypedAST {
+	public abstract static class IfClause extends CachingTypedAST {
 		public abstract boolean satisfied(EvaluationEnvironment env);
 		
 		public abstract TypedAST getClause();

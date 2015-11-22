@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
@@ -28,7 +29,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
-public class Sequence implements CoreAST, Iterable<TypedAST> {
+public class Sequence extends AbstractTypedAST implements CoreAST, Iterable<TypedAST> {
 	private LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
 	private Type retType = null;
 

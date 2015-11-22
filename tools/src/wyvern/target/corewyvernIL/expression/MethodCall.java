@@ -71,7 +71,7 @@ public class MethodCall extends Expression {
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType ot = objectExpr.typeCheck(ctx);
 		StructuralType st = ot.getStructuralType(ctx);
-		DeclType dt = st.findDecl(methodName);
+		DeclType dt = st.findDecl(methodName, ctx);
 		if (dt == null)
 			throw new RuntimeException("method not found");
 		if (!(dt instanceof DefDeclType))
