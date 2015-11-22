@@ -4,6 +4,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
@@ -12,7 +13,9 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -260,8 +263,28 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			
 			// must be import
 			ImportDeclaration imp = (ImportDeclaration) ast;
+			// add the import's type to the context, and get the import value
+			Expression importExp = null;
+			String importName = imp.getUri().getSchemeSpecificPart();
+			if (importName.contains(".")) {
+				importName = importName.substring(importName.lastIndexOf(".")+1);
+			}
+			if (imp.getUri().getScheme().equals("java")) {
+				String importPath = imp.getUri().getRawSchemeSpecificPart();
+				try {
+					FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
+					ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass());
+					importExp = new JavaValue(obj, type);
+					ctx = ctx.extend(importName, new Variable(importName), type);
+				} catch (ReflectiveOperationException e1) {
+					throw new RuntimeException(e1);
+				}
+			} else {
+				// TODO: need to add types for non-java imports
+				importExp = new Variable(imp.getUri().getSchemeSpecificPart());
+			}
 			Expression e = wrapLetWithIterator(ai, normalSeq, ctx);
-			return new Let(imp.getUri().getSchemeSpecificPart(), new wyvern.target.corewyvernIL.expression.Variable(imp.getUri().getSchemeSpecificPart()), e);
+			return new Let(importName, importExp, e);
 		} else {
 			// must be instantiate
 			

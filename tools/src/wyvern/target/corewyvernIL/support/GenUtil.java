@@ -1,11 +1,16 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -212,5 +217,44 @@ public class GenUtil {
 			return null;
 		}
 		return null;
+	}
+
+	public static ValueType javaClassToWyvernType(Class<?> javaClass) {
+		return javaClassToWyvernTypeRec(javaClass, new HashSet<String>());
+	}
+	public static ValueType javaClassToWyvernTypeRec(Class<?> javaClass, Set<String> touched) {
+		if (javaClass.getName().equals("int")) {
+			return Util.intType();
+		}
+		if (touched.contains(javaClass.getName()) || touched.size() > 5) {
+			// TODO: revise strategy to support recursive types
+			return null;
+		}
+		touched.add(javaClass.getName());
+		
+		List<DeclType> declTypes = new LinkedList<DeclType>();
+		// for each method in javaClass, attempt to convert argument types
+		// if we fail, we just leave out that method
+		nextMethod: for (Method m : javaClass.getMethods()) {
+			
+			ValueType retType = javaClassToWyvernTypeRec(m.getReturnType(),touched);
+			if (retType == null)
+				continue;
+			List<FormalArg> argTypes = new LinkedList<FormalArg>();
+			Class<?> argClasses[] = m.getParameterTypes(); 
+			for (int i = 0; i < argClasses.length; ++i) {
+				ValueType t = javaClassToWyvernTypeRec(argClasses[i],touched);
+				if (t == null)
+					continue nextMethod;
+				argTypes.add(new FormalArg(m.getParameters()[i].getName(), t));
+			}
+			declTypes.add(new DefDeclType(m.getName(), retType, argTypes));
+		}
+		
+		// TODO: extend to types other than int, and structural types based on that
+		// TODO: extend to fields
+		// TODO: support nominal types in Java
+		touched.remove(javaClass.getName());
+		return new StructuralType("IGNORE_ME", declTypes , true);
 	}
 }
