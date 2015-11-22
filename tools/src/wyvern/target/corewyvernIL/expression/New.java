@@ -94,8 +94,7 @@ public class New extends Expression {
 			Declaration newD = d.interpret(ctx);
 			ds.add(newD);
 		}
-		ObjectValue objValue = new ObjectValue(ds, selfName, getExprType());
-		objValue.captureContext(ctx); //capture eval context
+		ObjectValue objValue = new ObjectValue(ds, selfName, getExprType(), ctx);
 		return objValue;
 	}
 }

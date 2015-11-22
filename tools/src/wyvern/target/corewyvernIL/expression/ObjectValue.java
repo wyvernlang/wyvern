@@ -6,14 +6,16 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class ObjectValue extends New implements Invokable {
-	EvalContext evalCtx = EvalContext.empty(); // captured eval context
+	final EvalContext evalCtx; // captured eval context
 	
-	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType) {
+	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, EvalContext ctx) {
 		super(decls, selfName, exprType);
+		if (selfName == null || selfName.length() == 0)
+			throw new RuntimeException("selfName invariant violated");
+		evalCtx = ctx.extend(selfName, this);
 	}
 
 	@Override
@@ -33,7 +35,4 @@ public class ObjectValue extends New implements Invokable {
 		return (Value) decl.getDefinition();
 	}
 
-	public void captureContext(EvalContext ctx) {
-		evalCtx = ctx;
-	}
 }
