@@ -372,7 +372,6 @@ public class ILTests {
 	}
 
     @Test
-//    @Category(CurrentlyBroken.class)
     public void testSimpleLambda() throws ParseException {
 
         String source = "type UnitIntFn \n"
@@ -380,9 +379,7 @@ public class ILTests {
             + "val getFive:UnitIntFn = #() => 5\n"
             + "getFive.apply()";
 
-
         TypedAST ast = TestUtil.getNewAST(source);
-
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
         Expression program = ast.generateIL(genCtx);
@@ -391,7 +388,6 @@ public class ILTests {
 
         ValueType t = null;
         try {
-
             t = program.typeCheck(ctx);
         } catch(NullPointerException e) {
             e.printStackTrace(System.out);
