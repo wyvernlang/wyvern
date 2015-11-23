@@ -130,40 +130,46 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
          * Use the StructualType and the DefDeclaration to make a New. Return.
          */
 
+        // Extend the generalContext to include the parameters passed into the function.
+        GenContext extendedCtx = ctx;
+        for(NameBinding binding : this.bindings) {
+            extendedCtx = extendedCtx.extend(
+                binding.getName(),
+                new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
+                binding.getType().generateILType()
+            );
+        }
 
         List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings);
 
         // Generate the IL for the body, and get it's return type.
-        Expression il = this.body.generateIL(ctx); // TODO do I have to extend the ctx or not?
-        ValueType bodyReturnType = il.typeCheck(ctx);
+        Expression il = this.body.generateIL(extendedCtx);
+        ValueType bodyReturnType = il.typeCheck(extendedCtx);
 
-        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, this.body.generateIL(ctx));
+        // Create a new list of function declaration, which is a singleton, containing only "apply"
+        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, this.body.generateIL(extendedCtx));
         List<Declaration> declList = new LinkedList<>();
         declList.add(applyDef);
 
-
+        // Store a redundency of the function declaration
         DeclType ddecl = new DefDeclType("apply", bodyReturnType, intermediateArgs);
         List<DeclType> declTypes = new LinkedList<>();
         declTypes.add(ddecl);
 
         ValueType newType = new StructuralType("lambda", declTypes);
-        New n = new New(declList, "lambda", newType);
-		return n;
-	}
 
-    private static List<FormalArg> convertBindingToArgs(List<NameBinding> nameBindings) {
+        return new New(declList, "lambda", newType);
+}
+
+    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings) {
 
         List<FormalArg> result = new LinkedList<FormalArg>();
-        for(int i = 0; i < nameBindings.size(); i++) {
-            System.out.println("Printing the type of the element:");
-            System.out.println(nameBindings.get(i).getClass().toString());
 
-            NameBinding binding = nameBindings.get(i);
-            String formalName = binding.getName();
-            Type bindingType = binding.getType();
-            ValueType formalType = bindingType.generateILType();
-            FormalArg convertedArg = new FormalArg(formalName, formalType);
-            result.add(convertedArg);
+        for(NameBinding binding : bindings) {
+            result.add( new FormalArg(
+                binding.getName(),
+                binding.getType().generateILType()
+            ));
         }
 
         return result;

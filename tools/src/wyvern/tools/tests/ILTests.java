@@ -355,7 +355,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testLambda() throws ParseException {
 		
         String source = TestUtil.readFile(PATH + "lambdatest.wyv");
