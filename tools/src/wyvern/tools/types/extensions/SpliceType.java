@@ -2,6 +2,7 @@ package wyvern.tools.types.extensions;
 
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
@@ -81,6 +82,12 @@ public class SpliceType implements Type {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FileLocation getLocation() {
 		// TODO Auto-generated method stub
 		return null;
 	}

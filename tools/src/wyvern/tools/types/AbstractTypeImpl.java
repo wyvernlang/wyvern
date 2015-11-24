@@ -1,5 +1,6 @@
 package wyvern.tools.types;
 
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 
 import java.util.HashMap;
@@ -8,7 +9,21 @@ import java.util.Map;
 import java.util.Optional;
 
 public abstract class AbstractTypeImpl implements Type {
+	private final FileLocation location;
 	private Optional<TypeBinding> resolved;
+	
+	protected AbstractTypeImpl(FileLocation location) {
+		this.location = location;
+	}
+
+	protected AbstractTypeImpl() {
+		this.location = null;
+	}
+
+	@Override
+	public FileLocation getLocation() {
+		return location;
+	}
 
 	@Override
 	public void setResolvedBinding(TypeBinding resolvedBinding) {

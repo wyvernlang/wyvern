@@ -16,6 +16,7 @@ public class ToolError extends RuntimeException {
     protected ToolError(ErrorMessage message, FileLocation location, String... args) {
         super(message.getErrorMessage(args) + " on line number " +
                 ((location != null)?location.toString():"NULL"));
+        this.location = location;
         assert message.numberOfArguments() == args.length;
         this.errorMessage = message;
     }
@@ -23,6 +24,7 @@ public class ToolError extends RuntimeException {
 	protected ToolError(ErrorMessage message, HasLocation errorLocation, String... args) {
         super(message.getErrorMessage(args) + " on line number " +
                 ((errorLocation != null)?errorLocation.getLocation() + "":"NULL"));
+        this.location = (errorLocation != null)?errorLocation.getLocation():null;
         assert message.numberOfArguments() == args.length;
         this.errorMessage = message;
 	}
@@ -32,6 +34,15 @@ public class ToolError extends RuntimeException {
 	}
 
 	private ErrorMessage errorMessage;	
+	private FileLocation location;
+	
+	public FileLocation getLocation() {
+		return location;
+	}
+	
+	public int getLine() {
+		return (location==null)?-1:location.line;
+	}
 	
 	/**
 	 * For serialization

@@ -157,4 +157,10 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public FileLocation getLocation() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

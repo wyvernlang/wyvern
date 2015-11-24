@@ -434,7 +434,7 @@ Type Type() :
   	id = id2;
   })* {
 	if (exp == null)
-		return build.nominalType(id.image);
+		return build.nominalType(id.image, loc(id));
   	else
   		return build.qualifiedType(exp, id2.image);
   }

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.types.Type;
 
 public interface ASTBuilder<AST,Type> {
 	public AST sequence(AST t1, AST t2, boolean inModule);
@@ -36,7 +37,7 @@ public interface ASTBuilder<AST,Type> {
 	public Object caseArm(String name, Type type, AST exp, FileLocation loc);
 	public Object tagInfo(Type type, List<Type> comprises);
 	
-	public Type nominalType(String name);
+	public Type nominalType(String name, FileLocation loc);
 	public Type qualifiedType(AST base, String name);
 	
 	public void setNewBody(AST newExp, AST decls);
