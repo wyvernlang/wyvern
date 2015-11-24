@@ -10,9 +10,13 @@ public abstract class EvalContext {
 	
 	public abstract Value lookup(String varName);
 	
+	public abstract EvalContext combine(EvalContext ctx);
+	
 	public static EvalContext empty() {
 		return theEmpty;
 	}
 	
-	private static EvalContext theEmpty = new EmptyValContext(); 
+	private static EvalContext theEmpty = new EmptyValContext();
+
+	public abstract String endToString();
 }

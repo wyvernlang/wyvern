@@ -17,11 +17,13 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public class MethodGenContext extends GenContext {
 
 	ILMethod method;
+	String objectName;
 	String methodName;
 	GenContext genContext;
 	
 	public MethodGenContext(String methodName, ILMethod method, GenContext genContext) {
 		this.method = method;
+		this.objectName = method.getObjName();
 		this.methodName = methodName;
 		this.genContext = genContext;
 	}
@@ -33,7 +35,7 @@ public class MethodGenContext extends GenContext {
 	
 	@Override
 	public String endToString() {
-		return methodName + " : " + method.getObjName() +  ", " + genContext.endToString();
+		return methodName + " = " + objectName + '.' + methodName +  ", " + genContext.endToString();
 	}
 
 	@Override
@@ -46,12 +48,7 @@ public class MethodGenContext extends GenContext {
 		return genContext.getType(varName);
 	}
 
-	@Override
-	public ILMethod getMethod(String varName) {
-		if(this.methodName.equals(varName)) return method;
-		else return genContext.getMethod(varName);
-	}
-
+	// TODO: this whole approach here is kind of hacky
 	@Override
 	public List<Declaration> genDeclSeq(GenContext origCtx) {
 		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
@@ -66,6 +63,7 @@ public class MethodGenContext extends GenContext {
 		return decls;
 	}
 
+	// TODO: this whole approach here is kind of hacky
 	@Override
 	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
 		List<DeclType> declts = genContext == origCtx ? new LinkedList<DeclType>():genContext.genDeclTypeSeq(origCtx);
@@ -78,9 +76,17 @@ public class MethodGenContext extends GenContext {
 		return declts;
 	}
 
-	@Override
+	/*@Override
 	public Expression lookupExp(String varName) {
 		return genContext.lookupExp(varName);
+	}*/
+
+	@Override
+	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
+		if (this.methodName.equals(varName))
+			return new InvocationExprGenerator(new Variable(method.getObjName()), varName, origCtx);
+		else
+			return genContext.getCallableExprRec(varName, origCtx);
 	}
 
 }

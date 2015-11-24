@@ -1,8 +1,10 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
@@ -122,39 +124,24 @@ public class Application extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
+		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
+		List<FormalArg> formals = exprGen.getExpectedArgTypes(ctx);
+		
 		// generate arguments		
 		List<Expression> args = new LinkedList<Expression>();
         if (argument instanceof TupleObject) {
         	for (TypedAST ast : ((TupleObject) argument).getObjects()) {
+        		// TODO: propagate types downward from formals
         		args.add(ast.generateIL(ctx));
         	}
         } else if (argument instanceof UnitVal) {
         	// leave args empty
         } else {
+    		// TODO: propagate types downward from formals
         	args.add(argument.generateIL(ctx));
         }
 		
 		// generate the call
-		String methodName = null;
-		Expression receiver = null;
-		
-		if (function instanceof Invocation) {
-			Invocation i = (Invocation) function;
-			methodName = i.getOperationName();
-			receiver = i.getReceiver().generateIL(ctx);
-		} else {
-			// must be variable
-			Variable v = (Variable) function;
-			methodName = v.getName();
-			String objName = ctx.getMethod(methodName).getObjName();  
-			if (objName != null) {
-				/* f => y.f */
-				receiver = new wyvern.target.corewyvernIL.expression.Variable(objName);
-			} else {
-				throw new RuntimeException("calls with no receiver are not implemented");
-			}
-		}
-		
-		return new MethodCall(receiver, methodName, args);
+        return exprGen.genExprWithArgs(args);
 	}
 }

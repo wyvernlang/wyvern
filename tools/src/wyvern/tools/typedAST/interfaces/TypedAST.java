@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.interfaces;
 
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.parsing.ExtParser;
@@ -23,7 +24,8 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	Type getType();
 	Type typecheck(Environment env, Optional<Type> expected);
 	
-	/** an interpreter */
+	/** an interpreter.  Out of date - should generate IL code and interpret that instead. */
+	@Deprecated
 	Value evaluate(EvaluationEnvironment env);
 
 	/**
@@ -38,6 +40,7 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 */
 	TypedAST cloneWithChildren(Map<String, TypedAST> newChildren);
 
+	@Deprecated
 	void codegenToIL(GenerationEnvironment environment, ILWriter writer);
 
 	public static HasParser meta$get() {
@@ -51,4 +54,6 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 * @return
 	 */
 	Expression generateIL(GenContext ctx);
+	
+	CallableExprGenerator getCallableExpr(GenContext ctx);
 }

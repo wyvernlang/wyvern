@@ -1,13 +1,18 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.InvocationExprGenerator;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -28,6 +33,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -165,18 +171,11 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		Expression re = receiver.generateIL(ctx);
-		ValueType rt = re.typeCheck(ctx);
-		DeclType dt = rt.findDecl(operationName);
-		if (dt == null)
-			throw new RuntimeException("typechecking error: operation not found");
-		if (dt instanceof ValDeclType || dt instanceof VarDeclType) {
-			if (argument != null)
-				throw new RuntimeException("type error: unexpected argument");				
-			return new FieldGet(re, operationName);
-		} else {
-			Expression ae = argument == null ? null : argument.generateIL(ctx);
-			throw new RuntimeException("method calls not implemented");			
-		}
+		return getCallableExpr(ctx).genExpr();
+	}
+	
+	@Override
+	public CallableExprGenerator getCallableExpr(GenContext genCtx) {
+		return new InvocationExprGenerator(receiver.generateIL(genCtx), operationName, genCtx);
 	}
 }

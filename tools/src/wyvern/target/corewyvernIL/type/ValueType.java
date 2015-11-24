@@ -21,8 +21,11 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	}
 
 	/** Find the declaration type with the specified name, or return null if it is not present */
-	public DeclType findDecl(String declName) {
-		return null;
+	public DeclType findDecl(String declName, TypeContext ctx) {
+		StructuralType st = getStructuralType(ctx);
+		if (st == null)
+			return null;
+		return st.findDecl(declName, ctx);
 	}
 
 	public abstract ValueType adapt(View v);

@@ -418,7 +418,7 @@ AST LambdaFn(ExpFlags flags) :
 { List formals; AST body; }
 {
     formals = Formals() <ARROW> body = Expression(flags) {
-        return build.fn(Arrays.asList(formals), body);
+        return build.fn(formals, body);
     }
 }
 

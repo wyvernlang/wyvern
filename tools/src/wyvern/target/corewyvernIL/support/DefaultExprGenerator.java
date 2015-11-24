@@ -1,0 +1,38 @@
+package wyvern.target.corewyvernIL.support;
+
+import java.util.List;
+
+import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.type.ValueType;
+
+public class DefaultExprGenerator implements CallableExprGenerator {
+
+	private Expression expr;
+	
+	public DefaultExprGenerator(Expression e) {
+		expr = e;
+	}
+	
+	@Override
+	public Expression genExpr() {
+		return expr;
+	}
+
+	@Override
+	public Expression genExprWithArgs(List<Expression> args) {
+		Expression e = genExpr();
+		return new MethodCall(e, "apply", args);
+	}
+
+	@Override
+	public List<FormalArg> getExpectedArgTypes(TypeContext ctx) {
+		Expression e = genExpr();
+		ValueType vt = e.typeCheck(ctx);
+		DefDeclType dt = (DefDeclType)vt.findDecl("apply", ctx);
+		return dt.getFormalArgs();
+	}
+
+}

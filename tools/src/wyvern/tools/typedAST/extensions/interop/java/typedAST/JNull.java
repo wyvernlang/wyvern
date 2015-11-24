@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
+import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.interop.java.types.JNullType;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class JNull implements TypedAST {
+public class JNull extends AbstractTypedAST {
 	@Override
 	public Type getType() {
 		return new JNullType();

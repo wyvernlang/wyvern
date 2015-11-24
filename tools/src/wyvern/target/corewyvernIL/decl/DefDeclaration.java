@@ -20,10 +20,12 @@ import wyvern.target.oir.OIREnvironment;
 public class DefDeclaration extends NamedDeclaration {
 
 	private List<FormalArg> formalArgs;
-	private ValueType type;
-	private Expression body;
+
+
+    private ValueType type; // The return type of the body.
+    private Expression body;
 	
-	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
+    public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body) {
 		super(methodName);
 		this.formalArgs = formalArgs;
@@ -34,27 +36,28 @@ public class DefDeclaration extends NamedDeclaration {
 
 	@Override
 	public String toString() {
-		return "DefDeclaration[" + getName() + "(...) : " + type + " = ...]";
+		return "DefDeclaration[" + getName() + "(...) : " + type + " = " + body + "]";
 	}
-	
+
 	public List<FormalArg> getFormalArgs() {
 		return formalArgs;
 	}
-	
+
 	public void setFormalArgs(List<FormalArg> formalArgs) {
 		this.formalArgs = formalArgs;
 	}
-	
+
 	public ValueType getType() {
 		return type;
 	}
 	public void setType(ValueType type) {
 		this.type = type;
 	}
-	
+
 	public Expression getBody() {
 		return body;
 	}
+
 	public void setBody(Expression body) {
 		this.body = body;
 	}
