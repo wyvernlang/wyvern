@@ -136,11 +136,11 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
             extendedCtx = extendedCtx.extend(
                 binding.getName(),
                 new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
-                binding.getType().generateILType()
+                binding.getType().getILType(extendedCtx)
             );
         }
 
-        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings);
+        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, extendedCtx);
 
         // Generate the IL for the body, and get it's return type.
         Expression il = this.body.generateIL(extendedCtx);
@@ -161,14 +161,14 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         return new New(declList, "lambda", newType);
 }
 
-    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings) {
+    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx) {
 
         List<FormalArg> result = new LinkedList<FormalArg>();
 
         for(NameBinding binding : bindings) {
             result.add( new FormalArg(
                 binding.getName(),
-                binding.getType().generateILType()
+                binding.getType().getILType(ctx)
             ));
         }
 
