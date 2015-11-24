@@ -24,7 +24,8 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	Type getType();
 	Type typecheck(Environment env, Optional<Type> expected);
 	
-	/** an interpreter */
+	/** an interpreter.  Out of date - should generate IL code and interpret that instead. */
+	@Deprecated
 	Value evaluate(EvaluationEnvironment env);
 
 	/**
@@ -39,6 +40,7 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 */
 	TypedAST cloneWithChildren(Map<String, TypedAST> newChildren);
 
+	@Deprecated
 	void codegenToIL(GenerationEnvironment environment, ILWriter writer);
 
 	public static HasParser meta$get() {
