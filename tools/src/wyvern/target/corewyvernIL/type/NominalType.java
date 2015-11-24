@@ -18,7 +18,7 @@ public class NominalType extends ValueType{
 	
 	@Override
 	public StructuralType getStructuralType(TypeContext ctx) {
-		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember);
+		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 			return vt.getStructuralType(ctx);

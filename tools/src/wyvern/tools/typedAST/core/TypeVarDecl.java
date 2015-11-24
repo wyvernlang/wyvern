@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
+import wyvern.tools.typedAST.abs.AbstractTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
@@ -61,7 +62,7 @@ public class TypeVarDecl extends Declaration {
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
-	private abstract class EnvironmentExtInner implements EnvironmentExtender {
+	private abstract class EnvironmentExtInner extends AbstractTypedAST implements EnvironmentExtender {
 
 		private final FileLocation loc;
 

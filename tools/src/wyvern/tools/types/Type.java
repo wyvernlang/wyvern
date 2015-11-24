@@ -35,6 +35,7 @@ public interface Type extends TreeWritable {
 	void setResolvedBinding(TypeBinding binding);
 	Type cloneWithBinding(TypeBinding binding);
 
+	@Deprecated
 	wyvern.target.corewyvernIL.type.ValueType generateILType();
 	public ValueType getILType(GenContext ctx);
 }

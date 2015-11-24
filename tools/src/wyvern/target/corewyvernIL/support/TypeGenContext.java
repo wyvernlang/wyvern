@@ -25,19 +25,9 @@ public class TypeGenContext extends GenContext {
 	}
 
 	@Override
-	public Expression lookupExp(String varName) {
-		return genContext.lookupExp(varName);
-	}
-
-	@Override
 	public String getType(String varName) {
 		if(this.typeName.equals(varName)) return objName;
 		else return genContext.getType(varName);
-	}
-
-	@Override
-	public ILMethod getMethod(String varName) {
-		return genContext.getMethod(varName);
 	}
 
 	@Override
@@ -70,6 +60,11 @@ public class TypeGenContext extends GenContext {
 		TypeDeclaration decl = new TypeDeclaration(typeName, new NominalType(objName, typeName));
 		decls.add(decl);
 		return decls;
+	}
+
+	@Override
+	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
+		return genContext.getCallableExprRec(varName, origCtx);
 	}
 
 }

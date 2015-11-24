@@ -53,7 +53,7 @@ public class FieldGet extends Expression implements Path {
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType vt = objectExpr.typeCheck(ctx);
-		DeclType dt = vt.findDecl(fieldName);
+		DeclType dt = vt.findDecl(fieldName, ctx);
 		if (dt == null)
 			throw new RuntimeException("typechecking error: operation not found");
 		if (!(dt instanceof ValDeclType || dt instanceof VarDeclType))

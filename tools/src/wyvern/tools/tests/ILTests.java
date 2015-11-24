@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
@@ -35,6 +36,8 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
 import wyvern.tools.imports.extensions.WyvernResolver;
+import wyvern.tools.interop.FObject;
+import wyvern.tools.interop.JObject;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
@@ -269,22 +272,19 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	
+    
 	@Test
 	public void testSingleModule() throws ParseException {
 		
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-    	TypeContext ctx = TypeContext.empty();
+    	TypeContext ctx = TypeContext.empty().extend("D", null);
     	
-    	// TODO: uncomment what's below and make it typecheck!
-    	/*
 		DeclType t = decl.typeCheck(ctx, ctx);
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
-		*/
 	}
 
 	@Test
@@ -294,16 +294,27 @@ public class ILTests {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
 		for(String fileName : fileList) {
 			
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
 		
-		// TODO: link into a single expression and show that it successfully typechecks and evaluates
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral three = new IntegerLiteral(3);
+		Assert.assertEquals(three, v);
 	}
 	
 	@Test
@@ -400,4 +411,55 @@ public class ILTests {
         Assert.assertEquals(five, v);
     }
 
+	@Test
+	public void testJavaImportLibrary1() throws ReflectiveOperationException {
+		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest");
+		List<Object> args = new LinkedList<Object>();
+		args.add(1);
+		Object result = obj.invokeMethod("addOne", args);
+		Assert.assertEquals(2, result);
+	}
+	
+	@Test
+	public void testJavaImportLibrary2() throws ReflectiveOperationException {
+		FObject obj = wyvern.tools.interop.Default.importer().find("java.lang.System.out");
+		List<Object> args = new LinkedList<Object>();
+		args.add("Hello, world!");
+		Object result = obj.invokeMethod("println", args);
+	}
+	
+	@Test
+	public void testJavaImport1() throws ParseException {
+		String input = "resource module main\n\n"
+//					 + "require ffi/java\n\n"
+//					 + "import testcode/Adder\n\n"
+//					 + "type Adder\n"
+//					 + "    def addOne(i:system.Int):system.Int\n\n"
+					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
+					 + "val x : Int = importTest.addOne(4)\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		decls.add(decl);
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+		Assert.assertEquals(Util.intType(), t);		
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	public static ImportTestClass importTest = new ImportTestClass();
+	public static class ImportTestClass {
+		public int addOne(int i) {
+			return i+1;
+		}
+	}
 }

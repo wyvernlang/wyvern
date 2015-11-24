@@ -1,11 +1,16 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -30,7 +35,7 @@ public class GenUtil {
 	 * for a valdeclaration v = e:
 	 * 	wrap it into let v = e in rest</br>
 	 * 
-	 * for a method or type declaration d: 
+	 * for a method or type declaration block d (declaration sequence): 
 	 * 	wrap it into an object y, 
 	 * 	and translate to wrap let y = new { d to IL declaration } in rest,
 	 *  adding mapping f->y.f or T->y.T into context </br>
@@ -55,6 +60,7 @@ public class GenUtil {
 			// or just don't support top-level vars
 			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
 				String newName = GenContext.generateName();
+				// TODO: code smell: this code is a lot like the case below that also calls ctx.rec(...)
 				GenContext newCtx = ctx.rec(newName, ast); // extend the environment 
 				wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(newCtx);
 				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
@@ -66,7 +72,7 @@ public class GenUtil {
 				ValueType type = new StructuralType(newName, declts);
 				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
-				Expression e = doGenModuleIL(newCtx, origCtx, ai, isModule); // generate the rest part 
+				Expression e = doGenModuleIL(newCtx.extend(newName, new Variable(newName), type), origCtx, ai, isModule); // generate the rest part 
 				return new Let(newName, newExp, e);
 			} else if (ast instanceof ValDeclaration) {
 				/* same as doGenIL */
@@ -91,17 +97,18 @@ public class GenUtil {
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
 					Declaration d = (Declaration) seq_ast;
 					newCtx = newCtx.rec(newName, d); // extend the environment 
+					declts.add(d.genILType(newCtx));
 				}
+				
+				ValueType type = new StructuralType(newName, declts);
+				newCtx = newCtx.extend(newName, new Variable(newName), type);
 				
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
 					Declaration d = (Declaration) seq_ast;
-					newCtx = newCtx.rec(newName, d); // extend the environment 
 					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(newCtx);
 					decls.add(decl);
-					declts.add(d.genILType(newCtx));
 				}
 		
-				ValueType type = new StructuralType(newName, declts);
 				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
 				Expression e = doGenModuleIL(newCtx, origCtx, ai, isModule); // generate the rest part 
@@ -163,5 +170,91 @@ public class GenUtil {
 		}
 		
 		return genCtx;
+	}
+
+	public static Expression genExp(List<wyvern.target.corewyvernIL.decl.Declaration> decls, GenContext genCtx) {
+		Expression program = null;
+		Iterator<wyvern.target.corewyvernIL.decl.Declaration> ai = decls.iterator();
+		
+		if (!ai.hasNext())
+			throw new RuntimeException("expected an expression in the list");
+		
+		return GenUtil.genExpByIterator(genCtx, ai);
+	}
+
+	private static Expression genExpByIterator(GenContext genCtx, Iterator<wyvern.target.corewyvernIL.decl.Declaration> ai) {
+		if (ai.hasNext()) {
+			wyvern.target.corewyvernIL.decl.Declaration decl = ai.next();
+			Expression program = null;
+			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
+				wyvern.target.corewyvernIL.decl.ValDeclaration vd = (wyvern.target.corewyvernIL.decl.ValDeclaration) decl;
+				return new Let(vd.getName(), vd.getDefinition(), genExpByIterator(genCtx, ai));
+			} else if (decl instanceof wyvern.target.corewyvernIL.decl.TypeDeclaration) {
+				wyvern.target.corewyvernIL.decl.TypeDeclaration td = (wyvern.target.corewyvernIL.decl.TypeDeclaration) decl;
+				//return new Let(td.getName(), new Variable(td.getName()), genExpByIterator(genCtx, ai)); // manually adding instead of linking
+				return genExpByIterator(genCtx, ai);
+			} else if (decl instanceof wyvern.target.corewyvernIL.decl.DefDeclaration) {
+				wyvern.target.corewyvernIL.decl.Declaration methodDecl = (wyvern.target.corewyvernIL.decl.DefDeclaration) decl;
+				List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+						new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+				List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+						new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+				decls.add(methodDecl);
+				declts.add(methodDecl.typeCheck(genCtx, genCtx));
+				ValueType type = new StructuralType(decl.getName(), declts);
+				
+				/* manually wrap the method into an object*/
+				Expression newExp = new New(decls, decl.getName(), type);
+				if(!ai.hasNext()) {
+					//return newExp;
+					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>()));
+				} else {
+					return new Let(decl.getName(), newExp, genExpByIterator(genCtx, ai));
+				}
+			}			
+		} else {
+			// Cannot happen
+			return null;
+		}
+		return null;
+	}
+
+	public static ValueType javaClassToWyvernType(Class<?> javaClass) {
+		return javaClassToWyvernTypeRec(javaClass, new HashSet<String>());
+	}
+	public static ValueType javaClassToWyvernTypeRec(Class<?> javaClass, Set<String> touched) {
+		if (javaClass.getName().equals("int")) {
+			return Util.intType();
+		}
+		if (touched.contains(javaClass.getName()) || touched.size() > 5) {
+			// TODO: revise strategy to support recursive types
+			return null;
+		}
+		touched.add(javaClass.getName());
+		
+		List<DeclType> declTypes = new LinkedList<DeclType>();
+		// for each method in javaClass, attempt to convert argument types
+		// if we fail, we just leave out that method
+		nextMethod: for (Method m : javaClass.getMethods()) {
+			
+			ValueType retType = javaClassToWyvernTypeRec(m.getReturnType(),touched);
+			if (retType == null)
+				continue;
+			List<FormalArg> argTypes = new LinkedList<FormalArg>();
+			Class<?> argClasses[] = m.getParameterTypes(); 
+			for (int i = 0; i < argClasses.length; ++i) {
+				ValueType t = javaClassToWyvernTypeRec(argClasses[i],touched);
+				if (t == null)
+					continue nextMethod;
+				argTypes.add(new FormalArg(m.getParameters()[i].getName(), t));
+			}
+			declTypes.add(new DefDeclType(m.getName(), retType, argTypes));
+		}
+		
+		// TODO: extend to types other than int, and structural types based on that
+		// TODO: extend to fields
+		// TODO: support nominal types in Java
+		touched.remove(javaClass.getName());
+		return new StructuralType("IGNORE_ME", declTypes , true);
 	}
 }

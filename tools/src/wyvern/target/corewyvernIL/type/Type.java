@@ -1,4 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
-public abstract class Type {
+import wyvern.target.corewyvernIL.ASTNode;
+
+public abstract class Type extends ASTNode {
 }

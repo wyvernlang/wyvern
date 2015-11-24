@@ -25,6 +25,7 @@ public class Let extends Expression {
 		this.varName = varName;
 		this.toReplace = toReplace;
 		if (inExpr == null) throw new RuntimeException();
+		if (toReplace == null) throw new RuntimeException();
 		this.inExpr = inExpr;
 	}
 

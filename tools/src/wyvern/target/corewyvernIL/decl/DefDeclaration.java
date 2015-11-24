@@ -36,7 +36,7 @@ public class DefDeclaration extends NamedDeclaration {
 
 	@Override
 	public String toString() {
-		return "DefDeclaration[" + getName() + "(...) : " + type + " = ...]";
+		return "DefDeclaration[" + getName() + "(...) : " + type + " = " + body + "]";
 	}
 
 	public List<FormalArg> getFormalArgs() {

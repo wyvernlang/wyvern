@@ -39,15 +39,6 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public Expression lookupExp(String varName) {
-		if (varName.equals(var))
-			return expr;
-		else {
-			return genContext.lookupExp(varName);
-		}
-	}
-
-	@Override
 	public ValueType lookup(String varName) {
 		if (varName.equals(var))
 			return type;
@@ -77,8 +68,11 @@ public class VarGenContext extends GenContext {
 	}
 
 	@Override
-	public ILMethod getMethod(String varName) {
-		return genContext.getMethod(varName);
-	}
-	
+	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
+		if (varName.equals(var))
+			return new DefaultExprGenerator(expr);
+		else {
+			return genContext.getCallableExprRec(varName, origCtx);
+		}
+	}	
 }

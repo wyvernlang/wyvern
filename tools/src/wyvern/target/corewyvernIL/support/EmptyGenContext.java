@@ -11,11 +11,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class EmptyGenContext extends GenContext {
 
 	@Override
-	public Expression lookupExp(String varName) {
-		throw new RuntimeException("Variable " + varName + " not found");
-	}
-
-	@Override
 	public ValueType lookup(String varName) {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}
@@ -32,12 +27,6 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	public ILMethod getMethod(String varName) {
-		return null;
-		//throw new RuntimeException("Method " + varName + " not found");
-	}
-
-	@Override
 	public List<Declaration> genDeclSeq(GenContext origCtx) {
 		return new LinkedList<Declaration>();
 	}
@@ -45,6 +34,11 @@ public class EmptyGenContext extends GenContext {
 	@Override
 	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
 		return new LinkedList<DeclType>();
+	}
+
+	@Override
+	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
+		throw new RuntimeException("Variable " + varName + " not found");
 	}
 
 }
