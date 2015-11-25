@@ -131,23 +131,17 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
          */
 
         // Extend the generalContext to include the parameters passed into the function.
-        GenContext extendedCtx = ctx;
-        for(NameBinding binding : this.bindings) {
-            extendedCtx = extendedCtx.extend(
-                binding.getName(),
-                new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
-                binding.getType().getILType(extendedCtx)
-            );
-        }
+        ctx = extendCtxWithParams(ctx, this.bindings);
 
-        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, extendedCtx);
+        // Convert the bindings into formals
+        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, ctx);
 
         // Generate the IL for the body, and get it's return type.
-        Expression il = this.body.generateIL(extendedCtx);
-        ValueType bodyReturnType = il.typeCheck(extendedCtx);
+        Expression il = this.body.generateIL(ctx);
+        ValueType bodyReturnType = il.typeCheck(ctx);
 
         // Create a new list of function declaration, which is a singleton, containing only "apply"
-        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, this.body.generateIL(extendedCtx));
+        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, il);
         List<Declaration> declList = new LinkedList<>();
         declList.add(applyDef);
 
@@ -156,9 +150,9 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         List<DeclType> declTypes = new LinkedList<>();
         declTypes.add(ddecl);
 
-        ValueType newType = new StructuralType("lambda", declTypes);
+        ValueType newType = new StructuralType("@lambda-structual-decl", declTypes);
 
-        return new New(declList, "lambda", newType);
+        return new New(declList, "@lambda-decl", newType);
 }
 
     private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx) {
@@ -173,5 +167,16 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         }
 
         return result;
+    }
+
+    private static GenContext extendCtxWithParams(GenContext ctx, List<NameBinding> bindings) {
+        for(NameBinding binding : bindings) {
+            ctx = ctx.extend(
+                binding.getName(),
+                new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
+                binding.getType().getILType(ctx)
+            );
+        }
+        return ctx;
     }
 }
