@@ -322,10 +322,11 @@ public class CopperTSL implements ExtParser {
 		toGenDefs.entrySet().stream().forEach(entry->classDecls[cdIdx.getAndIncrement()]
 				= new DefDeclaration(entry.getKey(), new Arrow(new Unit(), new Unit()), new LinkedList<>(), entry.getValue(), false));
 
+		New decls = new New(new DeclSequence(), unkLoc);
 		classDecls[cdIdx.getAndIncrement()] = new DefDeclaration("create", new Arrow(new Unit(),
-				new UnresolvedType(wyvClassName)),
+				new UnresolvedType(wyvClassName, unkLoc)),
 				Arrays.asList(),
-				new New(new DeclSequence(), unkLoc), true);
+				decls, true);
 
 
 		ArrayList<TypedAST> pairedObjDecls = new ArrayList<>();

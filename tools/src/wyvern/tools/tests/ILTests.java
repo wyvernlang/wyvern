@@ -35,6 +35,7 @@ import wyvern.target.oir.EmitLLVMVisitor;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.interop.JObject;
@@ -229,6 +230,26 @@ public class ILTests {
 		
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
+	}
+	
+	@Test()
+	public void testBogusType() throws ParseException {
+		try {
+			String input = "val obj = new\n"
+				     	 + "    def id(x:Foo) : Foo = x\n"
+						 + "val i : Int = 5\n\n"
+						 + "i\n"
+				     	 ;
+			TypedAST ast = TestUtil.getNewAST(input);
+			// bogus "system" entry, but makes the text work for now
+			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+			Expression program = ((Sequence) ast).generateIL(genCtx);
+			TypeContext ctx = TypeContext.empty();
+			ValueType t = program.typeCheck(ctx);
+			Assert.fail("typechecking should have failed");
+		} catch (ToolError e) {
+			Assert.assertEquals(2, e.getLine());
+		}
 	}
 	
 	@Test

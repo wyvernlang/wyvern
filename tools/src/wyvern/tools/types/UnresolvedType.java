@@ -16,7 +16,8 @@ import java.util.Optional;
 public class UnresolvedType extends AbstractTypeImpl implements Type {
 	private String typeName;
 
-	public UnresolvedType(String typeName) {
+	public UnresolvedType(String typeName, FileLocation loc) {
+		super(loc);
 		this.typeName = typeName;
 	}
 	
@@ -106,6 +107,9 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 		}
 		*/
 		String objName = ctx.getType(typeName);
+		if (objName == null)
+			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, typeName);
+			//throw new RuntimeException("type " + typeName + "is not defined");
 		return new NominalType(objName, typeName);
 	}
 }

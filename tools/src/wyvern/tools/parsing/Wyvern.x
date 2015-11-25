@@ -807,7 +807,7 @@ import java.net.URI;
    		|	 type:t1 mult_t type:t2 {: RESULT = new Tuple((Type)t1,(Type)t2); :}
    		|    type:t dot_t identifier_t:el {: RESULT = new TypeInv((Type)t, (String)el); :}
    		|	 openParen_t type:ta closeParen_t {: RESULT = ta; :}
-   		|	 identifier_t:id {: RESULT = new UnresolvedType((String)id); :}
+   		|	 identifier_t:id {: RESULT = new UnresolvedType((String)id, null); :}
    		;
 
    	typeasc ::= colon_t type:ty {: RESULT = ty; :};

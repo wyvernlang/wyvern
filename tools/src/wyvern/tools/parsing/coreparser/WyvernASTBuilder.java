@@ -119,8 +119,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public Type nominalType(String name) {
-		return new UnresolvedType(name);
+	public Type nominalType(String name, FileLocation loc) {
+		return new UnresolvedType(name, loc);
 	}
 	
 	@Override

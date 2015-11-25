@@ -2,6 +2,7 @@ package wyvern.tools.types;
 
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWritable;
@@ -10,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
-public interface Type extends TreeWritable {
+public interface Type extends TreeWritable, HasLocation {
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes);
 	public boolean subtype(Type other);
 

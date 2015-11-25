@@ -15,6 +15,7 @@ import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
 
 public class Bool extends AbstractTypeImpl implements OperatableType {
+	public Bool(FileLocation location) { super(location); }
 	public Bool() { }
 
 	private static final Set<String> legalOperators = new HashSet<String>(Arrays.asList(new String[] {
