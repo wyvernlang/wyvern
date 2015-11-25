@@ -22,11 +22,11 @@ type IntIntFn
 type HigherIntFn
 	def apply(x:system.Int,y:IntIntFn):system.Int
 
-val getFive:UnitIntFn = () => 5
+val getFive:UnitIntFn = #() => 5
 
-val id:IntIntFn = (x:Int) => x
+val id:IntIntFn = #(x:system.Int) => x
 
-val higherOrder:HigherIntFn = (x:Int,y:IntIntFn) => y.apply(x)
+val higherOrder:HigherIntFn = #(x:system.Int,y:IntIntFn) => y.apply(x)
 
 val x = getFive.apply()
 

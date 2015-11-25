@@ -410,7 +410,19 @@ AST Expression(ExpFlags flags) :
   }
 |
   <FN> formal = Formal() <ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp); }
+|
+    <POUND> exp = LambdaFn(flags) { return exp; }
 }
+
+AST LambdaFn(ExpFlags flags) :
+{ List formals; AST body; }
+{
+    formals = Formals() <ARROW> body = Expression(flags) {
+        return build.fn(formals, body);
+    }
+}
+
+
 
 List<Type> TypeList() :
 { List<Type> types = new LinkedList<Type>(); Type type; }

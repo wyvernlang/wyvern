@@ -94,15 +94,16 @@ public class ILTests {
         String input =
                   "val x = 5\n"
         		+ "x\n";
-		TypedAST ast = TestUtil.getNewAST(input);
-		Expression program = ast.generateIL(GenContext.empty());
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
+        TypedAST ast = TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(GenContext.empty());
+        TypeContext ctx = TypeContext.empty();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
     }
+
 	@Test
 	public void testFieldRead() throws ParseException {
 		String input = "val obj = new\n"
@@ -386,22 +387,51 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testLambda() throws ParseException {
 		
-		String source = TestUtil.readFile(PATH + "lambdatest.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
+        String source = TestUtil.readFile(PATH + "lambdatest.wyv");
+        TypedAST ast = TestUtil.getNewAST(source);
 
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx);
+        TypeContext ctx = TypeContext.empty();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
 	}
-	
+
+    @Test
+    public void testSimpleLambda() throws ParseException {
+
+        String source = "type UnitIntFn \n"
+            + "     def apply():system.Int \n"
+            + "val getFive:UnitIntFn = #() => 5\n"
+            + "getFive.apply()";
+
+        TypedAST ast = TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx);
+        TypeContext ctx = TypeContext.empty();
+
+
+        ValueType t = null;
+        try {
+            t = program.typeCheck(ctx);
+        } catch(NullPointerException e) {
+            e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
+        }
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {
 		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest");

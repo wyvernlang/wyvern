@@ -1,11 +1,15 @@
 package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.evaluation.Closure;
@@ -23,6 +27,7 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,8 +116,67 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 
 	@Override
+    /**
+     * @param GenContext The type context of the lambda declaration
+     * @return The Intermediate Representation of the inline function decl
+     */
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        /*
+         * First, map the NameBindings to Formal Arguments, dropping the parameters into the IR.
+         * Next, find the type of the body. The type of the body is the return type of the function.
+         * This allows the creation of the DefDeclaration
+         *
+         * Next, create a new StructuralType, duplicating the DefDecl as a DeclType.
+         * Use the StructualType and the DefDeclaration to make a New. Return.
+         */
+
+        // Extend the generalContext to include the parameters passed into the function.
+        ctx = extendCtxWithParams(ctx, this.bindings);
+
+        // Convert the bindings into formals
+        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, ctx);
+
+        // Generate the IL for the body, and get it's return type.
+        Expression il = this.body.generateIL(ctx);
+        ValueType bodyReturnType = il.typeCheck(ctx);
+
+        // Create a new list of function declaration, which is a singleton, containing only "apply"
+        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, il);
+        List<Declaration> declList = new LinkedList<>();
+        declList.add(applyDef);
+
+        // Store a redundency of the function declaration
+        DeclType ddecl = new DefDeclType("apply", bodyReturnType, intermediateArgs);
+        List<DeclType> declTypes = new LinkedList<>();
+        declTypes.add(ddecl);
+
+        ValueType newType = new StructuralType("@lambda-structual-decl", declTypes);
+
+        return new New(declList, "@lambda-decl", newType);
+}
+
+    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx) {
+
+        List<FormalArg> result = new LinkedList<FormalArg>();
+
+        for(NameBinding binding : bindings) {
+            result.add( new FormalArg(
+                binding.getName(),
+                binding.getType().getILType(ctx)
+            ));
+        }
+
+        return result;
+    }
+
+    private static GenContext extendCtxWithParams(GenContext ctx, List<NameBinding> bindings) {
+        for(NameBinding binding : bindings) {
+            ctx = ctx.extend(
+                binding.getName(),
+                new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
+                binding.getType().getILType(ctx)
+            );
+        }
+        return ctx;
+    }
 }
