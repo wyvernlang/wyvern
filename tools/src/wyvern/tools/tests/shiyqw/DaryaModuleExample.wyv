@@ -1,0 +1,14 @@
+// This is work in progress and doesn't have the full power including imports.
+
+class File
+
+resource module IO : sigIO
+	 def getCurrentFile() : File =
+	     new File
+
+resource module Log : sigLog
+	 require IO as io
+
+resource module Main
+	 instantiate IO() as io
+	 instantiate Log(io) as log
