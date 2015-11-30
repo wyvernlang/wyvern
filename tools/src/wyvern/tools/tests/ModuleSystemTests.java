@@ -33,10 +33,10 @@ import wyvern.tools.types.extensions.Int;
 
 @Category(RegressionTests.class)
 public class ModuleSystemTests {
-	
+
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
 	private static final String PATH = BASE_PATH + "shiyqw/";
-	
+
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();
 		WyvernResolver.getInstance().addPath(PATH);
@@ -50,7 +50,7 @@ public class ModuleSystemTests {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
-    
+
 	@Test
 	public void testImport() throws ParseException {
 		String program = TestUtil.readFile(PATH + "import.wyv");
@@ -58,7 +58,7 @@ public class ModuleSystemTests {
 		WyvernResolver.getInstance().setNewParser(true);
 		typeCheckfailWith(ast, ErrorMessage.MODULE_TYPE_ERROR);
 	}
-	
+
 	@Test
 	public void testRequire() throws ParseException {
 		String program = TestUtil.readFile(PATH + "require.wyv");
@@ -67,7 +67,7 @@ public class ModuleSystemTests {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
-	
+
 	@Test
 	public void testRsType() throws ParseException {
 		String program = TestUtil.readFile(PATH + "rsType.wyv");
@@ -76,7 +76,7 @@ public class ModuleSystemTests {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
-	
+
 	@Test
 	public void testWyt() throws ParseException {
 		String program = TestUtil.readFile(PATH + "Log.wyt");
@@ -85,17 +85,28 @@ public class ModuleSystemTests {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
+
 	@Test
 	public void testInst() throws ParseException {
 		String program = TestUtil.readFile(PATH + "inst.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);
 	}
+
+	@Test
+	public void testDaryaModuleExample() throws ParseException {
+		String program = TestUtil.readFile(PATH + "DaryaModuleExample.wyv");
+		TypedAST ast = TestUtil.getNewAST(program);
+		WyvernResolver.getInstance().setNewParser(true);
+		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
+		ast.evaluate(Globals.getStandardEvalEnv());
+	}
+
 	/**
 	 * Attempts to typecheck the given AST and catch the given ErrorMessage.
 	 * This error being thrown indicates the test passed.
-	 * 
+	 *
 	 * If the error isn't thrown, the test fails.
-	 * 
+	 *
 	 * @param ast
 	 * @param errorMessage
 	 */
@@ -106,10 +117,10 @@ public class ModuleSystemTests {
 			// toolError.printStackTrace(); // FIXME:
 			System.out.println(errorMessage);
 			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
-			
+
 			return;
 		}
-		
+
 		Assert.fail("Should have failed with error: " + errorMessage);
 	}
 }
