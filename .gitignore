@@ -32,7 +32,7 @@ tools/src/wyvern/tools/parsing/coreparser/TokenMgrError.java
 tools/src/wyvern/tools/parsing/coreparser/WyvernParser.java
 tools/src/wyvern/tools/parsing/coreparser/WyvernParserConstants.java
 tools/out
-tools/src/wyvern/target/llvm/autom4te.cache
+tools/src/wyvern/target/llvm/autom4te.cache/
 tools/src/wyvern/target/llvm/.libs/
 tools/src/wyvern/target/llvm/Makefile
 tools/src/wyvern/target/llvm/config.log
