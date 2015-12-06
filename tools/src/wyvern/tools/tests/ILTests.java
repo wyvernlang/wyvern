@@ -1,24 +1,19 @@
 package wyvern.tools.tests;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
-import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.target.corewyvernIL.expression.New;
-import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -28,41 +23,17 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.oir.EmitLLVMNative;
-import wyvern.target.oir.EmitLLVMVisitor;
-import wyvern.target.oir.OIRAST;
-import wyvern.target.oir.OIREnvironment;
-import wyvern.target.oir.OIRProgram;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
-import wyvern.tools.interop.JObject;
-import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.TypeVarDecl;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.transformers.ExpressionWriter;
-import wyvern.tools.typedAST.transformers.GenerationEnvironment;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.extensions.Int;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Optional.empty;
-import static wyvern.stdlib.Globals.getStandardEnv;
 
 @Category(RegressionTests.class)
 public class ILTests {
@@ -101,6 +72,22 @@ public class ILTests {
         Assert.assertEquals(Util.intType(), t);
         Value v = program.interpret(EvalContext.empty());
         IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+    }
+
+    @Test
+	@Category(CurrentlyBroken.class)
+    public void testLetValWithString() throws ParseException {
+        String input =
+                  "val x = \"five\"\n"
+        		+ "x\n";
+        TypedAST ast = TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(GenContext.empty());
+        TypeContext ctx = TypeContext.empty();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.stringType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        StringLiteral five = new StringLiteral("five");
 		Assert.assertEquals(five, v);
     }
 
@@ -207,6 +194,25 @@ public class ILTests {
 		Assert.assertEquals(Util.intType(), t);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testIdentityCallString() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    def id(x:system.String) : system.String = x\n"
+				     + "obj.id(\"five\")\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.stringType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        StringLiteral five = new StringLiteral("five");
 		Assert.assertEquals(five, v);
 	}
 
@@ -507,10 +513,42 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testJavaImport2() throws ParseException {
+		String input = "resource module main\n\n"
+//					 + "require ffi/java\n\n"
+//					 + "import testcode/Adder\n\n"
+//					 + "type Adder\n"
+//					 + "    def addOne(i:system.Int):system.Int\n\n"
+					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
+					 + "val x : system.String = importTest.addOneString(\"4\")\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		decls.add(decl);
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.stringType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	StringLiteral five = new StringLiteral("5");
+		Assert.assertEquals(five, v);
+	}
+	
 	public static ImportTestClass importTest = new ImportTestClass();
 	public static class ImportTestClass {
 		public int addOne(int i) {
 			return i+1;
+		}
+		public String addOneString(String s) {
+			return Integer.toString(Integer.parseInt(s)+1);
 		}
 	}
 }

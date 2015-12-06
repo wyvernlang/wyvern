@@ -101,7 +101,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return new StringLiteral(value);
 	}
 }
