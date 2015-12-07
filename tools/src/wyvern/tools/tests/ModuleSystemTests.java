@@ -35,7 +35,7 @@ import wyvern.tools.types.extensions.Int;
 public class ModuleSystemTests {
 
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "shiyqw/";
+	private static final String PATH = BASE_PATH + "modules/";
 
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();
@@ -94,7 +94,7 @@ public class ModuleSystemTests {
 
 	@Test
 	public void testDaryaModuleExample() throws ParseException {
-		String program = TestUtil.readFile(PATH + "DaryaModuleExample.wyv");
+		String program = TestUtil.readFile(PATH + "paper-module-example/Main.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);
 		WyvernResolver.getInstance().setNewParser(true);
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
