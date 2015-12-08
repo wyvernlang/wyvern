@@ -1,0 +1,9 @@
+resource module FileIO
+
+import java:wyvern.tools.tests.ECOOP16Tests.nativeFileIO
+
+def read():system.Int
+	nativeFileIO.read()
+	
+def write(x:system.Int):system.Int
+	nativeFileIO.write(x)

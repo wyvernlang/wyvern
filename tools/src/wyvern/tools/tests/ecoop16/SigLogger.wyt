@@ -1,0 +1,2 @@
+resource type SigLogger
+	def log(x : Int) : Int

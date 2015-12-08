@@ -1,0 +1,6 @@
+resource module Logger
+
+require SigFileIO as io
+
+def log(entry : Int) : Int
+	io.write(entry)

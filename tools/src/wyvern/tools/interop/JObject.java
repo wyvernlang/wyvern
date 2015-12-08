@@ -13,9 +13,8 @@ public class JObject implements FObject {
 
 	@Override
 	public Object invokeMethod(String methodName, List<Object> args) throws ReflectiveOperationException {
-		Class<?> parameterTypes[] = null;
+		Class<?> parameterTypes[] = new Class<?>[args.size()];
 		if (args.size() > 0) {
-			parameterTypes = new Class<?>[args.size()];
 			int i = 0;
 			for (Object arg : args) {
 				parameterTypes[i++] = arg.getClass();
