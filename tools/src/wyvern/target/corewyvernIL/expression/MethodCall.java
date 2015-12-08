@@ -82,7 +82,8 @@ public class MethodCall extends Expression {
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
 			Type argType = ddt.getFormalArgs().get(i).getType().adapt(v);
-			if (!e.typeCheck(ctx).isSubtypeOf(argType, ctx))
+			ValueType actualType = e.typeCheck(ctx); 
+			if (!actualType.isSubtypeOf(argType, ctx))
 				throw new RuntimeException("argument type doesn't match");
 		}
 		// compute result type

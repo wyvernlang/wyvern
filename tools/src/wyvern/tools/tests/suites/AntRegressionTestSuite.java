@@ -11,7 +11,7 @@ import wyvern.tools.tests.FileTestRunner;
 import wyvern.tools.tests.TypeCheckingTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
-import wyvern.tools.tests.ECOOP16Tests;
+import wyvern.tools.tests.ECOOP16;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.CodegenTests;
@@ -54,7 +54,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				LexingTests.class,		// tests the new lexer
 				CoreParserTests.class,	// tests the new parser
 				ILTests.class,			// tests the new IL
-				ECOOP16Tests.class,		// tests the new IL
+				ECOOP16.class,		// tests the new IL
 				})
 public class AntRegressionTestSuite {
 

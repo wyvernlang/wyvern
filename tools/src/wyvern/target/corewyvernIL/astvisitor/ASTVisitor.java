@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
@@ -31,6 +32,7 @@ public abstract class ASTVisitor<T> {
 	public abstract T visit(Environment env, OIREnvironment oirenv, Match match);
 	public abstract T visit(Environment env, OIREnvironment oirenv, FieldGet fieldGet);
 	public abstract T visit(Environment env, OIREnvironment oirenv, Let let);
+	public abstract T visit(Environment env, OIREnvironment oirenv, Bind bind);
 	public abstract T visit(Environment env, OIREnvironment oirenv, FieldSet fieldSet);
 	public abstract T visit(Environment env, OIREnvironment oirenv, Variable variable);
 	public abstract T visit(Environment env, OIREnvironment oirenv, Cast cast);

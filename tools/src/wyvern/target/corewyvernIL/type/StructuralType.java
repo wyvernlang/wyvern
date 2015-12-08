@@ -83,6 +83,10 @@ public class StructuralType extends ValueType {
 			}
 		}
 		
+		// a resource type is not a subtype of a non-resource type
+		if (resourceFlag && !st.resourceFlag)
+			return false;
+		
 		return true;
 	}
 
@@ -102,12 +106,12 @@ public class StructuralType extends ValueType {
 		for (DeclType dt : declTypes) {
 			newDTs.add(dt.adapt(v));
 		}
-		return new StructuralType(selfName, newDTs);
+		return new StructuralType(selfName, newDTs, resourceFlag);
 	}
 	
 	@Override
 	public String toString() {
-		String ret = "[" + selfName + " => ";
+		String ret = (resourceFlag?"[resource ":"[") + selfName + " => ";
 		for(DeclType declt : declTypes) {
 			ret += declt.toString();
 			ret += ";";

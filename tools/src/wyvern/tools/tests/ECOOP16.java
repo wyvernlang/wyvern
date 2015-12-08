@@ -36,7 +36,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
-public class ECOOP16Tests {
+public class ECOOP16 {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
 	private static final String PATH = BASE_PATH + "ecoop16/";
@@ -47,7 +47,7 @@ public class ECOOP16Tests {
     }
 
 	@Test
-	public void testExample5() throws ParseException {
+	public void testFigure5Corrected() throws ParseException {
 		
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
@@ -77,7 +77,7 @@ public class ECOOP16Tests {
 	}
 	
 	@Test(expected=RuntimeException.class)
-	public void testExample5Fig5() throws ParseException {
+	public void testFigure5() throws ParseException {
 		
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt",
 							"Logger.wyv", "WavyUnderlineV3Fig5.wyv",
@@ -109,7 +109,7 @@ public class ECOOP16Tests {
 	}
 	
 	@Test(expected=RuntimeException.class)
-	public void testExample5Fig3() throws ParseException {
+	public void testFigure3() throws ParseException {
 		
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt",
 							"Logger.wyv", "WavyUnderlineV1.wyv",
@@ -141,8 +141,7 @@ public class ECOOP16Tests {
 	}
 	
 	@Test
-	//@Category(CurrentlyBroken.class)
-	public void testExample2() throws ParseException {
+	public void testFigure2() throws ParseException {
 		
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
@@ -172,7 +171,7 @@ public class ECOOP16Tests {
 	}
 	
 	@Test(expected=RuntimeException.class)
-	public void testFig4() throws ParseException {
+	public void testFigure4() throws ParseException {
 		
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "WavyUnderlineV2.wyv", "fig4.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
@@ -197,34 +196,6 @@ public class ECOOP16Tests {
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
-	}
-	
-	@Test
-	public void testJavaImport1() throws ParseException {
-		String input = "resource module main\n\n"
-//					 + "require ffi/java\n\n"
-//					 + "import testcode/Adder\n\n"
-//					 + "type Adder\n"
-//					 + "    def addOne(i:system.Int):system.Int\n\n"
-					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
-					 + "val x : Int = importTest.addOne(4)\n"
-				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}

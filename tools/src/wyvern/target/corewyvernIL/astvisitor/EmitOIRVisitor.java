@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
@@ -519,5 +520,10 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		oirdelegate = new OIRDelegate (oirtype, delegateDecl.getFieldName());
 		
 		return oirdelegate;
+	}
+
+	@Override
+	public OIRAST visit(Environment env, OIREnvironment oirenv, Bind bind) {
+		throw new RuntimeException("not implemented");
 	}
 }
