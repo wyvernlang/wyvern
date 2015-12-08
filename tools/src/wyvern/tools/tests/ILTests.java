@@ -39,7 +39,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public class ILTests {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "shiyqw/module/";
+	private static final String PATH = BASE_PATH + "modules/module/";
 	
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();

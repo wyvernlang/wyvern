@@ -1,0 +1,7 @@
+resource module Main
+
+import Lists
+
+val aList : Lists.List = Lists.create()
+
+val x : Int = aList.contents

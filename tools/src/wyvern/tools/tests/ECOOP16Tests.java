@@ -77,6 +77,37 @@ public class ECOOP16Tests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
+	public void testExample2() throws ParseException {
+		
+		String[] fileList = {"Lists.wyv", "example2.wyv", };
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test
 	public void testJavaImport1() throws ParseException {
 		String input = "resource module main\n\n"
 //					 + "require ffi/java\n\n"
