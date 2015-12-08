@@ -29,6 +29,10 @@ public class New extends Expression {
 		super(type);
 		this.decls = decls;
 		this.selfName = selfName;
+		for (Declaration d : decls) {
+			if (d == null)
+				throw new NullPointerException();
+		}
 	}
 
 	public List<Declaration> getDecls() {

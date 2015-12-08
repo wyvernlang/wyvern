@@ -1,7 +1,9 @@
-resource module Main
+resource module main
 
 import Lists
 
-val aList : Lists.List = Lists.create()
+val listFactory = Lists.listFactory
+
+val aList : listFactory.List = listFactory.create()
 
 val x : Int = aList.contents

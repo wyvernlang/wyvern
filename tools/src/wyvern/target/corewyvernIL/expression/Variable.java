@@ -39,7 +39,7 @@ public class Variable extends Expression implements Path {
 
 	@Override
 	public String toString() {
-		return "Variable [name=" + name + "]";
+		return name;
 	}
 
 	private String name;

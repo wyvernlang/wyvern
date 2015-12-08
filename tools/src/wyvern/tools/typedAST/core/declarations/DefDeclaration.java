@@ -251,14 +251,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		List<FormalArg> args = new LinkedList<FormalArg>();
 		GenContext methodContext = thisContext;
 		for (NameBinding b : argNames) {
-			ValueType argType = b.getType().getILType(ctx);
+			ValueType argType = b.getType().getILType(thisContext);
 			args.add(new FormalArg(b.getName(), argType));
 			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
 		}
-		this.returnILType = this.getResultILType(ctx);
+		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(ctx), body.generateIL(methodContext));
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext));
 	}
 
 

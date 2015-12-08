@@ -295,8 +295,8 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
-		return null;
+		StructuralType type = computeInternalILType(ctx);
+		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
 	}
 	
 	public boolean isResource() {

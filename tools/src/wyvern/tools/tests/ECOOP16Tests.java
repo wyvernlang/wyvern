@@ -77,7 +77,7 @@ public class ECOOP16Tests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
+	//@Category(CurrentlyBroken.class)
 	public void testExample2() throws ParseException {
 		
 		String[] fileList = {"Lists.wyv", "example2.wyv", };

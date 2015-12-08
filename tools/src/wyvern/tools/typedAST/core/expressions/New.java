@@ -274,10 +274,12 @@ public class New extends CachingTypedAST implements CoreAST {
 	public Expression generateIL(GenContext ctx) {
 		// TODO see if the user specified a different self name
 		String selfName = "this";
+		// fake an appropriate context
+		GenContext tempThisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), null);
 		// compute the structural type for this
 		List<DeclType> declTypes = new LinkedList<DeclType>();
 		for (TypedAST d : seq) {
-			DeclType t = ((Declaration) d).genILType(ctx);
+			DeclType t = ((Declaration) d).genILType(tempThisContext);
 			declTypes.add(t);
 		}
 		ValueType type = new StructuralType(selfName, declTypes);
@@ -287,6 +289,8 @@ public class New extends CachingTypedAST implements CoreAST {
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		for (TypedAST d : seq) {
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
+			if (decl == null)
+				throw new NullPointerException();
 			decls.add(decl);
 		}
 		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
