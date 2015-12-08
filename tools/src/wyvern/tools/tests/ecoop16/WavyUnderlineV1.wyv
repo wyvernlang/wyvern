@@ -1,0 +1,6 @@
+resource module WavyUnderlineV1
+
+require SigFileIO as io
+
+def underlineIt() : system.Int
+	io.write(10)

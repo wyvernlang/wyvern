@@ -1,6 +1,6 @@
 resource module main // must be called main, apparently
 
-instantiate FileIO() as io
-instantiate Example5(io) as ex5
+instantiate FileIO() as fileIO
+instantiate Example5(fileIO) as ex5
 
 val x = ex5.x

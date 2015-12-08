@@ -1,0 +1,6 @@
+resource module main
+
+instantiate UserInfo() as uInfo
+instantiate WavyUnderlineV2(uInfo) as wavyUnderliner
+
+val x : Int = wavyUnderliner.leakUserInfo()

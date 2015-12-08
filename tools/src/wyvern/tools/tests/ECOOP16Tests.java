@@ -76,11 +76,105 @@ public class ECOOP16Tests {
 		Assert.assertEquals(five, v);
 	}
 	
+	@Test(expected=RuntimeException.class)
+	public void testExample5Fig5() throws ParseException {
+		
+		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt",
+							"Logger.wyv", "WavyUnderlineV3Fig5.wyv",
+							"example5.wyv", "example5driver.wyv", };
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void testExample5Fig3() throws ParseException {
+		
+		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt",
+							"Logger.wyv", "WavyUnderlineV1.wyv",
+							"example5Fig3.wyv", "example5driver.wyv", };
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
 	@Test
 	//@Category(CurrentlyBroken.class)
 	public void testExample2() throws ParseException {
 		
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void testFig4() throws ParseException {
+		
+		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "WavyUnderlineV2.wyv", "fig4.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);

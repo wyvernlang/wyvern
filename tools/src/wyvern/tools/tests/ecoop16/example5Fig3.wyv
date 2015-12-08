@@ -1,0 +1,7 @@
+resource module Example5
+
+require SigFileIO as fileIO
+instantiate Logger(fileIO) as logger
+instantiate WavyUnderlineV1() as wavyUnderliner
+
+val x : system.Int = wavyUnderliner.underlineIt()
