@@ -1,9 +1,6 @@
 resource module main
 
-import Lists
+instantiate UserInfo() as uInfo
+instantiate DocumentLock(uInfo) as dockLock
 
-val listFactory = Lists.listFactory
-
-val aList : listFactory.List = listFactory.create()
-
-val x : Int = aList.contents
+val x : Int = dockLock.sign()

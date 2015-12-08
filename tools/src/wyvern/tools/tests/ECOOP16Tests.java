@@ -80,7 +80,7 @@ public class ECOOP16Tests {
 	//@Category(CurrentlyBroken.class)
 	public void testExample2() throws ParseException {
 		
-		String[] fileList = {"Lists.wyv", "example2.wyv", };
+		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);

@@ -24,6 +24,7 @@ import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class GenUtil {
@@ -82,6 +83,8 @@ public class GenUtil {
 				GenContext newCtx = ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name), type);
 				Expression dfn = vd.getDefinition().generateIL(ctx);
 				return new Let(name, dfn, doGenModuleIL(newCtx, origCtx, ai, isModule));
+			} else if (ast instanceof VarDeclaration) {
+				throw new RuntimeException("top-level vars not implemented (are they implementable with this design?)");
 			} else if (ast instanceof DeclSequence || ast instanceof Sequence) {
 				String newName = GenContext.generateName();
 				

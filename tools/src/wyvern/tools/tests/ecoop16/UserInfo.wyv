@@ -1,0 +1,18 @@
+resource module UserInfo
+
+import Lists
+
+val listFactory = Lists.listFactory
+
+val name : Int = 5
+
+def setName(uName : Int) : Int
+	0
+
+def init(uName : Int) : Int
+	setName(uName)
+	val actionHistory = listFactory.create()
+	0
+	
+def getName() : Int
+	name
