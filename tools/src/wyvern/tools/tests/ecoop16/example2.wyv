@@ -1,6 +1,6 @@
 resource module main
 
 instantiate UserInfo() as uInfo
-instantiate DocumentLock(uInfo) as dockLock
+instantiate DocumentLock(uInfo) as docLock
 
-val x : Int = dockLock.sign()
+val x : Int = docLock.sign()
