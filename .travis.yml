@@ -3,3 +3,7 @@ jdk: oraclejdk8
 script:
   - cd tools
   - ant test
+notifications:
+  email:
+    recipients:
+      - jonathan.aldrich@cs.cmu.edu
