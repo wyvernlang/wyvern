@@ -15,6 +15,9 @@ For information about how to build and run the Wyvern tools, and about the Wyver
 
 Research papers on Wyvern and other material is available at the Wyvern web page, http://www.cs.cmu.edu/~aldrich/wyvern/
 
+Contributing
+------------
+If you'd like to contribute to Wyvern, read the Wyvern tool architecture document above to get the system to build on your machine, then find an issue marked "Starter" and comment that you are working on it--then submit a pull request when you are done.  Please send questions to jonathan.aldrich@cs.cmu.edu
 
 License
 ---------------
