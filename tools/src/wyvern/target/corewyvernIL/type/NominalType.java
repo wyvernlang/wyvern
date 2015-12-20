@@ -1,8 +1,10 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
@@ -25,6 +27,12 @@ public class NominalType extends ValueType{
 		} else {
 			return super.getStructuralType(ctx);
 		}
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		path.doPrettyPrint(dest, indent);
+		dest.append('.').append(typeMember);
 	}
 
 	@Override

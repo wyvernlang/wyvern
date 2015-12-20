@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.decl;
 
+import java.io.IOException;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.FormalArg;
@@ -30,6 +31,25 @@ public class DefDeclaration extends NamedDeclaration {
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = body;
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("def ").append(getName()).append('(');
+		boolean first = true;
+		for (FormalArg arg: formalArgs) {
+			if (first)
+				first = false;
+			else
+				dest.append(", ");
+			arg.doPrettyPrint(dest, indent);
+		}
+		String newIndent = indent+"    ";
+		dest.append(") : ");
+		type.doPrettyPrint(dest, newIndent);
+		dest.append('\n').append(newIndent);
+		body.doPrettyPrint(dest,newIndent);
+		dest.append('\n');
 	}
 
 	@Override

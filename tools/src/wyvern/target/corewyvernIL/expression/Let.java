@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -58,6 +60,16 @@ public class Let extends Expression {
 		ValueType t = toReplace.typeCheck(ctx);
 		this.setExprType(inExpr.typeCheck(ctx.extend(varName, t)));
 		return getExprType();
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		String newIndent = indent + "    ";
+		dest.append("let\n").append(newIndent)
+		.append(varName).append(" = ");
+		toReplace.doPrettyPrint(dest,newIndent);
+		dest.append('\n').append(indent).append("in ");
+		inExpr.doPrettyPrint(dest,indent);
 	}
 
 	@Override

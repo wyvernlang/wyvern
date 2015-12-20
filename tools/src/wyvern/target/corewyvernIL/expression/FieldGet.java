@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -27,6 +29,12 @@ public class FieldGet extends Expression implements Path {
 		super();
 		this.objectExpr = objectExpr;
 		this.fieldName = fieldName;
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		objectExpr.doPrettyPrint(dest,indent);
+		dest.append('.').append(fieldName);
 	}
 
 	public Expression getObjectExpr() {

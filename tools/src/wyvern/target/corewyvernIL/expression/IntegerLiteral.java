@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -43,6 +45,11 @@ public class IntegerLiteral extends AbstractValue {
 		this.value = value;
 	}
 
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(Integer.toString(value));
+	}
+	
 	public int getValue() {
 		return value;
 	}

@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +51,17 @@ public class New extends Expression {
 	public void setSelfName(String selfName) {
 		this.selfName = selfName;
 	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append("new ").append(selfName).append(" =>\n");
+		boolean first = true;
+		
+		for (Declaration decl: decls) {
+			decl.doPrettyPrint(dest, indent + "    ");
+		}
+	}
+	
 
 	/** Returns a declaration of the proper name, or null if not found */
 	public Declaration findDecl(String name) {

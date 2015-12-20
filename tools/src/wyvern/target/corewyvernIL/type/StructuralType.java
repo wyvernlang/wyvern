@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +33,18 @@ public class StructuralType extends ValueType {
 				throw new NullPointerException("invariant: decl types should not be null");
 		this.declTypes = declTypes;
 		this.resourceFlag = resourceFlag;
+	}
+	
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		String newIndent = indent + "    ";
+		if (resourceFlag)
+			dest.append("resource ");
+		dest.append("type { ").append(selfName).append(" =>\n");
+		for (DeclType dt : declTypes) {
+			dt.doPrettyPrint(dest, newIndent);
+		}		
+		dest.append(indent).append("  }");
 	}
 
 	public String getSelfName() {

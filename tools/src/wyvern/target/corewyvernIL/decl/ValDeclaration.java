@@ -1,6 +1,10 @@
 package wyvern.target.corewyvernIL.decl;
 
 import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.FormalArg;
+
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -38,6 +42,15 @@ public class ValDeclaration extends DeclarationWithRHS {
 		this.type = type;
 	}
 	
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("val ").append(getName()).append(':');
+		type.doPrettyPrint(dest, indent);
+		dest.append(" = ");
+		getDefinition().doPrettyPrint(dest, indent);
+		dest.append('\n');
+	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

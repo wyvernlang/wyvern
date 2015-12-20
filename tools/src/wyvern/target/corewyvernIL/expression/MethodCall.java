@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,21 @@ public class MethodCall extends Expression {
 		// sanity check
 		if (args.size() > 0 && args.get(0) == null)
 			throw new NullPointerException("invariant: no null args");
+	}
+	
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		objectExpr.doPrettyPrint(dest,indent);
+		dest.append('.').append(methodName).append('(');
+		boolean first = true;
+		for (Expression arg : args) {
+			if (first)
+				first = false;
+			else
+				dest.append(", ");
+			arg.doPrettyPrint(dest, indent);
+		}
+		dest.append(')');
 	}
 	
 	@Override

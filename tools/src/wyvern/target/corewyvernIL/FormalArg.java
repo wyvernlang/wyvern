@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -16,6 +18,12 @@ public class FormalArg extends ASTNode implements EmitOIR {
 		this.type = type;
 	}
 	
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(name).append(':');
+		type.doPrettyPrint(dest, indent);
+	}
+
 	public String getName() {
 		return name;
 	}

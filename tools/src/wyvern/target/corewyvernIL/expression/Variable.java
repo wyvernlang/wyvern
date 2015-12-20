@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -44,6 +46,11 @@ public class Variable extends Expression implements Path {
 
 	private String name;
 
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(name);
+	}
+	
 	public Variable(String name) {
 		super();
 		this.name = name;

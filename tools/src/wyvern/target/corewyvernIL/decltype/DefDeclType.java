@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -86,6 +87,23 @@ public class DefDeclType extends DeclTypeWithResult {
 		} else if (!args.equals(other.args))
 			return false;
 		return true;
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("def ").append(getName()).append('(');
+		boolean first = true;
+		for (FormalArg arg: args) {
+			if (first)
+				first = false;
+			else
+				dest.append(", ");
+			arg.doPrettyPrint(dest, indent);
+		}
+		String newIndent = indent+"    ";
+		dest.append(") : ");
+		getRawResultType().doPrettyPrint(dest, newIndent);
+		dest.append('\n');
 	}
 
 	@Override

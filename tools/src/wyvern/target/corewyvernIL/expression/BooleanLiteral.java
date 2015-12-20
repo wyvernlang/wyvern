@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -24,6 +26,11 @@ public class BooleanLiteral extends AbstractValue {
         this.value = value;
     }
 
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(value?"true":"false");
+	}
+	
     @Override
     public ValueType typeCheck(TypeContext env) {
         // TODO Auto-generated method stub

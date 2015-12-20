@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -60,6 +62,13 @@ public class ValDeclType extends DeclTypeWithResult implements EmitOIR{
 		} else if (!getRawResultType().equals(other.getRawResultType()))
 			return false;
 		return true;
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("val ").append(getName()).append(" : ");
+		getRawResultType().doPrettyPrint(dest, indent);
+		dest.append('\n');
 	}
 
 	@Override
