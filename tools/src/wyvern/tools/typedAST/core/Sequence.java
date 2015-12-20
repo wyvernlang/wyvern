@@ -352,7 +352,7 @@ public class Sequence extends AbstractTypedAST implements CoreAST, Iterable<Type
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
 		
-		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ai, isModule);
+		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ctx, ai, isModule);
 		return decl;
 	}
 

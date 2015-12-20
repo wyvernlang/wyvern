@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -71,6 +73,13 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 		} else if (!getRawResultType().equals(other.getRawResultType()))
 			return false;
 		return true;
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("type ").append(getName()).append(" = ");
+		getSourceType().doPrettyPrint(dest, indent);
+		dest.append('\n');
 	}
 
 	@Override

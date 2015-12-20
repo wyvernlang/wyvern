@@ -122,7 +122,7 @@ public class StructuralType extends ValueType {
 		return new StructuralType(selfName, newDTs, resourceFlag);
 	}
 	
-	@Override
+	/*@Override
 	public String toString() {
 		String ret = (resourceFlag?"[resource ":"[") + selfName + " => ";
 		for(DeclType declt : declTypes) {
@@ -130,5 +130,5 @@ public class StructuralType extends ValueType {
 			ret += ";";
 		}
 		return ret + "]";
-	}
+	}*/
 }

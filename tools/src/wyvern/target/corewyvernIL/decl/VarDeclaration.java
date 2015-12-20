@@ -21,10 +21,10 @@ public class VarDeclaration extends DeclarationWithRHS {
 
 	private ValueType type;
 	
-	@Override
+	/*@Override
 	public String toString() {
 		return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
-	}
+	}*/
 
 	public VarDeclaration(String name, ValueType type, Expression value) {
 		super(name, value);

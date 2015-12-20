@@ -52,10 +52,10 @@ public class DefDeclaration extends NamedDeclaration {
 		dest.append('\n');
 	}
 
-	@Override
+	/*@Override
 	public String toString() {
 		return "DefDeclaration[" + getName() + "(...) : " + type + " = " + body + "]";
-	}
+	}*/
 	
 	public List<FormalArg> getFormalArgs() {
 		return formalArgs;

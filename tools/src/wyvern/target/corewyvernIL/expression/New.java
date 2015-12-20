@@ -18,10 +18,10 @@ import wyvern.target.oir.OIREnvironment;
 
 public class New extends Expression {
 	
-	@Override
+	/*@Override
 	public String toString() {
 		return "New [" + selfName + " : " + this.getExprType() + " => " + decls + "]";
-	}
+	}*/
 
 	private List<Declaration> decls;
 	private String selfName;

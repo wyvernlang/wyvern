@@ -1,0 +1,8 @@
+// TODO: shouldn't need this
+module ListClient
+
+import Lists
+
+val list = Lists.create()
+
+val five = list.contents

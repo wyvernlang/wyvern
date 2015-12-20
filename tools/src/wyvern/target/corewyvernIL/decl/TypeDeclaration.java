@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.decl;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -45,7 +47,14 @@ public class TypeDeclaration extends NamedDeclaration {
 	}
 	
 	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("type ").append(getName()).append(" = ");
+		sourceType.doPrettyPrint(dest, indent);
+		dest.append('\n');
+	}
+
+	/*@Override
 	public String toString() {
 		return "type declaration " + super.getName() + " = " + sourceType.toString();
-	}
+	}*/
 }

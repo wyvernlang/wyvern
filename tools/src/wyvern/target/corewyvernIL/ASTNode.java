@@ -8,10 +8,18 @@ public abstract class ASTNode {
 		doPrettyPrint(dest, "");
 		return dest.toString();
 	}
+	public String toString() {
+		try {
+			return prettyPrint();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "ERROR_PRINTING";
+		}
+	}
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		/*dest.append("NOT_IMPLEMENTED(")
+		dest.append("NOT_IMPLEMENTED(")
 			.append(this.getClass().getName())
-			.append(')');*/
-		throw new RuntimeException("not implemented");
+			.append(')');
+		//throw new RuntimeException("not implemented");
 	}
 }

@@ -6,6 +6,8 @@ import static wyvern.stdlib.Globals.getStandardEnv;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -15,6 +17,17 @@ import org.junit.experimental.categories.Category;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -22,8 +35,10 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.TokenManager;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernTokenManager;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -93,6 +108,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testDaryaModuleExample() throws ParseException {
 		String program = TestUtil.readFile(PATH + "paper-module-example/Main.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);
@@ -122,5 +138,36 @@ public class ModuleSystemTests {
 		}
 
 		Assert.fail("Should have failed with error: " + errorMessage);
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testADT() throws ParseException {
+		
+		String[] fileList = {"Lists.wyv", "ListClient.wyv"};
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+		Expression program = new FieldGet(mainProgram, "x"); 
+		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		wyvern.target.corewyvernIL.expression.Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
 	}
 }

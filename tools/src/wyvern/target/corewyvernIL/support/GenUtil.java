@@ -48,11 +48,13 @@ public class GenUtil {
 	 *  generate an IL declaration list for all mapping inside the context,
 	 *  create a new object to wrap the declaration list.</br>
 	 * 
-	 * @param ctx the context before generate
+	 * @param ctx the current context
+	 * @param addedCtx the context with elements we have added that need to be preserved in the final object
+	 * @param origCtx the context before starting module generation
 	 * @param ai the iterator of a Wyvern Module System declaration
 	 * @return the generated IL Expression
 	 */
-	public static Expression doGenModuleIL(GenContext ctx, GenContext origCtx, Iterator<? extends TypedAST> ai, boolean isModule) {
+	public static Expression doGenModuleIL(GenContext ctx, GenContext addedCtx, GenContext origCtx, Iterator<? extends TypedAST> ai, boolean isModule) {
 		if (ai.hasNext()) {
 			TypedAST ast = ai.next(); 
 			// TODO (BUG): the approach of wrapping at the end won't work for VarDeclarations!
@@ -73,7 +75,7 @@ public class GenUtil {
 				ValueType type = new StructuralType(newName, declts);
 				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
-				Expression e = doGenModuleIL(newCtx.extend(newName, new Variable(newName), type), origCtx, ai, isModule); // generate the rest part 
+				Expression e = doGenModuleIL(newCtx.extend(newName, new Variable(newName), type), ctx, origCtx, ai, isModule); // generate the rest part 
 				return new Let(newName, newExp, e);
 			} else if (ast instanceof ValDeclaration) {
 				/* same as doGenIL */
@@ -82,7 +84,7 @@ public class GenUtil {
 				String name = vd.getName();
 				GenContext newCtx = ctx.extend(name, new wyvern.target.corewyvernIL.expression.Variable(name), type);
 				Expression dfn = vd.getDefinition().generateIL(ctx);
-				return new Let(name, dfn, doGenModuleIL(newCtx, origCtx, ai, isModule));
+				return new Let(name, dfn, doGenModuleIL(newCtx, newCtx, origCtx, ai, isModule));
 			} else if (ast instanceof VarDeclaration) {
 				throw new RuntimeException("top-level vars not implemented (are they implementable with this design?)");
 			} else if (ast instanceof DeclSequence || ast instanceof Sequence) {
@@ -104,23 +106,23 @@ public class GenUtil {
 				}
 				
 				ValueType type = new StructuralType(newName, declts);
-				newCtx = newCtx.extend(newName, new Variable(newName), type);
+				GenContext genCtx = newCtx.extend(newName, new Variable(newName), type);
 				
 				for(TypedAST seq_ast : seq.getDeclIterator()) {
 					Declaration d = (Declaration) seq_ast;
-					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(newCtx);
+					wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(genCtx);
 					decls.add(decl);
 				}
 		
 				/* wrap the declaration into an object */
 				Expression newExp = new New(decls, newName, type);
-				Expression e = doGenModuleIL(newCtx, origCtx, ai, isModule); // generate the rest part 
+				Expression e = doGenModuleIL(genCtx, newCtx, origCtx, ai, isModule); // generate the rest part 
 				return new Let(newName, newExp, e);
 			} else {
 				/* same as doGenIL */
 				Expression e1 = ast.generateIL(ctx);
 				if (isModule || ai.hasNext()) {
-					Expression e2 = doGenModuleIL(ctx, origCtx, ai, isModule);
+					Expression e2 = doGenModuleIL(ctx, ctx, origCtx, ai, isModule);
 					return new Let(GenContext.generateName(), e1, e2);
 				} else {
 					return e1;
@@ -129,7 +131,7 @@ public class GenUtil {
 		} else {
 			/* when declaration sequence come to the end, create a new object for this module */
 			String newName = GenContext.generateName();
-			return new New(ctx.genDeclSeq(origCtx), newName, new StructuralType(newName, ctx.genDeclTypeSeq(origCtx)));
+			return new New(addedCtx.genDeclSeq(origCtx), newName, new StructuralType(newName, addedCtx.genDeclTypeSeq(origCtx)));
 		}
 	}
 

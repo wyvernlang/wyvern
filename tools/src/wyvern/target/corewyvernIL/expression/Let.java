@@ -13,10 +13,10 @@ import wyvern.target.oir.OIREnvironment;
 
 public class Let extends Expression {
 
-	@Override
+	/*@Override
 	public String toString() {
 		return "Let[" + varName + " = " + toReplace + " in " + inExpr + "]";
-	}
+	}*/
 
 	private String varName;
 	private Expression toReplace;

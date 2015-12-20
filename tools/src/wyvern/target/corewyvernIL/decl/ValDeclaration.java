@@ -21,10 +21,10 @@ import wyvern.target.oir.OIREnvironment;
 
 public class ValDeclaration extends DeclarationWithRHS {
 
-	@Override
+	/*@Override
 	public String toString() {
 		return "ValDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
-	}
+	}*/
 
 	public ValDeclaration(String fieldName, ValueType type, Expression value) {
 		super(fieldName, value);
