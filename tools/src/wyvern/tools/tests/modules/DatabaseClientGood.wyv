@@ -1,0 +1,6 @@
+resource module DatabaseClient
+
+require DatabaseProxy as proxy
+
+def update () : Unit
+	proxy.increment()
