@@ -129,4 +129,6 @@ public abstract class GenContext extends TypeContext {
 	public final CallableExprGenerator getCallableExpr(String varName) {
 		return getCallableExprRec(varName, this);
 	}
+	
+	public abstract wyvern.target.corewyvernIL.type.ValueType getAliasType(String aliasName);
 }

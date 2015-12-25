@@ -233,13 +233,18 @@ AST DeclSequence(boolean inModule) :
 AST Declaration(boolean inModule) :
 { AST exp; }
 {
+  
+
+  
   exp = DefDeclaration()  { return exp; }
 |
   exp = ValDeclaration()  { return exp; }
 |
   exp = VarDeclaration()  { return exp; }
 |
-  exp = TypeDeclaration()  { return exp; }
+   LOOKAHEAD(3) exp =   TypeDeclaration()  { return exp; }
+|
+   LOOKAHEAD(3) exp = TypeAbbrevDeclaration() {return exp; }
 |
   exp = DelegateDeclaration()  { return exp; }
 |
@@ -262,6 +267,14 @@ AST ValDeclaration() :
   <VAL> name=<IDENTIFIER> [ <COLON> type = Type() ] <EQUALS> body = ExpressionLine(false) {
 	return build.valDecl(name.image, type, body, loc(name));
   }
+}
+
+AST TypeAbbrevDeclaration() :
+{Token t = null; Type reference = null; Token alias = null; }
+{
+   t = <TYPE> alias = <IDENTIFIER> <EQUALS> reference = Type() <NEWLINE> {
+     return build.typeAbbrevDecl(alias.image, reference, loc(t));
+   }
 }
 
 AST VarDeclaration() :

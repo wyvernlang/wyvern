@@ -23,6 +23,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -57,6 +58,11 @@ public class GenUtil {
 	public static Expression doGenModuleIL(GenContext ctx, GenContext addedCtx, GenContext origCtx, Iterator<? extends TypedAST> ai, boolean isModule) {
 		if (ai.hasNext()) {
 			TypedAST ast = ai.next(); 
+			if (ast instanceof TypeAbbrevDeclaration) {
+				TypeAbbrevDeclaration typeAbbrevDecl = (TypeAbbrevDeclaration) ast;
+				AliasGenContext newCtx = new AliasGenContext(typeAbbrevDecl.getAlias(), typeAbbrevDecl.getReference(), ctx);
+				return doGenModuleIL(newCtx,addedCtx, origCtx, ai, isModule);
+			} else 
 			// TODO (BUG): the approach of wrapping at the end won't work for VarDeclarations!
 			// because the var in the object wrapper is not the same as the var in the original module
 			// Maybe fix by translation of var into getters/setters?
