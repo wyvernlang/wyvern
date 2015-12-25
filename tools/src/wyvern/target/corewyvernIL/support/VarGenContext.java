@@ -75,4 +75,9 @@ public class VarGenContext extends GenContext {
 			return genContext.getCallableExprRec(varName, origCtx);
 		}
 	}	
+	
+	@Override
+	public ValueType getAliasType(String aliasName) {
+		return genContext.getAliasType(aliasName);
+	}	
 }

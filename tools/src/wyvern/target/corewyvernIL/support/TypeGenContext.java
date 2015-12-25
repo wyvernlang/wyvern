@@ -66,5 +66,11 @@ public class TypeGenContext extends GenContext {
 	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
 		return genContext.getCallableExprRec(varName, origCtx);
 	}
+	
+	@Override
+	public ValueType getAliasType(String aliasName) {
+		return genContext.getAliasType(aliasName);
+	}
+
 
 }
