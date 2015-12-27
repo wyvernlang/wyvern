@@ -2,7 +2,9 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -122,7 +124,24 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		// Figure out expression being assigned.
+		CallableExprGenerator cegExpr = value.getCallableExpr(ctx);
+		Expression exprToAssign = cegExpr.genExpr();
+		ValueType exprType = exprToAssign.getExprType();
+		
+		// Figure out receiver and field.
+		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
+		Expression exprFieldGet = cegReceiver.genExpr();
+		if (!(exprFieldGet instanceof FieldGet))
+			 // TODO this only assigns to objects
+			throw new RuntimeException("Should be assigning to object ");
+		FieldGet fieldGet = (FieldGet) exprFieldGet;
+		String fieldName = fieldGet.getName();
+		Expression objExpr = fieldGet.getObjectExpr();
+		
+		// Return new assignment.
+		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
+	
 	}
 }
