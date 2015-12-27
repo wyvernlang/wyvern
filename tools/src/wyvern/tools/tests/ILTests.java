@@ -213,7 +213,6 @@ public class ILTests {
 	}
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testIdentityCallString() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.String) : system.String = x\n"
@@ -229,6 +228,24 @@ public class ILTests {
         Value v = program.interpret(EvalContext.empty());
         StringLiteral five = new StringLiteral("five");
 		Assert.assertEquals(five, v);
+	}
+
+    @Test
+	public void testIdentityCallString2() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    def id(x:system.String) : system.String = x\n"
+				     + "obj.id(\"five\")\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.stringType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        StringLiteral five = new StringLiteral("seven");
+		Assert.assertNotEquals(five, v);
 	}
 
 	@Test
