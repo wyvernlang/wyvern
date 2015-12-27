@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class VarDeclaration extends Declaration implements CoreAST {
-	TypedAST definition;
+	ExpressionAST definition;
 	Type definitionType;
 	NameBinding binding;
 
@@ -44,7 +45,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	public VarDeclaration(String varName, Type parsedType, TypedAST definition) {
-		this.definition=definition;
+		this.definition=(ExpressionAST)definition;
 		binding = new AssignableNameBinding(varName, parsedType);
 	}
 
@@ -147,12 +148,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location; //TODO
-	}
-
-	@Override
-	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.DeclarationWriter;
@@ -237,7 +238,7 @@ public class New extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-	public TypedAST doClone(Map<String, TypedAST> newChildren) {
+	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
 
 		New aNew = new New(new HashMap<>(), location);
 		aNew.setBody((DeclSequence) newChildren.get("seq"));

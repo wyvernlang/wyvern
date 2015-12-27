@@ -4,7 +4,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class KeywordInvocation extends AbstractTypedAST {
+public class KeywordInvocation extends AbstractExpressionAST {
 	private final TypedAST tgt;
 	private final String id;
 	private final TypedAST lit;

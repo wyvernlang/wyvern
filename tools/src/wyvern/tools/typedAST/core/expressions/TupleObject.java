@@ -9,6 +9,7 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -20,33 +21,34 @@ import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
-	private TypedAST[] objects;
-	private static TypedAST[] typeObj = new TypedAST[0];
+	private ExpressionAST[] objects;
+	private static ExpressionAST[] typeObj = new ExpressionAST[0];
 	
 	public TupleObject(List<TypedAST> objects) {
 		this(objects.toArray(typeObj));
 	}
 	public TupleObject(TypedAST[] objects) {
-		this.objects = objects;
+		this.objects = Arrays.copyOf(objects, objects.length, ExpressionAST[].class); 
 		if (objects.length > 0)
 			this.location = objects[0].getLocation();
 	}
 	
 	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {
 		if (rest instanceof TupleObject) {
-			objects = new TypedAST[((TupleObject) rest).objects.length + 1];
-			objects[0] = first;
+			objects = new ExpressionAST[((TupleObject) rest).objects.length + 1];
+			objects[0] = (ExpressionAST)first;
 			for (int i = 1; i < ((TupleObject) rest).objects.length + 1; i++) {
 				objects[i] = ((TupleObject) rest).objects[i-1];
 			}
 		} else {
-			this.objects = new TypedAST[] { first, rest };
+			this.objects = new ExpressionAST[] { (ExpressionAST)first, (ExpressionAST)rest };
 		}
 		this.location = commaLine;
 	}
@@ -56,8 +58,8 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		writer.writeArgs(objects);	
 	}
 	
-	public TypedAST getObject(int index) {
-		return objects[index];
+	public ExpressionAST getObject(int index) {
+		return (ExpressionAST) objects[index];
 	}
 
 	@Override
@@ -107,15 +109,15 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-	public TypedAST doClone(Map<String, TypedAST> newChildren) {
-		TypedAST[] objs = new TypedAST[newChildren.size()];
+	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
+    	ExpressionAST[] objs = new ExpressionAST[newChildren.size()];
 		for (String s : newChildren.keySet()) {
-			objs[Integer.parseInt(s)] = newChildren.get(s);
+			objs[Integer.parseInt(s)] = (ExpressionAST)newChildren.get(s);
 		}
 		return new TupleObject(objs);
 	}
 
-	public TypedAST[] getObjects() {
+	public ExpressionAST[] getObjects() {
 		return objects;
 	}
 

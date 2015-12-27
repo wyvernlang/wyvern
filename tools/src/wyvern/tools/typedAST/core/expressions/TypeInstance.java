@@ -3,7 +3,7 @@ package wyvern.tools.typedAST.core.expressions;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -13,6 +13,7 @@ import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
 import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
 
-public class TypeInstance extends AbstractTypedAST implements CoreAST {
+public class TypeInstance extends AbstractTreeWritable implements CoreAST {
 	private TypeBinding binding;
 	
 	public TypeInstance(TypeBinding binding) {
@@ -90,9 +91,9 @@ public class TypeInstance extends AbstractTypedAST implements CoreAST {
 		return this.location;
 	}
 
-	@Override
+	/*@Override
 	public Expression generateIL(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
-	}
+	}*/
 }

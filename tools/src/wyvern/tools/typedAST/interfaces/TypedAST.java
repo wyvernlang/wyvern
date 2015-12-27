@@ -45,15 +45,5 @@ public interface TypedAST extends TreeWritable, HasLocation {
 
 	public static HasParser meta$get() {
 		return () -> new QuoteParser();
-	}
-	
-	/** Generates the new Wyvern Intermediate Language (IL) from this
-	 * AST.
-	 * 
-	 * @param ctx The generation context used for translation
-	 * @return
-	 */
-	Expression generateIL(GenContext ctx);
-	
-	CallableExprGenerator getCallableExpr(GenContext ctx);
+	}	
 }

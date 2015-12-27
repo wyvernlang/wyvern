@@ -25,6 +25,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class GenUtil {
@@ -120,7 +121,7 @@ public class GenUtil {
 				return new Let(newName, newExp, e);
 			} else {
 				/* same as doGenIL */
-				Expression e1 = ast.generateIL(ctx);
+				Expression e1 = ((ExpressionAST)ast).generateIL(ctx);
 				if (isModule || ai.hasNext()) {
 					Expression e2 = doGenModuleIL(ctx, ctx, origCtx, ai, isModule);
 					return new Let(GenContext.generateName(), e1, e2);

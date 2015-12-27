@@ -1,6 +1,6 @@
 package wyvern.tools.typedAST.interfaces;
 
 
-public interface Value extends TypedAST {
+public interface Value extends ExpressionAST {
 
 }

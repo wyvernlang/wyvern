@@ -3,7 +3,7 @@ package wyvern.tools.typedAST.extensions;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
@@ -23,7 +23,7 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
-public class SpliceBindExn extends AbstractTypedAST implements BoundCode {
+public class SpliceBindExn extends AbstractExpressionAST implements BoundCode {
 	private final TypedAST exn;
 	private List<NameBinding> bindings;
 

@@ -33,6 +33,7 @@ import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
@@ -65,7 +66,7 @@ public class ILTests {
         String input =
                   "val x = 5\n"
         		+ "x\n";
-        TypedAST ast = TestUtil.getNewAST(input);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
         Expression program = ast.generateIL(GenContext.empty());
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
@@ -81,7 +82,7 @@ public class ILTests {
         String input =
                   "val x = \"five\"\n"
         		+ "x\n";
-        TypedAST ast = TestUtil.getNewAST(input);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
         Expression program = ast.generateIL(GenContext.empty());
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
@@ -97,7 +98,7 @@ public class ILTests {
 				     + "    val v = 5\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		Expression program = ast.generateIL(GenContext.empty());
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
@@ -113,7 +114,7 @@ public class ILTests {
 				     + "    var v : system.Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -132,7 +133,7 @@ public class ILTests {
 				     + "obj.v = 5\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -150,7 +151,7 @@ public class ILTests {
 				     + "    def m() : system.Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -168,7 +169,7 @@ public class ILTests {
 				     + "    v\n"
 				     + "foo()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -185,7 +186,7 @@ public class ILTests {
 				     + "    def id(x:system.Int) : system.Int = x\n"
 				     + "obj.id(5)\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -204,7 +205,7 @@ public class ILTests {
 				     + "    def id(x:system.String) : system.String = x\n"
 				     + "obj.id(\"five\")\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -265,7 +266,7 @@ public class ILTests {
 					 + "val i : Int = 5\n\n"
 					 + "i\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -288,7 +289,7 @@ public class ILTests {
 					 + "    delegate IntResult to r\n\n"
 					 + "r2.getResult()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -363,7 +364,7 @@ public class ILTests {
 	public void testRecursiveTypes() throws ParseException {
 		
 		String source = TestUtil.readFile(PATH + "recursivetypes.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -380,7 +381,7 @@ public class ILTests {
 	public void testRecursiveFunctions() throws ParseException {
 		
 		String source = TestUtil.readFile(PATH + "recursivefunctions.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
@@ -396,7 +397,7 @@ public class ILTests {
 	public void testLambda() throws ParseException {
 		
         String source = TestUtil.readFile(PATH + "lambdatest.wyv");
-        TypedAST ast = TestUtil.getNewAST(source);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
         Expression program = ast.generateIL(genCtx);
@@ -416,7 +417,7 @@ public class ILTests {
             + "val getFive:UnitIntFn = #() => 5\n"
             + "getFive.apply()";
 
-        TypedAST ast = TestUtil.getNewAST(source);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
         Expression program = ast.generateIL(genCtx);
@@ -446,7 +447,7 @@ public class ILTests {
             + "val getFive:UnitIntFn = #() => 5\n"
             + "getFive()";
 
-        TypedAST ast = TestUtil.getNewAST(source);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
         Expression program = ast.generateIL(genCtx);

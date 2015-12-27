@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ValDeclaration extends Declaration implements CoreAST {
-	TypedAST definition;
+	ExpressionAST definition;
 	Type definitionType;
 	NameBinding binding;
 	
@@ -53,7 +54,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
-		this.definition=definition;
+		this.definition=(ExpressionAST) definition;
 		binding = new NameBindingImpl(name, null);
 		this.location = location;
 	}
@@ -81,7 +82,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 		}
 		
-		this.definition=definition;
+		this.definition=(ExpressionAST)definition;
 		binding = new NameBindingImpl(name, type);
 		this.location = location;
 	}
@@ -151,7 +152,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		return binding.getName();
 	}
 	
-	public TypedAST getDefinition() {
+	public ExpressionAST getDefinition() {
 		return definition;
 	}
 
@@ -241,12 +242,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location; //TODO
-	}
-
-	@Override
-	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
