@@ -91,6 +91,21 @@ public class ILTests {
 		Assert.assertEquals(five, v);
     }
 
+    @Test
+    public void testLetValWithString2() throws ParseException {
+        String input =
+                  "val x = \"five\"\n"
+        		+ "x\n";
+        TypedAST ast = TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(GenContext.empty());
+        TypeContext ctx = TypeContext.empty();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.stringType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        StringLiteral five = new StringLiteral("");
+		Assert.assertNotEquals(five, v);
+    }
+
 	@Test
 	public void testFieldRead() throws ParseException {
 		String input = "val obj = new\n"
