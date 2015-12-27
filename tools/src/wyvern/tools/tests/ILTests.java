@@ -76,7 +76,6 @@ public class ILTests {
     }
 
     @Test
-	@Category(CurrentlyBroken.class)
     public void testLetValWithString() throws ParseException {
         String input =
                   "val x = \"five\"\n"
@@ -194,7 +193,8 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	@Test
+
+    @Test
 	public void testIdentityCall() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.Int) : system.Int = x\n"

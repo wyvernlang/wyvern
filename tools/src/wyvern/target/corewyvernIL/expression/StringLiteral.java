@@ -55,11 +55,10 @@ public class StringLiteral extends Literal {
         }
         try {
             StringLiteral other = (StringLiteral) obj;
-            return value.equals(other);
+            return this.equals(other);
         } catch(ClassCastException e) {
             return false;
         }
-        //return true; // TODO should this not be 'false' by default??
     }
 
     @Override
