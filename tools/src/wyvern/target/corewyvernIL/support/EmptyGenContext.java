@@ -21,7 +21,7 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	public String getType(String varName) {
+	public String getContainerForTypeAbbrev(String typeName) {
 		return null;
 		//throw new RuntimeException("Type " + varName + " not found");
 	}

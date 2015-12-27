@@ -52,13 +52,13 @@ public abstract class GenContext extends TypeContext {
 	}
 	
 	/**
-	 * Getting the outer object name of a type.
-	 * For a mapping T -> y.T, getType(T) = y;
+	 * Gets the name of the container object for a type abbreviation.
+	 * For a mapping T -> y.T, getContainerForTypeAbbrev(T) = y;
 	 * 
-	 * @param varName the type name
-	 * @return the outer object name of the of the type
+	 * @param typeName the type abbreviation's name
+	 * @return the name of the container object for the type abbreviation
 	 */
-	public abstract String getType(String varName);
+	public abstract String getContainerForTypeAbbrev(String typeName);
 	
 	public static GenContext empty() {
 		return theEmpty;

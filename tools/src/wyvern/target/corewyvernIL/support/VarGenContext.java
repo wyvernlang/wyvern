@@ -63,8 +63,8 @@ public class VarGenContext extends GenContext {
 	}
 
 	@Override
-	public String getType(String varName) {
-		return genContext.getType(varName);
+	public String getContainerForTypeAbbrev(String typeName) {
+		return genContext.getContainerForTypeAbbrev(typeName);
 	}
 
 	@Override
