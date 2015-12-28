@@ -134,13 +134,12 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
 		Expression exprFieldGet = cegReceiver.genExpr();
 		if (!(exprFieldGet instanceof FieldGet))
-			 // TODO this only assigns to objects
-			throw new RuntimeException("Should be assigning to object ");
+			throw new RuntimeException("Should be assigning to object");
 		FieldGet fieldGet = (FieldGet) exprFieldGet;
 		String fieldName = fieldGet.getName();
 		Expression objExpr = fieldGet.getObjectExpr();
 		
-		// Return new assignment.
+		// Return field set.
 		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
 	
 	}

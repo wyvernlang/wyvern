@@ -103,9 +103,9 @@ public class FieldSet extends Expression {
 			else {
 				if (!(decl instanceof wyvern.target.corewyvernIL.decl.VarDeclaration))
 					throw new RuntimeException("Expected assignment to var field in field set.");
-				VarDeclaration vDecl = (VarDeclaration) decl;
-				VarDeclaration vDeclUpdated = new VarDeclaration(fieldName, vDecl.getType(), exprToAssign);
-				newDeclarations.add(vDeclUpdated.interpret(ctx));
+				VarDeclaration varDecl = (VarDeclaration) decl;
+				VarDeclaration varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), exprToAssign);
+				newDeclarations.add(varDeclUpdated.interpret(ctx));
 			}
 		}
 		
