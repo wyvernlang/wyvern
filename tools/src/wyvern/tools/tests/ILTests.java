@@ -260,7 +260,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testTypeAbbrev() throws ParseException {
 		String input = "type Int = system.Int\n\n"
 					 + "val i : Int = 5\n\n"
