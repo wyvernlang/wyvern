@@ -9,11 +9,15 @@ import wyvern.target.corewyvernIL.support.View;
 public abstract class ValueType extends CaseType implements EmitOIR {
 
 	/**
-	 * Returns the equivalent structural type, or null if the structural type is unknown
+	 * Returns the equivalent structural type.  If the structural type
+	 * is unknown (e.g. because this is a nominal type and the
+	 * corresponding type member is abstract from this context) then
+	 * the empty structural type is returned.
+	 *  
 	 * @param ctx TODO
 	 */
 	public StructuralType getStructuralType(TypeContext ctx) {
-		return null;
+		return StructuralType.getEmptyType();
 	}
 
 	public boolean isSubtypeOf(Type t, TypeContext ctx) {

@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.type;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +34,12 @@ public class StructuralType extends ValueType {
 				throw new NullPointerException("invariant: decl types should not be null");
 		this.declTypes = declTypes;
 		this.resourceFlag = resourceFlag;
+	}
+
+	private static StructuralType emptyType = new StructuralType("IGNORE_ME", Collections.emptyList());
+	
+	public static StructuralType getEmptyType() {
+		return emptyType;
 	}
 	
 	@Override
