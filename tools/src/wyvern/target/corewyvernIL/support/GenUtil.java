@@ -23,6 +23,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -62,7 +63,7 @@ public class GenUtil {
 			// because the var in the object wrapper is not the same as the var in the original module
 			// Maybe fix by translation of var into getters/setters?
 			// or just don't support top-level vars
-			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
+			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration || ast instanceof TypeAbbrevDeclaration) {
 				String newName = GenContext.generateName();
 				// TODO: code smell: this code is a lot like the case below that also calls ctx.rec(...)
 				GenContext newCtx = ctx.rec(newName, ast); // extend the environment 
