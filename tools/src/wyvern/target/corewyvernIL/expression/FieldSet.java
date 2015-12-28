@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -54,7 +55,24 @@ public class FieldSet extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		return null;
+		
+		// Figure out types of object and expression.
+		ValueType valTypeExpr = exprToAssign.typeCheck(ctx);
+		StructuralType structTypeObj = objectExpr.typeCheck(ctx).getStructuralType(ctx);
+		
+		// Figure out the type of the field.
+		DeclType declTypeField = structTypeObj.findDecl(fieldName, ctx);
+		if (!(declTypeField instanceof VarDeclType))
+			throw new RuntimeException("Type error: trying to set the field " + fieldName + ", but this isn't"
+										+ "a var declaration.");
+		ValueType valTypeField = ((VarDeclType) declTypeField).getRawResultType();
+	
+		// Make sure assigned type is compatible with the field's type.
+		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
+			throw new RuntimeException("Type error: trying to set the field " + fieldName + ", but the type "
+										+ valTypeExpr + " cannot be assigned to " + valTypeField);
+		return valTypeExpr;
+		
 	}
 	
 	@Override
