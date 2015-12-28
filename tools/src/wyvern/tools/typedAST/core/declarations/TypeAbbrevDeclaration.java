@@ -4,9 +4,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.binding.NameBinding;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -159,8 +162,8 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		ValueType referenceILType = reference.getILType(ctx);
+		return new ConcreteTypeMember(getAlias(), referenceILType);
 	}
 
 	@Override
@@ -173,8 +176,8 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
 			GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		ValueType referenceILType = reference.getILType(ctx);
+		return new TypeDeclaration(getAlias(), referenceILType);
 	}
 
 	

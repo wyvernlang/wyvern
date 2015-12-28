@@ -81,6 +81,8 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 		}
 		
+		declaredType = type;
+		
 		this.definition=definition;
 		binding = new NameBindingImpl(name, type);
 		this.location = location;

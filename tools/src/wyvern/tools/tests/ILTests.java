@@ -1,5 +1,7 @@
 package wyvern.tools.tests;
 
+import static org.junit.Assert.*;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -541,6 +543,21 @@ public class ILTests {
     	StringLiteral five = new StringLiteral("5");
 		Assert.assertEquals(five, v);
 	}
+	
+	
+	@Test
+	public void testSimple() throws Exception {
+		String input = "type test\n"
+				     + "    def m(): system.Int\n"
+				     ;
+		TypedAST ast = TestUtil.getNewAST(input);
+		GenContext ctx = GenContext.empty().extend("system", new Variable("system"),null);
+		Expression ast_IL = ast.generateIL(ctx);
+		//ValueType valueType = ast_IL.typeCheck(TypeContext.empty());
+		//Value t1 = ast_IL.interpret(EvalContext.empty());
+		int i = 1;
+	}
+	
 	
 	public static ImportTestClass importTest = new ImportTestClass();
 	public static class ImportTestClass {
