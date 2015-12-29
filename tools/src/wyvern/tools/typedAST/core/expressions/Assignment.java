@@ -2,9 +2,12 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
@@ -26,14 +29,15 @@ import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
-	private TypedAST target;
-	private TypedAST value;
 	
-	private TypedAST nextExpr;
+	private ExpressionAST target;
+	private ExpressionAST value;
+	
+	private ExpressionAST nextExpr;
 
 	public Assignment(TypedAST target, TypedAST value, FileLocation fileLocation) {
-		this.target = target;
-		this.value = value;
+		this.target = (ExpressionAST) target;
+		this.value = (ExpressionAST) value;
 		this.location = fileLocation;
 	}
 
@@ -122,7 +126,23 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		// Figure out expression being assigned.
+		CallableExprGenerator cegExpr = value.getCallableExpr(ctx);
+		Expression exprToAssign = cegExpr.genExpr();
+		ValueType exprType = exprToAssign.getExprType();
+		
+		// Figure out receiver and field.
+		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
+		Expression exprFieldGet = cegReceiver.genExpr();
+		if (!(exprFieldGet instanceof FieldGet))
+			ToolError.reportError(ErrorMessage.EXPECTED_RECORD_TYPE, HasLocation.UNKNOWN);
+		FieldGet fieldGet = (FieldGet) exprFieldGet;
+		String fieldName = fieldGet.getName();
+		Expression objExpr = fieldGet.getObjectExpr();
+		
+		// Return FieldSet.
+		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
+	
 	}
 }

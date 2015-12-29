@@ -140,7 +140,6 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldWrite() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    var v : system.Int = 2\n"
