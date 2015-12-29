@@ -5,11 +5,12 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class WhileStatement extends AbstractTypedAST implements CoreAST {
+public class WhileStatement extends AbstractExpressionAST implements CoreAST, ExpressionAST {
 
 	private TypedAST conditional;
 	private TypedAST body;

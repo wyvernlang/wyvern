@@ -7,7 +7,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.Optional;
 
-public abstract class AbstractValue extends AbstractTypedAST implements Value {
+public abstract class AbstractValue extends AbstractExpressionAST implements Value {
 
 	@Override
 	public Type typecheck(Environment env, Optional<Type> expected) {

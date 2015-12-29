@@ -5,7 +5,8 @@ import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -19,7 +20,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
 
-public class DSLDummy extends AbstractTypedAST {
+public class DSLDummy extends AbstractExpressionAST implements ExpressionAST {
 	private final Type expected;
 	private TypedAST dslDef = null;
     public DSLDummy(Type expected) {

@@ -42,11 +42,11 @@ import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	private String operationName;
-	private TypedAST receiver;
+	private ExpressionAST receiver;
 	private TypedAST argument;
 
 	public Invocation(TypedAST op1, String operatorName, TypedAST op2, FileLocation fileLocation) {
-		this.receiver = op1;
+		this.receiver = (ExpressionAST) op1;
 		this.argument = op2;
 		this.operationName = operatorName;
 		this.location = fileLocation;
@@ -160,7 +160,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public TypedAST doClone(Map<String, TypedAST> nc) {
+	public ExpressionAST doClone(Map<String, TypedAST> nc) {
 		return new Invocation(nc.get("receiver"), operationName, nc.get("argument"), location);
 	}
 

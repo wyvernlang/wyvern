@@ -13,7 +13,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
@@ -37,7 +37,7 @@ import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
 
 
-public class Variable extends AbstractTypedAST implements CoreAST, Assignable {
+public class Variable extends AbstractExpressionAST implements CoreAST, Assignable {
 	private NameBinding binding;
 	
 	public Variable(NameBinding binding, FileLocation location) {

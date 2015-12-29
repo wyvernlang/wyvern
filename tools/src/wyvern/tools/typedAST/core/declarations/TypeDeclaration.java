@@ -197,12 +197,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public DeclType genILType(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;

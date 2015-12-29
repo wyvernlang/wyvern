@@ -30,12 +30,12 @@ import static wyvern.tools.errors.ToolError.reportError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Application extends CachingTypedAST implements CoreAST {
-	private TypedAST function;
-	private TypedAST argument;
+	private ExpressionAST function;
+	private ExpressionAST argument;
 
 	public Application(TypedAST function, TypedAST argument, FileLocation location) {
-		this.function = function;
-		this.argument = argument;
+		this.function = (ExpressionAST) function;
+		this.argument = (ExpressionAST) argument;
 		this.location = location;
 	}
 
@@ -113,8 +113,8 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-	public TypedAST doClone(Map<String, TypedAST> nc) {
-		return new Application(nc.get("function"), nc.get("argument"), location);
+	public ExpressionAST doClone(Map<String, TypedAST> nc) {
+		return new Application((ExpressionAST)nc.get("function"), (ExpressionAST)nc.get("argument"), location);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
@@ -130,7 +130,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 		// generate arguments		
 		List<Expression> args = new LinkedList<Expression>();
         if (argument instanceof TupleObject) {
-        	for (TypedAST ast : ((TupleObject) argument).getObjects()) {
+        	for (ExpressionAST ast : ((TupleObject) argument).getObjects()) {
         		// TODO: propagate types downward from formals
         		args.add(ast.generateIL(ctx));
         	}

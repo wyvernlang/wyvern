@@ -113,7 +113,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-	public TypedAST doClone(Map<String, TypedAST> nc) {
+	public ExpressionAST doClone(Map<String, TypedAST> nc) {
 		return new Assignment(nc.get("target"), nc.get("value"), location);
 	}
 
