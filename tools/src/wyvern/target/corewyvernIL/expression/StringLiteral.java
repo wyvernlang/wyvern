@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.target.corewyvernIL.support.Util;
 
 public class StringLiteral extends Literal {
 	
@@ -28,10 +29,38 @@ public class StringLiteral extends Literal {
 		this.value = value;
 	}
 
+    @Override
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if(obj == null) {
+            return false;
+        }
+        if(this.getClass() != obj.getClass()) {
+            return false;
+        }
+        try {
+            StringLiteral other = (StringLiteral) obj;
+            return this.getValue().equals(other.getValue());
+        } catch(ClassCastException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return this.value.toString();
+    }
+
 	@Override
 	public ValueType typeCheck(TypeContext env) {
-		// TODO Auto-generated method stub
-		return null;
+        return Util.stringType();
 	}
 
 	@Override

@@ -77,7 +77,6 @@ public class ILTests {
     }
 
     @Test
-	@Category(CurrentlyBroken.class)
     public void testLetValWithString() throws ParseException {
         String input =
                   "val x = \"five\"\n"
@@ -90,6 +89,21 @@ public class ILTests {
         Value v = program.interpret(EvalContext.empty());
         StringLiteral five = new StringLiteral("five");
 		Assert.assertEquals(five, v);
+    }
+
+    @Test
+    public void testLetValWithString2() throws ParseException {
+        String input =
+                  "val x = \"five\"\n"
+        		+ "x\n";
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(GenContext.empty());
+        TypeContext ctx = TypeContext.empty();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.stringType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        StringLiteral five = new StringLiteral("");
+		Assert.assertNotEquals(five, v);
     }
 
 	@Test
@@ -180,7 +194,8 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	@Test
+
+    @Test
 	public void testIdentityCall() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.Int) : system.Int = x\n"
@@ -199,7 +214,6 @@ public class ILTests {
 	}
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testIdentityCallString() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.String) : system.String = x\n"
@@ -215,6 +229,24 @@ public class ILTests {
         Value v = program.interpret(EvalContext.empty());
         StringLiteral five = new StringLiteral("five");
 		Assert.assertEquals(five, v);
+	}
+
+    @Test
+	public void testIdentityCallString2() throws ParseException {
+		String input = "val obj = new\n"
+				     + "    def id(x:system.String) : system.String = x\n"
+				     + "obj.id(\"five\")\n"
+				     ;
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.stringType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        StringLiteral five = new StringLiteral("seven");
+		Assert.assertNotEquals(five, v);
 	}
 
 	@Test
@@ -514,7 +546,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testJavaImport2() throws ParseException {
 		String input = "resource module main\n\n"
 //					 + "require ffi/java\n\n"

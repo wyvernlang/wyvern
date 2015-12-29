@@ -39,7 +39,9 @@ public class JavaValue extends AbstractValue implements Invokable {
 	private Value javaToWyvern(Object result) {
 		if (result instanceof Integer) {
 			return new IntegerLiteral((Integer)result);
-		} else {
+        } else if(result instanceof String) {
+            return new StringLiteral((String) result);
+        } else {
 			throw new RuntimeException("some Java->Wyvern cases not implemented");
 		}
 	}
@@ -50,6 +52,8 @@ public class JavaValue extends AbstractValue implements Invokable {
 	private Object wyvernToJava(Value arg) {
 		if (arg instanceof IntegerLiteral) {
 			return new Integer(((IntegerLiteral)arg).getValue());
+        } else if (arg instanceof StringLiteral) {
+            return new String(((StringLiteral) arg).getValue());
 		} else {
 			throw new RuntimeException("some Wyvern->Java cases not implemented");
 		}
