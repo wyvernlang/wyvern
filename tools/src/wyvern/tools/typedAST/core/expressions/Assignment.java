@@ -136,7 +136,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
 		Expression exprFieldGet = cegReceiver.genExpr();
 		if (!(exprFieldGet instanceof FieldGet))
-			ToolError.reportError(ErrorMessage.EXPECTED_RECORD_TYPE, HasLocation.UNKNOWN);
+			ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
 		FieldGet fieldGet = (FieldGet) exprFieldGet;
 		String fieldName = fieldGet.getName();
 		Expression objExpr = fieldGet.getObjectExpr();

@@ -67,14 +67,13 @@ public class FieldSet extends Expression {
 		// Figure out the type of the field.
 		DeclType declTypeField = structTypeObj.findDecl(fieldName, ctx);
 		if (!(declTypeField instanceof VarDeclType))
-			ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_ASSIGNED, HasLocation.UNKNOWN,
-								  declTypeField.toString());
+			ToolError.reportError(ErrorMessage.CANNOT_BE_ASSIGNED, this,
+								  declTypeField.getName());
 		ValueType valTypeField = ((VarDeclType) declTypeField).getResultType(View.from(objectExpr, ctx));
 		
 		// Make sure assigned type is compatible with the field's type.
 		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
-			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, HasLocation.UNKNOWN,
-								  valTypeExpr.toString(), structTypeObj.toString());
+			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 		return valTypeExpr;
 		
 	}
