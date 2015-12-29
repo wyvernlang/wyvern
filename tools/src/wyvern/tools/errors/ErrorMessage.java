@@ -9,6 +9,8 @@ public enum ErrorMessage {
 	TYPE_CANNOT_BE_ASSIGNED("Type %ARG cannot assigned to a value after initalization", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
 	VARIABLE_NOT_DECLARED("Variable %ARG has no type in the context", 1),
+	NO_SUCH_METHOD("There is no visible method named %ARG", 1),
+	NOT_A_METHOD("%ARG is not a method", 1),
 	TYPE_NOT_DECLARED("Type %ARG has no declaration in the context", 1),
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),
 	OPERATOR_DOES_NOT_APPLY2("Operator %ARG cannot be applied to types %ARG and %ARG", 3),

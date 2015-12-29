@@ -21,6 +21,9 @@ import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public class MethodCall extends Expression {
 
@@ -89,9 +92,9 @@ public class MethodCall extends Expression {
 		StructuralType st = ot.getStructuralType(ctx);
 		DeclType dt = st.findDecl(methodName, ctx);
 		if (dt == null)
-			throw new RuntimeException("method not found");
+			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName);
 		if (!(dt instanceof DefDeclType))
-			throw new RuntimeException("invoking a non-method");
+			ToolError.reportError(ErrorMessage.NOT_A_METHOD, this, methodName);
 		DefDeclType ddt = (DefDeclType)dt;
 		View v = View.from(objectExpr, ctx);
 		// check argument compatibility
@@ -100,11 +103,7 @@ public class MethodCall extends Expression {
 			Type argType = ddt.getFormalArgs().get(i).getType().adapt(v);
 			ValueType actualType = e.typeCheck(ctx); 
 			if (!actualType.isSubtypeOf(argType, ctx)) {
-                StringBuilder message = new StringBuilder("Argument type doesn't match. Expected: ");
-                message.append(actualType.toString());
-                message.append("\tFound: ");
-                message.append(argType.toString());
-				throw new RuntimeException(message.toString());
+				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
             }
 		}
 		// compute result type
