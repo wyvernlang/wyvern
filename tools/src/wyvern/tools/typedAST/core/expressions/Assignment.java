@@ -28,14 +28,15 @@ import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
-	private TypedAST target;
-	private TypedAST value;
 	
-	private TypedAST nextExpr;
+	private ExpressionAST target;
+	private ExpressionAST value;
+	
+	private ExpressionAST nextExpr;
 
 	public Assignment(TypedAST target, TypedAST value, FileLocation fileLocation) {
-		this.target = target;
-		this.value = value;
+		this.target = (ExpressionAST) target;
+		this.value = (ExpressionAST) value;
 		this.location = fileLocation;
 	}
 
@@ -139,7 +140,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		String fieldName = fieldGet.getName();
 		Expression objExpr = fieldGet.getObjectExpr();
 		
-		// Return field set.
+		// Return FieldSet.
 		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
 	
 	}
