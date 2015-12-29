@@ -38,6 +38,7 @@ import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.extensions.SpliceBindExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
@@ -337,13 +338,13 @@ public class CopperTSL implements ExtParser {
 
 
 		Type javaClassType = Util.javaToWyvType(javaClass);
-		TypedAST bufGet = new Application(
+		ExpressionAST bufGet = new Application(
 				new Invocation(new Variable(new NameBindingImpl("buf", null), unkLoc), "getSrcString", null, unkLoc),
 				UnitVal.getInstance(unkLoc),
 				unkLoc);
 		ClassType emptyType =
 				new ClassType(new Reference<>(Environment.getEmptyEnvironment()), new Reference<>(Environment.getEmptyEnvironment()), new LinkedList<>(), null, "empty");
-		TypedAST javaObjInit = new Application(new ExternalFunction(new Arrow(emptyType, Util.javaToWyvType(Value.class)), (env,arg)->{
+		ExpressionAST javaObjInit = new Application(new ExternalFunction(new Arrow(emptyType, Util.javaToWyvType(Value.class)), (env,arg)->{
 			return Util.toWyvObj(arg);
 		}),
 				new Application(
@@ -354,7 +355,7 @@ public class CopperTSL implements ExtParser {
 				new Application(new Invocation(new Application(
 					new Invocation(new Variable(new NameBindingImpl(javaClassName, null), unkLoc), "create", null, unkLoc),
 					javaObjInit, unkLoc), "parse", null, unkLoc),
-					new TupleObject(new TypedAST[] {bufGet, new StringConstant("TSL code")}), unkLoc), unkLoc);
+					new TupleObject(new ExpressionAST[] {bufGet, new StringConstant("TSL code")}), unkLoc), unkLoc);
 
 		DefDeclaration parseDef =
 				new DefDeclaration("parse",

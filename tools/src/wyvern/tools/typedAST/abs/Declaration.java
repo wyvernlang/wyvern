@@ -8,6 +8,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
 
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.Optional;
 // Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)
 
 // TODO SMELL: probably should have Declarations not be in an "evaluate" part of the AST
-public abstract class Declaration extends AbstractTypedAST implements EnvironmentExtender {
+public abstract class Declaration extends AbstractTreeWritable implements EnvironmentExtender {
 	protected Declaration nextDecl = null;
 
 	/** 

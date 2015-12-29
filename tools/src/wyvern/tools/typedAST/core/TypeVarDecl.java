@@ -14,7 +14,7 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
@@ -35,6 +35,7 @@ import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -62,7 +63,7 @@ public class TypeVarDecl extends Declaration {
 	/**
 	 * Helper class to allow easy variation of bound types
 	 */
-	private abstract class EnvironmentExtInner extends AbstractTypedAST implements EnvironmentExtender {
+	private abstract class EnvironmentExtInner extends AbstractTreeWritable implements EnvironmentExtender {
 
 		private final FileLocation loc;
 
@@ -174,12 +175,6 @@ public class TypeVarDecl extends Declaration {
 			}
 
 
-
-			@Override
-			public Expression generateIL(GenContext ctx) {
-				// TODO Auto-generated method stub
-				return null;
-			}
 		};
 
 		this.fileLocation = fileLocation;
@@ -277,10 +272,10 @@ public class TypeVarDecl extends Declaration {
 
 	}
 
-	@Override
+	/*@Override
 	public Expression generateIL(GenContext ctx) {
 		return body.generateIL(ctx);
-	}
+	}*/
 
 	private StructuralType computeInternalILType(GenContext ctx) {		
 		TypeDeclaration td = (TypeDeclaration) this.body;

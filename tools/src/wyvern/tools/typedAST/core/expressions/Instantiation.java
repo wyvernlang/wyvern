@@ -80,12 +80,6 @@ public class Instantiation extends Declaration implements CoreAST {
 		
 	}
 
-	@Override
-	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	public URI getUri() {
 		return this.uri;
 	}

@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -67,7 +68,7 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-	public TypedAST doClone(Map<String, TypedAST> newChildren) {
+	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
 		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
 	}
 

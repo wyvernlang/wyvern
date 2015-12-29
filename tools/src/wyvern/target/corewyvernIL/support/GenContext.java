@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.TypeVarDecl;
+import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public abstract class GenContext extends TypeContext {
@@ -52,13 +53,13 @@ public abstract class GenContext extends TypeContext {
 	}
 	
 	/**
-	 * Getting the outer object name of a type.
-	 * For a mapping T -> y.T, getType(T) = y;
+	 * Gets the name of the container object for a type abbreviation.
+	 * For a mapping T -> y.T, getContainerForTypeAbbrev(T) = y;
 	 * 
-	 * @param varName the type name
-	 * @return the outer object name of the of the type
+	 * @param typeName the type abbreviation's name
+	 * @return the name of the container object for the type abbreviation
 	 */
-	public abstract String getType(String varName);
+	public abstract String getContainerForTypeAbbrev(String typeName);
 	
 	public static GenContext empty() {
 		return theEmpty;
@@ -88,13 +89,19 @@ public abstract class GenContext extends TypeContext {
 		if(ast instanceof TypeVarDecl) {
 			String typeName = ((TypeVarDecl) ast).getName();
 			return new TypeGenContext(typeName, newName, this); 
-		} else {
-			assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
+		} else if(ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
+			//assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
 			wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
 			String methodName = methodDecl.getName();
 			ILMethod method = new ILMethod(newName, methodDecl);
 			return new MethodGenContext(methodName, method, this); 
 		}
+		else {
+			assert (ast instanceof TypeAbbrevDeclaration);
+			TypeAbbrevDeclaration typeAbbrevDecl = (TypeAbbrevDeclaration) ast;
+			return new TypeGenContext(typeAbbrevDecl.getAlias(), newName, this); 
+		}
+		
 		
 	}
 	/**

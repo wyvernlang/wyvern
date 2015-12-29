@@ -206,11 +206,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
-		return null;
-	}
-
-	@Override
 	public DeclType genILType(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
@@ -298,13 +293,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			TypedAST argument = inst.getArgs();
 			List<Expression> args = new LinkedList<Expression>();
 		    if (argument instanceof TupleObject) {
-		    	for (TypedAST arg : ((TupleObject) argument).getObjects()) {
+		    	for (ExpressionAST arg : ((TupleObject) argument).getObjects()) {
 		    		args.add(arg.generateIL(ctx));
 		    	}
 		    } else {
 		    	if(! (argument instanceof UnitVal)) {
 		    		/* single argument */
-			    	args.add(argument.generateIL(ctx));
+			    	args.add(((ExpressionAST)argument).generateIL(ctx));
 		    	}
 		    	/* no argument */
 		    }

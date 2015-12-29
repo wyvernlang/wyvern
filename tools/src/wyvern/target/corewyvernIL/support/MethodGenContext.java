@@ -44,8 +44,8 @@ public class MethodGenContext extends GenContext {
 	}
 
 	@Override
-	public String getType(String varName) {
-		return genContext.getType(varName);
+	public String getContainerForTypeAbbrev(String typeName) {
+		return genContext.getContainerForTypeAbbrev(typeName);
 	}
 
 	// TODO: this whole approach here is kind of hacky

@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
 public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
-	protected TypedAST body; // HACK
+	protected ExpressionAST body; // HACK
 	private String name;
 	private Type type;
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
@@ -51,7 +52,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, fullType);
 		this.name = name;
-		this.body = body;
+		this.body = (ExpressionAST) body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
@@ -63,7 +64,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = fullType;
 		this.name = name;
-		this.body = body;
+		this.body = (ExpressionAST) body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
@@ -74,7 +75,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = fullType;
 		this.name = name;
-		this.body = body;
+		this.body = (ExpressionAST)body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
@@ -220,13 +221,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (resolvedType == null)
 			resolvedType = TypeResolver.resolve(type, against);
 		return env.extend(new NameBindingImpl(name, resolvedType));
-	}
-
-
-	@Override
-	public Expression generateIL(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 

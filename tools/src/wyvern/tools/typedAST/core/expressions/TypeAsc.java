@@ -3,7 +3,8 @@ package wyvern.tools.typedAST.core.expressions;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -22,7 +23,7 @@ import java.util.Optional;
 /**
  * Created by Ben Chung on 3/13/14.
  */
-public class TypeAsc extends AbstractTypedAST {
+public class TypeAsc extends AbstractExpressionAST implements ExpressionAST {
 
 	private final TypedAST exn;
 	private Type should;

@@ -34,11 +34,11 @@ import java.util.stream.Collectors;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	private List<NameBinding> bindings;
-	TypedAST body;
+	ExpressionAST body;
 
 	public Fn(List<NameBinding> bindings, TypedAST body) {
 		this.bindings = bindings;
-		this.body = body;
+		this.body = (ExpressionAST) body;
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 
 	@Override
-	public TypedAST doClone(Map<String, TypedAST> nc) {
+	public ExpressionAST doClone(Map<String, TypedAST> nc) {
 		return new Fn(bindings, nc.get("body"));
 	}
 

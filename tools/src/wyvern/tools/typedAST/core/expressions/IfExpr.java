@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -33,7 +34,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		public abstract TypedAST getClause();
 		public abstract TypedAST getBody();
 
-		protected abstract TypedAST createInstance(TypedAST clause, TypedAST body);
+		protected abstract ExpressionAST createInstance(TypedAST clause, TypedAST body);
 
 		@Override
 		public Map<String, TypedAST> getChildren() {
@@ -44,7 +45,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		public TypedAST doClone(Map<String, TypedAST> newChildren) {
+		public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
 			return createInstance(newChildren.get("clause"), newChildren.get("body"));
 		}
 	}
@@ -76,7 +77,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		protected TypedAST createInstance(TypedAST clause, TypedAST body) {
+		protected ExpressionAST createInstance(TypedAST clause, TypedAST body) {
 			return new CondClause(clause, body, location);
 		}
 
@@ -140,7 +141,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
 		}
 
 		@Override
-		protected TypedAST createInstance(TypedAST clause, TypedAST body) {
+		protected ExpressionAST createInstance(TypedAST clause, TypedAST body) {
 			return new UncondClause(body, location);
 		}
 
@@ -207,7 +208,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-	public TypedAST doClone(Map<String, TypedAST> newChildren) {
+	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
 		ArrayList<IfClause> clauses = new ArrayList<>(newChildren.size());
 		int i = 0;
 		for (String s : newChildren.keySet())

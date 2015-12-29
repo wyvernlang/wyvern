@@ -7,11 +7,12 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.util.TreeWriter;
 
 public class QualifiedType extends AbstractTypeImpl {
-	private TypedAST base;
+	private ExpressionAST base;
 	private String name;
 	
 	public String getName() { return name; }
@@ -19,7 +20,7 @@ public class QualifiedType extends AbstractTypeImpl {
 
 	public QualifiedType(TypedAST base, String name) {
 		this.name = name;
-		this.base = base;
+		this.base = (ExpressionAST) base;
 	}
 
 	@Override
@@ -33,7 +34,7 @@ public class QualifiedType extends AbstractTypeImpl {
 		return new NominalType(getPath(base, ctx), name);
 	}
 
-	private static Path getPath(TypedAST ast, GenContext ctx) {
+	private static Path getPath(ExpressionAST ast, GenContext ctx) {
 		Expression exp = ast.generateIL(ctx);
 		return (Path) exp;
 	}

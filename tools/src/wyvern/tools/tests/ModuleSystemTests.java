@@ -170,4 +170,52 @@ public class ModuleSystemTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTransitiveAuthorityBad() throws ParseException {
+
+		String[] fileList = {"Database.wyv", "DatabaseProxy.wyv", "DatabaseClientBad.wyv"};
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+
+		// Should give some compilation error, but top-level vars are not implemented yet.
+		// (21/12/2015)
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTransitiveAuthorityGood() throws ParseException {
+
+		String[] fileList = {"Database.wyv", "DatabaseProxy.wyv", "DatabaseClientGood.wyv"};
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		// Should compile OK, but top-level vars not implemented yet.
+		// (21/12/2015)
+	}
+	
 }

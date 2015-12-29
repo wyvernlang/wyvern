@@ -106,7 +106,7 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 			return new NominalType("system", "Int");
 		}
 		*/
-		String objName = ctx.getType(typeName);
+		String objName = ctx.getContainerForTypeAbbrev(typeName);
 		if (objName == null)
 			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, typeName);
 			//throw new RuntimeException("type " + typeName + "is not defined");
