@@ -86,36 +86,24 @@ public class FieldSet extends Expression {
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		
 		// Evaluate object whose field is being set.
 		Value objExprVal = objectExpr.interpret(ctx);
 		if (!(objExprVal instanceof ObjectValue))
 			throw new RuntimeException("Runtime error: trying to set field of something which isn't an object.");
 		ObjectValue object = (ObjectValue) objExprVal;
-		
-		// Check the object has such a field.
-		if (object.getField(fieldName, ctx) == null)
+
+		// find the declaration corresponding to the field
+		Declaration decl = object.findDecl(fieldName);
+		if (decl == null)
 			throw new RuntimeException("Runtime error: trying to set the undeclared field " + fieldName);	
-		
-		// Construct new list of declarations.
-		List<Declaration> newDeclarations  = new LinkedList<>();
-		for (Declaration decl : object.getDecls()) {
-			if (!decl.getName().equals(fieldName)) {
-				newDeclarations.add(decl);
-			}
-			else {
-				if (!(decl instanceof wyvern.target.corewyvernIL.decl.VarDeclaration))
-					throw new RuntimeException("Expected assignment to var field in field set.");
-				VarDeclaration varDecl = (VarDeclaration) decl;
-				VarDeclaration varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), exprToAssign);
-				newDeclarations.add(varDeclUpdated.interpret(ctx));
-			}
-		}
-		
+		if (!(decl instanceof wyvern.target.corewyvernIL.decl.VarDeclaration))
+			throw new RuntimeException("Expected assignment to var field in field set.");
+		VarDeclaration varDecl = (VarDeclaration) decl;
+		VarDeclaration varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), exprToAssign);
+				
 		// Update object's declarations.
-		object.setDecls(newDeclarations);
+		object.setDecl(varDeclUpdated);
 		return object;
-		
 	}
 	
 	@Override

@@ -11,6 +11,9 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class ObjectValue extends New implements Invokable {
 	final EvalContext evalCtx; // captured eval context
 	
+	/** Precondition: the decls argument must be unique.
+	 * It is owned by this ObjectValue after the constructor call.
+	 */
 	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, EvalContext ctx) {
 		super(decls, selfName, exprType);
 		if (selfName == null || selfName.length() == 0)
@@ -35,4 +38,15 @@ public class ObjectValue extends New implements Invokable {
 		return (Value) decl.getDefinition();
 	}
 
+	public void setDecl(Declaration decl) {
+		List<Declaration> decls = this.getDecls();
+		for (int i = 0; i < decls.size(); ++i) {
+			if (decl.getName().equals(decls.get(i).getName())) {
+				decls.set(i, decl);
+				return;
+			}
+		}
+		throw new RuntimeException("cannot set decl " + decl.getName());
+	}
+	
 }

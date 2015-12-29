@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -38,10 +39,6 @@ public class New extends Expression {
 
 	public List<Declaration> getDecls() {
 		return decls;
-	}
-	
-	public void setDecls(List<Declaration> decls) {
-		this.decls = decls;
 	}
 	
 	public String getSelfName() {
