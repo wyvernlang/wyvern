@@ -11,9 +11,13 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 
 public class FieldSet extends Expression {
 
@@ -63,14 +67,14 @@ public class FieldSet extends Expression {
 		// Figure out the type of the field.
 		DeclType declTypeField = structTypeObj.findDecl(fieldName, ctx);
 		if (!(declTypeField instanceof VarDeclType))
-			throw new RuntimeException("Type error: trying to set the field " + fieldName + ", but this isn't"
-										+ "a var declaration.");
-		ValueType valTypeField = ((VarDeclType) declTypeField).getRawResultType();
-	
+			ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_ASSIGNED, HasLocation.UNKNOWN,
+								  declTypeField.toString());
+		ValueType valTypeField = ((VarDeclType) declTypeField).getResultType(View.from(objectExpr, ctx));
+		
 		// Make sure assigned type is compatible with the field's type.
 		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
-			throw new RuntimeException("Type error: trying to set the field " + fieldName + ", but the type "
-										+ valTypeExpr + " cannot be assigned to " + valTypeField);
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, HasLocation.UNKNOWN,
+								  valTypeExpr.toString(), structTypeObj.toString());
 		return valTypeExpr;
 		
 	}

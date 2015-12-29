@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
@@ -135,7 +136,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
 		Expression exprFieldGet = cegReceiver.genExpr();
 		if (!(exprFieldGet instanceof FieldGet))
-			throw new RuntimeException("Should be assigning to object");
+			ToolError.reportError(ErrorMessage.EXPECTED_RECORD_TYPE, HasLocation.UNKNOWN);
 		FieldGet fieldGet = (FieldGet) exprFieldGet;
 		String fieldName = fieldGet.getName();
 		Expression objExpr = fieldGet.getObjectExpr();
