@@ -231,6 +231,9 @@ public class GenUtil {
 		if (javaClass.getName().equals("int")) {
 			return Util.intType();
 		}
+        if (javaClass.getName().equals("java.lang.String")) {
+            return Util.stringType();
+        }
 		if (touched.contains(javaClass.getName()) || touched.size() > 5) {
 			// TODO: revise strategy to support recursive types
 			return null;

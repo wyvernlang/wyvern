@@ -99,8 +99,13 @@ public class MethodCall extends Expression {
 			Expression e = args.get(i);
 			Type argType = ddt.getFormalArgs().get(i).getType().adapt(v);
 			ValueType actualType = e.typeCheck(ctx); 
-			if (!actualType.isSubtypeOf(argType, ctx))
-				throw new RuntimeException("argument type doesn't match");
+			if (!actualType.isSubtypeOf(argType, ctx)) {
+                StringBuilder message = new StringBuilder("Argument type doesn't match. Expected: ");
+                message.append(actualType.toString());
+                message.append("\tFound: ");
+                message.append(argType.toString());
+				throw new RuntimeException(message.toString());
+            }
 		}
 		// compute result type
 		this.setExprType(ddt.getResultType(v));

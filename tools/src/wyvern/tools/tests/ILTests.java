@@ -546,7 +546,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testJavaImport2() throws ParseException {
 		String input = "resource module main\n\n"
 //					 + "require ffi/java\n\n"
