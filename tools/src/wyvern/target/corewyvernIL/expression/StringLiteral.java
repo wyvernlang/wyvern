@@ -34,14 +34,6 @@ public class StringLiteral extends Literal {
         return this.value.hashCode();
     }
 
-    public boolean equals(String s) {
-        return this.value.equals(s);
-    }
-
-    public boolean equals(StringLiteral s) {
-        return this.value.equals(s.getValue());
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -55,7 +47,7 @@ public class StringLiteral extends Literal {
         }
         try {
             StringLiteral other = (StringLiteral) obj;
-            return this.equals(other);
+            return this.getValue().equals(other.getValue());
         } catch(ClassCastException e) {
             return false;
         }
