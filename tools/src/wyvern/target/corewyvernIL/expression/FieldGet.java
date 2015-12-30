@@ -19,6 +19,8 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 
 public class FieldGet extends Expression implements Path {
 
@@ -50,9 +52,9 @@ public class FieldGet extends Expression implements Path {
 		ValueType vt = objectExpr.typeCheck(ctx);
 		DeclType dt = vt.findDecl(fieldName, ctx);
 		if (dt == null)
-			throw new RuntimeException("typechecking error: operation not found");
+			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, fieldName);
 		if (!(dt instanceof ValDeclType || dt instanceof VarDeclType))
-			throw new RuntimeException("typechecking error: can't treat a method or type member as a field");
+			ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, this, dt.getName());
 		this.setExprType(((DeclTypeWithResult)dt).getResultType(View.from(objectExpr, ctx)));
 		return getExprType();
 	}
