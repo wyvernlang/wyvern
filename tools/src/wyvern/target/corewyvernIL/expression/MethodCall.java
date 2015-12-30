@@ -23,6 +23,7 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class MethodCall extends Expression {
@@ -32,8 +33,8 @@ public class MethodCall extends Expression {
 	private List<Expression> args;
 	
 	public MethodCall(Expression objectExpr, String methodName,
-			List<Expression> args) {
-		super();
+			List<Expression> args, HasLocation location) {
+		super(location != null ? location.getLocation():null);
 		this.objectExpr = objectExpr;
 		this.methodName = methodName;
 		this.args = args;
@@ -66,26 +67,14 @@ public class MethodCall extends Expression {
 		return objectExpr;
 	}
 	
-	public void setObjectExpr(Expression objectExpr) {
-		this.objectExpr = objectExpr;
-	}
-	
 	public String getMethodName() {
 		return methodName;
-	}
-	
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
 	}
 	
 	public List<Expression> getArgs() {
 		return args;
 	}
 	
-	/*public void setArgs(List<Expression> args) {
-		this.args = args;
-	}*/
-
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType ot = objectExpr.typeCheck(ctx);

@@ -41,16 +41,8 @@ public class FieldGet extends Expression implements Path {
 		return objectExpr;
 	}
 	
-	public void setObjectExpr(Expression objectExpr) {
-		this.objectExpr = objectExpr;
-	}
-	
 	public String getName() {
 		return fieldName;
-	}
-	
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
 	}
 	
 	@Override

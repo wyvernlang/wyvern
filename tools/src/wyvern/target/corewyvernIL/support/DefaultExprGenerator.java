@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 
 public class DefaultExprGenerator implements CallableExprGenerator {
 
@@ -22,9 +23,9 @@ public class DefaultExprGenerator implements CallableExprGenerator {
 	}
 
 	@Override
-	public Expression genExprWithArgs(List<Expression> args) {
+	public Expression genExprWithArgs(List<Expression> args, HasLocation loc) {
 		Expression e = genExpr();
-		return new MethodCall(e, "apply", args);
+		return new MethodCall(e, "apply", args, loc);
 	}
 
 	@Override

@@ -13,9 +13,4 @@ public abstract class TagType extends Type {
 	{
 		return caseType;
 	}
-	
-	public void setCaseType (CaseType _caseType)
-	{
-		caseType = _caseType;
-	}
 }

@@ -34,26 +34,14 @@ public class Bind extends Expression {
 		return varName;
 	}
 	
-	public void setVarName(String varName) {
-		this.varName = varName;
-	}
-	
 	public Expression getToReplace() {
 		return toReplace;
-	}
-	
-	public void setToReplace(Expression toReplace) {
-		this.toReplace = toReplace;
 	}
 	
 	public Expression getInExpr() {
 		return inExpr;
 	}
 	
-	public void setInExpr(Expression inExpr) {
-		this.inExpr = inExpr;
-	}
-
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType t = toReplace.typeCheck(ctx);

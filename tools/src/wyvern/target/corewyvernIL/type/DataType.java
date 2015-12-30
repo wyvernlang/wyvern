@@ -17,9 +17,4 @@ public class DataType extends TagType {
 	{
 		return cases;
 	}
-	
-	public void setCases (List<Path> _cases)
-	{
-		cases = _cases;
-	}
 }

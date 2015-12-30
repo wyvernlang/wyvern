@@ -19,11 +19,6 @@ import wyvern.target.oir.OIREnvironment;
 
 public class New extends Expression {
 	
-	/*@Override
-	public String toString() {
-		return "New [" + selfName + " : " + this.getExprType() + " => " + decls + "]";
-	}*/
-
 	private List<Declaration> decls;
 	private String selfName;
 	
@@ -45,10 +40,6 @@ public class New extends Expression {
 		return selfName;
 	}
 	
-	public void setSelfName(String selfName) {
-		this.selfName = selfName;
-	}
-
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append("new ").append(selfName).append(" =>\n");

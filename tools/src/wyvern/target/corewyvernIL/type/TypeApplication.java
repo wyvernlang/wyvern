@@ -22,18 +22,6 @@ public class TypeApplication extends ValueType {
 		this.typeMember = typeMember;
 	}
 
-	public void setBaseType(ValueType baseType) {
-		this.baseType = baseType;
-	}
-
-	public void setTypeArgument(ValueType typeArgument) {
-		this.typeArgument = typeArgument;
-	}
-
-	public void setTypeMember(String typeMember) {
-		this.typeMember = typeMember;
-	}
-	
 	public ValueType getBaseType ()
 	{
 		return baseType;

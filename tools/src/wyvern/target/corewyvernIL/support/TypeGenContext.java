@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 
 public class TypeGenContext extends GenContext {
 
@@ -55,8 +56,8 @@ public class TypeGenContext extends GenContext {
 	}
 
 	@Override
-	public List<Declaration> genDeclSeq(GenContext origCtx) {
-		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
+	public List<Declaration> genDeclSeq(GenContext origCtx, HasLocation location) {
+		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx, location);
 		TypeDeclaration decl = new TypeDeclaration(typeName, new NominalType(objName, typeName));
 		decls.add(decl);
 		return decls;

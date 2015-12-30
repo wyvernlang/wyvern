@@ -28,18 +28,10 @@ public class DelegateDeclaration extends Declaration{
 		return valueType;
 	}
 	
-	public void setMethods(ValueType valueType) {
-		this.valueType = valueType;
-	}
-	
 	public String getFieldName() {
 		return fieldName;
 	}
 	
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
-
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

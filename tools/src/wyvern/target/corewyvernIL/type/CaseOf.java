@@ -12,10 +12,5 @@ public class CaseOf extends CaseType {
 	public ValueType getValueType ()
 	{
 		return valueType;
-	}
-	
-	public void setValueType (ValueType _valueType)
-	{
-		valueType = _valueType;
-	}
+	}	
 }

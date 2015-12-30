@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class MethodGenContext extends GenContext {
@@ -50,13 +51,13 @@ public class MethodGenContext extends GenContext {
 
 	// TODO: this whole approach here is kind of hacky
 	@Override
-	public List<Declaration> genDeclSeq(GenContext origCtx) {
-		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
+	public List<Declaration> genDeclSeq(GenContext origCtx, HasLocation location) {
+		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx, location);
 		List<Expression> args = new LinkedList<Expression>();
 		for(FormalArg arg : method.getArgsILType()) {
 			args.add(new Variable(arg.getName()));
 		}
-		Expression body = new MethodCall(new Variable(method.getObjName()), methodName, args);
+		Expression body = new MethodCall(new Variable(method.getObjName()), methodName, args, location);
 		
 		DefDeclaration decl = new DefDeclaration(methodName, method.getArgsILType(), method.getReturnILType(), body);
 		decls.add(decl);

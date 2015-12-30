@@ -28,10 +28,6 @@ public class TypeDeclaration extends NamedDeclaration {
 	public Type getSourceType() {
 		return sourceType;
 	}
-	
-	public void setSourceType(Type sourceType) {
-		this.sourceType = sourceType;
-	}
 
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,

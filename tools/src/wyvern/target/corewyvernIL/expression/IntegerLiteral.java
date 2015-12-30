@@ -54,10 +54,6 @@ public class IntegerLiteral extends AbstractValue {
 		return value;
 	}
 
-	public void setValue(int value) {
-		this.value = value;
-	}
-
 	@Override
 	public ValueType typeCheck(TypeContext env) {
 		return Util.intType();

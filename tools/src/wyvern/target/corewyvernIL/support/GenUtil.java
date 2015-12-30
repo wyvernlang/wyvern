@@ -133,7 +133,7 @@ public class GenUtil {
 		} else {
 			/* when declaration sequence come to the end, create a new object for this module */
 			String newName = GenContext.generateName();
-			return new New(addedCtx.genDeclSeq(origCtx), newName, new StructuralType(newName, addedCtx.genDeclTypeSeq(origCtx)));
+			return new New(addedCtx.genDeclSeq(origCtx, null), newName, new StructuralType(newName, addedCtx.genDeclTypeSeq(origCtx)));
 		}
 	}
 
@@ -214,7 +214,7 @@ public class GenUtil {
 				Expression newExp = new New(decls, decl.getName(), type);
 				if(!ai.hasNext()) {
 					//return newExp;
-					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>()));
+					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>(), null));
 				} else {
 					return new Let(decl.getName(), newExp, genExpByIterator(genCtx, ai));
 				}

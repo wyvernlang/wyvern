@@ -37,26 +37,14 @@ public class FieldSet extends Expression {
 		return objectExpr;
 	}
 	
-	public void setObjectExpr(Expression objectExpr) {
-		this.objectExpr = objectExpr;
-	}
-	
 	public String getFieldName() {
 		return fieldName;
-	}
-	
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
 	}
 	
 	public Expression getExprToAssign() {
 		return exprToAssign;
 	}
 	
-	public void setExprToAssign(Expression exprToAssign) {
-		this.exprToAssign = exprToAssign;
-	}
-
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		

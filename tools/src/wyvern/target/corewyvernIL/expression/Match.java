@@ -29,26 +29,14 @@ public class Match extends Expression {
 		return matchExpr;
 	}
 	
-	public void setMatchExpr(Expression matchExpr) {
-		this.matchExpr = matchExpr;
-	}
-	
 	public Expression getElseExpr() {
 		return elseExpr;
-	}
-	
-	public void setElseExpr(Expression elseExpr) {
-		this.elseExpr = elseExpr;
 	}
 	
 	public List<Case> getCases() {
 		return cases;
 	}
 	
-	public void setCases(List<Case> cases) {
-		this.cases = cases;
-	}
-
 	@Override
 	public ValueType typeCheck(TypeContext env) {
 		// TODO Auto-generated method stub

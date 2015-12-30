@@ -61,24 +61,13 @@ public class DefDeclaration extends NamedDeclaration {
 		return formalArgs;
 	}
 	
-	public void setFormalArgs(List<FormalArg> formalArgs) {
-		this.formalArgs = formalArgs;
-	}
-	
 	public ValueType getType() {
 		return type;
-	}
-	public void setType(ValueType type) {
-		this.type = type;
 	}
 	
 	public Expression getBody() {
 		return body;
 	}
-	public void setBody(Expression body) {
-		this.body = body;
-	}
-
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

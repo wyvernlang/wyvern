@@ -58,10 +58,6 @@ public class StructuralType extends ValueType {
 		return selfName;
 	}
 	
-	public void setSelfName(String selfName) {
-		this.selfName = selfName;
-	}
-	
 	public List<DeclType> getDeclTypes() {
 		return declTypes;
 	}

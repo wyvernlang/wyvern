@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 
 public class InvocationExprGenerator implements CallableExprGenerator {
 
@@ -35,12 +36,12 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	}
 
 	@Override
-	public Expression genExprWithArgs(List<Expression> args) {
+	public Expression genExprWithArgs(List<Expression> args, HasLocation loc) {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
-			return new MethodCall(e, "apply", args);
+			return new MethodCall(e, "apply", args, loc);
 		} else {
-			return new MethodCall(receiver, declType.getName(), args);			
+			return new MethodCall(receiver, declType.getName(), args, loc);			
 		}
 	}
 

@@ -37,10 +37,6 @@ public class VarDeclaration extends DeclarationWithRHS {
 		return type;
 	}
 	
-	public void setType(ValueType type) {
-		this.type = type;
-	}
-	
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

@@ -60,10 +60,6 @@ public class Variable extends Expression implements Path {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	@Override
 	public ValueType typeCheck(TypeContext env) {
 		return env.lookup(name);

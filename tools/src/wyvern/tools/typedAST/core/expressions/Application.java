@@ -106,10 +106,10 @@ public class Application extends CachingTypedAST implements CoreAST {
             arguments = Arrays.asList(ExpressionWriter.generate(iw->argument.codegenToIL(environment, iw)));
         }
         if (function instanceof Invocation && ((Invocation) function).getArgument() == null) { // straight MethodCall
-            writer.write(new MethodCall(ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw)), ((Invocation) function).getOperationName(), arguments));
+            writer.write(new MethodCall(ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw)), ((Invocation) function).getOperationName(), arguments, this));
         }
         Expression expr = ExpressionWriter.generate(iw -> function.codegenToIL(environment, iw));
-        writer.write(new MethodCall(expr, "call", arguments));
+        writer.write(new MethodCall(expr, "call", arguments, this));
     }
 
     @Override
@@ -142,6 +142,6 @@ public class Application extends CachingTypedAST implements CoreAST {
         }
 		
 		// generate the call
-        return exprGen.genExprWithArgs(args);
+        return exprGen.genExprWithArgs(args, this);
 	}
 }

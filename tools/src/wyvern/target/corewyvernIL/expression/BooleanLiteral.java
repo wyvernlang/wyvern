@@ -22,10 +22,6 @@ public class BooleanLiteral extends AbstractValue {
         return value;
     }
 
-    public void setValue(boolean value) {
-        this.value = value;
-    }
-
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(value?"true":"false");

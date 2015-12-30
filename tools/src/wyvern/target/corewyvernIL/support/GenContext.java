@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -108,7 +109,7 @@ public abstract class GenContext extends TypeContext {
 	 * Generate the Wyvern IL declaration list for all mapping in the context
 	 * @return the Wyvern IL declaration list for all mapping inside the context
 	 */
-	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx); 
+	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx, HasLocation location); 
 	/**
 	 * Generate the Wyvern IL declType list for all mapping in the context
 	 * @return the Wyvern IL declType list for all mapping inside the context

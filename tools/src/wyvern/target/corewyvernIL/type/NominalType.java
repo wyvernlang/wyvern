@@ -76,18 +76,10 @@ public class NominalType extends ValueType{
 		return path;
 	}
 	
-	public void setPath(Path path) {
-		this.path = path;
-	}
-	
 	public String getTypeMember() {
 		return typeMember;
 	}
 	
-	public void setTypeMember(String typeMember) {
-		this.typeMember = typeMember;
-	}
-
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

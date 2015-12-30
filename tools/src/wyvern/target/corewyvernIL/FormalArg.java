@@ -28,18 +28,10 @@ public class FormalArg extends ASTNode implements EmitOIR {
 		return name;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 	public ValueType getType() {
 		return type;
 	}
 	
-	public void setType(ValueType type) {
-		this.type = type;
-	}
-
 	@Override
 	public <T> T acceptVisitor(ASTVisitor<T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

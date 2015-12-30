@@ -38,10 +38,6 @@ public class ValDeclaration extends DeclarationWithRHS {
 		return type;
 	}
 	
-	public void setType(ValueType type) {
-		this.type = type;
-	}
-	
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("val ").append(getName()).append(':');

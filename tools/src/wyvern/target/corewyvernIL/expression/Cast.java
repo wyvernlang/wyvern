@@ -22,10 +22,6 @@ public class Cast extends Expression{
 		return toCastExpr;
 	}
 
-	public void setToCastExpr(Expression toCastExpr) {
-		this.toCastExpr = toCastExpr;
-	}
-
 	@Override
 	public ValueType typeCheck(TypeContext env) {
 		// TODO Auto-generated method stub

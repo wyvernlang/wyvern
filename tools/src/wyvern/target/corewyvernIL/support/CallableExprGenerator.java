@@ -4,6 +4,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.tools.errors.HasLocation;
 
 /**
  * This abstraction allows more efficient code generation by
@@ -19,7 +20,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 public interface CallableExprGenerator {
 	public Expression genExpr();
 
-	public Expression genExprWithArgs(List<Expression> args);
+	public Expression genExprWithArgs(List<Expression> args, HasLocation loc);
 	
 	/** Returns null if no argument type is expected */
 	public List<FormalArg> getExpectedArgTypes(TypeContext ctx);

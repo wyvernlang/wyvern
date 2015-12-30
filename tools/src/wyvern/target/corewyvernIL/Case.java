@@ -13,24 +13,15 @@ public class Case extends ASTNode {
 		super();
 		this.pattern = pattern;
 		this.body = body;
-		this.setVarName(varName);
+		this.varName = varName;
 	}
 	public NominalType getPattern() {
 		return pattern;
 	}
-	public void setPattern(NominalType pattern) {
-		this.pattern = pattern;
-	}
 	public Expression getBody() {
 		return body;
 	}
-	public void setBody(Expression body) {
-		this.body = body;
-	}
 	public String getVarName() {
 		return varName;
-	}
-	public void setVarName(String varName) {
-		this.varName = varName;
 	}
 }

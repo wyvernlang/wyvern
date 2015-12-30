@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class VarGenContext extends GenContext {
@@ -47,8 +48,8 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx) {
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx);
+	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx, HasLocation location) {
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx, location);
 	    ValDeclaration decl = new ValDeclaration(var, type, expr);
 		decls.add(decl);
 		return decls;

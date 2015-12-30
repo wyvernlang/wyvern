@@ -156,7 +156,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 				arguments.add(ExpressionWriter.generate(iwriter->arg.codegenToIL(environment, iwriter)));
 			}
 		}
-		writer.write(new MethodCall(ExpressionWriter.generate(iwriter->receiver.codegenToIL(environment, iwriter)), operationName, arguments));
+		writer.write(new MethodCall(ExpressionWriter.generate(iwriter->receiver.codegenToIL(environment, iwriter)), operationName, arguments, this));
 	}
 
 	@Override
