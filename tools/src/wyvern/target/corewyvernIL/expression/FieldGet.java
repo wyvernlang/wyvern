@@ -46,11 +46,6 @@ public class FieldGet extends Expression implements Path {
 	}
 	
 	@Override
-	public String toString() {
-		return objectExpr.toString() + "." + fieldName;
-	}
-
-	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType vt = objectExpr.typeCheck(ctx);
 		DeclType dt = vt.findDecl(fieldName, ctx);

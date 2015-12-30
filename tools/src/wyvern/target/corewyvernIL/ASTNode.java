@@ -27,7 +27,7 @@ public abstract class ASTNode implements HasLocation {
 		doPrettyPrint(dest, "");
 		return dest.toString();
 	}
-	public String toString() {
+	public final String toString() {
 		try {
 			return prettyPrint();
 		} catch (IOException e) {

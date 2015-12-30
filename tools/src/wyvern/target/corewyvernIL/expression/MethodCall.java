@@ -58,11 +58,6 @@ public class MethodCall extends Expression {
 		dest.append(')');
 	}
 	
-	@Override
-	public String toString() {
-		return objectExpr.toString() + "." + methodName + "(" + args + ")";
-	}
-
 	public Expression getObjectExpr() {
 		return objectExpr;
 	}

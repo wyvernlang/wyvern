@@ -107,11 +107,6 @@ public class DefDeclType extends DeclTypeWithResult {
 	}
 
 	@Override
-	public String toString() {
-		return "Def[" + getName() + "(...) : " + getRawResultType() + " = ...]";
-	}
-
-	@Override
 	public DeclType adapt(View v) {
 		List<FormalArg> newArgs = new LinkedList<FormalArg>();
 		for (FormalArg a : args) {

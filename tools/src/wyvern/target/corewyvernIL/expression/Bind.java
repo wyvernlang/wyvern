@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -13,8 +15,13 @@ import wyvern.target.oir.OIREnvironment;
 public class Bind extends Expression {
 
 	@Override
-	public String toString() {
-		return "Let[" + varName + " = " + toReplace + " in " + inExpr + "]";
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		String newIndent = indent + "    ";
+		dest.append("bind\n").append(newIndent)
+		.append(varName).append(" = ");
+		toReplace.doPrettyPrint(dest,newIndent);
+		dest.append('\n').append(indent).append("in ");
+		inExpr.doPrettyPrint(dest,indent);
 	}
 
 	private String varName;

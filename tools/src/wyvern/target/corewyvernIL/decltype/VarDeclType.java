@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -72,7 +74,9 @@ public class VarDeclType extends DeclTypeWithResult implements EmitOIR{
 	}
 
 	@Override
-	public String toString() {
-		return "Var[" + getName() + " : " + getRawResultType() + "]";
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("var ").append(getName()).append(" : ");
+		getRawResultType().doPrettyPrint(dest, indent);
+		dest.append('\n');
 	}
 }

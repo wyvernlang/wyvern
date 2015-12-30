@@ -33,11 +33,6 @@ public class IntegerLiteral extends AbstractValue {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return Integer.toString(value);
-	}
-
 	private int value;
 
 	public IntegerLiteral(int value) {

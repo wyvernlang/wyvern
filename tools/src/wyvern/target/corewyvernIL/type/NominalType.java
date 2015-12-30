@@ -51,11 +51,6 @@ public class NominalType extends ValueType{
 		return path.equals(other.path) && typeMember.equals(other.typeMember);
 	}
 
-	@Override
-	public String toString() {
-		return path.toString() + "." + typeMember.toString();
-	}
-
 	private Path path;
 	private String typeMember;
 	

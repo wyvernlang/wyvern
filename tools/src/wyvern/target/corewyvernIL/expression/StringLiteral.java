@@ -53,11 +53,6 @@ public class StringLiteral extends Literal {
         }
     }
 
-    @Override
-    public String toString() {
-        return this.value.toString();
-    }
-
 	@Override
 	public ValueType typeCheck(TypeContext env) {
         return Util.stringType();

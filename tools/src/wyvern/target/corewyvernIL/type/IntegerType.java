@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -22,8 +24,8 @@ public class IntegerType extends ValueType {
 	}
 
 	@Override
-	public String toString() {
-		return "Int";
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append("Int");
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -95,9 +96,12 @@ public class FieldSet extends Expression {
 	}
 	
 	@Override
-	public String toString() {
-		return objectExpr.toString() + "." + fieldName + " = " + exprToAssign.toString();
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		objectExpr.doPrettyPrint(dest,indent);
+		dest.append('.').append(fieldName);
+		dest.append(" = ");
+		exprToAssign.doPrettyPrint(dest,indent);
 	}
-	
+
 	
 }

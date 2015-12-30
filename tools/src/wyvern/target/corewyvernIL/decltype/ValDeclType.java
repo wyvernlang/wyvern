@@ -72,11 +72,6 @@ public class ValDeclType extends DeclTypeWithResult implements EmitOIR{
 	}
 
 	@Override
-	public String toString() {
-		return "Val[" + getName() + " : " + getRawResultType() + "]";
-	}
-
-	@Override
 	public DeclType adapt(View v) {
 		return new ValDeclType(getName(), this.getRawResultType().adapt(v));
 	}

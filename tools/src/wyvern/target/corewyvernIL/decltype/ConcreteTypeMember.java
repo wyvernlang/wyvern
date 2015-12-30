@@ -83,11 +83,6 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 	}
 
 	@Override
-	public String toString() {
-		return "TypeMember[" + getName() + " = " + getRawResultType() + "]";
-	}
-
-	@Override
 	public DeclType adapt(View v) {
 		return new ConcreteTypeMember(getName(), this.getRawResultType().adapt(v));
 	}
