@@ -213,21 +213,21 @@ public class ILTests {
 	}
 
 	@Test
-	public void testAssignStructuralTypes() throws ParseException {
-		String input = "val firstObj = new\n"
-					 + "    var a : system.Int = 10\n"
-					 + "val secondObj = new\n"
-					 + "    var b : system.Int = 20\n"
-					 + "firstObj = secondObj\n"
-					 + "firstObj.a\n";
+	public void testTypeDeclarations () throws ParseException {
+		String input = "resource type Doubler\n"
+					 + "    def double(argument : system.Int) : system.Int\n"
+					 + "val d : Doubler = new\n"
+					 + "	def double (argument : system.Int) : system.Int\n"
+					 + "		argument * 2\n"
+					 + "d.double(5)";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx);
 		ValueType type = program.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Util.intType(), type);
 		Value result = program.interpret(EvalContext.empty());
-		IntegerLiteral twenty = new IntegerLiteral(20);
-		Assert.assertEquals(result, twenty);
+		IntegerLiteral ten = new IntegerLiteral(10);
+		Assert.assertEquals(result, ten);
 	}
 	
 	@Test
