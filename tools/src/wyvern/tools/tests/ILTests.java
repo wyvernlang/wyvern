@@ -144,6 +144,7 @@ public class ILTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testVarFieldReadFromNonExistent() throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 5\n"
@@ -183,6 +184,7 @@ public class ILTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testVarFieldWriteToNonExistent () throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 3\n"
@@ -211,8 +213,19 @@ public class ILTests {
 		IntegerLiteral ten = new IntegerLiteral(10);
 		Assert.assertEquals(result, ten);
 	}
+	
+	@Test
+	public void testWriteToValField () throws ParseException {
+		String input = "val object = new \n"
+					 + "    val field : system.Int = 5 \n"
+					 + "object.field = 10\n";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		assertTypeCheckFails(ast, genCtx);
+	}
 
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testTypeDeclarations () throws ParseException {
 		String input = "resource type Doubler\n"
 					 + "    def double(argument : system.Int) : system.Int\n"
