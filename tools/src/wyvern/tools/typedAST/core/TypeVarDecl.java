@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -302,5 +303,14 @@ public class TypeVarDecl extends Declaration {
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		StructuralType type = computeInternalILType(ctx);
 		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
+	}
+	
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		wyvern.target.corewyvernIL.decl.Declaration decl =
+			new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(),
+					computeInternalILType(tlc.getContext()));
+		DeclType dt = genILType(tlc.getContext());
+		tlc.addModuleDecl(decl,dt);
 	}
 }

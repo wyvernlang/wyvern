@@ -50,7 +50,7 @@ public class GenUtil {
 	public static GenContext link(GenContext genCtx, wyvern.target.corewyvernIL.decl.Declaration decl) {
 		if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
 			wyvern.target.corewyvernIL.decl.ValDeclaration vd = (wyvern.target.corewyvernIL.decl.ValDeclaration) decl;
-			return genCtx.extend(vd.getName(), vd.getDefinition(), vd.getType()); // manually adding instead of linking
+			return genCtx.extend(vd.getName(), new Variable(vd.getName())/*vd.getDefinition()*/, vd.getType()); // manually adding instead of linking
 		} else if (decl instanceof wyvern.target.corewyvernIL.decl.TypeDeclaration) {
 			wyvern.target.corewyvernIL.decl.TypeDeclaration td = (wyvern.target.corewyvernIL.decl.TypeDeclaration) decl;
 			return genCtx.extend(td.getName(), new Variable(td.getName()), (ValueType) td.getSourceType()); // manually adding instead of linking

@@ -22,10 +22,10 @@ import wyvern.target.oir.OIREnvironment;
 
 public class FieldGet extends Expression implements Path {
 
-	private Expression objectExpr;
+	private IExpr objectExpr;
 	private String fieldName;
 	
-	public FieldGet(Expression objectExpr, String fieldName) {
+	public FieldGet(IExpr objectExpr, String fieldName) {
 		super();
 		this.objectExpr = objectExpr;
 		this.fieldName = fieldName;
@@ -37,7 +37,7 @@ public class FieldGet extends Expression implements Path {
 		dest.append('.').append(fieldName);
 	}
 
-	public Expression getObjectExpr() {
+	public IExpr getObjectExpr() {
 		return objectExpr;
 	}
 	

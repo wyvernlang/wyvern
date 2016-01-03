@@ -109,6 +109,6 @@ public abstract class Declaration extends AbstractTreeWritable implements Enviro
 
 	//public abstract void addModuleDecl(TopLevelContext tlc);
 	public void addModuleDecl(TopLevelContext tlc) {
-		//throw new RuntimeException("not implemented");
+		throw new RuntimeException("not implemented");
 	}
 }

@@ -139,7 +139,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 			ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
 		FieldGet fieldGet = (FieldGet) exprFieldGet;
 		String fieldName = fieldGet.getName();
-		Expression objExpr = fieldGet.getObjectExpr();
+		IExpr objExpr = fieldGet.getObjectExpr();
 		
 		// Return FieldSet.
 		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);

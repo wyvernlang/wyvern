@@ -352,8 +352,8 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 		tlc.setReceiverName(null);
 	
-		/* wrap the declaration into an object */
+		/* wrap the declarations into an object */
 		Expression newExp = new New(decls, newName, type);
-		tlc.addLet(newName, type, newExp);
+		tlc.addLet(newName, type, newExp, true);
 	}
 }

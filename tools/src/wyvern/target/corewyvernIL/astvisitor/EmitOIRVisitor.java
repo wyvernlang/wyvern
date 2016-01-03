@@ -212,7 +212,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		OIRExpression oirObject;
 		Expression object;
 		
-		object = fieldGet.getObjectExpr();
+		object = (Expression) fieldGet.getObjectExpr();
 		oirObject = (OIRExpression) object.acceptVisitor(this, 
 				env, oirenv);
 		oirFieldGet = new OIRFieldGet (oirObject, fieldGet.getName());
@@ -248,7 +248,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		Expression object;
 		Expression toSet;
 		
-		object = fieldSet.getObjectExpr();
+		object = (Expression) fieldSet.getObjectExpr();
 		toSet = fieldSet.getExprToAssign();
 		oirObject = (OIRExpression) object.acceptVisitor(this, env,
 				oirenv);

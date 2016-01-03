@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -38,25 +39,16 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	private Type reference;
 	private FileLocation location;
 
-	public TypeAbbrevDeclaration() {
-		
-	}
-	
 	public TypeAbbrevDeclaration(String alias, Type reference, FileLocation loc) {
 		this.alias = alias;
 		this.reference = reference;
 		this.location = loc;
-				
 	}
 	
 	public Type getReference() {
 		return reference;
 	}
 	
-	public String getAlias() {
-		return alias;
-	}
-
 	@Override
 	public Type getType() {
 		// TODO Auto-generated method stub
@@ -156,7 +148,7 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	@Override
 	public DeclType genILType(GenContext ctx) {
 		ValueType referenceILType = reference.getILType(ctx);
-		return new ConcreteTypeMember(getAlias(), referenceILType);
+		return new ConcreteTypeMember(getName(), referenceILType);
 	}
 
 	@Override
@@ -170,10 +162,15 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
 			GenContext ctx) {
 		ValueType referenceILType = reference.getILType(ctx);
-		return new TypeDeclaration(getAlias(), referenceILType);
+		return new TypeDeclaration(getName(), referenceILType);
 	}
-
 	
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext());
+		DeclType dt = genILType(tlc.getContext());
+		tlc.addModuleDecl(decl,dt);
+	}
 
 	
 

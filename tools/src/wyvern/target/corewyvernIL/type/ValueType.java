@@ -16,8 +16,20 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	 *  
 	 * @param ctx TODO
 	 */
-	public StructuralType getStructuralType(TypeContext ctx) {
-		return StructuralType.getEmptyType();
+	public final StructuralType getStructuralType(TypeContext ctx) {
+		return getStructuralType(ctx, StructuralType.getEmptyType());
+	}
+
+	/**
+	 * Returns the equivalent structural type.  If the structural type
+	 * is unknown (e.g. because this is a nominal type and the
+	 * corresponding type member is abstract from this context) then
+	 * the default type is returned 
+	 *  
+	 * @param ctx TODO
+	 */
+	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
+		return theDefault;
 	}
 
 	public boolean isSubtypeOf(Type t, TypeContext ctx) {
@@ -32,6 +44,12 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 		return st.findDecl(declName, ctx);
 	}
 
+	/**
+	 * Returns a type that is equivalent to this type
+	 * under the View v.  If v maps x to y.f, for example,
+	 * then a type of the form x.g.T will be mapped to the
+	 * type y.f.g.T
+	 */
 	public abstract ValueType adapt(View v);
 
 	public boolean equalsInContext(ValueType otherType, TypeContext ctx) {

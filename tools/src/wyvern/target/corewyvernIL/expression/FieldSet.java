@@ -22,11 +22,11 @@ import wyvern.tools.errors.ToolError;
 
 public class FieldSet extends Expression {
 
-	private Expression objectExpr;
+	private IExpr objectExpr;
 	private String fieldName;
 	private Expression exprToAssign;
 	
-	public FieldSet(ValueType exprType, Expression objectExpr,
+	public FieldSet(ValueType exprType, IExpr objectExpr,
 			String fieldName, Expression exprToAssign) {
 		super(exprType);
 		this.objectExpr = objectExpr;
@@ -34,7 +34,7 @@ public class FieldSet extends Expression {
 		this.exprToAssign = exprToAssign;
 	}
 
-	public Expression getObjectExpr() {
+	public IExpr getObjectExpr() {
 		return objectExpr;
 	}
 	

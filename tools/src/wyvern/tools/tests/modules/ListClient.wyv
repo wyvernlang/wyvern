@@ -1,5 +1,7 @@
-// TODO: shouldn't need this
-module ListClient
+// TODO: shouldn't need "resource" here
+// TODO: shouldn't have to be called "main"
+// TODO: shouldn't need a module declaration at all
+resource module main
 
 import Lists
 

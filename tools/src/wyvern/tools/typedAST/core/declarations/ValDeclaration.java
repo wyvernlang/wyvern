@@ -247,7 +247,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void genTopLevel(TopLevelContext tlc) {
-		tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext()));
+		tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext()), false);
 	}
 
 	@Override

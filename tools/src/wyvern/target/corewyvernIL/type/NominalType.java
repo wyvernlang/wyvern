@@ -19,13 +19,13 @@ import wyvern.target.oir.OIREnvironment;
 public class NominalType extends ValueType{
 	
 	@Override
-	public StructuralType getStructuralType(TypeContext ctx) {
+	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
 		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
-			return vt.getStructuralType(ctx);
+			return vt.getStructuralType(ctx, theDefault);
 		} else {
-			return super.getStructuralType(ctx);
+			return super.getStructuralType(ctx, theDefault);
 		}
 	}
 
@@ -75,6 +75,18 @@ public class NominalType extends ValueType{
 		return typeMember;
 	}
 	
+	public boolean isSubtypeOf(Type t, TypeContext ctx) {
+		if (equals(t))
+			return true;
+		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+		if (dt instanceof ConcreteTypeMember) {
+			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+			return vt.isSubtypeOf(t, ctx);
+		} else {
+			return false; // nominal equality was the best we can do 
+		}
+	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

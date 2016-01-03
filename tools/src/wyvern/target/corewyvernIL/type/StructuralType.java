@@ -10,6 +10,8 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIRAST;
@@ -73,14 +75,14 @@ public class StructuralType extends ValueType {
 	}
 
 	@Override
-	public StructuralType getStructuralType(TypeContext ctx) {
+	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
 		return this;
 	}
 	
 	@Override
 	public boolean isSubtypeOf(Type t, TypeContext ctx) {
 		if (t instanceof NominalType) {
-			StructuralType st = ((NominalType) t).getStructuralType(ctx);
+			StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
 			if (st == null) 
 				return false; // abstract type; I am not a subtype of this
 			else
@@ -91,10 +93,12 @@ public class StructuralType extends ValueType {
 			return false;
 		
 		StructuralType st = (StructuralType) t;
+		st = (StructuralType) st.adapt(new ReceiverView(new Variable(st.selfName), new Variable(selfName)));
 		
+		TypeContext extendedCtx = ctx.extend(selfName, this);
 		for (DeclType dt : st.declTypes) {
 			DeclType candidateDT = findDecl(dt.getName(), ctx);
-			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, ctx)) {
+			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx)) {
 				return false;
 			}
 		}

@@ -42,7 +42,9 @@ public class New extends Expression {
 	
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append("new ").append(selfName).append(" =>\n");
+		dest.append("new ").append(selfName).append(" : ");
+		getExprType().doPrettyPrint(dest, indent);
+		dest.append(" =>\n");
 		boolean first = true;
 		
 		for (Declaration decl: decls) {

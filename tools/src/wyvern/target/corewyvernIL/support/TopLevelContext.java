@@ -1,15 +1,19 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javafx.util.Pair;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -19,6 +23,7 @@ public class TopLevelContext {
 	//private List<Pair<Declaration,DeclType>> moduleDecls = new LinkedList<Pair<Declaration,DeclType>>();
 	private List<Declaration> moduleDecls = new LinkedList<Declaration>();
 	private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
+	private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
 	private GenContext ctx;
 	private String receiverName;
 	//private Expression expression;
@@ -46,10 +51,28 @@ public class TopLevelContext {
 	public Expression getModuleExpression() {
 		String newName = GenContext.generateName();
 		ValueType vt = new StructuralType(newName, moduleDeclTypes);
+		vt = adapt(vt, newName);
 		Expression exp = new New(moduleDecls, newName, vt);
 		addExpression(exp);
 		
 		return getExpression();
+	}
+	/** Adapts the type vt to account for the names we have to
+	 * avoid.
+	 */
+	private ValueType adapt(ValueType vt, String thisName) {
+		for (Map.Entry<String, Boolean> e : avoidanceMap.entrySet()) {
+			Variable v = new Variable(e.getKey());
+			boolean isDeclBlock = e.getValue();
+			Variable receiver = new Variable(thisName);
+			Path newPath = receiver;
+			if (!isDeclBlock) {
+				newPath = new FieldGet(receiver, e.getKey());
+			}
+			View view = new ReceiverView(v, newPath);
+			vt = vt.adapt(view);
+		}
+		return vt;
 	}
 	
 	public void addExpression(Expression exp) {
@@ -64,9 +87,10 @@ public class TopLevelContext {
 		name = null;*/
 	}
 
-	public void addLet(String name, ValueType type, Expression exp) {
+	public void addLet(String name, ValueType type, Expression exp, boolean isDeclBlock) {
 		pending.push(new Pair<String,Expression>(name, exp));
 		ctx = ctx.extend(name, new Variable(name), type);
+		avoidanceMap.put(name, isDeclBlock);
 	}
 
 	public void updateContext(GenContext newCtx) {

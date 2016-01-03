@@ -141,7 +141,6 @@ public class ModuleSystemTests {
 	}
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testADT() throws ParseException {
 		
 		String[] fileList = {"Lists.wyv", "ListClient.wyv"};
@@ -162,7 +161,7 @@ public class ModuleSystemTests {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "five"); 
 		
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);

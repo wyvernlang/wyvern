@@ -78,7 +78,7 @@ public abstract class GenContext extends TypeContext {
 		else {
 			assert (ast instanceof TypeAbbrevDeclaration);
 			TypeAbbrevDeclaration typeAbbrevDecl = (TypeAbbrevDeclaration) ast;
-			return new TypeGenContext(typeAbbrevDecl.getAlias(), newName, this); 
+			return new TypeGenContext(typeAbbrevDecl.getName(), newName, this); 
 		}
 		
 		
