@@ -118,7 +118,8 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 				return body;
 			}			
 		};
-		return GenUtil.doGenModuleIL(ctx, ctx, ctx, myIter, false);
+		throw new RuntimeException("not implemented");
+		//return GenUtil.doGenModuleIL(ctx, ctx, ctx, myIter, false);
 		
 		/*if (!declIter.hasNext())
 			throw new RuntimeException("oops, no decls in the let");

@@ -24,27 +24,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public abstract class GenContext extends TypeContext {
 	
-	/* ILMethod: the type of an IL method */
-	public static class ILMethod {
-		String objName;
-		wyvern.tools.typedAST.core.declarations.DefDeclaration defDecl;
-		
-		public ILMethod(String objName, wyvern.tools.typedAST.core.declarations.DefDeclaration defDecl) {
-			this.objName = objName;
-			this.defDecl = defDecl;
-		}
-		
-		public String getObjName() {
-			return objName;
-		}
-		public List<FormalArg> getArgsILType() {
-			return defDecl.getArgILTypes();
-		}
-		public ValueType getReturnILType() {
-			return defDecl.getReturnILType();
-		}
-	}
-	
 	public GenContext extend(String var, Expression expr, ValueType type) {
 		return new VarGenContext(var, expr, type, this);
 	}
@@ -94,8 +73,7 @@ public abstract class GenContext extends TypeContext {
 			//assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
 			wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
 			String methodName = methodDecl.getName();
-			ILMethod method = new ILMethod(newName, methodDecl);
-			return new MethodGenContext(methodName, method, this); 
+			return new MethodGenContext(methodName, newName, this); 
 		}
 		else {
 			assert (ast instanceof TypeAbbrevDeclaration);
@@ -105,16 +83,6 @@ public abstract class GenContext extends TypeContext {
 		
 		
 	}
-	/**
-	 * Generate the Wyvern IL declaration list for all mapping in the context
-	 * @return the Wyvern IL declaration list for all mapping inside the context
-	 */
-	public abstract List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx, HasLocation location); 
-	/**
-	 * Generate the Wyvern IL declType list for all mapping in the context
-	 * @return the Wyvern IL declType list for all mapping inside the context
-	 */
-	public abstract List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(GenContext origCtx);
 
 	/**
 	 * Internal recursive version.

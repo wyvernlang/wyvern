@@ -42,25 +42,8 @@ public class TypeGenContext extends GenContext {
 	}
 
 	@Override
-	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
-		List<DeclType> declts = genContext == origCtx ? new LinkedList<DeclType>():genContext.genDeclTypeSeq(origCtx);
-		DeclType declt = new ConcreteTypeMember(typeName, new NominalType(objName, typeName)); 
-		declts.add(declt);
-		
-		return declts;
-	}
-
-	@Override
 	public ValueType lookup(String varName) {
 		return genContext.lookup(varName);
-	}
-
-	@Override
-	public List<Declaration> genDeclSeq(GenContext origCtx, HasLocation location) {
-		List<Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx, location);
-		TypeDeclaration decl = new TypeDeclaration(typeName, new NominalType(objName, typeName));
-		decls.add(decl);
-		return decls;
 	}
 
 	@Override

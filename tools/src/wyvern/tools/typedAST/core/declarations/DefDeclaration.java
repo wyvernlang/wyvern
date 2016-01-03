@@ -5,8 +5,10 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -261,6 +263,24 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return generateDecl(ctx, ctx);
 	}
 
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		List<Expression> args = new LinkedList<Expression>();
+		for(NameBinding arg : argNames) {
+			args.add(new Variable(arg.getName()));
+		}
+		if (tlc.getReceiverName() == null)
+			throw new RuntimeException("must set receiver name before addModuleDecl on a def");
+		Expression body = new MethodCall(new Variable(tlc.getReceiverName()), name, args, this);
+		
+		if (argILTypes == null)
+			throw new NullPointerException("need to call topLevelGen/generateDecl before addModuleDecl");
+		wyvern.target.corewyvernIL.decl.DefDeclaration decl =
+			new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body);
+		
+		DeclType dt = genILType(tlc.getContext());
+		tlc.addModuleDecl(decl,dt);
+	}
 
 	public List<FormalArg> getArgILTypes() {
 		return argILTypes;

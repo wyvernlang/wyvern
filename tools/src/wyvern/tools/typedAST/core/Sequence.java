@@ -5,6 +5,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -13,6 +14,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -57,6 +59,9 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 
 	public static Sequence append(Sequence s, TypedAST e) {
 		Iterator<TypedAST> innerIter = s.iterator();
+		if (s instanceof DeclSequence && e instanceof Declaration) {
+			return DeclSequence.simplify(new DeclSequence(s, e));
+		}
 		return new Sequence(() -> new Iterator<TypedAST>() {
 			private boolean fetched = false;
 			@Override
@@ -347,13 +352,28 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	 */
 	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
 		Sequence seqWithBlocks = combine();
-		Iterator<TypedAST> ai = seqWithBlocks.iterator();
+		
+		TopLevelContext tlc = new TopLevelContext(ctx);
+		seqWithBlocks.genTopLevel(tlc);
+		Expression result = isModule?tlc.getModuleExpression():tlc.getExpression();
+		
+		/*Iterator<TypedAST> ai = seqWithBlocks.iterator();
 		
 		if (!ai.hasNext())
 			throw new RuntimeException("expected an expression in the list");
 		
-		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ctx, ai, isModule);
-		return decl;
+		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ctx, ai, isModule);*/
+		return result;
+	}
+
+	@Override
+	public void genTopLevel(TopLevelContext tlc) {
+		for (TypedAST ast : exps) {
+			ast.genTopLevel(tlc);
+			if (ast instanceof Declaration) {
+				((Declaration)ast).addModuleDecl(tlc);
+			}
+		}
 	}
 
 	/**
@@ -367,7 +387,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		Sequence recSequence = new DeclSequence();
 		for (TypedAST ast : this.getIterator()) {
 			
-			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration) {
+			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration || ast instanceof TypeAbbrevDeclaration) {
 				Declaration d = (Declaration) ast;
 				if(recBlock == false) {
 					recBlock = true;

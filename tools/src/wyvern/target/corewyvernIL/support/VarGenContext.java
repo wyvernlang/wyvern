@@ -48,22 +48,6 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public List<wyvern.target.corewyvernIL.decl.Declaration> genDeclSeq(GenContext origCtx, HasLocation location) {
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = genContext == origCtx ? new LinkedList<Declaration>():genContext.genDeclSeq(origCtx, location);
-	    ValDeclaration decl = new ValDeclaration(var, type, expr);
-		decls.add(decl);
-		return decls;
-	} 
-	
-	@Override
-	public List<wyvern.target.corewyvernIL.decltype.DeclType> genDeclTypeSeq(GenContext origCtx) {
-		List<wyvern.target.corewyvernIL.decltype.DeclType> declts = genContext == origCtx ? new LinkedList<DeclType>():genContext.genDeclTypeSeq(origCtx);
-	    wyvern.target.corewyvernIL.decltype.DeclType declt = new ValDeclType(var, type);
-		declts.add(declt);
-		return declts;
-	}
-
-	@Override
 	public String getContainerForTypeAbbrev(String typeName) {
 		return genContext.getContainerForTypeAbbrev(typeName);
 	}

@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.abs;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
@@ -105,4 +106,9 @@ public abstract class Declaration extends AbstractTreeWritable implements Enviro
 	 * @return the declaration generated 
 	 */
 	public abstract wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx);
+
+	//public abstract void addModuleDecl(TopLevelContext tlc);
+	public void addModuleDecl(TopLevelContext tlc) {
+		//throw new RuntimeException("not implemented");
+	}
 }

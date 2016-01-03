@@ -28,16 +28,6 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	public List<Declaration> genDeclSeq(GenContext origCtx, HasLocation location) {
-		return new LinkedList<Declaration>();
-	}
-
-	@Override
-	public List<DeclType> genDeclTypeSeq(GenContext origCtx) {
-		return new LinkedList<DeclType>();
-	}
-
-	@Override
 	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}

@@ -6,6 +6,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -245,6 +246,11 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
+	public void genTopLevel(TopLevelContext tlc) {
+		tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext()));
+	}
+
+	@Override
 	public DeclType genILType(GenContext ctx) {
 		ValueType vt = getILValueType(ctx);
 		return new ValDeclType(getName(), vt);
@@ -271,5 +277,15 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		wyvern.target.corewyvernIL.decl.Declaration decl =
+			new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(),
+					getILValueType(tlc.getContext()),
+					new wyvern.target.corewyvernIL.expression.Variable(getName()));
+		DeclType dt = genILType(tlc.getContext());
+		tlc.addModuleDecl(decl,dt);
 	}
 }

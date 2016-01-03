@@ -4,7 +4,11 @@ package wyvern.tools.typedAST.core.declarations;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -316,4 +320,40 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return normalSeq;
 	}
 	
+	
+	@Override
+	public void genTopLevel(TopLevelContext tlc) {
+		String newName = GenContext.generateName();
+		
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+				new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
+				new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
+		
+		GenContext newCtx = tlc.getContext();
+		
+		for(TypedAST seq_ast : getDeclIterator()) {
+			Declaration d = (Declaration) seq_ast;
+			// TODO: refactor to make rec a method of Declaration
+			newCtx = newCtx.rec(newName, d); // extend the environment
+			declts.add(d.genILType(newCtx));
+		}
+		
+		ValueType type = new StructuralType(newName, declts);
+		GenContext genCtx = newCtx.extend(newName, new Variable(newName), type);
+		
+		tlc.updateContext(genCtx);
+		tlc.setReceiverName(newName);
+		for(TypedAST seq_ast : getDeclIterator()) {
+			Declaration d = (Declaration) seq_ast;
+			wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(genCtx);
+			decls.add(decl);
+			d.addModuleDecl(tlc);
+		}
+		tlc.setReceiverName(null);
+	
+		/* wrap the declaration into an object */
+		Expression newExp = new New(decls, newName, type);
+		tlc.addLet(newName, type, newExp);
+	}
 }

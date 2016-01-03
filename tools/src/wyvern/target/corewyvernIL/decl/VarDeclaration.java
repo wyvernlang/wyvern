@@ -1,6 +1,9 @@
 package wyvern.target.corewyvernIL.decl;
 
 import wyvern.target.corewyvernIL.Environment;
+
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -32,6 +35,15 @@ public class VarDeclaration extends DeclarationWithRHS {
 		this.type = type;
 	}
 	
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("var ").append(getName()).append(':');
+		type.doPrettyPrint(dest, indent);
+		dest.append(" = ");
+		getDefinition().doPrettyPrint(dest, indent);
+		dest.append('\n');
+	}
+
 	@Override
 	public ValueType getType() {
 		return type;

@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.HasParser;
@@ -45,5 +46,8 @@ public interface TypedAST extends TreeWritable, HasLocation {
 
 	public static HasParser meta$get() {
 		return () -> new QuoteParser();
-	}	
+	}
+	public default void genTopLevel(TopLevelContext tlc) {
+		throw new RuntimeException("genTopLevel not implemented for " + this.getClass());
+	}
 }
