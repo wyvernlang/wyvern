@@ -89,10 +89,15 @@
 				<path refid="classpath.base" />
 				<pathelement location="${build.dir}"/>
 			</classpath>
-        <formatter type="brief" usefile="false" />
-        <batchtest>
-            <fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
-        </batchtest>
-    </junit>
-  </target>
+            <formatter type="brief" usefile="false" />
+			<batchtest>
+				<fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
+			</batchtest>
+		</junit>
+    </target>
+	<target name="clean"
+			description="clean up">
+		<!-- Delete the ${build.dir} directory tree -->
+		<delete dir="${build.dir}"/>
+	</target>
 </project>
