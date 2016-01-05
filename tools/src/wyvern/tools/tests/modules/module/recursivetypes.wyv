@@ -1,9 +1,7 @@
 // Test recursive types
 
-type T	// use instead of B in A to test everything but recursion in the syntax
-
 type A
-	def identity(b:T):T
+	def identity(b:B):B
 
 type B
 	def getA():A
@@ -11,9 +9,10 @@ type B
 	
 val b:B = new
 	def getA():A = new
-		def identity(bb:T):T = bb
+		def identity(bb:B):B = bb
 		
 	def getValue():system.Int = 5
 
 b.getValue()
-//b.getA().identity(b).getValue()
+
+b.getA().identity(b).getValue()

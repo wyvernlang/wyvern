@@ -336,6 +336,10 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			Declaration d = (Declaration) seq_ast;
 			// TODO: refactor to make rec a method of Declaration
 			newCtx = newCtx.rec(newName, d); // extend the environment
+		}
+		
+		for(TypedAST seq_ast : getDeclIterator()) {
+			Declaration d = (Declaration) seq_ast;
 			declts.add(d.genILType(newCtx));
 		}
 		
