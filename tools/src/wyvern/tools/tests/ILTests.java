@@ -424,6 +424,23 @@ public class ILTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
+	public void testFib() throws ParseException {
+		
+        String source = TestUtil.readFile(PATH + "bool-nat-fib.wyv");
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx);
+        TypeContext ctx = TypeContext.empty();
+        ValueType t = program.typeCheck(ctx);
+        // Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        //IntegerLiteral five = new IntegerLiteral(5);
+        //Assert.assertEquals(five, v);
+	}
+
+	@Test
 	public void testLambda() throws ParseException {
 		
         String source = TestUtil.readFile(PATH + "lambdatest.wyv");
