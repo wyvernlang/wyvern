@@ -6,7 +6,7 @@ no-arg: { statements }	// using type-directed parsing
 one-arg, inferred type: x => expression
 
 still to test:
-	nicer function type abbreviations, convenient syntax for invoking apply
+	nicer function type abbreviations
 	one-arg functions with inferred types
 	no-arg lambda syntax
 */
@@ -22,11 +22,11 @@ type IntIntFn
 type HigherIntFn
 	def apply(x:system.Int,y:IntIntFn):system.Int
 
-val getFive:UnitIntFn = #() => 5
+val getFive:UnitIntFn = () => 5
 
-val id:IntIntFn = #(x:system.Int) => x
+val id:IntIntFn = (x:system.Int) => x
 
-val higherOrder:HigherIntFn = #(x:system.Int,y:IntIntFn) => y.apply(x)
+val higherOrder:HigherIntFn = (x:system.Int,y:IntIntFn) => y.apply(x)
 
 val x = getFive.apply()
 

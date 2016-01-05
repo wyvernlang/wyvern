@@ -461,7 +461,7 @@ public class ILTests {
 
         String source = "type UnitIntFn \n"
             + "     def apply():system.Int \n"
-            + "val getFive:UnitIntFn = #() => 5\n"
+            + "val getFive:UnitIntFn = () => 5\n"
             + "getFive.apply()";
 
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
@@ -491,7 +491,7 @@ public class ILTests {
 
         String source = "type UnitIntFn \n"
             + "     def apply():system.Int \n"
-            + "val getFive:UnitIntFn = #() => 5\n"
+            + "val getFive:UnitIntFn = () => 5\n"
             + "getFive()";
 
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);

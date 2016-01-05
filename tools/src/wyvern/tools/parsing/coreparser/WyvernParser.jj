@@ -415,6 +415,7 @@ Object CaseArm() :
 AST Expression(ExpFlags flags) :
 { AST exp; AST exp2 = null; Object formal; Token t = null; }
 {
+  LOOKAHEAD(3)
   exp = AdditiveExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
   	if (exp2 != null) {
   		return build.assignment(exp, exp2, loc(t));
@@ -424,7 +425,8 @@ AST Expression(ExpFlags flags) :
 |
   <FN> formal = Formal() <ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp); }
 |
-    <POUND> exp = LambdaFn(flags) { return exp; }
+    LOOKAHEAD(3)
+    exp = LambdaFn(flags) { return exp; }
 }
 
 AST LambdaFn(ExpFlags flags) :
