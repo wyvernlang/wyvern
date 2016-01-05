@@ -51,7 +51,7 @@ def succ(n:Nat):Nat
 // TODO(2): avoid requirement to use # below
 def fibonacci(n:Nat):Nat
 	n.caseAnalyze(
-		#() => succ(zero),
-		#(p:Nat) => n.times(fibonacci(p)))
+		() => succ(zero),
+		(p:Nat) => n.times(fibonacci(p)))
 
 fibonacci(succ(succ(succ(zero))))
