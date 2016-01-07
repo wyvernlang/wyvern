@@ -16,6 +16,8 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 
 public class New extends Expression {
 	
@@ -86,6 +88,7 @@ public class New extends Expression {
 		StructuralType requiredT = t.getStructuralType(ctx);
 		StructuralType actualT = new StructuralType(selfName, dts);
 		if (!actualT.isSubtypeOf(requiredT, ctx)) {
+			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 			throw new RuntimeException("typechecking error: not a subtype");
 		}
 		

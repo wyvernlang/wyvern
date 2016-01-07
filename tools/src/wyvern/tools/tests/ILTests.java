@@ -2,12 +2,14 @@ package wyvern.tools.tests;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -24,6 +26,7 @@ import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
@@ -139,6 +142,18 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testVarFieldReadFromNonExistent() throws ParseException {
+		String input = "val obj = new\n"
+					 + "    var v : system.Int = 5\n"
+					 + "obj.x\n";
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		assertTypeCheckFails(ast, genCtx);
+	}
+	
 	@Test
 	public void testVarFieldWrite() throws ParseException {
 		String input = "val obj = new\n"
@@ -157,6 +172,77 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	
+	@Test
+	public void testVarFieldWriteToWrongType() throws ParseException {
+		String input = "val obj = new\n"
+					 + "    var v : system.Int = 3\n"
+					 + "obj.v = \"hello\"\n";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		assertTypeCheckFails(ast, genCtx);
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testVarFieldWriteToNonExistent () throws ParseException {
+		String input = "val obj = new\n"
+					 + "    var v : system.Int = 3\n"
+					 + "obj.x = 5\n";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		assertTypeCheckFails(ast, genCtx);
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testWriteFieldtoOtherField () throws ParseException {
+		// Need to declare a structural type T, then declare firstObj as var firstObj : T = new ...
+		String input = "val firstObj = new\n"
+					 + "    var a : system.Int = 5\n"
+				     + "val secondObj = new\n"
+				     + "    var b : system.Int = 10\n"
+				     + "firstObj.a = secondObj.b\n"
+				     + "firstObj.a";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+		ValueType type = program.typeCheck(TypeContext.empty());
+		Assert.assertEquals(Util.intType(), type);
+		Value result = program.interpret(EvalContext.empty());
+		IntegerLiteral ten = new IntegerLiteral(10);
+		Assert.assertEquals(result, ten);
+	}
+	
+	@Test
+	public void testWriteToValField () throws ParseException {
+		String input = "val object = new \n"
+					 + "    val field : system.Int = 5 \n"
+					 + "object.field = 10\n";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		assertTypeCheckFails(ast, genCtx);
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTypeDeclarations () throws ParseException {
+		String input = "resource type Doubler\n"
+					 + "    def double(argument : system.Int) : system.Int\n"
+					 + "val d : Doubler = new\n"
+					 + "	def double (argument : system.Int) : system.Int\n"
+					 + "		argument * 2\n"
+					 + "d.double(5)";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx);
+		ValueType type = program.typeCheck(TypeContext.empty());
+		Assert.assertEquals(Util.intType(), type);
+		Value result = program.interpret(EvalContext.empty());
+		IntegerLiteral ten = new IntegerLiteral(10);
+		Assert.assertEquals(result, ten);
+	}
+	
 	@Test
 	public void testDefDecl() throws ParseException {
 		String input = "val obj = new\n"
@@ -598,4 +684,19 @@ public class ILTests {
 			return Integer.toString(Integer.parseInt(s)+1);
 		}
 	}
+	
+
+	/**
+	 * Asserts that the given AST should not successfully typecheck and should throw 
+	 * some kind of ToolError.
+	 * @param ast: ast that should fail typechecking.
+	 */
+	private static void assertTypeCheckFails(ExpressionAST ast, GenContext genCtx) {
+		try {
+			Expression program = ast.generateIL(genCtx);
+			program.typeCheck(TypeContext.empty());
+			Assert.fail("A type error should have been reported.");
+		} catch (ToolError toolError) {}
+	}
+	
 }
