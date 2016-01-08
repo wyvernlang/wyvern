@@ -26,8 +26,8 @@ val false : Bool = new
 	def iff(trueCase:UnitNatFn, falseCase:UnitNatFn):Nat
 		falseCase()
 	
-// TODO(3 - delegate): really need "this" in the source syntax
-val zero : Nat = new z =>
+// TODO(3 - delegate): really need to rename "this" in the source syntax
+val zero : Nat = new //z =>
 	def isZero():Bool
 		true
 	def caseAnalyze(zeroCase:UnitNatFn, succCase:NatNatFn):Nat
@@ -35,7 +35,7 @@ val zero : Nat = new z =>
 	def plus(n:Nat):Nat
 		n
 	def times(n:Nat):Nat
-		z
+		this // z
 
 def succ(n:Nat):Nat
 	new
@@ -48,7 +48,6 @@ def succ(n:Nat):Nat
 		def times(n1:Nat):Nat
 			succ(n.times(n1).plus(n))
 			
-// TODO(2): avoid requirement to use # below
 def fibonacci(n:Nat):Nat
 	n.caseAnalyze(
 		() => succ(zero),
