@@ -31,9 +31,9 @@ public class StructuralType extends ValueType {
 		super();
 		this.selfName = selfName;
 		// check a sanity condition
-		if (declTypes != null && declTypes.size()>0)
-			if (declTypes.get(0) == null)
-				throw new NullPointerException("invariant: decl types should not be null");
+//		if (declTypes != null && declTypes.size()>0)
+//			if (declTypes.get(0) == null)
+//				throw new NullPointerException("invariant: decl types should not be null");
 		this.declTypes = declTypes;
 		this.resourceFlag = resourceFlag;
 	}

@@ -5,20 +5,28 @@ import java.util.List;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class ObjectValue extends New implements Invokable {
 	final EvalContext evalCtx; // captured eval context
+	final boolean hasDelegate;
+	ObjectValue delegateTarget;
 	
 	/** Precondition: the decls argument must be unique.
 	 * It is owned by this ObjectValue after the constructor call.
 	 */
-	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, EvalContext ctx) {
+	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, DelegateDeclaration delegateDecl,EvalContext ctx) {
 		super(decls, selfName, exprType);
+		
 		if (selfName == null || selfName.length() == 0)
 			throw new RuntimeException("selfName invariant violated");
 		evalCtx = ctx.extend(selfName, this);
+		hasDelegate = delegateDecl != null ? true : false; 
+		if (hasDelegate) {
+			delegateTarget = (ObjectValue)ctx.lookup(delegateDecl.getFieldName());
+		}
 	}
 
 	@Override
@@ -26,16 +34,31 @@ public class ObjectValue extends New implements Invokable {
 		ctx = ctx.combine(evalCtx);
 		EvalContext methodCtx = ctx;
 		DefDeclaration dd = (DefDeclaration) findDecl(methodName);
-		for (int i = 0; i < args.size(); ++i) {
-			methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getName(), args.get(i));
+		if (dd != null) {
+			for (int i = 0; i < args.size(); ++i) {
+				methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getName(), args.get(i));
+			}
+			return dd.getBody().interpret(methodCtx);
 		}
-		return dd.getBody().interpret(methodCtx);
+		else if(hasDelegate) {
+			return delegateTarget.invoke(methodName, args, methodCtx);
+		}
+		else {
+			throw new RuntimeException("can't reach here");
+		}
 	}
 
 	@Override
 	public Value getField(String fieldName, EvalContext ctx) {
 		DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName);
-		return (Value) decl.getDefinition();
+		if (decl != null) {
+			return (Value) decl.getDefinition();
+		}
+		else if(delegateTarget != null && delegateTarget.findDecl(fieldName) != null) {
+			return delegateTarget.getField(fieldName, ctx);
+		}
+		
+		throw new RuntimeException("can't find field: " + fieldName);
 	}
 
 	public void setDecl(Declaration decl) {

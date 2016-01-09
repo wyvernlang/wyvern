@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -274,26 +275,47 @@ public class New extends CachingTypedAST implements CoreAST {
 	@Override
 	public Expression generateIL(GenContext ctx) {
 		// TODO see if the user specified a different self name
-		String selfName = "this";
-		// fake an appropriate context
-		GenContext tempThisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), null);
-		// compute the structural type for this
-		List<DeclType> declTypes = new LinkedList<DeclType>();
-		for (TypedAST d : seq) {
-			DeclType t = ((Declaration) d).genILType(tempThisContext);
-			declTypes.add(t);
-		}
-		ValueType type = new StructuralType(selfName, declTypes);
-		// TODO translate the ascribed type, if any
-		// translate the declarations
-		GenContext thisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), type);
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		for (TypedAST d : seq) {
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
-			if (decl == null)
-				throw new NullPointerException();
-			decls.add(decl);
-		}
-		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
+				String selfName = "this";
+				// fake an appropriate context
+				GenContext tempThisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), null);
+				// compute the structural type for this
+				List<DeclType> declTypes = new LinkedList<DeclType>();
+				
+				ValueType type = null;
+				
+				wyvern.tools.typedAST.core.declarations.DelegateDeclaration delegateDecl = null;
+				
+				for (TypedAST d : seq) {
+					if (d instanceof wyvern.tools.typedAST.core.declarations.DelegateDeclaration) {
+						delegateDecl = (wyvern.tools.typedAST.core.declarations.DelegateDeclaration)d;
+					}
+					else {
+						DeclType t = ((Declaration) d).genILType(tempThisContext);
+						declTypes.add(t);
+					}
+				}
+				// add delegate object's declaration which not been override
+				if (delegateDecl != null) {
+					StructuralType delegateStructuralType = delegateDecl.getType().getILType(tempThisContext).getStructuralType(tempThisContext);
+					for (DeclType declType : delegateStructuralType.getDeclTypes()) {
+						if (!declTypes.stream().anyMatch(newDefDecl-> newDefDecl.isSubtypeOf(declType, tempThisContext))) {
+							declTypes.add(declType);
+						}
+					}
+				}
+				
+				
+				type = new StructuralType(selfName, declTypes);
+				// TODO translate the ascribed type, if any
+				// translate the declarations
+				GenContext thisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), type);
+				List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+				for (TypedAST d : seq) {
+					wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
+					if (decl == null)
+						throw new NullPointerException();
+					decls.add(decl);
+				}
+				return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
 	}
 }
