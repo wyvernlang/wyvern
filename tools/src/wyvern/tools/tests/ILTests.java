@@ -694,7 +694,10 @@ public class ILTests {
 	private static void assertTypeCheckFails(ExpressionAST ast, GenContext genCtx) {
 		try {
 			Expression program = ast.generateIL(genCtx);
-			program.typeCheck(TypeContext.empty());
+			
+			// not quite right, but works for now
+			// TODO: replace this with a standard prelude
+			program.typeCheck(TypeContext.empty().extend("system", Util.unitType()));
 			Assert.fail("A type error should have been reported.");
 		} catch (ToolError toolError) {}
 	}
