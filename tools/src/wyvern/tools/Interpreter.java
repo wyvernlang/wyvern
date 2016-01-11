@@ -8,21 +8,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import wyvern.tools.tests.tagTests.TestUtil;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class Interpreter {
 
+
+    /**
+     * The interpreter only supports 1 argument, which is the path to the Wyvern file.
+     * If more arguments are supplied, it will exit with an error.
+     * Then, the file is read in to memory in it's entirety, before being executed in an empty context. The resulting value is printed to the screen.
+     */
 	public static void main(String[] args) {
 		
-        System.out.println("Running the interpreter.");
         if(args.length != 1) {
 			System.err.println("usage: wyvern <filename>");
 			System.exit(1);
@@ -32,10 +38,9 @@ public class Interpreter {
         Path filepath = Paths.get(filename);
         if(!Files.isReadable(filepath)) {
             System.err.println("Cannot read file " + filename);
-			System.exit(-1);
+			System.exit(1);
         }
 
-        // TODO include the try/catch block for the parse error.
         String source = TestUtil.readFile(filepath.toAbsolutePath().toString());
         try {
             ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
@@ -45,8 +50,9 @@ public class Interpreter {
             Value v = program.interpret(EvalContext.empty());
             System.out.println(v.toString());
         } catch(ParseException e) {
-            System.err.println("Failed to parse file.");
-            e.printStackTrace();
+            System.err.println(e.toString());
+        } catch(ToolError e) {
+            System.err.println(e.getTypecheckingErrorMessage().toString());
         }
     }
 }
