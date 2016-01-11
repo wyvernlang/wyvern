@@ -3,11 +3,14 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -23,6 +26,8 @@ public class New extends Expression {
 	
 	private List<Declaration> decls;
 	private String selfName;
+	private boolean hasDelegate;
+	private DelegateDeclaration delegateDeclaration;
 	
 	public New(List<Declaration> decls, String selfName, ValueType type) {
 		super(type);
@@ -31,6 +36,13 @@ public class New extends Expression {
 		for (Declaration d : decls) {
 			if (d == null)
 				throw new NullPointerException();
+		}
+		
+		Optional<Declaration> delegate_option = decls.stream().filter(d-> d instanceof DelegateDeclaration).findFirst();
+		
+		hasDelegate = delegate_option.isPresent();
+		if (hasDelegate) {
+			delegateDeclaration = (DelegateDeclaration)delegate_option.get();
 		}
 	}
 
@@ -73,37 +85,56 @@ public class New extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		List<DeclType> dts = new LinkedList<DeclType>();
+        List<DeclType> dts = new LinkedList<DeclType>();
 		
 		TypeContext thisCtx = ctx.extend(selfName, getExprType());
 		
-		// check that all decls are well-typed
-		for (Declaration d : decls) {
+		for (Declaration d : decls_ExceptDelegate()) {
 			DeclType dt = d.typeCheck(ctx, thisCtx);
 			dts.add(dt);
 		}
 		
+		ValueType type = getExprType();
+		if (hasDelegate) {
+			ValueType delegateObjectType = ctx.lookup(delegateDeclaration.getFieldName()); 
+			
+			
+			
+			StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
+			// new defined declaration will override delegate object's method definition if they had subType relationship
+			for (DeclType declType : delegateStructuralType.getDeclTypes()) {
+				if (!dts.stream().anyMatch(newDefDeclType-> newDefDeclType.isSubtypeOf(declType, thisCtx))) {
+					dts.add(declType);
+				}
+			}
+		}
+		
 		// check that everything in the claimed structural type was accounted for
-		ValueType t = getExprType();
-		StructuralType requiredT = t.getStructuralType(ctx);
+		StructuralType requiredT = type.getStructuralType(ctx);
 		StructuralType actualT = new StructuralType(selfName, dts);
 		if (!actualT.isSubtypeOf(requiredT, ctx)) {
-			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 			throw new RuntimeException("typechecking error: not a subtype");
 		}
 		
-		return t;
+		return type;
 	}
 
 	@Override
 	public Value interpret(EvalContext ctx) {
+Value result = null;
+		
 		// evaluate all decls
 		List<Declaration> ds = new LinkedList<Declaration>();
-		for (Declaration d : decls) {;
+		for (Declaration d : decls_ExceptDelegate()) {;
 			Declaration newD = d.interpret(ctx);
 			ds.add(newD);
 		}
-		ObjectValue objValue = new ObjectValue(ds, selfName, getExprType(), ctx);
-		return objValue;
+		result = new ObjectValue(ds, selfName, getExprType(),delegateDeclaration, ctx);
+		
+		return result;
+	}
+	
+	private List<Declaration> decls_ExceptDelegate() {
+		return decls.stream().filter(x->x != delegateDeclaration).collect(Collectors.toList());
 	}
 }
