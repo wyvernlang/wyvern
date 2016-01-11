@@ -85,18 +85,20 @@ public class New extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-List<DeclType> dts = new LinkedList<DeclType>();
+        List<DeclType> dts = new LinkedList<DeclType>();
 		
 		TypeContext thisCtx = ctx.extend(selfName, getExprType());
+		
+		for (Declaration d : decls_ExceptDelegate()) {
+			DeclType dt = d.typeCheck(ctx, thisCtx);
+			dts.add(dt);
+		}
 		
 		ValueType type = getExprType();
 		if (hasDelegate) {
 			ValueType delegateObjectType = ctx.lookup(delegateDeclaration.getFieldName()); 
 			
-			for (Declaration d : decls_ExceptDelegate()) {
-				DeclType dt = d.typeCheck(ctx, thisCtx);
-				dts.add(dt);
-			}
+			
 			
 			StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
 			// new defined declaration will override delegate object's method definition if they had subType relationship
@@ -106,13 +108,7 @@ List<DeclType> dts = new LinkedList<DeclType>();
 				}
 			}
 		}
-		else {
-			// check that all decls are well-typed
-			for (Declaration d : decls) {
-				DeclType dt = d.typeCheck(ctx, thisCtx);
-				dts.add(dt);
-			}
-		}
+		
 		// check that everything in the claimed structural type was accounted for
 		StructuralType requiredT = type.getStructuralType(ctx);
 		StructuralType actualT = new StructuralType(selfName, dts);
