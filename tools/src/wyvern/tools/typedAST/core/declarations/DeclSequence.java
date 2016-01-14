@@ -306,11 +306,11 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 				}
 				recSequence = Sequence.append(recSequence, d);
 			} else if(!(d instanceof ImportDeclaration) && !(d instanceof Instantiation)) {
-				if(recBlock == false) {
+				if(recBlock == true) {
+				    recBlock = false;
 					normalSeq = Sequence.append(normalSeq, recSequence);
 				}
 				normalSeq = Sequence.append(normalSeq, d);
-			    recBlock = true;
 			}
 		}
 		
