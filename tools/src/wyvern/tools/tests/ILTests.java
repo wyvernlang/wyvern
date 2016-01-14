@@ -516,7 +516,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testFib() throws ParseException {
 		
         String source = TestUtil.readFile(PATH + "bool-nat-fib.wyv");
