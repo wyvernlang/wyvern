@@ -31,8 +31,7 @@ public class ObjectValue extends New implements Invokable {
 
 	@Override
 	public Value invoke(String methodName, List<Value> args, EvalContext ctx) {
-		ctx = ctx.combine(evalCtx);
-		EvalContext methodCtx = ctx;
+		EvalContext methodCtx = evalCtx;
 		DefDeclaration dd = (DefDeclaration) findDecl(methodName);
 		if (dd != null) {
 			for (int i = 0; i < args.size(); ++i) {
