@@ -31,6 +31,8 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class GenUtil {
 
+	private final static int JAVA_REC_DEPTH = 1;
+	
 	/**
 	 * Linking of single modules </br>
 	 * 
@@ -130,7 +132,7 @@ public class GenUtil {
         if (javaClass.getName().equals("java.lang.String")) {
             return Util.stringType();
         }
-		if (touched.contains(javaClass.getName()) || touched.size() > 5) {
+		if (touched.contains(javaClass.getName()) || touched.size() > JAVA_REC_DEPTH) {
 			// TODO: revise strategy to support recursive types
 			return null;
 		}
