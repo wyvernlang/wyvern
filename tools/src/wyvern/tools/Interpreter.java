@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -40,7 +41,8 @@ public class Interpreter {
         String source = TestUtil.readFile(filepath.toAbsolutePath().toString());
         try {
             ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-            Expression program = ast.generateIL(GenContext.empty());
+    		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+            Expression program = ast.generateIL(genCtx);
             TypeContext ctx = TypeContext.empty();
             program.typeCheck(ctx);
             Value v = program.interpret(EvalContext.empty());

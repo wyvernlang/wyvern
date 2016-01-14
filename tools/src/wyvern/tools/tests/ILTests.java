@@ -26,6 +26,7 @@ import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.Interpreter;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -395,7 +396,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testSimpleDelegation() throws ParseException {
 		String input = "type IntResult\n"
 					 + "    def getResult():system.Int\n\n"
@@ -490,6 +490,12 @@ public class ILTests {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
+	}
+	
+	@Test
+	public void testInterpreterOnScript() {
+		String[] args = new String[] { PATH + "recursivetypes.wyv" };
+		Interpreter.main(args);
 	}
 	
 	
