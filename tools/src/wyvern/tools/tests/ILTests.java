@@ -653,6 +653,28 @@ public class ILTests {
 	}
 	
 	@Test
+	public void testBigInt() throws ParseException {
+        String source = TestUtil.readFile(PATH + "bigint.wyv");
+		TypedAST ast = TestUtil.getNewAST(source);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		decls.add(decl);
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+		Value mainV = mainProgram.interpret(EvalContext.empty());
+		Assert.assertEquals(Util.intType(), t);		
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
+	
+	@Test
 	public void testJavaImport2() throws ParseException {
 		String input = "resource module main\n\n"
 //					 + "require ffi/java\n\n"
@@ -690,6 +712,12 @@ public class ILTests {
 		}
 	}
 	
+	public static IntLibrary intLibrary = new IntLibrary();
+	public static class IntLibrary {
+		public int add(int i, int j) {
+			return i+j;
+		}
+	}
 
 	/**
 	 * Asserts that the given AST should not successfully typecheck and should throw 
