@@ -247,7 +247,6 @@ public class ModuleSystemTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testTopLevelVarsSimple () throws ParseException {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		genCtx = new TypeGenContext("Int", "system", genCtx);
@@ -271,7 +270,7 @@ public class ModuleSystemTests {
 		
 		// Evaluate.
 		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
-		Assert.assertEquals(new IntegerLiteral(10), result);
+		Assert.assertEquals(new IntegerLiteral(5), result);
 		
 	}
 	

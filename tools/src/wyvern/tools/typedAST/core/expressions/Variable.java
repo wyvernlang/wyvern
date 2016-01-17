@@ -1,26 +1,17 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
-import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FieldGet;
-import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -33,7 +24,6 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -157,9 +147,10 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this);
 		Variable anonReference = anonReferenceOpt.get();
 		
-		// Replace with an invocation to anonymous object's getter.
-		Invocation inv = new Invocation(anonReference, TopLevelContext.anonymousGetterName(), null, null);
-		inv.genTopLevel(tlc);
+		// Replace with an invocation to anonymous object's getter method.
+		Invocation anonInvocation = new Invocation(anonReference, TopLevelContext.anonymousGetterName(), null, null);
+		Application anonMethodCall = new Application(anonInvocation, UnitVal.getInstance(null), null);
+		anonMethodCall.genTopLevel(tlc);
 		
 	}
 	
