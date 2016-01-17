@@ -147,7 +147,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 		// Figure out name of anonymous object.
 		Optional<Variable> anonReferenceOpt = tlc.anonymousObjectReference(this.getName());
 		if (!anonReferenceOpt.isPresent())
-			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this);
+			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, this.getName());
 		Variable anonReference = anonReferenceOpt.get();
 		
 		// Replace with an invocation to anonymous object's getter method.
