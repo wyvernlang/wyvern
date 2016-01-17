@@ -8,14 +8,18 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -32,6 +36,8 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -177,12 +183,51 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void genTopLevel (TopLevelContext tlc) {
 
-		// Create the var primitive and update the top-level context.
 		GenContext ctx = tlc.getContext();
-		String varName = getName();
-		ValueType varType = getILValueType(ctx);
-		Expression varExpr = this.definition.generateIL(ctx);
-		tlc.updateContext(ctx.extend(varName, varExpr, varType));
+		
+		// Name and type of this variable.
+		String varName = this.getName();
+		
+		if (definitionType == null)
+			definitionType = definition.getType();
+		
+		Type typeOfVar = this.definitionType;
+		ValueType valTypeOfVar = typeOfVar.getILType(ctx);	
+		
+		// Create the body of the anonymous object.
+		List<Declaration> decls = new LinkedList<>();
+		decls.add(this);
+
+		// Object name and variable reference.
+		String objName = TopLevelContext.getAnonymousVarName(varName);
+		wyvern.tools.typedAST.core.expressions.Variable objReference =
+				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		
+		// Create the getter declaration.
+		String getterName = "get";
+		Invocation getterBody = new Invocation(objReference, varName, null, null);
+		DefDeclaration getterDecl = new DefDeclaration(getterName, typeOfVar, new LinkedList<>(),
+														 getterBody, false, null);
+		decls.add(getterDecl);
+		
+		// Create the anonymous object.
+		DeclSequence declSeq = new DeclSequence(decls);
+		New objInstantiation = new New(declSeq, null);
+		Expression expr = objInstantiation.generateIL(ctx);
+		ValueType objType = declSeq.figureOutType(ctx);
+		
+		GenContext newCtx = tlc.getContext().extend(objName, expr, objType);
+		tlc.updateContext(newCtx);
+		tlc.addLet(objName, objType, expr, false);
+		
+		/*
+		 * 
+	public New(DeclSequence seq, FileLocation fileLocation) {
+		this.seq = seq;
+		this.location = fileLocation;
+	}
+
+		 */
 		
 	}
 	

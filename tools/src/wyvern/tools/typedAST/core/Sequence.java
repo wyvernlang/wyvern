@@ -1,11 +1,17 @@
 package wyvern.tools.typedAST.core;
 
+import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -14,8 +20,10 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
+import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
@@ -332,13 +340,49 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		/*Iterator<TypedAST> ai = exps.iterator();
-		
-		if (!ai.hasNext())
-			throw new RuntimeException("expected an expression in the list");
-		
-		return GenUtil.doGenIL(ctx, ai);*/
 		return generateModuleIL(ctx, false);
+	}
+	
+	public ValueType figureOutType (GenContext ctx) {
+		
+		// Set up a phony "this" in the context.
+		String selfName = "this";
+		GenContext tmpCtx = ctx.extend(selfName, new Variable(selfName), null);
+		
+		// Figure out structural type for the "this" variable.
+		List<DeclType> declTypes = new LinkedList<>();
+
+		wyvern.tools.typedAST.core.declarations.DelegateDeclaration delegateDecl = null;
+		
+		Iterator<TypedAST> iter = this.flatten();
+		while (iter.hasNext()) {
+			TypedAST ast = iter.next();
+			if (ast instanceof wyvern.tools.typedAST.core.declarations.DelegateDeclaration) {
+				delegateDecl = (wyvern.tools.typedAST.core.declarations.DelegateDeclaration)ast;
+			}
+			else if (ast instanceof Declaration) {
+				DeclType t = ((Declaration) ast).genILType(tmpCtx);
+				declTypes.add(t);
+			}
+			else {
+				System.out.println("wot");
+				continue; // some expression, skip it.
+			}
+		}
+
+		// Add delegate object's declaration which not been overriden.
+		if (delegateDecl != null) {
+			StructuralType delegateStructuralType = delegateDecl.getType().getILType(tmpCtx).getStructuralType(tmpCtx);
+			for (DeclType declType : delegateStructuralType.getDeclTypes()) {
+				if (!declTypes.stream().anyMatch(newDefDecl-> newDefDecl.isSubtypeOf(declType, tmpCtx))) {
+					declTypes.add(declType);
+				}
+			}
+		}
+		
+		// Update context with the type of the "this" variable.
+		return new StructuralType(selfName, declTypes);
+		
 	}
 	
 	/**
@@ -351,19 +395,48 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	 * @return the IL expression of a module
 	 */
 	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
-		Sequence seqWithBlocks = combine();
 		
+		// Script preprocessing.
+		if (!isModule) {
+
+			// Figure out type of "this" to allow for self-referential statements.
+			ValueType moduleType = this.figureOutType(ctx);
+			ctx = ctx.extend("this", new Variable("this"), moduleType);
+			
+		}
 		TopLevelContext tlc = new TopLevelContext(ctx);
+		
+		// Generate module IL by looking at everything in sequence.
+		Sequence seqWithBlocks = combine();
 		seqWithBlocks.genTopLevel(tlc);
 		Expression result = isModule?tlc.getModuleExpression():tlc.getExpression();
-		
-		/*Iterator<TypedAST> ai = seqWithBlocks.iterator();
-		
-		if (!ai.hasNext())
-			throw new RuntimeException("expected an expression in the list");
-		
-		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ctx, ai, isModule);*/
 		return result;
+		
+	}
+	
+	/**
+	 * Check to see whether execution of this sequence will capture or modify state.
+	 * @return boolean
+	 */
+	private boolean isStateful () {
+		for (TypedAST ast : exps) {
+			if (ast instanceof VarDeclaration || ast instanceof FieldSet) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Turn a sequence of code without a module into an anonymous module.
+	 * @param ctx: ctx to evaluate in.
+	 * @return a ModuleDeclaration.
+	 */
+	public ModuleDeclaration asHeadlessModule (GenContext ctx) {
+		boolean isResourceModule = this.isStateful();
+		String anonymousName = GenContext.generateName();
+		ModuleDeclaration moduleDecl = new ModuleDeclaration(anonymousName, (EnvironmentExtender)this, null, isResourceModule);
+		return moduleDecl;
 	}
 
 	@Override
