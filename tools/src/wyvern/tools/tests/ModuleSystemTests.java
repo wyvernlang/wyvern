@@ -247,7 +247,7 @@ public class ModuleSystemTests {
 	}
 	
 	@Test
-	public void testTopLevelVarsSimple () throws ParseException {
+	public void testTopLevelVarGet () throws ParseException {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
@@ -260,17 +260,37 @@ public class ModuleSystemTests {
 		Sequence seq = (Sequence) ast;
 		Expression program = seq.generateIL(genCtx);
 		
-		// Figure out the type of this code as a module, add to TypeContext.
-		ValueType vt = seq.figureOutType(genCtx);
-		TypeContext ctx = TypeContext.empty().extend("this", vt);
-		
 		// Typecheck. 
-		ValueType t = program.typeCheck(ctx);
+		ValueType t = program.typeCheck(GenContext.empty());
 		Assert.assertEquals(Util.intType(), t);
 		
 		// Evaluate.
 		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
 		Assert.assertEquals(new IntegerLiteral(5), result);
+		
+	}
+	
+	@Test
+	public void testTopLevelVarSet () throws ParseException {
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		String source = "var v : Int = 5\n"
+					  + "v = 10\n"
+					  + "v\n";
+		
+		// Generate code to be evaluated.
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx);
+		
+		// Typecheck. 
+		ValueType t = program.typeCheck(GenContext.empty());
+		Assert.assertEquals(Util.intType(), t);
+		
+		// Evaluate.
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
 		
 	}
 	
