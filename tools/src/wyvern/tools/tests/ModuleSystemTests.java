@@ -26,6 +26,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -41,6 +42,7 @@ import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
+import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -223,20 +225,53 @@ public class ModuleSystemTests {
 	@Category(CurrentlyBroken.class)
 	public void testTopLevelVars () throws ParseException {
 		
-		String[] fileList = {"Database.wyv", "DatabaseUser.wyv"};
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		// Load and link Database.wyv.
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl);
 		
-		for(String fileName : fileList) {
-			System.out.println(fileName);
-			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-			decls.add(decl);
-			genCtx = GenUtil.link(genCtx, decl);
-		}
+		// Interpret DatabaseUser.wyv with Database.wyv in the context.
+		String source = TestUtil.readFile(PATH + "DatabaseUser.wyv");
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx);
+		TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
 		
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTopLevelVarsSimple () throws ParseException {
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		String source = "var v : Int = 5\n"
+					  + "v\n";
+		
+		// Generate code to be evaluated.
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Sequence seq = (Sequence) ast;
+		Expression program = seq.generateIL(genCtx);
+		
+		// Figure out the type of this code as a module, add to TypeContext.
+		ValueType vt = seq.figureOutType(genCtx);
+		TypeContext ctx = TypeContext.empty().extend("this", vt);
+		
+		// Typecheck. 
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		
+		// Evaluate.
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
 		
 	}
 	
