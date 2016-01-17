@@ -39,8 +39,10 @@ import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
@@ -215,6 +217,27 @@ public class ModuleSystemTests {
 		
 		// Should compile OK, but top-level vars not implemented yet.
 		// (21/12/2015)
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTopLevelVars () throws ParseException {
+		
+		String[] fileList = {"Database.wyv", "DatabaseUser.wyv"};
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		
+		for(String fileName : fileList) {
+			System.out.println(fileName);
+			String source = TestUtil.readFile(PATH + fileName);
+			TypedAST ast = TestUtil.getNewAST(source);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			decls.add(decl);
+			genCtx = GenUtil.link(genCtx, decl);
+		}
+		
+		
 	}
 	
 }
