@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -161,9 +162,45 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), binding.getType().getILType(ctx), definition.generateIL(ctx));
 	}
 
+	/**
+	 * Internal helper method. Return the ValueType of this definition. If the type isn't
+	 * currently set, it will figure it out and set the type.
+	 * @param ctx: ctx to evaulate.
+	 * @return the ValueType of the definition of this VarDeclaration.
+	 */
+	private ValueType getILValueType (GenContext ctx) {
+		if (definitionType == null)
+			definitionType = definition.getType();
+		return definitionType.getILType(ctx);
+	}
+	
+	@Override
+	public void genTopLevel (TopLevelContext tlc) {
+
+		// Create the var primitive and update the top-level context.
+		GenContext ctx = tlc.getContext();
+		String varName = getName();
+		ValueType varType = getILValueType(ctx);
+		Expression varExpr = this.definition.generateIL(ctx);
+		tlc.updateContext(ctx.extend(varName, varExpr, varType));
+		
+	}
+	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		GenContext ctx = tlc.getContext();
+		wyvern.target.corewyvernIL.decl.Declaration decl;
+		decl = new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(),
+																  getILValueType(ctx),
+																  definition.generateIL(ctx));
+		DeclType dt = genILType(tlc.getContext());
+		tlc.addModuleDecl(decl,dt);		
+	}
+	
 }
