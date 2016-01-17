@@ -134,7 +134,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		// Figure out receiver and field.
 		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
 		Expression exprFieldGet = cegReceiver.genExpr();
-		if (!(target instanceof wyvern.tools.typedAST.core.expressions.Variable))
+		if (!(target instanceof FieldGet))
 			ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
 		
 		// Extract information from FieldGet.
