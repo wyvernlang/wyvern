@@ -10,12 +10,16 @@ import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.*;
@@ -143,4 +147,20 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 	public CallableExprGenerator getCallableExpr(GenContext ctx) {
 		return ctx.getCallableExpr(getName());
 	}
+	
+	@Override
+	public void genTopLevel (TopLevelContext tlc) {
+		
+		// Figure out name of anonymous object.
+		Optional<Variable> anonReferenceOpt = tlc.anonymousObjectReference(this.getName());
+		if (!anonReferenceOpt.isPresent())
+			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this);
+		Variable anonReference = anonReferenceOpt.get();
+		
+		// Replace with an invocation to anonymous object's getter.
+		Invocation inv = new Invocation(anonReference, TopLevelContext.anonymousGetterName(), null, null);
+		inv.genTopLevel(tlc);
+		
+	}
+	
 }

@@ -182,7 +182,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	
 	@Override
 	public void genTopLevel (TopLevelContext tlc) {
-
 		GenContext ctx = tlc.getContext();
 		
 		// Name and type of this variable.
@@ -195,17 +194,19 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		ValueType valTypeOfVar = typeOfVar.getILType(ctx);	
 		
 		// Create the body of the anonymous object.
+	
+		// Internal name of anonymous object.
+		String anonName = tlc.anonymousObjectGenerate(varName);
+
+		// Body of anonymous object will be stored here.
 		List<Declaration> decls = new LinkedList<>();
 		decls.add(this);
 
-		// Object name and variable reference.
-		String objName = TopLevelContext.getAnonymousVarName(varName);
-		wyvern.tools.typedAST.core.expressions.Variable objReference =
-				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
-		
-		// Create the getter declaration.
-		String getterName = "get";
-		Invocation getterBody = new Invocation(objReference, varName, null, null);
+		// Create a declaration for the anonymous object's getter.
+		String getterName = TopLevelContext.anonymousGetterName();
+		wyvern.tools.typedAST.core.expressions.Variable selfReference = new
+				wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		Invocation getterBody = new Invocation(selfReference, varName, null, null);
 		DefDeclaration getterDecl = new DefDeclaration(getterName, typeOfVar, new LinkedList<>(),
 														 getterBody, false, null);
 		decls.add(getterDecl);
@@ -216,9 +217,9 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		Expression expr = objInstantiation.generateIL(ctx);
 		ValueType objType = declSeq.figureOutType(ctx);
 		
-		GenContext newCtx = tlc.getContext().extend(objName, expr, objType);
+		GenContext newCtx = tlc.getContext().extend(anonName, expr, objType);
 		tlc.updateContext(newCtx);
-		tlc.addLet(objName, objType, expr, false);
+		tlc.addLet(anonName, objType, expr, false);
 		
 		/*
 		 * 
