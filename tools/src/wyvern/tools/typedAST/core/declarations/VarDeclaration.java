@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
+import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -204,12 +205,26 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 		// Create a declaration for the anonymous object's getter.
 		String getterName = TopLevelContext.anonymousGetterName();
-		wyvern.tools.typedAST.core.expressions.Variable selfReference = new
+		wyvern.tools.typedAST.core.expressions.Variable selfReferenceGetter = new
 				wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
-		Invocation getterBody = new Invocation(selfReference, varName, null, null);
+		Invocation getterBody = new Invocation(selfReferenceGetter, varName, null, null);
 		DefDeclaration getterDecl = new DefDeclaration(getterName, typeOfVar, new LinkedList<>(),
 														 getterBody, false, null);
 		decls.add(getterDecl);
+		
+		// Create a declaration for the anonymous object's setter.
+		String setterName = TopLevelContext.anonymousSetterName();
+		wyvern.tools.typedAST.core.expressions.Variable selfReferenceSetter = new
+				wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		Invocation fieldGet = new Invocation(selfReferenceSetter, varName, null, null);
+		wyvern.tools.typedAST.core.expressions.Variable valueToAssign =
+				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
+		LinkedList<NameBinding> formalArguments = new LinkedList<>();
+		formalArguments.add(new NameBindingImpl("x", typeOfVar));
+		DefDeclaration setterDecl = new DefDeclaration(setterName, typeOfVar, formalArguments,
+														setterBody, false, null);
+		decls.add(setterDecl);
 		
 		// Create the anonymous object.
 		DeclSequence declSeq = new DeclSequence(decls);
