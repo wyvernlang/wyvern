@@ -256,7 +256,7 @@ AST Declaration(boolean inModule) :
 AST DefDeclaration() :
 { Type resultType; Token name; AST body; List args; }
 {
-  <DEF> name=<IDENTIFIER> args = Formals() <COLON> resultType = Type() body=DefBody() {
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) args = Formals() <COLON> resultType = Type() body=DefBody() {
 	return build.defDecl(name.image, resultType, args, body, false, loc(name));
   }
 }
@@ -330,7 +330,7 @@ AST DeclType() :
 AST DefDeclType() :
 { Type resultType; Token name; List args; }
 {
-  <DEF> name=<IDENTIFIER> args = Formals() <COLON> resultType = Type() <NEWLINE> {
+  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) args = Formals() <COLON> resultType = Type() <NEWLINE> {
 	return build.defDeclType(name.image, resultType, args, loc(name));
   }
 }
@@ -577,4 +577,14 @@ AST Instantiation() :
 {
 <INSTANTIATE> uri = Uri() arg = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
 {return build.instantiation(uri, arg, name, loc(name));}
+}
+
+Token OverrideOperator() :
+{Token operator;}
+{
+      operator = <PLUS> {return operator;}
+	| operator = <DASH> {return operator;}
+	| operator = <MULT> {return operator;}
+    | operator = <DIVIDE> {return operator;}
+	
 }
