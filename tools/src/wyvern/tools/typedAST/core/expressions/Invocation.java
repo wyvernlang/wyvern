@@ -31,6 +31,7 @@ import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -171,7 +172,20 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
 	@Override
 	public Expression generateIL(GenContext ctx) {
-		return getCallableExpr(ctx).genExpr();
+		
+		CallableExprGenerator generator = getCallableExpr(ctx);
+		
+        if (argument != null) {
+			Expression arg  = ((Variable)argument).generateIL(ctx);
+			List<Expression> args = new ArrayList<Expression>();
+			args.add(arg);
+			
+			return generator.genExprWithArgs(args, this);
+		}
+        else {
+        	 return getCallableExpr(ctx).genExpr();
+		}
+	   
 	}
 	
 	@Override
