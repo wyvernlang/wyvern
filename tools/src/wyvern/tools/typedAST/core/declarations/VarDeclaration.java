@@ -236,15 +236,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		tlc.updateContext(newCtx);
 		tlc.addLet(anonName, objType, expr, false);
 		
-		/*
-		 * 
-	public New(DeclSequence seq, FileLocation fileLocation) {
-		this.seq = seq;
-		this.location = fileLocation;
-	}
-
-		 */
-		
 	}
 	
 	@Override
