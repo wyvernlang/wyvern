@@ -675,7 +675,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testOperatorPlus() throws ParseException {
         String source = TestUtil.readFile(PATH + "operator-plus.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
@@ -762,11 +761,11 @@ public class ILTests {
 			return i + j;
 		}
 		
-		public int minus(int i, int j) {
+		public int subtract(int i, int j) {
 			return i - j;
 		}
 		
-		public int time(int i, int j) {
+		public int multiply(int i, int j) {
 			return i * j;
 		}
 		

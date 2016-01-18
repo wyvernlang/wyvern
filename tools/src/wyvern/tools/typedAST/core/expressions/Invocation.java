@@ -181,9 +181,8 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 			args.add(arg);
 			
 			return generator.genExprWithArgs(args, this);
-		}
-        else {
-        	 return getCallableExpr(ctx).genExpr();
+		} else {
+        	 return generator.genExpr();
 		}
 	   
 	}
