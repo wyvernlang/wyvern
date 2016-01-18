@@ -395,50 +395,13 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	 * @return the IL expression of a module
 	 */
 	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
-		
-		// Script preprocessing.
-		if (!isModule) {
-
-			// Figure out type of "this" to allow for self-referential statements.
-			ValueType moduleType = this.figureOutType(ctx);
-			ctx = ctx.extend("this", new Variable("this"), moduleType);
-			
-		}
-		TopLevelContext tlc = new TopLevelContext(ctx);
-		
-		// Generate module IL by looking at everything in sequence.
 		Sequence seqWithBlocks = combine();
+		TopLevelContext tlc = new TopLevelContext(ctx);
 		seqWithBlocks.genTopLevel(tlc);
 		Expression result = isModule?tlc.getModuleExpression():tlc.getExpression();
 		return result;
-		
 	}
 	
-	/**
-	 * Check to see whether execution of this sequence will capture or modify state.
-	 * @return boolean
-	 */
-	private boolean isStateful () {
-		for (TypedAST ast : exps) {
-			if (ast instanceof VarDeclaration || ast instanceof FieldSet) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Turn a sequence of code without a module into an anonymous module.
-	 * @param ctx: ctx to evaluate in.
-	 * @return a ModuleDeclaration.
-	 */
-	public ModuleDeclaration asHeadlessModule (GenContext ctx) {
-		boolean isResourceModule = this.isStateful();
-		String anonymousName = GenContext.generateName();
-		ModuleDeclaration moduleDecl = new ModuleDeclaration(anonymousName, (EnvironmentExtender)this, null, isResourceModule);
-		return moduleDecl;
-	}
-
 	@Override
 	public void genTopLevel(TopLevelContext tlc) {
 		for (TypedAST ast : exps) {
