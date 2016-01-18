@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -80,7 +81,7 @@ public class TypeAsc extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -6,6 +6,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -123,7 +124,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
 		List<FormalArg> formals = exprGen.getExpectedArgTypes(ctx);
 		
@@ -132,13 +133,13 @@ public class Application extends CachingTypedAST implements CoreAST {
         if (argument instanceof TupleObject) {
         	for (ExpressionAST ast : ((TupleObject) argument).getObjects()) {
         		// TODO: propagate types downward from formals
-        		args.add(ast.generateIL(ctx));
+        		args.add(ast.generateIL(ctx, null));
         	}
         } else if (argument instanceof UnitVal) {
         	// leave args empty
         } else {
     		// TODO: propagate types downward from formals
-        	args.add(argument.generateIL(ctx));
+        	args.add(argument.generateIL(ctx, null));
         }
 		
 		// generate the call

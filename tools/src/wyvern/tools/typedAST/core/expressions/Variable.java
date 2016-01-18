@@ -135,7 +135,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		return ctx.lookupExp(getName());
 	}
 	

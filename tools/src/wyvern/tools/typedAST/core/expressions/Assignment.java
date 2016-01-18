@@ -125,7 +125,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		
 		// Figure out expression being assigned.
 		CallableExprGenerator cegExpr = value.getCallableExpr(ctx);

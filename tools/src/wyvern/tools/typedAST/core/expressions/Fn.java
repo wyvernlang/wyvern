@@ -120,7 +120,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
      * @param GenContext The type context of the lambda declaration
      * @return The Intermediate Representation of the inline function decl
      */
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
         /*
          * First, map the NameBindings to Formal Arguments, dropping the parameters into the IR.
          * Next, find the type of the body. The type of the body is the return type of the function.
@@ -137,7 +137,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, ctx);
 
         // Generate the IL for the body, and get it's return type.
-        Expression il = this.body.generateIL(ctx);
+        Expression il = this.body.generateIL(ctx, null);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
         // Create a new list of function declaration, which is a singleton, containing only "apply"

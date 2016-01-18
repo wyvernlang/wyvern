@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -100,7 +101,7 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		final Iterator<Declaration> declIter = decl.getDeclIterator().iterator();
 		Iterator<TypedAST> myIter = new Iterator<TypedAST>() {
 			boolean returnedBody = false;

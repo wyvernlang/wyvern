@@ -42,7 +42,7 @@ public class Interpreter {
         try {
             ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
     		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-            Expression program = ast.generateIL(genCtx);
+            Expression program = ast.generateIL(genCtx, null);
             TypeContext ctx = TypeContext.empty();
             program.typeCheck(ctx);
             Value v = program.interpret(EvalContext.empty());

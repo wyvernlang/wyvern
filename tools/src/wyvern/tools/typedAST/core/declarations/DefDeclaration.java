@@ -254,7 +254,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext));
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, null));
 	}
 
 

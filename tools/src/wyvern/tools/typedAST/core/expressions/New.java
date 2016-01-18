@@ -273,7 +273,7 @@ public class New extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		// TODO see if the user specified a different self name
 				String selfName = "this";
 				// fake an appropriate context

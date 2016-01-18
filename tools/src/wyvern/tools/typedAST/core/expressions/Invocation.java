@@ -171,12 +171,12 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		
 		CallableExprGenerator generator = getCallableExpr(ctx);
 		
         if (argument != null) {
-			Expression arg  = ((Variable)argument).generateIL(ctx);
+			Expression arg  = ((Variable)argument).generateIL(ctx, null);
 			List<Expression> args = new ArrayList<Expression>();
 			args.add(arg);
 			
@@ -189,6 +189,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	
 	@Override
 	public CallableExprGenerator getCallableExpr(GenContext genCtx) {
-		return new InvocationExprGenerator(receiver.generateIL(genCtx), operationName, genCtx);
+		return new InvocationExprGenerator(receiver.generateIL(genCtx, null), operationName, genCtx);
 	}
 }

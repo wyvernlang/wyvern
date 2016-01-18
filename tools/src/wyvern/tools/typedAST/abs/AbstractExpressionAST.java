@@ -10,6 +10,6 @@ import wyvern.tools.util.AbstractTreeWritable;
 public abstract class AbstractExpressionAST extends AbstractTreeWritable implements ExpressionAST {
 	@Override
 	public CallableExprGenerator getCallableExpr(GenContext ctx) {
-		return new DefaultExprGenerator(generateIL(ctx));
+		return new DefaultExprGenerator(generateIL(ctx, null));
 	}
 }

@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.expressions;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
@@ -72,7 +73,7 @@ public class KeywordInvocation extends AbstractExpressionAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

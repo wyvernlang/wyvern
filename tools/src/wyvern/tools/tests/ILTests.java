@@ -71,7 +71,7 @@ public class ILTests {
                   "val x = 5\n"
         		+ "x\n";
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(GenContext.empty());
+        Expression program = ast.generateIL(GenContext.empty(), null);
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.intType(), t);
@@ -86,7 +86,7 @@ public class ILTests {
                   "val x = \"five\"\n"
         		+ "x\n";
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(GenContext.empty());
+        Expression program = ast.generateIL(GenContext.empty(), null);
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.stringType(), t);
@@ -101,7 +101,7 @@ public class ILTests {
                   "val x = \"five\"\n"
         		+ "x\n";
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(GenContext.empty());
+        Expression program = ast.generateIL(GenContext.empty(), null);
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.stringType(), t);
@@ -117,7 +117,7 @@ public class ILTests {
 				     + "obj.v\n"
 				     ;
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		Expression program = ast.generateIL(GenContext.empty());
+		Expression program = ast.generateIL(GenContext.empty(), null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -135,7 +135,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -165,7 +165,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -207,7 +207,7 @@ public class ILTests {
 				     + "firstObj.a";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
 		ValueType type = program.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Util.intType(), type);
 		Value result = program.interpret(EvalContext.empty());
@@ -236,7 +236,7 @@ public class ILTests {
 					 + "d.double(5)";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
 		ValueType type = program.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Util.intType(), type);
 		Value result = program.interpret(EvalContext.empty());
@@ -254,7 +254,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -272,7 +272,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -290,7 +290,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -308,7 +308,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.stringType(), t);
@@ -326,7 +326,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.stringType(), t);
@@ -346,7 +346,7 @@ public class ILTests {
 		TypedAST ast = TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ((Sequence) ast).generateIL(genCtx);
+		Expression program = ((Sequence) ast).generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
@@ -368,7 +368,7 @@ public class ILTests {
 			TypedAST ast = TestUtil.getNewAST(input);
 			// bogus "system" entry, but makes the text work for now
 			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-			Expression program = ((Sequence) ast).generateIL(genCtx);
+			Expression program = ((Sequence) ast).generateIL(genCtx, null);
 			TypeContext ctx = TypeContext.empty();
 			ValueType t = program.typeCheck(ctx);
 			Assert.fail("typechecking should have failed");
@@ -386,7 +386,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -408,7 +408,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -483,7 +483,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -506,7 +506,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx);
+		Expression program = ast.generateIL(genCtx, null);
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -522,7 +522,7 @@ public class ILTests {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx);
+        Expression program = ast.generateIL(genCtx, null);
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
         // Assert.assertEquals(Util.intType(), t);
@@ -538,7 +538,7 @@ public class ILTests {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx);
+        Expression program = ast.generateIL(genCtx, null);
         TypeContext ctx = TypeContext.empty();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.intType(), t);
@@ -558,7 +558,7 @@ public class ILTests {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx);
+        Expression program = ast.generateIL(genCtx, null);
         TypeContext ctx = TypeContext.empty();
 
 
@@ -588,7 +588,7 @@ public class ILTests {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx);
+        Expression program = ast.generateIL(genCtx, null);
         TypeContext ctx = TypeContext.empty();
 
 
@@ -737,7 +737,7 @@ public class ILTests {
 						 + "c.getConstant()";
 			ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-			Expression program = ast.generateIL(genCtx);
+			Expression program = ast.generateIL(genCtx, null);
 			ValueType type = program.typeCheck(TypeContext.empty());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
@@ -781,7 +781,7 @@ public class ILTests {
 	 */
 	private static void assertTypeCheckFails(ExpressionAST ast, GenContext genCtx) {
 		try {
-			Expression program = ast.generateIL(genCtx);
+			Expression program = ast.generateIL(genCtx, null);
 			
 			// not quite right, but works for now
 			// TODO: replace this with a standard prelude

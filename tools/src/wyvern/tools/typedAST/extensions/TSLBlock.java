@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.extensions;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.Binding;
@@ -126,7 +127,7 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

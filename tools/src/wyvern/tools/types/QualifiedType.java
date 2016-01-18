@@ -35,7 +35,7 @@ public class QualifiedType extends AbstractTypeImpl {
 	}
 
 	private static Path getPath(ExpressionAST ast, GenContext ctx) {
-		Expression exp = ast.generateIL(ctx);
+		Expression exp = ast.generateIL(ctx, null);
 		return (Path) exp;
 	}
 	

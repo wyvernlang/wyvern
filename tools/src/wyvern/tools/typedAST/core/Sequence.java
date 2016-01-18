@@ -6,6 +6,7 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -331,7 +332,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		/*Iterator<TypedAST> ai = exps.iterator();
 		
 		if (!ai.hasNext())
