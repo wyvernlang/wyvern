@@ -141,10 +141,15 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 	@Override
 	public void genTopLevel (TopLevelContext tlc) {
 		
-		// TODO: only perform the below if the variable in question was declared with Var.
-		// Otherwise, perform the default genTopLevel.
+		// If the variable is defined in the context, it was declared with val.
+		// Do the default top level generation (as defined by ExpressionAST).
+		GenContext ctx = tlc.getContext();
+		if (ctx.isDefined(this.getName())) {
+			super.genTopLevel(tlc);
+			return;
+		}
 		
-		// Figure out name of anonymous object.
+		// Otherwise it was declared with var. Figure out name of anonymous object.
 		Optional<Variable> anonReferenceOpt = tlc.anonymousObjectReference(this.getName());
 		if (!anonReferenceOpt.isPresent())
 			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, this.getName());
