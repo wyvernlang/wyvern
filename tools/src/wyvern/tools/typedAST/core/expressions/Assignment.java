@@ -4,10 +4,10 @@ import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.interfaces.*;
@@ -137,6 +137,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		Expression exprFieldGet = cegReceiver.genExpr();
 		if (!(exprFieldGet instanceof FieldGet))
 			ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
+		
+		// Extract information from FieldGet.
 		FieldGet fieldGet = (FieldGet) exprFieldGet;
 		String fieldName = fieldGet.getName();
 		IExpr objExpr = fieldGet.getObjectExpr();
@@ -145,4 +147,32 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
 	
 	}
+	
+	@Override
+	public void genTopLevel (TopLevelContext tlc) {
+		
+		// Figure out receiver and field. At the moment this is not ideal: it will only support top-level assignations
+		// of the form x = ___, where x is a variable. If x is a compound expression that evaluates to a variable, this
+		// will not work. We should get a callable experssion instead, but since top-level vars aren't stored in the
+		// context with their actual name, this doesn't work at the moment.
+		if (!(target instanceof wyvern.tools.typedAST.core.expressions.Variable)) {
+			super.genTopLevel(tlc);
+			return;
+		}
+		
+		// Otherwise turn this var write into a method call to the anon object's setter.
+		wyvern.tools.typedAST.core.expressions. Variable varWrite = (wyvern.tools.typedAST.core.expressions.Variable) target;
+		String varName = varWrite.getName();
+		Optional<wyvern.tools.typedAST.core.expressions.Variable> anonReferenceOpt = tlc.anonymousObjectReference(varName);
+		if (!anonReferenceOpt.isPresent())
+			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, varName);
+		wyvern.tools.typedAST.core.expressions.Variable anonReference = anonReferenceOpt.get();
+		
+		// Create a method call to the anon object's setter.
+		Invocation anonInvocation = new Invocation(anonReference, TopLevelContext.anonymousSetterName(), null, null);
+		Application anonMethodCall = new Application(anonInvocation, this.value, null);
+		anonMethodCall.genTopLevel(tlc);
+		
+	}
+	
 }

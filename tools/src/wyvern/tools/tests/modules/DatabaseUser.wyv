@@ -1,0 +1,5 @@
+
+require Database
+
+Database.contents = 10
+Database.contents

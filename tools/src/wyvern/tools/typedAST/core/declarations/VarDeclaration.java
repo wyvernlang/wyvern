@@ -7,14 +7,20 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
+import wyvern.tools.typedAST.core.expressions.Assignment;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -31,6 +37,8 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -161,9 +169,90 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), binding.getType().getILType(ctx), definition.generateIL(ctx));
 	}
 
+	/**
+	 * Internal helper method. Return the ValueType of this definition. If the type isn't
+	 * currently set, it will figure it out and set the type.
+	 * @param ctx: ctx to evaulate.
+	 * @return the ValueType of the definition of this VarDeclaration.
+	 */
+	private ValueType getILValueType (GenContext ctx) {
+		if (definitionType == null)
+			definitionType = definition.getType();
+		return definitionType.getILType(ctx);
+	}
+	
+	@Override
+	public void genTopLevel (TopLevelContext tlc) {
+		GenContext ctx = tlc.getContext();
+		
+		// Name and type of this variable.
+		String varName = this.getName();
+		
+		if (definitionType == null)
+			definitionType = definition.getType();
+		
+		Type typeOfVar = this.definitionType;
+		ValueType valTypeOfVar = typeOfVar.getILType(ctx);	
+		
+		// Create the body of the anonymous object.
+	
+		// Internal name of anonymous object.
+		String anonName = tlc.anonymousObjectGenerate(varName);
+
+		// Body of anonymous object will be stored here.
+		List<Declaration> decls = new LinkedList<>();
+		decls.add(this);
+
+		// Create a declaration for the anonymous object's getter.
+		String getterName = TopLevelContext.anonymousGetterName();
+		wyvern.tools.typedAST.core.expressions.Variable selfReferenceGetter = new
+				wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		Invocation getterBody = new Invocation(selfReferenceGetter, varName, null, null);
+		DefDeclaration getterDecl = new DefDeclaration(getterName, typeOfVar, new LinkedList<>(),
+														 getterBody, false, null);
+		decls.add(getterDecl);
+		
+		// Create a declaration for the anonymous object's setter.
+		String setterName = TopLevelContext.anonymousSetterName();
+		wyvern.tools.typedAST.core.expressions.Variable selfReferenceSetter = new
+				wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		Invocation fieldGet = new Invocation(selfReferenceSetter, varName, null, null);
+		wyvern.tools.typedAST.core.expressions.Variable valueToAssign =
+				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
+		LinkedList<NameBinding> formalArguments = new LinkedList<>();
+		formalArguments.add(new NameBindingImpl("x", typeOfVar));
+		DefDeclaration setterDecl = new DefDeclaration(setterName, typeOfVar, formalArguments,
+														setterBody, false, null);
+		decls.add(setterDecl);
+		
+		// Create the anonymous object.
+		DeclSequence declSeq = new DeclSequence(decls);
+		New objInstantiation = new New(declSeq, null);
+		Expression expr = objInstantiation.generateIL(ctx);
+		ValueType objType = declSeq.figureOutType(ctx);
+		
+		GenContext newCtx = tlc.getContext().extend(anonName, expr, objType);
+		tlc.updateContext(newCtx);
+		tlc.addLet(anonName, objType, expr, false);
+		
+	}
+	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		GenContext ctx = tlc.getContext();
+		wyvern.target.corewyvernIL.decl.Declaration decl;
+		decl = new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(),
+																  getILValueType(ctx),
+																  definition.generateIL(ctx));
+		DeclType dt = genILType(tlc.getContext());
+		tlc.addModuleDecl(decl,dt);		
+	}
+	
 }

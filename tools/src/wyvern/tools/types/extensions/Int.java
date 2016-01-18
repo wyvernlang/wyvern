@@ -100,7 +100,6 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return wyvern.target.corewyvernIL.support.Util.intType();
 	}
 }
