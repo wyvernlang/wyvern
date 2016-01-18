@@ -607,6 +607,37 @@ public class ILTests {
         Assert.assertEquals(five, v);
     }
 
+    @Test
+	@Category(CurrentlyBroken.class)
+    public void testLambdaInferred() throws ParseException {
+
+        String source = "type IntIntFn \n"
+            + "     def apply(x:system.Int):system.Int \n"
+            + "val getFive:IntIntFn = x => x\n"
+            + "getFive(5)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx, null);
+        TypeContext ctx = TypeContext.empty();
+
+
+        ValueType t = null;
+        try {
+            t = program.typeCheck(ctx);
+        } catch(NullPointerException e) {
+            e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
+        }
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {
 		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest");
