@@ -105,4 +105,12 @@ public abstract class GenContext extends TypeContext {
 	public final CallableExprGenerator getCallableExpr(String varName) {
 		return getCallableExprRec(varName, this);
 	}
+	
+	/**
+	 * Check to see if the given variable name is defined in the context.
+	 * @param varName: name of variable to lookup.
+	 * @return true if the variable is defined.
+	 */
+	public abstract boolean isDefined (String varName);
+	
 }

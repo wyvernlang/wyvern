@@ -55,4 +55,10 @@ public class MethodGenContext extends GenContext {
 			return genContext.getCallableExprRec(varName, origCtx);
 	}
 
+	@Override
+	public boolean isDefined(String varName) {
+		return genContext.isDefined(varName);
+	}
+	
+
 }

@@ -31,5 +31,10 @@ public class EmptyGenContext extends GenContext {
 	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}
+	
+	@Override
+	public boolean isDefined (String varName) {
+		return false;
+	}
 
 }

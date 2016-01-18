@@ -59,5 +59,11 @@ public class VarGenContext extends GenContext {
 		else {
 			return genContext.getCallableExprRec(varName, origCtx);
 		}
-	}	
+	}
+	
+	@Override
+	public boolean isDefined (String varName) {
+		return var.equals(varName) ? true : genContext.isDefined(varName);
+	}
+	
 }
