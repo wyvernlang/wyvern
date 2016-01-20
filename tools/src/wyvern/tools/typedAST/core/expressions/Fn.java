@@ -10,7 +10,9 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -27,6 +29,13 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
+
+
+
+
+
+
+
 
 
 import java.util.*;
@@ -130,11 +139,13 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
          * Use the StructualType and the DefDeclaration to make a New. Return.
          */
 
+		// Convert the bindings into formals
+        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, ctx, expectedType);
+		
         // Extend the generalContext to include the parameters passed into the function.
-        ctx = extendCtxWithParams(ctx, this.bindings);
+        ctx = extendCtxWithParams(ctx, intermediateArgs);
 
-        // Convert the bindings into formals
-        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, ctx);
+        
 
         // Generate the IL for the body, and get it's return type.
         Expression il = this.body.generateIL(ctx, null);
@@ -155,26 +166,61 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         return new New(declList, "@lambda-decl", newType);
 }
 
-    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx) {
+    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx, ValueType declType) {
 
+    	List<FormalArg> expectedFormals = getExpectedFormls(ctx, declType);
+    	
         List<FormalArg> result = new LinkedList<FormalArg>();
 
-        for(NameBinding binding : bindings) {
-            result.add( new FormalArg(
-                binding.getName(),
-                binding.getType().getILType(ctx)
-            ));
-        }
+        if (expectedFormals.size() != bindings.size()) {
+        	//TODO: will replace with ToolError in the future
+			throw new RuntimeException("args count does not map between declType and lambda expression");
+		}
+        
+        for (int i = 0; i < expectedFormals.size(); i++) {
+        	NameBinding binding = bindings.get(i);
+        	
+        	ValueType argType = null;        	
+        	if (binding.getType() != null) {
+				argType = binding.getType().getILType(ctx);
+			}
+        	else {
+				argType = expectedFormals.get(i).getType();
+			}
+        	
+        	result.add( new FormalArg(
+                    binding.getName(),
+                    argType
+                ));
+		}
+        
+        
 
         return result;
     }
 
-    private static GenContext extendCtxWithParams(GenContext ctx, List<NameBinding> bindings) {
-        for(NameBinding binding : bindings) {
+	private static List<FormalArg> getExpectedFormls(GenContext ctx, ValueType declType) {
+		StructuralType declStructuralType = declType.getStructuralType(ctx);
+    	
+    	
+    	DeclType applyDecl = declStructuralType.findDecl("apply", ctx);
+    	
+    	if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
+			//TODO: will replace with ToolError in the future
+    		throw new RuntimeException("the declType is not a lambda type(it has no apply method)");
+		}
+    	
+    	DefDeclType applyDef = (DefDeclType) applyDecl;
+    	
+    	return applyDef.getFormalArgs();
+	}
+
+    private static GenContext extendCtxWithParams(GenContext ctx, List<FormalArg> formalArgs) {
+        for(FormalArg binding : formalArgs) {
             ctx = ctx.extend(
                 binding.getName(),
                 new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
-                binding.getType().getILType(ctx)
+                binding.getType()
             );
         }
         return ctx;

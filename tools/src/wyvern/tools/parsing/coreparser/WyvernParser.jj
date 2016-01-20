@@ -343,6 +343,37 @@ AST ValDeclType() :
   }
 }
 
+List Formals_Lambda() :
+{ List args = new LinkedList(); Object singleParameter;}
+{     singleParameter = Formal_Lambda() { 
+            args.add(singleParameter);
+            return args;
+        }
+   | <LPAREN> [ FormalsList_Lambda(args) ] <RPAREN> {
+			return args;
+		}
+}
+
+void FormalsList_Lambda(List args):
+{ Object formal;}
+{
+  formal = Formal_Lambda() {
+      args.add(formal);
+  }
+  ( <COMMA> formal = Formal_Lambda() {
+      args.add(formal);
+	}
+  )*
+}
+
+Object Formal_Lambda() :
+{ Token id; Type type = null; }
+{
+  id = <IDENTIFIER> [<COLON> type = Type()] {
+      return build.formalArg(id.image, type);
+  }
+}
+
 List Formals() :
 { List args = new LinkedList(); }
 {
@@ -415,6 +446,9 @@ Object CaseArm() :
 AST Expression(ExpFlags flags) :
 { AST exp; AST exp2 = null; Object formal; Token t = null; }
 {
+  LOOKAHEAD(4)
+    exp = LambdaFn(flags) { return exp; }
+|  
   LOOKAHEAD(3)
   exp = AdditiveExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
   	if (exp2 != null) {
@@ -424,15 +458,13 @@ AST Expression(ExpFlags flags) :
   }
 |
   <FN> formal = Formal() <ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp); }
-|
-    LOOKAHEAD(3)
-    exp = LambdaFn(flags) { return exp; }
+
 }
 
 AST LambdaFn(ExpFlags flags) :
 { List formals; AST body; }
 {
-    formals = Formals() <ARROW> body = Expression(flags) {
+    formals = Formals_Lambda() <ARROW> body = Expression(flags) {
         return build.fn(formals, body);
     }
 }
