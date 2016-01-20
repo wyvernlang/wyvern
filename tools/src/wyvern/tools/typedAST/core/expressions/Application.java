@@ -131,15 +131,18 @@ public class Application extends CachingTypedAST implements CoreAST {
 		// generate arguments		
 		List<Expression> args = new LinkedList<Expression>();
         if (argument instanceof TupleObject) {
-        	for (ExpressionAST ast : ((TupleObject) argument).getObjects()) {
-        		// TODO: propagate types downward from formals
-        		args.add(ast.generateIL(ctx, null));
-        	}
+        	ExpressionAST[] raw_args = ((TupleObject) argument).getObjects();
+        	for (int i = 0; i < raw_args.length; i++) {
+				ValueType expectedArgType = formals.get(i).getType();
+				ExpressionAST ast = raw_args[i];
+				// TODO: propagate types downward from formals
+				args.add(ast.generateIL(ctx, expectedArgType));
+			}
         } else if (argument instanceof UnitVal) {
         	// leave args empty
         } else {
     		// TODO: propagate types downward from formals
-        	args.add(argument.generateIL(ctx, null));
+        	args.add(argument.generateIL(ctx, formals.get(0).getType()));
         }
 		
 		// generate the call
