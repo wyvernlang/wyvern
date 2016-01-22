@@ -37,6 +37,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 @IncludeCategory(RegressionTests.class)
 @ExcludeCategory(CurrentlyBroken.class)
 @SuiteClasses( {
+				// LEGACY TESTS HERE
 				// these tests use the old parser
 				TypeCheckTagTests.class, 
 				DynamicTagTests.class,
@@ -52,6 +53,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				
 				CodegenTests.class,		// tests the old translation to the new IL
 				
+				// CURRENTLY IMPORTANT TESTS HERE
 				LexingTests.class,		// tests the new lexer
 				CoreParserTests.class,	// tests the new parser
 				ILTests.class,			// tests the new IL
