@@ -13,6 +13,8 @@ import wyvern.tools.util.TreeWriter;
 
 import java.util.*;
 
+import com.sun.deploy.uitoolkit.impl.fx.Utils;
+
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
 import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY2;
 import static wyvern.tools.errors.ToolError.reportError;
@@ -100,7 +102,6 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return wyvern.target.corewyvernIL.support.Util.intType();
 	}
 }
