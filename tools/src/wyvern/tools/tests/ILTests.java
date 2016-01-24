@@ -608,7 +608,6 @@ public class ILTests {
     }
 
     @Test
-	@Category(CurrentlyBroken.class)
     public void testLambdaInferred() throws ParseException {
 
         String source = "type IntIntFn \n"
