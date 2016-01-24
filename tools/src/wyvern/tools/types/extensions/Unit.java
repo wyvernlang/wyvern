@@ -58,7 +58,6 @@ public class Unit extends AbstractTypeImpl {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return wyvern.target.corewyvernIL.support.Util.unitType();
 	}
 }
