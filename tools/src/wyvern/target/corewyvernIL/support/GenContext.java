@@ -24,6 +24,12 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public abstract class GenContext extends TypeContext {
 	
+	private GenContext nextContext = null;
+	
+	protected GenContext(GenContext next) {
+		nextContext = next;
+	}
+	
 	public GenContext extend(String var, Expression expr, ValueType type) {
 		return new VarGenContext(var, expr, type, this);
 	}
@@ -104,5 +110,10 @@ public abstract class GenContext extends TypeContext {
 	 */
 	public final CallableExprGenerator getCallableExpr(String varName) {
 		return getCallableExprRec(varName, this);
+	}
+	
+	@Override
+	protected GenContext getNext() {
+		return nextContext;
 	}
 }

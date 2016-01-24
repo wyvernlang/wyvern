@@ -273,7 +273,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 				String importPath = imp.getUri().getRawSchemeSpecificPart();
 				try {
 					FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
-					ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass());
+					ctx = GenUtil.ensureJavaTypesPresent(ctx);
+					ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
 					importExp = new JavaValue(obj, type);
 					ctx = ctx.extend(importName, new Variable(importName), type);
 				} catch (ReflectiveOperationException e1) {

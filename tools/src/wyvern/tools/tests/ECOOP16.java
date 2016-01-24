@@ -50,9 +50,9 @@ public class ECOOP16 {
 	public void testFigure5Corrected() throws ParseException {
 		
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+		//GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
@@ -69,7 +69,6 @@ public class ECOOP16 {
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
 		Expression program = new FieldGet(mainProgram, "x"); 
 		
-    	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);

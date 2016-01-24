@@ -11,6 +11,10 @@ import wyvern.tools.errors.HasLocation;
 
 public class EmptyGenContext extends GenContext {
 
+	protected EmptyGenContext() {
+		super(null);
+	}
+
 	@Override
 	public ValueType lookup(String varName) {
 		throw new RuntimeException("Variable " + varName + " not found");

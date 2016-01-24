@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.support;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -122,10 +123,22 @@ public class GenUtil {
 		return null;
 	}
 
-	public static ValueType javaClassToWyvernType(Class<?> javaClass) {
-		return javaClassToWyvernTypeRec(javaClass, new HashSet<String>());
+	public static ValueType javaClassToWyvernType(Class<?> javaClass, TypeContext ctx) {
+		//return javaClassToWyvernTypeRec(javaClass, new HashSet<String>());
+		// TODO: extend to types other than int, and structural types based on that
+		if (javaClass.getName().equals("int")) {
+			return Util.intType();
+		}
+		
+        if (javaClass.getName().equals("java.lang.String")) {
+            return Util.stringType();
+        }
+        
+		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookup(javaTypesObjectName);
+		return type.getJavaType(javaClass, ctx);
 	}
-	public static ValueType javaClassToWyvernTypeRec(Class<?> javaClass, Set<String> touched) {
+	// out of date
+	/*private static ValueType javaClassToWyvernTypeRec(Class<?> javaClass, Set<String> touched) {
 		if (javaClass.getName().equals("int")) {
 			return Util.intType();
 		}
@@ -162,5 +175,24 @@ public class GenUtil {
 		// TODO: support nominal types in Java
 		touched.remove(javaClass.getName());
 		return new StructuralType("IGNORE_ME", declTypes , true);
+	}*/
+	
+	private static final String javaTypesObjectName = "java$types"; 
+	private static final Variable javaTypesObject = new Variable(javaTypesObjectName);
+	private static ValueType javaTypes = null;
+	
+	public static Variable getJavaTypesObject() {
+		return javaTypesObject;
+	}
+
+	public static GenContext ensureJavaTypesPresent(GenContext ctx) {
+		if (ctx.isPresent(javaTypesObjectName))
+			return ctx;
+		
+		// we just reuse the Java structural types object
+		// no harm in this provided we aren't loading multiple versions of the same Java class
+		if (javaTypes == null)
+			javaTypes = new StructuralTypesFromJava();
+		return ctx.extend(javaTypesObjectName, javaTypesObject, javaTypes);
 	}
 }

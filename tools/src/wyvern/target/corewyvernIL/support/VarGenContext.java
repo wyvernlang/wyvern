@@ -19,14 +19,13 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public class VarGenContext extends GenContext {
 	private String var;
 	private Expression expr;
-	private GenContext genContext;
 	private ValueType type;
 	
 	public VarGenContext(String var, Expression expr, ValueType type, GenContext genContext) {
+		super(genContext);
 		this.var = var;
 		this.expr = expr;
 		this.type = type;
-		this.genContext = genContext;
 	}
 	
 	@Override
@@ -36,7 +35,7 @@ public class VarGenContext extends GenContext {
 	
 	@Override
 	public String endToString() {
-		return var + " : " + type + " = " + expr + ", " + genContext.endToString();
+		return var + " : " + type + " = " + expr + ", " + getNext().endToString();
 	}
 	
 	@Override
@@ -44,12 +43,12 @@ public class VarGenContext extends GenContext {
 		if (varName.equals(var))
 			return type;
 		else
-			return genContext.lookup(varName);
+			return getNext().lookup(varName);
 	}
 	
 	@Override
 	public String getContainerForTypeAbbrev(String typeName) {
-		return genContext.getContainerForTypeAbbrev(typeName);
+		return getNext().getContainerForTypeAbbrev(typeName);
 	}
 
 	@Override
@@ -57,7 +56,7 @@ public class VarGenContext extends GenContext {
 		if (varName.equals(var))
 			return new DefaultExprGenerator(expr);
 		else {
-			return genContext.getCallableExprRec(varName, origCtx);
+			return getNext().getCallableExprRec(varName, origCtx);
 		}
 	}	
 }

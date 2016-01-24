@@ -21,4 +21,9 @@ public class VarBindingContext extends TypeContext {
 			return previous.lookup(varName);
 		}
 	}
+
+	@Override
+	protected TypeContext getNext() {
+		return previous;
+	}
 }

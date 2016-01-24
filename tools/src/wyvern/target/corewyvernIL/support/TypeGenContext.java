@@ -17,18 +17,17 @@ public class TypeGenContext extends GenContext {
 
 	String typeName;
 	String objName;
-	GenContext genContext;
 	
 	public TypeGenContext(String typeName, String newName, GenContext genContext) {
+		super(genContext);
 		this.typeName = typeName;
 		this.objName = newName;
-		this.genContext = genContext;
 	}
 
 	@Override
 	public String getContainerForTypeAbbrev(String typeName) {
 		if(this.typeName.equals(typeName)) return objName;
-		else return genContext.getContainerForTypeAbbrev(typeName);
+		else return getNext().getContainerForTypeAbbrev(typeName);
 	}
 
 	@Override
@@ -38,17 +37,17 @@ public class TypeGenContext extends GenContext {
 	
 	@Override
 	public String endToString() {
-		return typeName + " : " + objName  + ", " + genContext.endToString();
+		return typeName + " : " + objName  + ", " + getNext().endToString();
 	}
 
 	@Override
 	public ValueType lookup(String varName) {
-		return genContext.lookup(varName);
+		return getNext().lookup(varName);
 	}
 
 	@Override
 	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
-		return genContext.getCallableExprRec(varName, origCtx);
+		return getNext().getCallableExprRec(varName, origCtx);
 	}
 
 }

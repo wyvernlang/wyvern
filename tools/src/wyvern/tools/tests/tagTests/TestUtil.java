@@ -10,6 +10,11 @@ import java.util.Optional;
 import org.junit.Assert;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -84,6 +89,21 @@ public class TestUtil {
 		String expecting = "IntegerConstant(" + value + ")";
 
 		Assert.assertEquals(expecting, v.toString());
+	}
+	
+	public static GenContext getStandardGenContext() {
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
+		return genCtx;
+	}
+	
+	public static TypeContext getStandardTypeContext() {
+    	GenContext ctx = GenContext.empty();
+    	ctx = GenUtil.ensureJavaTypesPresent(ctx);
+		return ctx;
 	}
 	
 	public static void evaluateExpecting(TypedAST ast, String value) {

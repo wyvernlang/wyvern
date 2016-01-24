@@ -50,7 +50,7 @@ public class StructuralType extends ValueType {
 		if (resourceFlag)
 			dest.append("resource ");
 		dest.append("type { ").append(selfName).append(" =>\n");
-		for (DeclType dt : declTypes) {
+		for (DeclType dt : getDeclTypes()) {
 			dt.doPrettyPrint(dest, newIndent);
 		}		
 		dest.append(indent).append("  }");
@@ -96,7 +96,7 @@ public class StructuralType extends ValueType {
 		st = (StructuralType) st.adapt(new ReceiverView(new Variable(st.selfName), new Variable(selfName)));
 		
 		TypeContext extendedCtx = ctx.extend(selfName, this);
-		for (DeclType dt : st.declTypes) {
+		for (DeclType dt : st.getDeclTypes()) {
 			DeclType candidateDT = findDecl(dt.getName(), ctx);
 			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx)) {
 				return false;
@@ -112,7 +112,7 @@ public class StructuralType extends ValueType {
 
 	@Override
 	public DeclType findDecl(String declName, TypeContext ctx) {
-		for (DeclType mdt : declTypes) {
+		for (DeclType mdt : getDeclTypes()) {
 			if (mdt.getName().equals(declName)) {
 				return mdt;
 			}
@@ -123,7 +123,7 @@ public class StructuralType extends ValueType {
 	@Override
 	public ValueType adapt(View v) {
 		List<DeclType> newDTs = new LinkedList<DeclType>();
-		for (DeclType dt : declTypes) {
+		for (DeclType dt : getDeclTypes()) {
 			newDTs.add(dt.adapt(v));
 		}
 		return new StructuralType(selfName, newDTs, resourceFlag);

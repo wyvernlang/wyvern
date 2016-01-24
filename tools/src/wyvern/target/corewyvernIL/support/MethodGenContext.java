@@ -19,12 +19,11 @@ public class MethodGenContext extends GenContext {
 
 	String objectName;
 	String methodName;
-	GenContext genContext;
 	
 	public MethodGenContext(String methodName, String objectName, GenContext genContext) {
+		super(genContext);
 		this.objectName = objectName;
 		this.methodName = methodName;
-		this.genContext = genContext;
 	}
 
 	@Override
@@ -34,17 +33,17 @@ public class MethodGenContext extends GenContext {
 	
 	@Override
 	public String endToString() {
-		return methodName + " = " + objectName + '.' + methodName +  ", " + genContext.endToString();
+		return methodName + " = " + objectName + '.' + methodName +  ", " + getNext().endToString();
 	}
 
 	@Override
 	public ValueType lookup(String varName) {
-		return genContext.lookup(varName);
+		return getNext().lookup(varName);
 	}
 
 	@Override
 	public String getContainerForTypeAbbrev(String typeName) {
-		return genContext.getContainerForTypeAbbrev(typeName);
+		return getNext().getContainerForTypeAbbrev(typeName);
 	}
 
 	@Override
@@ -52,7 +51,7 @@ public class MethodGenContext extends GenContext {
 		if (this.methodName.equals(varName))
 			return new InvocationExprGenerator(new Variable(objectName), varName, origCtx);
 		else
-			return genContext.getCallableExprRec(varName, origCtx);
+			return getNext().getCallableExprRec(varName, origCtx);
 	}
 
 }
