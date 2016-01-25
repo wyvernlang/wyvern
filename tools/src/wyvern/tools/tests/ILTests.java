@@ -303,6 +303,29 @@ public class ILTests {
 		
 	}
 	
+	@Test
+	public void testSwitch () throws ParseException {
+		
+		String input = "val obj = new\n"
+					 + "    var switch : system.Int = 0\n"
+					 + "    def activate () : system.Unit\n"
+					 + "        this.switch = 1\n"
+					 + "obj.activate()\n"
+					 + "obj.switch";
+
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral ten = new IntegerLiteral(10);
+		Assert.assertEquals(ten, v);
+		
+	}
+	
     @Test
 	public void testIdentityCall() throws ParseException {
 		String input = "val obj = new\n"
@@ -789,7 +812,6 @@ public class ILTests {
 		} catch (ToolError e) {
 		}
 	}
-
 
 	public static ImportTestClass importTest = new ImportTestClass();
 	public static class ImportTestClass {
