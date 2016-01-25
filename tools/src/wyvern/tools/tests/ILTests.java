@@ -308,7 +308,7 @@ public class ILTests {
 		
 		String input = "val obj = new\n"
 					 + "    var switch : system.Int = 0\n"
-					 + "    def activate () : system.Unit\n"
+					 + "    def activate () : system.Int\n"
 					 + "        this.switch = 1\n"
 					 + "obj.activate()\n"
 					 + "obj.switch";
@@ -321,8 +321,8 @@ public class ILTests {
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
 		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral ten = new IntegerLiteral(10);
-		Assert.assertEquals(ten, v);
+    	IntegerLiteral one = new IntegerLiteral(1);
+		Assert.assertEquals(one, v);
 		
 	}
 	
