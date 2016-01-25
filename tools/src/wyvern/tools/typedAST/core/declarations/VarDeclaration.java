@@ -211,7 +211,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		letDecl.genTopLevel(tlc);
 		ctx = tlc.getContext();
 		
-		// Create a getter method.
+		// Create a declaration for getter method.
 		String getterName = varNameToGetter(varName);
 		wyvern.tools.typedAST.core.expressions.Variable gettersObjReference;
 		gettersObjReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(tempObjName, null), null);
@@ -219,76 +219,66 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		Arrow getterArrType = new Arrow(new Unit(), definitionType);
 		DefDeclaration getterDecl = new DefDeclaration(getterName, getterArrType, new LinkedList<>(), getterBody, false, null);
 		wyvern.target.corewyvernIL.decl.Declaration getterDeclIL = getterDecl.generateDecl(ctx, ctx);
-		
-		List<DeclType> declTypes = new LinkedList<>();
-		declTypes.add(getterDecl.genILType(ctx));
-		String newName = GenContext.generateName();
-		StructuralType structType = new StructuralType(newName, declTypes);
-		List<wyvern.target.corewyvernIL.decl.Declaration> declarations = new LinkedList<>();
-		declarations.add(getterDeclIL);
-		ctx = ctx.extend(newName, new Variable(newName), structType);
-		tlc.updateContext(ctx);
-		tlc.setReceiverName(newName);
-		wyvern.target.corewyvernIL.expression.New newExp;
-		newExp = new wyvern.target.corewyvernIL.expression.New(declarations, newName, structType);
-		tlc.addLet(newName, structType, newExp, true);
-		
-		// Create a method call to the getter.
-		Variable getterAsVar = new Variable(getterName);
-		MethodCall methodCallExpr = new MethodCall(new Variable(newName), getterName, new LinkedList<>(), null);
-				
 
-		// Equate the var with a call to the getter.
-		ctx = ctx.extend(varName, methodCallExpr, varValueType);
-		tlc.updateContext(ctx);
-		
-/*
-		
-		// Create a setter method.
+		// Create a declaration for setter method.
 		String setterName = varNameToSetter(varName);
 		wyvern.tools.typedAST.core.expressions.Variable settersObjReference;
 		settersObjReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(tempObjName, null), null);
 		Invocation fieldGet = new Invocation(settersObjReference, varName, null, null);
-		wyvern.tools.typedAST.core.expressions.Variable valueToAssign;
-		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		wyvern.tools.typedAST.core.expressions.Variable valueToAssign =
+				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
 		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
+		LinkedList<NameBinding> setterArgs = new LinkedList<>();
+		setterArgs.add(new NameBindingImpl("x", definitionType));
 		Arrow setterArrType = new Arrow(definitionType, new Unit());
-		LinkedList<NameBinding> formalArgs = new LinkedList<>();
-		formalArgs.add(new NameBindingImpl("x", this.definitionType));
-		DefDeclaration setterDecl = new DefDeclaration(setterName, setterArrType, formalArgs, setterBody, false, null);
+		DefDeclaration setterDecl = new DefDeclaration(setterName, setterArrType, setterArgs, setterBody, false, null);
 		wyvern.target.corewyvernIL.decl.Declaration setterDeclIL = setterDecl.generateDecl(ctx, ctx);
 		
-		// Update contexts.
-		ctx = ctx.extend(setterName, new Variable(setterName), wyvern.target.corewyvernIL.support.Util.unitType());
+		// Create a block of declarations.
+		List<DeclType> declTypes = new LinkedList<>();
+		declTypes.add(getterDecl.genILType(ctx));
+		declTypes.add(setterDecl.genILType(ctx));
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<>();
+		decls.add(getterDeclIL);
+		decls.add(setterDeclIL);
+		String newName = GenContext.generateName();
+		StructuralType structType = new StructuralType(newName, declTypes);
+		ctx = ctx.extend(newName,  new Variable(newName), structType);
 		tlc.updateContext(ctx);
-		tlc.addModuleDecl(setterDeclIL, setterDeclIL.typeCheck(ctx, ctx));
 		
+		// Create a new expression to add to the top-level.
+		wyvern.target.corewyvernIL.expression.New newExp;
+		newExp = new wyvern.target.corewyvernIL.expression.New(decls, newName, structType);
+		tlc.addLet(newName, structType, newExp, true);
 		
-		*/
+		// Create a method call to the getter.
+		MethodCall methodCallExpr = new MethodCall(new Variable(newName), getterName, new LinkedList<>(), null);
+				
+		// Equate the var with a call to the getter.
+		ctx = ctx.extend(varName, methodCallExpr, varValueType);
+		tlc.updateContext(ctx);
 		
 	}
 	
-	private String varNameToTempObj (String s) {
+	public static String varNameToTempObj (String s) {
 		return "__temp" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 	
-	private String varNameToGetter (String s) {
+	public static String varNameToGetter (String s) {
 		return "get" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 	
-	private String varNameToSetter (String s) {
+	public static String varNameToSetter (String s) {
 		return "set" + Character.toUpperCase(s.charAt(0)) + s.substring(1);		
 	}
 
+	public static String getterToVarName (String s) {
+		return s.replaceFirst("get", "");
+	}
+	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
-		GenContext ctx = tlc.getContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl;
-		decl = new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(),
-																  getILValueType(ctx),
-																  definition.generateIL(ctx, null));
-		DeclType dt = genILType(tlc.getContext());
-		tlc.addModuleDecl(decl,dt);		
+		return; // do nothing -- this is handled in VarDeclaration.
 	}
 	
 }
