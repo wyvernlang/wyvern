@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -176,7 +177,46 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		
+		// Create a var declaration.
+		wyvern.target.corewyvernIL.decl.VarDeclaration varDecl;
+		varDecl = new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), binding.getType().getILType(ctx), definition.generateIL(ctx, null));
+		String varName = this.getName();
+		return varDecl;
+
+		/*
+
+		// Create a declaration for getter method.
+		String getterName = varNameToGetter(varName);
+		wyvern.tools.typedAST.core.expressions.Variable gettersVarReference;
+		gettersVarReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(), location)
+		
+		gettersObjReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(tempObjName, null), null);
+		Invocation getterBody = new Invocation(gettersObjReference, varName, null, null);
+		Arrow getterArrType = new Arrow(new Unit(), definitionType);
+		DefDeclaration getterDecl = new DefDeclaration(getterName, getterArrType, new LinkedList<>(), getterBody, false, null);
+		wyvern.target.corewyvernIL.decl.Declaration getterDeclIL = getterDecl.generateDecl(ctx, ctx);
+
+		// Create a declaration for setter method.
+		String setterName = varNameToSetter(varName);
+		wyvern.tools.typedAST.core.expressions.Variable settersObjReference;
+		settersObjReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(tempObjName, null), null);
+		Invocation fieldGet = new Invocation(settersObjReference, varName, null, null);
+		wyvern.tools.typedAST.core.expressions.Variable valueToAssign =
+				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
+		LinkedList<NameBinding> setterArgs = new LinkedList<>();
+		setterArgs.add(new NameBindingImpl("x", definitionType));
+		Arrow setterArrType = new Arrow(definitionType, new Unit());
+		DefDeclaration setterDecl = new DefDeclaration(setterName, setterArrType, setterArgs, setterBody, false, null);
+		wyvern.target.corewyvernIL.decl.Declaration setterDeclIL = setterDecl.generateDecl(ctx, ctx);
+		
+		
+		
 		return new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), binding.getType().getILType(ctx), definition.generateIL(ctx, null));
+		
+		*/
+		
 	}
 
 	@Override
@@ -230,7 +270,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
 		LinkedList<NameBinding> setterArgs = new LinkedList<>();
 		setterArgs.add(new NameBindingImpl("x", definitionType));
-		Arrow setterArrType = new Arrow(definitionType, new Unit());
+		Arrow setterArrType = new Arrow(definitionType, definitionType);
 		DefDeclaration setterDecl = new DefDeclaration(setterName, setterArrType, setterArgs, setterBody, false, null);
 		wyvern.target.corewyvernIL.decl.Declaration setterDeclIL = setterDecl.generateDecl(ctx, ctx);
 		
@@ -278,7 +318,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
-		return; // do nothing -- this is handled in VarDeclaration.
+		return; // do nothing--adding module declarations handle in genTopLevel.
 	}
 	
 }

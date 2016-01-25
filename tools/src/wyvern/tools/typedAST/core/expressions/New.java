@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -15,10 +16,13 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -31,8 +35,10 @@ import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
@@ -274,48 +280,66 @@ public class New extends CachingTypedAST implements CoreAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
-		// TODO see if the user specified a different self name
-				String selfName = "this";
-				// fake an appropriate context
-				GenContext tempThisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), null);
-				// compute the structural type for this
-				List<DeclType> declTypes = new LinkedList<DeclType>();
+
+		String selfName = "this";
+		ValueType type = seq.inferStructuralType(ctx);
+		
+		// TODO translate the ascribed type, if any
+		// translate the declarations
+		GenContext thisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), type);
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		for (TypedAST d : seq) {
+			
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
+			if (decl == null) throw new NullPointerException();
+			decls.add(decl);
+			
+			if (d instanceof VarDeclaration) {
+				VarDeclaration varDecl = (VarDeclaration) d;
+				wyvern.target.corewyvernIL.decl.Declaration getter = generateVarGetter(thisContext, varDecl);
+				wyvern.target.corewyvernIL.decl.Declaration setter = generateVarSetter(thisContext, varDecl);
+				decls.add(getter);
+				decls.add(setter);
+			}
 				
-				ValueType type = null;
-				
-				wyvern.tools.typedAST.core.declarations.DelegateDeclaration delegateDecl = null;
-				
-				for (TypedAST d : seq) {
-					if (d instanceof wyvern.tools.typedAST.core.declarations.DelegateDeclaration) {
-						delegateDecl = (wyvern.tools.typedAST.core.declarations.DelegateDeclaration)d;
-					}
-					else {
-						DeclType t = ((Declaration) d).genILType(tempThisContext);
-						declTypes.add(t);
-					}
-				}
-				// add delegate object's declaration which not been override
-				if (delegateDecl != null) {
-					StructuralType delegateStructuralType = delegateDecl.getType().getILType(tempThisContext).getStructuralType(tempThisContext);
-					for (DeclType declType : delegateStructuralType.getDeclTypes()) {
-						if (!declTypes.stream().anyMatch(newDefDecl-> newDefDecl.isSubtypeOf(declType, tempThisContext))) {
-							declTypes.add(declType);
-						}
-					}
-				}
-				
-				
-				type = new StructuralType(selfName, declTypes);
-				// TODO translate the ascribed type, if any
-				// translate the declarations
-				GenContext thisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), type);
-				List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-				for (TypedAST d : seq) {
-					wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
-					if (decl == null)
-						throw new NullPointerException();
-					decls.add(decl);
-				}
-				return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
+		}
+		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
 	}
+	
+	private wyvern.target.corewyvernIL.decl.Declaration generateVarGetter (GenContext ctx, VarDeclaration varDecl) {
+		
+		String varName = varDecl.getName();
+		Type definitionType = varDecl.getType();
+		
+		// Create a declaration for getter method.
+		String getterName = VarDeclaration.varNameToGetter(varName);
+		wyvern.tools.typedAST.core.expressions.Variable thisReference;
+		thisReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		Invocation getterBody = new Invocation(thisReference, varName, null, null);
+		Arrow getterArrType = new Arrow(new Unit(), definitionType);
+		DefDeclaration getterDecl = new DefDeclaration(getterName, getterArrType, new LinkedList<>(), getterBody, false, null);
+		return getterDecl.generateDecl(ctx, ctx);
+		
+	}
+	
+	private wyvern.target.corewyvernIL.decl.Declaration generateVarSetter (GenContext ctx, VarDeclaration varDecl) {
+		
+		String varName = varDecl.getName();
+		Type definitionType = varDecl.getType();
+		
+		String setterName = VarDeclaration.varNameToSetter(varName);
+		wyvern.tools.typedAST.core.expressions.Variable thisReference;
+		thisReference = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+		Invocation fieldGet = new Invocation(thisReference, varName, null, null);
+		wyvern.tools.typedAST.core.expressions.Variable valueToAssign =
+				new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
+		LinkedList<NameBinding> setterArgs = new LinkedList<>();
+		setterArgs.add(new NameBindingImpl("x", definitionType));
+		Arrow setterArrType = new Arrow(definitionType, definitionType);
+		DefDeclaration setterDecl = new DefDeclaration(setterName, setterArrType, setterArgs, setterBody, false, null);
+		wyvern.target.corewyvernIL.decl.Declaration setterDeclIL = setterDecl.generateDecl(ctx, ctx);
+		return setterDeclIL;
+	}
+	
 }
