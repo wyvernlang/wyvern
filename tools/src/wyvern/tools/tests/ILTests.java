@@ -608,7 +608,7 @@ public class ILTests {
     }
 
     @Test
-    public void testLambdaInferred() throws ParseException {
+    public void testLambdaInferredInValDeclaration() throws ParseException {
 
         String source = "type IntIntFn \n"
             + "     def apply(x:system.Int):system.Int \n"
@@ -636,6 +636,137 @@ public class ILTests {
         IntegerLiteral five = new IntegerLiteral(5);
         Assert.assertEquals(five, v);
     }
+    
+    @Test
+    public void testLambdaInferredInApplication() throws ParseException {
+
+        String source = "type IntIntFn \n"
+            + "     def apply(x:system.Int):system.Int \n"
+            + "type UseLambda\n"
+            + "    def runLambda(x:IntIntFn):system.Int\n"
+            + "val t = new\n"
+            + "    def runLambda(x:IntIntFn):system.Int\n"
+            + "        x(5)\n" 
+            + "t.runLambda(x=>x)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx, null);
+        TypeContext ctx = TypeContext.empty();
+
+
+        ValueType t = null;
+        try {
+            t = program.typeCheck(ctx);
+        } catch(NullPointerException e) {
+            e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
+        }
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+    
+    @Test
+    public void testLambdaInferredInDefDeclarationReturnValue() throws ParseException {
+
+    	 String source = "type IntIntFn \n"
+    	            + "     def apply(x:system.Int):system.Int \n"
+    	            + "def getLambda():IntIntFn\n"
+    	            + "    val t:system.int = 1\n"
+    	            + "    x => x\n"
+    	            + "val lambda = getLambda()\n"
+    	            + "lambda(5)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx, null);
+        TypeContext ctx = TypeContext.empty();
+
+
+        ValueType t = null;
+        try {
+            t = program.typeCheck(ctx);
+        } catch(NullPointerException e) {
+            e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
+        }
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+    
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLambdaInferredInVarDeclaration() throws ParseException {
+
+    	 String source = "type IntIntFn \n"
+    	            + "     def apply(x:system.Int):system.Int \n"
+    	            + "var t:IntIntFn = x=>x\n"
+    	            + "t(5)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx, null);
+        TypeContext ctx = TypeContext.empty();
+
+
+        ValueType t = null;
+        try {
+            t = program.typeCheck(ctx);
+        } catch(NullPointerException e) {
+            e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
+        }
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+    
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLambdaInferredInAssignment() throws ParseException {
+
+    	 String source = "type IntIntFn \n"
+    	            + "     def apply(x:system.Int):system.Int \n"
+    	            + "var t:IntIntFn = x=>x\n"
+    	            + "t = x=>5\n"
+    	            + "t(4)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx, null);
+        TypeContext ctx = TypeContext.empty();
+
+
+        ValueType t = null;
+        try {
+            t = program.typeCheck(ctx);
+        } catch(NullPointerException e) {
+            e.printStackTrace(System.out);
+            Assert.fail("Failed to typecheck. Null Pointer Exception");
+        }
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+
 
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {

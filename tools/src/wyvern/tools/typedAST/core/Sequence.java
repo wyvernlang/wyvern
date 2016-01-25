@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.*;
@@ -339,7 +340,10 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 			throw new RuntimeException("expected an expression in the list");
 		
 		return GenUtil.doGenIL(ctx, ai);*/
-		return generateModuleIL(ctx, false);
+	    Sequence seqWithBlocks = combine();		
+		TopLevelContext tlc = new TopLevelContext(ctx);
+		seqWithBlocks.genTopLevel(tlc, expectedType);
+		return tlc.getExpression();
 	}
 	
 	/**
@@ -374,6 +378,29 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 			if (ast instanceof Declaration) {
 				((Declaration)ast).addModuleDecl(tlc);
 			}
+		}
+	}
+	
+	
+	public void genTopLevel(TopLevelContext tlc, ValueType expectedType) {
+		for (int i = 0; i < exps.size()-1; i++) {
+			TypedAST ast =  exps.get(i);
+			ast.genTopLevel(tlc);
+			if (ast instanceof Declaration) {
+				((Declaration)ast).addModuleDecl(tlc);
+			}
+		}
+		
+		TypedAST ast = exps.getLast();
+		if (ast instanceof Fn) {
+			((Fn)ast).genTopLevel(tlc, expectedType);			
+		}
+		else {
+			ast.genTopLevel(tlc);
+		}
+		
+		if (ast instanceof Declaration) {
+			((Declaration)ast).addModuleDecl(tlc);
 		}
 	}
 
