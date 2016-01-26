@@ -15,6 +15,8 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.evaluation.Closure;
+import wyvern.tools.typedAST.core.expressions.Assignment;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
@@ -289,4 +291,62 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public wyvern.target.corewyvernIL.type.ValueType getReturnILType() {
 		return returnILType;
 	}
+	
+
+	/**
+	 * Generate a getter method declaration for the field of an object.
+	 * @param ctx: context to evaluate in.
+	 * @param receiver: the object for which to make the getter.
+	 * @param varName: the name of the field.
+	 * @param varType: the type of the field.
+	 * @return a declaration for an appropriate getter method.
+	 */
+	public static DefDeclaration generateGetter (GenContext ctx, wyvern.tools.typedAST.core.expressions.Variable receiver,
+											  String varName, Type varType) {
+		
+		// The body of the getter is an invocation of the form: receiver.varName
+		String getterName = VarDeclaration.varNameToGetter(varName);
+		Invocation getterBody = new Invocation(receiver, varName, null, null);
+		
+		// Getter's signature is Unit -> varType
+		Arrow getterArrType = new Arrow(new Unit(), varType);
+		
+		// Make and return the declaration.
+		wyvern.tools.typedAST.core.declarations.DefDeclaration getterDecl;
+		getterDecl = new wyvern.tools.typedAST.core.declarations.DefDeclaration(getterName, getterArrType, new LinkedList<>(),
+																				getterBody, false, null);
+		return getterDecl;
+		
+	}
+	
+	/**
+	 * Generate a setter method declaration for the field of an object.
+	 * @param ctx: context to evaluate in.
+	 * @param receiver: the object for which to make the setter.
+	 * @param varName: the name of the field.
+	 * @param varType: the type of the field.
+	 * @return a declaration for an appropriate setter method.
+	 */
+	public static DefDeclaration generateSetter (GenContext ctx, wyvern.tools.typedAST.core.expressions.Variable receiver,
+											  String varName, Type varType) {
+
+		// The body of the setter is an assignment of the form: receiver.varName = x
+		String setterName = VarDeclaration.varNameToSetter(varName);
+		Invocation fieldGet = new Invocation(receiver, varName, null, null);
+		wyvern.tools.typedAST.core.expressions.Variable valueToAssign;
+		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
+		
+		// The setter takes one argument x : varType; its signature is varType -> varType
+		LinkedList<NameBinding> setterArgs = new LinkedList<>();
+		setterArgs.add(new NameBindingImpl("x", varType));
+		Arrow setterArrType = new Arrow(varType, varType);
+		
+		// Make and return the declaration.
+		DefDeclaration setterDecl;
+		setterDecl = new DefDeclaration(setterName, setterArrType, setterArgs, setterBody, false, null);
+		return setterDecl;
+		
+	}
+	
 }
