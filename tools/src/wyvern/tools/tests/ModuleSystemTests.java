@@ -246,6 +246,31 @@ public class ModuleSystemTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTopLevelVarsWithAliasing () throws ParseException {
+		
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		// Load and link Database.wyv.
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl);
+		
+		// Interpret DatabaseUser.wyv with Database.wyv in the context.
+		String source = TestUtil.readFile(PATH + "DatabaseUserTricky.wyv");
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx, Util.intType());
+		TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
+		
+	}
+	
+	@Test
 	public void testTopLevelVarGet () throws ParseException {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		genCtx = new TypeGenContext("Int", "system", genCtx);
