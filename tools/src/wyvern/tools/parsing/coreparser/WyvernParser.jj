@@ -450,7 +450,7 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Token id = null; Token id2 = null; AST exp = null; }
+{ Token id = null; Token id2 = null; AST exp = null; Type arrowResult = null; }
 {
   id = <IDENTIFIER> (<DOT> id2 = <IDENTIFIER> {
 	if (exp == null) {
@@ -459,12 +459,27 @@ Type Type() :
 		exp = build.invocation(exp, id.image, null, loc(id));
 	}
   	id = id2;
-  })* {
-	if (exp == null)
-		return build.nominalType(id.image, loc(id));
-  	else
-  		return build.qualifiedType(exp, id2.image);
-  }
+ })* (<TARROW> arrowResult = Type() )? {
+    if (arrowResult == null) {
+        if(exp == null) {
+		    return build.nominalType(id.image, loc(id));
+        } else {
+  		    return build.qualifiedType(exp, id2.image);
+        }
+    } else {
+        if(exp == null) {
+            return build.arrowType(
+                build.nominalType(id.image, loc(id)),
+                arrowResult
+            );
+        } else {
+            return build.arrowType(
+                build.nominalType(id.image, loc(id)),
+                arrowResult
+            );
+        }
+    }
+ }
 }
 
 AST AdditiveExpression(ExpFlags flags) :
