@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import javafx.util.Pair;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -17,6 +16,7 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.util.Pair;
 
 public class TopLevelContext {
 	private Stack<Pair<String,Expression>> pending = new Stack<Pair<String,Expression>>();
@@ -40,10 +40,10 @@ public class TopLevelContext {
 
 	public Expression getExpression() {
 		Pair<String,Expression> pair = pending.pop();
-		Expression exp = pair.getValue();
+		Expression exp = pair.second;
 		while (!pending.isEmpty()) {
 			pair = pending.pop();
-			exp = new Let(pair.getKey(), pair.getValue(), exp);
+			exp = new Let(pair.first, pair.second, exp);
 		}
 		return exp;
 	}
