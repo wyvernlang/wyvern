@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.ErrorMessage;
@@ -29,6 +30,7 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
+
 
 
 
@@ -164,7 +166,11 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         ValueType newType = new StructuralType("@lambda-structual-decl", declTypes);
 
         return new New(declList, "@lambda-decl", newType);
-}
+	}
+	
+	public  void genTopLevel(TopLevelContext topLevelContext, ValueType expectedType) {
+		topLevelContext.addExpression(generateIL(topLevelContext.getContext(), expectedType));
+	}
 
     private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx, ValueType declType) {
 
@@ -175,6 +181,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         if (expectedFormals.size() != bindings.size()) {
         	//TODO: will replace with ToolError in the future
 			throw new RuntimeException("args count does not map between declType and lambda expression");
+			
 		}
         
         for (int i = 0; i < expectedFormals.size(); i++) {
