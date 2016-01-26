@@ -295,7 +295,8 @@ public class New extends CachingTypedAST implements CoreAST {
 			if (decl == null) throw new NullPointerException();
 			decls.add(decl);
 			
-			//A VarDeclaration also generates declarations for the getter and setter to the var field.
+			// A VarDeclaration also generates declarations for the getter and setter to the var field.
+			// TODO: is the best place for this to happen?
 			if (d instanceof VarDeclaration) {
 				VarDeclaration varDecl = (VarDeclaration) d;
 				String varName = varDecl.getName();
