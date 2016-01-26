@@ -1,0 +1,9 @@
+
+require Database
+
+Database.contents = 0
+
+val db = Database
+db.contents = 10
+
+Database.contents
