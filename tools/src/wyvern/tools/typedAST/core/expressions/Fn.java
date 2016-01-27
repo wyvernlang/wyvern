@@ -172,19 +172,19 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 		topLevelContext.addExpression(generateIL(topLevelContext.getContext(), expectedType));
 	}
 
-    private static List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx, ValueType declType) {
+    private List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx, ValueType declType) {
 
-    	List<FormalArg> expectedFormals = getExpectedFormls(ctx, declType);
+    	List<FormalArg> expectedFormals = declType == null?null:getExpectedFormls(ctx, declType);
     	
         List<FormalArg> result = new LinkedList<FormalArg>();
 
-        if (expectedFormals.size() != bindings.size()) {
+        if (expectedFormals != null && expectedFormals.size() != bindings.size()) {
         	//TODO: will replace with ToolError in the future
 			throw new RuntimeException("args count does not map between declType and lambda expression");
 			
 		}
         
-        for (int i = 0; i < expectedFormals.size(); i++) {
+        for (int i = 0; i < bindings.size(); i++) {
         	NameBinding binding = bindings.get(i);
         	
         	ValueType argType = null;        	
@@ -192,6 +192,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 				argType = binding.getType().getILType(ctx);
 			}
         	else {
+        		if (expectedFormals == null)
+        			ToolError.reportError(ErrorMessage.CANNOT_INFER_ARG_TYPE, this);
 				argType = expectedFormals.get(i).getType();
 			}
         	

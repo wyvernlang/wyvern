@@ -110,6 +110,34 @@ public class ILTests {
 		Assert.assertNotEquals(five, v);
     }
 
+    @Test
+    public void testLetValWithString3() throws ParseException {
+        String input = "val identity = (x: system.Int) => x\n"
+                     + "identity(5)";
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(TestUtil.getStandardGenContext(), null);
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+    }
+
+    @Test(expected=ToolError.class)
+    public void testLetValWithString4() throws ParseException {
+        String input = "val identity = (x: system.Int) => x\n"
+                     + "   identity(5)";
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(TestUtil.getStandardGenContext(), null);
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+    }
+
 	@Test
 	public void testFieldRead() throws ParseException {
 		String input = "val obj = new\n"

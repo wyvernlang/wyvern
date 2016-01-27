@@ -19,16 +19,18 @@ public enum ErrorMessage {
 	ASSIGNMENT_SUBTYPING("The assigned value is not a subtype of the left-hand side of this assignment", 0),
 	DUPLICATE_MEMBER("%ARG has more than one member named %ARG", 2),
 	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
+	CANNOT_INFER_ARG_TYPE("Cannot infer the argument type as there is no expected type for the function expression", 0),
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
 	
 	// Syntax errors
-	LEXER_ERROR("Error dyring lexing (often caused by inconsistent whitespace for indentation)", 0),
+	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
 	UNEXPECTED_INPUT("Unexpected input", 0),
 	UNEXPECTED_INPUT_WITH_ARGS("Unexpected input: %ARG", 1),
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),
 	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
+	ILLEGAL_INDENTED_BLOCK("Indented block cannot appear here", 0),
 	
 	// Tagged Type errors
 	//TODO: these need parameters that give more information
