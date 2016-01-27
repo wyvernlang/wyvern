@@ -1,11 +1,15 @@
 package wyvern.tools.typedAST.transformers;
 
-import wyvern.target.corewyvernIL.expression.*;
-import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.WyvernException;
-
 import java.util.HashMap;
 import java.util.Optional;
+
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.WyvernException;
 
 public class GenerationEnvironment {
     private static int gen = 0;

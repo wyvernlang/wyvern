@@ -1,7 +1,15 @@
 package wyvern.tools.tests.utils;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.junit.Assert;
+
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
@@ -10,14 +18,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class ModuleTestCase implements TestCase {
 

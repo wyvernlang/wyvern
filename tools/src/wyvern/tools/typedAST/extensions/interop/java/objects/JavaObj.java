@@ -3,7 +3,6 @@ package wyvern.tools.typedAST.extensions.interop.java.objects;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 

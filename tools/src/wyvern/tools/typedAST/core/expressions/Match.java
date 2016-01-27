@@ -18,9 +18,6 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -34,8 +31,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeInv;
-import wyvern.tools.types.extensions.TypeType;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 

@@ -1,20 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.ValDeclaration;
-import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
-import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FieldGet;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class VarGenContext extends GenContext {
 	private String var;

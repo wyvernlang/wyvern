@@ -1,5 +1,9 @@
 package wyvern.tools.typedAST.core.evaluation;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -19,10 +23,6 @@ import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Closure extends AbstractValue implements ApplyableValue {
 	private BoundCode function;

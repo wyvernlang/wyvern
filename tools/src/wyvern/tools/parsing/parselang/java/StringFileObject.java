@@ -1,8 +1,9 @@
 package wyvern.tools.parsing.parselang.java;
 
-import javax.tools.SimpleJavaFileObject;
 import java.io.IOException;
 import java.net.URI;
+
+import javax.tools.SimpleJavaFileObject;
 
 //Largely from http://www.ibm.com/developerworks/java/library/j-jcomp/index.html
 public class StringFileObject extends SimpleJavaFileObject {

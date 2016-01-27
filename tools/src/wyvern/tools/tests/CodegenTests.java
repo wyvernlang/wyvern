@@ -1,16 +1,18 @@
 package wyvern.tools.tests;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import static java.util.Optional.empty;
+import static wyvern.stdlib.Globals.getStandardEnv;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.oir.EmitLLVMNative;
-import wyvern.target.oir.EmitLLVMVisitor;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
@@ -20,12 +22,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.types.extensions.Int;
-
-import java.io.IOException;
-import java.io.StringReader;
-
-import static java.util.Optional.empty;
-import static wyvern.stdlib.Globals.getStandardEnv;
 
 public class CodegenTests {
     @Test

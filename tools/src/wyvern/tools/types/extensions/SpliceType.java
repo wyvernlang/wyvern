@@ -1,5 +1,10 @@
 package wyvern.tools.types.extensions;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -7,11 +12,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 
 public class SpliceType implements Type {
 	private final Type inner;

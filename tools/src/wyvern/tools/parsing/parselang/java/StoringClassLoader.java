@@ -1,18 +1,20 @@
 package wyvern.tools.parsing.parselang.java;
 
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import wyvern.tools.util.Pair;
-
-import javax.tools.JavaFileObject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import javax.tools.JavaFileObject;
+
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+
+import wyvern.tools.util.Pair;
 
 //Largely from http://www.ibm.com/developerworks/java/library/j-jcomp/index.html
 public class StoringClassLoader extends ClassLoader {

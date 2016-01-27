@@ -1,7 +1,10 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -15,7 +18,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
-import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -29,10 +31,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
 
 public class VarDeclaration extends Declaration implements CoreAST {
 	ExpressionAST definition;

@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import wyvern.target.corewyvernIL.Environment;
-import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class NominalType extends ValueType{

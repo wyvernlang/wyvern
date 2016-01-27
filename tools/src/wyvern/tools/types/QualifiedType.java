@@ -5,8 +5,6 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.util.TreeWriter;

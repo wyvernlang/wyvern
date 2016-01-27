@@ -1,5 +1,8 @@
 package wyvern.tools.typedAST.core.values;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -12,9 +15,6 @@ import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class VarValue extends AbstractValue {
 	private Value innerValue;

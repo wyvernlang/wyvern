@@ -1,9 +1,5 @@
 package wyvern.target.oir;
 
-import java.util.HashMap;
-
-import wyvern.target.oir.declarations.OIRClassDeclaration;
-
 public class FinalPICNode
 {
 	private PICEntry picEntry;

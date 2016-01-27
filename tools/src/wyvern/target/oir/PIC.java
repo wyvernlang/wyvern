@@ -1,7 +1,6 @@
 package wyvern.target.oir;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 

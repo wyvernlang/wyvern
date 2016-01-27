@@ -1,7 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -12,9 +14,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Map;
-import java.util.Optional;
 
 public class PropDeclaration extends Declaration {
 	private final String name;

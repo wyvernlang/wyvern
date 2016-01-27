@@ -1,17 +1,21 @@
 package wyvern.tools.types;
 
-import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.*;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.util.TreeWriter;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.errors.WyvernException;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.util.TreeWriter;
 
 public class UnresolvedType extends AbstractTypeImpl implements Type {
 	private String typeName;

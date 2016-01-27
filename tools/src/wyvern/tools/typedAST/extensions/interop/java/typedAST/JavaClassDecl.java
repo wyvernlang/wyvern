@@ -1,7 +1,19 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
-import jdk.internal.dynalink.support.Lookup;
-import jdk.nashorn.internal.lookup.MethodHandleFactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -19,11 +31,6 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
-
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.*;
-import java.util.*;
 
 public class JavaClassDecl extends ClassDeclaration {
 	private Class clazz;

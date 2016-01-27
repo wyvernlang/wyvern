@@ -1,8 +1,5 @@
 package wyvern.tools.tests;
 
-import static java.util.Optional.empty;
-import static wyvern.stdlib.Globals.getStandardEnv;
-
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
@@ -13,12 +10,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
-import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
-import wyvern.tools.parsing.coreparser.TokenManager;
 import wyvern.tools.parsing.coreparser.WyvernParser;
-import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.core.values.IntegerConstant;

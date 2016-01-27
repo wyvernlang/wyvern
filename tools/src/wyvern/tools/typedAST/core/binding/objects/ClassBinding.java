@@ -1,7 +1,6 @@
 package wyvern.tools.typedAST.core.binding.objects;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;

@@ -4,7 +4,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 

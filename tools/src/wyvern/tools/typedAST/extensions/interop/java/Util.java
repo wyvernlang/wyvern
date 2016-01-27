@@ -1,23 +1,22 @@
 package wyvern.tools.typedAST.extensions.interop.java;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.typedAST.core.binding.Binding;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.values.*;
-import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
-import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
-import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
-import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
-import wyvern.tools.typedAST.interfaces.ApplyableValue;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.*;
-import wyvern.tools.util.EvaluationEnvironment;
+import static org.objectweb.asm.Opcodes.AASTORE;
+import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ANEWARRAY;
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.CHECKCAST;
+import static org.objectweb.asm.Opcodes.DUP;
+import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.PUTFIELD;
+import static org.objectweb.asm.Opcodes.RETURN;
+import static org.objectweb.asm.Opcodes.V1_7;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,7 +25,35 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.objectweb.asm.Opcodes.*;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.core.values.Obj;
+import wyvern.tools.typedAST.core.values.StringConstant;
+import wyvern.tools.typedAST.core.values.TupleValue;
+import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
+import wyvern.tools.typedAST.extensions.interop.java.objects.JavaWyvObject;
+import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
+import wyvern.tools.typedAST.extensions.interop.java.types.JavaClassType;
+import wyvern.tools.typedAST.interfaces.ApplyableValue;
+import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.types.extensions.ClassType;
+import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Str;
+import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.types.extensions.Unit;
+import wyvern.tools.util.EvaluationEnvironment;
 
 public class Util {
 	private static HashMap<Class, Type> classCache = new HashMap<Class, Type>();

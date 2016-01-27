@@ -1,21 +1,29 @@
 package wyvern.tools.types.extensions;
 
+import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
+import static wyvern.tools.errors.ToolError.reportError;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.types.*;
+import wyvern.tools.types.ApplyableType;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.SubtypeRelation;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-
-import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
-import static wyvern.tools.errors.ToolError.reportError;
 
 public class Intersection implements Type, OperatableType, ApplyableType {
 	private List<Type> types;

@@ -1,15 +1,22 @@
 package wyvern.tools.types.extensions;
 
+import java.util.LinkedList;
+
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.Binding;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.declarations.*;
+import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-
-import java.util.LinkedList;
 
 /**
  * Useful type functionality

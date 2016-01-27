@@ -1,12 +1,12 @@
 package wyvern.tools.types;
 
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Map;
+
 import wyvern.tools.typedAST.extensions.TSLBlock;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.extensions.SpliceType;
 import wyvern.tools.types.extensions.TypeInv;
-
-import java.lang.reflect.Field;
-import java.util.*;
 
 //Sigh...
 public class TypeResolver {

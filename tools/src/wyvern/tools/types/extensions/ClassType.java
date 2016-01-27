@@ -1,26 +1,38 @@
 package wyvern.tools.types.extensions;
 
-import wyvern.target.corewyvernIL.expression.FieldGet;
+import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
+import static wyvern.tools.errors.ToolError.reportError;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.type.*;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.types.*;
+import wyvern.tools.types.AbstractTypeImpl;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.ParameterizableType;
+import wyvern.tools.types.RecordType;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-
-import static wyvern.tools.errors.ErrorMessage.OPERATOR_DOES_NOT_APPLY;
-import static wyvern.tools.errors.ToolError.reportError;
 
 public class ClassType extends AbstractTypeImpl implements OperatableType, RecordType, ParameterizableType {
 	private ClassDeclaration decl = null;

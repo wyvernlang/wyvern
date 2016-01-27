@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.EmitOIR;
-import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;

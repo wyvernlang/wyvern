@@ -1,5 +1,18 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
+import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
+import static wyvern.tools.errors.ToolError.reportError;
+import static wyvern.tools.errors.ToolError.reportEvalError;
+
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -10,7 +23,12 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.interfaces.ApplyableValue;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -21,14 +39,6 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
-import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
-import static wyvern.tools.errors.ToolError.reportError;
-import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Application extends CachingTypedAST implements CoreAST {
 	private ExpressionAST function;

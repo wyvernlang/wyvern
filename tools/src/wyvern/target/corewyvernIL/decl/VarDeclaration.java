@@ -1,24 +1,15 @@
 package wyvern.target.corewyvernIL.decl;
 
-import wyvern.target.corewyvernIL.Environment;
-
 import java.io.IOException;
 
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.Value;
-import wyvern.target.corewyvernIL.type.Type;
-import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.oir.OIRAST;
-import wyvern.target.oir.OIREnvironment;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.oir.OIREnvironment;
 
 public class VarDeclaration extends DeclarationWithRHS {
 

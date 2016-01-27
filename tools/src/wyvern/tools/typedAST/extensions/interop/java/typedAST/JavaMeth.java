@@ -1,21 +1,20 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Intersection;
-import wyvern.tools.util.EvaluationEnvironment;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.extensions.interop.java.Util;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Intersection;
+import wyvern.tools.util.EvaluationEnvironment;
 
 public class JavaMeth extends DefDeclaration {
 

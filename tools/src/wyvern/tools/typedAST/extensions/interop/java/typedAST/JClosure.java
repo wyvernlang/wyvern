@@ -1,5 +1,14 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
+import java.lang.invoke.MethodHandle;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -20,10 +29,6 @@ import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.lang.invoke.MethodHandle;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class JClosure extends AbstractValue implements ApplyableValue {
 	private static AtomicInteger uidGen = new AtomicInteger();

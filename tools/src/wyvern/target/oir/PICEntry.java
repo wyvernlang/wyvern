@@ -1,10 +1,6 @@
 package wyvern.target.oir;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
 
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.tools.errors.WyvernException;

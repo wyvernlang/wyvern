@@ -1,5 +1,11 @@
 package wyvern.tools.typedAST.extensions;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -21,8 +27,6 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
 
 public class SpliceBindExn extends AbstractExpressionAST implements BoundCode {
 	private final TypedAST exn;
