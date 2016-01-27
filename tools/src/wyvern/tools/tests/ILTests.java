@@ -795,6 +795,41 @@ public class ILTests {
         Assert.assertEquals(five, v);
     }
 
+	@Test
+    @Category(CurrentlyBroken.class)
+	public void testTypeMembers() throws ParseException {
+		String input = "type Numeric\n"
+                     + "    val n:Int\n\n"
+				
+                     + "type Cell\n"
+                     + "    type T = system.Int\n"
+                     + "    val element:this.T\n\n"
+
+                     + "type Holder\n"
+                     + "    type U = Cell\n\n"
+
+                     + "val h:Holder = new\n"
+                     + "    type U = Cell\n\n"
+                     
+                     + "val num:Numeric = new\n"
+                     + "    val n:Int = 5\n\n"
+                     
+                     + "val c:h.U = new\n"
+                     + "    type T = system.Int\n"
+                     + "    val element:this.T = num\n\n"
+                     
+                     + "c.element.n"
+				     ;
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+        Expression program = ast.generateIL(genCtx, null);
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
 
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {
