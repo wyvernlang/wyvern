@@ -1,7 +1,6 @@
 package wyvern.target.oir.expressions;
 
 import wyvern.target.oir.ASTVisitor;
-import wyvern.target.oir.EmitILVisitor;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.declarations.OIRIntegerType;
 import wyvern.target.oir.declarations.OIRType;

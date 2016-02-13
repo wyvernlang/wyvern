@@ -5,10 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import wyvern.target.oir.ASTVisitor;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
-import wyvern.target.oir.expressions.OIRValue;
-import wyvern.target.oir.expressions.OIRVariable;
 
 public class OIRClassDeclaration extends OIRType {
 	private String name;

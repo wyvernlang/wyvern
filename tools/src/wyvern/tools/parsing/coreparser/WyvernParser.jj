@@ -411,13 +411,15 @@ AST DefBody() :
 }
 
 AST ExpressionLine(boolean makeValDecl) :
-{ AST exp; AST decls = null; Token t; Object caseArm; List cases; ExpFlags flags = new ExpFlags(); }
+{ AST exp; AST decls = null; Token t; Token t2 = null; Object caseArm; List cases; ExpFlags flags = new ExpFlags(); }
 {
   exp = Expression(flags) t=<NEWLINE>
-  [ <INDENT> decls = DeclSequence(true) <DEDENT> ]
+  [ t2=<INDENT> decls = DeclSequence(true) <DEDENT> ]
   {
     if (!flags.isEmpty()) {
     	build.setNewBody(flags.getNewExp(), decls);
+    } else if (t2 != null) {
+        ToolError.reportError(ErrorMessage.ILLEGAL_INDENTED_BLOCK, loc(t2));
     }
     
     // create a decl if requested (e.g. we are within a module)

@@ -1,23 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FieldGet;
-import wyvern.target.corewyvernIL.expression.MethodCall;
-import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.typedAST.core.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;

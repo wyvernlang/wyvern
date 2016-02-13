@@ -1,6 +1,7 @@
 package wyvern.tools;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,14 +10,11 @@ import java.util.Optional;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
-import wyvern.target.oir.EmitLLVMNative;
 import wyvern.tools.parsing.Wyvern;
-import wyvern.tools.parsing.transformers.DSLTransformer;
-import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.tests.OIRToLLVMTests;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.util.TreeWriter;
-import wyvern.tools.tests.*;
 
 public class LLVMTestMain {
 

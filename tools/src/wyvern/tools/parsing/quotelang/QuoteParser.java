@@ -1,29 +1,24 @@
 package wyvern.tools.parsing.quotelang;
 
+import static wyvern.tools.types.TypeUtils.arrow;
+import static wyvern.tools.types.TypeUtils.unit;
+
+import java.io.IOException;
+
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.ParseBuffer;
-import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.typedAST.extensions.ToastExpression;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
-import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.TypedAST.AbstractASTTransformer;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-
-import static wyvern.tools.types.TypeUtils.arrow;
-import static wyvern.tools.types.TypeUtils.unit;
-
-import java.io.IOException;
 
 public class QuoteParser implements ExtParser {
 	private static class ToastExecutor extends AbstractASTTransformer {

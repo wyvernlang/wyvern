@@ -1,29 +1,48 @@
 package wyvern.tools.tests;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import static java.util.Optional.empty;
+import static wyvern.stdlib.Globals.getStandardEnv;
+import static wyvern.tools.types.Environment.getEmptyEnvironment;
+import static wyvern.tools.util.EvaluationEnvironment.EMPTY;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Optional;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
+import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.HasParser;
+import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.declarations.*;
-import wyvern.tools.typedAST.core.expressions.*;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
+import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Fn;
+import wyvern.tools.typedAST.core.expressions.New;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.SpliceExn;
@@ -32,23 +51,13 @@ import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.*;
-import wyvern.tools.parsing.transformers.DSLTransformer;
-import wyvern.tools.parsing.ExtParser;
-import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.Bool;
+import wyvern.tools.types.extensions.Int;
+import wyvern.tools.types.extensions.Tuple;
+import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-
-import javax.tools.Tool;
-
-import java.io.*;
-import java.util.*;
-
-import static java.util.Optional.empty;
-import static wyvern.stdlib.Globals.getStandardEnv;
-import static wyvern.tools.types.Environment.getEmptyEnvironment;
-import static wyvern.tools.util.EvaluationEnvironment.EMPTY;
 
 @Category(RegressionTests.class)
 public class CopperTests {

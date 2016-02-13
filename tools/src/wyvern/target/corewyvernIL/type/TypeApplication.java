@@ -2,9 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class TypeApplication extends ValueType {

@@ -1,7 +1,13 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
+import static wyvern.tools.errors.ToolError.reportError;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
@@ -19,13 +25,6 @@ import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
-import static wyvern.tools.errors.ToolError.reportError;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
 	private URI uri;

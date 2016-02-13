@@ -1,12 +1,12 @@
 package wyvern.tools.typedAST.abs;
 
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-
-import java.util.Map;
-import java.util.Optional;
 
 public abstract class CachingTypedAST extends AbstractExpressionAST implements ExpressionAST {
 	private Type type;

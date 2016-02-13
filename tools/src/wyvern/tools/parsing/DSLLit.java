@@ -1,5 +1,8 @@
 package wyvern.tools.parsing;
 
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -17,9 +20,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Created by Ben Chung on 3/11/14.

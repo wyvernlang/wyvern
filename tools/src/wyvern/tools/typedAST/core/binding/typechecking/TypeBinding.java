@@ -1,12 +1,11 @@
 package wyvern.tools.typedAST.core.binding.typechecking;
 
+import java.util.Optional;
+
 import wyvern.tools.typedAST.core.binding.AbstractBinding;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
-
-import java.util.Optional;
 
 public class TypeBinding extends AbstractBinding {
 	private final Reference<Value> metadata;

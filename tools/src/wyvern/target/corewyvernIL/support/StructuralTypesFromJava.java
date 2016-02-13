@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;

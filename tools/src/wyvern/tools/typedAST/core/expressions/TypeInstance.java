@@ -1,9 +1,13 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.support.GenContext;
+import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DECLARED;
+import static wyvern.tools.errors.ToolError.reportError;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -16,13 +20,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static wyvern.tools.errors.ErrorMessage.TYPE_NOT_DECLARED;
-import static wyvern.tools.errors.ToolError.reportError;
 
 public class TypeInstance extends AbstractTreeWritable implements CoreAST {
 	private TypeBinding binding;

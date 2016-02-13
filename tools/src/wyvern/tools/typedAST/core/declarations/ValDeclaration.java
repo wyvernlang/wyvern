@@ -1,5 +1,9 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -32,10 +36,6 @@ import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
 
 public class ValDeclaration extends Declaration implements CoreAST {
 	ExpressionAST definition;

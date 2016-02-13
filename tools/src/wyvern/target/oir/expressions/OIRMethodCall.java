@@ -1,6 +1,6 @@
 package wyvern.target.oir.expressions;
 
-import java.util.*;
+import java.util.List;
 
 import wyvern.target.oir.ASTVisitor;
 import wyvern.target.oir.OIREnvironment;

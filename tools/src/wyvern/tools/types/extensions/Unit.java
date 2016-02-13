@@ -1,5 +1,9 @@
 package wyvern.tools.types.extensions;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.WyvernException;
@@ -8,11 +12,6 @@ import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 
 public class Unit extends AbstractTypeImpl {
 	public Unit() {  }

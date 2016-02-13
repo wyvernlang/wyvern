@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.junit.Assert;
 
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -19,16 +20,12 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
-import wyvern.tools.parsing.coreparser.TokenManager;
-import wyvern.tools.parsing.coreparser.WyvernASTBuilder;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernParserConstants;
-import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
 public class TestUtil {
 	public static final String BASE_PATH = "src/wyvern/tools/tests/";

@@ -1,21 +1,19 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.AbstractTypeDeclaration;
-import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeInv;
-import wyvern.tools.util.EvaluationEnvironment;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.

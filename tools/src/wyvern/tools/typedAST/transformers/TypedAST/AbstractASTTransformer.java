@@ -1,8 +1,8 @@
 package wyvern.tools.typedAST.transformers.TypedAST;
 
-import wyvern.tools.typedAST.interfaces.TypedAST;
-
 import java.util.Map;
+
+import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public abstract class AbstractASTTransformer implements AstTransformer {
 	protected final TypedAST defaultTransformation(TypedAST input) {

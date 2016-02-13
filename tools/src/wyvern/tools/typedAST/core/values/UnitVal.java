@@ -1,5 +1,8 @@
 package wyvern.tools.typedAST.core.values;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -14,9 +17,6 @@ import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
 	private UnitVal(FileLocation location) { this.location = location; }

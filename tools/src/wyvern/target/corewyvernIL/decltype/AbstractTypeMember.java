@@ -2,9 +2,7 @@ package wyvern.target.corewyvernIL.decltype;
 
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.Environment;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 

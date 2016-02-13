@@ -2,14 +2,12 @@ package wyvern.tools.tests;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -27,7 +25,6 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.Interpreter;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
@@ -108,6 +105,34 @@ public class ILTests {
         Value v = program.interpret(EvalContext.empty());
         StringLiteral five = new StringLiteral("");
 		Assert.assertNotEquals(five, v);
+    }
+
+    @Test
+    public void testLetValWithString3() throws ParseException {
+        String input = "val identity = (x: system.Int) => x\n"
+                     + "identity(5)";
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(TestUtil.getStandardGenContext(), null);
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+    }
+
+    @Test(expected=ToolError.class)
+    public void testLetValWithString4() throws ParseException {
+        String input = "val identity = (x: system.Int) => x\n"
+                     + "   identity(5)";
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+        Expression program = ast.generateIL(TestUtil.getStandardGenContext(), null);
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(Util.intType(), t);
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
     }
 
 	@Test
@@ -789,6 +814,41 @@ public class ILTests {
         Assert.assertEquals(five, v);
     }
 
+	@Test
+    @Category(CurrentlyBroken.class)
+	public void testTypeMembers() throws ParseException {
+		String input = "type Numeric\n"
+                     + "    val n:Int\n\n"
+				
+                     + "type Cell\n"
+                     + "    type T = system.Int\n"
+                     + "    val element:this.T\n\n"
+
+                     + "type Holder\n"
+                     + "    type U = Cell\n\n"
+
+                     + "val h:Holder = new\n"
+                     + "    type U = Cell\n\n"
+                     
+                     + "val num:Numeric = new\n"
+                     + "    val n:Int = 5\n\n"
+                     
+                     + "val c:h.U = new\n"
+                     + "    type T = system.Int\n"
+                     + "    val element:this.T = num\n\n"
+                     
+                     + "c.element.n"
+				     ;
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+        Expression program = ast.generateIL(genCtx, null);
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral five = new IntegerLiteral(5);
+		Assert.assertEquals(five, v);
+	}
 
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {

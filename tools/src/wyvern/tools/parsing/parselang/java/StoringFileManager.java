@@ -1,12 +1,16 @@
 package wyvern.tools.parsing.parselang.java;
 
-import javax.tools.*;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
 
 //Largely from http://www.ibm.com/developerworks/java/library/j-jcomp/index.html
 public class StoringFileManager extends ForwardingJavaFileManager<JavaFileManager> {

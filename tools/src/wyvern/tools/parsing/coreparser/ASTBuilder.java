@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.types.Type;
 
 public interface ASTBuilder<AST,Type> {
 	public AST sequence(AST t1, AST t2, boolean inModule);
