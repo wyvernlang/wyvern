@@ -1,5 +1,9 @@
 package wyvern.tools.imports.extensions;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Optional;
+
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
@@ -8,10 +12,6 @@ import wyvern.tools.typedAST.extensions.interop.java.typedAST.JavaClassDecl;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Optional;
 
 public class JavaResolver implements ImportResolver {
 	private static ImportResolver instance = new JavaResolver();

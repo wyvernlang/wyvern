@@ -1,8 +1,8 @@
 package wyvern.tools.typedAST.transformers.Types;
 
-import wyvern.tools.types.Type;
-
 import java.util.Map;
+
+import wyvern.tools.types.Type;
 
 public abstract class AbstractTypeTransformer implements TypeTransformer {
 	protected final Type defaultTransformation(Type input) {

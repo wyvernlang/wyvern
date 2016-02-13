@@ -2,9 +2,6 @@ package wyvern.target.oir;
 
 import java.util.HashSet;
 
-import wyvern.target.oir.declarations.OIRClassDeclaration;
-import wyvern.target.oir.declarations.OIRType;
-
 public class OIRStaticPIC {
 	public static OIRProgram program = OIRProgram.program;
 	private HashSet<String> classesWithMethod;

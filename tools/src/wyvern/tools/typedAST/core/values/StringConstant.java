@@ -1,5 +1,8 @@
 package wyvern.tools.typedAST.core.values;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -9,16 +12,17 @@ import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
-import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 public class StringConstant extends AbstractValue implements InvokableValue, CoreAST {
 	private String value;

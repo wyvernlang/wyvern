@@ -1,24 +1,36 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.expression.*;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.core.evaluation.Closure;
+import wyvern.tools.typedAST.interfaces.BoundCode;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -30,18 +42,6 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-
-
-
-
-
-
-
-
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	private List<NameBinding> bindings;

@@ -1,10 +1,11 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
-import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.support.GenContext;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
@@ -17,10 +18,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class JavaType extends AbstractTreeWritable implements EnvironmentExtender {
 	private final Type equivType;

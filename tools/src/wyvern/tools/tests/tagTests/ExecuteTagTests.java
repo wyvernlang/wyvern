@@ -1,5 +1,8 @@
 package wyvern.tools.tests.tagTests;
 
+import static wyvern.tools.tests.tagTests.TestUtil.evaluateExpecting;
+import static wyvern.tools.tests.tagTests.TestUtil.getAST;
+
 import java.io.IOException;
 
 import org.junit.Test;
@@ -8,8 +11,6 @@ import org.junit.experimental.categories.Category;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import static wyvern.tools.tests.tagTests.TestUtil.getAST;
-import static wyvern.tools.tests.tagTests.TestUtil.evaluateExpecting;
 
 @Category(RegressionTests.class)
 public class ExecuteTagTests {

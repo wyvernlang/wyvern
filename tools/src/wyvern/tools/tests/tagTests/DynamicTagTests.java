@@ -2,7 +2,6 @@ package wyvern.tools.tests.tagTests;
 
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

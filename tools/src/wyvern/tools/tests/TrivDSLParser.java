@@ -1,5 +1,9 @@
 package wyvern.tools.tests;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.ParseBuffer;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
@@ -10,10 +14,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Int;
 import wyvern.tools.types.extensions.Unit;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 public class TrivDSLParser implements ExtParser {
 	@Override

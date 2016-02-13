@@ -2,14 +2,7 @@ package wyvern.target.oir;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
-import wyvern.target.oir.declarations.OIRClassDeclaration;
-import wyvern.target.oir.declarations.OIRFormalArg;
-import wyvern.target.oir.declarations.OIRInterface;
-import wyvern.target.oir.declarations.OIRMemberDeclaration;
-import wyvern.target.oir.declarations.OIRMethod;
-import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.declarations.OIRType;
 
 public class OIREnvironment {

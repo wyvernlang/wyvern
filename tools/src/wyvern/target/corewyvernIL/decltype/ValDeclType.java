@@ -5,11 +5,9 @@ import java.io.IOException;
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class ValDeclType extends DeclTypeWithResult implements EmitOIR{

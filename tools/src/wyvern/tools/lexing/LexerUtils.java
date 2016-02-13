@@ -3,6 +3,7 @@ package wyvern.tools.lexing;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.MULTI_LINE_COMMENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.SINGLE_LINE_COMMENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.WHITESPACE;
+
 import wyvern.tools.parsing.coreparser.Token;
 
 public class LexerUtils {

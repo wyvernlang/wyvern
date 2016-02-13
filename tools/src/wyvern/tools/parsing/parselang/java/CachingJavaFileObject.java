@@ -1,8 +1,13 @@
 package wyvern.tools.parsing.parselang.java;
 
-import javax.tools.SimpleJavaFileObject;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
+
+import javax.tools.SimpleJavaFileObject;
 
 //Largely from http://www.ibm.com/developerworks/java/library/j-jcomp/index.html
 public class CachingJavaFileObject extends SimpleJavaFileObject {

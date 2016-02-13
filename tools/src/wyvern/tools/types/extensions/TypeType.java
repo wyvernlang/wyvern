@@ -1,28 +1,35 @@
 package wyvern.tools.types.extensions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.type.*;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.expressions.Invocation;
-import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
-import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.*;
+import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.types.AbstractTypeImpl;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.RecordType;
+import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
 	private TypeDeclaration decl;

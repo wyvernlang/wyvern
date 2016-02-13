@@ -1,15 +1,12 @@
 package wyvern.tools.typedAST.core.binding.compiler;
 
 import wyvern.tools.typedAST.core.binding.Binding;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Optional;
 
 public class MetadataInnerBinding implements Binding {
 

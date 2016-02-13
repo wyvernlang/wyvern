@@ -1,8 +1,8 @@
 package wyvern.tools.tests.utils;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-
 import java.io.IOException;
+
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 
 public interface TestCase {
 	String getName();

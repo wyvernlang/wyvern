@@ -1,5 +1,16 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Stack;
+
 //import wyvern.targets.java.annotations.Val;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -18,15 +29,12 @@ import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.DeclarationWriter;
-import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-
-import java.util.*;
 
 public class DeclSequence extends Sequence implements EnvironmentExtender {
 
@@ -320,7 +328,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return normalSeq;
 	}
 	
-	
 	@Override
 	public void genTopLevel(TopLevelContext tlc) {
 		String newName = GenContext.generateName();
@@ -360,4 +367,46 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		Expression newExp = new New(decls, newName, type);
 		tlc.addLet(newName, type, newExp, true);
 	}
+	
+	/**
+	 * Figure out the structural type represented by this sequence.
+	 * @param ctx: context to evaluate in.
+	 * @return structural type of this sequence.
+	 */
+	public StructuralType inferStructuralType (GenContext ctx) {
+		
+		// TODO: see if user specified a different self name.
+		String selfName = "this";
+		
+		// Fake an appropriate context.
+		GenContext ctxTemp = ctx.extend(selfName, new Variable(selfName), null);
+		
+		// Store the types for each declaration in this list.
+		List<DeclType> declTypes = new LinkedList<DeclType>();
+		
+		// Look at each declaration.
+		wyvern.tools.typedAST.core.declarations.DelegateDeclaration delegateDecl = null;
+		for (TypedAST d : this) {
+			if (d instanceof wyvern.tools.typedAST.core.declarations.DelegateDeclaration) {
+				delegateDecl = (wyvern.tools.typedAST.core.declarations.DelegateDeclaration)d;
+			}
+			else {
+				DeclType t = ((Declaration) d).genILType(ctxTemp);
+				declTypes.add(t);
+			}
+		}
+		
+		// Add delegate object's declaration which has not been overridden to the structuarl type.
+		if (delegateDecl != null) {
+			StructuralType delegateStructuralType = delegateDecl.getType().getILType(ctxTemp).getStructuralType(ctxTemp);
+			for (DeclType declType : delegateStructuralType.getDeclTypes()) {
+				if (!declTypes.stream().anyMatch(newDefDecl-> newDefDecl.isSubtypeOf(declType, ctxTemp))) {
+					declTypes.add(declType);
+				}
+			}
+		}
+		
+		return new StructuralType(selfName, declTypes);
+	}
+	
 }

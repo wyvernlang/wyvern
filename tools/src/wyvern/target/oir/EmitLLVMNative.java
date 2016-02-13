@@ -1,18 +1,11 @@
 package wyvern.target.oir;
 
-import wyvern.target.oir.declarations.OIRClassDeclaration;
-import wyvern.target.oir.declarations.OIRInterface;
-import wyvern.target.oir.declarations.OIRMethod;
-import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.expressions.OIRBoolean;
-import wyvern.target.oir.expressions.OIRFieldGet;
-import wyvern.target.oir.expressions.OIRFieldSet;
 import wyvern.target.oir.expressions.OIRIfThenElse;
 import wyvern.target.oir.expressions.OIRInteger;
 import wyvern.target.oir.expressions.OIRLet;
 import wyvern.target.oir.expressions.OIRLiteral;
 import wyvern.target.oir.expressions.OIRMethodCall;
-import wyvern.target.oir.expressions.OIRNew;
 import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRValue;

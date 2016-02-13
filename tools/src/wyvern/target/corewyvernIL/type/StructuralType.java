@@ -7,14 +7,11 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
-import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class StructuralType extends ValueType {

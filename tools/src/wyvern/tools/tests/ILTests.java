@@ -2,14 +2,12 @@ package wyvern.tools.tests;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -27,7 +25,6 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.Interpreter;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
@@ -309,6 +306,28 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 
+	@Test
+	public void testDefWithVarInside() throws ParseException {
+		
+		String input = "def foo() : system.Int\n"
+					 + "    var v : system.Int = 5\n"
+					 + "    v = 10\n"
+					 + "    v\n"
+					 + "foo()\n";
+		
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+    	TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		Value v = program.interpret(EvalContext.empty());
+    	IntegerLiteral ten = new IntegerLiteral(10);
+		Assert.assertEquals(ten, v);
+		
+	}
+	
     @Test
 	public void testIdentityCall() throws ParseException {
 		String input = "val obj = new\n"
@@ -960,7 +979,6 @@ public class ILTests {
 		} catch (ToolError e) {
 		}
 	}
-
 
 	public static ImportTestClass importTest = new ImportTestClass();
 	public static class ImportTestClass {

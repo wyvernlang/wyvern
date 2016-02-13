@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import wyvern.target.oir.ASTVisitor;
-import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 
 public class OIRInterface extends OIRType {

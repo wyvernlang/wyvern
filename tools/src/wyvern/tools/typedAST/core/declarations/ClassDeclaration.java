@@ -1,7 +1,14 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+
 import wyvern.target.corewyvernIL.ASTNode;
-import wyvern.target.corewyvernIL.decl.*;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -15,15 +22,16 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.*;
+import wyvern.tools.typedAST.core.binding.NameBinding;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
-import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.binding.evaluation.LateValueBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.objects.ClassBinding;
 import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.LateTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
+import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
@@ -43,10 +51,6 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	protected DeclSequence decls = new DeclSequence(new LinkedList<Declaration>());

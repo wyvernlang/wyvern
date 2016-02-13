@@ -1,11 +1,5 @@
 package wyvern.tools.tests;
 
-import static java.util.Optional.empty;
-import static wyvern.stdlib.Globals.getStandardEnv;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -26,25 +19,19 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.parsing.coreparser.TokenManager;
-import wyvern.tools.parsing.coreparser.WyvernParser;
-import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
 
 @Category(RegressionTests.class)
 public class ModuleSystemTests {
@@ -215,6 +202,95 @@ public class ModuleSystemTests {
 		
 		// Should compile OK, but top-level vars not implemented yet.
 		// (21/12/2015)
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTopLevelVars () throws ParseException {
+		
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		// Load and link Database.wyv.
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl);
+		
+		// Interpret DatabaseUser.wyv with Database.wyv in the context.
+		String source = TestUtil.readFile(PATH + "DatabaseUser.wyv");
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx, Util.intType());
+		TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
+		
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testTopLevelVarsWithAliasing () throws ParseException {
+		
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		// Load and link Database.wyv.
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl);
+		
+		// Interpret DatabaseUser.wyv with Database.wyv in the context.
+		String source = TestUtil.readFile(PATH + "DatabaseUserTricky.wyv");
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx, Util.intType());
+		TypeContext ctx = TypeContext.empty();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(Util.intType(), t);
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
+		
+	}
+	
+	@Test
+	public void testTopLevelVarGet () throws ParseException {
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		String source = "var v : Int = 5\n"
+					  + "v\n";
+		
+		// Generate code to be evaluated.
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx, Util.intType());
+		
+		// Evaluate.
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(5), result);
+		
+	}
+	
+	@Test
+	public void testTopLevelVarSet () throws ParseException {
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		genCtx = new TypeGenContext("Int", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);
+	
+		String source = "var v : Int = 5\n"
+					  + "v = 10\n"
+					  + "v\n";
+		
+		// Generate code to be evaluated.
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		Expression program = ast.generateIL(genCtx, Util.intType());
+		
+		// Evaluate.
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(10), result);
+		
 	}
 	
 }

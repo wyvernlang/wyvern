@@ -1,13 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.HasLocation;
 
 public class EmptyGenContext extends GenContext {
 

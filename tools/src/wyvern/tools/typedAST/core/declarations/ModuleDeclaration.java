@@ -1,5 +1,13 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -7,25 +15,27 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.MethodCall;
-import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
@@ -35,9 +45,6 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;

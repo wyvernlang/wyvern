@@ -1,5 +1,11 @@
 package wyvern.tools.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Optional;
+
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.Wyvern;
@@ -7,12 +13,6 @@ import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 public class CLI {
 	public static void main(String[] args) throws IOException, CopperParserException {

@@ -1,8 +1,8 @@
 package wyvern.tools.typedAST.transformers;
 
-import wyvern.target.corewyvernIL.ASTNode;
-
 import java.util.function.Function;
+
+import wyvern.target.corewyvernIL.ASTNode;
 
 public interface ILWriter {
     void write(ASTNode node);

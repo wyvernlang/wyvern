@@ -1,20 +1,28 @@
 package wyvern.tools.types.extensions;
 
+import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
+import static wyvern.tools.errors.ToolError.reportError;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Application;
-import wyvern.tools.types.*;
+import wyvern.tools.types.AbstractTypeImpl;
+import wyvern.tools.types.ApplyableType;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.SubtypeRelation;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.*;
-
-import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
-import static wyvern.tools.errors.ToolError.reportError;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	private Type result;
@@ -115,7 +123,6 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.result.getILType(ctx);
 	}
 }

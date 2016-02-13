@@ -1,21 +1,25 @@
 package wyvern.tools.types.extensions;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.*;
+import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.types.AbstractTypeImpl;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.OperatableType;
+import wyvern.tools.types.SubtypeRelation;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResolver.Resolvable {
 	private Type[] types;

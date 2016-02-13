@@ -1,19 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class MethodGenContext extends GenContext {
 

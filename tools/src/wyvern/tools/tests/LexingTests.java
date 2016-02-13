@@ -1,47 +1,33 @@
 package wyvern.tools.tests;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DASH;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEDENT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DIVIDE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DSLLINE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.IDENTIFIER;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.INDENT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.LPAREN;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.MULT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.MULTI_LINE_COMMENT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.NEWLINE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.PLUS;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.RPAREN;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.SINGLE_LINE_COMMENT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TILDE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.WHITESPACE;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.imports.extensions.WyvernResolver;
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.lexing.WyvernLexer;
-import wyvern.tools.parsing.HasParser;
-import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.declarations.*;
-import wyvern.tools.typedAST.core.expressions.*;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.parsing.DSLLit;
-import wyvern.tools.typedAST.extensions.SpliceExn;
-import wyvern.tools.typedAST.extensions.TSLBlock;
-import wyvern.tools.typedAST.extensions.interop.java.Util;
-import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.parsing.transformers.DSLTransformer;
-import wyvern.tools.parsing.ExtParser;
-import wyvern.tools.parsing.Wyvern;
-
-import java.io.*;
-import java.util.*;
-
-import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 import wyvern.tools.parsing.coreparser.Token;
+import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
 public class LexingTests {

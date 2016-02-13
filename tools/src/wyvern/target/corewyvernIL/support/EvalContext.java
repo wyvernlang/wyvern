@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Value;
-import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class EvalContext {
 	public EvalContext extend(String var, Value v) {

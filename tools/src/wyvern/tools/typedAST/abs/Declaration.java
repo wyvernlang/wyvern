@@ -1,9 +1,10 @@
 package wyvern.tools.typedAST.abs;
 
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -11,8 +12,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
-
-import java.util.Optional;
 
 // TODO: Consider adding a class "ListOfDeclarations" that only handles indents with decls and make
 // Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)

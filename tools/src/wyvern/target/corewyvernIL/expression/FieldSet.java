@@ -1,8 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -17,7 +15,6 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class FieldSet extends Expression {
@@ -88,8 +85,19 @@ public class FieldSet extends Expression {
 		if (!(decl instanceof wyvern.target.corewyvernIL.decl.VarDeclaration))
 			throw new RuntimeException("Expected assignment to var field in field set.");
 		VarDeclaration varDecl = (VarDeclaration) decl;
-		VarDeclaration varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), exprToAssign);
-				
+		Value exprInterpreted = exprToAssign.interpret(ctx);
+		VarDeclaration varDeclUpdated = null;
+		
+		// Evaluate the expression in the current context. Update the declaration.
+		// VarDeclaration's constructor needs to take an expression, not a value.
+		// TODO: is this an exhaustive case analysis?
+		if (exprInterpreted instanceof AbstractValue) {
+			varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), (AbstractValue)exprInterpreted);
+		}
+		else {
+			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
+		}
+		
 		// Update object's declarations.
 		object.setDecl(varDeclUpdated);
 		return object;

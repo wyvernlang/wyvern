@@ -2,15 +2,16 @@ package wyvern.stdlib;
 
 import static wyvern.tools.types.TypeUtils.arrow;
 import static wyvern.tools.types.TypeUtils.integer;
-import static wyvern.tools.types.TypeUtils.unit;
 import static wyvern.tools.types.TypeUtils.str;
+import static wyvern.tools.types.TypeUtils.unit;
+
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.JavaResolver;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;

@@ -1,14 +1,12 @@
 package wyvern.tools.typedAST.transformers;
 
+import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.tools.errors.WyvernException;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Created by Ben Chung on 6/24/2015.
