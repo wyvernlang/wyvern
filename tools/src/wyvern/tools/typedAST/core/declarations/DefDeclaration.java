@@ -1,9 +1,15 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -38,9 +44,6 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
 public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
@@ -71,7 +74,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.body = (ExpressionAST) body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
-		this.location = location;
 	}
 
 	private DefDeclaration(String name, Type fullType, List<NameBinding> argNames,

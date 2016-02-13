@@ -1,6 +1,16 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Stack;
+
 //import wyvern.targets.java.annotations.Val;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -19,15 +29,12 @@ import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.DeclarationWriter;
-import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-
-import java.util.*;
 
 public class DeclSequence extends Sequence implements EnvironmentExtender {
 
