@@ -1,12 +1,10 @@
 package wyvern.tools.typedAST.interfaces;
 
-import wyvern.target.corewyvernIL.ASTNode;
-import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.support.CallableExprGenerator;
-import wyvern.target.corewyvernIL.support.GenContext;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.HasLocation;
-import wyvern.tools.parsing.ExtParser;
 import wyvern.tools.parsing.HasParser;
 import wyvern.tools.parsing.quotelang.QuoteParser;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -15,9 +13,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWritable;
-
-import java.util.Map;
-import java.util.Optional;
 
 public interface TypedAST extends TreeWritable, HasLocation {
 

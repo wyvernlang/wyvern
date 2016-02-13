@@ -1,29 +1,22 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.net.URI;
+import java.util.Hashtable;
+import java.util.Map;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.interfaces.*;
+import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.net.URI;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
-
-import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
-import static wyvern.tools.errors.ToolError.reportEvalError;
 
 public class Instantiation extends Declaration implements CoreAST {
 	private URI uri;

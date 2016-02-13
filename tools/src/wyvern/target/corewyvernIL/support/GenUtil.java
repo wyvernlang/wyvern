@@ -1,34 +1,15 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.TypeVarDecl;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
-import wyvern.tools.typedAST.core.declarations.ValDeclaration;
-import wyvern.tools.typedAST.core.declarations.VarDeclaration;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class GenUtil {
 

@@ -1,11 +1,9 @@
 package wyvern.tools.util;
 
-import wyvern.tools.typedAST.core.binding.LateBinder;
-
-import java.sql.Ref;
-import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import wyvern.tools.typedAST.core.binding.LateBinder;
 
 public class Reference<T> {
 	private final String stackTrace = "";

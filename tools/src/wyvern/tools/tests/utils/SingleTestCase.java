@@ -1,17 +1,18 @@
 package wyvern.tools.tests.utils;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Optional;
+
 import org.junit.Assert;
+
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.transformers.DSLTransformer;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Optional;
 
 public class SingleTestCase implements TestCase {
 	public String getName() {

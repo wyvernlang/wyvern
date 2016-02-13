@@ -1,14 +1,14 @@
 package wyvern.stdlib;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-import wyvern.tools.parsing.Wyvern;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Type;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
+
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.parsing.Wyvern;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Type;
 
 public class Compiler {
 	public static TypedAST compileSources(String filename, List<String> sources) {

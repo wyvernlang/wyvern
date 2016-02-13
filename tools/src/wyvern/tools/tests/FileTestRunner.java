@@ -1,17 +1,5 @@
 package wyvern.tools.tests;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.utils.SingleTestCase;
-import wyvern.tools.tests.utils.TestCase;
-import wyvern.tools.tests.utils.TestSuiteParser;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.tests.suites.RegressionTests;
+import wyvern.tools.tests.utils.TestCase;
+import wyvern.tools.tests.utils.TestSuiteParser;
 
 @RunWith(Parameterized.class)
 @Category(RegressionTests.class)

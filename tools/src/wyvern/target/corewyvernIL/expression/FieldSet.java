@@ -1,8 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -17,7 +15,6 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class FieldSet extends Expression {

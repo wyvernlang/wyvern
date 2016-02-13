@@ -1,12 +1,12 @@
 package wyvern.tools.util;
 
-import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.types.Environment;
-
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.Function;
+
+import wyvern.tools.typedAST.core.binding.evaluation.EvaluationBinding;
+import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.types.Environment;
 
 public class EvaluationEnvironment {
     private EvaluationEnvironment() {

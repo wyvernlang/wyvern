@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Value;
-import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarEvalContext extends EvalContext {
 	private EvalContext previous;

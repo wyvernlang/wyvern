@@ -4,12 +4,10 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.TypeVarDecl;
-import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
@@ -17,7 +15,6 @@ import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Application;
@@ -36,11 +33,9 @@ import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.util.Reference;
 
 public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	

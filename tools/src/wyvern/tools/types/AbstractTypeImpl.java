@@ -1,12 +1,12 @@
 package wyvern.tools.types;
 
-import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 
 public abstract class AbstractTypeImpl implements Type {
 	private final FileLocation location;

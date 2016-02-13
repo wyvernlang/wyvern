@@ -1,9 +1,9 @@
 package wyvern.tools.typedAST.interfaces;
 
+import java.util.List;
+
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.types.Type;
-
-import java.util.List;
 
 public interface BoundCode {
 

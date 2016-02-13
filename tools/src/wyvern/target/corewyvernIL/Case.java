@@ -2,7 +2,6 @@ package wyvern.target.corewyvernIL;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.Type;
 
 public class Case extends ASTNode {
 	private String varName;

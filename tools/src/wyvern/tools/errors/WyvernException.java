@@ -1,7 +1,5 @@
 package wyvern.tools.errors;
 
-import wyvern.tools.parsing.Wyvern;
-
 import java.util.Optional;
 
 public class WyvernException extends RuntimeException {

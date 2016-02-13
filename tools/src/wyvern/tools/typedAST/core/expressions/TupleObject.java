@@ -1,5 +1,11 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -21,12 +27,6 @@ import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class TupleObject extends CachingTypedAST implements CoreAST {
 	private ExpressionAST[] objects;

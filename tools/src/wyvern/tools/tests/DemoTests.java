@@ -1,32 +1,17 @@
 package wyvern.tools.tests;
 
-import static java.util.Optional.empty;
-import static wyvern.stdlib.Globals.getStandardEnv;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Optional;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-import wyvern.stdlib.Globals;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.parsing.coreparser.TokenManager;
-import wyvern.tools.parsing.coreparser.WyvernParser;
-import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
 
 public class DemoTests {
     @BeforeClass public static void setupResolver() {

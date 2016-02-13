@@ -1,12 +1,9 @@
 package wyvern.tools.parsing;
 
-import edu.umn.cs.melt.copper.runtime.io.CircleTokenBuffer;
-import edu.umn.cs.melt.copper.runtime.io.ScannerBuffer;
-
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.util.Scanner;
+
+import edu.umn.cs.melt.copper.runtime.io.ScannerBuffer;
 
 /*
  * Shamelessly taken from the implementation of SlidingWindowScannerBuffer in Copper

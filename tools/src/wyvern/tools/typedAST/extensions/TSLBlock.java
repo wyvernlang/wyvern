@@ -1,5 +1,9 @@
 package wyvern.tools.typedAST.extensions;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -18,10 +22,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 	private final TypedAST inner;
