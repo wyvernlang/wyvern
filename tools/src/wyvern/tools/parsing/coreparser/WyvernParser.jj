@@ -325,6 +325,8 @@ AST DeclType() :
   exp = DefDeclType()  { return exp; }
 |
   exp = ValDeclType()  { return exp; }
+|
+  exp = TypeAbbrevDeclaration() { return exp; }
 }
 
 AST DefDeclType() :
