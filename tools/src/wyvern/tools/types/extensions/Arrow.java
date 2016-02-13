@@ -123,7 +123,6 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.result.getILType(ctx);
 	}
 }

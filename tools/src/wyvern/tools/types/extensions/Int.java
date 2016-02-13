@@ -24,6 +24,7 @@ import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.TreeWriter;
 
+
 public class Int extends AbstractTypeImpl implements OperatableType {
 	public Int() { }
 	
@@ -107,7 +108,6 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return wyvern.target.corewyvernIL.support.Util.intType();
 	}
 }

@@ -4,6 +4,8 @@ import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,9 +13,11 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -141,14 +145,52 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 		// Figure out receiver and field.
 		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
 		Expression exprFieldGet = cegReceiver.genExpr();
-		if (!(exprFieldGet instanceof FieldGet))
-			ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
-		FieldGet fieldGet = (FieldGet) exprFieldGet;
-		String fieldName = fieldGet.getName();
-		IExpr objExpr = fieldGet.getObjectExpr();
 		
-		// Return FieldSet.
-		return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
-	
+		// TODO: is this robust?
+		// TODO: is this an exhaustive case analysis?
+		
+		// Assigning to a top-level var.
+		if (exprFieldGet instanceof MethodCall) {
+			
+			// Figure out the var being assigned and get the name of its setter.
+			MethodCall methCall = (MethodCall) exprFieldGet;
+			String methName = methCall.getMethodName();
+			String varName = wyvern.tools.typedAST.core.declarations.VarDeclaration.getterToVarName(methName);
+			String setterName = wyvern.tools.typedAST.core.declarations.VarDeclaration.varNameToSetter(varName);
+			
+			// Return an invocation to the setter w/ appropriate argmuents supplied.
+			Expression receiver = methCall.getObjectExpr();
+			List<Expression> setterArgs = new LinkedList<>();
+			setterArgs.add(exprToAssign);
+			return new MethodCall(receiver, setterName, setterArgs, null);
+			
+		}
+		
+		// Assigning to an object's field.
+		else if (exprFieldGet instanceof FieldGet) {
+
+			// Return a FieldSet to the appropriate field.
+			FieldGet fieldGet = (FieldGet) exprFieldGet;
+			String fieldName = fieldGet.getName();
+			IExpr objExpr = fieldGet.getObjectExpr();
+			return new wyvern.target.corewyvernIL.expression.FieldSet(exprType, objExpr, fieldName, exprToAssign);
+		
+		}
+		
+		// Unknown what's going on.
+		else {
+			ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
+			return null; // dead code
+		}
+		
 	}
+	
+	@Override
+	public void genTopLevel (TopLevelContext tlc) {
+		Expression expr = generateIL(tlc.getContext(), null);
+		tlc.addExpression(expr);
+	}
+
 }
+
+
