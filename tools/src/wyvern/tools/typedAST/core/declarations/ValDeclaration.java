@@ -80,7 +80,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				
 				//type = null;
 			// }
-            // binding.getType()
 		}
 
 		this.definition=(ExpressionAST)definition;
