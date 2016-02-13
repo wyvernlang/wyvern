@@ -46,24 +46,24 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	String declaredTypeName;
 	
 	String variableName;
-	
+
 	private TaggedInfo ti;
-	
+
 	private boolean isClass;
 	public boolean isClassMember() {
 		return isClass;
 	}
-	
+
 	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
 		this.definition=(ExpressionAST) definition;
 		binding = new NameBindingImpl(name, null);
 		this.location = location;
 	}
-	
+
 	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
 		if (type instanceof UnresolvedType) {
 			UnresolvedType t = (UnresolvedType) type;
-			
+
 			// System.out.println("t = " + t);
 			
 			TaggedInfo tag = TaggedInfo.lookupTagByType(t); // FIXME:
@@ -80,9 +80,9 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				
 				//type = null;
 			// }
-
+            // binding.getType()
 		}
-		
+
 		this.definition=(ExpressionAST)definition;
 		binding = new NameBindingImpl(name, type);
 		this.location = location;
@@ -263,8 +263,14 @@ public class ValDeclaration extends Declaration implements CoreAST {
 			// convert the declared type if there is one
 			vt = declaredType.getILType(ctx);
 		} else {
-			// convert the declaration and typecheck it
-			vt = definition.generateIL(ctx, null).typeCheck(ctx);
+
+			// then there is no proper R-value
+			if(definition == null) {
+                vt = this.binding.getType().getILType(ctx);
+			} else {
+				// convert the declaration and typecheck it
+				vt = definition.generateIL(ctx, null).typeCheck(ctx);
+			}
 		}
 		return vt;
 	}

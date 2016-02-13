@@ -155,7 +155,7 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(
 			GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
-		return null;
+		return new TypeDeclaration(alias, reference.getILType(ctx));
 	}
 
 	@Override
