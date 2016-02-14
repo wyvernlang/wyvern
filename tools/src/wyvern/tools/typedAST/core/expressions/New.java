@@ -57,7 +57,6 @@ public class New extends CachingTypedAST implements CoreAST {
 	Map<String, TypedAST> args = new HashMap<String, TypedAST>();
 	boolean isGeneric = false;
 
-	private static final ClassDeclaration EMPTY = new ClassDeclaration("Empty", "", "", null, FileLocation.UNKNOWN);
 	private static int generic_num = 0;
 	private DeclSequence seq;
 	private Type ct;
@@ -182,8 +181,6 @@ public class New extends CachingTypedAST implements CoreAST {
 		} else {
 
 			Environment mockEnv = Environment.getEmptyEnvironment();
-
-			LinkedList<Declaration> decls = new LinkedList<>();
 
 			classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
 		}

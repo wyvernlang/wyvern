@@ -964,7 +964,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testResourceTypechecking() throws ParseException {
 		try {
 			String input = "type Constant\n"
@@ -977,7 +976,7 @@ public class ILTests {
 			ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 			Expression program = ast.generateIL(genCtx, null);
-			ValueType type = program.typeCheck(TypeContext.empty());
+			program.typeCheck(TypeContext.empty());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
 		}
