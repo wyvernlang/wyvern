@@ -460,24 +460,18 @@ Type Type() :
 	}
   	id = id2;
  })* (<TARROW> arrowResult = Type() )? {
-    if (arrowResult == null) {
-        if(exp == null) {
-		    return build.nominalType(id.image, loc(id));
-        } else {
-  		    return build.qualifiedType(exp, id2.image);
-        }
+
+    Type t;
+    if (exp == null) {
+        t = build.nominalType(id.image, loc(id));
     } else {
-        if(exp == null) {
-            return build.arrowType(
-                build.nominalType(id.image, loc(id)),
-                arrowResult
-            );
-        } else {
-            return build.arrowType(
-                build.nominalType(id.image, loc(id)),
-                arrowResult
-            );
-        }
+        t = build.qualifiedType(exp, id2.image);
+    }
+
+    if (arrowResult == null) {
+        return t;
+    } else {
+        return build.arrowType(t, arrowResult);
     }
  }
 }
