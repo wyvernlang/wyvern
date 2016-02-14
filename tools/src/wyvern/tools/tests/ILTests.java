@@ -815,7 +815,6 @@ public class ILTests {
     }
 
 	@Test
-    @Category(CurrentlyBroken.class)
 	public void testTypeMembers() throws ParseException {
 		String input = "type Numeric\n"
                      + "    val n:Int\n\n"

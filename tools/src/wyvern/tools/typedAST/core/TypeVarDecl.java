@@ -7,6 +7,12 @@ import java.util.Optional;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -43,6 +49,7 @@ public class TypeVarDecl extends Declaration {
 	private final Reference<Value> metadataObj;
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
+    private String selfReferenceName = "this;";
 
 	/**
 	 * Helper class to allow easy variation of bound types
@@ -263,7 +270,8 @@ public class TypeVarDecl extends Declaration {
 
 	private StructuralType computeInternalILType(GenContext ctx) {		
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		return new StructuralType(this.name, td.genDeclTypeSeq(ctx), this.resourceFlag);
+		GenContext localCtx = ctx.extend("this", new Variable("this"), null);
+		return new StructuralType(this.name, td.genDeclTypeSeq(localCtx), this.resourceFlag);
 	}
 	
 	@Override
@@ -296,4 +304,8 @@ public class TypeVarDecl extends Declaration {
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}
+
+    public void setSelfReferenceName(String name) {
+        this.selfReferenceName = name;
+    }
 }
