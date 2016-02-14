@@ -625,6 +625,9 @@ public class ILTests {
     }
 
     @Test
+    /**
+     * Checks to see if the .apply() sugar on lambda fns recognizes
+     */
     public void testSimpleLambda2() throws ParseException {
 
         String source = "type UnitIntFn \n"
@@ -1025,4 +1028,25 @@ public class ILTests {
 		} catch (ToolError toolError) {}
 	}
 	
+
+    @Test
+    public void testArrowSugar() throws ParseException {
+
+        String source = "val identity: system.Int->system.Int = (x: system.Int) => x\n"
+            + "identity(10)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        Expression program = ast.generateIL(genCtx, null);
+        TypeContext ctx = TypeContext.empty();
+
+        ValueType t = program.typeCheck(ctx);
+
+        Assert.assertEquals(Util.intType(), t);
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(10);
+        Assert.assertEquals(five, v);
+    }
 }

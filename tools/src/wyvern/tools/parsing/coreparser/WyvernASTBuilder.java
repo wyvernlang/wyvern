@@ -35,6 +35,7 @@ import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.UnresolvedType;
 
 public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
@@ -119,6 +120,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		return new UnresolvedType(name, loc);
 	}
 	
+    @Override
+	public Type arrowType(Type argument, Type result) {
+		return new Arrow(argument, result);
+	}
+
 	@Override
 	public Type qualifiedType(TypedAST base, String name) {
 		return new QualifiedType(base, name);
