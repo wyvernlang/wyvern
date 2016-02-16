@@ -316,7 +316,14 @@ public class New extends CachingTypedAST implements CoreAST {
 			}
 
 		}
-		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
+		// if type is not specified, infer
+		if (expectedType == null) {
+			return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
+		} else { // if type is specified, use that type
+			return new wyvern.target.corewyvernIL.expression.New(decls, selfName, expectedType);
+		}
+//		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
+
 	}
 	
 }

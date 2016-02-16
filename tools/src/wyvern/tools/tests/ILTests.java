@@ -965,17 +965,17 @@ public class ILTests {
 	
 	@Test
 	public void testResourceTypechecking() throws ParseException {
+		String input = "type Constant\n"
+				     + "    def getConstant() : system.Int\n"
+				     + "val c : Constant = new\n"
+				     + "	var anotherConstant : system.Int = 7\n"
+				     + "	def getConstant() : system.Int\n"
+				     + "		42\n"
+				     + "c.getConstant()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
 		try {
-			String input = "type Constant\n"
-						 + "    def getConstant() : system.Int\n"
-						 + "val c : Constant = new\n"
-						 + "	var anotherConstant : system.Int = 7\n"
-						 + "	def getConstant () : system.Int\n"
-						 + "		42\n"
-						 + "c.getConstant()";
-			ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-			Expression program = ast.generateIL(genCtx, null);
 			program.typeCheck(TypeContext.empty());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
