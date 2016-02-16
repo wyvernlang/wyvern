@@ -964,7 +964,7 @@ public class ILTests {
 	}
 	
 	@Test
-	public void testResourceTypechecking() throws ParseException {
+	public void testResourceTypecheckingVar() throws ParseException {
 		String input = "type Constant\n"
 				     + "    def getConstant() : system.Int\n"
 				     + "val c : Constant = new\n"
@@ -972,6 +972,30 @@ public class ILTests {
 				     + "	def getConstant() : system.Int\n"
 				     + "		42\n"
 				     + "c.getConstant()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+		try {
+			program.typeCheck(TypeContext.empty());
+			Assert.fail("Typechecking should have failed.");
+		} catch (ToolError e) {
+		}
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testResourceTypecheckingDef() throws ParseException {
+		String input = "type Stateful\n"
+					 + "	var state : system.Int\n"
+					 + "type PseudoNonStateful\n"
+					 + "	def saveState() : system.Int\n"
+					 + "var a : Stateful = new\n"
+					 + "	var state : system.Int = 43\n"
+					 + "var b : PseudoNonStateful = new\n"
+					 + "	def saveState() : system.Int\n"
+					 + "		var c : Stateful = a\n"
+					 + "		0\n"
+					 + "b.saveState()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		Expression program = ast.generateIL(genCtx, null);
