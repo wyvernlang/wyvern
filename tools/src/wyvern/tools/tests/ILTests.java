@@ -982,6 +982,25 @@ public class ILTests {
 		}
 	}
 
+	@Test
+	public void testVarsInTypes() throws ParseException {
+		String input = "type TwoVars\n"
+					 + "	var one : system.Int\n"
+					 + "	var two : system.Int\n"
+					 + "var x : TwoVars = new\n"
+					 + "	var one : system.Int = 1\n"
+					 + "	var two : system.Int = 2\n"
+					 + "x.one";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+		ValueType t = program.typeCheck(TypeContext.empty());
+		Value v = program.interpret(EvalContext.empty());
+		Assert.assertEquals(Util.intType(), t);
+		IntegerLiteral one = new IntegerLiteral(1);
+		Assert.assertEquals(one, v);
+	}
+
 	public static ImportTestClass importTest = new ImportTestClass();
 	public static class ImportTestClass {
 		public int addOne(int i) {
