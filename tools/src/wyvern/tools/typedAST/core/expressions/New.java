@@ -322,8 +322,6 @@ public class New extends CachingTypedAST implements CoreAST {
 		} else { // if type is specified, use that type
 			return new wyvern.target.corewyvernIL.expression.New(decls, selfName, expectedType);
 		}
-//		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
-
 	}
 	
 }
