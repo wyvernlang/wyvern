@@ -314,7 +314,7 @@ public class New extends CachingTypedAST implements CoreAST {
 				decls.add(getter);
 				decls.add(setter);	
 			}
-				
+
 		}
 		return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
 	}
