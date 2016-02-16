@@ -8,6 +8,7 @@ import java.util.List;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -19,7 +20,7 @@ public class StructuralType extends ValueType {
 	private String selfName;
 	private List<DeclType> declTypes;
 	private boolean resourceFlag = false;
-	
+
 	public StructuralType(String selfName, List<DeclType> declTypes) {
 		this(selfName, declTypes, false);
 	}
@@ -33,14 +34,20 @@ public class StructuralType extends ValueType {
 //				throw new NullPointerException("invariant: decl types should not be null");
 		this.declTypes = declTypes;
 		this.resourceFlag = resourceFlag;
+		// if there is a var declaration, it's a resource type
+		for (DeclType dt : declTypes) {
+			if (dt instanceof VarDeclType) {
+				this.resourceFlag = true;
+			}
+		}
 	}
 
 	private static StructuralType emptyType = new StructuralType("IGNORE_ME", Collections.emptyList());
-	
+
 	public static StructuralType getEmptyType() {
 		return emptyType;
 	}
-	
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		String newIndent = indent + "    ";
@@ -56,11 +63,11 @@ public class StructuralType extends ValueType {
 	public String getSelfName() {
 		return selfName;
 	}
-	
+
 	public List<DeclType> getDeclTypes() {
 		return declTypes;
 	}
-	
+
 	/*public void setDeclTypes(List<DeclType> declTypes) {
 		this.declTypes = declTypes;
 	}*/
@@ -75,7 +82,7 @@ public class StructuralType extends ValueType {
 	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
 		return this;
 	}
-	
+
 	@Override
 	public boolean isSubtypeOf(Type t, TypeContext ctx) {
 		if (t instanceof NominalType) {
@@ -85,13 +92,13 @@ public class StructuralType extends ValueType {
 			else
 				return isSubtypeOf(st, ctx);
 		}
-		
+
 		if (!(t instanceof StructuralType))
 			return false;
-		
+
 		StructuralType st = (StructuralType) t;
 		st = (StructuralType) st.adapt(new ReceiverView(new Variable(st.selfName), new Variable(selfName)));
-		
+
 		TypeContext extendedCtx = ctx.extend(selfName, this);
 		for (DeclType dt : st.getDeclTypes()) {
 			DeclType candidateDT = findDecl(dt.getName(), ctx);
@@ -99,11 +106,11 @@ public class StructuralType extends ValueType {
 				return false;
 			}
 		}
-		
+
 		// a resource type is not a subtype of a non-resource type
 		if (resourceFlag && !st.resourceFlag)
 			return false;
-		
+
 		return true;
 	}
 
@@ -125,7 +132,7 @@ public class StructuralType extends ValueType {
 		}
 		return new StructuralType(selfName, newDTs, resourceFlag);
 	}
-	
+
 	/*@Override
 	public String toString() {
 		String ret = (resourceFlag?"[resource ":"[") + selfName + " => ";
