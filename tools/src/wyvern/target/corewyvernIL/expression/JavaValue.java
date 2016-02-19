@@ -12,6 +12,8 @@ import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.interop.FObject;
 
 public class JavaValue extends AbstractValue implements Invokable {
+	// FObject is part of a non-Wyvern-specific Java interop library
+	// e.g. it could be re-used by Plaid or some future language design
 	private FObject foreignObject;
 	
 	public JavaValue(FObject foreignObject, ValueType exprType) {

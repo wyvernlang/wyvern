@@ -5,6 +5,10 @@ import java.util.List;
 /**
  * Represents a foreign (Java) object in another language
  * 
+ * This is a different abstraction from JavaValue (in Wyvern) so that this code
+ * could one day be reused by another interpreter (for some language other than
+ * Wyvern).  All non-Wyvern-specific interop code should go in this package.
+ * 
  * @author aldrich
  *
  */
