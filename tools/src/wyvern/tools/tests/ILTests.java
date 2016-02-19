@@ -1007,6 +1007,23 @@ public class ILTests {
 	}
 
 	@Test
+	public void testResourcenessOfTypesWithVars() throws ParseException {
+		String input = "type TwoVars\n"
+					 + "	var one : system.Int\n"
+					 + "	var two : system.Int\n"
+					 + "var x : TwoVars = new\n"
+					 + "	var one : system.Int = 1\n"
+					 + "	var two : system.Int = 2\n"
+					 + "x.one";
+		try {
+			TestUtil.getNewAST(input);
+			Assert.fail("AST creation should have failed.");
+		} catch (RuntimeException e) {
+		}
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
 	public void testVarsInTypes() throws ParseException {
 		String input = "type TwoVars\n"
 					 + "	var one : system.Int\n"
