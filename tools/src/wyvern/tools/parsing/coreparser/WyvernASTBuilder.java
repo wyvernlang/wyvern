@@ -91,6 +91,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	public TypedAST valDeclType(String name, Type type, FileLocation loc) {
 		return new ValDeclaration(name, type, null, loc);
 	}
+
+	@Override
+	public TypedAST varDeclType(String name, Type type, FileLocation loc) {
+		return new VarDeclaration(name, type, null);
+	}
 	
 	@Override
 	public TypedAST typeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource) {

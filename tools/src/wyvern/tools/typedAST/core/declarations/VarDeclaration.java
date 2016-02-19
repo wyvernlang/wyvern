@@ -186,9 +186,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	 * @return ValueType of this VarDeclaration.
 	 */
 	private ValueType getILValueType (GenContext ctx) {
-		if (definitionType == null)
-			definitionType = definition.getType();
-		return definitionType.getILType(ctx);
+		return binding.getType().getILType(ctx);
 	}
 	
 	@Override
@@ -202,7 +200,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		ValueType varValueType = getILValueType(ctx);
 		
 		// Create a temp object with a single var declaration.
-		VarDeclaration varDecl = new VarDeclaration(varName, this.definitionType, this.definition);
+		VarDeclaration varDecl = new VarDeclaration(varName, this.binding.getType(), this.definition);
 		DeclSequence tempObjBody = new DeclSequence(varDecl);
 		New tempObj = new New(tempObjBody, null);
 		String tempObjName = varNameToTempObj(varName);

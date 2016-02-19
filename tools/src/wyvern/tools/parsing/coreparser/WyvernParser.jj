@@ -326,6 +326,8 @@ AST DeclType() :
 |
   exp = ValDeclType()  { return exp; }
 |
+  exp = VarDeclType()  { return exp; }
+|
   exp = TypeAbbrevDeclaration() { return exp; }
 }
 
@@ -342,6 +344,14 @@ AST ValDeclType() :
 {
   <VAL> name=<IDENTIFIER> <COLON> type = Type() <NEWLINE> {
 	return build.valDeclType(name.image, type, loc(name));
+  }
+}
+
+AST VarDeclType() :
+{ Type type; Token name; List args; }
+{
+  <VAR> name=<IDENTIFIER> <COLON> type = Type() <NEWLINE> {
+  return build.varDeclType(name.image, type, loc(name));
   }
 }
 

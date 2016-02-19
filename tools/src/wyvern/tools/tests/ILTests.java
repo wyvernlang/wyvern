@@ -964,23 +964,65 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
-	public void testResourceTypechecking() throws ParseException {
+	public void testResourceTypecheckingVar() throws ParseException {
+		String input = "type Constant\n"
+				     + "    def getConstant() : system.Int\n"
+				     + "val c : Constant = new\n"
+				     + "	var anotherConstant : system.Int = 7\n"
+				     + "	def getConstant() : system.Int\n"
+				     + "		42\n"
+				     + "c.getConstant()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
 		try {
-			String input = "type Constant\n"
-						 + "    def getConstant() : system.Int\n"
-						 + "val c : Constant = new\n"
-						 + "	var anotherConstant : system.Int = 7\n"
-						 + "	def getConstant () : system.Int\n"
-						 + "		42\n"
-						 + "c.getConstant()";
-			ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-			Expression program = ast.generateIL(genCtx, null);
-			ValueType type = program.typeCheck(TypeContext.empty());
+			program.typeCheck(TypeContext.empty());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
 		}
+	}
+
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testResourceTypecheckingDef() throws ParseException {
+		String input = "type Stateful\n"
+					 + "	var state : system.Int\n"
+					 + "type PseudoNonStateful\n"
+					 + "	def saveState() : system.Int\n"
+					 + "var a : Stateful = new\n"
+					 + "	var state : system.Int = 43\n"
+					 + "var b : PseudoNonStateful = new\n"
+					 + "	def saveState() : system.Int\n"
+					 + "		var c : Stateful = a\n"
+					 + "		0\n"
+					 + "b.saveState()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+		try {
+			program.typeCheck(TypeContext.empty());
+			Assert.fail("Typechecking should have failed.");
+		} catch (ToolError e) {
+		}
+	}
+
+	@Test
+	public void testVarsInTypes() throws ParseException {
+		String input = "type TwoVars\n"
+					 + "	var one : system.Int\n"
+					 + "	var two : system.Int\n"
+					 + "var x : TwoVars = new\n"
+					 + "	var one : system.Int = 1\n"
+					 + "	var two : system.Int = 2\n"
+					 + "x.one";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+		ValueType t = program.typeCheck(TypeContext.empty());
+		Value v = program.interpret(EvalContext.empty());
+		Assert.assertEquals(Util.intType(), t);
+		IntegerLiteral one = new IntegerLiteral(1);
+		Assert.assertEquals(one, v);
 	}
 
 	public static ImportTestClass importTest = new ImportTestClass();
