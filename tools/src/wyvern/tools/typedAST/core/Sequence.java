@@ -26,6 +26,7 @@ import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
+import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -356,6 +357,15 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		return tlc.getExpression();
 	}
 	
+	public boolean hasVarDeclaration() {
+		for (TypedAST e : exps) {
+			if (e instanceof VarDeclaration) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Generate IL expression for a top-level declaration sequence</br>
 	 * @see GenUtil.doGenModuleIL
