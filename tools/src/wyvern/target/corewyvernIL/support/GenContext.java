@@ -2,7 +2,7 @@ package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.typedAST.core.TypeVarDecl;
+import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 

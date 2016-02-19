@@ -1,4 +1,4 @@
-package wyvern.tools.typedAST.core;
+package wyvern.tools.typedAST.core.declarations;
 
 import java.util.HashMap;
 import java.util.Map;

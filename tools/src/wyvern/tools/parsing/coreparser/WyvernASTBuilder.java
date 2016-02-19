@@ -7,7 +7,7 @@ import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.TypeVarDecl;
+import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
