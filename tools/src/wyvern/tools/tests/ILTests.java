@@ -985,7 +985,7 @@ public class ILTests {
 	@Test
 	@Category(CurrentlyBroken.class)
 	public void testResourceTypecheckingDef() throws ParseException {
-		String input = "type Stateful\n"
+		String input = "resource type Stateful\n"
 					 + "	var state : system.Int\n"
 					 + "type PseudoNonStateful\n"
 					 + "	def saveState() : system.Int\n"
@@ -1007,8 +1007,24 @@ public class ILTests {
 	}
 
 	@Test
-	public void testVarsInTypes() throws ParseException {
+	public void testResourcenessOfTypesWithVars() throws ParseException {
 		String input = "type TwoVars\n"
+					 + "	var one : system.Int\n"
+					 + "	var two : system.Int\n"
+					 + "var x : TwoVars = new\n"
+					 + "	var one : system.Int = 1\n"
+					 + "	var two : system.Int = 2\n"
+					 + "x.one";
+		try {
+			TestUtil.getNewAST(input);
+			Assert.fail("AST creation should have failed.");
+		} catch (RuntimeException e) {
+		}
+	}
+
+	@Test
+	public void testVarsInTypes() throws ParseException {
+		String input = "resource type TwoVars\n"
 					 + "	var one : system.Int\n"
 					 + "	var two : system.Int\n"
 					 + "var x : TwoVars = new\n"

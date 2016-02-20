@@ -105,6 +105,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		if (!(body instanceof DeclSequence)) {
 			body = new DeclSequence(Arrays.asList(body));
 		}
+
+		if (((DeclSequence)body).hasVarDeclaration() && !isResource) {
+			throw new RuntimeException(name + " must be resource");
+		}
+
 		//Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);
 		//return new TypeDeclaration(name, (DeclSequence) body, null, (TaggedInfo) tagInfo, loc);
 		return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource);
