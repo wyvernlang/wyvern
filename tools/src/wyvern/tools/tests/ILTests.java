@@ -1107,4 +1107,32 @@ public class ILTests {
         IntegerLiteral five = new IntegerLiteral(10);
         Assert.assertEquals(five, v);
     }
+    
+    @Test
+	@Category(CurrentlyBroken.class)
+    public void testTypeMemberInFunction() throws ParseException {
+
+        String source = ""
+                      + "type IntHolder\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType\n\n"
+
+                      + "def Identity(holder: IntHolder) : IntHolder\n"
+                      + "    holder\n\n"
+
+                      + "val five: IntHolder = new\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType = 5\n\n"
+
+                      + "Identity(five)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+    }
+
 }

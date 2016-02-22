@@ -5,17 +5,23 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -89,16 +95,25 @@ public class TestUtil {
 	}
 	
 	public static GenContext getStandardGenContext() {
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), getSystemType());
 		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
+
+	private static ValueType getSystemType() {
+		// construct a type for the system object
+		List<DeclType> declTypes = new LinkedList<DeclType>();
+		declTypes.add(new AbstractTypeMember("Int"));
+		declTypes.add(new AbstractTypeMember("Unit"));
+		ValueType systemType = new StructuralType("this", declTypes);
+		return systemType;
+	}
 	
 	public static TypeContext getStandardTypeContext() {
     	GenContext ctx = GenContext.empty();
+    	ctx = ctx.extend("system", new Variable("system"), getSystemType());
     	ctx = GenUtil.ensureJavaTypesPresent(ctx);
 		return ctx;
 	}
