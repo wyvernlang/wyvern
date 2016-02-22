@@ -30,8 +30,15 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
 		return theDefault;
 	}
+	
+	/** For nominal types that are transitively equivalent to a known type, return that type.
+	 *  For all other types, this is the identity.
+	 */
+	public ValueType getCanonicalType(TypeContext ctx) {
+		return this;
+	}
 
-	public boolean isSubtypeOf(Type t, TypeContext ctx) {
+	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
 		return equals(t); // default
 	}
 

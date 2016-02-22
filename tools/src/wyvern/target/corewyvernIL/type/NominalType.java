@@ -25,6 +25,16 @@ public class NominalType extends ValueType{
 			return super.getStructuralType(ctx, theDefault);
 		}
 	}
+	
+	@Override
+	public ValueType getCanonicalType(TypeContext ctx) {
+		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+		if (dt instanceof ConcreteTypeMember) {
+			return ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx)).getCanonicalType(ctx);
+		} else {
+			return this;
+		}
+	}
 
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
@@ -72,7 +82,7 @@ public class NominalType extends ValueType{
 		return typeMember;
 	}
 	
-	public boolean isSubtypeOf(Type t, TypeContext ctx) {
+	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
 		if (equals(t))
 			return true;
 		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
@@ -80,7 +90,8 @@ public class NominalType extends ValueType{
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 			return vt.isSubtypeOf(t, ctx);
 		} else {
-			return false; // nominal equality was the best we can do 
+			ValueType ct = t.getCanonicalType(ctx);
+			return equals(ct); // check for equality with the canonical type 
 		}
 	}
 

@@ -77,7 +77,7 @@ public class MethodCall extends Expression {
 		// check argument compatibility
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
-			Type argType = ddt.getFormalArgs().get(i).getType().adapt(v);
+			ValueType argType = ddt.getFormalArgs().get(i).getType().adapt(v);
 			ValueType actualType = e.typeCheck(ctx); 
 			if (!actualType.isSubtypeOf(argType, ctx)) {
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());

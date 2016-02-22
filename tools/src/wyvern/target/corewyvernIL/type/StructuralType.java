@@ -84,7 +84,7 @@ public class StructuralType extends ValueType {
 	}
 
 	@Override
-	public boolean isSubtypeOf(Type t, TypeContext ctx) {
+	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
 		if (t instanceof NominalType) {
 			StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
 			if (st == null) 
