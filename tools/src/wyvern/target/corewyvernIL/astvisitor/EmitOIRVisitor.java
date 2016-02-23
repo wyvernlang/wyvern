@@ -509,11 +509,11 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
 	public OIRAST visit(Environment env, OIREnvironment oirenv,
 			NominalType nominalType) {
-		OIRFieldGet oirfieldget;
+		OIRExpression oirfieldget;
 		Path path;
 		
 		path = nominalType.getPath();
-		oirfieldget = (OIRFieldGet) path.acceptVisitor(this, env, oirenv);
+		oirfieldget = (OIRExpression) path.acceptVisitor(this, env, oirenv);
 		
 		return new OIRFieldGet (oirfieldget, nominalType.getTypeMember()+"tag");
 	}
