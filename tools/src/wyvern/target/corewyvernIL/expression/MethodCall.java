@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -24,7 +25,7 @@ public class MethodCall extends Expression {
 	private Expression objectExpr;
 	private String methodName;
 	private List<Expression> args;
-	
+
 	public MethodCall(Expression objectExpr, String methodName,
 			List<Expression> args, HasLocation location) {
 		super(location != null ? location.getLocation():null);
@@ -35,7 +36,7 @@ public class MethodCall extends Expression {
 		if (args.size() > 0 && args.get(0) == null)
 			throw new NullPointerException("invariant: no null args");
 	}
-	
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		objectExpr.doPrettyPrint(dest,indent);
@@ -50,19 +51,19 @@ public class MethodCall extends Expression {
 		}
 		dest.append(')');
 	}
-	
+
 	public Expression getObjectExpr() {
 		return objectExpr;
 	}
-	
+
 	public String getMethodName() {
 		return methodName;
 	}
-	
+
 	public List<Expression> getArgs() {
 		return args;
 	}
-	
+
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType ot = objectExpr.typeCheck(ctx);
@@ -78,7 +79,7 @@ public class MethodCall extends Expression {
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
 			ValueType argType = ddt.getFormalArgs().get(i).getType().adapt(v);
-			ValueType actualType = e.typeCheck(ctx); 
+			ValueType actualType = e.typeCheck(ctx);
 			if (!actualType.isSubtypeOf(argType, ctx)) {
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
             }
@@ -102,6 +103,17 @@ public class MethodCall extends Expression {
 			Expression e = args.get(i);
 			argValues.add(e.interpret(ctx));
 		}
-		return receiver.invoke(methodName, argValues, ctx);		
+		return receiver.invoke(methodName, argValues, ctx);
 	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = objectExpr.getFreeVariables();
+		freeVars.add(methodName);
+		for (Expression arg : args) {
+			freeVars.addAll(arg.getFreeVariables());
+		}
+		return freeVars;
+	}
+
 }

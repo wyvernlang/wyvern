@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -24,12 +26,12 @@ public class ValDeclaration extends DeclarationWithRHS {
 	}
 
 	private ValueType type;
-	
+
 	@Override
 	public ValueType getType() {
 		return type;
 	}
-	
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("val ").append(getName()).append(':');
@@ -49,11 +51,17 @@ public class ValDeclaration extends DeclarationWithRHS {
 	public DeclType getDeclType() {
 		return new ValDeclType(getName(), type);
 	}
-	
+
 	@Override
 	public Declaration interpret(EvalContext ctx) {
 		Expression newValue = (Expression) getDefinition().interpret(ctx);
 		return new ValDeclaration(getName(), type, newValue);
+	}
+
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = new HashSet<>();
+		freeVars.add(this.getName());
+		return freeVars;
 	}
 
 }

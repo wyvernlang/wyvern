@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -43,7 +45,7 @@ public class Variable extends Expression implements Path {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(name);
 	}
-	
+
 	public Variable(String name) {
 		super();
 		this.name = name;
@@ -73,5 +75,11 @@ public class Variable extends Expression implements Path {
 	@Override
 	public Path adapt(View v) {
 		return v.adapt(this);
+	}
+
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = new HashSet<>();
+		freeVars.add(this.getName());
+		return freeVars;
 	}
 }

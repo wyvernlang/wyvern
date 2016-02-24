@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -10,7 +12,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
 public class IntegerLiteral extends AbstractValue {
-	
+
 	@Override
 	public int hashCode() {
 		return value;
@@ -41,7 +43,7 @@ public class IntegerLiteral extends AbstractValue {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(Integer.toString(value));
 	}
-	
+
 	public int getValue() {
 		return value;
 	}
@@ -55,6 +57,11 @@ public class IntegerLiteral extends AbstractValue {
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
 		return emitILVisitor.visit(env, oirenv, this);
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return new HashSet<>();
 	}
 
 }

@@ -1,7 +1,9 @@
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
@@ -18,7 +20,7 @@ public class DefDeclaration extends NamedDeclaration {
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
-	
+
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body) {
 		super(methodName);
@@ -51,15 +53,15 @@ public class DefDeclaration extends NamedDeclaration {
 	public String toString() {
 		return "DefDeclaration[" + getName() + "(...) : " + type + " = " + body + "]";
 	}*/
-	
+
 	public List<FormalArg> getFormalArgs() {
 		return formalArgs;
 	}
-	
+
 	public ValueType getType() {
 		return type;
 	}
-	
+
 	public Expression getBody() {
 		return body;
 	}
@@ -79,4 +81,17 @@ public class DefDeclaration extends NamedDeclaration {
 			throw new RuntimeException("body doesn't match declared type");
 		return new DefDeclType(getName(), type, formalArgs);
 	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		Set<String> boundVars = new HashSet<>();
+		boundVars.add(this.getName());
+		for (FormalArg farg : formalArgs) {
+			boundVars.add(farg.getName());
+		}
+		Set<String> freeVars = body.getFreeVariables();
+		freeVars.removeAll(boundVars);
+		return freeVars;
+	}
+
 }

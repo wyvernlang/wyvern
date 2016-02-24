@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -19,7 +21,7 @@ public class TypeDeclaration extends NamedDeclaration {
 	}
 
 	private Type sourceType;
-	
+
 	public Type getSourceType() {
 		return sourceType;
 	}
@@ -33,10 +35,10 @@ public class TypeDeclaration extends NamedDeclaration {
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		DeclType declt = new ConcreteTypeMember(super.getName(), (ValueType) this.sourceType); 
+		DeclType declt = new ConcreteTypeMember(super.getName(), (ValueType) this.sourceType);
 		return declt;
 	}
-	
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("type ").append(getName()).append(" = ");
@@ -48,4 +50,9 @@ public class TypeDeclaration extends NamedDeclaration {
 	public String toString() {
 		return "type declaration " + super.getName() + " = " + sourceType.toString();
 	}*/
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return new HashSet<>();
+	}
 }

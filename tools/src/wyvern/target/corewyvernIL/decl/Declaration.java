@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.decl;
 
+import java.util.Set;
+
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -19,4 +21,7 @@ public abstract class Declaration extends ASTNode implements EmitOIR {
 
 	/** Returns the name of this declaration, or null if this declaration is not named */
 	public abstract String getName();
+
+	public abstract Set<String> getFreeVariables();
+
 }

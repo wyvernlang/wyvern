@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -10,9 +12,9 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
 public class StringLiteral extends Literal {
-	
+
 	private java.lang.String value;
-	
+
 	public StringLiteral(java.lang.String value) {
 		super(null);
 		this.value = value;
@@ -59,10 +61,14 @@ public class StringLiteral extends Literal {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append('"').append(value).append('"');
 	}
-	
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
 		return emitILVisitor.visit(env, oirenv, this);
+	}
+
+	public Set<String> getFreeVariables() {
+		return new HashSet<>();
 	}
 }

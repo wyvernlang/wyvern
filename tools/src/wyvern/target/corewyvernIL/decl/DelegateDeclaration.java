@@ -1,5 +1,8 @@
 package wyvern.target.corewyvernIL.decl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -11,7 +14,7 @@ public class DelegateDeclaration extends Declaration{
 
 	private ValueType valueType;
 	private String fieldName;
-	
+
 	public DelegateDeclaration(ValueType valueType, String fieldName) {
 		super();
 		this.valueType = valueType;
@@ -21,11 +24,11 @@ public class DelegateDeclaration extends Declaration{
 	public ValueType getValueType() {
 		return valueType;
 	}
-	
+
 	public String getFieldName() {
 		return fieldName;
 	}
-	
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -41,5 +44,12 @@ public class DelegateDeclaration extends Declaration{
 	@Override
 	public String getName() {
 		return null;
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = new HashSet<>();
+		freeVars.add(fieldName);
+		return freeVars;
 	}
 }

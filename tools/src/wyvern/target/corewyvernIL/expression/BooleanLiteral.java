@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -25,7 +27,7 @@ public class BooleanLiteral extends AbstractValue {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(value?"true":"false");
 	}
-	
+
     @Override
     public ValueType typeCheck(TypeContext env) {
         // TODO Auto-generated method stub
@@ -38,5 +40,11 @@ public class BooleanLiteral extends AbstractValue {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return new HashSet<>();
+	}
+
 }
 
