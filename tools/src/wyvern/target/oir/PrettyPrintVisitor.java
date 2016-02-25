@@ -1,12 +1,19 @@
 package wyvern.target.oir;
 
+import java.util.List;
+import java.util.HashSet;
+
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
+import wyvern.target.oir.declarations.OIRFormalArg;
 import wyvern.target.oir.declarations.OIRInterface;
 import wyvern.target.oir.declarations.OIRMethod;
 import wyvern.target.oir.declarations.OIRMethodDeclaration;
+import wyvern.target.oir.declarations.OIRMemberDeclaration;
+import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
+import wyvern.target.oir.expressions.OIRExpression;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
 import wyvern.target.oir.expressions.OIRIfThenElse;
@@ -22,6 +29,48 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
     String indent = "";
     final String indentIncrement = "  ";
     int uniqueId = 0;
+
+    HashSet<String> classesUsed;
+
+    public PrettyPrintVisitor() {
+        classesUsed = new HashSet<String>();
+    }
+
+    private String commaSeparatedExpressions(OIREnvironment oirenv,
+                                             List<OIRExpression> exps) {
+        String args = "";
+        int nArgs = exps.size();
+        for (int i = 0; i < nArgs; i++) {
+            OIRExpression arg_i = exps.get(i);
+            args += arg_i.acceptVisitor(this, oirenv);
+            if (i < nArgs - 1)
+                args += ", ";
+        }
+        return args;
+    }
+
+    public String prettyPrint(OIRAST oirast,
+                              OIREnvironment oirenv) {
+        String python =
+             oirast.acceptVisitor(this, oirenv);
+        String[] lines = python.split("\\n");
+        int lastIndex = lines.length-1;
+        lines[lastIndex] = "print(" + lines[lastIndex] + ")";
+        StringBuilder out = new StringBuilder();
+        for (String line : lines) {
+            out.append(line);
+            out.append("\n");
+        }
+
+        String classDefs = "";
+        for (String className : classesUsed) {
+            OIRType type = oirenv.lookup(className);
+            classDefs += type.acceptVisitor(this, oirenv) + "\n";
+        }
+
+        return classDefs + out.toString();
+    }
+
     public String visit(OIREnvironment oirenv,
                         OIRInteger oirInteger) {
         return Integer.toString(oirInteger.getValue());
@@ -82,7 +131,8 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
         uniqueId++;
 
         String funDecl = "def letFn" + Integer.toString(letId) +
-            "(" + oirLet.getVarName() +"):\n" + indent + indentIncrement;
+            "(" + oirLet.getVarName() +"):\n" + indent + indentIncrement
+            + "return ";
         String toReplaceString = oirLet.getToReplace().acceptVisitor(this, oirenv);
         String funCall = "\n" + indent + "letFn" + Integer.toString(letId) +
             "(" + toReplaceString + ")";
@@ -92,12 +142,19 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
 
     public String visit(OIREnvironment oirenv,
                         OIRMethodCall oirMethodCall) {
-        return "OIRMethodCall unimplemented";
+        String objExpr =
+            oirMethodCall.getObjectExpr().acceptVisitor(this, oirenv);
+        String args = commaSeparatedExpressions(oirenv,
+                                                oirMethodCall.getArgs());
+        return objExpr + "." + oirMethodCall.getMethodName() + "(" + args + ")";
     }
 
     public String visit(OIREnvironment oirenv,
                         OIRNew oirNew) {
-        return "OIRNew unimplemented";
+        String args = commaSeparatedExpressions(oirenv,
+                                                oirNew.getArgs());
+        classesUsed.add(oirNew.getTypeName());
+        return oirNew.getTypeName() + "(" + args + ")";
     }
 
     public String visit(OIREnvironment oirenv,
@@ -117,7 +174,23 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
 
     public String visit(OIREnvironment oirenv,
                         OIRClassDeclaration oirClassDeclaration) {
-        return "OIRClassDeclaration unimplemented";
+        String classDef = "class " + oirClassDeclaration.getName() + ":";
+        String oldIndent = indent;
+        indent += indentIncrement;
+        String members = "\n" + indent + "pass";
+        for (OIRMemberDeclaration memberDec : oirClassDeclaration.getMembers()) {
+            if (members.equals("\n" + indent + "pass"))
+                members = "";
+            members += "\n" + indent;
+            if (memberDec instanceof OIRMethod) {
+                OIRMethod method = (OIRMethod)memberDec;
+                members += method.acceptVisitor(this, oirenv);
+            }
+        }
+
+        indent = oldIndent;
+
+        return classDef + members;
     }
 
     public String visit(OIREnvironment oirenv,
@@ -142,6 +215,21 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
 
     public String visit(OIREnvironment oirenv,
                         OIRMethod oirMethod) {
-        return "OIRMethod unimplemented";
+        String args = "self";
+        for (OIRFormalArg formalArg : oirMethod.getDeclaration().getArgs()) {
+            args += ", " + formalArg.getName();
+        }
+        String def = "def " + oirMethod.getDeclaration().getName() +
+            "(" + args + ")"+ ":";
+
+        String oldIndent = indent;
+        indent += indentIncrement;
+
+        String body = "\n" + indent + "return " +
+            oirMethod.getBody().acceptVisitor(this, oirenv);
+
+        indent = oldIndent;
+
+        return def + body;
     }
 }

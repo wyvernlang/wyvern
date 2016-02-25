@@ -60,8 +60,10 @@ public class OIRTests {
                                     null,
                                     OIREnvironment.getRootEnvironment());
         String pprint =
-            oirast.acceptVisitor(new PrettyPrintVisitor(),
-                                 OIREnvironment.getRootEnvironment());
+            new PrettyPrintVisitor().prettyPrint(oirast,
+                                                 OIREnvironment.getRootEnvironment());
+            // oirast.acceptVisitor(new PrettyPrintVisitor(),
+            //                      OIREnvironment.getRootEnvironment());
         System.out.println("OIR Program:\n" + pprint);
     }
 

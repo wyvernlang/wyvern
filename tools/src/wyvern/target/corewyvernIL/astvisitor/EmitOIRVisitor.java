@@ -132,7 +132,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 					pair = new OIRFieldValueInitializePair (
 							(OIRFieldDeclaration)oirMemDecl, oirvalue);
 					fieldValuePairs.add (pair);
-					args.add((OIRExpression) oirvalue);
+					args.add(oirvalue);
 				}
 				else if (decl instanceof ValDeclaration)
 				{
@@ -146,7 +146,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 					pair = new OIRFieldValueInitializePair (
 							(OIRFieldDeclaration)oirMemDecl, oirvalue);
 					fieldValuePairs.add (pair);
-					args.add((OIRExpression) oirvalue);
+					args.add(oirvalue);
 				}
 				
 				classenv.addName(oirMemDecl.getName (), oirMemDecl.getType ());
