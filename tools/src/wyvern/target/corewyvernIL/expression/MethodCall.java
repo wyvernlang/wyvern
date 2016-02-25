@@ -13,7 +13,6 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.StructuralType;
-import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
