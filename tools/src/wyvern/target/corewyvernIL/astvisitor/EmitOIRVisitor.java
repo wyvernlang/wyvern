@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.astvisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -30,6 +31,8 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -60,6 +63,7 @@ import wyvern.target.oir.expressions.OIRNew;
 import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
+import wyvern.tools.tests.tagTests.TestUtil;
 
 public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 	private int classCount = 0;
@@ -509,13 +513,25 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
 	public OIRAST visit(Environment env, OIREnvironment oirenv,
 			NominalType nominalType) {
-		OIRExpression oirfieldget;
-		Path path;
-		
-		path = nominalType.getPath();
-		oirfieldget = (OIRExpression) path.acceptVisitor(this, env, oirenv);
-		
-		return new OIRFieldGet (oirfieldget, nominalType.getTypeMember()+"tag");
+    // Note: This code belongs more in the Match case
+		// OIRExpression oirfieldget;
+		// Path path;
+
+    // path = nominalType.getPath();
+    // oirfieldget = (OIRExpression) path.acceptVisitor(this, env, oirenv);
+
+    // return new OIRFieldGet (oirfieldget, nominalType.getTypeMember()+"tag");
+
+    StructuralType defaultType =
+        new StructuralType("emptyType",
+                           new ArrayList<DeclType>());
+    // TypeContext context = TypeContext.empty().extend("system.Int",
+    //                                                  Util.intType());
+    TypeContext context = TestUtil.getStandardGenContext();
+
+    StructuralType st = nominalType.getStructuralType(context,
+                                                      defaultType);
+    return st.acceptVisitor(this, env, oirenv);
 	}
 
 	public OIRAST visit(Environment env, OIREnvironment oirenv,
