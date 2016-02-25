@@ -45,6 +45,6 @@ public class BooleanLiteral extends AbstractValue {
 	public Set<String> getFreeVariables() {
 		return new HashSet<>();
 	}
-
+	
 }
 

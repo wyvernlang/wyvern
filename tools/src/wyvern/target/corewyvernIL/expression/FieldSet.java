@@ -117,7 +117,6 @@ public class FieldSet extends Expression {
 	public Set<String> getFreeVariables() {
 		Set<String> freeVars = objectExpr.getFreeVariables();
 		freeVars.addAll(exprToAssign.getFreeVariables());
-		freeVars.add(fieldName);
 		return freeVars;
 	}
 

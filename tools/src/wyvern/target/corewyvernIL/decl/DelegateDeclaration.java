@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class DelegateDeclaration extends Declaration{
+public class DelegateDeclaration extends Declaration {
 
 	private ValueType valueType;
 	private String fieldName;
@@ -48,8 +48,6 @@ public class DelegateDeclaration extends Declaration{
 
 	@Override
 	public Set<String> getFreeVariables() {
-		Set<String> freeVars = new HashSet<>();
-		freeVars.add(fieldName);
-		return freeVars;
+		return new HashSet<>();
 	}
 }

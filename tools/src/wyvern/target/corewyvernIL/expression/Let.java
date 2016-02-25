@@ -68,9 +68,13 @@ public class Let extends Expression {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		Set<String> boundVars = toReplace.getFreeVariables();
-		Set<String> freeVars = inExpr.getFreeVariables();
-		freeVars.removeAll(boundVars);
+		
+		// Get free variables in the sub-expressions.
+		Set<String> freeVars = toReplace.getFreeVariables();
+		freeVars.addAll(inExpr.getFreeVariables());
+		
+		// Remove the name that just became bound.
+		freeVars.remove(varName);
 		return freeVars;
 	}
 }

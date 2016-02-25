@@ -84,13 +84,16 @@ public class DefDeclaration extends NamedDeclaration {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		Set<String> boundVars = new HashSet<>();
-		boundVars.add(this.getName());
-		for (FormalArg farg : formalArgs) {
-			boundVars.add(farg.getName());
-		}
+		
+		// Get all free variables in the body of the method.
 		Set<String> freeVars = body.getFreeVariables();
-		freeVars.removeAll(boundVars);
+		
+		// Remove variables that became bound in this method's scope.
+		freeVars.remove(this.getName());
+		for (FormalArg farg : formalArgs) {
+			freeVars.remove(farg.getName());
+		}
+		
 		return freeVars;
 	}
 

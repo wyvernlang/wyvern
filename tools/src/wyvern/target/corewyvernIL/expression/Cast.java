@@ -1,6 +1,5 @@
 package wyvern.target.corewyvernIL.expression;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -43,6 +42,6 @@ public class Cast extends Expression{
 
 	@Override
 	public Set<String> getFreeVariables() {
-		return new HashSet<>();
+		return toCastExpr.getFreeVariables();
 	}
 }

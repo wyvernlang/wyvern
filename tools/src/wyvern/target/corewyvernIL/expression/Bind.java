@@ -70,8 +70,12 @@ public class Bind extends Expression {
 
 	@Override
 	public Set<String> getFreeVariables() {
+		
+		// Get free variables in the sub-expressions.
 		Set<String> freeVars = toReplace.getFreeVariables();
 		freeVars.addAll(inExpr.getFreeVariables());
+		
+		// Remove the name that just became bound.
 		freeVars.remove(varName);
 		return freeVars;
 	}

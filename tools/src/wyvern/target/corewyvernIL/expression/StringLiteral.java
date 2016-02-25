@@ -68,7 +68,10 @@ public class StringLiteral extends Literal {
 		return emitILVisitor.visit(env, oirenv, this);
 	}
 
+	@Override
 	public Set<String> getFreeVariables() {
 		return new HashSet<>();
 	}
+
+	
 }
