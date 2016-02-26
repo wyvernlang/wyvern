@@ -268,10 +268,11 @@ public class TypeVarDecl extends Declaration {
 		return body.generateIL(ctx);
 	}*/
 
-	private StructuralType computeInternalILType(GenContext ctx) {		
+	private StructuralType computeInternalILType(GenContext ctx) {
+		final String defaultThisName = "this";
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		GenContext localCtx = ctx.extend("this", new Variable("this"), null);
-		return new StructuralType(this.name, td.genDeclTypeSeq(localCtx), this.resourceFlag);
+		GenContext localCtx = ctx.extend(defaultThisName, new Variable(defaultThisName), null);
+		return new StructuralType(defaultThisName, td.genDeclTypeSeq(localCtx), this.resourceFlag);
 	}
 	
 	@Override
