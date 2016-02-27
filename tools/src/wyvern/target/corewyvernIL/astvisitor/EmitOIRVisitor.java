@@ -127,7 +127,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 					VarDeclaration varDecl;
 					
 					varDecl = (VarDeclaration)decl;
-					oirvalue = (OIRExpression) varDecl.acceptVisitor(this,
+					oirvalue = (OIRExpression) varDecl.getDefinition().acceptVisitor(this,
 							env, oirenv);
 					pair = new OIRFieldValueInitializePair (
 							(OIRFieldDeclaration)oirMemDecl, oirvalue);
@@ -141,7 +141,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 					ValDeclaration varDecl;
 					
 					varDecl = (ValDeclaration)decl;
-					oirvalue = (OIRExpression) varDecl.acceptVisitor(this,
+					oirvalue = (OIRExpression) varDecl.getDefinition().acceptVisitor(this,
 							env, oirenv);
 					pair = new OIRFieldValueInitializePair (
 							(OIRFieldDeclaration)oirMemDecl, oirvalue);
