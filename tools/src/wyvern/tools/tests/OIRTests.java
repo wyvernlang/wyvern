@@ -101,6 +101,16 @@ public class OIRTests {
     }
 
     @Test
+    public void testOIRMultipleFields() throws ParseException {
+        String input =
+            "val obj = new\n" +
+            "    val x = 23\n" +
+            "    val y = 64\n" +
+            "obj.y\n";
+        printPyFromInput(input);
+    }
+
+    @Test
     public void testOIRVarFieldRead() throws ParseException {
         String input =
             "val obj = new\n" +

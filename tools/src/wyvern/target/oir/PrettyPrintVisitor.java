@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
+import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
 import wyvern.target.oir.declarations.OIRInterface;
 import wyvern.target.oir.declarations.OIRMethod;
@@ -177,10 +178,28 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
         String classDef = "class " + oirClassDeclaration.getName() + ":";
         String oldIndent = indent;
         indent += indentIncrement;
-        String members = "\n" + indent + "pass";
+        String members = "";
+
+        // Build a constructor
+        StringBuilder constructor_args = new StringBuilder();
+        StringBuilder constructor_body = new StringBuilder();
+        for (OIRFieldValueInitializePair pair : oirClassDeclaration.getFieldValuePairs()) {
+            OIRFieldDeclaration dec = pair.fieldDeclaration;
+            OIRExpression value = pair.valueDeclaration;
+            constructor_body.append("\n");
+            constructor_body.append(indent + indentIncrement);
+            constructor_body.append("this.");
+            constructor_body.append(dec.getName());
+            constructor_body.append(" = ");
+            constructor_body.append(value.acceptVisitor(this, oirenv));
+
+            constructor_args.append(", " + dec.getName() + "Ignored");
+        }
+        members += "\n" + indent +
+            "def __init__(this" + constructor_args.toString() + "):";
+        members += constructor_body.toString();
+
         for (OIRMemberDeclaration memberDec : oirClassDeclaration.getMembers()) {
-            if (members.equals("\n" + indent + "pass"))
-                members = "";
             members += "\n" + indent;
             if (memberDec instanceof OIRMethod) {
                 OIRMethod method = (OIRMethod)memberDec;
