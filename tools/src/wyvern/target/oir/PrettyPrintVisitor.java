@@ -88,18 +88,18 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
 
     public String visit(OIREnvironment oirenv,
                         OIRFieldGet oirFieldGet) {
-        return (oirFieldGet.getObjectExpr() +
+        return (oirFieldGet.getObjectExpr().acceptVisitor(this, oirenv) +
                 "." +
                 oirFieldGet.getFieldName());
     }
 
     public String visit(OIREnvironment oirenv,
                         OIRFieldSet oirFieldSet) {
-        return (oirFieldSet.getObjectExpr() +
+        return (oirFieldSet.getObjectExpr().acceptVisitor(this, oirenv) +
                 "." +
                 oirFieldSet.getFieldName() +
                 " = " +
-                oirFieldSet.getExprToAssign());
+                oirFieldSet.getExprToAssign().acceptVisitor(this, oirenv));
     }
 
     public String visit(OIREnvironment oirenv,
@@ -215,7 +215,7 @@ public class PrettyPrintVisitor extends ASTVisitor<String> {
 
     public String visit(OIREnvironment oirenv,
                         OIRMethod oirMethod) {
-        String args = "self";
+        String args = "this";
         for (OIRFormalArg formalArg : oirMethod.getDeclaration().getArgs()) {
             args += ", " + formalArg.getName();
         }
