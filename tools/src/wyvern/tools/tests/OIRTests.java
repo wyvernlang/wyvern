@@ -70,16 +70,25 @@ public class OIRTests {
     @Test
     public void testOIRLetValWithParse() throws ParseException {
         String input =
-            "val x = 5\n"
-        		+ "x\n";
+            "val x = 5\n" +
+        		"x\n";
+        printPyFromInput(input);
+    }
+
+    @Test
+    public void testMultipleLets() throws ParseException {
+        String input =
+            "val x = 5\n" +
+            "val y = 7\n" +
+        		"x\n";
         printPyFromInput(input);
     }
 
     @Test
     public void testOIRLetValWithString() throws ParseException {
         String input =
-            "val x = \"five\"\n"
-        		+ "x\n";
+            "val x = \"five\"\n" +
+        		"x\n";
         printPyFromInput(input);
     }
 
