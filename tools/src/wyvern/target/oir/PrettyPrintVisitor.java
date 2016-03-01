@@ -26,7 +26,7 @@ import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 
-public class PrettyPrintVisitor extends ASTVisitor<String> {
+public class PrettyPrintVisitor extends ASTVisitor<OIREnvironment, String> {
     String indent = "";
     final String indentIncrement = "  ";
     int uniqueId = 0;
