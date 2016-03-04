@@ -127,4 +127,25 @@ public class OIRTests {
             "obj.v\n";
         printPyFromInput(input);
     }
+
+    @Test
+    public void testOIRVarFieldWrite() throws ParseException {
+        String input =
+            "val obj = new\n" +
+            "    var v : system.Int = 2\n" +
+            "obj.v = 23\n" +
+            "obj.v\n";
+        printPyFromInput(input);
+    }
+
+    @Test
+    public void testDefWithVarInside() throws ParseException {
+        String input =
+            "def foo() : system.Int\n" +
+            "    var v : system.Int = 5\n" +
+            "    v = 10\n" +
+            "    v\n" +
+            "foo()\n";
+        printPyFromInput(input);
+    }
 }
