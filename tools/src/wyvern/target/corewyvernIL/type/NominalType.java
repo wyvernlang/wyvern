@@ -70,6 +70,9 @@ public class NominalType extends ValueType{
 
 	public NominalType(Path path, String typeMember) {
 		super();
+        if(path.equals(null)) {
+            throw new IllegalStateException("Path cannot be null.");
+        }
 		this.path = path;
 		this.typeMember = typeMember;
 	}

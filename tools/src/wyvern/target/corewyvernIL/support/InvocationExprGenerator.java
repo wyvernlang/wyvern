@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.support;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
@@ -28,7 +29,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	
 	@Override
 	public Expression genExpr() {
-		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
+		if (declType instanceof ValDeclType || declType instanceof VarDeclType || declType instanceof ConcreteTypeMember) {
 			return new FieldGet(receiver, declType.getName());
 		} else {
 			throw new RuntimeException("eta-expansion of a method reference not implemented");
