@@ -30,7 +30,7 @@ public class ObjectValue extends New implements Invokable {
 	}
 
 	@Override
-	public Value invoke(String methodName, List<Value> args, EvalContext ctx) {
+	public Value invoke(String methodName, List<Value> args) {
 		EvalContext methodCtx = evalCtx;
 		DefDeclaration dd = (DefDeclaration) findDecl(methodName);
 		if (dd != null) {
@@ -40,7 +40,7 @@ public class ObjectValue extends New implements Invokable {
 			return dd.getBody().interpret(methodCtx);
 		}
 		else if(hasDelegate) {
-			return delegateTarget.invoke(methodName, args, methodCtx);
+			return delegateTarget.invoke(methodName, args);
 		}
 		else {
 			throw new RuntimeException("can't reach here");
@@ -48,13 +48,13 @@ public class ObjectValue extends New implements Invokable {
 	}
 
 	@Override
-	public Value getField(String fieldName, EvalContext ctx) {
+	public Value getField(String fieldName) {
 		DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName);
 		if (decl != null) {
 			return (Value) decl.getDefinition();
 		}
 		else if(delegateTarget != null && delegateTarget.findDecl(fieldName) != null) {
-			return delegateTarget.getField(fieldName, ctx);
+			return delegateTarget.getField(fieldName);
 		}
 		
 		throw new RuntimeException("can't find field: " + fieldName);

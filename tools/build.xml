@@ -84,7 +84,7 @@
     </target>
 	
 	<target name="test" depends="build">
-		<junit printsummary="on" haltonfailure="yes">
+		<junit printsummary="on" haltonfailure="yes" fork="yes">
 			<classpath>
 				<path refid="classpath.base" />
 				<pathelement location="${build.dir}"/>

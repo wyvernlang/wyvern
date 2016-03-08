@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -24,14 +25,22 @@ public class StructuralTypesFromJava extends StructuralType {
 		DeclType packageDecl = findDecl(packageName, ctx);
 		if (packageDecl == null) {
 			packageDecl = new ValDeclType(packageName, new StructuralTypesFromJava());
-			this.getDeclTypes().add(packageDecl);
+			
+			List<DeclType> newDeclTypes = new ArrayList<DeclType>(this.getDeclTypes().size()+1);
+			newDeclTypes.addAll(this.getDeclTypes());
+			newDeclTypes.add(packageDecl);
+			this.declTypes = newDeclTypes;
 		}
 		StructuralTypesFromJava packageType = (StructuralTypesFromJava)((ValDeclType)packageDecl).getRawResultType();
 		ConcreteTypeMember classDecl = (ConcreteTypeMember)packageType.findDecl(className, ctx);
 		if (classDecl == null) {
 			LazyStructuralType classType = new LazyStructuralType(javaClass, ctx);
 			classDecl = new ConcreteTypeMember(className, classType);
-			packageType.getDeclTypes().add(classDecl);
+			
+			List<DeclType> newDeclTypes = new ArrayList<DeclType>(packageType.getDeclTypes().size()+1);
+			newDeclTypes.addAll(packageType.getDeclTypes());
+			newDeclTypes.add(classDecl);
+			packageType.declTypes = newDeclTypes;
 		}
 		Path path = new FieldGet(GenUtil.getJavaTypesObject(), packageName);
 		ValueType type = new NominalType(path, className);

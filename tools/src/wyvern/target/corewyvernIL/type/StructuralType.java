@@ -18,7 +18,7 @@ import wyvern.target.oir.OIREnvironment;
 public class StructuralType extends ValueType {
 
 	private String selfName;
-	private List<DeclType> declTypes;
+	protected List<DeclType> declTypes;
 	private boolean resourceFlag = false;
 
 	public StructuralType(String selfName, List<DeclType> declTypes) {

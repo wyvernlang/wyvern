@@ -102,6 +102,6 @@ public class MethodCall extends Expression {
 			Expression e = args.get(i);
 			argValues.add(e.interpret(ctx));
 		}
-		return receiver.invoke(methodName, argValues, ctx);		
+		return receiver.invoke(methodName, argValues);		
 	}
 }
