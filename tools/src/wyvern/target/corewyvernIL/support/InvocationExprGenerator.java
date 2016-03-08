@@ -29,7 +29,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	
 	@Override
 	public Expression genExpr() {
-		if (declType instanceof ValDeclType || declType instanceof VarDeclType || declType instanceof ConcreteTypeMember) {
+		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			return new FieldGet(receiver, declType.getName());
 		} else {
 			throw new RuntimeException("eta-expansion of a method reference not implemented");
