@@ -49,7 +49,7 @@ public class TypeVarDecl extends Declaration {
 	private final Reference<Value> metadataObj;
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
-    private String selfReferenceName = "this;";
+    private final String defaultSelfName = "this";
 
 	/**
 	 * Helper class to allow easy variation of bound types
@@ -268,10 +268,10 @@ public class TypeVarDecl extends Declaration {
 		return body.generateIL(ctx);
 	}*/
 
-	private StructuralType computeInternalILType(GenContext ctx) {		
+	private StructuralType computeInternalILType(GenContext ctx) {
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		GenContext localCtx = ctx.extend("this", new Variable("this"), null);
-		return new StructuralType(this.name, td.genDeclTypeSeq(localCtx), this.resourceFlag);
+		GenContext localCtx = ctx.extend(defaultSelfName, new Variable(defaultSelfName), null);
+		return new StructuralType(defaultSelfName, td.genDeclTypeSeq(localCtx), this.resourceFlag);
 	}
 	
 	@Override
@@ -304,8 +304,4 @@ public class TypeVarDecl extends Declaration {
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}
-
-    public void setSelfReferenceName(String name) {
-        this.selfReferenceName = name;
-    }
 }

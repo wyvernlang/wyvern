@@ -67,7 +67,7 @@ public class FieldGet extends Expression implements Path {
 		if (!(receiver instanceof Invokable))
 			throw new RuntimeException("expected an object value at field get");
 		Invokable ov = (Invokable) receiver;
-		return ov.getField(fieldName, ctx);
+		return ov.getField(fieldName);
  	}
 
 	@Override

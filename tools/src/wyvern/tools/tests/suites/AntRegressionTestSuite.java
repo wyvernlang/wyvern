@@ -12,6 +12,7 @@ import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
 import wyvern.tools.tests.ECOOP16;
 import wyvern.tools.tests.ILTests;
+import wyvern.tools.tests.OIRTests;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
 import wyvern.tools.tests.RossettaCodeTests;
@@ -55,6 +56,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				LexingTests.class,		// tests the new lexer
 				CoreParserTests.class,	// tests the new parser
 				ILTests.class,			// tests the new IL
+        OIRTests.class,
 				ECOOP16.class,		// tests the new IL
 				ModuleSystemTests.class,		// tests the new IL
 				})

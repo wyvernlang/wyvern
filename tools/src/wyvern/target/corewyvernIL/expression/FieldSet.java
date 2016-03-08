@@ -101,7 +101,7 @@ public class FieldSet extends Expression {
 
 		// Update object's declarations.
 		object.setDecl(varDeclUpdated);
-		return object;
+		return exprInterpreted;
 	}
 
 	@Override

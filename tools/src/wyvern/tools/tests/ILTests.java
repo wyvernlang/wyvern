@@ -1109,7 +1109,6 @@ public class ILTests {
     }
     
     @Test
-	@Category(CurrentlyBroken.class)
     public void testTypeMemberInFunction() throws ParseException {
 
         String source = ""
@@ -1135,4 +1134,34 @@ public class ILTests {
         ValueType t = program.typeCheck(ctx);
     }
 
+
+    @Test
+    public void testDependentType() throws ParseException {
+
+        String source = ""
+                      + "type IntHolder\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType\n\n"
+
+                      + "def Identity(holder: IntHolder) : holder.heldType\n"
+                      + "    holder.element\n\n"
+
+                      + "val five: IntHolder = new\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType = 5\n\n"
+
+                      + "Identity(five)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+
+        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
+
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
 }
