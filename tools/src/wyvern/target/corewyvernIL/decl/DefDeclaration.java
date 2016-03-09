@@ -88,11 +88,9 @@ public class DefDeclaration extends NamedDeclaration {
 		Set<String> freeVars = body.getFreeVariables();
 		
 		// Remove variables that became bound in this method's scope.
-		freeVars.remove(this.getName());
 		for (FormalArg farg : formalArgs) {
 			freeVars.remove(farg.getName());
 		}
-		
 		return freeVars;
 	}
 

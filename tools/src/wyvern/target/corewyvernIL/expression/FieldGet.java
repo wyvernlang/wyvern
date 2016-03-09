@@ -79,6 +79,6 @@ public class FieldGet extends Expression implements Path {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		return new HashSet<>();
+		return objectExpr.getFreeVariables();
 	}
 }

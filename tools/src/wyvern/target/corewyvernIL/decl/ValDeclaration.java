@@ -59,9 +59,7 @@ public class ValDeclaration extends DeclarationWithRHS {
 	}
 
 	public Set<String> getFreeVariables() {
-		Set<String> freeVars = new HashSet<>();
-		freeVars.addAll(getDefinition().getFreeVariables());
-		return freeVars;
+		return getDefinition().getFreeVariables();
 	}
 
 }

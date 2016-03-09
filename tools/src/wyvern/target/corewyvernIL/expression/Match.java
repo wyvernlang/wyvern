@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
@@ -59,6 +60,13 @@ public class Match extends Expression {
 		Set<String> freeVars = matchExpr.getFreeVariables();
 		for (Case c : cases) {
 			freeVars.addAll(c.getBody().getFreeVariables());
+			freeVars.remove(c.getVarName());
+			
+			// Add variable at the root of the path of the NominalType
+			// Look up that variable to get the tag to do the tag check.
+			// Path p = c.getPattern().getPath();
+			// if p returns y.f.x, the variable at the root of the path = y?
+			
 		}
 		freeVars.addAll(elseExpr.getFreeVariables());
 		return freeVars;

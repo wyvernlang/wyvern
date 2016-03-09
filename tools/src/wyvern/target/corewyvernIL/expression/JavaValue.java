@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -78,7 +79,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		throw new RuntimeException("Free variables of a JavaValue not yet implemented.");
+		return new HashSet<>();
 	}
 
 }

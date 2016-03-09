@@ -70,8 +70,9 @@ public class Let extends Expression {
 	public Set<String> getFreeVariables() {
 		
 		// Get free variables in the sub-expressions.
-		Set<String> freeVars = toReplace.getFreeVariables();
-		freeVars.addAll(inExpr.getFreeVariables());
+		Set<String> freeVars = inExpr.getFreeVariables();
+		freeVars.remove(varName);
+		freeVars.addAll(toReplace.getFreeVariables());
 		
 		// Remove the name that just became bound.
 		freeVars.remove(varName);

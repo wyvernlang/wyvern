@@ -108,7 +108,6 @@ public class MethodCall extends Expression {
 	@Override
 	public Set<String> getFreeVariables() {
 		Set<String> freeVars = objectExpr.getFreeVariables();
-		freeVars.add(this.methodName);
 		for (Expression arg : args) {
 			freeVars.addAll(arg.getFreeVariables());
 		}
