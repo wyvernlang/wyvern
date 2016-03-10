@@ -43,7 +43,7 @@ public class OIREnvironment {
 	
 	public void addType (String name, OIRType type)
 	{
-		nameTable.put(name, type);
+		typeTable.put(name, type);
 	}
 
 	public OIRType lookup(String name) 
@@ -54,8 +54,12 @@ public class OIREnvironment {
 		OIRType type;
 		
 		type = nameTable.get(name);
-		if (type == null)
+		if (type == null) {
+			if (parent == null)
+				throw new RuntimeException("OIREnvironment looking up \"" + name + "\", parent is null");
 			return parent.lookup(name);
+		}
+			
 		return type;
 	}
 
@@ -65,9 +69,33 @@ public class OIREnvironment {
 		
 		OIRType type;
 		
-		type = nameTable.get(name);
-		if (type == null)
-			return parent.lookup(name);
+		type = typeTable.get(name);
+		if (type == null) {
+      if (parent == null)
+          throw new RuntimeException("OIREnvironment looking up type \"" + name + "\", parent is null");
+			return parent.lookupType(name);
+    }
 		return type;
 	}
+
+  public String prettyPrint() {
+    StringBuilder builder = new StringBuilder();
+    doPrettyPrint(builder, "");
+    return builder.toString();
+  }
+
+  private void doPrettyPrint(StringBuilder builder, String indent) {
+    builder.append(indent + "OIREnvironment " + this + ":\n");
+    builder.append(indent + "nameTable:\n");
+    for (String name : nameTable.keySet()) {
+      builder.append(indent + "  " + name + "\n");
+    }
+    builder.append(indent + "typeTable:\n");
+    for (String name : typeTable.keySet()) {
+      builder.append(indent + "  " + name + "\n");
+    }
+    for (OIREnvironment child : children) {
+      child.doPrettyPrint(builder, indent + "  ");
+    }
+  }
 }

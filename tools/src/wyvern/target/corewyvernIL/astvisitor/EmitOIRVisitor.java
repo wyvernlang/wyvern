@@ -254,6 +254,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		toReplace = let.getToReplace();
 		oirToReplace = (OIRExpression)toReplace.acceptVisitor(this, 
 				env, oirenv);
+		// System.out.println("DEBUG: Adding variable " + let.getVarName() + " to oirenv");
 		oirenv.addName(let.getVarName(), oirToReplace.typeCheck(oirenv));
 		inExpr = let.getInExpr();
 		oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, env, oirenv);

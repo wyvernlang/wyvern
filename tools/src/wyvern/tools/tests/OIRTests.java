@@ -1,5 +1,6 @@
 package wyvern.tools.tests;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,12 +54,27 @@ public class OIRTests {
     }
 
     private void printPyFromInput(String input) throws ParseException {
+        printPyFromInput(input, false);
+    }
+
+    private void printPyFromInput(String input, boolean debug) throws ParseException {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
         Expression ILprogram = ast.generateIL(GenContext.empty().extend("system", new Variable("system"), null), null);
+        if (debug) {
+            try {
+                System.out.println("IL program:\n" + ILprogram.prettyPrint());
+            } catch (IOException e) {
+                System.err.println("Error pretty-printing IL program.");
+            }
+        }
         OIRAST oirast =
             ILprogram.acceptVisitor(new EmitOIRVisitor(),
                                     null,
                                     OIREnvironment.getRootEnvironment());
+        if (debug) {
+          System.out.println("OIR Root Environment:");
+          System.out.println(OIREnvironment.getRootEnvironment().prettyPrint());
+        }
         String pprint =
             new PrettyPrintVisitor().prettyPrint(oirast,
                                                  OIREnvironment.getRootEnvironment());
@@ -146,6 +162,6 @@ public class OIRTests {
             "    v = 10\n" +
             "    v\n" +
             "foo()\n";
-        printPyFromInput(input);
+        printPyFromInput(input, true);
     }
 }

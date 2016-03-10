@@ -23,6 +23,7 @@ public class OIRMethodCall extends OIRExpression{
 			if (oirType == null)
 			{
 				/* TODO: Error */
+				throw new RuntimeException("Error - no type for member " + methodName + " found.");
 			}
 			setExprType (oirType);
 			return getExprType ();

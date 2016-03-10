@@ -116,7 +116,7 @@ public class OIRClassDeclaration extends OIRType {
 			}
 			else if (memDecls instanceof OIRMethod)
 			{
-				if (((OIRMethod)memDecls).getDeclaration().getName() == fieldName)
+				if (((OIRMethod)memDecls).getDeclaration().getName().equals(fieldName))
 					return ((OIRMethod)memDecls).getDeclaration().getReturnType();
 			}
 		}

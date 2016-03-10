@@ -72,9 +72,14 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         }
 
         String classDefs = "";
-        for (String className : classesUsed) {
-            OIRType type = oirenv.lookup(className);
-            classDefs += type.acceptVisitor(this, state) + "\n";
+        HashSet<String> oldClassesUsed = null;
+        while (!classesUsed.equals(oldClassesUsed)) {
+            oldClassesUsed = new HashSet<String>(classesUsed);
+            for (String className : classesUsed) {
+                System.out.println("Codegen for class " + className);
+                OIRType type = oirenv.lookupType(className);
+                classDefs += type.acceptVisitor(this, state) + "\n";
+            }
         }
 
         return classDefs + out.toString();
@@ -202,6 +207,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         String args = commaSeparatedExpressions(state,
                                                 oirNew.getArgs());
         state.expectingReturn = oldExpectingReturn;
+        System.out.println("Adding class " + oirNew.getTypeName() + " to classesUsed");
         classesUsed.add(oirNew.getTypeName());
         return oirNew.getTypeName() + "(" + args + ")";
     }
