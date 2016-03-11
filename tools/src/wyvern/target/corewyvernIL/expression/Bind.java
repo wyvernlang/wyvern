@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -12,6 +13,10 @@ import wyvern.target.oir.OIREnvironment;
 
 public class Bind extends Expression {
 
+	private String varName;
+	private Expression toReplace;
+	private Expression inExpr;
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		String newIndent = indent + "    ";
@@ -22,10 +27,6 @@ public class Bind extends Expression {
 		inExpr.doPrettyPrint(dest,indent);
 	}
 
-	private String varName;
-	private Expression toReplace;
-	private Expression inExpr;
-	
 	public Bind(String varName, Expression toReplace, Expression inExpr) {
 		super();
 		this.varName = varName;
@@ -38,15 +39,15 @@ public class Bind extends Expression {
 	public String getVarName() {
 		return varName;
 	}
-	
+
 	public Expression getToReplace() {
 		return toReplace;
 	}
-	
+
 	public Expression getInExpr() {
 		return inExpr;
 	}
-	
+
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType t = toReplace.typeCheck(ctx);
@@ -65,5 +66,10 @@ public class Bind extends Expression {
 		// TODO: not sure this implementation is quite right
 		Value v = toReplace.interpret(ctx);
 		return inExpr.interpret(ctx.extend(varName, v));
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return toReplace.getFreeVariables();
 	}
 }

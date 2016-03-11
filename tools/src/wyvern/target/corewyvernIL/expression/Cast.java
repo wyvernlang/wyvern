@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.Set;
+
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -10,7 +12,7 @@ public class Cast extends Expression{
 
 	private Expression toCastExpr;
 
-	
+
 	public Cast(Expression toCastExpr, ValueType exprType) {
 		super(exprType);
 		this.toCastExpr = toCastExpr;
@@ -36,5 +38,10 @@ public class Cast extends Expression{
 	public Value interpret(EvalContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return toCastExpr.getFreeVariables();
 	}
 }

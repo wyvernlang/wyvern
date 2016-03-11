@@ -1,7 +1,9 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -14,7 +16,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 	// FObject is part of a non-Wyvern-specific Java interop library
 	// e.g. it could be re-used by Plaid or some future language design
 	private FObject foreignObject;
-	
+
 	public JavaValue(FObject foreignObject, ValueType exprType) {
 		super(exprType);
 		this.foreignObject = foreignObject;
@@ -73,6 +75,11 @@ public class JavaValue extends AbstractValue implements Invokable {
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		return this.getExprType();
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return new HashSet<>();
 	}
 
 }

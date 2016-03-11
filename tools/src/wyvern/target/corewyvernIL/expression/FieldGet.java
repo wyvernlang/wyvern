@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -20,7 +22,7 @@ public class FieldGet extends Expression implements Path {
 
 	private IExpr objectExpr;
 	private String fieldName;
-	
+
 	public FieldGet(IExpr objectExpr, String fieldName) {
 		super();
 		this.objectExpr = objectExpr;
@@ -36,11 +38,11 @@ public class FieldGet extends Expression implements Path {
 	public IExpr getObjectExpr() {
 		return objectExpr;
 	}
-	
+
 	public String getName() {
 		return fieldName;
 	}
-	
+
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType vt = objectExpr.typeCheck(ctx);
@@ -73,5 +75,10 @@ public class FieldGet extends Expression implements Path {
 		if (!(objectExpr instanceof Path))
 			throw new RuntimeException("tried to adapt something that's not a path or type");
 		return new FieldGet((Expression)((Path)objectExpr).adapt(v), fieldName);
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		return objectExpr.getFreeVariables();
 	}
 }
