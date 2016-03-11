@@ -142,6 +142,7 @@ public class New extends Expression {
 		for (Declaration decl : decls) {
 			freeVars.addAll(decl.getFreeVariables());
 		}
+		freeVars.remove(selfName);
 		return freeVars;
 	}
 }

@@ -62,10 +62,11 @@ public class Match extends Expression {
 			freeVars.addAll(c.getBody().getFreeVariables());
 			freeVars.remove(c.getVarName());
 			
+			// TODO: fix when Match is implemented
 			// Add variable at the root of the path of the NominalType
 			// Look up that variable to get the tag to do the tag check.
 			// Path p = c.getPattern().getPath();
-			// if p returns y.f.x, the variable at the root of the path = y?
+			// if p returns y.f.x, the variable at the root of the path = y
 			
 		}
 		freeVars.addAll(elseExpr.getFreeVariables());

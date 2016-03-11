@@ -71,11 +71,10 @@ public class Let extends Expression {
 		
 		// Get free variables in the sub-expressions.
 		Set<String> freeVars = inExpr.getFreeVariables();
+		// Remove the name that just became bound.
 		freeVars.remove(varName);
 		freeVars.addAll(toReplace.getFreeVariables());
 		
-		// Remove the name that just became bound.
-		freeVars.remove(varName);
 		return freeVars;
 	}
 }
