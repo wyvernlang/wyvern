@@ -25,7 +25,7 @@ public class ObjectValue extends New implements Invokable {
 		evalCtx = ctx.extend(selfName, this);
 		hasDelegate = delegateDecl != null ? true : false; 
 		if (hasDelegate) {
-			delegateTarget = (ObjectValue)ctx.lookup(delegateDecl.getFieldName());
+			delegateTarget = (ObjectValue)ctx.lookupValue(delegateDecl.getFieldName());
 		}
 	}
 

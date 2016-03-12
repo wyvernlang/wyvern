@@ -26,11 +26,11 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public ValueType lookup(String varName) {
+	public ValueType lookupType(String varName) {
 		if (varName.equals(var))
 			return type;
 		else
-			return getNext().lookup(varName);
+			return getNext().lookupType(varName);
 	}
 	
 	@Override

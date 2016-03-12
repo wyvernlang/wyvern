@@ -14,11 +14,11 @@ public class VarBindingContext extends TypeContext {
 	}
 
 	@Override
-	public ValueType lookup(String varName) {
+	public ValueType lookupType(String varName) {
 		if (varName.equals(this.varName)) {
 			return type;
 		} else {
-			return previous.lookup(varName);
+			return previous.lookupType(varName);
 		}
 	}
 

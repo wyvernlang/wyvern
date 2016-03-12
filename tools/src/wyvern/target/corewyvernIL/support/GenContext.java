@@ -78,7 +78,7 @@ public abstract class GenContext extends TypeContext {
 	 * Internal recursive version.
 	 * 
 	 * @param varName the method name
-	 * @param origCtx the original context the lookup was performed in
+	 * @param origCtx the original context the lookupValue was performed in
 	 * @return the CallableExprGenerator
 	 */
 	abstract CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx);

@@ -330,7 +330,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		for(Declaration d : reqSeq.getDeclIterator()) {
 			ImportDeclaration req = (ImportDeclaration) d;
 			String name = req.getUri().getSchemeSpecificPart();
-			wyvern.target.corewyvernIL.type.ValueType type = ctx.lookup(name);
+			wyvern.target.corewyvernIL.type.ValueType type = ctx.lookupType(name);
 			types.add(new FormalArg(req.getAsName(), type));
 		}
 		return types;

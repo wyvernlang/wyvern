@@ -94,7 +94,7 @@ public class New extends Expression {
 
 		ValueType type = getExprType();
 		if (hasDelegate) {
-			ValueType delegateObjectType = ctx.lookup(delegateDeclaration.getFieldName());
+			ValueType delegateObjectType = ctx.lookupType(delegateDeclaration.getFieldName());
 			StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
 			// new defined declaration will override delegate object's method definition if they had subType relationship
 			for (DeclType declType : delegateStructuralType.getDeclTypes()) {

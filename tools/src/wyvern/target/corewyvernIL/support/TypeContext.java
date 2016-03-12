@@ -7,7 +7,7 @@ public abstract class TypeContext {
 		return new VarBindingContext(var, type, this);
 	}
 	
-	public abstract ValueType lookup(String varName);
+	public abstract ValueType lookupType(String varName);
 	
 	public boolean isPresent(String varName) {
 		if (getNext() == null)
