@@ -78,6 +78,23 @@ public class OIREnvironment {
 		return type;
 	}
 
+  // TODO: Is this a reasonable approach to finding class declarations?
+  public OIRType topDownLookupType(String name) {
+    if (name == null)
+      return null;
+
+    OIRType type = typeTable.get(name);
+
+    if (type == null) {
+      for (OIREnvironment child : children) {
+        type = child.topDownLookupType(name);
+        if (type != null)
+          return type;
+      }
+    }
+    return type;
+  }
+
   public String prettyPrint() {
     StringBuilder builder = new StringBuilder();
     doPrettyPrint(builder, "");
