@@ -78,10 +78,12 @@ public class MethodCall extends Expression {
 		for (int i = 0; i < args.size(); ++i) {
 			Expression e = args.get(i);
 			ValueType argType = ddt.getFormalArgs().get(i).getType().adapt(v);
-			ValueType actualType = e.typeCheck(ctx);
+			String name = ddt.getFormalArgs().get(i).getName();
+			ValueType actualType = e.typeCheck(ctx); 
 			if (!actualType.isSubtypeOf(argType, ctx)) {
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
             }
+			ctx = ctx.extend(name, argType);
 		}
 		// compute result type
 		this.setExprType(ddt.getResultType(v));
