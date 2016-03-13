@@ -10,8 +10,7 @@ public abstract class EvalContext extends TypeContext {
 
 	@Override
 	public ValueType lookupType(String varName) {
-		// TODO: return appropriate ValueType
-		throw new RuntimeException("Cannot look up type from EvalContext.");
+		return lookupValue(varName).getType();
 	}
 
 	public abstract Value lookupValue(String varName);

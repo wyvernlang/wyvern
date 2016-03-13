@@ -73,5 +73,9 @@ public class StringLiteral extends Literal {
 		return new HashSet<>();
 	}
 
-	
+
+	@Override
+	public ValueType getType() {
+		return Util.stringType();
+	}
 }

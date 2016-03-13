@@ -82,4 +82,8 @@ public class JavaValue extends AbstractValue implements Invokable {
 		return new HashSet<>();
 	}
 
+	@Override
+	public ValueType getType() {
+		return this.getExprType();
+	}
 }
