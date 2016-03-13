@@ -7,6 +7,7 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
@@ -30,8 +31,7 @@ public class BooleanLiteral extends AbstractValue {
 
     @Override
     public ValueType typeCheck(TypeContext env) {
-        // TODO Auto-generated method stub
-        return null;
+        return Util.booleanType();
     }
 
 	@Override
@@ -45,6 +45,10 @@ public class BooleanLiteral extends AbstractValue {
 	public Set<String> getFreeVariables() {
 		return new HashSet<>();
 	}
-	
+
+	@Override
+	public ValueType getType() {
+		return Util.booleanType();
+	}
 }
 

@@ -52,4 +52,9 @@ public class RationalLiteral extends AbstractValue {
 		return new HashSet<>();
 	}
 
+	@Override
+	public ValueType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

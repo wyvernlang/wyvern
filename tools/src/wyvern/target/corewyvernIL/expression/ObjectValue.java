@@ -70,5 +70,9 @@ public class ObjectValue extends New implements Invokable {
 		}
 		throw new RuntimeException("cannot set decl " + decl.getName());
 	}
-	
+
+	@Override
+	public ValueType getType() {
+		return getExprType();
+	}
 }
