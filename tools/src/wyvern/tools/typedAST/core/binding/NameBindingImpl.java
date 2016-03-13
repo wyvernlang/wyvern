@@ -20,7 +20,7 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 	public Value getValue(EvaluationEnvironment env) {
 		// TODO: code smell, leaving in to make sure I don't need it.  Refactor to move down to ValueBinding and eliminate env parameter
 		throw new RuntimeException("deprecated - to be removed");
-		/*NameBinding bind = env.lookup(getName());
+		/*NameBinding bind = env.lookupValue(getName());
 		assert bind instanceof ValueBinding;
 		return ((ValueBinding)bind).getValue(env);*/
 	}

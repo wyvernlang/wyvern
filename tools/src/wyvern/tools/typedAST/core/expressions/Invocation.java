@@ -95,7 +95,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 			if (w.getName().equals("w")) {
 				System.out.println("Examining w more closely.");
 				System.out.println(((MetadataWrapper) w.getType()).getInner());
-				System.out.println(env.lookup(w.getName()).getType());
+				System.out.println(env.lookupValue(w.getName()).getType());
 			}
 		}
 		*/

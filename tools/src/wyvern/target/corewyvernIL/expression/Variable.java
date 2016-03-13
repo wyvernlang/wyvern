@@ -57,7 +57,7 @@ public class Variable extends Expression implements Path {
 
 	@Override
 	public ValueType typeCheck(TypeContext env) {
-		return env.lookup(name);
+		return env.lookupType(name);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class Variable extends Expression implements Path {
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		Value exp =  ctx.lookup(name);
+		Value exp =  ctx.lookupValue(name);
 		return exp;
 	}
 

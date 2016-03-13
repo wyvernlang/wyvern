@@ -63,6 +63,10 @@ public class IntegerLiteral extends AbstractValue {
 	public Set<String> getFreeVariables() {
 		return new HashSet<>();
 	}
-	
 
+
+	@Override
+	public ValueType getType() {
+		return Util.intType();
+	}
 }

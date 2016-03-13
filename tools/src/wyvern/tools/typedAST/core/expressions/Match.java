@@ -100,7 +100,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 
 		if (matchingOver instanceof Variable) {
 			Variable w = (Variable) matchingOver;
-			//ClassType wType = (ClassType) env.lookup(w.getName()).getType();
+			//ClassType wType = (ClassType) env.lookupValue(w.getName()).getType();
 			// System.out.println("wType = " + wType);
 			// System.out.println("looked up = " + TaggedInfo.lookupTagByType(wType));
 			// System.out.println("but mot = " + matchingOverTag);
@@ -114,11 +114,11 @@ public class Match extends CachingTypedAST implements CoreAST {
 		System.out.println("v.getType() = " + v.getType());
 		System.out.println("v.getName() = " + v.getName());
 		System.out.println(env);
-		System.out.println(env.lookup(v.getName()));
+		System.out.println(env.lookupValue(v.getName()));
 
 		System.out.println("mo = " + mo + " and its class is " + mo.getClass());
-		System.out.println(env.lookup(v.getName()).getUse());
-		System.out.println(env.lookup(v.getName()).getValue(env));
+		System.out.println(env.lookupValue(v.getName()).getUse());
+		System.out.println(env.lookupValue(v.getName()).getValue(env));
 
 		TypeType ttmo = (TypeType) mo;
 		System.out.println("ttmo.getName() is declared but not actual type = " + ttmo.getName());
@@ -455,7 +455,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 			// System.out.println(tagName);
 
 			//check type exists
-			// TypeBinding type = env.lookupType(tagName.toString()); // FIXME:
+			// TypeBinding type = env.lookupValue(tagName.toString()); // FIXME:
 
 			// if (type == null) {
 			//	ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, this, tagName.toString());

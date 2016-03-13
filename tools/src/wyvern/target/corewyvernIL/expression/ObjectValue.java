@@ -25,7 +25,7 @@ public class ObjectValue extends New implements Invokable {
 		evalCtx = ctx.extend(selfName, this);
 		hasDelegate = delegateDecl != null ? true : false; 
 		if (hasDelegate) {
-			delegateTarget = (ObjectValue)ctx.lookup(delegateDecl.getFieldName());
+			delegateTarget = (ObjectValue)ctx.lookupValue(delegateDecl.getFieldName());
 		}
 	}
 
@@ -70,5 +70,9 @@ public class ObjectValue extends New implements Invokable {
 		}
 		throw new RuntimeException("cannot set decl " + decl.getName());
 	}
-	
+
+	@Override
+	public ValueType getType() {
+		return getExprType();
+	}
 }
