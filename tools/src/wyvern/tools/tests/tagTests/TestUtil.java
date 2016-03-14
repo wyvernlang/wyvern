@@ -98,6 +98,7 @@ public class TestUtil {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), getSystemType());
 		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		genCtx = new TypeGenContext("String", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}

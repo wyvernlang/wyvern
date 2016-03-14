@@ -1,0 +1,11 @@
+module Lists
+
+type Any
+
+type Option
+
+type List
+	val contents : Any
+	val next : Option
+
+

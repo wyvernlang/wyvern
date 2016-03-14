@@ -1,0 +1,63 @@
+module wyvern_reflect_base
+// resource module main
+
+import java:wyvern.tools.tests.ReflectionTests.mirror
+
+type Any
+
+type List
+	val contents : Any
+
+/**
+* Mirror to reflect an object at run time.
+*/
+type Object
+    def equals(object:Object) : system.Int
+    // def invoke (m:Method, args:List) : Object
+    // def set(f:Field, value:Object) : Unit
+    // def typeOf() : Type
+
+/**
+* Reflects the static type.
+*/
+type Type
+    def equals(typ:Type) : Boolean
+    def fields() : List
+    def fieldByName(name:String) : Field
+    def methodByName(name:String) : Method
+    def methods() : List
+    def name() : String
+
+/**
+* Mirror to reflect the compile time attributes of a method.
+*/
+type Method
+    def arguments() : List
+    def equals(method:Method) : Unit // Boolean
+    def name() : String
+    def returnType() : Type
+
+/**
+* Mirror to reflect the static attributes of a variable.
+*/
+type Variable
+    def equals(variable:Variable) : Unit // Boolean
+    def name() : String
+    def typeOf() : Type
+
+/**
+* Mirror to reflect the static attributes of a field. Fields are
+* distinct from variables in that they are declared with object scope.
+*/
+type Field
+    def equals(field:Field) : Unit // Boolean
+    def name() : String
+    def typeOf() : Type
+
+// TODO: migrate to another module
+def reflect(object1:Any) : Object = new
+    val original : Any = object1
+    def equals(object2:Object) : system.Int = mirror.equals(object1, object2)
+    // def invoke(m:Method, args:List) : Object = reflect(mirror.invoke(object1, "methodName", args))
+
+// def typeReflect[T]() : Type
