@@ -1,5 +1,7 @@
 package wyvern.tools.reflection;
 
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -16,12 +18,28 @@ import java.util.List;
 public class Mirror {
 
     public int equals(ObjectValue o1, ObjectValue o2) {
-        // o1.typeCheck(evalContext);
+        EvalContext evalCtx = o1.getEvalCtx();
+        // o2 is an ObjectMirror
         Value obj = o2.getField("original");
-        Value res = null;
+        if (!o1.getType().equalsInContext(obj.getType(), evalCtx)) {
+            return 0;
+        }
         if (obj instanceof ObjectValue) {
-            // compare obj and o1
-            // ((ObjectValue) obj).typeCheck(evalContext);
+            List<Declaration> objDecls = ((ObjectValue) obj).getDecls();
+            for (Declaration decl : objDecls) {
+                if (decl instanceof DeclarationWithRHS) {
+                    Declaration o1Decl = o1.findDecl(decl.getName());
+                    if (o1Decl == null || !(o1Decl instanceof DeclarationWithRHS)) {
+                        return 0;
+                    }
+                    Value declVal = ((DeclarationWithRHS) decl)
+                            .getDefinition().interpret(evalCtx);
+                    Value o1DeclVal = ((DeclarationWithRHS) o1Decl)
+                            .getDefinition().interpret(evalCtx);
+                    // TODO: compare RHS of decls
+                    // if ()
+                }
+            }
         }
         return 1;
     }
@@ -34,8 +52,7 @@ public class Mirror {
         return;
     }
 
-    // TODO: change to EvalContext
-    public ValueType type(ObjectValue o, TypeContext evalContext) {
-        return o.typeCheck(evalContext);
+    public ValueType type(ObjectValue o) {
+        return o.getType();
     }
 }

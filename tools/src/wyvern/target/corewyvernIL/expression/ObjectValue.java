@@ -75,4 +75,8 @@ public class ObjectValue extends New implements Invokable {
 	public ValueType getType() {
 		return getExprType();
 	}
+
+	public EvalContext getEvalCtx() {
+		return this.evalCtx;
+	}
 }

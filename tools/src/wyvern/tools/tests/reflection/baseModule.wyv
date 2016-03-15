@@ -1,6 +1,4 @@
-// rename module when module system works
-// module wyvern_reflect_base
-resource module main
+module wyvern_reflect_base
 
 import java:wyvern.tools.tests.ReflectionTests.mirror
 
