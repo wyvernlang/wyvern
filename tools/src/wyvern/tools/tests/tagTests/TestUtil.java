@@ -13,13 +13,18 @@ import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -109,6 +114,15 @@ public class TestUtil {
 		declTypes.add(new AbstractTypeMember("Unit"));
 		ValueType systemType = new StructuralType("this", declTypes);
 		return systemType;
+	}
+	
+	private static ObjectValue getSystemValue() {
+		// construct a type for the system object
+		List<Declaration> decls = new LinkedList<Declaration>();
+		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int")));
+		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit")));
+		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, EvalContext.empty());
+		return systemVal;
 	}
 	
 	public static TypeContext getStandardTypeContext() {
