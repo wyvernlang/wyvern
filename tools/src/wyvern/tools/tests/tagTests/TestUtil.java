@@ -125,6 +125,12 @@ public class TestUtil {
 		return systemVal;
 	}
 	
+	public static EvalContext getStandardEvalContext() {
+		EvalContext ctx = EvalContext.empty();
+    	ctx = ctx.extend("system", getSystemValue());
+		return ctx;
+	}
+	
 	public static TypeContext getStandardTypeContext() {
     	GenContext ctx = GenContext.empty();
     	ctx = ctx.extend("system", new Variable("system"), getSystemType());
