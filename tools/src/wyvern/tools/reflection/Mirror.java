@@ -2,9 +2,7 @@ package wyvern.tools.reflection;
 
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
-import wyvern.target.corewyvernIL.expression.Invokable;
-import wyvern.target.corewyvernIL.expression.ObjectValue;
-import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -16,6 +14,20 @@ import java.util.List;
  * Created by ewang on 2/16/16.
  */
 public class Mirror {
+
+    private boolean valueEquals(Value v1, Value v2) {
+        // TODO: JavaValue, RationalLiteral, StringLiteral
+        if (v1 instanceof BooleanLiteral && v2 instanceof BooleanLiteral) {
+            return ((BooleanLiteral) v1).getValue() == ((BooleanLiteral) v2).getValue();
+        }
+        if (v1 instanceof IntegerLiteral && v2 instanceof IntegerLiteral) {
+            return ((IntegerLiteral) v1).getValue() == ((IntegerLiteral) v2).getValue();
+        }
+        if (v1 instanceof ObjectValue && v2 instanceof ObjectValue) {
+            return (1 == equals((ObjectValue) v1, (ObjectValue) v2));
+        }
+        return false;
+    }
 
     public int equals(ObjectValue o1, ObjectValue o2) {
         EvalContext evalCtx = o1.getEvalCtx();
@@ -37,7 +49,9 @@ public class Mirror {
                     Value o1DeclVal = ((DeclarationWithRHS) o1Decl)
                             .getDefinition().interpret(evalCtx);
                     // TODO: compare RHS of decls
-                    // if ()
+                    if (!valueEquals(declVal, o1DeclVal)) {
+                        return 0;
+                    }
                 }
             }
         }

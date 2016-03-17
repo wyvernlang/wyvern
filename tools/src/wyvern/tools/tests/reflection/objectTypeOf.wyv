@@ -14,7 +14,7 @@ type Object
     def equals(object:Object) : Int
     // def invoke (m:Method, args:List) : Object
     // def set(f:Field, value:Object) : Unit
-    // def typeOf() : Type
+    def typeOf() : Type
 
 /**
 * Reflects the static type.
@@ -53,11 +53,20 @@ type Field
     def name() : String
     def typeOf() : Type
 
-// TODO: migrate to another module
-def reflect(object1:Any) : Object = new
+def createType(object:Any) = new
+    val original : Any = object
+    def equals(typ:Type) : Boolean = mirror.equalTypes(object, typ)
+    // def fields() : List
+    // def fieldByName(name:String) : Field
+    // def methodByName(name:String) : Method
+    // def methods() : List
+    def name() : String = mirror.typeName(object)
+
+def reflect(object:Any) : Object = new
     val original : Any = object1
-    def equals(object2:Object) : Int = mirror.equals(object1, object2)
-    // def invoke(m:Method, args:List) : Object = reflect(mirror.invoke(object1, "methodName", args))
+    def equals(object2:Object) : Int = mirror.equals(object, object2)
+    // def invoke(m:Method, args:List) : Object = reflect(mirror.invoke(object, "methodName", args))
+    def typeOf() : Type = createType(object1)
 
 // def typeReflect[T]() : Type
 type IntObj
@@ -69,24 +78,10 @@ type StringObj
 val intObj : IntObj = new
     val contents = 47
 
-val intObj2 : IntObj = new
-    val contents = 48
-
-/* val intObj3 : IntObj = new
-    val contents = 48-1 */
-
 val stringObj : StringObj = new
     val contents = "reflection in wyvern!"
 
-// Test objects with different types aren't equal
 val intMirror : Object = reflect(intObj)
 val stringMirror : Object = reflect(stringObj)
-val typeNotEqual : Int = intMirror.equals(stringMirror)
+val x : Int = intMirror.equals(stringMirror)
 
-// Test that objects with the same type and different values aren't equal
-val intMirror2 : Object = reflect(intObj2)
-val valsNotEqual : Int = intMirror2.equals(intMirror)
-
-// Test that objects with the same type and same values are equal
-// val intMirror3 : Object = reflect(intObj3)
-// val valsEqual : Int = intMirror3.equals(intMirror)

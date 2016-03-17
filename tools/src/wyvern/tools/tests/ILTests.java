@@ -895,7 +895,32 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	
+
+	@Test
+	public void testJavaImport3() throws ParseException {
+		String input = "resource module main\n\n"
+//					 + "require ffi/java\n\n"
+//					 + "import testcode/Adder\n\n"
+//					 + "type Adder\n"
+//					 + "    def addOne(i:system.Int):system.Int\n\n"
+				+ "import java:wyvern.tools.tests.ILTests.importTest\n\n"
+				+ "val x : Int = importTest.addOne(4)\n"
+				+ "val y : Int = 1 + 1\n"
+				;
+		TypedAST ast = TestUtil.getNewAST(input);
+		// bogus "system" entry, but makes the text work for now
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
+		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+		decls.add(decl);
+		Expression mainProgram = GenUtil.genExp(decls, genCtx);
+		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky
+		ValueType t = program.typeCheck(ctx);
+		Value v = program.interpret(EvalContext.empty());
+	}
+
 	@Test
 	public void testBigInt() throws ParseException {
         String source = TestUtil.readFile(PATH + "bigint.wyv");
