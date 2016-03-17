@@ -28,10 +28,10 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
-public class ECOOP16 {
+public class OOPSLA16 {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "ecoop16/";
+	private static final String PATH = BASE_PATH + "oopsla16/";
 	
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();
