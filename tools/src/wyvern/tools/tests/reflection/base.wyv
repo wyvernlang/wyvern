@@ -1,4 +1,3 @@
-// rename module when module system works
 // module wyvern_reflect_base
 resource module main
 
@@ -55,10 +54,9 @@ type Field
     def name() : String
     def typeOf() : Type
 
-// TODO: migrate to another module
+// TODO: migrate to another module?
 def reflect(object1:Any) : Object = new
     val original : Any = object1
     def equals(object2:Object) : Int = mirror.equals(object1, object2)
-    // def invoke(m:Method, args:List) : Object = reflect(mirror.invoke(object1, "methodName", args))
 
 // def typeReflect[T]() : Type
