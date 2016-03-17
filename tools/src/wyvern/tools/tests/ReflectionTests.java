@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.reflection.Mirror;
+import wyvern.tools.tests.reflection.TestTools;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ReflectionTests {
 
     public static Mirror mirror = new Mirror();
+    public static TestTools tools = new TestTools();
     private static final String BASE_PATH = TestUtil.BASE_PATH;
     private static final String PATH = BASE_PATH + "reflection/";
 
@@ -51,27 +53,9 @@ public class ReflectionTests {
     }
 
     @Test
-    public void testObjectEquals() throws ParseException {
-        String input = TestUtil.readFile(PATH + "objectEquals.wyv");
-        TypedAST ast = TestUtil.getNewAST(input);
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        genCtx = new TypeGenContext("Boolean", "system", genCtx);
-        TypeContext ctx = TestUtil.getStandardTypeContext();
-        wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-        genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-        List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-        decls.add(decl);
-        Expression mainProgram = GenUtil.genExp(decls, genCtx);
-        mainProgram.typeCheck(ctx);
-        wyvern.target.corewyvernIL.expression.Value v = mainProgram.interpret(TestUtil.getStandardEvalContext());
-        IntegerLiteral zero = new IntegerLiteral(0);
-        // Assert.assertEquals(zero, v);
-    }
-
-    @Test
     @Category(CurrentlyBroken.class)
-    public void testObjectEqualsModule() throws ParseException {
-        String [] fileList = {"baseModule.wyv", "objectEqualsModule.wyv"};
+    public void testObjectEquals() throws ParseException {
+        String [] fileList = {"baseModule.wyv", "objectEquals.wyv"};
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
         GenContext genCtx = TestUtil.getStandardGenContext();
         genCtx = new TypeGenContext("Boolean", "system", genCtx);
@@ -85,11 +69,10 @@ public class ReflectionTests {
         }
         Expression mainProgram = GenUtil.genExp(decls, genCtx);
         // after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-        Expression program = new FieldGet(mainProgram, "x");
 
         TypeContext ctx = TestUtil.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx);
-        program.interpret(TestUtil.getStandardEvalContext());
+        mainProgram.typeCheck(ctx);
+        mainProgram.interpret(TestUtil.getStandardEvalContext());
     }
 
     @Test

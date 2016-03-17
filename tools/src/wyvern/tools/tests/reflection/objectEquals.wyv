@@ -1,65 +1,8 @@
 resource module main
 
-import java:wyvern.tools.tests.ReflectionTests.mirror
+import wyvern_reflect_base
+import java:wyvern.tools.tests.ReflectionTests.tools
 
-type Any
-
-type List
-	val contents : Any
-
-/**
-* Mirror to reflect an object at run time.
-*/
-type Object
-    def equals(object:Object) : Int
-    // def invoke (m:Method, args:List) : Object
-    // def set(f:Field, value:Object) : Unit
-    // def typeOf() : Type
-
-/**
-* Reflects the static type.
-*/
-type Type
-    def equals(typ:Type) : Boolean
-    def fields() : List
-    def fieldByName(name:String) : Field
-    def methodByName(name:String) : Method
-    def methods() : List
-    def name() : String
-
-/**
-* Mirror to reflect the compile time attributes of a method.
-*/
-type Method
-    def arguments() : List
-    def equals(method:Method) : Unit // Boolean
-    def name() : String
-    def returnType() : Type
-
-/**
-* Mirror to reflect the static attributes of a variable.
-*/
-type Variable
-    def equals(variable:Variable) : Unit // Boolean
-    def name() : String
-    def typeOf() : Type
-
-/**
-* Mirror to reflect the static attributes of a field. Fields are
-* distinct from variables in that they are declared with object scope.
-*/
-type Field
-    def equals(field:Field) : Unit // Boolean
-    def name() : String
-    def typeOf() : Type
-
-// TODO: migrate to another module
-def reflect(object1:Any) : Object = new
-    val original : Any = object1
-    def equals(object2:Object) : Int = mirror.equals(object1, object2)
-    // def invoke(m:Method, args:List) : Object = reflect(mirror.invoke(object1, "methodName", args))
-
-// def typeReflect[T]() : Type
 type IntObj
 	val contents : Int
 
@@ -72,21 +15,24 @@ val intObj : IntObj = new
 val intObj2 : IntObj = new
     val contents = 48
 
-/* val intObj3 : IntObj = new
-    val contents = 48-1 */
+val intObj3 : IntObj = new
+    val contents = tools.add(46, 1)
 
 val stringObj : StringObj = new
     val contents = "reflection in wyvern!"
 
 // Test objects with different types aren't equal
-val intMirror : Object = reflect(intObj)
-val stringMirror : Object = reflect(stringObj)
+val intMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj)
+val stringMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(stringObj)
 val typeNotEqual : Int = intMirror.equals(stringMirror)
+tools.assertIntEquals(typeNotEqual, 0)
 
 // Test that objects with the same type and different values aren't equal
-val intMirror2 : Object = reflect(intObj2)
+val intMirror2 : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj2)
 val valsNotEqual : Int = intMirror2.equals(intMirror)
+tools.assertIntEquals(valsNotEqual, 0)
 
 // Test that objects with the same type and same values are equal
-// val intMirror3 : Object = reflect(intObj3)
-// val valsEqual : Int = intMirror3.equals(intMirror)
+val intMirror3 : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj3)
+val valsEqual : Int = intMirror3.equals(intMirror)
+tools.assertIntEquals(valsEqual, 1)

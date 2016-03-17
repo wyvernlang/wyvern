@@ -48,7 +48,6 @@ public class Mirror {
                             .getDefinition().interpret(evalCtx);
                     Value o1DeclVal = ((DeclarationWithRHS) o1Decl)
                             .getDefinition().interpret(evalCtx);
-                    // TODO: compare RHS of decls
                     if (!valueEquals(declVal, o1DeclVal)) {
                         return 0;
                     }
