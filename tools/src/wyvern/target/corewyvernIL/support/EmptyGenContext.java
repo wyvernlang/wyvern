@@ -9,7 +9,7 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	public ValueType lookup(String varName) {
+	public ValueType lookupType(String varName) {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}
 

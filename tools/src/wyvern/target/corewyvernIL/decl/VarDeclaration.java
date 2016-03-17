@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -14,7 +16,7 @@ import wyvern.target.oir.OIREnvironment;
 public class VarDeclaration extends DeclarationWithRHS {
 
 	private ValueType type;
-	
+
 	/*@Override
 	public String toString() {
 		return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
@@ -25,7 +27,7 @@ public class VarDeclaration extends DeclarationWithRHS {
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 	}
-	
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("var ").append(getName()).append(':');
@@ -39,7 +41,7 @@ public class VarDeclaration extends DeclarationWithRHS {
 	public ValueType getType() {
 		return type;
 	}
-	
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -50,11 +52,17 @@ public class VarDeclaration extends DeclarationWithRHS {
 	public DeclType getDeclType() {
 		return new VarDeclType(getName(), type);
 	}
-	
+
 	@Override
 	public Declaration interpret(EvalContext ctx) {
 		Expression newValue = (Expression) getDefinition().interpret(ctx);
 		return new VarDeclaration(getName(), type, newValue);
+	}
+
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = new HashSet<>();
+		freeVars.addAll(getDefinition().getFreeVariables());
+		return freeVars;
 	}
 
 }

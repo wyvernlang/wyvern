@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -22,7 +23,7 @@ public class FieldSet extends Expression {
 	private IExpr objectExpr;
 	private String fieldName;
 	private Expression exprToAssign;
-	
+
 	public FieldSet(ValueType exprType, IExpr objectExpr,
 			String fieldName, Expression exprToAssign) {
 		super(exprType);
@@ -34,36 +35,36 @@ public class FieldSet extends Expression {
 	public IExpr getObjectExpr() {
 		return objectExpr;
 	}
-	
+
 	public String getFieldName() {
 		return fieldName;
 	}
-	
+
 	public Expression getExprToAssign() {
 		return exprToAssign;
 	}
-	
+
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		
+
 		// Figure out types of object and expression.
 		ValueType valTypeExpr = exprToAssign.typeCheck(ctx);
 		StructuralType structTypeObj = objectExpr.typeCheck(ctx).getStructuralType(ctx);
-		
+
 		// Figure out the type of the field.
 		DeclType declTypeField = structTypeObj.findDecl(fieldName, ctx);
 		if (!(declTypeField instanceof VarDeclType))
 			ToolError.reportError(ErrorMessage.CANNOT_BE_ASSIGNED, this,
 								  declTypeField.getName());
 		ValueType valTypeField = ((VarDeclType) declTypeField).getResultType(View.from(objectExpr, ctx));
-		
+
 		// Make sure assigned type is compatible with the field's type.
 		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 		return valTypeExpr;
-		
+
 	}
-	
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -81,13 +82,13 @@ public class FieldSet extends Expression {
 		// find the declaration corresponding to the field
 		Declaration decl = object.findDecl(fieldName);
 		if (decl == null)
-			throw new RuntimeException("Runtime error: trying to set the undeclared field " + fieldName);	
+			throw new RuntimeException("Runtime error: trying to set the undeclared field " + fieldName);
 		if (!(decl instanceof wyvern.target.corewyvernIL.decl.VarDeclaration))
 			throw new RuntimeException("Expected assignment to var field in field set.");
 		VarDeclaration varDecl = (VarDeclaration) decl;
 		Value exprInterpreted = exprToAssign.interpret(ctx);
 		VarDeclaration varDeclUpdated = null;
-		
+
 		// Evaluate the expression in the current context. Update the declaration.
 		// VarDeclaration's constructor needs to take an expression, not a value.
 		// TODO: is this an exhaustive case analysis?
@@ -97,12 +98,12 @@ public class FieldSet extends Expression {
 		else {
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 		}
-		
+
 		// Update object's declarations.
 		object.setDecl(varDeclUpdated);
-		return object;
+		return exprInterpreted;
 	}
-	
+
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		objectExpr.doPrettyPrint(dest,indent);
@@ -111,5 +112,11 @@ public class FieldSet extends Expression {
 		exprToAssign.doPrettyPrint(dest,indent);
 	}
 
-	
+	@Override
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = objectExpr.getFreeVariables();
+		freeVars.addAll(exprToAssign.getFreeVariables());
+		return freeVars;
+	}
+
 }

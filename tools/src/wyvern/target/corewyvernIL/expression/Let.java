@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -14,7 +15,7 @@ public class Let extends Expression {
 	private String varName;
 	private Expression toReplace;
 	private Expression inExpr;
-	
+
 	public Let(String varName, Expression toReplace, Expression inExpr) {
 		super();
 		this.varName = varName;
@@ -27,15 +28,15 @@ public class Let extends Expression {
 	public String getVarName() {
 		return varName;
 	}
-	
+
 	public Expression getToReplace() {
 		return toReplace;
 	}
-	
+
 	public Expression getInExpr() {
 		return inExpr;
 	}
-	
+
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType t = toReplace.typeCheck(ctx);
@@ -63,5 +64,17 @@ public class Let extends Expression {
 	public Value interpret(EvalContext ctx) {
 		Value v = toReplace.interpret(ctx);
 		return inExpr.interpret(ctx.extend(varName, v));
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		
+		// Get free variables in the sub-expressions.
+		Set<String> freeVars = inExpr.getFreeVariables();
+		// Remove the name that just became bound.
+		freeVars.remove(varName);
+		freeVars.addAll(toReplace.getFreeVariables());
+		
+		return freeVars;
 	}
 }

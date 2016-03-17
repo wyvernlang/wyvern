@@ -14,11 +14,11 @@ public class VarEvalContext extends EvalContext {
 	}
 
 	@Override
-	public Value lookup(String varName) {
+	public Value lookupValue(String varName) {
 		if (varName.equals(this.varName)) {
 			return v;
 		} else {
-			return previous.lookup(varName);
+			return previous.lookupValue(varName);
 		}
 	}
 
@@ -41,5 +41,10 @@ public class VarEvalContext extends EvalContext {
 	@Override
 	public String endToString() {
 		return varName  + " = " + v + ", " + previous.endToString();
+	}
+
+	@Override
+	protected TypeContext getNext() {
+		return previous;
 	}
 }

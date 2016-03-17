@@ -1,9 +1,11 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.Environment;
@@ -92,7 +94,7 @@ public class New extends Expression {
 
 		ValueType type = getExprType();
 		if (hasDelegate) {
-			ValueType delegateObjectType = ctx.lookup(delegateDeclaration.getFieldName()); 
+			ValueType delegateObjectType = ctx.lookupType(delegateDeclaration.getFieldName());
 			StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
 			// new defined declaration will override delegate object's method definition if they had subType relationship
 			for (DeclType declType : delegateStructuralType.getDeclTypes()) {
@@ -129,5 +131,18 @@ public class New extends Expression {
 
 	private List<Declaration> decls_ExceptDelegate() {
 		return decls.stream().filter(x->x != delegateDeclaration).collect(Collectors.toList());
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		Set<String> freeVars = new HashSet<>();
+		if (hasDelegate) {
+			freeVars.addAll(delegateDeclaration.getFreeVariables());
+		}
+		for (Declaration decl : decls) {
+			freeVars.addAll(decl.getFreeVariables());
+		}
+		freeVars.remove(selfName);
+		return freeVars;
 	}
 }

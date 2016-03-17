@@ -25,8 +25,8 @@ public class MethodGenContext extends GenContext {
 	}
 
 	@Override
-	public ValueType lookup(String varName) {
-		return getNext().lookup(varName);
+	public ValueType lookupType(String varName) {
+		return getNext().lookupType(varName);
 	}
 
 	@Override

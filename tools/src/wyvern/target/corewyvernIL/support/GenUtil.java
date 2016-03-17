@@ -115,7 +115,7 @@ public class GenUtil {
             return Util.stringType();
         }
         
-		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookup(javaTypesObjectName);
+		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupType(javaTypesObjectName);
 		return type.getJavaType(javaClass, ctx);
 	}
 	// out of date

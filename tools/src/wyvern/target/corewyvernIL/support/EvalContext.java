@@ -1,13 +1,19 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.type.ValueType;
 
-public abstract class EvalContext {
+public abstract class EvalContext extends TypeContext {
 	public EvalContext extend(String var, Value v) {
 		return new VarEvalContext(var, v, this);
 	}
-	
-	public abstract Value lookup(String varName);
+
+	@Override
+	public ValueType lookupType(String varName) {
+		return lookupValue(varName).getType();
+	}
+
+	public abstract Value lookupValue(String varName);
 	
 	public abstract EvalContext combine(EvalContext ctx);
 	

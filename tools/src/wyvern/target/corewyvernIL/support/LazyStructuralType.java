@@ -15,6 +15,7 @@ public class LazyStructuralType extends StructuralType {
 
 	private Class<?> javaClass;
 	private TypeContext ctx;
+	private boolean initialized = false;
 
 	public LazyStructuralType(Class<?> javaClass, TypeContext ctx) {
 		super("java_type", new ArrayList<DeclType>());
@@ -23,12 +24,15 @@ public class LazyStructuralType extends StructuralType {
 	}
 
 	public List<DeclType> getDeclTypes() {
-		fillOutType();
+		if (!initialized) {
+			fillOutType();
+			initialized = true;
+		}
 		return super.getDeclTypes();
 	}
 
 	private void fillOutType() {
-		List<DeclType> declTypes = super.getDeclTypes();
+		List<DeclType> newDeclTypes = new ArrayList<DeclType>();
 		// for each method in javaClass, attempt to convert argument types
 		// if we fail, we just leave out that method
 		nextMethod: for (Method m : javaClass.getMethods()) {
@@ -44,10 +48,13 @@ public class LazyStructuralType extends StructuralType {
 					continue nextMethod;
 				argTypes.add(new FormalArg(m.getParameters()[i].getName(), t));
 			}
-			declTypes.add(new DefDeclType(m.getName(), retType, argTypes));
+			newDeclTypes.add(new DefDeclType(m.getName(), retType, argTypes));
 		}
 		
 		// TODO: extend to fields
+		
+		// update declTypes
+		declTypes = newDeclTypes;
 	}
 	
 }

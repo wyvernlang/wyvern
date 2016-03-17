@@ -1,11 +1,12 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
@@ -15,14 +16,14 @@ public class JavaValue extends AbstractValue implements Invokable {
 	// FObject is part of a non-Wyvern-specific Java interop library
 	// e.g. it could be re-used by Plaid or some future language design
 	private FObject foreignObject;
-	
+
 	public JavaValue(FObject foreignObject, ValueType exprType) {
 		super(exprType);
 		this.foreignObject = foreignObject;
 	}
 
 	@Override
-	public Value invoke(String methodName, List<Value> args, EvalContext ctx) {
+	public Value invoke(String methodName, List<Value> args) {
 		List<Object> javaArgs = new LinkedList<Object>();
 		for (Value arg : args) {
 			javaArgs.add(wyvernToJava(arg));
@@ -62,7 +63,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 	}
 
 	@Override
-	public Value getField(String fieldName, EvalContext ctx) {
+	public Value getField(String fieldName) {
 		throw new RuntimeException("getting a Java object's field not implemented yet");
 	}
 
@@ -76,4 +77,13 @@ public class JavaValue extends AbstractValue implements Invokable {
 		return this.getExprType();
 	}
 
+	@Override
+	public Set<String> getFreeVariables() {
+		return new HashSet<>();
+	}
+
+	@Override
+	public ValueType getType() {
+		return this.getExprType();
+	}
 }

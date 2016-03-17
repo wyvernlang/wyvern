@@ -234,7 +234,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public DeclType genILType(GenContext ctx) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
 		for (NameBinding b : argNames) {
-			args.add(new FormalArg(b.getName(), b.getType().getILType(ctx)));
+			String bName = b.getName();
+			ValueType type = b.getType().getILType(ctx);
+			FormalArg fa = new FormalArg(bName, type);
+			args.add(fa);
+			ctx = ctx.extend(bName, new Variable(bName), type);
 		}
 		DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args);
 		return ret;
@@ -254,6 +258,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			ValueType argType = b.getType().getILType(thisContext);
 			args.add(new FormalArg(b.getName(), argType));
 			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
+			thisContext = thisContext.extend(b.getName(), new Variable(b.getName()), argType);
 		}
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;

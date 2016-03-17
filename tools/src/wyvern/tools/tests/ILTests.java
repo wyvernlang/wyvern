@@ -1109,7 +1109,6 @@ public class ILTests {
     }
     
     @Test
-	@Category(CurrentlyBroken.class)
     public void testTypeMemberInFunction() throws ParseException {
 
         String source = ""
@@ -1135,4 +1134,156 @@ public class ILTests {
         ValueType t = program.typeCheck(ctx);
     }
 
+
+    @Test
+    public void testDependentType() throws ParseException {
+
+        String source = ""
+                      + "type IntHolder\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType\n\n"
+
+                      + "def Identity(holder: IntHolder) : holder.heldType\n"
+                      + "    holder.element\n\n"
+
+                      + "val five: IntHolder = new\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType = 5\n\n"
+
+                      + "Identity(five)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+
+        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
+
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+
+    @Test
+    public void testDependentType2() throws ParseException {
+
+        String source = ""
+                      + "type IntHolder\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType\n\n"
+
+                      + "def Identity(holder: IntHolder, passedType: holder.heldType) : holder.heldType\n"
+                      + "    holder.element\n\n"
+
+                      + "val five: IntHolder = new\n"
+                      + "    type heldType = system.Int\n"
+                      + "    val element: this.heldType = 5\n\n"
+
+                      + "Identity(five, 5)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+
+        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
+
+
+        Value v = program.interpret(EvalContext.empty());
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
+
+    @Test
+    public void testIfStatement() throws ParseException {
+
+        String source = ""
+                      + "type Body\n"
+                      + "    type T = system.Int\n"
+                      + "    def apply(): this.T \n\n"
+
+                      + "type Boolean\n"
+                      + "   def iff(thenFn: Body, elseFn: Body) : thenFn.T \n\n"
+
+                      + "val true = new \n"
+                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n\n"
+                      + "        thenFn.apply()\n\n"
+
+                      + "val false = new \n"
+                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n"
+                      + "        elseFn.apply()\n\n"
+
+                      + "def ifSt(bool: Boolean, thenFn: Body, elseFn: Body): thenFn.T \n"
+                      + "    bool.iff(thenFn, elseFn) \n\n"
+
+                      + "val IntegerFive = new \n"
+                      + "   type T = system.Int \n"
+                      + "   def apply(): this.T \n"
+                      + "       5 \n\n"
+
+                      + "val IntegerTen = new \n"
+                      + "   type T = system.Int \n"
+                      + "   def apply(): this.T \n"
+                      + "       10 \n\n"
+
+                      + "ifSt(true, IntegerTen, IntegerFive)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+
+        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
+        Value v = program.interpret(EvalContext.empty());
+
+        IntegerLiteral ten = new IntegerLiteral(10);
+        Assert.assertEquals(ten, v);
+    }
+
+    @Test
+    public void testIfStatement2() throws ParseException {
+
+        String source = ""
+                      + "type Body\n"
+                      + "    type T = system.Int\n"
+                      + "    def apply(): this.T \n\n"
+
+                      + "type Boolean\n"
+                      + "   def iff(thenFn: Body, elseFn: Body) : thenFn.T \n\n"
+
+                      + "val true = new \n"
+                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n\n"
+                      + "        thenFn.apply()\n\n"
+
+                      + "val false = new \n"
+                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n"
+                      + "        elseFn.apply()\n\n"
+
+                      + "def ifSt(bool: Boolean, thenFn: Body, elseFn: Body): thenFn.T \n"
+                      + "    bool.iff(thenFn, elseFn) \n\n"
+
+                      + "val IntegerFive = new \n"
+                      + "   type T = system.Int \n"
+                      + "   def apply(): this.T \n"
+                      + "       5 \n\n"
+
+                      + "val IntegerTen = new \n"
+                      + "   type T = system.Int \n"
+                      + "   def apply(): this.T \n"
+                      + "       10 \n\n"
+
+                      + "ifSt(false, IntegerTen, IntegerFive)";
+
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+
+        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
+        Value v = program.interpret(EvalContext.empty());
+
+        IntegerLiteral five = new IntegerLiteral(5);
+        Assert.assertEquals(five, v);
+    }
 }

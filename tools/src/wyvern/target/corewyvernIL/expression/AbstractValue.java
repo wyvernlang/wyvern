@@ -13,4 +13,5 @@ public abstract class AbstractValue extends Expression implements Value {
 	public Value interpret(EvalContext ctx) {
 		return this;
 	}
+	
 }
