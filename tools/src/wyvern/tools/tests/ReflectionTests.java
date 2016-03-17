@@ -1,13 +1,10 @@
 package wyvern.tools.tests;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.support.*;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.reflection.Mirror;
