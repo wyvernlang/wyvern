@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
@@ -561,4 +562,15 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 	public OIRAST visit(Environment env, OIREnvironment oirenv, Bind bind) {
 		throw new RuntimeException("not implemented");
 	}
+
+  @Override
+  public OIRAST visit(Environment env,
+                      OIREnvironment oirenv,
+                      ConcreteTypeMember concreteTypeMember) {
+    OIRType type = (OIRType)concreteTypeMember.getRawResultType()
+      .acceptVisitor(this, env, oirenv);
+    oirenv.addType(concreteTypeMember.getName(), type);
+
+    return type;
+  }
 }

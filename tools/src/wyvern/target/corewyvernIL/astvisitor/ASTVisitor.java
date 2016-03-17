@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -51,4 +52,5 @@ public abstract class ASTVisitor<T> {
 	public abstract T visit(Environment env, OIREnvironment oirenv, StructuralType structuralType);
 	public abstract T visit(Environment env, OIREnvironment oirenv, StringLiteral stringLiteral);
 	public abstract T visit(Environment env, OIREnvironment oirenv, DelegateDeclaration delegateDecl);
+  public abstract T visit(Environment env, OIREnvironment oirenv, ConcreteTypeMember concreteTypeMember);
 }

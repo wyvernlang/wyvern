@@ -58,11 +58,11 @@ public class OIRTests {
 		WyvernResolver.getInstance().addPath(PATH);
   }
 
-  private void printPyFromInput(String input, String expected) throws ParseException {
-    printPyFromInput(input, expected, false);
+  private void testPyFromInput(String input, String expected) throws ParseException {
+    testPyFromInput(input, expected, false);
   }
 
-  private void printPyFromInput(String input, String expected, boolean debug) throws ParseException {
+  private void testPyFromInput(String input, String expected, boolean debug) throws ParseException {
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
     Expression ILprogram = ast.generateIL(GenContext.empty().extend("system", new Variable("system"), null), null);
     if (debug) {
@@ -127,7 +127,7 @@ public class OIRTests {
     String input =
       "val x = 5\n" +
       "x\n";
-    printPyFromInput(input, "5");
+    testPyFromInput(input, "5");
   }
 
   @Test
@@ -136,7 +136,7 @@ public class OIRTests {
       "val x = 5\n" +
       "val y = 7\n" +
       "x\n";
-    printPyFromInput(input, "5");
+    testPyFromInput(input, "5");
   }
 
   @Test
@@ -144,7 +144,7 @@ public class OIRTests {
     String input =
       "val x = \"five\"\n" +
       "x\n";
-    printPyFromInput(input, "five");
+    testPyFromInput(input, "five");
   }
 
   @Test
@@ -152,7 +152,7 @@ public class OIRTests {
     String input =
       "val identity = (x: system.Int) => x\n" +
       "identity(5)";
-    printPyFromInput(input, "5");
+    testPyFromInput(input, "5");
   }
 
   @Test
@@ -161,7 +161,7 @@ public class OIRTests {
       "val obj = new\n" +
       "    val v = 5\n" +
       "obj.v\n";
-    printPyFromInput(input, "5");
+    testPyFromInput(input, "5");
   }
 
   @Test
@@ -171,7 +171,7 @@ public class OIRTests {
       "    val x = 23\n" +
       "    val y = 64\n" +
       "obj.y\n";
-    printPyFromInput(input, "64");
+    testPyFromInput(input, "64");
   }
 
   @Test
@@ -180,7 +180,7 @@ public class OIRTests {
       "val obj = new\n" +
       "    var v : system.Int = 5\n" +
       "obj.v\n";
-    printPyFromInput(input, "5");
+    testPyFromInput(input, "5");
   }
 
   @Test
@@ -190,7 +190,7 @@ public class OIRTests {
       "    var v : system.Int = 2\n" +
       "obj.v = 23\n" +
       "obj.v\n";
-    printPyFromInput(input, "23");
+    testPyFromInput(input, "23");
   }
 
   @Test
@@ -201,6 +201,97 @@ public class OIRTests {
       "    v = 10\n" +
       "    v\n" +
       "foo()\n";
-    printPyFromInput(input, "10", true);
+    testPyFromInput(input, "10", false);
+  }
+
+  @Test
+  public void testDefWithValInside() throws ParseException {
+    String input =
+      "def foo() : system.Int\n" +
+      "    val v : system.Int = 17\n" +
+      "    v\n" +
+      "foo()\n";
+    testPyFromInput(input, "17");
+  }
+
+  @Test
+  public void testDefDecl() throws ParseException {
+    String input =
+      "val obj = new\n" +
+      "    val v : system.int = 5\n" +
+      "    def m() : system.Int = 5\n" +
+      "obj.v\n";
+    testPyFromInput(input, "5");
+  }
+
+  @Test
+  public void testIdentityCall() throws ParseException {
+    String input =
+      "val obj = new\n" +
+      "    def id(x:system.Int) : system.Int = x\n" +
+      "obj.id(13)\n";
+    testPyFromInput(input, "13");
+  }
+
+  @Test
+  public void testIdentityCallString() throws ParseException {
+    String input =
+      "val obj = new\n" +
+      "    def id(x:system.String) : system.String = x\n" +
+      "obj.id(\"Well met!\")\n";
+    testPyFromInput(input, "Well met!");
+  }
+
+  @Test
+  public void testType() throws ParseException {
+    String input =
+      "type IntResult\n" +
+      "    def getResult() : system.Int\n\n" +
+      "val r : IntResult = new\n" +
+      "    def getResult() : system.Int = 18\n\n" +
+      "r.getResult()\n";
+    testPyFromInput(input, "18");
+  }
+
+  @Test
+  public void testTypeAbbrev() throws ParseException {
+    String input =
+      "type Int = system.Int\n" +
+      "val i : Int = 32\n" +
+      "i\n";
+    testPyFromInput(input, "32");
+  }
+
+  @Test
+  public void testSimpleDelegation() throws ParseException {
+    String input =
+      "type IntResult\n" +
+      "    def getResult() : system.Int\n" +
+      "val r : IntResult = new\n" +
+      "    def getResult() : system.Int = 26" +
+      "val r2 : IntResult = new\n" +
+      "    delegate IntResult to r\n" +
+      "r2.getResult()\n";
+    testPyFromInput(input, "26");
+  }
+
+  @Test
+  public void declareRecursiveFunction() throws ParseException {
+    String input =
+      "val f : system.Int = 3\n" +
+      "def m(y : system.Int) : system.Int = m(y)\n" +
+      "f\n";
+    testPyFromInput(input, "3");
+  }
+
+  @Test
+  public void testScoping() throws ParseException {
+    String input =
+      "def f(x : system.Int) : system.Int\n" +
+      "    val obj = new\n" +
+      "        def const() : system.Int = x\n" +
+      "    obj.const()\n" +
+      "f(7)\n";
+    testPyFromInput(input, "7");
   }
 }
