@@ -4,9 +4,6 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 
 import java.util.List;
 
@@ -55,17 +52,5 @@ public class Mirror {
             }
         }
         return 1;
-    }
-
-    public Value invoke(ObjectValue o, String methodName, List<Value> argList) {
-        return o.invoke(methodName, argList);
-    }
-
-    public void set() {
-        return;
-    }
-
-    public ValueType type(ObjectValue o) {
-        return o.getType();
     }
 }
