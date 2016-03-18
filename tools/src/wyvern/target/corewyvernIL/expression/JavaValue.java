@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +58,8 @@ public class JavaValue extends AbstractValue implements Invokable {
 			return new Integer(((IntegerLiteral)arg).getValue());
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
+		} else if (arg instanceof ObjectValue) {
+			return arg;
 		} else {
 			throw new RuntimeException("some Wyvern->Java cases not implemented");
 		}

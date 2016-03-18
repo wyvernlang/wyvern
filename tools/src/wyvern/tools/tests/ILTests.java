@@ -895,7 +895,7 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
-	
+
 	@Test
 	public void testBigInt() throws ParseException {
         String source = TestUtil.readFile(PATH + "bigint.wyv");

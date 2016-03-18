@@ -1,0 +1,38 @@
+resource module main
+
+import wyvern_reflect_base
+import java:wyvern.tools.tests.ReflectionTests.tools
+
+type IntObj
+	val contents : Int
+
+type StringObj
+    val contents : String
+
+val intObj : IntObj = new
+    val contents = 47
+
+val intObj2 : IntObj = new
+    val contents = 48
+
+val intObj3 : IntObj = new
+    val contents = tools.add(46, 1)
+
+val stringObj : StringObj = new
+    val contents = "reflection in wyvern!"
+
+// Test objects with different types aren't equal
+val intMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj)
+val stringMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(stringObj)
+val typeNotEqual : Int = intMirror.equals(stringMirror)
+tools.assertIntEquals(typeNotEqual, 0)
+
+// Test that objects with the same type and different values aren't equal
+val intMirror2 : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj2)
+val valsNotEqual : Int = intMirror2.equals(intMirror)
+tools.assertIntEquals(valsNotEqual, 0)
+
+// Test that objects with the same type and same values are equal
+val intMirror3 : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj3)
+val valsEqual : Int = intMirror3.equals(intMirror)
+tools.assertIntEquals(valsEqual, 1)
