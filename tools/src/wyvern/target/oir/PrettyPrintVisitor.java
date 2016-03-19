@@ -2,6 +2,8 @@ package wyvern.target.oir;
 
 import java.util.List;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Set;
 
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
@@ -30,6 +32,8 @@ class PrettyPrintState {
   public OIREnvironment oirenv;
   public boolean expectingReturn;
   public int variableCounter;
+  public HashMap <String, OIRClassDeclaration> classDecls;
+  public HashSet <String> freeVarSet;
 }
 
 public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
@@ -61,12 +65,34 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return "var" + state.variableCounter;
   }
 
+  private void findClassDecls(PrettyPrintState state, OIREnvironment oirenv) {
+    for (HashMap.Entry<String, OIRType> pair : oirenv.getTypeTable().entrySet()) {
+      String name = pair.getKey();
+      OIRType type = pair.getValue();
+      if (type instanceof OIRClassDeclaration) {
+        state.classDecls.put(name, (OIRClassDeclaration)type);
+      }
+    }
+    for (OIREnvironment child : oirenv.getChildren())
+      findClassDecls(state, child);
+  }
+
   public String prettyPrint(OIRAST oirast,
                             OIREnvironment oirenv) {
+    String classDefs = "";
     PrettyPrintState state = new PrettyPrintState();
     state.oirenv = oirenv;
     state.expectingReturn = false;
     state.variableCounter = 0;
+    state.classDecls = new HashMap<String, OIRClassDeclaration>();
+    state.freeVarSet = new HashSet<String>();
+
+    findClassDecls(state, oirenv);
+
+    for (OIRClassDeclaration classDecl : state.classDecls.values()) {
+      classDefs += classDecl.acceptVisitor(this, state) + "\n";
+    }
+
     String python =
       oirast.acceptVisitor(this, state);
     String[] lines = python.split("\\n");
@@ -76,17 +102,6 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     for (String line : lines) {
       out.append(line);
       out.append("\n");
-    }
-
-    String classDefs = "";
-    HashSet<String> oldClassesUsed = null;
-    while (!classesUsed.equals(oldClassesUsed)) {
-      oldClassesUsed = new HashSet<String>(classesUsed);
-      for (String className : classesUsed) {
-        System.out.println("Codegen for class " + className);
-        OIRType type = oirenv.topDownLookupType(className);
-        classDefs += type.acceptVisitor(this, state) + "\n";
-      }
     }
 
     return classDefs + out.toString();
@@ -227,12 +242,36 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                       OIRNew oirNew) {
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
+
+
     String args = commaSeparatedExpressions(state,
                                             oirNew.getArgs());
+
+    // Collect free variables
+    OIRClassDeclaration decl = state.classDecls.get(oirNew.getTypeName());
+    if (decl == null) {
+      throw new RuntimeException("OIRNew called with class " + oirNew.getTypeName() + ", but no OIRClassDeclaration was found.");
+    }
+    Set<String> freeVars = decl.getFreeVariables();
+    String dict;
+    if (args.equals(""))
+      dict = "env={";
+    else
+      dict = ", env={";
+    boolean first = true;
+    for (String freeVar : freeVars) {
+      if (!first)
+        dict += ", ";
+      first = false;
+
+      dict += "'" + freeVar + "': " + freeVar;
+    }
+    dict += "}";
+    if (!args.equals(""))
+
     state.expectingReturn = oldExpectingReturn;
-    System.out.println("Adding class " + oirNew.getTypeName() + " to classesUsed");
     classesUsed.add(oirNew.getTypeName());
-    return oirNew.getTypeName() + "(" + args + ")";
+    return oirNew.getTypeName() + "(" + args + dict + ")";
   }
 
   public String visit(PrettyPrintState state,
@@ -250,15 +289,23 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRVariable oirVariable) {
+    String var;
+    if (state.freeVarSet.contains(oirVariable.getName()))
+      var = "this.env['" + oirVariable.getName() + "']";
+    else
+      var = oirVariable.getName();
     if (state.expectingReturn)
-      return "return " + oirVariable.getName();
-    return oirVariable.getName();
+      return "return " + var;
+    return var;
   }
 
   public String visit(PrettyPrintState state,
                       OIRClassDeclaration oirClassDeclaration) {
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
+
+    HashSet<String> oldFreeVarSet = state.freeVarSet;
+    state.freeVarSet = new HashSet<String>(oirClassDeclaration.getFreeVariables());
 
     String classDef = "class " + oirClassDeclaration.getName() + ":";
     String oldIndent = indent;
@@ -280,10 +327,9 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
       constructor_args.append(", " + dec.getName() + "Ignored");
     }
-    if (oirClassDeclaration.getFieldValuePairs().isEmpty())
-      constructor_body.append("\n" + indent + indentIncrement + "pass");
     members += "\n" + indent +
-      "def __init__(this" + constructor_args.toString() + "):";
+      "def __init__(this" + constructor_args.toString() + ", env={}):";
+    members += "\n" + indent + indentIncrement + "this.env = env";
     members += constructor_body.toString();
 
     for (OIRMemberDeclaration memberDec : oirClassDeclaration.getMembers()) {
@@ -297,6 +343,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     indent = oldIndent;
 
     state.expectingReturn = oldExpectingReturn;
+    state.freeVarSet = oldFreeVarSet;
 
     return classDef + members;
   }

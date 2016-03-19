@@ -63,9 +63,13 @@ public class OIRTests {
   }
 
   private void testPyFromInput(String input, String expected, boolean debug) throws ParseException {
+    // Since the root OIR environment is stateful, reset it between tests
+    OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
     Expression ILprogram = ast.generateIL(GenContext.empty().extend("system", new Variable("system"), null), null);
     if (debug) {
+      System.out.println("Wyvern Program:");
+      System.out.println(input);
       try {
         System.out.println("IL program:\n" + ILprogram.prettyPrint());
       } catch (IOException e) {
@@ -77,14 +81,15 @@ public class OIRTests {
                               null,
                               OIREnvironment.getRootEnvironment());
     if (debug) {
-      System.out.println("OIR Root Environment:");
-      System.out.println(OIREnvironment.getRootEnvironment().prettyPrint());
+      // System.out.println("OIR Root Environment:");
+      // System.out.println(OIREnvironment.getRootEnvironment().prettyPrint());
     }
     String pprint =
       new PrettyPrintVisitor().prettyPrint(oirast,
                                            OIREnvironment.getRootEnvironment());
 
-    System.out.println("OIR Program:\n" + pprint);
+    if (debug)
+      System.out.println("OIR Program:\n" + pprint);
 
     // Call the system python interpreter to execute the code
     try {
@@ -100,22 +105,25 @@ public class OIRTests {
       BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
       BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-      System.out.println("Python output:");
+      if (debug)
+        System.out.println("Python output:");
 
       String result = "";
       String s = null;
       while ((s = stdInput.readLine()) != null) {
-        System.out.println(s);
+        if (debug)
+          System.out.println(s);
         if (result != "")
           result += "\n";
         result += s;
       }
 
-      System.out.println("Python error output:");
-      while ((s = stdErr.readLine()) != null) {
-        System.out.println(s);
+      if (debug) {
+        System.out.println("Python error output:");
+        while ((s = stdErr.readLine()) != null) {
+          System.out.println(s);
+        }
       }
-
       assertEquals(expected, result);
     } catch (IOException e) {
       System.out.println("Error running python test: " + e.toString());
@@ -292,6 +300,6 @@ public class OIRTests {
       "        def const() : system.Int = x\n" +
       "    obj.const()\n" +
       "f(7)\n";
-    testPyFromInput(input, "7");
+    testPyFromInput(input, "7", true);
   }
 }

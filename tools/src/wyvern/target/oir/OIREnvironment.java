@@ -6,77 +6,94 @@ import java.util.LinkedList;
 import wyvern.target.oir.declarations.OIRType;
 
 public class OIREnvironment {
-	private OIREnvironment parent;
-	private HashMap<String, OIRType> nameTable;
-	private HashMap<String, OIRType> typeTable;
-	private LinkedList<OIREnvironment> children;
-	
-	private static OIREnvironment rootEnvironment = new OIREnvironment(null);
-	
-	public static OIREnvironment getRootEnvironment ()
-	{
-		return rootEnvironment;
-	}
-	
-	public OIREnvironment (OIREnvironment parent)
-	{
-		children = new LinkedList<OIREnvironment> ();
-		nameTable = new HashMap<String, OIRType> ();
-		typeTable = new HashMap<String, OIRType> ();
-		this.parent = parent;
-		
-		if (parent != null)
-		{
-			parent.addChild(this);
-		}
-	}
-	
-	public void addChild (OIREnvironment environment)
-	{
-		children.add (environment);
-	}
-	
-	public void addName (String name, OIRType type)
-	{
-		nameTable.put(name, type);
-	}
-	
-	public void addType (String name, OIRType type)
-	{
-		typeTable.put(name, type);
-	}
+  private OIREnvironment parent;
+  private HashMap<String, OIRType> nameTable;
+  private HashMap<String, OIRType> typeTable;
+  private LinkedList<OIREnvironment> children;
 
-	public OIRType lookup(String name) 
-	{
-		if (name == null)
-			return null;
-		
-		OIRType type;
-		
-		type = nameTable.get(name);
-		if (type == null) {
-			if (parent == null)
-				throw new RuntimeException("OIREnvironment looking up \"" + name + "\", parent is null");
-			return parent.lookup(name);
-		}
-			
-		return type;
-	}
+  private static OIREnvironment rootEnvironment = new OIREnvironment(null);
 
-	public OIRType lookupType(String name) {
-		if (name == null)
-			return null;
-		
-		OIRType type;
-		
-		type = typeTable.get(name);
-		if (type == null) {
+  public static OIREnvironment getRootEnvironment ()
+  {
+    return rootEnvironment;
+  }
+
+  public static void resetRootEnvironment()
+  {
+    rootEnvironment = new OIREnvironment(null);
+  }
+
+  public OIREnvironment (OIREnvironment parent)
+  {
+    children = new LinkedList<OIREnvironment> ();
+    nameTable = new HashMap<String, OIRType> ();
+    typeTable = new HashMap<String, OIRType> ();
+    this.parent = parent;
+
+    if (parent != null)
+    {
+      parent.addChild(this);
+    }
+  }
+
+  public void addChild (OIREnvironment environment)
+  {
+    children.add (environment);
+  }
+
+  public void addName (String name, OIRType type)
+  {
+    nameTable.put(name, type);
+  }
+
+  public void addType (String name, OIRType type)
+  {
+    typeTable.put(name, type);
+  }
+
+  public HashMap<String, OIRType> getNameTable() {
+    return nameTable;
+  }
+
+  public HashMap<String, OIRType> getTypeTable() {
+    return typeTable;
+  }
+
+  public LinkedList<OIREnvironment> getChildren() {
+    return children;
+  }
+
+  public OIRType lookup(String name)
+  {
+    if (name == null)
+      return null;
+
+    OIRType type;
+
+    type = nameTable.get(name);
+    if (type == null) {
+      if (parent == null)
+        throw new RuntimeException("OIREnvironment looking up \"" + name + "\", parent is null");
+      return parent.lookup(name);
+    }
+
+    return type;
+  }
+
+  public OIRType lookupType(String name) {
+    if (name == null)
+      return null;
+
+    OIRType type;
+
+    type = typeTable.get(name);
+    if (type == null) {
       if (parent == null)
           throw new RuntimeException("OIREnvironment looking up type \"" + name + "\", parent is null");
-			return parent.lookupType(name);
+      return parent.lookupType(name);
     }
-		return type;
-	}
+    return type;
+  }
 
   // TODO: Is this a reasonable approach to finding class declarations?
   public OIRType topDownLookupType(String name) {

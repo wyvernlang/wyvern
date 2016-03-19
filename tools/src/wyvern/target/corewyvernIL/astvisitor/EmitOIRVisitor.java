@@ -157,7 +157,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		
 		className = generateClassName ();
 		cd = new OIRClassDeclaration (classenv, className, newExpr.getSelfName(),
-				delegates, oirMemDecls, fieldValuePairs);
+                                  delegates, oirMemDecls, fieldValuePairs,
+                                  newExpr.getFreeVariables());
 		oirenv.addType(className, cd);
 		classenv.addName(newExpr.getSelfName(), cd);
 		OIRProgram.program.addTypeDeclaration(cd);

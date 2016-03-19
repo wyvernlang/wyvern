@@ -3,6 +3,7 @@ package wyvern.target.oir.declarations;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.oir.ASTVisitor;
 import wyvern.target.oir.OIREnvironment;
@@ -16,14 +17,17 @@ public class OIRClassDeclaration extends OIRType {
 	private int classID;
 	private HashSet <String> methods;
 	private HashMap <String, String> methodToFieldMap;
+  private Set <String> freeVariables;
 	
 	public OIRClassDeclaration(OIREnvironment environment, String name, String selfName, List<OIRDelegate> delegates,
-			List<OIRMemberDeclaration> members, List<OIRFieldValueInitializePair> fieldValuePairs)
+                             List<OIRMemberDeclaration> members, List<OIRFieldValueInitializePair> fieldValuePairs,
+                             Set<String> freeVariables)
 	{
 		super(environment);
 		this.name = name;
 		this.delegates = delegates;
 		this.members = members;
+    this.freeVariables = freeVariables;
 		methods = new HashSet <String> ();
 		for (OIRMemberDeclaration member : members)
 		{
@@ -203,4 +207,7 @@ public class OIRClassDeclaration extends OIRType {
 	{
 		return classID;
 	}
+  public Set<String> getFreeVariables() {
+    return freeVariables;
+  }
 }
