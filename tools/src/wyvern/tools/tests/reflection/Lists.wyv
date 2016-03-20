@@ -1,0 +1,14 @@
+resource module Lists
+
+type List
+    def isEmpty() : Boolean
+    def decompose() : Any * List
+
+def empty(emptyVal : Any) : List = new
+    def isEmpty() : Boolean = true
+    def decompose() : Any * List = (emptyVal, this)
+
+def cons(x : Any, y : List) : List = new
+    def isEmpty() : Boolean = false
+    def decompose() : Any * List = (x, y)
+

@@ -4,6 +4,8 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
 
 import java.util.List;
 
@@ -52,5 +54,28 @@ public class Mirror {
             }
         }
         return 1;
+    }
+
+    public Value invoke(ObjectValue o, String methodName, List<Value> argList) {
+        return o.invoke(methodName, argList);
+    }
+
+    public int equalTypes(ObjectValue obj, ObjectValue type) {
+        EvalContext evalCtx = obj.getEvalCtx();
+
+        Value typeOrig = type.getField("original");
+        if (obj.getType().equalsInContext(typeOrig.getType(), evalCtx)) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public String typeName(ObjectValue obj) {
+        ValueType type = obj.getType();
+        if (type instanceof NominalType) {
+            return ((NominalType) type).getTypeMember();
+        }
+        // give message "error: structural type"
+        return obj.getType().toString();
     }
 }

@@ -34,25 +34,7 @@ public class ReflectionTests {
 
     @Test
     public void testBase() throws ParseException {
-        String input = TestUtil.readFile(PATH + "base.wyv");
-        TypedAST ast = TestUtil.getNewAST(input);
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        genCtx = new TypeGenContext("Boolean", "system", genCtx);
-        TypeContext ctx = TestUtil.getStandardTypeContext();
-        wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-        genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-        List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-        decls.add(decl);
-        Expression mainProgram = GenUtil.genExp(decls, genCtx);
-        //Expression program = new FieldGet(mainProgram, "x"); // slightly hacky
-        mainProgram.typeCheck(ctx);
-        mainProgram.interpret(EvalContext.empty());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testObjectEquals() throws ParseException {
-        String [] fileList = {"baseModule.wyv", "objectEquals.wyv"};
+        String [] fileList = {"baseModule.wyv", "base.wyv"};
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
         GenContext genCtx = TestUtil.getStandardGenContext();
         genCtx = new TypeGenContext("Boolean", "system", genCtx);
@@ -72,4 +54,49 @@ public class ReflectionTests {
         mainProgram.interpret(TestUtil.getStandardEvalContext());
     }
 
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testObjectEquals() throws ParseException {
+        String [] fileList = {"baseModule.wyv", "intObject.wyv", "objectEquals.wyv"};
+        List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        genCtx = new TypeGenContext("Boolean", "system", genCtx);
+
+        for (String filename : fileList) {
+            String source = TestUtil.readFile(PATH + filename);
+            TypedAST ast = TestUtil.getNewAST(source);
+            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+            decls.add(decl);
+            genCtx = GenUtil.link(genCtx, decl);
+        }
+        Expression mainProgram = GenUtil.genExp(decls, genCtx);
+        // after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        mainProgram.typeCheck(ctx);
+        mainProgram.interpret(TestUtil.getStandardEvalContext());
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testObjectTypeOf() throws ParseException {
+        String [] fileList = {"baseModule.wyv", "objectTypeOf.wyv"};
+        List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+        GenContext genCtx = TestUtil.getStandardGenContext();
+        genCtx = new TypeGenContext("Boolean", "system", genCtx);
+
+        for (String filename : fileList) {
+            String source = TestUtil.readFile(PATH + filename);
+            TypedAST ast = TestUtil.getNewAST(source);
+            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+            decls.add(decl);
+            genCtx = GenUtil.link(genCtx, decl);
+        }
+        Expression mainProgram = GenUtil.genExp(decls, genCtx);
+        // after genExp the modules are transferred into an object. We need to evaluate one field of the main object
+
+        TypeContext ctx = TestUtil.getStandardTypeContext();
+        mainProgram.typeCheck(ctx);
+        mainProgram.interpret(TestUtil.getStandardEvalContext());
+    }
 }
