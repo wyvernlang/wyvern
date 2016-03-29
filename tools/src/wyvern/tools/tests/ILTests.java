@@ -251,16 +251,16 @@ public class ILTests {
 	}
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testTypeDeclarations () throws ParseException {
+		// TODO: when we have a standard library defined with multiplication, make this really double the number!
 		String input = "resource type Doubler\n"
 					 + "    def double(argument : system.Int) : system.Int\n"
 					 + "val d : Doubler = new\n"
 					 + "	def double (argument : system.Int) : system.Int\n"
-					 + "		argument * 2\n"
-					 + "d.double(5)";
+					 + "		argument\n"
+					 + "d.double(10)";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        GenContext genCtx = TestUtil.getStandardGenContext();
 		Expression program = ast.generateIL(genCtx, null);
 		ValueType type = program.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Util.intType(), type);
