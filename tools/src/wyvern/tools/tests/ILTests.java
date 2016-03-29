@@ -270,6 +270,26 @@ public class ILTests {
 	}
 	
 	@Test
+    @Category(CurrentlyBroken.class)
+	public void testTaggedClassParsing() throws ParseException {
+		String input = "class List\n\n"
+					 + "class Nil extends List\n\n"
+					 + "class Cons extends List\n\n"
+					 + "    val element:Int\n"
+					 + "    val next:List\n\n"
+					 + "val c = new Cons\n"
+					 + "    val element = 5\n"
+					 + "    val next:List = new Nil\n\n"
+					 + "c.element\n\n"
+					 + "val l : List = t\n\n"
+					 + "match(l)\n"
+					 + "    case Nil => 0\n"
+					 + "    case c:Cons => c.element\n"
+					 ;
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+	}
+	
+	@Test
 	public void testDefDecl() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    val v : system.Int = 5\n"
