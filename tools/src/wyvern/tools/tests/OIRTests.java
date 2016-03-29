@@ -75,6 +75,7 @@ public class OIRTests {
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }
+      System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
@@ -276,7 +277,7 @@ public class OIRTests {
       "type IntResult\n" +
       "    def getResult() : system.Int\n" +
       "val r : IntResult = new\n" +
-      "    def getResult() : system.Int = 26" +
+      "    def getResult() : system.Int = 26\n" +
       "val r2 : IntResult = new\n" +
       "    delegate IntResult to r\n" +
       "r2.getResult()\n";
@@ -300,6 +301,39 @@ public class OIRTests {
       "        def const() : system.Int = x\n" +
       "    obj.const()\n" +
       "f(7)\n";
+    testPyFromInput(input, "7");
+  }
+
+  @Test
+  public void testILNullPtr() throws ParseException {
+    String input =
+      "val obj = new\n" +
+      "    val x = 5\n" +
+      "    val y = this.x\n" +
+      "obj.y\n";
+    testPyFromInput(input, "5");
+  }
+
+  @Test
+  public void testScoping2() throws ParseException {
+    String input =
+      "def f(x : system.Int) : system.Int\n" +
+      "    val obj = new\n" +
+      "        val x = 32\n" +
+      "        val y = this.x\n" +
+      "    obj.y\n" +
+      "f(23)\n";
+    testPyFromInput(input, "32");
+  }
+
+  @Test
+  public void testAssignAsExpression() throws ParseException {
+    String input =
+      "val obj = new\n" +
+      "    var x : system.Int = 3\n" +
+      "    def identity(x : system.Int) : system.Int = x\n" +
+      "obj.identity(obj.x = 7)\n" +
+      "obj.x\n";
     testPyFromInput(input, "7", true);
   }
 }
