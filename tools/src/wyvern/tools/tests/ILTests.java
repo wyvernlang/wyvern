@@ -1005,15 +1005,15 @@ public class ILTests {
 	@Test
 	@Category(CurrentlyBroken.class)
 	public void testResourceTypecheckingDef() throws ParseException {
-		String input = "resource type Stateful\n"
+		String input = "resource type Resource\n"
 					 + "	var state : system.Int\n"
-					 + "type PseudoNonStateful\n"
+					 + "type PseudoPure\n"
 					 + "	def saveState() : system.Int\n"
-					 + "var a : Stateful = new\n"
+					 + "var a : Resource = new\n"
 					 + "	var state : system.Int = 43\n"
-					 + "var b : PseudoNonStateful = new\n"
+					 + "var b : PseudoPure = new\n"
 					 + "	def saveState() : system.Int\n"
-					 + "		var c : Stateful = a\n"
+					 + "		var c : Resource = a\n"
 					 + "		0\n"
 					 + "b.saveState()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
