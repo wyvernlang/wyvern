@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
@@ -46,6 +47,7 @@ import wyvern.target.oir.declarations.OIRDelegate;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
 import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
+import wyvern.target.oir.declarations.OIRIntegerType;
 import wyvern.target.oir.declarations.OIRInterface;
 import wyvern.target.oir.declarations.OIRMemberDeclaration;
 import wyvern.target.oir.declarations.OIRMethod;
@@ -496,8 +498,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 		{
 			OIRMethodDeclarationGroup declTypeGroup;
 
-			declTypeGroup = (OIRMethodDeclarationGroup) declType.acceptVisitor(
-					this, env, oirenv);
+			OIRAST declAST = declType.acceptVisitor(this, env, oirenv);
+			declTypeGroup = (OIRMethodDeclarationGroup) declAST;
 			for (int i = 0; i < declTypeGroup.size(); i++)
 			{
 				oirInterfaceEnv.addName(declTypeGroup.elementAt(i).getName(), 
@@ -568,10 +570,18 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   public OIRAST visit(Environment env,
                       OIREnvironment oirenv,
                       ConcreteTypeMember concreteTypeMember) {
-    OIRType type = (OIRType)concreteTypeMember.getRawResultType()
+    /*OIRType type = (OIRType)concreteTypeMember.getRawResultType()
       .acceptVisitor(this, env, oirenv);
     oirenv.addType(concreteTypeMember.getName(), type);
 
-    return type;
+    return type;*/
+	  
+	return new OIRMethodDeclarationGroup();
   }
+
+	@Override
+	public OIRAST visit(Environment env, OIREnvironment oirenv, TypeDeclaration typeDecl) {
+		// the tag field
+		return new OIRFieldDeclaration(typeDecl.getName()+"tag",OIRIntegerType.getIntegerType());
+	}
 }

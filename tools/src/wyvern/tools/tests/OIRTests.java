@@ -268,7 +268,7 @@ public class OIRTests {
       "type Int = system.Int\n" +
       "val i : Int = 32\n" +
       "i\n";
-    testPyFromInput(input, "32");
+    testPyFromInput(input, "32", true);
   }
 
   @Test

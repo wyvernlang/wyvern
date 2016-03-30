@@ -5,7 +5,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
-public abstract class ValueType extends CaseType implements EmitOIR {
+public abstract class ValueType extends CaseType {
 
 	/**
 	 * Returns the equivalent structural type.  If the structural type
