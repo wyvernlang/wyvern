@@ -328,13 +328,11 @@ public class ILTests {
 
 	@Test
 	public void testDefWithVarInside() throws ParseException {
-		
 		String input = "def foo() : system.Int\n"
 					 + "    var v : system.Int = 5\n"
 					 + "    v = 10\n"
 					 + "    v\n"
 					 + "foo()\n";
-		
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
@@ -352,8 +350,7 @@ public class ILTests {
 	public void testIdentityCall() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.Int) : system.Int = x\n"
-				     + "obj.id(5)\n"
-				     ;
+				     + "obj.id(5)\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
@@ -1005,15 +1002,15 @@ public class ILTests {
 	@Test
 	@Category(CurrentlyBroken.class)
 	public void testResourceTypecheckingDef() throws ParseException {
-		String input = "resource type Stateful\n"
+		String input = "resource type Resource\n"
 					 + "	var state : system.Int\n"
-					 + "type PseudoNonStateful\n"
+					 + "type PseudoPure\n"
 					 + "	def saveState() : system.Int\n"
-					 + "var a : Stateful = new\n"
+					 + "var a : Resource = new\n"
 					 + "	var state : system.Int = 43\n"
-					 + "var b : PseudoNonStateful = new\n"
+					 + "var b : PseudoPure = new\n"
 					 + "	def saveState() : system.Int\n"
-					 + "		var c : Stateful = a\n"
+					 + "		var c : Resource = a\n"
 					 + "		0\n"
 					 + "b.saveState()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
