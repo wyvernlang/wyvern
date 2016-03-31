@@ -1015,10 +1015,9 @@ public class ILTests {
 					 + "b.saveState()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
 		try {
-			program.typeCheck(TypeContext.empty());
-			Assert.fail("Typechecking should have failed.");
+			ast.generateIL(genCtx, null);
+			Assert.fail("Typechecking should have failed (in code generation).");
 		} catch (ToolError e) {
 		}
 	}

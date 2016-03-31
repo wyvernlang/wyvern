@@ -10,7 +10,9 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
@@ -19,6 +21,7 @@ public class DefDeclaration extends NamedDeclaration {
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
+	private boolean resourceFlag = false;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body) {
@@ -64,6 +67,11 @@ public class DefDeclaration extends NamedDeclaration {
 	public Expression getBody() {
 		return body;
 	}
+
+	public boolean isResource() {
+		return this.resourceFlag;
+	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -76,6 +84,17 @@ public class DefDeclaration extends NamedDeclaration {
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
 		}
+		Set<String> freeVars = this.getFreeVariables();
+		if (!freeVars.isEmpty()) {
+			for (String freeVar : freeVars) {
+				Variable fv = new Variable(freeVar);
+				ValueType fvt = fv.typeCheck(methodCtx);
+				if (fvt instanceof StructuralType && ((StructuralType) fvt).isResource()) {
+					this.resourceFlag = true;
+				}
+			}
+		}
+
 		if (!body.typeCheck(methodCtx).isSubtypeOf(getType(), methodCtx))
 			throw new RuntimeException("body doesn't match declared type");
 		return new DefDeclType(getName(), type, formalArgs);
@@ -83,7 +102,6 @@ public class DefDeclaration extends NamedDeclaration {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		
 		// Get all free variables in the body of the method.
 		Set<String> freeVars = body.getFreeVariables();
 		

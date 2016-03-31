@@ -72,6 +72,10 @@ public class StructuralType extends ValueType {
 		this.declTypes = declTypes;
 	}*/
 
+	public boolean isResource() {
+		return this.resourceFlag;
+	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {

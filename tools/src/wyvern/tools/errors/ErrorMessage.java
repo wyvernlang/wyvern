@@ -21,6 +21,7 @@ public enum ErrorMessage {
 	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
 	CANNOT_INFER_ARG_TYPE("Cannot infer the argument type as there is no expected type for the function expression", 0),
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
+	MUST_BE_RESOURCE_TYPE("%ARG type must be resource", 1),
 	
 	// Syntax errors
 	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
