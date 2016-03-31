@@ -1000,7 +1000,6 @@ public class ILTests {
 	}
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testResourceTypecheckingDef() throws ParseException {
 		String input = "resource type Stateful\n"
 					 + "	var state : system.Int\n"
