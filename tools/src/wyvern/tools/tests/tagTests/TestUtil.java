@@ -25,6 +25,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -116,7 +117,7 @@ public class TestUtil {
 		// construct a type for the system object
 		List<DeclType> declTypes = new LinkedList<DeclType>();
 		declTypes.add(new AbstractTypeMember("Int"));
-		declTypes.add(new AbstractTypeMember("Unit"));
+		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
 		ValueType systemType = new StructuralType("this", declTypes);

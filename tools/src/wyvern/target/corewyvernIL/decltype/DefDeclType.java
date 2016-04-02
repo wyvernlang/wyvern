@@ -39,15 +39,16 @@ public class DefDeclType extends DeclTypeWithResult {
 			return false;
 		}
 		DefDeclType ddt = (DefDeclType) dt;
-		if (args.size() != ddt.args.size())
+		if (args.size() != ddt.args.size() || !ddt.getName().equals(getName()))
 			return false;
 		for (int i = 0; i < args.size(); ++i) {
 			if (! (ddt.args.get(i).getType().isSubtypeOf(args.get(i).getType(), ctx))) {
 				return false;
 			}
 		}
-		return ddt.getName().equals(getName())
-			&& this.getRawResultType().isSubtypeOf(ddt.getRawResultType(), ctx);
+		ValueType rawResultType = this.getRawResultType();
+		ValueType otherRawResultType = ddt.getRawResultType();
+		return rawResultType.isSubtypeOf(otherRawResultType, ctx);
 	}
 	@Override
 	public int hashCode() {

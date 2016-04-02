@@ -37,6 +37,7 @@ import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
@@ -347,7 +348,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		// The setter takes one argument x : varType; its signature is varType -> Unit
 		LinkedList<NameBinding> setterArgs = new LinkedList<>();
 		setterArgs.add(new NameBindingImpl("x", varType));
-		Arrow setterArrType = new Arrow(varType, varType);
+		Type unitType = new UnresolvedType("Unit", receiver.getLocation());
+		Arrow setterArrType = new Arrow(varType, unitType);
 		
 		// Make and return the declaration.
 		DefDeclaration setterDecl;

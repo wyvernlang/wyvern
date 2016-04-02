@@ -54,7 +54,7 @@ public class OIRTests {
 
     private void printPyFromInput(String input) throws ParseException {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression ILprogram = ast.generateIL(GenContext.empty().extend("system", new Variable("system"), null), null);
+        Expression ILprogram = ast.generateIL(TestUtil.getStandardGenContext(), null);
         OIRAST oirast =
             ILprogram.acceptVisitor(new EmitOIRVisitor(),
                                     null,

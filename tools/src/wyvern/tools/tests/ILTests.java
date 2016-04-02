@@ -157,16 +157,7 @@ public class ILTests {
 				     + "    var v : system.Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -187,18 +178,13 @@ public class ILTests {
 				     + "obj.v = 5\n"
 				     + "obj.v\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestInt(input, 5);
 	}
 	
+	private void doTestInt(String input, int expectedIntResult) throws ParseException {
+		doTest(input, Util.intType(), new IntegerLiteral(expectedIntResult));
+	}
+
 	@Test
 	public void testVarFieldWriteToWrongType() throws ParseException {
 		String input = "val obj = new\n"
@@ -356,18 +342,7 @@ public class ILTests {
 					 + "    v = 10\n"
 					 + "    v\n"
 					 + "foo()\n";
-		
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral ten = new IntegerLiteral(10);
-		Assert.assertEquals(ten, v);
-		
+		doTest(input, Util.intType(), new IntegerLiteral(10));
 	}
 	
     @Test
@@ -960,17 +935,16 @@ public class ILTests {
 	
 	@Test
 	public void testBool() throws ParseException {
-		testScript("Bool.wyv", Util.intType(), new IntegerLiteral(5));
+		doTestScript("Bool.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testList() throws ParseException {
-		testScript("List.wyv", Util.intType(), new IntegerLiteral(5));
+		doTestScript("List.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	// TODO: make other script tests call this function
-	private void testScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
+	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 		GenContext genCtx = TestUtil.getStandardGenContext();
@@ -1038,11 +1012,15 @@ public class ILTests {
 				     + "	def getConstant() : system.Int\n"
 				     + "		42\n"
 				     + "c.getConstant()";
+		doTestTypeFail(input);
+	}
+
+	private void doTestTypeFail(String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = TestUtil.getStandardGenContext();
 		Expression program = ast.generateIL(genCtx, null);
 		try {
-			program.typeCheck(TypeContext.empty());
+			program.typeCheck(TestUtil.getStandardTypeContext());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
 		}
@@ -1097,14 +1075,7 @@ public class ILTests {
 					 + "	var one : system.Int = 1\n"
 					 + "	var two : system.Int = 2\n"
 					 + "x.one";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-		ValueType t = program.typeCheck(TypeContext.empty());
-		Value v = program.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);
-		IntegerLiteral one = new IntegerLiteral(1);
-		Assert.assertEquals(one, v);
+		doTest(input, Util.intType(), new IntegerLiteral(1));
 	}
 
 	public static ImportTestClass importTest = new ImportTestClass();
