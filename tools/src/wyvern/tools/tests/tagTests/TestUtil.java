@@ -16,6 +16,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -24,6 +25,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -104,6 +106,7 @@ public class TestUtil {
 		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = new TypeGenContext("String", "system", genCtx);
+		genCtx = new TypeGenContext("Dyn", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
@@ -113,6 +116,8 @@ public class TestUtil {
 		List<DeclType> declTypes = new LinkedList<DeclType>();
 		declTypes.add(new AbstractTypeMember("Int"));
 		declTypes.add(new AbstractTypeMember("Unit"));
+		declTypes.add(new AbstractTypeMember("String"));
+		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
 		ValueType systemType = new StructuralType("this", declTypes);
 		return systemType;
 	}
@@ -122,6 +127,8 @@ public class TestUtil {
 		List<Declaration> decls = new LinkedList<Declaration>();
 		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int")));
 		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit")));
+		decls.add(new TypeDeclaration("String", new NominalType("this", "String")));
+		decls.add(new TypeDeclaration("Dyn", new DynamicType()));
 		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, EvalContext.empty());
 		return systemVal;
 	}

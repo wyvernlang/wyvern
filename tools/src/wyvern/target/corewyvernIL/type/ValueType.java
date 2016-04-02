@@ -39,7 +39,7 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	}
 
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
-		return equals(t); // default
+		return t instanceof DynamicType || equals(t); // default
 	}
 
 	/** Find the declaration type with the specified name, or return null if it is not present */

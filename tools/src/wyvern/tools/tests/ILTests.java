@@ -325,6 +325,28 @@ public class ILTests {
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
 	}
+	
+	// TODO: add cast checks to make Dyn sound, and wrappers to make it capability-safe
+	@Test
+	public void testDyn() throws ParseException {
+		String input = "val v : Dyn = 5\n"
+				     + "val v2 : system.Int = v\n"
+				     + "v2\n"
+				     ;
+		doTest(input, Util.intType(), new IntegerLiteral(5));
+	}
+	
+	// TODO: make other string tests call this function
+	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		Expression program = ast.generateIL(genCtx, null);
+    	TypeContext ctx = TestUtil.getStandardTypeContext();
+		ValueType t = program.typeCheck(ctx);
+		Assert.assertEquals(expectedType, t);
+		Value v = program.interpret(TestUtil.getStandardEvalContext());
+		Assert.assertEquals(expectedResult, v);		
+	}
 
 	@Test
 	public void testDefWithVarInside() throws ParseException {
@@ -936,6 +958,24 @@ public class ILTests {
 		Assert.assertEquals(five, v);
 	}
 	
+	@Test
+	public void testBool() throws ParseException {
+		testScript("Bool.wyv", Util.intType(), new IntegerLiteral(5));
+	}
+	
+	// TODO: make other script tests call this function
+	private void testScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
+        String source = TestUtil.readFile(PATH + fileName);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(expectedType, t);
+        Value v = program.interpret(TestUtil.getStandardEvalContext());
+        Assert.assertEquals(expectedValue, v);
+	}
+
 	@Test
 	public void testOperatorPlus() throws ParseException {
         String source = TestUtil.readFile(PATH + "operator-plus.wyv");
