@@ -9,14 +9,15 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 
 public class DelegateDeclaration extends Declaration {
 
 	private ValueType valueType;
 	private String fieldName;
 
-	public DelegateDeclaration(ValueType valueType, String fieldName) {
-		super();
+	public DelegateDeclaration(ValueType valueType, String fieldName, FileLocation loc) {
+		super(loc);
 		this.valueType = valueType;
 		this.fieldName = fieldName;
 	}

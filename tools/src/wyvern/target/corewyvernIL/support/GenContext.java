@@ -1,8 +1,14 @@
 package wyvern.target.corewyvernIL.support;
 
+import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
+import static wyvern.tools.errors.ToolError.reportError;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
@@ -18,8 +24,13 @@ public abstract class GenContext extends TypeContext {
 		return new VarGenContext(var, expr, type, this);
 	}
 	
-	public final Expression lookupExp(String varName) {
-		return getCallableExpr(varName).genExpr();
+	public final Expression lookupExp(String varName, FileLocation loc) {
+		try {
+			return getCallableExpr(varName).genExpr();
+		} catch (RuntimeException e) {
+			ToolError.reportError(VARIABLE_NOT_DECLARED, loc, varName);
+			throw new RuntimeException("impossible");
+		}
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -61,7 +62,7 @@ public class FieldSet extends Expression {
 		// Make sure assigned type is compatible with the field's type.
 		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
-		return valTypeExpr;
+		return valTypeExpr;//Util.unitType();
 
 	}
 
@@ -93,7 +94,7 @@ public class FieldSet extends Expression {
 		// VarDeclaration's constructor needs to take an expression, not a value.
 		// TODO: is this an exhaustive case analysis?
 		if (exprInterpreted instanceof AbstractValue) {
-			varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), (AbstractValue)exprInterpreted);
+			varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), (AbstractValue)exprInterpreted, getLocation());
 		}
 		else {
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);

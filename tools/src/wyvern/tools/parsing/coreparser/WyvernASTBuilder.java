@@ -72,8 +72,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 	@Override
 	public TypedAST varDecl(String name, Type type, TypedAST exp, FileLocation loc) {
-		// TODO: use loc!
-		return new VarDeclaration(name, type, exp);
+		return new VarDeclaration(name, type, exp, loc);
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 	@Override
 	public TypedAST varDeclType(String name, Type type, FileLocation loc) {
-		return new VarDeclaration(name, type, null);
+		return new VarDeclaration(name, type, null, loc);
 	}
 	
 	@Override
@@ -121,8 +120,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST fn(List args, TypedAST body) {
-		return new Fn(args, body);
+	public TypedAST fn(List args, TypedAST body, FileLocation loc) {
+		return new Fn(args, body, loc);
 	}
 
 	@Override
@@ -147,13 +146,13 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST stringLit(String value) {
-		return new StringConstant(value);
+	public TypedAST stringLit(String value, FileLocation loc) {
+		return new StringConstant(value, loc);
 	}
 
 	@Override
-	public TypedAST integerLit(int value) {
-		return new IntegerConstant(value);
+	public TypedAST integerLit(int value, FileLocation loc) {
+		return new IntegerConstant(value, loc);
 	}
 
 	@Override
@@ -165,7 +164,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	@Override
 	public TypedAST application(TypedAST function, TypedAST arguments,
 			FileLocation loc) {
-		return new Application(function, arguments, loc);
+		return new Application(function, arguments, loc != null ? loc : arguments.getLocation());
 	}
 
 	@Override
@@ -174,8 +173,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST tuple(List<TypedAST> members) {
-		return new TupleObject(members);
+	public TypedAST tuple(List<TypedAST> members, FileLocation loc) {
+		return new TupleObject(members, loc);
 	}
 
 	@Override

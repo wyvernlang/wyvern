@@ -152,7 +152,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
                         type.generateILType(),
                         ExpressionWriter.generate(iw -> {
                             body.codegenToIL(igen, iw);
-                        })));
+                        }), getLocation()));
     }
 
     @Override
@@ -263,7 +263,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType));
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType), getLocation());
 	}
 
 
@@ -285,7 +285,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (argILTypes == null)
 			throw new NullPointerException("need to call topLevelGen/generateDecl before addModuleDecl");
 		wyvern.target.corewyvernIL.decl.DefDeclaration decl =
-			new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body);
+			new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body, getLocation());
 		
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
@@ -344,7 +344,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
 		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
 		
-		// The setter takes one argument x : varType; its signature is varType -> varType
+		// The setter takes one argument x : varType; its signature is varType -> Unit
 		LinkedList<NameBinding> setterArgs = new LinkedList<>();
 		setterArgs.add(new NameBindingImpl("x", varType));
 		Arrow setterArrType = new Arrow(varType, varType);

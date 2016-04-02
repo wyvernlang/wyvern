@@ -963,6 +963,12 @@ public class ILTests {
 		testScript("Bool.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testList() throws ParseException {
+		testScript("List.wyv", Util.intType(), new IntegerLiteral(5));
+	}
+	
 	// TODO: make other script tests call this function
 	private void testScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);

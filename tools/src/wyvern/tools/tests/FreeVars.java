@@ -26,6 +26,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
@@ -59,7 +60,7 @@ public class FreeVars {
 		//    x
 		
 		DefDeclaration defDecl = new DefDeclaration("method", new ArrayList<>(), systemInt(),
-				new Variable("x"));
+				new Variable("x"), FileLocation.UNKNOWN);
 		
 		Set<String> freeVars = defDecl.getFreeVariables();
 		Assert.assertTrue("x is a free variable in this method.", freeVars.contains("x"));
@@ -74,7 +75,7 @@ public class FreeVars {
 		//     x
 
 		Let varAssign = new Let("x", new Variable("y"), new Variable("x"));
-		DefDeclaration defDecl = new DefDeclaration("method", new ArrayList<>(), systemInt(), varAssign);
+		DefDeclaration defDecl = new DefDeclaration("method", new ArrayList<>(), systemInt(), varAssign, FileLocation.UNKNOWN);
 		
 		Set<String> freeVars = defDecl.getFreeVariables();
 
@@ -96,7 +97,7 @@ public class FreeVars {
 		
 		// The method declaration, wrapped inside a New expression.
 		LinkedList<Declaration> decls = new LinkedList<>();	
-		DefDeclaration defDecl = new DefDeclaration("method", new ArrayList<>(), systemInt(), assignYtoX);
+		DefDeclaration defDecl = new DefDeclaration("method", new ArrayList<>(), systemInt(), assignYtoX, FileLocation.UNKNOWN);
 		decls.add(defDecl);
 		
 		// The type of the declaration sequence.

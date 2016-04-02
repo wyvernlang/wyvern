@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class DefDeclaration extends NamedDeclaration {
@@ -23,8 +24,8 @@ public class DefDeclaration extends NamedDeclaration {
 	private Expression body;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
-			ValueType type, Expression body) {
-		super(methodName);
+			ValueType type, Expression body, FileLocation loc) {
+		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;

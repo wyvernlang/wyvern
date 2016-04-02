@@ -32,13 +32,14 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	private ExpressionAST[] objects;
 	private static ExpressionAST[] typeObj = new ExpressionAST[0];
 	
-	public TupleObject(List<TypedAST> objects) {
-		this(objects.toArray(typeObj));
+	public TupleObject(List<TypedAST> objects, FileLocation loc) {
+		this(objects.toArray(typeObj), loc);
 	}
-	public TupleObject(TypedAST[] objects) {
+	public TupleObject(TypedAST[] objects, FileLocation loc) {
+		this.location = loc;
 		this.objects = Arrays.copyOf(objects, objects.length, ExpressionAST[].class); 
-		if (objects.length > 0)
-			this.location = objects[0].getLocation();
+		/*if (objects.length > 0)
+			this.location = objects[0].getLocation();*/
 	}
 	
 	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {
@@ -115,7 +116,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		for (String s : newChildren.keySet()) {
 			objs[Integer.parseInt(s)] = (ExpressionAST)newChildren.get(s);
 		}
-		return new TupleObject(objs);
+		return new TupleObject(objs, location);
 	}
 
 	public ExpressionAST[] getObjects() {

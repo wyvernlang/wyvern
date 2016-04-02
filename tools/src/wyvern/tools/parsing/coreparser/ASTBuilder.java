@@ -23,16 +23,16 @@ public interface ASTBuilder<AST,Type> {
 	public AST typeAbbrevDecl(String alias, Type reference, FileLocation loc);
 	
 	public Object formalArg(String name, Type type);
-	public AST fn(List args, AST body);
+	public AST fn(List args, AST body, FileLocation loc);
 	public AST var(String name, FileLocation loc);
-	public AST stringLit(String value);
-	public AST integerLit(int value);
+	public AST stringLit(String value, FileLocation loc);
+	public AST integerLit(int value, FileLocation loc);
 	public AST invocation(AST receiver, String name, AST argument, FileLocation loc);
 	public AST application(AST function, AST arguments, FileLocation loc);
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc);
-	public AST tuple(List<AST> members);
+	public AST tuple(List<AST> members, FileLocation loc);
 	public AST match(AST exp, List cases, FileLocation loc);
 	
 	public Object caseArm(String name, Type type, AST exp, FileLocation loc);

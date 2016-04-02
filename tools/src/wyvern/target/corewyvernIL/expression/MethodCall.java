@@ -28,6 +28,8 @@ public class MethodCall extends Expression {
 	public MethodCall(Expression objectExpr, String methodName,
 			List<Expression> args, HasLocation location) {
 		super(location != null ? location.getLocation():null);
+		if (getLocation() == null || getLocation().line == -1)
+			throw new RuntimeException("missing location");
 		this.objectExpr = objectExpr;
 		this.methodName = methodName;
 		this.args = args;

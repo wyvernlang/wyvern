@@ -28,6 +28,7 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	private String value;
 	
 	public StringConstant(String s) { this.value = s; }
+	public StringConstant(String s, FileLocation loc) { this.value = s; location = loc; }
 
 	@Override
 	public Type getType() {
@@ -96,7 +97,7 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 
     @Override
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new StringLiteral(value));
+        writer.write(new StringLiteral(value, location));
     }
 
     private FileLocation location = FileLocation.UNKNOWN;
@@ -106,6 +107,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
-		return new StringLiteral(value);
+		return new StringLiteral(value, location);
 	}
 }

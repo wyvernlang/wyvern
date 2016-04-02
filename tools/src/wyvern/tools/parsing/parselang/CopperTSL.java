@@ -388,7 +388,7 @@ public class CopperTSL implements ExtParser {
 				new Application(new Invocation(new Application(
 					new Invocation(new Variable(new NameBindingImpl(javaClassName, null), unkLoc), "create", null, unkLoc),
 					javaObjInit, unkLoc), "parse", null, unkLoc),
-					new TupleObject(new ExpressionAST[] {bufGet, new StringConstant("TSL code")}), unkLoc), unkLoc);
+					new TupleObject(new ExpressionAST[] {bufGet, new StringConstant("TSL code")}, unkLoc), unkLoc), unkLoc);
 
 		DefDeclaration parseDef =
 				new DefDeclaration("parse",

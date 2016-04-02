@@ -29,6 +29,7 @@ import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -125,10 +126,10 @@ public class TestUtil {
 	private static ObjectValue getSystemValue() {
 		// construct a type for the system object
 		List<Declaration> decls = new LinkedList<Declaration>();
-		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int")));
-		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit")));
-		decls.add(new TypeDeclaration("String", new NominalType("this", "String")));
-		decls.add(new TypeDeclaration("Dyn", new DynamicType()));
+		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
 		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, EvalContext.empty());
 		return systemVal;
 	}

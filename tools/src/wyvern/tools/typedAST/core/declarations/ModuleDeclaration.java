@@ -381,9 +381,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 		if(isResource() == false) {
 			/* non resource module translated into value */
-			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body);
+			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
 		}
 		/* resource module translated into method */
-		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body);
+		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
 	}
 }
