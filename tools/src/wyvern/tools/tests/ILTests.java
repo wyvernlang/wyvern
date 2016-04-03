@@ -1022,6 +1022,102 @@ public class ILTests {
 	}
 
 	@Test
+	public void testVarMarkedResource() throws ParseException {
+		String input = "resource type MarkedResource\n"
+					 + "	def foo() : system.Int\n"
+					 + "type PseudoPure\n"
+					 + "	def bar() : system.Int\n"
+					 + "var a : MarkedResource = new\n"
+					 + "	def foo() : system.Int\n"
+					 + "		var x : system.Int = 43\n"
+					 + "		x\n"
+					 + "var b : PseudoPure = new\n"
+					 + "	def bar() : system.Int\n"
+					 + "		var c : MarkedResource = a\n"
+					 + "		0\n"
+					 + "b.bar()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		try {
+			Expression program = ast.generateIL(genCtx, null);
+			program.typeCheck(TypeContext.empty());
+			Assert.fail("Typechecking should have failed (in code generation).");
+		} catch (ToolError e) {
+		}
+	}
+
+	@Test
+	public void testValMarkedResource() throws ParseException {
+		String input = "resource type MarkedResource\n"
+				 + "	def foo() : system.Int\n"
+				 + "type PseudoPure\n"
+				 + "	def bar() : system.Int\n"
+				 + "val a : MarkedResource = new\n"
+				 + "	def foo() : system.Int\n"
+				 + "		var x : system.Int = 43\n"
+				 + "		x\n"
+				 + "var b : PseudoPure = new\n"
+				 + "	def bar() : system.Int\n"
+				 + "		var c : MarkedResource = a\n"
+				 + "		0\n"
+				 + "b.bar()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		try {
+			Expression program = ast.generateIL(genCtx, null);
+			program.typeCheck(TypeContext.empty());
+			Assert.fail("Typechecking should have failed (in code generation).");
+		} catch (ToolError e) {
+		}
+	}
+
+	@Test
+	public void testPureVar() throws ParseException {
+		String input = "type Pure1\n"
+					 + "	def foo() : system.Int\n"
+					 + "type Pure2\n"
+					 + "	def bar() : system.Int\n"
+					 + "var a : Pure1 = new\n"
+					 + "	def foo() : system.Int\n"
+					 + "		var x : system.Int = 43\n"
+					 + "		x\n"
+					 + "var b : Pure2 = new\n"
+					 + "	def bar() : system.Int\n"
+					 + "		var c : Pure1 = a\n"
+					 + "		0\n"
+					 + "b.bar()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		try {
+			Expression program = ast.generateIL(genCtx, null);
+			program.typeCheck(TypeContext.empty());
+			Assert.fail("Typechecking should have failed (in code generation).");
+		} catch (ToolError e) {
+		}
+	}
+
+	@Test
+	public void testPureVal() throws ParseException {
+		String input = "type Pure1\n"
+				 + "	def foo() : system.Int\n"
+				 + "type Pure2\n"
+				 + "	def bar() : system.Int\n"
+				 + "val a : Pure1 = new\n"
+				 + "	def foo() : system.Int\n"
+				 + "		var x : system.Int = 43\n"
+				 + "		x\n"
+				 + "var b : Pure2 = new\n"
+				 + "	def bar() : system.Int\n"
+				 + "		var c : Pure1 = a\n"
+				 + "		0\n"
+				 + "b.bar()";
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		Expression program = ast.generateIL(genCtx, null);
+		program.typeCheck(TypeContext.empty());
+	}
+
+	@Test
 	public void testResourcenessOfTypesWithVars() throws ParseException {
 		String input = "type TwoVars\n"
 					 + "	var one : system.Int\n"
