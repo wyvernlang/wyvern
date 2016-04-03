@@ -315,18 +315,6 @@ public class OIRTests {
   }
 
   @Test
-  public void testScoping2() throws ParseException {
-    String input =
-      "def f(x : system.Int) : system.Int\n" +
-      "    val obj = new\n" +
-      "        val x = 32\n" +
-      "        val y = this.x\n" +
-      "    obj.y\n" +
-      "f(23)\n";
-    testPyFromInput(input, "32");
-  }
-
-  @Test
   public void testAssignAsExpression() throws ParseException {
     String input =
       "val obj = new\n" +

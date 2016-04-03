@@ -24,6 +24,9 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.type.CaseType;
+import wyvern.target.corewyvernIL.type.DataType;
+import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.oir.OIREnvironment;
@@ -55,4 +58,7 @@ public abstract class ASTVisitor<T> {
 	public abstract T visit(Environment env, OIREnvironment oirenv, DelegateDeclaration delegateDecl);
 	public abstract T visit(Environment env, OIREnvironment oirenv, ConcreteTypeMember concreteTypeMember);
 	public abstract T visit(Environment env, OIREnvironment oirenv, TypeDeclaration typeDecl);
+  public abstract T visit(Environment env, OIREnvironment oirenv, CaseType caseType);
+  public abstract T visit(Environment env, OIREnvironment oirenv, ExtensibleTagType extensibleTagType);
+  public abstract T visit(Environment env, OIREnvironment oirenv, DataType dataType);
 }
