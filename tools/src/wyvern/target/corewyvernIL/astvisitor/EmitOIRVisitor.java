@@ -533,9 +533,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     StructuralType defaultType =
         new StructuralType("emptyType",
                            new ArrayList<DeclType>());
-    // TypeContext context = TypeContext.empty().extend("system.Int",
-    //                                                  Util.intType());
-    
+
     // TODO: This should also take into account types available in the OIREnvironment
     TypeContext context = TestUtil.getStandardGenContext();
 
