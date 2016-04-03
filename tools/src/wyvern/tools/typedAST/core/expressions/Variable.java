@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.AssignableValueBinding;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -131,11 +132,16 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
-		return ctx.lookupExp(getName());
+		return ctx.lookupExp(getName(), location);
 	}
 	
 	@Override
 	public CallableExprGenerator getCallableExpr(GenContext ctx) {
-		return ctx.getCallableExpr(getName());
+		try {
+			return ctx.getCallableExpr(getName());
+		} catch (RuntimeException e) {
+			ToolError.reportError(VARIABLE_NOT_DECLARED, location, getName());
+			throw new RuntimeException("impossible");
+		}
 	}
 }

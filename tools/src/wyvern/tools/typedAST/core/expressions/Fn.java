@@ -47,9 +47,15 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	private List<NameBinding> bindings;
 	ExpressionAST body;
 
+	@Deprecated
 	public Fn(List<NameBinding> bindings, TypedAST body) {
+		this(bindings, body, FileLocation.UNKNOWN);
+	}
+	
+	public Fn(List<NameBinding> bindings, TypedAST body, FileLocation loc) {
 		this.bindings = bindings;
 		this.body = (ExpressionAST) body;
+		this.location = loc;
 	}
 
 	@Override
@@ -113,12 +119,12 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
 		writer.write(new New(Arrays.asList(new DefDeclaration("call",
 				bindings.stream().map(b->new FormalArg(b.getName(), (ValueType)b.getType().generateILType())).collect(Collectors.toList()),
-                (ValueType)getType().generateILType(), ExpressionWriter.generate(iwriter->body.codegenToIL(new GenerationEnvironment(environment), iwriter)))), null, null));
+                (ValueType)getType().generateILType(), ExpressionWriter.generate(iwriter->body.codegenToIL(new GenerationEnvironment(environment), iwriter)), getLocation())), null, null));
 	}
 
 	@Override
 	public ExpressionAST doClone(Map<String, TypedAST> nc) {
-		return new Fn(bindings, nc.get("body"));
+		return new Fn(bindings, nc.get("body"), this.location);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
@@ -154,7 +160,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         ValueType bodyReturnType = il.typeCheck(ctx);
 
         // Create a new list of function declaration, which is a singleton, containing only "apply"
-        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, il);
+        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, il, getLocation());
         List<Declaration> declList = new LinkedList<>();
         declList.add(applyDef);
 

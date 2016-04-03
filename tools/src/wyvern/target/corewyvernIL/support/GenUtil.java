@@ -92,7 +92,7 @@ public class GenUtil {
 				Expression newExp = new New(decls, decl.getName(), type);
 				if(!ai.hasNext()) {
 					//return newExp;
-					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>(), null));
+					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>(), decl));
 				} else {
 					return new Let(decl.getName(), newExp, genExpByIterator(genCtx, ai));
 				}
@@ -114,6 +114,10 @@ public class GenUtil {
         if (javaClass.getName().equals("java.lang.String")) {
             return Util.stringType();
         }
+
+		if (javaClass.getName().equals("wyvern.target.corewyvernIL.expression.ObjectValue")) {
+			return Util.emptyType();
+		}
         
 		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupType(javaTypesObjectName);
 		return type.getJavaType(javaClass, ctx);

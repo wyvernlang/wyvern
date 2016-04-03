@@ -67,7 +67,8 @@ public class OIRTests {
     // Since the root OIR environment is stateful, reset it between tests
     OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-    Expression ILprogram = ast.generateIL(GenContext.empty().extend("system", new Variable("system"), null), null);
+    GenContext genContext = TestUtil.getStandardGenContext();
+    Expression ILprogram = ast.generateIL(genContext, null);
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);
@@ -82,10 +83,7 @@ public class OIRTests {
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
                               null,
                               OIREnvironment.getRootEnvironment());
-    if (debug) {
-      // System.out.println("OIR Root Environment:");
-      // System.out.println(OIREnvironment.getRootEnvironment().prettyPrint());
-    }
+
     String pprint =
       new PrettyPrintVisitor().prettyPrint(oirast,
                                            OIREnvironment.getRootEnvironment());
@@ -319,6 +317,6 @@ public class OIRTests {
       "    def identity(x : system.Int) : system.Int = x\n" +
       "obj.identity(obj.x = 7)\n" +
       "obj.x\n";
-    testPyFromInput(input, "7", true);
+    testPyFromInput(input, "7");
   }
 }

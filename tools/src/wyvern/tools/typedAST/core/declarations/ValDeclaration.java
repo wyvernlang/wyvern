@@ -204,7 +204,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
         environment.register(getName(), valueType);
         String genName = GenerationEnvironment.generateVariableName();
         writer.wrap(e->new Let(genName, Optional.ofNullable(definition).<Expression>map(d ->ExpressionWriter.generate(ew->d.codegenToIL(environment, ew))).orElse(null), (Expression)e));
-        writer.write(new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), getType().generateILType(), new Variable(genName)));
+        writer.write(new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), getType().generateILType(), new Variable(genName), location));
     }
 
     @Override
@@ -278,7 +278,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		
 		ValueType expectedType = getILValueType(ctx);
-		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType));
+		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType), location);
 	}
 
 	@Override
@@ -292,7 +292,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		wyvern.target.corewyvernIL.decl.Declaration decl =
 			new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(),
 					getILValueType(tlc.getContext()),
-					new wyvern.target.corewyvernIL.expression.Variable(getName()));
+					new wyvern.target.corewyvernIL.expression.Variable(getName()), location);
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}

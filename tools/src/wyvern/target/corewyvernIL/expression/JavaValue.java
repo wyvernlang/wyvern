@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.interop.FObject;
 
 public class JavaValue extends AbstractValue implements Invokable {
@@ -18,7 +20,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 	private FObject foreignObject;
 
 	public JavaValue(FObject foreignObject, ValueType exprType) {
-		super(exprType);
+		super(exprType, FileLocation.UNKNOWN);
 		this.foreignObject = foreignObject;
 	}
 
@@ -57,6 +59,8 @@ public class JavaValue extends AbstractValue implements Invokable {
 			return new Integer(((IntegerLiteral)arg).getValue());
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
+		} else if (arg instanceof ObjectValue) {
+			return arg;
 		} else {
 			throw new RuntimeException("some Wyvern->Java cases not implemented");
 		}

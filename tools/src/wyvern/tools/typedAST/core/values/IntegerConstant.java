@@ -25,8 +25,14 @@ import wyvern.tools.util.TreeWriter;
 public class IntegerConstant extends AbstractValue implements InvokableValue, CoreAST {
 	private int value;
 	
+	@Deprecated
 	public IntegerConstant(int i) {
+		this(i, FileLocation.UNKNOWN);
+	}
+
+	public IntegerConstant(int i, FileLocation loc) {
 		value = i;
+		location = loc;
 	}
 
 	@Override
@@ -94,12 +100,12 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new IntegerConstant(value);
+		return new IntegerConstant(value, location);
 	}
 
     @Override
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new IntegerLiteral(value));
+        writer.write(new IntegerLiteral(value, location));
     }
 
     @Override
@@ -113,6 +119,6 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
-		return new IntegerLiteral(value);
+		return new IntegerLiteral(value, location);
 	}
 }
