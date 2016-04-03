@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
@@ -84,14 +85,12 @@ public class DefDeclaration extends NamedDeclaration {
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
 		}
-		Set<String> freeVars = this.getFreeVariables();
-		if (!freeVars.isEmpty()) {
-			for (String freeVar : freeVars) {
-				Variable fv = new Variable(freeVar);
-				ValueType fvt = fv.typeCheck(methodCtx);
-				if (fvt instanceof StructuralType && ((StructuralType) fvt).isResource()) {
-					this.resourceFlag = true;
-				}
+		for (String freeVar : this.getFreeVariables()) {
+			ValueType t = (new Variable(freeVar)).typeCheck(methodCtx);
+			if (t instanceof StructuralType) {
+				this.resourceFlag = ((StructuralType) t).isResource();
+			} else if (t instanceof NominalType) {
+				this.resourceFlag = t.getStructuralType(ctx).isResource();
 			}
 		}
 
