@@ -35,6 +35,7 @@ class PrettyPrintState {
   public int variableCounter;
   public HashMap <String, OIRClassDeclaration> classDecls;
   public HashSet <String> freeVarSet;
+  public String currentMethod;
 }
 
 public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
@@ -87,6 +88,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     state.variableCounter = 0;
     state.classDecls = new HashMap<String, OIRClassDeclaration>();
     state.freeVarSet = new HashSet<String>();
+    state.currentMethod = "";
 
     findClassDecls(state, oirenv);
 
@@ -150,15 +152,25 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     state.expectingReturn = false;
     String objExpr =
       oirFieldSet.getObjectExpr().acceptVisitor(this, state);
-    String strVal =
-      (objExpr +
-       "." +
-       oirFieldSet.getFieldName() +
-       " = " +
-       oirFieldSet.getExprToAssign().acceptVisitor(this, state));
+    String fieldName = oirFieldSet.getFieldName();
+    String setterName =
+      "set" + fieldName.substring(0, 1).toUpperCase() +
+      fieldName.substring(1);
+
+    String strVal;
+    if (state.currentMethod.equals(setterName)) {
+      strVal =
+        objExpr + "." + fieldName + " = " +
+        oirFieldSet.getExprToAssign().acceptVisitor(this, state);
+    } else {
+      strVal = objExpr + "." + setterName + "(" +
+        oirFieldSet.getExprToAssign().acceptVisitor(this, state) + ")";
+    }
     state.expectingReturn = oldExpectingReturn;
+    // TODO: Handle case where objExpr has side effects
     if (state.expectingReturn)
-      return strVal + "\n" + indent + "return " + objExpr;
+      return strVal + "\n" + indent + "return " + objExpr + "." +
+        oirFieldSet.getFieldName();
     return strVal;
   }
 
@@ -375,7 +387,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     for (OIRFormalArg formalArg : oirMethod.getDeclaration().getArgs()) {
       args += ", " + formalArg.getName();
     }
-    String def = "def " + oirMethod.getDeclaration().getName() +
+    String name = oirMethod.getDeclaration().getName();
+    String oldMethod = state.currentMethod;
+    state.currentMethod = name;
+    String def = "def " + name +
       "(" + args + ")"+ ":";
 
     String oldIndent = indent;
@@ -389,6 +404,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
     state.expectingReturn = oldExpectingReturn;
     indent = oldIndent;
+    state.currentMethod = oldMethod;
 
     if (state.expectingReturn)
       return def + body + "\n" + indent + "return " + oirMethod.getDeclaration().getName();
