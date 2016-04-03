@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -109,6 +110,12 @@ public class OIRTests {
       if (debug)
         System.out.println("Python output:");
 
+      if (!p.waitFor(10, TimeUnit.SECONDS)) {
+        System.out.println("Python code timed out!");
+        fail("Python timeout -- infinite loop, or just slow?");
+        return;
+      }
+
       String result = "";
       String s = null;
       while ((s = stdInput.readLine()) != null) {
@@ -126,7 +133,7 @@ public class OIRTests {
         }
       }
       assertEquals(expected, result);
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.out.println("Error running python test: " + e.toString());
     }
   }
@@ -259,7 +266,7 @@ public class OIRTests {
       "val r : IntResult = new\n" +
       "    def getResult() : system.Int = 18\n\n" +
       "r.getResult()\n";
-    testPyFromInput(input, "18");
+    testPyFromInput(input, "18", true);
   }
 
   @Test
@@ -268,7 +275,7 @@ public class OIRTests {
       "type Int = system.Int\n" +
       "val i : Int = 32\n" +
       "i\n";
-    testPyFromInput(input, "32", true);
+    testPyFromInput(input, "32");
   }
 
   @Test
@@ -302,16 +309,6 @@ public class OIRTests {
       "    obj.const()\n" +
       "f(7)\n";
     testPyFromInput(input, "7");
-  }
-
-  @Test
-  public void testILNullPtr() throws ParseException {
-    String input =
-      "val obj = new\n" +
-      "    val x = 5\n" +
-      "    val y = this.x\n" +
-      "obj.y\n";
-    testPyFromInput(input, "5");
   }
 
   @Test

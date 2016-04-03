@@ -535,6 +535,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
                            new ArrayList<DeclType>());
     // TypeContext context = TypeContext.empty().extend("system.Int",
     //                                                  Util.intType());
+    
+    // TODO: This should also take into account types available in the OIREnvironment
     TypeContext context = TestUtil.getStandardGenContext();
 
     StructuralType st = nominalType.getStructuralType(context,

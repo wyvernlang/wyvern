@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
 import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
