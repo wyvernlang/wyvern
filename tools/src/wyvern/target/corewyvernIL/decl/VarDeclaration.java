@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 
 public class VarDeclaration extends DeclarationWithRHS {
 
@@ -22,8 +23,8 @@ public class VarDeclaration extends DeclarationWithRHS {
 		return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
 	}*/
 
-	public VarDeclaration(String name, ValueType type, Expression value) {
-		super(name, value);
+	public VarDeclaration(String name, ValueType type, Expression value, FileLocation loc) {
+		super(name, value, loc);
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 	}
@@ -56,7 +57,7 @@ public class VarDeclaration extends DeclarationWithRHS {
 	@Override
 	public Declaration interpret(EvalContext ctx) {
 		Expression newValue = (Expression) getDefinition().interpret(ctx);
-		return new VarDeclaration(getName(), type, newValue);
+		return new VarDeclaration(getName(), type, newValue, getLocation());
 	}
 
 	public Set<String> getFreeVariables() {

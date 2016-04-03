@@ -256,9 +256,10 @@ public class ModuleSystemTests {
 	
 	@Test
 	public void testTopLevelVarGet () throws ParseException {
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		/*GenContext.empty().extend("system", new Variable("system"), null);
 		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		genCtx = new TypeGenContext("Unit", "system", genCtx);*/
 	
 		String source = "var v : Int = 5\n"
 					  + "v\n";
@@ -268,16 +269,14 @@ public class ModuleSystemTests {
 		Expression program = ast.generateIL(genCtx, Util.intType());
 		
 		// Evaluate.
-		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(TestUtil.getStandardEvalContext());
 		Assert.assertEquals(new IntegerLiteral(5), result);
 		
 	}
 	
 	@Test
 	public void testTopLevelVarSet () throws ParseException {
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		GenContext genCtx = TestUtil.getStandardGenContext();
 	
 		String source = "var v : Int = 5\n"
 					  + "v = 10\n"
@@ -288,7 +287,7 @@ public class ModuleSystemTests {
 		Expression program = ast.generateIL(genCtx, Util.intType());
 		
 		// Evaluate.
-		wyvern.target.corewyvernIL.expression.Value result = program.interpret(EvalContext.empty());
+		wyvern.target.corewyvernIL.expression.Value result = program.interpret(TestUtil.getStandardEvalContext());
 		Assert.assertEquals(new IntegerLiteral(10), result);
 		
 	}

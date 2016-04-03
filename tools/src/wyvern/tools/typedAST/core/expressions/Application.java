@@ -48,6 +48,8 @@ public class Application extends CachingTypedAST implements CoreAST {
 		this.function = (ExpressionAST) function;
 		this.argument = (ExpressionAST) argument;
 		this.location = location;
+		//if (location == null || location.line == -1)
+		//	throw new RuntimeException();
 	}
 
 	@Override
@@ -128,7 +130,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 		return new Application((ExpressionAST)nc.get("function"), (ExpressionAST)nc.get("argument"), location);
 	}
 
-	private FileLocation location = FileLocation.UNKNOWN;
+	private FileLocation location;
 	public FileLocation getLocation() {
 		return this.location;
 	}

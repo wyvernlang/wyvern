@@ -81,7 +81,7 @@ public class NominalType extends ValueType {
 	}
 	
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
-		if (equals(t))
+		if (super.isSubtypeOf(t, ctx))
 			return true;
 		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 		if (dt instanceof ConcreteTypeMember) {
@@ -89,7 +89,7 @@ public class NominalType extends ValueType {
 			return vt.isSubtypeOf(t, ctx);
 		} else {
 			ValueType ct = t.getCanonicalType(ctx);
-			return equals(ct); // check for equality with the canonical type 
+			return super.isSubtypeOf(ct, ctx); // check for equality with the canonical type 
 		}
 	}
 

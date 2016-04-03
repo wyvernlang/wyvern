@@ -2,7 +2,10 @@ package wyvern.target.corewyvernIL.support;
 
 import java.util.LinkedList;
 
+import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -18,4 +21,7 @@ public class Util {
 	public static ValueType intType() { return theIntType; }
 	public static ValueType stringType() { return theStringType; }
 	public static ValueType unitType() { return theUnitType; }
+	public static Value unitValue() {
+		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, EvalContext.empty());
+	}
 }

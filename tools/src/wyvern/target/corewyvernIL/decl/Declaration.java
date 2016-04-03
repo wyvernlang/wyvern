@@ -7,8 +7,12 @@ import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.tools.errors.FileLocation;
 
 public abstract class Declaration extends ASTNode implements EmitOIR {
+	public Declaration(FileLocation loc) {
+		super(loc);
+	}
 	public abstract DeclType typeCheck(TypeContext ctx, TypeContext thisCtx);
 
 	/**
