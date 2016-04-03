@@ -3,9 +3,15 @@ package wyvern.target.corewyvernIL.support;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class EmptyGenContext extends GenContext {
-
+	private InterpreterState state;
+	
 	protected EmptyGenContext() {
 		super(null);
+	}
+
+	public EmptyGenContext(InterpreterState state) {
+		super(null);
+		this.state = state;
 	}
 
 	@Override
@@ -29,4 +35,8 @@ public class EmptyGenContext extends GenContext {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}
 
+	@Override
+	public InterpreterState getInterpreterState() {
+		return state;
+	}
 }

@@ -111,4 +111,8 @@ public abstract class GenContext extends TypeContext {
 	protected GenContext getNext() {
 		return nextContext;
 	}
+	
+	public InterpreterState getInterpreterState() {
+		return this.nextContext.getInterpreterState();
+	}
 }
