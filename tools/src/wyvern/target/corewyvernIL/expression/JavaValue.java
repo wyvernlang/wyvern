@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.interop.FObject;
 
 public class JavaValue extends AbstractValue implements Invokable {
@@ -17,7 +18,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 	private FObject foreignObject;
 
 	public JavaValue(FObject foreignObject, ValueType exprType) {
-		super(exprType);
+		super(exprType, FileLocation.UNKNOWN);
 		this.foreignObject = foreignObject;
 	}
 

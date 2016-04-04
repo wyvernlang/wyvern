@@ -8,7 +8,7 @@ public enum ErrorMessage {
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
 	CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
-	VARIABLE_NOT_DECLARED("Variable %ARG has no type in the context", 1),
+	VARIABLE_NOT_DECLARED("No variable named %ARG is in scope", 1),
 	NO_SUCH_METHOD("There is no visible method named %ARG", 1),
 	NOT_A_METHOD("%ARG is not a method", 1),
 	TYPE_NOT_DECLARED("Type %ARG has no declaration in the context", 1),

@@ -28,6 +28,8 @@ public class MethodCall extends Expression {
 	public MethodCall(Expression objectExpr, String methodName,
 			List<Expression> args, HasLocation location) {
 		super(location != null ? location.getLocation():null);
+		if (getLocation() == null || getLocation().line == -1)
+			throw new RuntimeException("missing location");
 		this.objectExpr = objectExpr;
 		this.methodName = methodName;
 		this.args = args;
@@ -81,6 +83,8 @@ public class MethodCall extends Expression {
 			String name = ddt.getFormalArgs().get(i).getName();
 			ValueType actualType = e.typeCheck(ctx); 
 			if (!actualType.isSubtypeOf(argType, ctx)) {
+				// for debugging
+				actualType.isSubtypeOf(argType, ctx);
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
             }
 			ctx = ctx.extend(name, argType);

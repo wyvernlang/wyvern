@@ -6,6 +6,7 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
@@ -15,7 +16,7 @@ public class RationalLiteral extends AbstractValue {
 	private int denominator;
 
 	public RationalLiteral(int numerator, int denominator) {
-		super(null);
+		super(null, null);
 		this.numerator = numerator;
 		this.denominator = denominator;
 	}

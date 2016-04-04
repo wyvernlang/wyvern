@@ -12,11 +12,12 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 
 public class TypeDeclaration extends NamedDeclaration {
 
-	public TypeDeclaration(String typeName, Type sourceType) {
-		super(typeName);
+	public TypeDeclaration(String typeName, Type sourceType, FileLocation loc) {
+		super(typeName, loc);
 		this.sourceType = sourceType;
 	}
 

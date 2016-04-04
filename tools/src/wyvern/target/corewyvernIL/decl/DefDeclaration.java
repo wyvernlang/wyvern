@@ -13,6 +13,9 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public class DefDeclaration extends NamedDeclaration {
 
@@ -21,8 +24,8 @@ public class DefDeclaration extends NamedDeclaration {
 	private Expression body;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
-			ValueType type, Expression body) {
-		super(methodName);
+			ValueType type, Expression body, FileLocation loc) {
+		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
@@ -76,8 +79,15 @@ public class DefDeclaration extends NamedDeclaration {
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
 		}
-		if (!body.typeCheck(methodCtx).isSubtypeOf(getType(), methodCtx))
-			throw new RuntimeException("body doesn't match declared type");
+		ValueType bodyType = body.typeCheck(methodCtx);
+		if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
+			// for debugging
+			//ValueType resultType = getType();
+			//bodyType.isSubtypeOf(resultType, methodCtx);
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");;
+			
+			//throw new RuntimeException("body doesn't match declared type");
+		}
 		return new DefDeclType(getName(), type, formalArgs);
 	}
 

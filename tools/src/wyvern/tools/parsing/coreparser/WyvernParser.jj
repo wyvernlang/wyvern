@@ -471,15 +471,15 @@ AST Expression(ExpFlags flags) :
     return exp;
   }
 |
-  <FN> formal = Formal() <ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp); }
+  <FN> formal = Formal() t=<ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp, loc(t)); }
 
 }
 
 AST LambdaFn(ExpFlags flags) :
-{ List formals; AST body; }
+{ List formals; AST body; Token t; }
 {
-    formals = Formals_Lambda() <ARROW> body = Expression(flags) {
-        return build.fn(formals, body);
+    formals = Formals_Lambda() t=<ARROW> body = Expression(flags) {
+        return build.fn(formals, body, loc(t));
     }
 }
 
@@ -581,9 +581,9 @@ AST PrimaryPrefix(ExpFlags flags) :
 AST Literal() :
 { Token lit; }
 {
-  lit = <STRING_LITERAL>  { return build.stringLit(lit.image); }
+  lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
 |
-  lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image)); }
+  lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
 |
   <RATIONAL_LITERAL>
 }
@@ -599,7 +599,7 @@ AST PrimarySuffix(AST lhs, ExpFlags flags) :
 AST Arguments(ExpFlags flags) :
 { AST exp = null; Token t; }
 {
-  t = <LPAREN> [ exp = ArgumentList(flags) ] <RPAREN> {
+  t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
   			if (exp == null)
   				return build.unitValue(loc(t));
   			else
@@ -607,7 +607,7 @@ AST Arguments(ExpFlags flags) :
 		}
 }
 
-AST ArgumentList(ExpFlags flags) :
+AST ArgumentList(ExpFlags flags, FileLocation loc) :
 { AST exp; AST exp2; LinkedList<AST> expList = null; Token t; }
 {
   exp = Expression(flags)
@@ -620,7 +620,7 @@ AST ArgumentList(ExpFlags flags) :
 	}
   )* {
   		if (expList != null) {
-  			return build.tuple(expList); 
+  			return build.tuple(expList, loc); 
   		}
   		return exp;
   	}

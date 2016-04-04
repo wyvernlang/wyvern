@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 
 public class IntegerLiteral extends AbstractValue {
 
@@ -35,7 +36,10 @@ public class IntegerLiteral extends AbstractValue {
 	private int value;
 
 	public IntegerLiteral(int value) {
-		super(Util.intType());
+		this(value, FileLocation.UNKNOWN);
+	}
+	public IntegerLiteral(int value, FileLocation loc) {
+		super(Util.intType(), loc);
 		this.value = value;
 	}
 
