@@ -16,7 +16,7 @@ public class BooleanLiteral extends AbstractValue {
     private boolean value;
 
     public BooleanLiteral(boolean value) {
-        super(null);
+        super(Util.booleanType(), null);
         this.value = value;
     }
 

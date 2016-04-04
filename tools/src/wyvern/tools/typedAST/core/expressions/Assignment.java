@@ -162,7 +162,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 			Expression receiver = methCall.getObjectExpr();
 			List<Expression> setterArgs = new LinkedList<>();
 			setterArgs.add(exprToAssign);
-			return new MethodCall(receiver, setterName, setterArgs, null);
+			return new MethodCall(receiver, setterName, setterArgs, this);
 			
 		}
 		

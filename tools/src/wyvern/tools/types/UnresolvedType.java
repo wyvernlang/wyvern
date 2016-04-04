@@ -31,15 +31,6 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 	}
 	
 	public Type resolve(Environment env) {
-		// System.out.println("Looking at: " + this.typeName);
-		
-		if (env.lookup(this.typeName) != null) {
-			NameBinding n = env.lookup(this.typeName);
-		
-			// System.out.println("NameBinding = " + n);
-			// System.out.println("Its type is " + n.getType());
-		}
-		
 		if (env.lookupType(typeName) == null) {
 			if (env.lookup(this.typeName) != null) {
 				// Perhaps its first class?
@@ -104,16 +95,10 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		/*
-		if(typeName.equals("Int")) {
-			return new NominalType("system", "Int");
-		}
-		*/
 		String objName = ctx.getContainerForTypeAbbrev(typeName);
-		if (objName == null)
+		if (objName == null) {
 			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, typeName);
-			//throw new RuntimeException("type " + typeName + "is not defined");
+		}
 		return new NominalType(objName, typeName);
 	}
 }

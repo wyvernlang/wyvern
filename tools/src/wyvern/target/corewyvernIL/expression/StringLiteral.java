@@ -10,13 +10,18 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.FileLocation;
 
 public class StringLiteral extends Literal {
 
 	private java.lang.String value;
 
 	public StringLiteral(java.lang.String value) {
-		super(null);
+		this(value, FileLocation.UNKNOWN);
+	}
+	
+	public StringLiteral(java.lang.String value, FileLocation loc) {
+		super(Util.stringType(), loc);
 		this.value = value;
 	}
 

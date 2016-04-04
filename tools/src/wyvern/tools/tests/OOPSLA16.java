@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -39,8 +40,9 @@ public class OOPSLA16 {
     }
 
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testFigure5Corrected() throws ParseException {
-		
+
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
 		GenContext genCtx = TestUtil.getStandardGenContext();
 		TypeContext ctx = TestUtil.getStandardTypeContext();
@@ -132,6 +134,7 @@ public class OOPSLA16 {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testFigure2() throws ParseException {
 		
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };

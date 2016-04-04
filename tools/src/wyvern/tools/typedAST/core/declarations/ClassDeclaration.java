@@ -480,8 +480,8 @@ public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST
         writer.wrap(e->new Let(newVar, new New(classMembers, "this", valueType), (Expression)e));
         environment.register(nameBinding.getName(), valueType);
         //TODO: Tags support
-        writer.write(new TypeDeclaration(nameBinding.getName(), valueType));
-        writer.write(new ValDeclaration(nameBinding.getName(), valueType, new Variable(newVar)));
+        writer.write(new TypeDeclaration(nameBinding.getName(), valueType, getLocation()));
+        writer.write(new ValDeclaration(nameBinding.getName(), valueType, new Variable(newVar), getLocation()));
     }
 
 

@@ -13,7 +13,32 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
 
-public class NominalType extends ValueType{
+public class NominalType extends ValueType {
+	private Path path;
+	private String typeMember;
+
+	public NominalType(String pathVariable, String typeMember) {
+		super();
+		this.path = new Variable(pathVariable);
+		this.typeMember = typeMember;
+	}
+
+	public NominalType(Path path, String typeMember) {
+		super();
+        if(path.equals(null)) {
+            throw new IllegalStateException("Path cannot be null.");
+        }
+		this.path = path;
+		this.typeMember = typeMember;
+	}
+
+	public Path getPath() {
+		return path;
+	}
+
+	public String getTypeMember() {
+		return typeMember;
+	}
 	
 	@Override
 	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
@@ -44,10 +69,7 @@ public class NominalType extends ValueType{
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(new Object[] {
-		           path,
-		           typeMember,
-		    });
+		return Arrays.hashCode(new Object[] { path, typeMember, });
 	}
 
 	@Override
@@ -57,36 +79,9 @@ public class NominalType extends ValueType{
 		NominalType other = (NominalType)obj;
 		return path.equals(other.path) && typeMember.equals(other.typeMember);
 	}
-
-	private Path path;
-	private String typeMember;
-	
-	
-	public NominalType(String pathVariable, String typeMember) {
-		super();
-		this.path = new Variable(pathVariable);
-		this.typeMember = typeMember;
-	}
-
-	public NominalType(Path path, String typeMember) {
-		super();
-        if(path.equals(null)) {
-            throw new IllegalStateException("Path cannot be null.");
-        }
-		this.path = path;
-		this.typeMember = typeMember;
-	}
-
-	public Path getPath() {
-		return path;
-	}
-	
-	public String getTypeMember() {
-		return typeMember;
-	}
 	
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
-		if (equals(t))
+		if (super.isSubtypeOf(t, ctx))
 			return true;
 		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 		if (dt instanceof ConcreteTypeMember) {
@@ -94,7 +89,7 @@ public class NominalType extends ValueType{
 			return vt.isSubtypeOf(t, ctx);
 		} else {
 			ValueType ct = t.getCanonicalType(ctx);
-			return equals(ct); // check for equality with the canonical type 
+			return super.isSubtypeOf(ct, ctx); // check for equality with the canonical type 
 		}
 	}
 

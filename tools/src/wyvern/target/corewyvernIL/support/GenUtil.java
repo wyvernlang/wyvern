@@ -12,9 +12,6 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class GenUtil {
-
-	private final static int JAVA_REC_DEPTH = 1;
-	
 	/**
 	 * Linking of single modules </br>
 	 * 
@@ -58,7 +55,6 @@ public class GenUtil {
 	}
 
 	public static Expression genExp(List<wyvern.target.corewyvernIL.decl.Declaration> decls, GenContext genCtx) {
-		Expression program = null;
 		Iterator<wyvern.target.corewyvernIL.decl.Declaration> ai = decls.iterator();
 		
 		if (!ai.hasNext())
@@ -70,7 +66,6 @@ public class GenUtil {
 	private static Expression genExpByIterator(GenContext genCtx, Iterator<wyvern.target.corewyvernIL.decl.Declaration> ai) {
 		if (ai.hasNext()) {
 			wyvern.target.corewyvernIL.decl.Declaration decl = ai.next();
-			Expression program = null;
 			if(decl instanceof wyvern.target.corewyvernIL.decl.ValDeclaration) {
 				wyvern.target.corewyvernIL.decl.ValDeclaration vd = (wyvern.target.corewyvernIL.decl.ValDeclaration) decl;
 				return new Let(vd.getName(), vd.getDefinition(), genExpByIterator(genCtx, ai));
@@ -92,7 +87,7 @@ public class GenUtil {
 				Expression newExp = new New(decls, decl.getName(), type);
 				if(!ai.hasNext()) {
 					//return newExp;
-					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>(), null));
+					return new Let(decl.getName(), newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>(), decl));
 				} else {
 					return new Let(decl.getName(), newExp, genExpByIterator(genCtx, ai));
 				}

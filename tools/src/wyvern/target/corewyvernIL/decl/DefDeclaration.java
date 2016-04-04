@@ -10,19 +10,26 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public class DefDeclaration extends NamedDeclaration {
 
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
+	private boolean resourceFlag = false;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
-			ValueType type, Expression body) {
-		super(methodName);
+			ValueType type, Expression body, FileLocation loc) {
+		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
@@ -64,6 +71,11 @@ public class DefDeclaration extends NamedDeclaration {
 	public Expression getBody() {
 		return body;
 	}
+
+	public boolean isResource() {
+		return this.resourceFlag;
+	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -76,14 +88,31 @@ public class DefDeclaration extends NamedDeclaration {
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
 		}
-		if (!body.typeCheck(methodCtx).isSubtypeOf(getType(), methodCtx))
-			throw new RuntimeException("body doesn't match declared type");
+
+		for (String freeVar : this.getFreeVariables()) {
+			ValueType t = (new Variable(freeVar)).typeCheck(methodCtx);
+			if (t instanceof StructuralType) {
+				this.resourceFlag = ((StructuralType) t).isResource();
+			} else if (t instanceof NominalType) {
+				this.resourceFlag = t.getStructuralType(ctx).isResource();
+			}
+		}
+
+		ValueType bodyType = body.typeCheck(methodCtx);
+		if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
+			// for debugging
+			//ValueType resultType = getType();
+			//bodyType.isSubtypeOf(resultType, methodCtx);
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");;
+			
+			//throw new RuntimeException("body doesn't match declared type");
+		}
+
 		return new DefDeclType(getName(), type, formalArgs);
 	}
 
 	@Override
 	public Set<String> getFreeVariables() {
-		
 		// Get all free variables in the body of the method.
 		Set<String> freeVars = body.getFreeVariables();
 		

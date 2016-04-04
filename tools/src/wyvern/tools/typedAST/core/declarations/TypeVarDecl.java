@@ -250,7 +250,7 @@ public class TypeVarDecl extends Declaration {
 
     @Override
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(ExpressionWriter.generate(ow -> new wyvern.target.corewyvernIL.decl.TypeDeclaration(name, body.getType().generateILType()))); // TODO better tag support
+        writer.write(ExpressionWriter.generate(ow -> new wyvern.target.corewyvernIL.decl.TypeDeclaration(name, body.getType().generateILType(), getLocation()))); // TODO better tag support
     }
 
     @Override
@@ -283,7 +283,7 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		StructuralType type = computeInternalILType(ctx);
-		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
+		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getLocation());
 	}
 	
 	public boolean isResource() {
@@ -293,14 +293,14 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
 		StructuralType type = computeInternalILType(ctx);
-		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type);
+		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getLocation());
 	}
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
 		wyvern.target.corewyvernIL.decl.Declaration decl =
 			new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(),
-					computeInternalILType(tlc.getContext()));
+					computeInternalILType(tlc.getContext()), getLocation());
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}

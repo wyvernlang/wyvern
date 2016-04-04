@@ -72,6 +72,10 @@ public class StructuralType extends ValueType {
 		this.declTypes = declTypes;
 	}*/
 
+	public boolean isResource() {
+		return this.resourceFlag;
+	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -85,6 +89,9 @@ public class StructuralType extends ValueType {
 
 	@Override
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+		t = t.getCanonicalType(ctx);
+		if (t instanceof DynamicType)
+			return true;
 		if (t instanceof NominalType) {
 			StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
 			if (st == null) 
