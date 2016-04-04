@@ -70,12 +70,12 @@ public class Mirror {
         return 0;
     }
 
-    public String typeName(ObjectValue obj) {
+    public String typeName(ObjectValue obj) throws Exception {
         ValueType type = obj.getType();
         if (type instanceof NominalType) {
             return ((NominalType) type).getTypeMember();
         }
-        // give message "error: structural type"
-        return obj.getType().toString();
+        throw new Exception("Error: Requested name of a structural type");
+        // return obj.getType().toString();
     }
 }

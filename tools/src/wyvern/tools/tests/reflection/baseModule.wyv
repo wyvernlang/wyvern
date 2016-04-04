@@ -1,19 +1,18 @@
 module wyvern_reflect_base
 
+import Lists
 import java:wyvern.tools.tests.ReflectionTests.mirror
 
 type Any
-
-type List
-	val contents : Any
 
 /**
 * Mirror to reflect an object at run time.
 */
 type Object
     def equals(object:Object) : Int
-    // def invoke (m:Method, args:List) : Object
+    def invoke (m:String, args:Lists.List) : Object
     // def set(f:Field, value:Object) : Unit
+    // def get(f:Field) : Object
     def typeOf() : Type
 
 /**
@@ -31,7 +30,7 @@ type Type
 * Mirror to reflect the compile time attributes of a method.
 */
 type Method
-    def arguments() : List
+    def arguments() : Lists.List
     def equals(method:Method) : Unit // Boolean
     def name() : String
     def returnType() : Type
@@ -53,20 +52,34 @@ type Field
     def name() : String
     def typeOf() : Type
 
-// TODO: migrate to another module?
-def createType(object:Any) : Type = new
-    val original : Any = object
-    def equals(typ:Type) : Int = mirror.equalTypes(object, typ)
-    // def fields() : List
-    // def fieldByName(name:String) : Field
-    // def methodByName(name:String) : Method
-    // def methods() : List
+def createField(name:String, type:Type) : Field = new
+    def equals(field:Field) : Unit // Boolean = mirror.equalFields(this, field)
+    def name() : String = name
+    def typeOf() : Type = type
+
+def createMethod(arguments:Lists.List, name:String, returnType:Type) : Method = new
+    def arguments() : Lists.List = arguments
+    def equals(method:Method) : Unit // Boolean = mirror.equalMethods(this, method)
+    def name() : String = name
+    def returnType() : Type = returnType
+
+def createType(fields:List, methods:List, name:String) =
+    def equals(typ:Type) : Int = mirror.equalTypes(this, typ)
+    def fields() : List = fields
+    def fieldByName(name:String) : Field = findField(name)
+    def methodByName(name:String) : Method = let
+        val arguments = mirror.getMethodArgs(name, object)
+        // TODO: get type
+        val returnType = createType(...)
+        in createMethod(arguments, name, returnType)
+    def methods() : List = methods
     def name() : String = mirror.typeName(object)
 
 def reflect(object:Any) : Object = new
     val original : Any = object
     def equals(object2:Object) : Int = mirror.equals(object, object2)
-    // def invoke(m:Method, args:List) : Object = reflect(mirror.invoke(object, "methodName", args))
+    // TODO: convert back into m:Method
+    def invoke(m:String, args:Lists.List) : Object = reflect(mirror.invoke(object, m, args))
     def typeOf() : Type = createType(object)
 
 // def typeReflect[T]() : Type

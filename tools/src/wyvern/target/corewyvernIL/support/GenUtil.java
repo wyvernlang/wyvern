@@ -118,7 +118,11 @@ public class GenUtil {
 		if (javaClass.getName().equals("wyvern.target.corewyvernIL.expression.ObjectValue")) {
 			return Util.emptyType();
 		}
-        
+
+		if (javaClass.getName().equals("java.util.List")) {
+			return Util.listType();
+		}
+
 		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupType(javaTypesObjectName);
 		return type.getJavaType(javaClass, ctx);
 	}

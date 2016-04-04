@@ -1,16 +1,23 @@
 resource module main
 
 import wyvern_reflect_base
+import Lists
 import java:wyvern.tools.tests.ReflectionTests.tools
+
+type Any
 
 type IntObj
 	val contents : Int
+	def add(x:IntObj) : Int
 
 type StringObj
     val contents : String
 
-val intObj : IntObj = new
-    val contents = 47
+def makeInt(contents:Int) : IntObj = new
+    val contents = contents
+    def add(x:IntObj) : Int = tools.add(this.contents, x.contents)
+
+val intObj : IntObj = makeInt(47)
 
 val stringObj : StringObj = new
     val contents = "reflection in wyvern!"
@@ -24,3 +31,8 @@ tools.assertIntEquals(typeNotEqual, 0)
 
 val typeName : String = intType.name()
 tools.assertStringEquals("IntObj", typeName)
+
+val l = Lists.cons(makeInt(5), Lists.empty(makeInt(0)))
+val sum : Any = intMirror.invoke("add", l)
+// Can't use because sum is supposed to be a mirror
+// tools.assertIntEquals(sum, 52)

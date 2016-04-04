@@ -1,14 +1,12 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.interop.FObject;
@@ -45,7 +43,9 @@ public class JavaValue extends AbstractValue implements Invokable {
 			return new IntegerLiteral((Integer)result);
         } else if(result instanceof String) {
             return new StringLiteral((String) result);
-        } else {
+        } else if(result instanceof Value) {
+			return (Value) result;
+		} else {
 			throw new RuntimeException("some Java->Wyvern cases not implemented");
 		}
 	}
@@ -59,6 +59,19 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
 		} else if (arg instanceof ObjectValue) {
+			List<Value> emptyList = new LinkedList<>();
+			// Extremely hacky. Won't work if a different list implementation is used, for example.
+			if (arg.getType() instanceof NominalType) {
+				if (((NominalType) arg.getType()).getTypeMember().equals("List")) {
+					ObjectValue wyvernArgList = (ObjectValue) arg;
+					List<Value> argList = new ArrayList<>();
+					while (((IntegerLiteral) (wyvernArgList.getField("length"))).getValue() != 0) {
+						argList.add(((ObjectValue) arg).invoke("getVal", emptyList));
+						wyvernArgList = (ObjectValue) wyvernArgList.invoke("getNext", emptyList);
+					}
+					return argList;
+				}
+			}
 			return arg;
 		} else {
 			throw new RuntimeException("some Wyvern->Java cases not implemented");

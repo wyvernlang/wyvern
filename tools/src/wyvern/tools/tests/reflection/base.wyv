@@ -2,4 +2,18 @@ resource module main
 
 import wyvern_reflect_base
 
+// filler line of code
 val x : Int = 5
+
+/* def createType(object:Any) : Type = new
+    val original : Any = object
+    def equals(typ:Type) : Int = mirror.equalTypes(object, typ)
+    // def fields() : List
+    def fieldByName(name:String) : Field = createField(name, Any) // TODO: get type
+    def methodByName(name:String) : Method = let
+        val arguments = mirror.getMethodArgs(name, object)
+        // TODO: get type
+        val returnType = Any
+        in createMethod(arguments, name, returnType)
+    // def methods() : List
+    def name() : String = mirror.typeName(object) */
