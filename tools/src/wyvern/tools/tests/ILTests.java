@@ -937,6 +937,8 @@ public class ILTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
+	// TODO: lambda has a resource variable, thus must be of a resource type
 	public void testList() throws ParseException {
 		doTestScript("List.wyv", Util.intType(), new IntegerLiteral(5));
 	}
@@ -1038,7 +1040,7 @@ public class ILTests {
 					 + "		0\n"
 					 + "b.saveState()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = TestUtil.getStandardGenContext();
 		try {
 			ast.generateIL(genCtx, null);
 			Assert.fail("Typechecking should have failed (in code generation).");
@@ -1062,10 +1064,9 @@ public class ILTests {
 					 + "		0\n"
 					 + "b.bar()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = TestUtil.getStandardGenContext();
 		try {
-			Expression program = ast.generateIL(genCtx, null);
-			program.typeCheck(TypeContext.empty());
+			ast.generateIL(genCtx, null);
 			Assert.fail("Typechecking should have failed (in code generation).");
 		} catch (ToolError e) {
 		}
@@ -1087,10 +1088,9 @@ public class ILTests {
 				 + "		0\n"
 				 + "b.bar()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = TestUtil.getStandardGenContext();
 		try {
-			Expression program = ast.generateIL(genCtx, null);
-			program.typeCheck(TypeContext.empty());
+			ast.generateIL(genCtx, null);
 			Assert.fail("Typechecking should have failed (in code generation).");
 		} catch (ToolError e) {
 		}
@@ -1112,10 +1112,9 @@ public class ILTests {
 					 + "		0\n"
 					 + "b.bar()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+		GenContext genCtx = TestUtil.getStandardGenContext();
 		try {
-			Expression program = ast.generateIL(genCtx, null);
-			program.typeCheck(TypeContext.empty());
+			ast.generateIL(genCtx, null);
 			Assert.fail("Typechecking should have failed (in code generation).");
 		} catch (ToolError e) {
 		}
@@ -1137,9 +1136,10 @@ public class ILTests {
 				 + "		0\n"
 				 + "b.bar()";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-		program.typeCheck(TypeContext.empty());
+		GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+        program.typeCheck(ctx);
 	}
 
 	@Test

@@ -10,16 +10,15 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
 
 public class StructuralType extends ValueType {
-
 	private String selfName;
 	protected List<DeclType> declTypes;
-	private boolean resourceFlag = false;
 
 	public StructuralType(String selfName, List<DeclType> declTypes) {
 		this(selfName, declTypes, false);
@@ -33,11 +32,11 @@ public class StructuralType extends ValueType {
 //			if (declTypes.get(0) == null)
 //				throw new NullPointerException("invariant: decl types should not be null");
 		this.declTypes = declTypes;
-		this.resourceFlag = resourceFlag;
+		this.setResourceFlag(resourceFlag);
 		// if there is a var declaration, it's a resource type
 		for (DeclType dt : declTypes) {
 			if (dt instanceof VarDeclType) {
-				this.resourceFlag = true;
+				this.setResourceFlag(true);
 			}
 		}
 	}
@@ -51,7 +50,7 @@ public class StructuralType extends ValueType {
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		String newIndent = indent + "    ";
-		if (resourceFlag)
+		if (isResource(GenContext.empty()))
 			dest.append("resource ");
 		dest.append("type { ").append(selfName).append(" =>\n");
 		for (DeclType dt : getDeclTypes()) {
@@ -71,10 +70,6 @@ public class StructuralType extends ValueType {
 	/*public void setDeclTypes(List<DeclType> declTypes) {
 		this.declTypes = declTypes;
 	}*/
-
-	public boolean isResource() {
-		return this.resourceFlag;
-	}
 
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
@@ -115,7 +110,7 @@ public class StructuralType extends ValueType {
 		}
 
 		// a resource type is not a subtype of a non-resource type
-		if (resourceFlag && !st.resourceFlag)
+		if (isResource(GenContext.empty()) && !st.isResource(GenContext.empty()))
 			return false;
 
 		return true;
@@ -137,7 +132,7 @@ public class StructuralType extends ValueType {
 		for (DeclType dt : getDeclTypes()) {
 			newDTs.add(dt.adapt(v));
 		}
-		return new StructuralType(selfName, newDTs, resourceFlag);
+		return new StructuralType(selfName, newDTs, isResource(GenContext.empty()));
 	}
 
 	/*@Override
