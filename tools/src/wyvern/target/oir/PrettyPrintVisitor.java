@@ -336,9 +336,9 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       constructor_body.append("this.");
       constructor_body.append(dec.getName());
       constructor_body.append(" = ");
-      constructor_body.append(value.acceptVisitor(this, state));
+      constructor_body.append(dec.getName());
 
-      constructor_args.append(", " + dec.getName() + "Ignored");
+      constructor_args.append(", " + dec.getName());
     }
     members += "\n" + indent +
       "def __init__(this" + constructor_args.toString() + ", env={}):";
