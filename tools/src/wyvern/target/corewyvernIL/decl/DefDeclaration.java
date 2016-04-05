@@ -19,11 +19,9 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class DefDeclaration extends NamedDeclaration {
-
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
-	private boolean resourceFlag = false;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body, FileLocation loc) {
@@ -70,10 +68,6 @@ public class DefDeclaration extends NamedDeclaration {
 		return body;
 	}
 
-	public boolean isResource() {
-		return this.resourceFlag;
-	}
-
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -86,17 +80,15 @@ public class DefDeclaration extends NamedDeclaration {
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
 		}
-
-		if (!this.resourceFlag) {
+		if (!this.containsResource()) {
 			for (String freeVar : this.getFreeVariables()) {
 				ValueType t = (new Variable(freeVar)).typeCheck(methodCtx);
 				if (t != null && t.isResource(methodCtx)) {
-					this.resourceFlag = true;
+					this.setHasResource(true);
 					break;
 				}
 			}
 		}
-
 		ValueType bodyType = body.typeCheck(methodCtx);
 		if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
 			// for debugging
@@ -106,7 +98,6 @@ public class DefDeclaration extends NamedDeclaration {
 			
 			//throw new RuntimeException("body doesn't match declared type");
 		}
-
 		return new DefDeclType(getName(), type, formalArgs);
 	}
 
@@ -121,5 +112,4 @@ public class DefDeclaration extends NamedDeclaration {
 		}
 		return freeVars;
 	}
-
 }

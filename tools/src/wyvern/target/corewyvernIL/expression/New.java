@@ -92,10 +92,10 @@ public class New extends Expression {
 		boolean isResource = false;
 		for (Declaration d : decls_ExceptDelegate()) {
 			DeclType dt = d.typeCheck(ctx, thisCtx);
-			if (d instanceof DefDeclaration && ((DefDeclaration)d).isResource()) {
+			dts.add(dt);
+			if (d.containsResource()) {
 				isResource = true;
 			}
-			dts.add(dt);
 		}
 
 		ValueType type = getExprType();
