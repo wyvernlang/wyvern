@@ -41,6 +41,11 @@ public class NominalType extends ValueType {
 	}
 	
 	@Override
+	public boolean isResource(TypeContext ctx) {
+		return this.getStructuralType(ctx).isResource(ctx);
+	}
+
+	@Override
 	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
 		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 		if (dt instanceof ConcreteTypeMember) {

@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -116,7 +117,7 @@ public class New extends Expression {
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName());;
 		}
 
-		if (isResource && !requiredT.isResource()) {
+		if (isResource && !requiredT.isResource(GenContext.empty())) {
 			ToolError.reportError(ErrorMessage.MUST_BE_RESOURCE_TYPE, this, requiredT.getSelfName());
 		}
 
