@@ -952,6 +952,7 @@ public class ILTests {
 	}
 	
 	@Test
+    @Category(CurrentlyBroken.class)
 	public void testListClient() throws ParseException {
 		doTestScriptModularly("modules.module.ListClient", Util.intType(), new IntegerLiteral(5));
 	}
