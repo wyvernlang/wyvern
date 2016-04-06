@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
@@ -186,6 +187,14 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		return new Pair<VarBinding, GenContext>(new VarBinding(importName, importExp), ctx);
 	}
 
+	@Override
+	public void genTopLevel(TopLevelContext tlc) {
+		Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext());
+		VarBinding binding = bindingAndCtx.first;
+		GenContext newCtx = bindingAndCtx.second;
+		tlc.addLet(binding.getVarName(), binding.getExpression().typeCheck(newCtx), binding.getExpression(), false);
+		tlc.updateContext(newCtx);
+	}
 
 	public String getAsName() {
 		return asName;
