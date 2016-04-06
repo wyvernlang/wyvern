@@ -1,5 +1,6 @@
 package wyvern.tools.tests;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,6 +20,8 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -943,7 +946,17 @@ public class ILTests {
 		doTestScript("List.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
-	// TODO: make other script tests call this function
+	@Test
+	public void testListModularly() throws ParseException {
+		doTestScriptModularly("modules.module.List", Util.intType(), new IntegerLiteral(5));
+	}
+	
+	@Test
+    @Category(CurrentlyBroken.class)
+	public void testListClient() throws ParseException {
+		doTestScriptModularly("modules.module.ListClient", Util.intType(), new IntegerLiteral(5));
+	}
+	
 	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
@@ -952,6 +965,21 @@ public class ILTests {
 		TypeContext ctx = TestUtil.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(expectedType, t);
+        Value v = program.interpret(TestUtil.getStandardEvalContext());
+        Assert.assertEquals(expectedValue, v);
+	}
+
+	// TODO: make other script tests call this function
+	private void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
+        Expression program = state.getResolver().resolveModule(qualifiedName);
+		
+        // resolveModule already typechecked, but we'll do it again to verify the type
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+        ValueType t = program.typeCheck(ctx);
+        Assert.assertEquals(expectedType, t);
+        
+        // check the result
         Value v = program.interpret(TestUtil.getStandardEvalContext());
         Assert.assertEquals(expectedValue, v);
 	}

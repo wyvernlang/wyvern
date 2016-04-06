@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.JavaValue;
@@ -43,6 +44,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
@@ -270,29 +272,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 			// must be import
 			ImportDeclaration imp = (ImportDeclaration) ast;
-			// add the import's type to the context, and get the import value
-			Expression importExp = null;
-			String importName = imp.getUri().getSchemeSpecificPart();
-			if (importName.contains(".")) {
-				importName = importName.substring(importName.lastIndexOf(".")+1);
-			}
-			if (imp.getUri().getScheme().equals("java")) {
-				String importPath = imp.getUri().getRawSchemeSpecificPart();
-				try {
-					FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
-					ctx = GenUtil.ensureJavaTypesPresent(ctx);
-					ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
-					importExp = new JavaValue(obj, type);
-					ctx = ctx.extend(importName, new Variable(importName), type);
-				} catch (ReflectiveOperationException e1) {
-					throw new RuntimeException(e1);
-				}
-			} else {
-				// TODO: need to add types for non-java imports
-				importExp = new Variable(imp.getUri().getSchemeSpecificPart());
-			}
-			Expression e = wrapLetWithIterator(ai, normalSeq, ctx);
-			return new Let(importName, importExp, e);
+			
+			Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(ctx);
+			
+			Expression e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second);
+			return new Let(bindingAndCtx.first, e);
 		} else {
 			// must be instantiate
 

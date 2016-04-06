@@ -7,10 +7,19 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
+import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
@@ -24,6 +33,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
@@ -151,7 +161,40 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Pair<VarBinding,GenContext> genBinding(GenContext ctx) {
+		// add the import's type to the context, and get the import value
+		Expression importExp = null;
+		String importName = this.getUri().getSchemeSpecificPart();
+		if (importName.contains(".")) {
+			importName = importName.substring(importName.lastIndexOf(".")+1);
+		}
+		if (this.getUri().getScheme().equals("java")) {
+			String importPath = this.getUri().getRawSchemeSpecificPart();
+			try {
+				FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
+				ctx = GenUtil.ensureJavaTypesPresent(ctx);
+				ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
+				importExp = new JavaValue(obj, type);
+				ctx = ctx.extend(importName, new Variable(importName), type);
+			} catch (ReflectiveOperationException e1) {
+				throw new RuntimeException(e1);
+			}
+		} else {
+			// TODO: need to add types for non-java imports
+			importExp = new Variable(this.getUri().getSchemeSpecificPart());
+		}
+		return new Pair<VarBinding, GenContext>(new VarBinding(importName, importExp), ctx);
+	}
 
+	@Override
+	public void genTopLevel(TopLevelContext tlc) {
+		Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext());
+		VarBinding binding = bindingAndCtx.first;
+		GenContext newCtx = bindingAndCtx.second;
+		tlc.addLet(binding.getVarName(), binding.getExpression().typeCheck(newCtx), binding.getExpression(), false);
+		tlc.updateContext(newCtx);
+	}
 
 	public String getAsName() {
 		return asName;
