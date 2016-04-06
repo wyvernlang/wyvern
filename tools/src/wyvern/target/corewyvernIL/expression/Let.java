@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -12,25 +13,26 @@ import wyvern.target.oir.OIREnvironment;
 
 public class Let extends Expression {
 
-	private String varName;
-	private Expression toReplace;
+	private VarBinding binding;
 	private Expression inExpr;
 
 	public Let(String varName, Expression toReplace, Expression inExpr) {
+		this(new VarBinding(varName, toReplace), inExpr);
+	}
+
+	public Let(VarBinding binding, Expression inExpr) {
 		super();
-		this.varName = varName;
-		this.toReplace = toReplace;
+		this.binding = binding;
 		if (inExpr == null) throw new RuntimeException();
-		if (toReplace == null) throw new RuntimeException();
 		this.inExpr = inExpr;
 	}
 
 	public String getVarName() {
-		return varName;
+		return binding.getVarName();
 	}
 
 	public Expression getToReplace() {
-		return toReplace;
+		return binding.getExpression();
 	}
 
 	public Expression getInExpr() {
@@ -39,8 +41,8 @@ public class Let extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		ValueType t = toReplace.typeCheck(ctx);
-		this.setExprType(inExpr.typeCheck(ctx.extend(varName, t)));
+		ValueType t = getToReplace().typeCheck(ctx);
+		this.setExprType(inExpr.typeCheck(ctx.extend(getVarName(), t)));
 		return getExprType();
 	}
 
@@ -48,8 +50,8 @@ public class Let extends Expression {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		String newIndent = indent + "    ";
 		dest.append("let\n").append(newIndent)
-		.append(varName).append(" = ");
-		toReplace.doPrettyPrint(dest,newIndent);
+		.append(getVarName()).append(" = ");
+		getToReplace().doPrettyPrint(dest,newIndent);
 		dest.append('\n').append(indent).append("in ");
 		inExpr.doPrettyPrint(dest,indent);
 	}
@@ -62,8 +64,8 @@ public class Let extends Expression {
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		Value v = toReplace.interpret(ctx);
-		return inExpr.interpret(ctx.extend(varName, v));
+		Value v = getToReplace().interpret(ctx);
+		return inExpr.interpret(ctx.extend(getVarName(), v));
 	}
 
 	@Override
@@ -72,8 +74,8 @@ public class Let extends Expression {
 		// Get free variables in the sub-expressions.
 		Set<String> freeVars = inExpr.getFreeVariables();
 		// Remove the name that just became bound.
-		freeVars.remove(varName);
-		freeVars.addAll(toReplace.getFreeVariables());
+		freeVars.remove(getVarName());
+		freeVars.addAll(getToReplace().getFreeVariables());
 		
 		return freeVars;
 	}
