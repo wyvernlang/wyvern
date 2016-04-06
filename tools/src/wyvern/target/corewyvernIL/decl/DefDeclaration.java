@@ -22,6 +22,7 @@ public class DefDeclaration extends NamedDeclaration {
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
+	private boolean hasResource = false;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body, FileLocation loc) {
@@ -30,6 +31,15 @@ public class DefDeclaration extends NamedDeclaration {
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = body;
+	}
+
+	@Override
+	public boolean containsResource() {
+		return this.hasResource;
+	}
+
+	public void setHasResource(boolean hasResource) {
+		this.hasResource = hasResource;
 	}
 
 	@Override
