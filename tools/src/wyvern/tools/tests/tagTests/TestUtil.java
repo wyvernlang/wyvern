@@ -20,9 +20,11 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -103,8 +105,17 @@ public class TestUtil {
 		Assert.assertEquals(expecting, v.toString());
 	}
 	
+	public static GenContext getGenContext(InterpreterState state) {
+		GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), getSystemType());
+		return addTypeAbbrevs(genCtx);
+	}
+
 	public static GenContext getStandardGenContext() {
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), getSystemType());
+		return addTypeAbbrevs(genCtx);
+	}
+
+	private static GenContext addTypeAbbrevs(GenContext genCtx) {
 		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = new TypeGenContext("String", "system", genCtx);
@@ -213,17 +224,21 @@ public class TestUtil {
 	}
 	
 	public static String readFile(String filename) {
+		return readFile(new File(filename));
+	}
+	
+	public static String readFile(File file) {
 		try {
 			StringBuffer b = new StringBuffer();
 			
-			for (String s : Files.readAllLines(new File(filename).toPath())) {
+			for (String s : Files.readAllLines(file.toPath())) {
 				//Be sure to add the newline as well
 				b.append(s).append("\n");
 			}
 			
 			return b.toString();
 		} catch (IOException e) {
-			Assert.fail("Failed opening file: " + filename);
+			Assert.fail("Failed opening file: " + file.getPath());
 			throw new RuntimeException(e);
 		}
 	}

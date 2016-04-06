@@ -1,11 +1,18 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
+
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 /** Resolves abstract module paths to concrete files, then parses the files into modules.
  *  Knows the root directory
@@ -14,7 +21,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
  */
 public class ModuleResolver {
 	private File rootDir;
-	private Map<String, Value> moduleCache = new HashMap<String, Value>();
+	private Map<String, Expression> moduleCache = new HashMap<String, Expression>();
 	
 	public ModuleResolver(File rootDir) {
 		if (!rootDir.isDirectory())
@@ -36,44 +43,59 @@ public class ModuleResolver {
 	
 	/** The main utility function for the ModuleResolver.
 	 *  Accepts a string argument of the module name to import
-	 *  Returns the uninstantiated module
+	 *  Loads a module expression from the file (or looks it up in a cache)
+	 *  Returns the uninstantiated module (a function to be applied,
+	 *  or an expression to be evaluated)
+	 * @throws ParseException 
 	 */
-	public Value resolveModule(String qualifiedName) {
-		Value loadedValue = cacheLookup(qualifiedName);
-		if (loadedValue != null)
-			return loadedValue;
-		File f = resolve(qualifiedName);
-		return load(f);
-	}
-	
-	private Value cacheLookup(String qualifiedName) {
+	public Expression resolveModule(String qualifiedName) throws ParseException {
+		if (!moduleCache.containsKey(qualifiedName)) {
+			File f = resolve(qualifiedName);
+			moduleCache.put(qualifiedName, load(f));
+		}
 		return moduleCache.get(qualifiedName);
 	}
-
+	
 	/**
 	 * Turns dots into directory slashes.
-	 * Adds a .wyv at the end
+	 * Adds a .wyv at the end, and the root to the beginning
 	 * 
 	 * @param qualifiedName
 	 * @return
 	 */
 	private File resolve(String qualifiedName) {
-		// TODO: implement me
-		return null;
+		String names[] = qualifiedName.split("\\.");
+		if (names.length == 0)
+			throw new RuntimeException();
+		names[names.length - 1] += ".wyv";
+		String filename = rootDir.getAbsolutePath();
+		for (int i = 0; i < names.length; ++i) {
+			filename += File.separatorChar;
+			filename += names[i];
+		}
+		return new File(filename);
 	}
 	
 	/**
 	 * Reads the file.
 	 * Parses it, generates IL, and typechecks it.
 	 * In the process, loads other modules as necessary.
-	 * Stores the resulting value in the cache.
-	 * Returns the resulting module.
+	 * Returns the resulting module expression.
 	 * 
 	 * @param file
 	 * @return
 	 */
-	private Value load(File file) {
-		// TODO: implement me
-		return null;
+	private Expression load(File file) throws ParseException {
+        String source = TestUtil.readFile(file);
+        
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+        
+		GenContext genCtx = TestUtil.getStandardGenContext();
+        Expression program = ast.generateIL(genCtx, null);
+        
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+        program.typeCheck(ctx);
+        
+        return program;
 	}
 }
