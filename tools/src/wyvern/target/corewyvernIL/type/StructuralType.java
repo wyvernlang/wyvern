@@ -19,6 +19,7 @@ import wyvern.target.oir.OIREnvironment;
 public class StructuralType extends ValueType {
 	private String selfName;
 	protected List<DeclType> declTypes;
+	private boolean resourceFlag = false;
 
 	public StructuralType(String selfName, List<DeclType> declTypes) {
 		this(selfName, declTypes, false);
@@ -45,6 +46,15 @@ public class StructuralType extends ValueType {
 
 	public static StructuralType getEmptyType() {
 		return emptyType;
+	}
+	
+	@Override
+	public boolean isResource(TypeContext ctx) {
+		return this.resourceFlag;
+	}
+
+	public void setResourceFlag(boolean isResource) {
+		this.resourceFlag = isResource;
 	}
 
 	@Override
