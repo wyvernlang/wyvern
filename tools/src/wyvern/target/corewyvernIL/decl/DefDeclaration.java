@@ -38,7 +38,7 @@ public class DefDeclaration extends NamedDeclaration {
 		return this.hasResource;
 	}
 
-	public void setHasResource(boolean hasResource) {
+	private void setHasResource(boolean hasResource) {
 		this.hasResource = hasResource;
 	}
 

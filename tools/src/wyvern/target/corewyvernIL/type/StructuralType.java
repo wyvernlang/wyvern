@@ -53,7 +53,7 @@ public class StructuralType extends ValueType {
 		return this.resourceFlag;
 	}
 
-	public void setResourceFlag(boolean isResource) {
+	private void setResourceFlag(boolean isResource) {
 		this.resourceFlag = isResource;
 	}
 
