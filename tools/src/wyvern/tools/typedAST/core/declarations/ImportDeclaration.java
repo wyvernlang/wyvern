@@ -9,6 +9,7 @@ import java.util.Map;
 
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -182,9 +183,20 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			}
 		} else {
 			// TODO: need to add types for non-java imports
-			importExp = new Variable(this.getUri().getSchemeSpecificPart());
+			String moduleName = this.getUri().getSchemeSpecificPart();
+			if (ctx.isPresent(moduleName)) {
+				importExp = new Variable(moduleName);
+			} else {
+				importExp = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
+			}
+			ctx = ctx.extend(importName, new Variable(importName), importExp.typeCheck(ctx));
 		}
 		return new Pair<VarBinding, GenContext>(new VarBinding(importName, importExp), ctx);
+	}
+	
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		// no action needed
 	}
 
 	@Override
@@ -192,8 +204,17 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext());
 		VarBinding binding = bindingAndCtx.first;
 		GenContext newCtx = bindingAndCtx.second;
-		tlc.addLet(binding.getVarName(), binding.getExpression().typeCheck(newCtx), binding.getExpression(), false);
+		ValueType type = binding.getExpression().typeCheck(newCtx);
+		tlc.addLet(binding.getVarName(), type, binding.getExpression(), false);
 		tlc.updateContext(newCtx);
+		
+		/*wyvern.target.corewyvernIL.expression.Variable variable = new wyvern.target.corewyvernIL.expression.Variable(binding.getVarName());
+		wyvern.target.corewyvernIL.decl.Declaration decl =
+				new wyvern.target.corewyvernIL.decl.ValDeclaration(binding.getVarName(),
+						type,
+						variable, location);
+		DeclType dt = new VarDeclType(binding.getVarName(), type);
+		tlc.addModuleDecl(decl,dt);*/
 	}
 
 	public String getAsName() {

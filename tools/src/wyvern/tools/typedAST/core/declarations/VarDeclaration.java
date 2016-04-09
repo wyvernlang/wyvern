@@ -207,7 +207,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		// Create a temp object with a single var declaration.
 		VarDeclaration varDecl = new VarDeclaration(varName, this.binding.getType(), this.definition, location);
 		DeclSequence tempObjBody = new DeclSequence(varDecl);
-		New tempObj = new New(tempObjBody, null);
+		New tempObj = new New(tempObjBody, location);
 		String tempObjName = varNameToTempObj(varName);
 		ValDeclaration letDecl = new ValDeclaration(tempObjName, tempObj, null);
 		

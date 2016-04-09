@@ -9,6 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -325,6 +327,15 @@ public class ILTests {
 		doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
+	@Test
+	public void testArrowSugar2() throws ParseException {
+		String input = "val id : Int -> Int = (x:Int) => x\n"
+				     + "def invoke(f:Int -> Int, x:Int) : Int = f(x)\n"
+				     + "invoke(id, 5)\n"
+				     ;
+		doTest(input, Util.intType(), new IntegerLiteral(5));
+	}
+	
 	// TODO: make other string tests call this function
 	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
@@ -581,9 +592,9 @@ public class ILTests {
 	}
 	
 	@Test
-	public void testFib() throws ParseException {
+	public void testFact() throws ParseException {
 		
-        String source = TestUtil.readFile(PATH + "bool-nat-fib.wyv");
+        String source = TestUtil.readFile(PATH + "bool-nat-fact.wyv");
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
 
         GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
@@ -897,41 +908,25 @@ public class ILTests {
 					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
 					 + "val x : Int = importTest.addOne(4)\n"
 				     ;
+		doTestModule(input, "x", Util.intType(), new IntegerLiteral(5));
+	}
+
+	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
 		TypedAST ast = TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
 		GenContext genCtx = TestUtil.getStandardGenContext();
 		TypeContext ctx = TestUtil.getStandardTypeContext();
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
+		Expression mainProgram = ((DefDeclaration)decl).getBody();
+		Expression program = new FieldGet(mainProgram, fieldName); // slightly hacky		
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		Assert.assertEquals(expectedType, t);		
+		Assert.assertEquals(expectedValue, v);
 	}
 
 	@Test
 	public void testBigInt() throws ParseException {
-        String source = TestUtil.readFile(PATH + "bigint.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-		Value mainV = mainProgram.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.bigint", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -953,7 +948,6 @@ public class ILTests {
 	}
 	
 	@Test
-    @Category(CurrentlyBroken.class)
 	public void testListClient() throws ParseException {
 		doTestScriptModularly("modules.module.ListClient", Util.intType(), new IntegerLiteral(5));
 	}
@@ -971,7 +965,7 @@ public class ILTests {
 	}
 
 	// TODO: make other script tests call this function
-	private void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
         InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
         Expression program = state.getResolver().resolveModule(qualifiedName);
 		
@@ -987,22 +981,7 @@ public class ILTests {
 
 	@Test
 	public void testOperatorPlus() throws ParseException {
-        String source = TestUtil.readFile(PATH + "operator-plus.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-		Value mainV = mainProgram.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.operator-plus", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -1015,21 +994,7 @@ public class ILTests {
 					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
 					 + "val x : system.String = importTest.addOneString(\"4\")\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.stringType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	StringLiteral five = new StringLiteral("5");
-		Assert.assertEquals(five, v);
+		doTestModule(input, "x", Util.stringType(), new StringLiteral("5"));
 	}
 	
 	@Test

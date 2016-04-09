@@ -12,6 +12,14 @@ public class VarEvalContext extends EvalContext {
 		this.v = v;
 		previous = evalContext;
 	}
+	
+	@Override
+	public boolean isPresent(String varName) {
+		if (this.varName.equals(varName))
+			return true;
+		else
+			return super.isPresent(varName);
+	}
 
 	@Override
 	public Value lookupValue(String varName) {

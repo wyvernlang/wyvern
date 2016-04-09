@@ -16,6 +16,14 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
+	public boolean isPresent(String varName) {
+		if (this.var.equals(varName))
+			return true;
+		else
+			return super.isPresent(varName);
+	}
+
+@Override
 	public String toString() {
 		return "GenContext[" + endToString();
 	}

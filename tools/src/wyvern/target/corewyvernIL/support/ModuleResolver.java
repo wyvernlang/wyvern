@@ -7,12 +7,18 @@ import java.util.Map;
 
 import org.junit.Assert;
 
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 
 /** Resolves abstract module paths to concrete files, then parses the files into modules.
  *  Knows the root directory
@@ -22,11 +28,16 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 public class ModuleResolver {
 	private File rootDir;
 	private Map<String, Expression> moduleCache = new HashMap<String, Expression>();
+	private InterpreterState state;
 	
 	public ModuleResolver(File rootDir) {
 		if (!rootDir.isDirectory())
 			throw new RuntimeException("the root path for the module resolver must be a directory");
 		this.rootDir = rootDir;
+	}
+	
+	void setInterpreterState(InterpreterState s) {
+		state = s;
 	}
 	
 	/**
@@ -48,7 +59,7 @@ public class ModuleResolver {
 	 *  or an expression to be evaluated)
 	 * @throws ParseException 
 	 */
-	public Expression resolveModule(String qualifiedName) throws ParseException {
+	public Expression resolveModule(String qualifiedName) {
 		if (!moduleCache.containsKey(qualifiedName)) {
 			File f = resolve(qualifiedName);
 			moduleCache.put(qualifiedName, load(f));
@@ -83,15 +94,33 @@ public class ModuleResolver {
 	 * Returns the resulting module expression.
 	 * 
 	 * @param file
+	 * @param state 
 	 * @return
 	 */
-	private Expression load(File file) throws ParseException {
+	private Expression load(File file) {
         String source = TestUtil.readFile(file);
         
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+        TypedAST ast = null;
+		try {
+			ast = TestUtil.getNewAST(source);
+		} catch (ParseException e) {
+			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(source, e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
+		}
         
-		GenContext genCtx = TestUtil.getStandardGenContext();
-        Expression program = ast.generateIL(genCtx, null);
+		GenContext genCtx = TestUtil.getGenContext(state);
+		Expression program;
+		if (ast instanceof ExpressionAST) {
+			program = ((ExpressionAST)ast).generateIL(genCtx, null);
+		} else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
+			Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx);
+			if (decl instanceof ValDeclaration) {
+				program = ((ValDeclaration)decl).getDefinition();
+			} else {
+				throw new RuntimeException();
+			}
+		} else {
+			throw new RuntimeException();
+		}
         
 		TypeContext ctx = TestUtil.getStandardTypeContext();
         program.typeCheck(ctx);

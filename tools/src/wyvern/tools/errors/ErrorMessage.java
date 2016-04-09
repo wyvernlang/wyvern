@@ -63,7 +63,9 @@ public enum ErrorMessage {
 
 	ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2),// end of error list
 	
-	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1);
+	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
+	
+	PARSE_ERROR("%ARG", 1);
 	
 	private ErrorMessage(String message, int numArgs) {
 		this.errorMessage = message;

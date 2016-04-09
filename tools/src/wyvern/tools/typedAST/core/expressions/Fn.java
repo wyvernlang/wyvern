@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -159,13 +160,13 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         Expression il = this.body.generateIL(ctx, null);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
-        // Create a new list of function declaration, which is a singleton, containing only "apply"
-        DefDeclaration applyDef = new DefDeclaration("apply", intermediateArgs, bodyReturnType, il, getLocation());
+        // Create a new list of function declaration, which is a singleton, containing only Util.APPLY_NAME
+        DefDeclaration applyDef = new DefDeclaration(Util.APPLY_NAME, intermediateArgs, bodyReturnType, il, getLocation());
         List<Declaration> declList = new LinkedList<>();
         declList.add(applyDef);
 
         // Store a redundency of the function declaration
-        DeclType ddecl = new DefDeclType("apply", bodyReturnType, intermediateArgs);
+        DeclType ddecl = new DefDeclType(Util.APPLY_NAME, bodyReturnType, intermediateArgs);
         List<DeclType> declTypes = new LinkedList<>();
         declTypes.add(ddecl);
 
@@ -218,7 +219,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 		StructuralType declStructuralType = declType.getStructuralType(ctx);
     	
     	
-    	DeclType applyDecl = declStructuralType.findDecl("apply", ctx);
+    	DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
     	
     	if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
 			//TODO: will replace with ToolError in the future
