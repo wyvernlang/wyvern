@@ -230,7 +230,8 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		declarationTypes.add(getter.genILType(ctx));
 		declarationTypes.add(setter.genILType(ctx));
 		String newName = GenContext.generateName();
-		StructuralType structType = new StructuralType(newName, declarationTypes);
+		// If it is a var declaration, it must be of resource type
+		StructuralType structType = new StructuralType(newName, declarationTypes, true);
 		ctx = ctx.extend(newName, new Variable(newName), structType);
 		tlc.updateContext(ctx);
 		
@@ -252,7 +253,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		MethodCall methodCallExpr = new MethodCall(new Variable(newName), getter.getName(), new LinkedList<>(), this);
 		ctx = ctx.extend(varName, methodCallExpr, varValueType);
 		tlc.updateContext(ctx);
-		
 	}
 	
 	public static String varNameToTempObj (String s) {

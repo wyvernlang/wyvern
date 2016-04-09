@@ -6,7 +6,6 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
 public abstract class ValueType extends CaseType implements EmitOIR {
-
 	/**
 	 * Returns the equivalent structural type.  If the structural type
 	 * is unknown (e.g. because this is a nominal type and the
@@ -36,6 +35,10 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	 */
 	public ValueType getCanonicalType(TypeContext ctx) {
 		return this;
+	}
+
+	public boolean isResource(TypeContext ctx) {
+		return false;
 	}
 
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
