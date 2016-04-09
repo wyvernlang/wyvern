@@ -20,7 +20,7 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	String endToString() {
+	protected String endToString() {
 		return "]";
 	}
 

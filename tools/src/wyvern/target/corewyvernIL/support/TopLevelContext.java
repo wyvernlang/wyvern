@@ -52,6 +52,16 @@ public class TopLevelContext {
 		String newName = GenContext.generateName();
 		ValueType vt = new StructuralType(newName, moduleDeclTypes);
 		vt = adapt(vt, newName);
+		
+		// determine if we need to be a resource type
+		for (Declaration d: moduleDecls) {
+			d.typeCheck(ctx, ctx);
+			if (d.containsResource()) {
+				vt = new StructuralType(newName, moduleDeclTypes, true);
+				break;
+			}
+		}
+		
 		Expression exp = new New(moduleDecls, newName, vt);
 		addExpression(exp);
 		

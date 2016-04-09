@@ -23,4 +23,5 @@ public abstract class TypeContext {
 	private static TypeContext theEmpty = new EmptyTypeContext(); 
 	
 	protected abstract TypeContext getNext();
+	protected abstract String endToString();
 }

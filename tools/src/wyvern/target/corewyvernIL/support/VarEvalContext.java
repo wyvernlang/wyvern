@@ -42,11 +42,6 @@ public class VarEvalContext extends EvalContext {
 	}
 	
 	@Override
-	public String toString() {
-		return "EvalContext[" + endToString();
-	}
-	
-	@Override
 	public String endToString() {
 		return varName  + " = " + v + ", " + previous.endToString();
 	}

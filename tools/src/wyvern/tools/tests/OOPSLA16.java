@@ -40,7 +40,6 @@ public class OOPSLA16 {
     }
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testFigure5Corrected() throws ParseException {
 
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
@@ -134,7 +133,6 @@ public class OOPSLA16 {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testFigure2() throws ParseException {
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
 		GenContext genCtx = TestUtil.getStandardGenContext();
