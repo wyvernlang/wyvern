@@ -44,18 +44,18 @@ public class OIRClassDeclaration extends OIRType {
 		}
 		this.selfName = selfName;
 		this.setFieldValuePairs(fieldValuePairs);
-		methodToFieldMap = new HashMap <String, String> ();
-		for (OIRDelegate delegate : delegates)
-		{
-			OIRInterface oirInterface;
+		// methodToFieldMap = new HashMap <String, String> ();
+		// for (OIRDelegate delegate : delegates)
+		// {
+		// 	OIRInterface oirInterface;
 			
-			oirInterface = (OIRInterface)delegate.getType();
+		// 	oirInterface = (OIRInterface)delegate.getType();
 			
-			for (OIRMethodDeclaration methDecl : oirInterface.getMethods())
-			{
-				methodToFieldMap.put(methDecl.getName(), delegate.getField());
-			}
-		}
+		// 	for (OIRMethodDeclaration methDecl : oirInterface.getMethods())
+		// 	{
+		// 		methodToFieldMap.put(methDecl.getName(), delegate.getField());
+		// 	}
+		// }
 	}
 	
 	public int getDelegateMethodFieldHashMap (String method)

@@ -51,12 +51,12 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 @Category(RegressionTests.class)
 public class OIRTests {
 
-	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "modules/module/";
+  private static final String BASE_PATH = TestUtil.BASE_PATH;
+  private static final String PATH = BASE_PATH + "modules/module/";
 
   @BeforeClass public static void setupResolver() {
     TestUtil.setPaths();
-		WyvernResolver.getInstance().addPath(PATH);
+    WyvernResolver.getInstance().addPath(PATH);
   }
 
   private void testPyFromInput(String input, String expected) throws ParseException {
@@ -264,7 +264,7 @@ public class OIRTests {
       "val r : IntResult = new\n" +
       "    def getResult() : system.Int = 18\n\n" +
       "r.getResult()\n";
-    testPyFromInput(input, "18", true);
+    testPyFromInput(input, "18");
   }
 
   @Test
@@ -318,5 +318,40 @@ public class OIRTests {
       "obj.identity(obj.x = 7)\n" +
       "obj.x\n";
     testPyFromInput(input, "7");
+  }
+
+  @Test
+  public void testIfStatement() throws ParseException {
+    String input = ""
+      + "type Body\n"
+      + "    type T = system.Int\n"
+      + "    def apply(): this.T \n\n"
+
+      + "type Boolean\n"
+      + "   def iff(thenFn: Body, elseFn: Body) : thenFn.T \n\n"
+
+      + "val true = new \n"
+      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n\n"
+      + "        thenFn.apply()\n\n"
+
+      + "val false = new \n"
+      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n"
+      + "        elseFn.apply()\n\n"
+
+      + "def ifSt(bool: Boolean, thenFn: Body, elseFn: Body): thenFn.T \n"
+      + "    bool.iff(thenFn, elseFn) \n\n"
+
+      + "val IntegerFive = new \n"
+      + "   type T = system.Int \n"
+      + "   def apply(): this.T \n"
+      + "       5 \n\n"
+
+      + "val IntegerTen = new \n"
+      + "   type T = system.Int \n"
+      + "   def apply(): this.T \n"
+      + "       10 \n\n"
+
+      + "ifSt(true, IntegerTen, IntegerFive)";
+    testPyFromInput(input, "10", true);
   }
 }

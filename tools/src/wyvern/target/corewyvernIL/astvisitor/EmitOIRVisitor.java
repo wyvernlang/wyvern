@@ -100,9 +100,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     List<OIRFieldValueInitializePair> fieldValuePairs;
     List<OIRExpression> args;
 
-    exprType = newExpr.getExprType();
-    if (exprType != null)
-      oirtype = (OIRType) exprType.acceptVisitor(this, env, oirenv);
+    // exprType = newExpr.getExprType();
+    // if (exprType != null)
+    //   oirtype = (OIRType) exprType.acceptVisitor(this, env, oirenv);
     classenv = new OIREnvironment (oirenv);
     oirMemDecls = new Vector<OIRMemberDeclaration> ();
     delegates = new Vector<OIRDelegate> ();
@@ -393,9 +393,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     OIRType oirtype;
     OIRFormalArg oirarg;
 
-    oirtype = (OIRType) formalArg.getType().acceptVisitor(this,
-        env, oirenv);
-    oirarg = new OIRFormalArg (formalArg.getName(), oirtype);
+    // oirtype = (OIRType) formalArg.getType().acceptVisitor(this,
+    //     env, oirenv);
+    oirarg = new OIRFormalArg (formalArg.getName(), null);
     return oirarg;
   }
 
@@ -557,9 +557,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     OIRType oirtype;
     ValueType type;
 
-    type = delegateDecl.getValueType();
-    oirtype = (OIRType) type.acceptVisitor(this, env, oirenv);
-    oirdelegate = new OIRDelegate (oirtype, delegateDecl.getFieldName());
+    // type = delegateDecl.getValueType();
+    // oirtype = (OIRType) type.acceptVisitor(this, env, oirenv);
+    oirdelegate = new OIRDelegate (null, delegateDecl.getFieldName());
 
     return oirdelegate;
   }

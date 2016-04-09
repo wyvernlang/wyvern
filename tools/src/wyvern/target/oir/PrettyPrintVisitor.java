@@ -7,6 +7,7 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
+import wyvern.target.oir.declarations.OIRDelegate;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
 import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
@@ -280,11 +281,17 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       dict += "'" + freeVar + "': " + freeVar;
     }
     dict += "}";
-    if (!args.equals(""))
+
+    String d = "";
+
+    if (!decl.getDelegates().isEmpty()) {
+      OIRDelegate delegate = decl.getDelegates().get(0);
+      d = ", delegate=" + delegate.getField();
+    }
 
     state.expectingReturn = oldExpectingReturn;
     classesUsed.add(oirNew.getTypeName());
-    return oirNew.getTypeName() + "(" + args + dict + ")";
+    return oirNew.getTypeName() + "(" + args + dict + d + ")";
   }
 
   public String visit(PrettyPrintState state,
@@ -341,9 +348,17 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       constructor_args.append(", " + dec.getName());
     }
     members += "\n" + indent +
-      "def __init__(this" + constructor_args.toString() + ", env={}):";
+      "def __init__(this" + constructor_args.toString() + ", env={}, delegate=None):";
     members += "\n" + indent + indentIncrement + "this.env = env";
+    members += "\n" + indent + indentIncrement + "this.delegate = delegate";
     members += constructor_body.toString();
+
+    if (!oirClassDeclaration.getDelegates().isEmpty()) {
+      OIRDelegate delegate = oirClassDeclaration.getDelegates().get(0);
+      members += "\n\n" + indent + "def __getattr__(self, name):";
+      members += "\n" + indent + indentIncrement +
+        "return getattr(self.delegate, name)";
+    }
 
     for (OIRMemberDeclaration memberDec : oirClassDeclaration.getMembers()) {
       members += "\n" + indent;
