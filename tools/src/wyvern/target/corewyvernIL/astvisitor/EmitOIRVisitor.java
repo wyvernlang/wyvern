@@ -261,8 +261,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     toReplace = let.getToReplace();
     oirToReplace = (OIRExpression)toReplace.acceptVisitor(this,
         env, oirenv);
-    // System.out.println("DEBUG: Adding variable " + let.getVarName() + " to oirenv");
-    oirenv.addName(let.getVarName(), oirToReplace.typeCheck(oirenv));
+    oirenv.addName(let.getVarName(), null);
     inExpr = let.getInExpr();
     oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, env, oirenv);
     oirLet = new OIRLet (let.getVarName(), oirToReplace, oirInExpr);
@@ -350,9 +349,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
       listOIRFormalArgs.add(formalArg);
     }
 
-    oirReturnType = (OIRType) defDecl.getType().acceptVisitor(this,
-        env, oirenv);
-    oirMethodDecl = new OIRMethodDeclaration (oirReturnType,
+    // oirReturnType = (OIRType) defDecl.getType().acceptVisitor(this,
+    //     env, oirenv);
+    oirMethodDecl = new OIRMethodDeclaration (null,
         defDecl.getName(), listOIRFormalArgs);
     oirBody = (OIRExpression) defDecl.getBody().acceptVisitor(this,
         env, defEnv);

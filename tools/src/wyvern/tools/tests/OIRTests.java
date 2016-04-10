@@ -352,6 +352,6 @@ public class OIRTests {
       + "       10 \n\n"
 
       + "ifSt(true, IntegerTen, IntegerFive)";
-    testPyFromInput(input, "10", true);
+    testPyFromInput(input, "10");
   }
 }
