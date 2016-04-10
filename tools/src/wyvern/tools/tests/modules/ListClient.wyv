@@ -1,10 +1,5 @@
-// TODO: shouldn't need "resource" here
-// TODO: shouldn't have to be called "main"
-// TODO: shouldn't need a module declaration at all
-resource module main
-
-import Lists
+import modules.Lists
 
 val list = Lists.create()
 
-val five = list.contents
+list.contents

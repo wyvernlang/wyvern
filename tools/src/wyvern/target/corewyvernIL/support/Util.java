@@ -24,4 +24,5 @@ public class Util {
 	public static Value unitValue() {
 		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, EvalContext.empty());
 	}
+	public static final String APPLY_NAME = "apply";
 }

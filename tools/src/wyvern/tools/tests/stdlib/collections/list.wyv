@@ -1,3 +1,5 @@
+module list
+
 type DynListToDynFn
 	def apply(element:Dyn,list:List):Dyn
 	
@@ -24,15 +26,3 @@ val Nil = new
 		nilCase()
 	def do(f:DynUnitFn):Unit = new // return an empty object
 
-// some test cases
-
-val aList = Cons(1, Cons(2, Cons(5, Nil)))
-
-var count : Int = 0
-
-aList.do(x => count = x)
-
-def pickLast(list:List, seed:Int):Int
-	list.caseAnalyze(() => seed, (x,l) => pickLast(l,x))
-
-val five = pickLast(aList,0)

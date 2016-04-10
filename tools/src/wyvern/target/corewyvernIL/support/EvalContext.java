@@ -13,6 +13,11 @@ public abstract class EvalContext extends TypeContext {
 		return lookupValue(varName).getType();
 	}
 
+	@Override
+	public String toString() {
+		return "EvalContext[" + endToString();
+	}
+	
 	public abstract Value lookupValue(String varName);
 	
 	public abstract EvalContext combine(EvalContext ctx);

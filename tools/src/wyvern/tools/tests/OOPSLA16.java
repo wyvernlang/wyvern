@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -40,7 +41,7 @@ public class OOPSLA16 {
 
 	@Test
 	public void testFigure5Corrected() throws ParseException {
-		
+
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
 		GenContext genCtx = TestUtil.getStandardGenContext();
 		TypeContext ctx = TestUtil.getStandardTypeContext();
@@ -133,12 +134,10 @@ public class OOPSLA16 {
 	
 	@Test
 	public void testFigure2() throws ParseException {
-		
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
-		
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		TypeContext ctx = TestUtil.getStandardTypeContext();
+
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
 		for(String fileName : fileList) {
@@ -154,7 +153,6 @@ public class OOPSLA16 {
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
 		Expression program = new FieldGet(mainProgram, "x"); 
 		
-    	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);

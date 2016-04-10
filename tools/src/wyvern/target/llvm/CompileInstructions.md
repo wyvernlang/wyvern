@@ -14,3 +14,10 @@ To compile follow these commands:
 
 Now a file named libWyvernLLVM.so (on Linux) or WyvernLLVM.dll (on Windows) will be created in this directory. Search for this file and paste this path in the System.load () function call in Interpreter.java.
 Now, LLVM JIT can be executed.
+
+NB! You may find these two extra settings helpful:
+
+export PATH=/usr/lib/llvm-3.5/bin/:$PATH
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
+(i.e. point explicitly at the llvm-config (without version number) and Java's home)
