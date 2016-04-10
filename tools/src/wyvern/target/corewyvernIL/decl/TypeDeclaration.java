@@ -30,8 +30,7 @@ public class TypeDeclaration extends NamedDeclaration {
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
-		// TODO Auto-generated method stub
-		return null;
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class OIRBoolean extends OIRLiteral {
 	}
 
 	@Override
-	public <T> T acceptVisitor(ASTVisitor<T> visitor, OIREnvironment oirenv) {
-		return visitor.visit(oirenv, this);
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+		return visitor.visit(state, this);
 	}
 }

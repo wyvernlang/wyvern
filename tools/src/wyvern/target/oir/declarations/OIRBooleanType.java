@@ -19,9 +19,9 @@ public class OIRBooleanType extends OIRType{
 	}
 	
 	@Override
-	public <T> T acceptVisitor(ASTVisitor<T> visitor, OIREnvironment oirenv) {
-		// TODO Auto-generated method stub
-		return null;
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+    // TODO Auto-generated method stub
+    return null;
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public class OIRFormalArg extends OIRAST {
 		this.type = type;
 	}
 	@Override
-	public <T> T acceptVisitor(ASTVisitor<T> visitor, OIREnvironment oirenv) {
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
 		// TODO Auto-generated method stub
 		return null;
 	}

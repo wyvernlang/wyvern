@@ -41,8 +41,8 @@ public class OIRMethodDeclaration extends OIRAST {
 		this.args = args;
 	}
 	@Override
-	public <T> T acceptVisitor(ASTVisitor<T> visitor, OIREnvironment oirenv) {
-		return visitor.visit(oirenv, this);
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+		return visitor.visit(state, this);
 	}
 	
 }
