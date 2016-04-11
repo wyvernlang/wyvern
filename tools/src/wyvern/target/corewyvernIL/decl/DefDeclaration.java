@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -121,5 +122,10 @@ public class DefDeclaration extends NamedDeclaration {
 			freeVars.remove(farg.getName());
 		}
 		return freeVars;
+	}
+	
+	@Override
+	public DeclType getDeclType() {
+		return new DefDeclType(getName(), type, formalArgs);
 	}
 }

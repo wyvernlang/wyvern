@@ -1,6 +1,0 @@
-resource module main
-
-instantiate Actual() as actual
-instantiate parameterized(actual) as p
-
-val x : Int = p.getFive()

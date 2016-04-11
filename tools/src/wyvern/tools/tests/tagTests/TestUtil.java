@@ -111,7 +111,7 @@ public class TestUtil {
 	}
 
 	public static GenContext getStandardGenContext() {
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), getSystemType());
+		GenContext genCtx = getGenContext(new InterpreterState(null)).extend("system", new Variable("system"), getSystemType());
 		return addTypeAbbrevs(genCtx);
 	}
 

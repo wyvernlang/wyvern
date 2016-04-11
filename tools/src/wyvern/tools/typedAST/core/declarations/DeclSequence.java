@@ -357,7 +357,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		tlc.setReceiverName(newName);
 		for(TypedAST seq_ast : getDeclIterator()) {
 			Declaration d = (Declaration) seq_ast;
-			wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(genCtx, null);
 			decls.add(decl);
 			d.addModuleDecl(tlc);
 		}

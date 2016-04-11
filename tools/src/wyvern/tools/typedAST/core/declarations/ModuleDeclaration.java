@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.beans.binding.Bindings;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.ContextBinding;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -17,8 +19,12 @@ import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.LoadedType;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.interop.FObject;
@@ -246,9 +252,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param ctx the context
 	 * @return new IL expression
 	 */
-	private Expression wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx) {
+	private Expression wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
 		Iterator<TypedAST> ai = impInstSeq.iterator();
-		return wrapLetWithIterator(ai, normalSeq, ctx);
+		return wrapLetWithIterator(ai, normalSeq, ctx, dependencies);
 	}
 
 
@@ -262,7 +268,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param ctx the context
 	 * @return the whole expression
 	 */
-	private Expression wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx) {
+	private Expression wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
 		if(!ai.hasNext()) {
 			return innerTranslate(normalSeq, ctx);
 		}
@@ -273,9 +279,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			// must be import
 			ImportDeclaration imp = (ImportDeclaration) ast;
 			
-			Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(ctx);
+			Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(ctx, dependencies);
 			
-			Expression e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second);
+			Expression e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second, dependencies);
 			return new Let(bindingAndCtx.first, e);
 		} else {
 			// must be instantiate
@@ -302,19 +308,27 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 							inst.getUri().getSchemeSpecificPart().toString(), args, this);
 			GenContext newContext = ctx.extend(inst.getName(), instValue, instValue.typeCheck(ctx));
 
-			Expression e = wrapLetWithIterator(ai, normalSeq, newContext);
+			Expression e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
 			return new Let(inst.getName(), instValue, e);
 		}
 	}
 
 
-	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx) {
+	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx, List<LoadedType> loadedTypes) {
 		/* generate the formal arguments by requiring sequence */
 		List<FormalArg> types = new LinkedList<FormalArg>();
 		for(Declaration d : reqSeq.getDeclIterator()) {
 			ImportDeclaration req = (ImportDeclaration) d;
 			String name = req.getUri().getSchemeSpecificPart();
-			wyvern.target.corewyvernIL.type.ValueType type = ctx.lookupType(name);
+			wyvern.target.corewyvernIL.type.ValueType type = null;
+			if (ctx.isPresent(name)) {
+				type = ctx.lookupType(name);
+			} else {
+				LoadedType lt = ctx.getInterpreterState().getResolver().resolveType(name);
+				type = new NominalType(lt.getModule().getSpec().getQualifiedName(), lt.getTypeName());
+				//bindings.add(binding);
+				loadedTypes.add(lt);
+			}
 			types.add(new FormalArg(req.getAsName(), type));
 		}
 		return types;
@@ -336,7 +350,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * For non-resource module: translate into a value
 	 */
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		GenContext methodContext = ctx;
 		Sequence reqSeq = new DeclSequence();
 		Sequence impInstSeq = new DeclSequence();
@@ -352,15 +366,25 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			else normalSeq = Sequence.append(normalSeq, inner);
 		}
 
-		List<FormalArg> formalArgs = new LinkedList<FormalArg>();
-		formalArgs = getTypes(reqSeq, ctx); // translate requiring modules to method parameters
+		List<FormalArg> formalArgs;
+		List<LoadedType> loadedTypes = new LinkedList<LoadedType>();
+		formalArgs = getTypes(reqSeq, ctx, loadedTypes); // translate requiring modules to method parameters
+		for (LoadedType lt : loadedTypes) {
+			// include the declaration itself
+			final String qualifiedName = lt.getModule().getSpec().getQualifiedName();
+			methodContext = methodContext.extend(qualifiedName, new Variable(qualifiedName), lt.getModule().getSpec().getType());
+			// include the type abbreviation
+			methodContext = new TypeGenContext(lt.getTypeName(), qualifiedName, methodContext);
+			if (dependencies != null)
+				dependencies.add(lt.getModule().getSpec());
+		}
 
 		/* adding parameters to environments */
 		for(FormalArg arg : formalArgs) {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
 	    /* importing modules and instantiations are translated into let sentence */
-		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext);
+		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext, dependencies);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(methodContext);
 
 		if(isResource() == false) {
