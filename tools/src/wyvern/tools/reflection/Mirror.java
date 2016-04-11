@@ -34,7 +34,7 @@ public class Mirror {
             return 0;
         }
         if (obj instanceof ObjectValue) {
-            List<Declaration> objDecls = ((ObjectValue) obj).getDecls();
+            List<? extends Declaration> objDecls = ((ObjectValue) obj).getDecls();
             for (Declaration decl : objDecls) {
                 if (decl instanceof DeclarationWithRHS) {
                     Declaration o1Decl = o1.findDecl(decl.getName());

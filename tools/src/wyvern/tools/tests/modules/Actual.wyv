@@ -1,0 +1,3 @@
+resource module Actual : modules.Formal
+
+def f():Int = 5

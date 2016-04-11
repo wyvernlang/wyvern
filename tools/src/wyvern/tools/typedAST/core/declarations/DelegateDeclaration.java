@@ -1,10 +1,12 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -140,7 +142,7 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}

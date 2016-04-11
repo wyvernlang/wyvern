@@ -357,12 +357,21 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		tlc.setReceiverName(newName);
 		for(TypedAST seq_ast : getDeclIterator()) {
 			Declaration d = (Declaration) seq_ast;
-			wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = d.topLevelGen(genCtx, null);
 			decls.add(decl);
 			d.addModuleDecl(tlc);
 		}
 		tlc.setReceiverName(null);
 	
+		// determine if we need to be a resource type
+		for (wyvern.target.corewyvernIL.decl.Declaration d: decls) {
+			d.typeCheck(tlc.getContext(), tlc.getContext());
+			if (d.containsResource()) {
+				type = new StructuralType(newName, declts, true);
+				break;
+			}
+		}
+		
 		/* wrap the declarations into an object */
 		Expression newExp = new New(decls, newName, type);
 		tlc.addLet(newName, type, newExp, true);

@@ -40,7 +40,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	public Expression genExprWithArgs(List<Expression> args, HasLocation loc) {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
-			return new MethodCall(e, "apply", args, loc);
+			return new MethodCall(e, Util.APPLY_NAME, args, loc);
 		} else {
 			return new MethodCall(receiver, declType.getName(), args, loc);			
 		}
@@ -51,7 +51,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
 			ValueType vt = e.typeCheck(ctx);
-			DefDeclType dt = (DefDeclType)vt.findDecl("apply", ctx);
+			DefDeclType dt = (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
 			return dt.getFormalArgs();
 		} else {
 			DefDeclType dt = (DefDeclType) declType;

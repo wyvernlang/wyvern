@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,9 +12,12 @@ import java.util.stream.Collectors;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -23,12 +27,31 @@ import wyvern.tools.errors.ToolError;
 
 public class New extends Expression {
 
-	private List<Declaration> decls;
+	private List<? extends Declaration> decls;
 	private String selfName;
 	private boolean hasDelegate;
 	private DelegateDeclaration delegateDeclaration;
 
-	public New(List<Declaration> decls, String selfName, ValueType type) {
+	/** convenience method for a single declaration */
+	public New(NamedDeclaration decl) {
+		this(Arrays.asList(decl));
+	}
+	
+	/** computes the type itself, uses a don't care selfName */
+	public New(List<NamedDeclaration> decls) {
+		this(decls, "dontcare", typeOf(decls));
+	}
+	
+	private static ValueType typeOf(List<NamedDeclaration> decls2) {
+		List<DeclType> declts =	new LinkedList<DeclType>();
+		for (NamedDeclaration d : decls2) {
+			declts.add(d.getDeclType());
+		}
+		ValueType type = new StructuralType("dontcare", declts);
+		return type;
+	}
+	
+	public New(List<? extends Declaration> decls, String selfName, ValueType type) {
 		super(type);
 		this.decls = decls;
 		this.selfName = selfName;
@@ -37,7 +60,7 @@ public class New extends Expression {
 				throw new NullPointerException();
 		}
 
-		Optional<Declaration> delegate_option = decls.stream().filter(d-> d instanceof DelegateDeclaration).findFirst();
+		Optional<? extends Declaration> delegate_option = decls.stream().filter(d-> d instanceof DelegateDeclaration).findFirst();
 
 		hasDelegate = delegate_option.isPresent();
 		if (hasDelegate) {
@@ -46,7 +69,7 @@ public class New extends Expression {
 	}
 
 	public List<Declaration> getDecls() {
-		return decls;
+		return (List<Declaration>)decls;
 	}
 
 	public String getSelfName() {
@@ -87,9 +110,13 @@ public class New extends Expression {
 
 		TypeContext thisCtx = ctx.extend(selfName, getExprType());
 
+		boolean isResource = false;
 		for (Declaration d : decls_ExceptDelegate()) {
 			DeclType dt = d.typeCheck(ctx, thisCtx);
 			dts.add(dt);
+			if (d.containsResource()) {
+				isResource = true;
+			}
 		}
 
 		ValueType type = getExprType();
@@ -109,6 +136,10 @@ public class New extends Expression {
 		StructuralType actualT = new StructuralType(selfName, dts);
 		if (!actualT.isSubtypeOf(requiredT, ctx)) {
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName());;
+		}
+
+		if (isResource && !requiredT.isResource(GenContext.empty())) {
+			ToolError.reportError(ErrorMessage.MUST_BE_RESOURCE_TYPE, this, requiredT.getSelfName());
 		}
 
 		return type;

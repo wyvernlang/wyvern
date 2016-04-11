@@ -46,7 +46,7 @@ public abstract class GenContext extends TypeContext {
 		return theEmpty;
 	}
 	
-	abstract String endToString();
+	protected abstract String endToString();
 	
 	private static GenContext theEmpty = new EmptyGenContext();
 

@@ -25,14 +25,14 @@ public class DefaultExprGenerator implements CallableExprGenerator {
 	@Override
 	public Expression genExprWithArgs(List<Expression> args, HasLocation loc) {
 		Expression e = genExpr();
-		return new MethodCall(e, "apply", args, loc);
+		return new MethodCall(e, Util.APPLY_NAME, args, loc);
 	}
 
 	@Override
 	public List<FormalArg> getExpectedArgTypes(TypeContext ctx) {
 		Expression e = genExpr();
 		ValueType vt = e.typeCheck(ctx);
-		DefDeclType dt = (DefDeclType)vt.findDecl("apply", ctx);
+		DefDeclType dt = (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
 		return dt.getFormalArgs();
 	}
 

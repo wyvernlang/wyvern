@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -55,10 +56,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
+	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
-		this.type = getMethodType(argNames, fullType);
+		this.type = getMethodType(argNames, returnType);
 		this.name = name;
 		this.body = (ExpressionAST) body;
 		this.argNames = argNames;
@@ -269,7 +270,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		return generateDecl(ctx, ctx);
 	}
 
@@ -316,12 +317,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		String getterName = VarDeclaration.varNameToGetter(varName);
 		Invocation getterBody = new Invocation(receiver, varName, null, null);
 		
-		// Getter's signature is Unit -> varType
-		Arrow getterArrType = new Arrow(new Unit(), varType);
-		
 		// Make and return the declaration.
 		wyvern.tools.typedAST.core.declarations.DefDeclaration getterDecl;
-		getterDecl = new wyvern.tools.typedAST.core.declarations.DefDeclaration(getterName, getterArrType, new LinkedList<>(),
+		getterDecl = new wyvern.tools.typedAST.core.declarations.DefDeclaration(getterName, varType, new LinkedList<>(),
 																				getterBody, false, null);
 		return getterDecl;
 		
@@ -349,11 +347,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		LinkedList<NameBinding> setterArgs = new LinkedList<>();
 		setterArgs.add(new NameBindingImpl("x", varType));
 		Type unitType = new UnresolvedType("Unit", receiver.getLocation());
-		Arrow setterArrType = new Arrow(varType, unitType);
+		//Arrow setterArrType = new Arrow(varType, unitType);
 		
 		// Make and return the declaration.
 		DefDeclaration setterDecl;
-		setterDecl = new DefDeclaration(setterName, setterArrType, setterArgs, setterBody, false, null);
+		setterDecl = new DefDeclaration(setterName, unitType, setterArgs, setterBody, false, null);
 		return setterDecl;
 		
 	}

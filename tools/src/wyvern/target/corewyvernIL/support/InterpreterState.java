@@ -7,6 +7,7 @@ public class InterpreterState {
 	
 	public InterpreterState(File rootDir) {
 		resolver = new ModuleResolver(rootDir);
+		resolver.setInterpreterState(this);
 	}
 	
 	public ModuleResolver getResolver() {

@@ -9,6 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -17,6 +19,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
@@ -70,14 +73,7 @@ public class ILTests {
         String input =
                   "val x = 5\n"
         		+ "x\n";
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(GenContext.empty(), null);
-        TypeContext ctx = TypeContext.empty();
-        ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.intType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
     }
 
     @Test
@@ -85,43 +81,14 @@ public class ILTests {
         String input =
                   "val x = \"five\"\n"
         		+ "x\n";
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(GenContext.empty(), null);
-        TypeContext ctx = TypeContext.empty();
-        ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.stringType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        StringLiteral five = new StringLiteral("five");
-		Assert.assertEquals(five, v);
-    }
-
-    @Test
-    public void testLetValWithString2() throws ParseException {
-        String input =
-                  "val x = \"five\"\n"
-        		+ "x\n";
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(GenContext.empty(), null);
-        TypeContext ctx = TypeContext.empty();
-        ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.stringType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        StringLiteral five = new StringLiteral("");
-		Assert.assertNotEquals(five, v);
+        doTest(input, Util.stringType(), new StringLiteral("five"));
     }
 
     @Test
     public void testLetValWithString3() throws ParseException {
         String input = "val identity = (x: system.Int) => x\n"
                      + "identity(5)";
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(TestUtil.getStandardGenContext(), null);
-        TypeContext ctx = TestUtil.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.intType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
     }
 
     @Test(expected=ToolError.class)
@@ -144,14 +111,7 @@ public class ILTests {
 				     + "    val v = 5\n"
 				     + "obj.v\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		Expression program = ast.generateIL(GenContext.empty(), null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
 	}
 	
 	@Test
@@ -210,7 +170,6 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testWriteFieldtoOtherField () throws ParseException {
 		// Need to declare a structural type T, then declare firstObj as var firstObj : T = new ...
 		String input = "val firstObj = new\n"
@@ -219,14 +178,7 @@ public class ILTests {
 				     + "    var b : system.Int = 10\n"
 				     + "firstObj.a = secondObj.b\n"
 				     + "firstObj.a";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-		ValueType type = program.typeCheck(TypeContext.empty());
-		Assert.assertEquals(Util.intType(), type);
-		Value result = program.interpret(EvalContext.empty());
-		IntegerLiteral ten = new IntegerLiteral(10);
-		Assert.assertEquals(result, ten);
+        doTestInt(input, 10);
 	}
 	
 	@Test
@@ -234,9 +186,7 @@ public class ILTests {
 		String input = "val object = new \n"
 					 + "    val field : system.Int = 5 \n"
 					 + "object.field = 10\n";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		doTestTypeFail(input);
 	}
 
 	@Test
@@ -248,14 +198,7 @@ public class ILTests {
 					 + "	def double (argument : system.Int) : system.Int\n"
 					 + "		argument\n"
 					 + "d.double(10)";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        GenContext genCtx = TestUtil.getStandardGenContext();
-		Expression program = ast.generateIL(genCtx, null);
-		ValueType type = program.typeCheck(TypeContext.empty());
-		Assert.assertEquals(Util.intType(), type);
-		Value result = program.interpret(EvalContext.empty());
-		IntegerLiteral ten = new IntegerLiteral(10);
-		Assert.assertEquals(result, ten);
+		doTestInt(input, 10);
 	}
 	
 	@Test
@@ -285,16 +228,7 @@ public class ILTests {
 				     + "    def m() : system.Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
 	}
 	@Test
 	public void testDefWithValInside() throws ParseException {
@@ -303,16 +237,7 @@ public class ILTests {
 				     + "    v\n"
 				     + "foo()\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
 	}
 	
 	// TODO: add cast checks to make Dyn sound, and wrappers to make it capability-safe
@@ -325,21 +250,25 @@ public class ILTests {
 		doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
+	@Test
+	public void testArrowSugar2() throws ParseException {
+		String input = "val id : Int -> Int = (x:Int) => x\n"
+				     + "def invoke(f:Int -> Int, x:Int) : Int = f(x)\n"
+				     + "invoke(id, 5)\n"
+				     ;
+		doTest(input, Util.intType(), new IntegerLiteral(5));
+	}
+	
 	// TODO: make other string tests call this function
 	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getStandardGenContext();
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
 		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TestUtil.getStandardTypeContext();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(expectedType, t);
-		Value v = program.interpret(TestUtil.getStandardEvalContext());
-		Assert.assertEquals(expectedResult, v);		
+        doChecks(program, expectedType, expectedResult);
 	}
 
 	@Test
 	public void testDefWithVarInside() throws ParseException {
-		
 		String input = "def foo() : system.Int\n"
 					 + "    var v : system.Int = 5\n"
 					 + "    v = 10\n"
@@ -352,18 +281,8 @@ public class ILTests {
 	public void testIdentityCall() throws ParseException {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.Int) : system.Int = x\n"
-				     + "obj.id(5)\n"
-				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+				     + "obj.id(5)\n";
+        doTestInt(input, 5);
 	}
 
 	@Test
@@ -372,34 +291,7 @@ public class ILTests {
 				     + "    def id(x:system.String) : system.String = x\n"
 				     + "obj.id(\"five\")\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.stringType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        StringLiteral five = new StringLiteral("five");
-		Assert.assertEquals(five, v);
-	}
-
-    @Test
-	public void testIdentityCallString2() throws ParseException {
-		String input = "val obj = new\n"
-				     + "    def id(x:system.String) : system.String = x\n"
-				     + "obj.id(\"five\")\n"
-				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.stringType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        StringLiteral five = new StringLiteral("seven");
-		Assert.assertNotEquals(five, v);
+        doTest(input, Util.stringType(), new StringLiteral("five"));
 	}
 
 	@Test
@@ -410,18 +302,7 @@ public class ILTests {
 					 + "    def getResult():system.Int = 5\n\n"
 					 + "r.getResult()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ((Sequence) ast).generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-				
-		Assert.assertEquals(Util.intType(), t);
-		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestInt(input, 5);
 	}
 	
 	@Test()
@@ -450,16 +331,7 @@ public class ILTests {
 					 + "val i : Int = 5\n\n"
 					 + "i\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
 	}
 	
 	@Test
@@ -472,26 +344,16 @@ public class ILTests {
 					 + "    delegate IntResult to r\n\n"
 					 + "r2.getResult()\n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+        doTestInt(input, 5);
 	}
     
 	@Test
 	public void testSingleModule() throws ParseException {
-		
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+		GenContext genCtx = new EmptyGenContext(new InterpreterState(null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
     	TypeContext ctx = TypeContext.empty().extend("D", null);
     	
 		DeclType t = decl.typeCheck(ctx, ctx);
@@ -499,10 +361,16 @@ public class ILTests {
 	}
 
 	@Test
+	public void testSimpleParameterization() throws ParseException {
+		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
+	}
+	
+
+	@Test
 	public void testMultipleModules() throws ParseException {
 		
 		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv", "main.wyv"};
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
+		GenContext genCtx = new EmptyGenContext(new InterpreterState(null)).extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
@@ -512,7 +380,7 @@ public class ILTests {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
@@ -530,33 +398,14 @@ public class ILTests {
 	
 	@Test
 	public void testRecursiveMethod() throws ParseException {
-		
-		String source = TestUtil.readFile(PATH + "recursive.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
-		
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), new NominalType("", "D"));
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-    	TypeContext ctx = TypeContext.empty();
-		DeclType t = decl.typeCheck(ctx, ctx);
-		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
+		doTestScriptModularly("modules.module.recursive", null, null);
 	}
 	
 	
 	
 	@Test
 	public void testRecursiveTypes() throws ParseException {
-		
-		String source = TestUtil.readFile(PATH + "recursivetypes.wyv");
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.recursivetypes", null, null);
 	}
 	
 	@Test
@@ -568,80 +417,41 @@ public class ILTests {
 	
 	@Test
 	public void testRecursiveFunctions() throws ParseException {
-		
-		String source = TestUtil.readFile(PATH + "recursivefunctions.wyv");
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.recursivefunctions", Util.intType(), new IntegerLiteral(5));		
 	}
 	
 	@Test
-	public void testFib() throws ParseException {
+	public void testFact() throws ParseException {
+		doTestScriptModularly("modules.module.bool-nat-fact", null, null);
 		
-        String source = TestUtil.readFile(PATH + "bool-nat-fib.wyv");
+        /*String source = TestUtil.readFile(PATH + "bool-nat-fact.wyv");
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
 
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
+        GenContext genCtx = TestUtil.getGenContext(state);
         Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
+        TypeContext ctx = TestUtil.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
         // Assert.assertEquals(Util.intType(), t);
         Value v = program.interpret(EvalContext.empty());
         //IntegerLiteral five = new IntegerLiteral(5);
-        //Assert.assertEquals(five, v);
+        //Assert.assertEquals(five, v);*/
 	}
 
 	@Test
 	public void testLambda() throws ParseException {
-		
-        String source = TestUtil.readFile(PATH + "lambdatest.wyv");
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-        ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(Util.intType(), t);
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.lambdatest", Util.intType(), new IntegerLiteral(5));
 	}
 
     @Test
     public void testSimpleLambda() throws ParseException {
 
-        String source = "type UnitIntFn \n"
+        String input = "type UnitIntFn \n"
             + "     def apply():system.Int \n"
             + "val getFive:UnitIntFn = () => 5\n"
             + "getFive.apply()";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        doTestInt(input, 5);
     }
 
     @Test
@@ -650,31 +460,12 @@ public class ILTests {
      */
     public void testSimpleLambda2() throws ParseException {
 
-        String source = "type UnitIntFn \n"
+        String input = "type UnitIntFn \n"
             + "     def apply():system.Int \n"
             + "val getFive:UnitIntFn = () => 5\n"
             + "getFive()";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        doTestInt(input, 5);
     }
 
     @Test
@@ -684,27 +475,8 @@ public class ILTests {
             + "     def apply(x:system.Int):system.Int \n"
             + "val getFive:IntIntFn = x => x\n"
             + "getFive(5)";
-
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        
+        doTestInt(source, 5);
     }
     
     @Test
@@ -718,27 +490,7 @@ public class ILTests {
             + "    def runLambda(x:IntIntFn):system.Int\n"
             + "        x(5)\n" 
             + "t.runLambda(x=>x)";
-
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        doTestInt(source, 5);
     }
     
     @Test
@@ -752,26 +504,7 @@ public class ILTests {
     	            + "val lambda = getLambda()\n"
     	            + "lambda(5)";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+    	 doTestInt(source, 5);
     }
     
     @Test
@@ -782,27 +515,8 @@ public class ILTests {
     	            + "     def apply(x:system.Int):system.Int \n"
     	            + "var t:IntIntFn = x=>x\n"
     	            + "t(5)";
-
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+    	 
+    	 doTestInt(source, 5);
     }
     
     @Test
@@ -815,26 +529,7 @@ public class ILTests {
     	            + "t = x=>5\n"
     	            + "t(4)";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-
-        ValueType t = null;
-        try {
-            t = program.typeCheck(ctx);
-        } catch(NullPointerException e) {
-            e.printStackTrace(System.out);
-            Assert.fail("Failed to typecheck. Null Pointer Exception");
-        }
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+    	doTestInt(source, 5);
     }
 
 	@Test
@@ -861,15 +556,7 @@ public class ILTests {
                      
                      + "c.element.n"
 				     ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-        Expression program = ast.generateIL(genCtx, null);
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.intType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestInt(input, 5);
 	}
 
 	@Test
@@ -899,41 +586,22 @@ public class ILTests {
 					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
 					 + "val x : Int = importTest.addOne(4)\n"
 				     ;
+		doTestModule(input, "x", Util.intType(), new IntegerLiteral(5));
+	}
+
+	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
 		TypedAST ast = TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = TestUtil.getStandardGenContext();
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
 		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
+		Expression mainProgram = ((DefDeclaration)decl).getBody();
+		Expression program = new FieldGet(mainProgram, fieldName); // slightly hacky		
+        doChecks(program, expectedType, expectedValue);
 	}
 
 	@Test
 	public void testBigInt() throws ParseException {
-        String source = TestUtil.readFile(PATH + "bigint.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-		Value mainV = mainProgram.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.bigint", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -952,7 +620,6 @@ public class ILTests {
 	}
 	
 	@Test
-    @Category(CurrentlyBroken.class)
 	public void testListClient() throws ParseException {
 		doTestScriptModularly("modules.module.ListClient", Util.intType(), new IntegerLiteral(5));
 	}
@@ -960,48 +627,35 @@ public class ILTests {
 	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-		GenContext genCtx = TestUtil.getStandardGenContext();
+        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
+		GenContext genCtx = TestUtil.getGenContext(state);
         Expression program = ast.generateIL(genCtx, null);
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(expectedType, t);
-        Value v = program.interpret(TestUtil.getStandardEvalContext());
-        Assert.assertEquals(expectedValue, v);
+        doChecks(program, expectedType, expectedValue);
 	}
 
 	// TODO: make other script tests call this function
-	private void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
         InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
-        Expression program = state.getResolver().resolveModule(qualifiedName);
-		
+        Expression program = state.getResolver().resolveModule(qualifiedName).getExpression();
+        doChecks(program, expectedType, expectedValue);
+	}
+	
+	private static void doChecks(Expression program, ValueType expectedType, Value expectedValue) {
         // resolveModule already typechecked, but we'll do it again to verify the type
 		TypeContext ctx = TestUtil.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
-        Assert.assertEquals(expectedType, t);
+        if (expectedType != null)
+        	Assert.assertEquals(expectedType, t);
         
         // check the result
         Value v = program.interpret(TestUtil.getStandardEvalContext());
-        Assert.assertEquals(expectedValue, v);
+        if (expectedValue != null)
+        	Assert.assertEquals(expectedValue, v);
 	}
 
 	@Test
 	public void testOperatorPlus() throws ParseException {
-        String source = TestUtil.readFile(PATH + "operator-plus.wyv");
-		TypedAST ast = TestUtil.getNewAST(source);
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Value v = program.interpret(EvalContext.empty());
-		Value mainV = mainProgram.interpret(EvalContext.empty());
-		Assert.assertEquals(Util.intType(), t);		
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		doTestScriptModularly("modules.module.operator-plus", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -1014,21 +668,7 @@ public class ILTests {
 					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
 					 + "val x : system.String = importTest.addOneString(\"4\")\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
-		// bogus "system" entry, but makes the text work for now
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-		genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		decls.add(decl);
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		Expression program = new FieldGet(mainProgram, "x"); // slightly hacky		
-		ValueType t = program.typeCheck(ctx);
-		Assert.assertEquals(Util.stringType(), t);
-		Value v = program.interpret(EvalContext.empty());
-    	StringLiteral five = new StringLiteral("5");
-		Assert.assertEquals(five, v);
+		doTestModule(input, "x", Util.stringType(), new StringLiteral("5"));
 	}
 	
 	@Test
@@ -1045,9 +685,9 @@ public class ILTests {
 
 	private void doTestTypeFail(String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		Expression program = ast.generateIL(genCtx, null);
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
 		try {
+			Expression program = ast.generateIL(genCtx, null);
 			program.typeCheck(TestUtil.getStandardTypeContext());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
@@ -1055,27 +695,91 @@ public class ILTests {
 	}
 
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testResourceTypecheckingDef() throws ParseException {
-		String input = "resource type Stateful\n"
+		String input = "resource type Resource\n"
 					 + "	var state : system.Int\n"
-					 + "type PseudoNonStateful\n"
+					 + "type PseudoPure\n"
 					 + "	def saveState() : system.Int\n"
-					 + "var a : Stateful = new\n"
+					 + "var a : Resource = new\n"
 					 + "	var state : system.Int = 43\n"
-					 + "var b : PseudoNonStateful = new\n"
+					 + "var b : PseudoPure = new\n"
 					 + "	def saveState() : system.Int\n"
-					 + "		var c : Stateful = a\n"
+					 + "		var c : Resource = a\n"
 					 + "		0\n"
 					 + "b.saveState()";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		Expression program = ast.generateIL(genCtx, null);
-		try {
-			program.typeCheck(TypeContext.empty());
-			Assert.fail("Typechecking should have failed.");
-		} catch (ToolError e) {
-		}
+		doTestTypeFail(input);
+	}
+
+	@Test
+	public void testVarMarkedResource() throws ParseException {
+		String input = "resource type MarkedResource\n"
+					 + "	def foo() : system.Int\n"
+					 + "type PseudoPure\n"
+					 + "	def bar() : system.Int\n"
+					 + "var a : MarkedResource = new\n"
+					 + "	def foo() : system.Int\n"
+					 + "		var x : system.Int = 43\n"
+					 + "		x\n"
+					 + "var b : PseudoPure = new\n"
+					 + "	def bar() : system.Int\n"
+					 + "		var c : MarkedResource = a\n"
+					 + "		0\n"
+					 + "b.bar()";
+		doTestTypeFail(input);
+	}
+
+	@Test
+	public void testValMarkedResource() throws ParseException {
+		String input = "resource type MarkedResource\n"
+				 + "	def foo() : system.Int\n"
+				 + "type PseudoPure\n"
+				 + "	def bar() : system.Int\n"
+				 + "val a : MarkedResource = new\n"
+				 + "	def foo() : system.Int\n"
+				 + "		var x : system.Int = 43\n"
+				 + "		x\n"
+				 + "var b : PseudoPure = new\n"
+				 + "	def bar() : system.Int\n"
+				 + "		var c : MarkedResource = a\n"
+				 + "		0\n"
+				 + "b.bar()";
+		doTestTypeFail(input);
+	}
+
+	@Test
+	public void testPureVar() throws ParseException {
+		String input = "type Pure1\n"
+					 + "	def foo() : system.Int\n"
+					 + "type Pure2\n"
+					 + "	def bar() : system.Int\n"
+					 + "var a : Pure1 = new\n"
+					 + "	def foo() : system.Int\n"
+					 + "		var x : system.Int = 43\n"
+					 + "		x\n"
+					 + "var b : Pure2 = new\n"
+					 + "	def bar() : system.Int\n"
+					 + "		var c : Pure1 = a\n"
+					 + "		0\n"
+					 + "b.bar()";
+		doTestTypeFail(input);
+	}
+
+	@Test
+	public void testPureVal() throws ParseException {
+		String input = "type Pure1\n"
+				 + "	def foo() : system.Int\n"
+				 + "type Pure2\n"
+				 + "	def bar() : system.Int\n"
+				 + "val a : Pure1 = new\n"
+				 + "	def foo() : system.Int\n"
+				 + "		var x : system.Int = 43\n"
+				 + "		x\n"
+				 + "var b : Pure2 = new\n"
+				 + "	def bar() : system.Int\n"
+				 + "		var c : Pure1 = a\n"
+				 + "		0\n"
+				 + "b.bar()";
+		doTestInt(input, 0);
 	}
 
 	@Test
@@ -1157,20 +861,7 @@ public class ILTests {
 
         String source = "val identity: system.Int->system.Int = (x: system.Int) => x\n"
             + "identity(10)";
-
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-        Expression program = ast.generateIL(genCtx, null);
-        TypeContext ctx = TypeContext.empty();
-
-        ValueType t = program.typeCheck(ctx);
-
-        Assert.assertEquals(Util.intType(), t);
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(10);
-        Assert.assertEquals(five, v);
+		doTestInt(source, 10);
     }
     
     @Test
@@ -1190,20 +881,14 @@ public class ILTests {
 
                       + "Identity(five)";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        Expression program = ast.generateIL(genCtx, null);
-
-        TypeContext ctx = TestUtil.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx);
+        doTest(source, null, null);
     }
 
 
     @Test
     public void testDependentType() throws ParseException {
 
-        String source = ""
+        String input = ""
                       + "type IntHolder\n"
                       + "    type heldType = system.Int\n"
                       + "    val element: this.heldType\n\n"
@@ -1217,17 +902,7 @@ public class ILTests {
 
                       + "Identity(five)";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        Expression program = ast.generateIL(genCtx, null);
-
-        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
-
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        doTest(input, null, new IntegerLiteral(5));
     }
 
     @Test
@@ -1246,18 +921,7 @@ public class ILTests {
                       + "    val element: this.heldType = 5\n\n"
 
                       + "Identity(five, 5)";
-
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        Expression program = ast.generateIL(genCtx, null);
-
-        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
-
-
-        Value v = program.interpret(EvalContext.empty());
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        doTest(source, null, new IntegerLiteral(5));
     }
 
     @Test
@@ -1294,16 +958,7 @@ public class ILTests {
 
                       + "ifSt(true, IntegerTen, IntegerFive)";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        Expression program = ast.generateIL(genCtx, null);
-
-        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
-        Value v = program.interpret(EvalContext.empty());
-
-        IntegerLiteral ten = new IntegerLiteral(10);
-        Assert.assertEquals(ten, v);
+        doTest(source, null, new IntegerLiteral(10));
     }
 
     @Test
@@ -1340,15 +995,6 @@ public class ILTests {
 
                       + "ifSt(false, IntegerTen, IntegerFive)";
 
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        Expression program = ast.generateIL(genCtx, null);
-
-        ValueType t = program.typeCheck(TestUtil.getStandardTypeContext());
-        Value v = program.interpret(EvalContext.empty());
-
-        IntegerLiteral five = new IntegerLiteral(5);
-        Assert.assertEquals(five, v);
+        doTest(source, null, new IntegerLiteral(5));
     }
 }

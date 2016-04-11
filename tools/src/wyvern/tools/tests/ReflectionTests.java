@@ -39,7 +39,7 @@ public class ReflectionTests {
         GenContext genCtx = TestUtil.getStandardGenContext();
         genCtx = new TypeGenContext("Boolean", "system", genCtx);
         TypeContext ctx = TestUtil.getStandardTypeContext();
-        wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+        wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
         genCtx = GenUtil.link(genCtx, decl); // not sure this is necessary
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
         decls.add(decl);
@@ -60,7 +60,7 @@ public class ReflectionTests {
         for (String filename : fileList) {
             String source = TestUtil.readFile(PATH + filename);
             TypedAST ast = TestUtil.getNewAST(source);
-            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
             decls.add(decl);
             genCtx = GenUtil.link(genCtx, decl);
         }

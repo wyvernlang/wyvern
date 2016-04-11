@@ -18,23 +18,23 @@ import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 
-public abstract class ASTVisitor<T> {
-	public abstract T visit(OIREnvironment oirenv, OIRInteger oirInteger);
-	public abstract T visit(OIREnvironment oirenv, OIRBoolean oirBoolean);
-	public abstract T visit(OIREnvironment oirenv, OIRCast oirCast);
-	public abstract T visit(OIREnvironment oirenv, OIRFieldGet oirFieldGet);
-	public abstract T visit(OIREnvironment oirenv, OIRFieldSet oirFieldSet);
-	public abstract T visit(OIREnvironment oirenv, OIRIfThenElse oirIfThenElse);
-	public abstract T visit(OIREnvironment oirenv, OIRLet oirLet);
-	public abstract T visit(OIREnvironment oirenv, OIRMethodCall oirMethodCall);
-	public abstract T visit(OIREnvironment oirenv, OIRNew oirNew);
-	public abstract T visit(OIREnvironment oirenv, OIRRational oirRational);
-	public abstract T visit(OIREnvironment oirenv, OIRString oirString);
-	public abstract T visit(OIREnvironment oirenv, OIRVariable oirVariable);
-	public abstract T visit(OIREnvironment oirenv, OIRClassDeclaration oirClassDeclaration);
-	public abstract T visit(OIREnvironment oirenv, OIRProgram oirProgram);
-	public abstract T visit(OIREnvironment oirenv, OIRInterface oirInterface);
-	public abstract T visit(OIREnvironment oirenv, OIRFieldDeclaration oirFieldDeclaration);
-	public abstract T visit(OIREnvironment oirenv, OIRMethodDeclaration oirMethodDeclaration);
-	public abstract T visit(OIREnvironment oirenv, OIRMethod oirMethod);
+public abstract class ASTVisitor<S, T> {
+	public abstract T visit(S state, OIRInteger oirInteger);
+	public abstract T visit(S state, OIRBoolean oirBoolean);
+	public abstract T visit(S state, OIRCast oirCast);
+	public abstract T visit(S state, OIRFieldGet oirFieldGet);
+	public abstract T visit(S state, OIRFieldSet oirFieldSet);
+	public abstract T visit(S state, OIRIfThenElse oirIfThenElse);
+	public abstract T visit(S state, OIRLet oirLet);
+	public abstract T visit(S state, OIRMethodCall oirMethodCall);
+	public abstract T visit(S state, OIRNew oirNew);
+	public abstract T visit(S state, OIRRational oirRational);
+	public abstract T visit(S state, OIRString oirString);
+	public abstract T visit(S state, OIRVariable oirVariable);
+	public abstract T visit(S state, OIRClassDeclaration oirClassDeclaration);
+	public abstract T visit(S state, OIRProgram oirProgram);
+	public abstract T visit(S state, OIRInterface oirInterface);
+	public abstract T visit(S state, OIRFieldDeclaration oirFieldDeclaration);
+	public abstract T visit(S state, OIRMethodDeclaration oirMethodDeclaration);
+	public abstract T visit(S state, OIRMethod oirMethod);
 }

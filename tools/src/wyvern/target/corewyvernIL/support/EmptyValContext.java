@@ -14,7 +14,7 @@ public class EmptyValContext extends EvalContext {
 
 	@Override
 	public String endToString() {
-		return null;
+		return "]";
 	}
 
 	@Override

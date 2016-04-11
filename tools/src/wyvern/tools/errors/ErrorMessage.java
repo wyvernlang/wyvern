@@ -21,6 +21,7 @@ public enum ErrorMessage {
 	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
 	CANNOT_INFER_ARG_TYPE("Cannot infer the argument type as there is no expected type for the function expression", 0),
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
+	MUST_BE_RESOURCE_TYPE("%ARG type must be resource", 1),
 	
 	// Syntax errors
 	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
@@ -62,7 +63,9 @@ public enum ErrorMessage {
 
 	ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2),// end of error list
 	
-	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1);
+	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
+	
+	PARSE_ERROR("%ARG", 1);
 	
 	private ErrorMessage(String message, int numArgs) {
 		this.errorMessage = message;

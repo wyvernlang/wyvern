@@ -4,7 +4,7 @@ type DynListToDynFn
 type UnitDynFn
 	def apply():Dyn
 	
-type DynUnitFn
+resource type DynUnitFn
 	def apply(element:Dyn):Unit
 
 
