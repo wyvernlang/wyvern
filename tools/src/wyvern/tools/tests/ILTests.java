@@ -858,7 +858,6 @@ public class ILTests {
 	@Test
 	public void testIntAdd() throws ParseException {
         String source = ""
-                + "import stdlib.ints\n\n"
                 + "val x : Int = 5\n"
                 + "val y : Int = x + 5\n"
                 + "y";		
@@ -868,7 +867,6 @@ public class ILTests {
 	@Test
 	public void testIntOps() throws ParseException {
         String source = ""
-                + "import stdlib.ints\n\n"
                 + "val x : Int = 2\n"
                 + "val y : Int = 4 / 2 - x * 2\n"
                 + "y";		
