@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +14,16 @@ import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -106,13 +110,16 @@ public class TestUtil {
 	}
 	
 	public static GenContext getGenContext(InterpreterState state) {
+		if (state.getGenContext() != null)
+			return state.getGenContext();
 		GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), getSystemType());
 		return addTypeAbbrevs(genCtx);
 	}
 
 	public static GenContext getStandardGenContext() {
-		GenContext genCtx = getGenContext(new InterpreterState(null)).extend("system", new Variable("system"), getSystemType());
-		return addTypeAbbrevs(genCtx);
+		/*GenContext genCtx = getGenContext(new InterpreterState(null)).extend("system", new Variable("system"), getSystemType());
+		return addTypeAbbrevs(genCtx);*/
+		return getGenContext(new InterpreterState(new File(BASE_PATH)));
 	}
 
 	private static GenContext addTypeAbbrevs(GenContext genCtx) {
@@ -120,6 +127,7 @@ public class TestUtil {
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = new TypeGenContext("String", "system", genCtx);
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
+		//genCtx.getInterpreterState().setGenContext(genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
@@ -127,11 +135,18 @@ public class TestUtil {
 	private static ValueType getSystemType() {
 		// construct a type for the system object
 		List<DeclType> declTypes = new LinkedList<DeclType>();
-		declTypes.add(new AbstractTypeMember("Int"));
+		//declTypes.add(new AbstractTypeMember("Int"));
+		List<DeclType> intDeclTypes = new LinkedList<DeclType>();
+		intDeclTypes.add(new DefDeclType("+", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		intDeclTypes.add(new DefDeclType("-", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		intDeclTypes.add(new DefDeclType("*", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		intDeclTypes.add(new DefDeclType("/", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		ValueType intType = new StructuralType("intSelf", intDeclTypes);
+		declTypes.add(new ConcreteTypeMember("Int", intType));
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
-		ValueType systemType = new StructuralType("this", declTypes);
+		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;
 	}
 	

@@ -4,6 +4,7 @@ import java.io.File;
 
 public class InterpreterState {
 	private ModuleResolver resolver;
+	private GenContext genCtx;
 	
 	public InterpreterState(File rootDir) {
 		resolver = new ModuleResolver(rootDir);
@@ -12,5 +13,14 @@ public class InterpreterState {
 	
 	public ModuleResolver getResolver() {
 		return resolver;
+	}
+
+	public GenContext getGenContext() {
+		return genCtx;
+	}
+	public void setGenContext(GenContext ctx) {
+		if (genCtx != null)
+			throw new RuntimeException();
+		genCtx = ctx;
 	}
 }

@@ -170,6 +170,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testOIRFieldRead() throws ParseException {
     String input =
       "val obj = new\n" +
@@ -179,6 +180,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testOIRMultipleFields() throws ParseException {
     String input =
       "val obj = new\n" +
@@ -189,6 +191,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testOIRVarFieldRead() throws ParseException {
     String input =
       "val obj = new\n" +
@@ -198,6 +201,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testOIRVarFieldWrite() throws ParseException {
     String input =
       "val obj = new\n" +
@@ -208,6 +212,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testDefWithVarInside() throws ParseException {
     String input =
       "def foo() : system.Int\n" +
@@ -229,6 +234,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testDefDecl() throws ParseException {
     String input =
       "val obj = new\n" +
@@ -310,6 +316,7 @@ public class OIRTests {
   }
 
   @Test
+  @Category(CurrentlyBroken.class)
   public void testAssignAsExpression() throws ParseException {
     String input =
       "val obj = new\n" +

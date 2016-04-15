@@ -262,7 +262,7 @@ public class ILTests {
 	// TODO: make other string tests call this function
 	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH)));
 		Expression program = ast.generateIL(genCtx, null);
         doChecks(program, expectedType, expectedResult);
 	}
@@ -855,6 +855,25 @@ public class ILTests {
 		} catch (ToolError toolError) {}
 	}
 	
+	@Test
+	public void testIntAdd() throws ParseException {
+        String source = ""
+                + "import stdlib.ints\n\n"
+                + "val x : Int = 5\n"
+                + "val y : Int = x + 5\n"
+                + "y";		
+		doTest(source, null, new IntegerLiteral(10));
+	}
+
+	@Test
+	public void testIntOps() throws ParseException {
+        String source = ""
+                + "import stdlib.ints\n\n"
+                + "val x : Int = 2\n"
+                + "val y : Int = 4 / 2 - x * 2\n"
+                + "y";		
+		doTest(source, null, new IntegerLiteral(-2));
+	}
 
     @Test
     public void testArrowSugar() throws ParseException {
