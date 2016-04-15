@@ -101,7 +101,7 @@ public class OIRToLLVMTests {
 						new OIRMethodDeclaration (oirInterface, "method",  args),
 						new OIRInteger (34)));
 		classEnv.addName("method", oirInterface);
-		oirClass = new OIRClassDeclaration (classEnv, "class1", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		oirClass = new OIRClassDeclaration (classEnv, "class1", "this", new Vector<OIRDelegate> (), oirMembers, null, null);
 		rootEnv.addName("class1", oirClass);
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, 
@@ -166,7 +166,7 @@ public class OIRToLLVMTests {
 						new OIRMethodDeclaration (OIRIntegerType.getIntegerType(), "me2",  args),
 		     			new OIRInteger (1234)));
 		classEnv.addName ("me2", OIRIntegerType.getIntegerType());				
-		oirClass2 = new OIRClassDeclaration (classEnv, "class2", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		oirClass2 = new OIRClassDeclaration (classEnv, "class2", "this", new Vector<OIRDelegate> (), oirMembers, null, null);
 		OIRProgram.program.addTypeDeclaration(oirClass2);
 		rootEnv.addName("class2", oirClass2);
 		
@@ -191,7 +191,7 @@ public class OIRToLLVMTests {
 		oirInit = new Vector<OIRFieldValueInitializePair> ();
 		oirInit.add(new OIRFieldValueInitializePair((OIRFieldDeclaration)oirMembers.get(0), 
 				new OIRNew (new Vector<OIRExpression> (), "class2")));
-		oirClass1 = new OIRClassDeclaration (classEnv, "class1", "this", oirDelegate, oirMembers, oirInit);
+		oirClass1 = new OIRClassDeclaration (classEnv, "class1", "this", oirDelegate, oirMembers, oirInit, null);
 		OIRProgram.program.addTypeDeclaration(oirClass1);
 		rootEnv.addName("class1", oirClass1);
 		
@@ -254,7 +254,7 @@ public class OIRToLLVMTests {
 						new OIRMethodDeclaration (OIRIntegerType.getIntegerType(), "me2",  args),
 		     			new OIRInteger (1234)));
 		classEnv.addName ("me2", OIRIntegerType.getIntegerType());				
-		oirClass2 = new OIRClassDeclaration (classEnv, "class2", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		oirClass2 = new OIRClassDeclaration (classEnv, "class2", "this", new Vector<OIRDelegate> (), oirMembers, null, null);
 		OIRProgram.program.addTypeDeclaration(oirClass2);
 		rootEnv.addName("class2", oirClass2);
 		
@@ -279,7 +279,7 @@ public class OIRToLLVMTests {
 		oirInit = new Vector<OIRFieldValueInitializePair> ();
 		oirInit.add(new OIRFieldValueInitializePair((OIRFieldDeclaration)oirMembers.get(0), 
 				new OIRNew (new Vector<OIRExpression> (), "class2")));
-		oirClass1 = new OIRClassDeclaration (classEnv, "class1", "this", oirDelegate, oirMembers, oirInit);
+		oirClass1 = new OIRClassDeclaration (classEnv, "class1", "this", oirDelegate, oirMembers, oirInit, null);
 		OIRProgram.program.addTypeDeclaration(oirClass1);
 		rootEnv.addName("class1", oirClass1);
 		
@@ -339,7 +339,7 @@ public class OIRToLLVMTests {
 		classEnv.addName("method", oirInterface);
 		oirInits = new Vector<OIRFieldValueInitializePair> ();
 		oirInits.add(new OIRFieldValueInitializePair (fieldDecl, new OIRInteger(12)));
-		oirClass = new OIRClassDeclaration (classEnv, "class1", "this", new Vector<OIRDelegate> (), oirMembers, oirInits);
+		oirClass = new OIRClassDeclaration (classEnv, "class1", "this", new Vector<OIRDelegate> (), oirMembers, oirInits, null);
 		rootEnv.addName("class1", oirClass);
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, new OIRFieldGet (new OIRVariable ("o"), "field"));
@@ -391,7 +391,7 @@ public class OIRToLLVMTests {
 				new OIRMethod (methodEnv,
 						new OIRMethodDeclaration (oirInterface, "method",  args),
 						new OIRInteger (34)));
-		oirClass = new OIRClassDeclaration (classEnv, "class1", "this", new Vector<OIRDelegate> (), oirMembers, null);
+		oirClass = new OIRClassDeclaration (classEnv, "class1", "this", new Vector<OIRDelegate> (), oirMembers, null, null);
 		rootEnv.addName("class1", oirClass);
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, new OIRFieldSet (new OIRVariable ("o"), "field", new OIRInteger (1)));

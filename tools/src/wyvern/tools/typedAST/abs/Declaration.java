@@ -1,8 +1,10 @@
 package wyvern.tools.typedAST.abs;
 
+import java.util.List;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -102,9 +104,10 @@ public abstract class Declaration extends AbstractTreeWritable implements Enviro
 	 * Actually I think we can combine generateDecl and topLevelGen. </br>
 	 * 
 	 * @param ctx the context
+	 * @param dependencies TODO
 	 * @return the declaration generated 
 	 */
-	public abstract wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx);
+	public abstract wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies);
 
 	//public abstract void addModuleDecl(TopLevelContext tlc);
 	public void addModuleDecl(TopLevelContext tlc) {

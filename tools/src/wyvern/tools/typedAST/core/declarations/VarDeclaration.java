@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -180,7 +181,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -207,7 +208,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		// Create a temp object with a single var declaration.
 		VarDeclaration varDecl = new VarDeclaration(varName, this.binding.getType(), this.definition, location);
 		DeclSequence tempObjBody = new DeclSequence(varDecl);
-		New tempObj = new New(tempObjBody, null);
+		New tempObj = new New(tempObjBody, location);
 		String tempObjName = varNameToTempObj(varName);
 		ValDeclaration letDecl = new ValDeclaration(tempObjName, tempObj, null);
 		
@@ -230,7 +231,8 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		declarationTypes.add(getter.genILType(ctx));
 		declarationTypes.add(setter.genILType(ctx));
 		String newName = GenContext.generateName();
-		StructuralType structType = new StructuralType(newName, declarationTypes);
+		// If it is a var declaration, it must be of resource type
+		StructuralType structType = new StructuralType(newName, declarationTypes, true);
 		ctx = ctx.extend(newName, new Variable(newName), structType);
 		tlc.updateContext(ctx);
 		
@@ -252,7 +254,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		MethodCall methodCallExpr = new MethodCall(new Variable(newName), getter.getName(), new LinkedList<>(), this);
 		ctx = ctx.extend(varName, methodCallExpr, varValueType);
 		tlc.updateContext(ctx);
-		
 	}
 	
 	public static String varNameToTempObj (String s) {

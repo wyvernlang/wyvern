@@ -26,4 +26,14 @@ public class VarBindingContext extends TypeContext {
 	protected TypeContext getNext() {
 		return previous;
 	}
+	
+	@Override
+	public String toString() {
+		return "VarBindingContext[" + endToString();
+	}
+	
+	@Override
+	protected String endToString() {
+		return "]";
+	}
 }

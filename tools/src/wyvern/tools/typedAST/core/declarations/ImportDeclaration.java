@@ -5,12 +5,25 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
+import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
@@ -24,6 +37,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
+import wyvern.tools.util.Pair;
 import wyvern.tools.util.TreeWriter;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
@@ -147,11 +161,70 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Pair<VarBinding,GenContext> genBinding(GenContext ctx, List<TypedModuleSpec> dependencies) {
+		// add the import's type to the context, and get the import value
+		Expression importExp = null;
+		String importName = this.getUri().getSchemeSpecificPart();
+		if (importName.contains(".")) {
+			importName = importName.substring(importName.lastIndexOf(".")+1);
+		}
+		if (this.getUri().getScheme().equals("java")) {
+			String importPath = this.getUri().getRawSchemeSpecificPart();
+			try {
+				FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
+				ctx = GenUtil.ensureJavaTypesPresent(ctx);
+				ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
+				importExp = new JavaValue(obj, type);
+				ctx = ctx.extend(importName, new Variable(importName), type);
+			} catch (ReflectiveOperationException e1) {
+				throw new RuntimeException(e1);
+			}
+		} else {
+			// TODO: need to add types for non-java imports
+			String moduleName = this.getUri().getSchemeSpecificPart();
+			if (ctx.isPresent(moduleName)) {
+				importExp = new Variable(moduleName);
+			} else {
+				final Module module = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
+				for (TypedModuleSpec spec: module.getDependencies()) {
+					ctx = ctx.extend(spec.getQualifiedName(), new Variable(spec.getQualifiedName()), spec.getType());
+				}
+				// TODO: this may not be transitive in the right way
+				dependencies.addAll(module.getDependencies());
+				importExp = module.getExpression();
+			}
+			ctx = ctx.extend(importName, new Variable(importName), importExp.typeCheck(ctx));
+		}
+		return new Pair<VarBinding, GenContext>(new VarBinding(importName, importExp), ctx);
+	}
+	
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+		// no action needed
+	}
 
+	@Override
+	public void genTopLevel(TopLevelContext tlc) {
+		Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext(), tlc.getDependencies());
+		VarBinding binding = bindingAndCtx.first;
+		GenContext newCtx = bindingAndCtx.second;
+		ValueType type = binding.getExpression().typeCheck(newCtx);
+		tlc.addLet(binding.getVarName(), type, binding.getExpression(), false);
+		tlc.updateContext(newCtx);
+		
+		/*wyvern.target.corewyvernIL.expression.Variable variable = new wyvern.target.corewyvernIL.expression.Variable(binding.getVarName());
+		wyvern.target.corewyvernIL.decl.Declaration decl =
+				new wyvern.target.corewyvernIL.decl.ValDeclaration(binding.getVarName(),
+						type,
+						variable, location);
+		DeclType dt = new VarDeclType(binding.getVarName(), type);
+		tlc.addModuleDecl(decl,dt);*/
+	}
 
 	public String getAsName() {
 		return asName;

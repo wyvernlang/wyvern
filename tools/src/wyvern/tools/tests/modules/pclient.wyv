@@ -1,0 +1,7 @@
+import modules.Actual
+import modules.parameterized
+
+val actual = Actual()
+val p = parameterized(actual)
+
+p.getFive()

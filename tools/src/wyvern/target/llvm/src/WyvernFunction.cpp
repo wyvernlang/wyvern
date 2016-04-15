@@ -39,7 +39,7 @@ WyvernFunction::WyvernFunction (Type* returnType, vector<Type*> typeArgs,
     
     cout << "About to crash on a Mac!" << endl;
     
-    assert(false); // This line "works" on Linux but not on Mac! Go figure whose fault is this? :-)
+    // assert(false); // This line "works" on Linux but not on Mac! Go figure whose fault is this? :-)
     
     IRBuilder<> TmpB(&llvmFunction->getEntryBlock(),
                      llvmFunction->getEntryBlock().begin());

@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -30,8 +31,7 @@ public class TypeDeclaration extends NamedDeclaration {
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
-		// TODO Auto-generated method stub
-		return null;
+		return emitILVisitor.visit(env, oirenv, this);
 	}
 
 	@Override
@@ -56,4 +56,13 @@ public class TypeDeclaration extends NamedDeclaration {
 	public Set<String> getFreeVariables() {
 		return new HashSet<>();
 	}
+	
+	/** LIMITATION: only works if sourceType is a ValueType.
+	 * in the future maybe we'll extract the ValueType from the source type somehow.
+	 */
+	@Override
+	public DeclType getDeclType() {
+		return new ConcreteTypeMember(getName(), (ValueType) sourceType);
+	}
+
 }

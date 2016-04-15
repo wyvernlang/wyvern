@@ -1,4 +1,4 @@
-resource module main
+//resource module main
 
 import java:wyvern.tools.tests.ILTests.importTest
 
@@ -19,4 +19,5 @@ val two = makeBigInt(2)
 val one = makeBigInt(1)
 val four = two.add(two)
 
-val x : Int = four.add(one).asInt()
+//val x : Int = 
+four.add(one).asInt()

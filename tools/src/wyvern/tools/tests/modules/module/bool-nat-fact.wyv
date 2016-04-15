@@ -1,5 +1,5 @@
 // a simple library for natural numbers and booleans,
-// and a recursive implementation of the fibonacci function
+// and a recursive implementation of the factorial function
 
 type UnitNatFn
 	def apply():Nat
@@ -48,9 +48,9 @@ def succ(n:Nat):Nat
 		def times(n1:Nat):Nat
 			succ(n.times(n1).plus(n))
 			
-def fibonacci(n:Nat):Nat
+def fact(n:Nat):Nat
 	n.caseAnalyze(
 		() => succ(zero),
-		(p:Nat) => n.times(fibonacci(p)))
+		(p:Nat) => n.times(fact(p)))
 
-fibonacci(succ(succ(succ(zero))))
+fact(succ(succ(succ(zero))))

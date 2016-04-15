@@ -129,32 +129,9 @@ public class ModuleSystemTests {
 
 	@Test
 	public void testADT() throws ParseException {
-		
-		String[] fileList = {"Lists.wyv", "ListClient.wyv"};
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
-		
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		
-		for(String fileName : fileList) {
-			System.out.println(fileName);
-			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-			decls.add(decl);
-			genCtx = GenUtil.link(genCtx, decl);
-		}
-		
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "five"); 
-		
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
-		wyvern.target.corewyvernIL.expression.Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+		ILTests.doTestScriptModularly("modules.ListClient",
+				Util.intType(),
+				new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -171,7 +148,7 @@ public class ModuleSystemTests {
 		for(String fileName : fileList) {
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
@@ -195,7 +172,7 @@ public class ModuleSystemTests {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
@@ -214,7 +191,7 @@ public class ModuleSystemTests {
 	
 		// Load and link Database.wyv.
 		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.
@@ -239,7 +216,7 @@ public class ModuleSystemTests {
 	
 		// Load and link Database.wyv.
 		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.

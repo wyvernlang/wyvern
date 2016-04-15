@@ -9,7 +9,9 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
@@ -18,10 +20,10 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class DefDeclaration extends NamedDeclaration {
-
 	private List<FormalArg> formalArgs;
 	private ValueType type;
 	private Expression body;
+	private boolean hasResource = false;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, Expression body, FileLocation loc) {
@@ -30,6 +32,15 @@ public class DefDeclaration extends NamedDeclaration {
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = body;
+	}
+
+	@Override
+	public boolean containsResource() {
+		return this.hasResource;
+	}
+
+	private void setHasResource(boolean hasResource) {
+		this.hasResource = hasResource;
 	}
 
 	@Override
@@ -67,6 +78,7 @@ public class DefDeclaration extends NamedDeclaration {
 	public Expression getBody() {
 		return body;
 	}
+
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
@@ -78,6 +90,15 @@ public class DefDeclaration extends NamedDeclaration {
 		TypeContext methodCtx = thisCtx;
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
+		}
+		if (!this.containsResource()) {
+			for (String freeVar : this.getFreeVariables()) {
+				ValueType t = (new Variable(freeVar)).typeCheck(methodCtx);
+				if (t != null && t.isResource(methodCtx)) {
+					this.setHasResource(true);
+					break;
+				}
+			}
 		}
 		ValueType bodyType = body.typeCheck(methodCtx);
 		if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
@@ -93,7 +114,6 @@ public class DefDeclaration extends NamedDeclaration {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		
 		// Get all free variables in the body of the method.
 		Set<String> freeVars = body.getFreeVariables();
 		
@@ -103,5 +123,9 @@ public class DefDeclaration extends NamedDeclaration {
 		}
 		return freeVars;
 	}
-
+	
+	@Override
+	public DeclType getDeclType() {
+		return new DefDeclType(getName(), type, formalArgs);
+	}
 }

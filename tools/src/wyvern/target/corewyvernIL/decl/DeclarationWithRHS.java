@@ -19,7 +19,6 @@ public abstract class DeclarationWithRHS extends NamedDeclaration {
 	}
 	
 	public abstract ValueType getType();
-	public abstract DeclType getDeclType();
 	
 	@Override
 	public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {

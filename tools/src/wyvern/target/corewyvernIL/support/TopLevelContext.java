@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.util.Pair;
@@ -23,6 +24,7 @@ public class TopLevelContext {
 	//private List<Pair<Declaration,DeclType>> moduleDecls = new LinkedList<Pair<Declaration,DeclType>>();
 	private List<Declaration> moduleDecls = new LinkedList<Declaration>();
 	private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
+	private List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 	private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
 	private GenContext ctx;
 	private String receiverName;
@@ -45,6 +47,7 @@ public class TopLevelContext {
 			pair = pending.pop();
 			exp = new Let(pair.first, pair.second, exp);
 		}
+		exp = ctx.getInterpreterState().getResolver().wrap(exp, dependencies);
 		return exp;
 	}
 
@@ -52,6 +55,16 @@ public class TopLevelContext {
 		String newName = GenContext.generateName();
 		ValueType vt = new StructuralType(newName, moduleDeclTypes);
 		vt = adapt(vt, newName);
+		
+		// determine if we need to be a resource type
+		for (Declaration d: moduleDecls) {
+			d.typeCheck(ctx, ctx);
+			if (d.containsResource()) {
+				vt = new StructuralType(newName, moduleDeclTypes, true);
+				break;
+			}
+		}
+		
 		Expression exp = new New(moduleDecls, newName, vt);
 		addExpression(exp);
 		
@@ -86,7 +99,14 @@ public class TopLevelContext {
 		}
 		name = null;*/
 	}
-
+	/**
+	 * Adds a binding to the sequence being generated
+	 * 
+	 * @param name	the name of the variable being bound
+	 * @param type	the variable's type
+	 * @param exp	the right-hand side of the binding
+	 * @param isDeclBlock flags a let statement that represents a block of recursive declarations, or a var
+	 */
 	public void addLet(String name, ValueType type, Expression exp, boolean isDeclBlock) {
 		pending.push(new Pair<String,Expression>(name, exp));
 		ctx = ctx.extend(name, new Variable(name), type);
@@ -109,5 +129,9 @@ public class TopLevelContext {
 	
 	public void setReceiverName(String rn) {
 		receiverName = rn;
+	}
+
+	public List<TypedModuleSpec> getDependencies() {
+		return dependencies;
 	}
 }

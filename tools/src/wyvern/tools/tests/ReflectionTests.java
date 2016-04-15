@@ -65,7 +65,7 @@ public class ReflectionTests {
         for (String filename : fileList) {
             String source = TestUtil.readFile(PATH + filename);
             TypedAST ast = TestUtil.getNewAST(source);
-            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
             decls.add(decl);
             genCtx = GenUtil.link(genCtx, decl);
         }
