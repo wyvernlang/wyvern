@@ -4,11 +4,14 @@ import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.JavaValue;
@@ -17,6 +20,10 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.DynamicType;
+import wyvern.target.corewyvernIL.type.IntegerType;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.ImportBinder;
@@ -181,7 +188,20 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			} catch (ReflectiveOperationException e1) {
 				throw new RuntimeException(e1);
 			}
-		} else {
+		} else if (this.getUri().getScheme().equals("python")) {
+      String moduleName = this.getUri().getRawSchemeSpecificPart();
+      System.out.println("Python import: " + moduleName);
+      importExp = new Variable(moduleName);
+      // how to handle arg lists?
+      // does wyvern have a list type yet?
+      // ArrayList<DeclType> declTypes = new ArrayList();
+      // NominalType intType = new NominalType("system", "Int");
+      // ArrayList<FormalArg> args = new ArrayList();
+      // args.add(new FormalArg("x", intType));
+      // declTypes.add(new DefDeclType("factorial", intType, args));
+      // StructuralType importType = new StructuralType("this", declTypes);
+      ctx = ctx.extend(importName, new Variable(importName), new NominalType("system", "Dyn"));
+    } else {
 			// TODO: need to add types for non-java imports
 			String moduleName = this.getUri().getSchemeSpecificPart();
 			if (ctx.isPresent(moduleName)) {
