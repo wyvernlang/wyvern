@@ -22,11 +22,11 @@ public class AbstractTypeMember extends DeclType implements EmitOIR {
 
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
-		throw new RuntimeException("not implemented");
+        return this.getName().equals(dt.getName());
 	}
 
 	@Override
 	public DeclType adapt(View v) {
-		throw new RuntimeException("not implemented");
+        return this;
 	}
 }
