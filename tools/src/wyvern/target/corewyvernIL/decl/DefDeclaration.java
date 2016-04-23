@@ -107,7 +107,6 @@ public class DefDeclaration extends NamedDeclaration {
 			//bodyType.isSubtypeOf(resultType, methodCtx);
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");;
 			
-			//throw new RuntimeException("body doesn't match declared type");
 		}
 		return new DefDeclType(getName(), type, formalArgs);
 	}

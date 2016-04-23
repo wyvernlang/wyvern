@@ -1014,4 +1014,61 @@ public class ILTests {
 
         doTest(source, null, new IntegerLiteral(5));
     }
+
+    @Test
+    public void testAbstractTypeMember() throws ParseException {
+        String source = ""
+            + "type TypeHolder\n"
+            + "    type T\n"
+            + "    val thing: this.T\n"
+            + "    def giveThing(): this.T\n\n"
+
+            + "val intHolder = new \n"
+            + "    type T = system.Int\n"
+            + "    val thing: system.Int = 10\n"
+            + "    def giveThing(): this.T\n"
+            + "        this.thing\n\n"
+
+            + "intHolder.giveThing()";
+
+        doTest(source, null, new IntegerLiteral(10));
+    }
+
+    @Test
+	@Category(CurrentlyBroken.class)
+    public void testGenericIfStatement() throws ParseException {
+
+        String source = ""
+                      + "type Body\n"
+                      + "    type T \n"
+                      + "    def apply(): this.T \n\n"
+
+                      + "type Boolean\n"
+                      + "   def iff(thenFn: Body, elseFn: Body) : thenFn.T \n\n"
+
+                      + "val true = new \n"
+                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n\n"
+                      + "        thenFn.apply()\n\n"
+
+                      + "val false = new \n"
+                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n"
+                      + "        elseFn.apply()\n\n"
+
+                      + "def ifSt(bool: Boolean, thenFn: Body, elseFn: Body): thenFn.T \n"
+                      + "    bool.iff(thenFn, elseFn) \n\n"
+
+                      + "val IntegerFive = new \n"
+                      + "   type T = system.Int \n"
+                      + "   def apply(): this.T \n"
+                      + "       5 \n\n"
+
+                      + "val IntegerTen = new \n"
+                      + "   type T = system.Int \n"
+                      + "   def apply(): this.T \n"
+                      + "       10 \n\n"
+
+                      + "ifSt(false, IntegerTen, IntegerFive)";
+
+        doTest(source, null, new IntegerLiteral(5));
+    }
 }

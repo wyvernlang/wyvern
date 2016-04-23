@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -144,6 +145,9 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
+        if (this.reference == null) {
+            return new AbstractTypeMember(this.alias);
+        }
 		ValueType referenceILType = reference.getILType(ctx);
 		return new ConcreteTypeMember(getName(), referenceILType);
 	}
