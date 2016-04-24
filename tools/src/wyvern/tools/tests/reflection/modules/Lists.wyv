@@ -32,8 +32,8 @@ def cons(x:Dyn, y:List) : List = new
 def map(f:Dyn -> Dyn, list:List) : Dyn = tools.ifTrue(list.isEmpty,
     () => list, () => cons(f(list.getVal()), map(f, list.getNext())))
 
-/* def fromJavaListHelp(javaList:system.List, ind:Int, size:Int) : List = tools.ifTrue(tools.intEquals(tools.add(ind, 1), size),
+/* def fromJavaListHelp(javaList:system.List, ind:Int, size:Int) : List = tools.intEquals(tools.add(ind, 1), size).ifTrue(
         () => nil(0),
-        () => cons(javaList.get(ind), fromJavaListHelp(javaList, tools.add(ind, 1), size))) */
+        () => cons(javaList.get(ind), fromJavaListHelp(javaList, tools.add(ind, 1), size)))
 
-/* def fromJavaList(javaList:system.List) : List = fromJavaListHelp(javaList, 0, javaList.size()) */
+def fromJavaList(javaList:system.List) : List = fromJavaListHelp(javaList, 0, javaList.size()) */

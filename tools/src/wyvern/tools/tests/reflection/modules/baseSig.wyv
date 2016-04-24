@@ -19,10 +19,10 @@ type wyvern_reflect_base
     */
     type Type
         def equals(typ:Type) : Int
-        // def fields() : List
-        // def fieldByName(name:String) : Field
-        // def methodByName(name:String) : Method
-        // def methods() : List
+        def fields() : List
+        def fieldByName(name:String) : Field
+        def methodByName(name:String) : Method
+        def methods() : List
         def name() : String
 
     /**

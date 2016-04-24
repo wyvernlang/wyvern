@@ -54,18 +54,9 @@ public class JavaValue extends AbstractValue implements Invokable {
             return new StringLiteral((String) result);
         } else if(result instanceof List) {
 			return new JavaValue(JavaWrapper.wrapObject(result), new NominalType("system", "List"));
-			/* jList resultList = (List) result;
-			for (Object elem : resultList) {
-				Value elemVal = javaToWyvern(elem);
-				// TODO: finish implementing
-			}
-			throw new RuntimeException("some Java->Wyvern cases not implemented"); */
 		} else if(result instanceof Boolean) {
-			// TODO: implement
-			// Boolean resultBool = (Boolean) result;
 			return new BooleanLiteral((Boolean) result);
-			// return (ObjectValue) (ObjectLinker.fObjectToNative.get(resultBool.toString()));
-		} else if(result instanceof StructuralType) { // is this okay as a Structural and not a ValueType?
+		} else if(result instanceof StructuralType) {
 			return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
 		} else if(result instanceof Value) {
 			// Needed for returning arbitrary values from reflection's invoke.
