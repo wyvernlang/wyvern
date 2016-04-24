@@ -6,7 +6,6 @@ import org.junit.experimental.categories.Category;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.support.*;
 import wyvern.tools.imports.extensions.WyvernResolver;
-import wyvern.tools.interop.ObjectLinker;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.reflection.Mirror;
 import wyvern.tools.tests.reflection.TestTools;
@@ -25,7 +24,6 @@ public class ReflectionTests {
 
     public static Mirror mirror = new Mirror();
     public static TestTools tools = new TestTools();
-    public static ObjectLinker linker = new ObjectLinker();
     private static final String PATH = TestUtil.BASE_PATH + "reflection/";
 
     @BeforeClass
