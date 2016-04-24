@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
@@ -12,7 +13,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
 
-public class IntegerLiteral extends AbstractValue {
+public class IntegerLiteral extends AbstractValue implements Invokable {
 
 	@Override
 	public int hashCode() {
@@ -72,5 +73,21 @@ public class IntegerLiteral extends AbstractValue {
 	@Override
 	public ValueType getType() {
 		return Util.intType();
+	}
+
+	@Override
+	public Value invoke(String methodName, List<Value> args) {
+		switch (methodName) {
+		case "+": return new IntegerLiteral(this.value + ((IntegerLiteral)args.get(0)).getValue());
+		case "-": return new IntegerLiteral(this.value - ((IntegerLiteral)args.get(0)).getValue());
+		case "*": return new IntegerLiteral(this.value * ((IntegerLiteral)args.get(0)).getValue());
+		case "/": return new IntegerLiteral(this.value / ((IntegerLiteral)args.get(0)).getValue());
+		default: throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public Value getField(String fieldName) {
+		throw new RuntimeException("no fields");
 	}
 }

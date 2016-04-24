@@ -532,13 +532,14 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     StructuralType defaultType =
         new StructuralType("emptyType",
                            new ArrayList<DeclType>());
+    return defaultType.acceptVisitor(this, env, oirenv);
 
     // TODO: This should also take into account types available in the OIREnvironment
-    TypeContext context = TestUtil.getStandardGenContext();
+    // TypeContext context = TestUtil.getStandardGenContext();
 
-    StructuralType st = nominalType.getStructuralType(context,
-                                                      defaultType);
-    return st.acceptVisitor(this, env, oirenv);
+    // StructuralType st = nominalType.getStructuralType(context,
+    //                                                   defaultType);
+    // return st.acceptVisitor(this, env, oirenv);
   }
 
   public OIRAST visit(Environment env, OIREnvironment oirenv,
