@@ -119,6 +119,7 @@ public class TestUtil {
 		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = new TypeGenContext("String", "system", genCtx);
+		genCtx = new TypeGenContext("Boolean", "system", genCtx);
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
@@ -130,6 +131,7 @@ public class TestUtil {
 		declTypes.add(new AbstractTypeMember("Int"));
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
+		declTypes.add(new AbstractTypeMember("Boolean"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
 		ValueType systemType = new StructuralType("this", declTypes);
 		return systemType;

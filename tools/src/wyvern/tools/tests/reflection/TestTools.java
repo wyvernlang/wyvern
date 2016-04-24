@@ -18,4 +18,12 @@ public class TestTools {
     public int add(int x, int y) {
         return x + y;
     }
+
+    public boolean intEquals(int x, int y) {
+        return x == y;
+    }
+
+    public Object ifTrue(boolean cond,  Object branch1, Object branch2) {
+        return cond ? branch1 : branch2;
+    }
 }

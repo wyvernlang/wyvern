@@ -27,6 +27,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST var(String name, FileLocation loc);
 	public AST stringLit(String value, FileLocation loc);
 	public AST integerLit(int value, FileLocation loc);
+	public AST booleanLit(boolean value, FileLocation loc);
 	public AST invocation(AST receiver, String name, AST argument, FileLocation loc);
 	public AST application(AST function, AST arguments, FileLocation loc);
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);

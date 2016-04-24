@@ -13,6 +13,10 @@ type IntObj
 type StringObj
     val contents : String
 
+type ZeroOrOne
+    val contents : Int
+    def eq(zo:ZeroOrOne) : Booleans.Bool
+
 def makeInt(contents:Int) : IntObj = new
     val contents = contents
     def add(x:IntObj) : Int = tools.add(this.contents, x.contents)
@@ -32,7 +36,16 @@ tools.assertIntEquals(typeNotEqual, 0)
 val typeName : String = intType.name()
 tools.assertStringEquals("IntObj", typeName)
 
-val l = Lists.cons(makeInt(5), Lists.empty(makeInt(0)))
-val sum : Any = intMirror.invoke("add", l)
+def makeZeroOrOne(x:Int) : ZeroOrOne = new
+    val contents = x
+    def eq(zo:ZeroOrOne)
+
+def findAddMeth(methods:Lists.List) : wyvern_reflect_base.Method =
+    val name = methods.getVal().name()
+
+
+val l = Lists.cons(makeInt(5), Lists.nil(makeInt(0)))
+val methods = intMirror.typeOf()
+val sum : Int = methods.getVal() intMirror.invoke("add", l.getVal())
 // Can't use because sum is supposed to be a mirror
 // tools.assertIntEquals(sum, 52)
