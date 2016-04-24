@@ -1,6 +1,6 @@
 resource module main
 
-import wyvern_reflect_base
+import modules.baseModule
 
 // filler line of code
 val x : Int = 5

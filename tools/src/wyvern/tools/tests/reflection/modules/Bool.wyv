@@ -1,7 +1,6 @@
 module Booleans
 // a simple library for booleans
 
-import java:wyvern.tools.tests.ReflectionTests.linker
 import java:wyvern.tools.tests.ReflectionTests.tools
 
 type UnitDynFn
@@ -18,5 +17,4 @@ val false : Bool = new
 	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
 		falseCase()
 
-// Test linker
 // tools.assertIntEquals(tools.intEquals(3, 5).ifTrue(() => 1, () => 0), 0)

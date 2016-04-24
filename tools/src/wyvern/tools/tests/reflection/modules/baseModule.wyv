@@ -1,6 +1,6 @@
 module wyvern_reflect_base
 
-import Lists
+import modules.Lists
 import java:wyvern.tools.tests.ReflectionTests.mirror
 
 type Any
@@ -69,18 +69,20 @@ def createMethod(arguments:Lists.List, name:String, returnType:Type) : Method = 
 def createType(typ:Any) : Type = new
     val structType = typ
     def equals(typ2:Type) : Int = mirror.equalTypes(this, typ2)
-    def fields() : List = let
-        val fieldNames = Lists.fromJavaList(mirror.getFieldNames(typ))
-        in Lists.map(name:String => createField(name, createType(mirror.getFieldType(typ, name))), fieldNames)
+    def fields() : Lists.List = let
+    val fieldNames = Lists.fromJavaList(mirror.getFieldNames(typ))
+    in
+    Lists.map(name:String => createField(name, createType(mirror.getFieldType(typ, name))), fieldNames)
     def fieldByName(name:String) : Field = createField(name, createType(mirror.getFieldType(typ, name)))
-    def methodByName(name:String) : Method =
-        // TODO: fix this to allow getting arg types
-        createMethod(name, mirror.getMethodArgNames(typ, name), createType(mirror.getMethodRetType(typ, name)))
+    // TODO: fix this to allow getting arg types
+    def methodByName(name:String) : Method = createMethod(
+        name, mirror.getMethodArgNames(typ, name), createType(mirror.getMethodRetType(typ, name)))
     def methods() : List = let
-        val methodNames = Lists.fromJavaList(mirror.getMethodNames(typ))
-        in Lists.map(name:String =>
-            // TODO: here too
-            createMethod(name, mirror.getMethodArgNames(typ, name), mirror.getMethodRetType(typ, name)), methodNames)
+    // TODO: here too
+    val methodNames = Lists.fromJavaList(mirror.getMethodNames(typ))
+    in
+    Lists.map(name:String => createMethod(
+        name, mirror.getMethodArgNames(typ, name), mirror.getMethodRetType(typ, name)), methodNames)
     def name() : String = mirror.typeName(typ)
 
 def reflect(object:Any) : Object = new

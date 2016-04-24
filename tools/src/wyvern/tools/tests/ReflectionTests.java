@@ -35,9 +35,12 @@ public class ReflectionTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testBase() throws ParseException {
-        String [] fileList = {"modules/Lists.wyv",
-                              "modules/Bool.wyv",
+        InterpreterState state = new InterpreterState(new File(PATH));
+        Expression program = state.getResolver().resolveModule("base").getExpression();
+        program.interpret(TestUtil.getStandardEvalContext());
+        /* String [] fileList = {"modules/Lists.wyv",
                               "modules/baseModule.wyv",
                               "base.wyv"};
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
@@ -56,13 +59,17 @@ public class ReflectionTests {
 
         TypeContext ctx = TestUtil.getStandardTypeContext();
         mainProgram.typeCheck(ctx);
-        mainProgram.interpret(TestUtil.getStandardEvalContext());
+        mainProgram.interpret(TestUtil.getStandardEvalContext()); */
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testObjectEquals() throws ParseException {
-        String [] fileList = {"modules/Bool.wyv",
+        InterpreterState state = new InterpreterState(new File(PATH));
+        Expression program = state.getResolver().resolveModule("objectEquals").getExpression();
+        program.interpret(TestUtil.getStandardEvalContext());
+
+        /* String [] fileList = {"modules/Bool.wyv",
                               "modules/Lists.wyv",
                               "modules/baseModule.wyv",
                               "modules/intObject.wyv",
@@ -83,10 +90,11 @@ public class ReflectionTests {
 
         TypeContext ctx = TestUtil.getStandardTypeContext();
         mainProgram.typeCheck(ctx);
-        mainProgram.interpret(TestUtil.getStandardEvalContext());
+        mainProgram.interpret(TestUtil.getStandardEvalContext()); */
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testObjectTypeOf() throws ParseException {
         String [] fileList = {"modules/Bool.wyv",
                               "modules/Lists.wyv",
@@ -116,25 +124,5 @@ public class ReflectionTests {
         InterpreterState state = new InterpreterState(new File(PATH));
         Expression program = state.getResolver().resolveModule("listClient").getExpression();
         program.interpret(TestUtil.getStandardEvalContext());
-        /* String [] fileList = {// "modules/Bool.wyv",
-                              "modules/Lists.wyv",
-                              "listClient.wyv"};
-        List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-        GenContext genCtx = TestUtil.getStandardGenContext();
-        genCtx = new TypeGenContext("List", "system", genCtx);
-
-        for (String filename : fileList) {
-            String source = TestUtil.readFile(PATH + filename);
-            TypedAST ast = TestUtil.getNewAST(source);
-            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
-            decls.add(decl);
-            genCtx = GenUtil.link(genCtx, decl);
-        }
-        Expression mainProgram = GenUtil.genExp(decls, genCtx);
-        // after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-
-        TypeContext ctx = TestUtil.getStandardTypeContext();
-        mainProgram.typeCheck(ctx);
-        mainProgram.interpret(TestUtil.getStandardEvalContext()); */
     }
 }
