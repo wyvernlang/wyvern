@@ -134,6 +134,10 @@ public class TestUtil {
 	}
 
 	private static ValueType getSystemType() {
+		List<FormalArg> ifTrueArgs = Arrays.asList(
+				new FormalArg("trueBranch", Util.unitToDynType()),
+				new FormalArg("falseBranch", Util.unitToDynType()));
+		List<DeclType> boolDeclTypes = Arrays.asList(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
 		// construct a type for the system object
 		List<DeclType> declTypes = new LinkedList<DeclType>();
 		//declTypes.add(new AbstractTypeMember("Int"));
@@ -143,10 +147,11 @@ public class TestUtil {
 		intDeclTypes.add(new DefDeclType("*", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 		intDeclTypes.add(new DefDeclType("/", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 		ValueType intType = new StructuralType("intSelf", intDeclTypes);
+		ValueType boolType = new StructuralType("boolean", boolDeclTypes);
 		declTypes.add(new ConcreteTypeMember("Int", intType));
+		declTypes.add(new ConcreteTypeMember("Boolean", boolType));
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
-		declTypes.add(new AbstractTypeMember("Boolean"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
 		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;

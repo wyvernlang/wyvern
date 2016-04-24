@@ -25,7 +25,7 @@ public class Util {
 	public static ValueType intType() { return theIntType; }
 	public static ValueType stringType() { return theStringType; }
 	public static ValueType unitType() { return theUnitType; }
-	public static ValueType arrowType() {
+	public static ValueType unitToDynType() {
 		LinkedList<DeclType> arrowDecls = new LinkedList<>();
 		arrowDecls.add(new DefDeclType("apply", new DynamicType(), new LinkedList<FormalArg>()));
 		return new StructuralType("arrow", arrowDecls);

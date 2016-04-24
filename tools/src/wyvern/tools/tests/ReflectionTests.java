@@ -125,4 +125,11 @@ public class ReflectionTests {
         Expression program = state.getResolver().resolveModule("listClient").getExpression();
         program.interpret(TestUtil.getStandardEvalContext());
     }
+
+    @Test
+    public void testBools() throws ParseException {
+        InterpreterState state = new InterpreterState(new File(PATH));
+        Expression program = state.getResolver().resolveModule("boolTests").getExpression();
+        program.interpret(TestUtil.getStandardEvalContext());
+    }
 }

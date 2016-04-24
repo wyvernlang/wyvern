@@ -50,7 +50,11 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 		switch(operator) {
 			case "&&": return new BooleanConstant(value && argValue.value);
 			case "||": return new BooleanConstant(value || argValue.value);
-			case "ifTrue":
+			/* case "ifTrue":
+				Type type = exp.getArgument().getType();
+				if (value) {
+					return new BooleanConstant(value);
+				} */
 			default: throw new RuntimeException("forgot to typecheck!");
 		}
 	}

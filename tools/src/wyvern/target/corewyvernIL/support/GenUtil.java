@@ -7,7 +7,6 @@ import java.util.List;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.interop.ObjectLinker;
 
 public class GenUtil {
 	/**
@@ -112,14 +111,14 @@ public class GenUtil {
 			return Util.booleanType();
 		}
 
-		// TODO: possibly useless
+		// TODO: might be unnecessary
 		if (javaClass.getName().equals("wyvern.target.corewyvernIL.expression.ObjectValue")) {
 			return Util.emptyType();
 		}
 
-		// TODO: possibly useless
+		// TODO: might be unnecessary
 		if (javaClass.getName().equals("java.lang.Object")) {
-			return Util.arrowType();
+			return Util.unitToDynType();
 		}
 
 		if (javaClass.getName().equals("java.util.List")) {
