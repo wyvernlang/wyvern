@@ -6,18 +6,18 @@ type UnitDynFn
 type Bool
 	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
 
-val true : Bool = new
+val True : Bool = new
 	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
 		trueCase()
 	
-val false : Bool = new
+val False : Bool = new
 	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
 		falseCase()
 		
 // some test cases
 
-val cond : Bool = true
-val condf : Bool = false
+val cond : Bool = True
+val condf : Bool = False
 
 def launderAsInt(x:Int):Int = x
 
