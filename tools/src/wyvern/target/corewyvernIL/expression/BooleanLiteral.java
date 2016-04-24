@@ -67,7 +67,7 @@ public class BooleanLiteral extends AbstractValue implements Invokable {
 
 	@Override
 	public Value getField(String fieldName) {
-		return null;
+		throw new RuntimeException("no fields");
 	}
 }
 
