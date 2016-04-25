@@ -39,13 +39,17 @@ import wyvern.tools.typedAST.transformers.GenerationEnvironment;
  */
 public class ModuleResolver {
 	private File rootDir;
+	private File libDir;
 	private Map<String, Module> moduleCache = new HashMap<String, Module>();
 	private InterpreterState state;
 	
-	public ModuleResolver(File rootDir) {
+	public ModuleResolver(File rootDir, File libDir) {
 		if (rootDir != null && !rootDir.isDirectory())
 			throw new RuntimeException("the root path for the module resolver must be a directory");
+		if (libDir != null && !libDir.isDirectory())
+			throw new RuntimeException("the lib path for the module resolver must be a directory");
 		this.rootDir = rootDir;
+		this.libDir = libDir;
 	}
 	
 	void setInterpreterState(InterpreterState s) {
@@ -107,12 +111,22 @@ public class ModuleResolver {
 		if (names.length == 0)
 			throw new RuntimeException();
 		names[names.length - 1] += isType?".wyt":".wyv";
-		String filename = rootDir.getAbsolutePath();
+		File f = findFile(names, rootDir.getAbsolutePath());
+		if (!f.exists() && libDir != null) {
+			File libFile = findFile(names, libDir.getAbsolutePath());
+			if (libFile.exists())
+				f = libFile;
+		}
+		return f;
+	}
+
+	private File findFile(String[] names, String filename) {
 		for (int i = 0; i < names.length; ++i) {
 			filename += File.separatorChar;
 			filename += names[i];
 		}
-		return new File(filename);
+		File f = new File(filename);
+		return f;
 	}
 	
 	/**
@@ -126,11 +140,9 @@ public class ModuleResolver {
 	 * @return
 	 */
 	private Module load(String qualifiedName, File file) {
-        String source = TestUtil.readFile(file);
-        
         TypedAST ast = null;
 		try {
-			ast = TestUtil.getNewAST(source);
+			ast = TestUtil.getNewAST(file);
 		} catch (ParseException e) {
 			e.printStackTrace();
 			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());

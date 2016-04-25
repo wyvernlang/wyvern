@@ -50,7 +50,8 @@ import wyvern.tools.types.Type;
 
 public class TestUtil {
 	public static final String BASE_PATH = "src/wyvern/tools/tests/";
-	private static final String STDLIB_PATH = BASE_PATH + "stdlib/";
+	public static final String STDLIB_PATH = BASE_PATH + "stdlib/";
+	public static final String LIB_PATH = "src/wyvern/lib/";
 	private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
 	
 	/** Sets up the standard library and platform paths in the Wyvern resolver
@@ -94,6 +95,25 @@ public class TestUtil {
 	}
 	
 	/**
+	 * Loads and parses the given file into the TypedAST representation, using the
+	 * new Wyvern parser.
+	 * 
+	 * @param program
+	 * @return
+	 * @throws IOException 
+	 * @throws CopperParserException 
+	 */
+	public static TypedAST getNewAST(File programLocation) throws ParseException {
+		String program = readFile(programLocation);
+		clearGlobalTagInfo();
+		Reader r = new StringReader(program);
+		WyvernParser<TypedAST,Type> wp = ParseUtils.makeParser(programLocation.getPath(), r);
+		TypedAST result = wp.CompilationUnit();
+		Assert.assertEquals("Could not parse the entire file, last token ", WyvernParserConstants.EOF, wp.token_source.getNextToken().kind);
+		return result;
+	}
+	
+	/**
 	 * Completely evaluates the given AST, and compares it to the given value.
 	 * Does typechecking first, then evaluation.
 	 * 
@@ -119,7 +139,7 @@ public class TestUtil {
 	public static GenContext getStandardGenContext() {
 		/*GenContext genCtx = getGenContext(new InterpreterState(null)).extend("system", new Variable("system"), getSystemType());
 		return addTypeAbbrevs(genCtx);*/
-		return getGenContext(new InterpreterState(new File(BASE_PATH)));
+		return getGenContext(new InterpreterState(new File(BASE_PATH), null));
 	}
 
 	private static GenContext addTypeAbbrevs(GenContext genCtx) {

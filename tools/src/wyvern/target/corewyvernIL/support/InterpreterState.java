@@ -6,8 +6,8 @@ public class InterpreterState {
 	private ModuleResolver resolver;
 	private GenContext genCtx;
 	
-	public InterpreterState(File rootDir) {
-		resolver = new ModuleResolver(rootDir);
+	public InterpreterState(File rootDir, File libDir) {
+		resolver = new ModuleResolver(rootDir, libDir);
 		resolver.setInterpreterState(this);
 	}
 	

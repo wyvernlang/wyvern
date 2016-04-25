@@ -262,7 +262,7 @@ public class ILTests {
 	// TODO: make other string tests call this function
 	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH)));
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), null));
 		Expression program = ast.generateIL(genCtx, null);
         doChecks(program, expectedType, expectedResult);
 	}
@@ -352,7 +352,7 @@ public class ILTests {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = new EmptyGenContext(new InterpreterState(null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
+		GenContext genCtx = new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
     	TypeContext ctx = TypeContext.empty().extend("D", null);
     	
@@ -370,7 +370,7 @@ public class ILTests {
 	public void testMultipleModules() throws ParseException {
 		
 		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv", "main.wyv"};
-		GenContext genCtx = new EmptyGenContext(new InterpreterState(null)).extend("system", new Variable("system"), new NominalType("", "system"));
+		GenContext genCtx = new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
@@ -591,7 +591,7 @@ public class ILTests {
 
 	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
 		TypedAST ast = TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
 		TypeContext ctx = TestUtil.getStandardTypeContext();
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 		Expression mainProgram = ((DefDeclaration)decl).getBody();
@@ -627,7 +627,7 @@ public class ILTests {
 	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
+        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), null);
 		GenContext genCtx = TestUtil.getGenContext(state);
         Expression program = ast.generateIL(genCtx, null);
         doChecks(program, expectedType, expectedValue);
@@ -635,7 +635,7 @@ public class ILTests {
 
 	// TODO: make other script tests call this function
 	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
-        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH));
+        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH));
         Expression program = state.getResolver().resolveModule(qualifiedName).getExpression();
         doChecks(program, expectedType, expectedValue);
 	}
@@ -685,7 +685,7 @@ public class ILTests {
 
 	private void doTestTypeFail(String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
 		try {
 			Expression program = ast.generateIL(genCtx, null);
 			program.typeCheck(TestUtil.getStandardTypeContext());

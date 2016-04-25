@@ -1,5 +1,6 @@
 package wyvern.tools;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,15 +39,22 @@ public class Interpreter {
 			System.exit(1);
         }
 
-        String source = TestUtil.readFile(filepath.toAbsolutePath().toString());
+        //String source = TestUtil.readFile(filepath.toAbsolutePath().toString());
         try {
-            ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-    		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null));
+        	File rootDir = new File(System.getProperty("user.dir"));
+        	String wyvernPath = System.getenv("WYVERN_HOME");
+        	if (wyvernPath == null) {
+        		System.err.println("must set WYVERN_HOME environmental variable to wyvern project directory");
+        		return;
+        	}
+        	wyvernPath += "/tools/src/wyvern/lib/";
+            ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
+    		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(rootDir, new File(wyvernPath)));
             Expression program = ast.generateIL(genCtx, null);
-            TypeContext ctx = TypeContext.empty();
+            TypeContext ctx = TestUtil.getStandardTypeContext();
             program.typeCheck(ctx);
-            Value v = program.interpret(EvalContext.empty());
-            System.out.println(v.toString());
+            Value v = program.interpret(TestUtil.getStandardEvalContext());
+            //System.out.println(v.toString());
         } catch(ParseException e) {
             System.err.println(e.toString());
         } catch(ToolError e) {

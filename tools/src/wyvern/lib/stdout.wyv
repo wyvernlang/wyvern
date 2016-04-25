@@ -1,0 +1,4 @@
+import java:wyvern.stdlib.support.Stdio.stdio
+
+def print(text:String):Unit
+	stdio.print(text)
