@@ -4,10 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.target.corewyvernIL.expression.New;
-import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -105,15 +102,29 @@ public class GenUtil {
 		if (javaClass.getName().equals("int")) {
 			return Util.intType();
 		}
-		
+
         if (javaClass.getName().equals("java.lang.String")) {
             return Util.stringType();
         }
 
+		if (javaClass.getName().equals("boolean")) {
+			return Util.booleanType();
+		}
+
+		// TODO: might be unnecessary
 		if (javaClass.getName().equals("wyvern.target.corewyvernIL.expression.ObjectValue")) {
 			return Util.emptyType();
 		}
-        
+
+		// TODO: might be unnecessary
+		if (javaClass.getName().equals("java.lang.Object")) {
+			return Util.unitToDynType();
+		}
+
+		if (javaClass.getName().equals("java.util.List")) {
+			return Util.listType();
+		}
+
 		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupType(javaTypesObjectName);
 		return type.getJavaType(javaClass, ctx);
 	}

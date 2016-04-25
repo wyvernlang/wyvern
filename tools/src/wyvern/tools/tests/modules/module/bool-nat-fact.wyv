@@ -18,18 +18,18 @@ type Nat
 	def times(n:Nat):Nat
 	
 
-val true : Bool = new
+val True : Bool = new
 	def iff(trueCase:UnitNatFn, falsecase:UnitNatFn):Nat
 		trueCase()
 	
-val false : Bool = new
+val False : Bool = new
 	def iff(trueCase:UnitNatFn, falseCase:UnitNatFn):Nat
 		falseCase()
 	
 // TODO(3 - delegate): really need to rename "this" in the source syntax
 val zero : Nat = new //z =>
 	def isZero():Bool
-		true
+		True
 	def caseAnalyze(zeroCase:UnitNatFn, succCase:NatNatFn):Nat
 		zeroCase()
 	def plus(n:Nat):Nat
@@ -40,7 +40,7 @@ val zero : Nat = new //z =>
 def succ(n:Nat):Nat
 	new
 		def isZero():Bool
-			false			
+			False
 		def caseAnalyze(zeroCase:UnitNatFn, succCase:NatNatFn):Nat
 			succCase(n)
 		def plus(n1:Nat):Nat

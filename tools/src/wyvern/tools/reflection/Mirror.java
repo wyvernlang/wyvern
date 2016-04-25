@@ -4,7 +4,12 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.interop.JObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,5 +57,79 @@ public class Mirror {
             }
         }
         return 1;
+    }
+
+    public StructuralType getObjectType(ObjectValue o) {
+        return o.getType().getStructuralType(o.getEvalCtx());
+    }
+
+    public Value invoke(ObjectValue o, String methodName, List<Value> argList) {
+        return o.invoke(methodName, argList);
+    }
+
+    public int equalTypes(ObjectValue type1, ObjectValue type2) {
+        EvalContext evalCtx = type1.getEvalCtx();
+        List<Object> args = new ArrayList<>();
+        args.add(evalCtx);
+        args.add(null);
+
+        JavaValue typeOrig1 = (JavaValue) (type1.getField("valType"));
+        JavaValue typeOrig2 = (JavaValue) (type1.getField("valType"));
+        try {
+            StructuralType structType1 = (StructuralType)
+                    ((JObject) (typeOrig1.getFObject())).invokeMethod("getStructuralType", args);
+            StructuralType structType2 = (StructuralType)
+                    ((JObject) (typeOrig2.getFObject())).invokeMethod("getStructuralType", args);
+            if (structType1.equalsInContext(structType2, evalCtx)) {
+                return 1;
+            }
+            return 0;
+        } catch (ReflectiveOperationException e) {
+            return 0;
+        }
+    }
+
+    public List<String> getFieldNames(JavaValue type) {
+        // TODO
+        return new ArrayList<>();
+    }
+
+    public ValueType getFieldType(JavaValue type, String fieldName) {
+        // TODO
+        return new StructuralType("Implement Later", new ArrayList<>());
+    }
+
+    public List<String> getMethodArgNames(JavaValue type) {
+        // TODO
+        return new ArrayList<>();
+    }
+
+    public ValueType getMethodRetType(JavaValue type, String methodName) {
+        // TODO
+        return new StructuralType("Implement Later", new ArrayList<>());
+    }
+
+    public List<String> getMethodNames(JavaValue type) {
+        // TODO
+        return new ArrayList<>();
+    }
+
+    public String typeName(ObjectValue obj) throws Exception {
+        ValueType type = obj.getType();
+        if (type instanceof NominalType) {
+            return ((NominalType) type).getTypeMember();
+        }
+        throw new Exception("Error: Requested name of a structural type");
+        // return obj.getType().toString();
+    }
+
+    public int equalMethods(ObjectValue m1, ObjectValue m2) {
+        // TODO
+        return 0;
+    }
+
+    public int equalFields(ObjectValue m1, ObjectValue m2) {
+        // TODO
+        return 0;
     }
 }

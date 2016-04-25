@@ -331,11 +331,11 @@ public class OIRTests {
       + "type Boolean\n"
       + "   def iff(thenFn: Body, elseFn: Body) : thenFn.T \n\n"
 
-      + "val true = new \n"
+      + "val True = new \n"
       + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n\n"
       + "        thenFn.apply()\n\n"
 
-      + "val false = new \n"
+      + "val False = new \n"
       + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n"
       + "        elseFn.apply()\n\n"
 
@@ -352,7 +352,7 @@ public class OIRTests {
       + "   def apply(): this.T \n"
       + "       10 \n\n"
 
-      + "ifSt(true, IntegerTen, IntegerFive)";
+      + "ifSt(True, IntegerTen, IntegerFive)";
     testPyFromInput(input, "10");
   }
 }

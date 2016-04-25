@@ -2,10 +2,13 @@ package wyvern.target.corewyvernIL.support;
 
 import java.util.LinkedList;
 
-import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -16,11 +19,25 @@ public class Util {
 	private static ValueType theIntType = new NominalType("system","Int");
 	private static ValueType theStringType = new NominalType("system","String");
 	private static ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
+
 	public static ValueType booleanType() { return theBooleanType; }
 	public static ValueType emptyType() { return theEmptyType; }
 	public static ValueType intType() { return theIntType; }
 	public static ValueType stringType() { return theStringType; }
 	public static ValueType unitType() { return theUnitType; }
+	public static ValueType unitToDynType() {
+		LinkedList<DeclType> arrowDecls = new LinkedList<>();
+		arrowDecls.add(new DefDeclType("apply", new DynamicType(), new LinkedList<FormalArg>()));
+		return new StructuralType("arrow", arrowDecls);
+	}
+	public static ValueType listType() {
+		/* jLinkedList<DeclType> listDecls = new LinkedList<DeclType>();
+		listDecls.add(new ValDeclType("length", new IntegerType()));
+		listDecls.add(new DefDeclType("getVal", theEmptyType, new LinkedList<FormalArg>()));
+		listDecls.add(new DefDeclType("getVal", new NominalType("system", "List"), new LinkedList<FormalArg>()));
+		return new StructuralType("list", listDecls); */
+		return new NominalType("Lists", "List");
+	}
 	public static Value unitValue() {
 		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, EvalContext.empty());
 	}

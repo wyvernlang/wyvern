@@ -1,0 +1,7 @@
+module int_object
+
+type IntObj
+	val contents : Int
+
+val intObj4 : IntObj = new
+    val contents = 47
