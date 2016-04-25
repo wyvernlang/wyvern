@@ -1,0 +1,13 @@
+resource module main
+
+import wyvern_reflect_base
+
+type IntObject
+	val contents : Int
+
+val intObj : IntObject = new
+    val contents = 47
+
+val intMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj)
+val stringMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect("reflection")
+val x : system.Int = listMirror.equals(stringMirror)

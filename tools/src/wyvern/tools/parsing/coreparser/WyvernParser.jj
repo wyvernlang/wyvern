@@ -83,7 +83,6 @@ TOKEN : /* Keywords */
 {
   < VAL: "val" >
 | < VAR: "var" >
-| < FN: "fn" >
 | < DEF: "def" >
 | < TYPE: "type" >
 | < CLASS: "class" >
@@ -152,6 +151,7 @@ TOKEN : /* Literals */
 {
   < STRING_LITERAL >
 | < DECIMAL_LITERAL >
+| < BOOLEAN_LITERAL >
 | < RATIONAL_LITERAL >
 }
 
@@ -582,6 +582,8 @@ AST Literal() :
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
 |
   lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
+|
+  lit = <BOOLEAN_LITERAL> { return build.booleanLit(Boolean.parseBoolean(lit.image), loc(lit)); }
 |
   <RATIONAL_LITERAL>
 }

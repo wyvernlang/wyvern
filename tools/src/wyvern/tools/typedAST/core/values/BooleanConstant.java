@@ -83,6 +83,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		// TODO Auto-generated method stub
-		return null;
+		return new BooleanLiteral(value);
 	}
 }

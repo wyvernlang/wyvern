@@ -1,0 +1,55 @@
+module base_sig
+
+type wyvern_reflect_base
+    type Any
+    type List
+        val contents : Any
+
+    /**
+    * Mirror to reflect an object at run time.
+    */
+    type Object
+        def equals(object:Object) : Int
+        // def invoke (m:Method, args:List) : Object
+        // def set(f:Field, value:Object) : Unit
+        def typeOf() : Type
+
+    /**
+    * Reflects the static type.
+    */
+    type Type
+        def equals(typ:Type) : Int
+        def fields() : List
+        def fieldByName(name:String) : Field
+        def methodByName(name:String) : Method
+        def methods() : List
+        def name() : String
+
+    /**
+    * Mirror to reflect the compile time attributes of a method.
+    */
+    type Method
+        def arguments() : List
+        def equals(method:Method) : Unit // Boolean
+        def name() : String
+        def returnType() : Type
+
+    /**
+    * Mirror to reflect the static attributes of a variable.
+    */
+    type Variable
+        def equals(variable:Variable) : Unit // Boolean
+        def name() : String
+        def typeOf() : Type
+
+    /**
+    * Mirror to reflect the static attributes of a field. Fields are
+    * distinct from variables in that they are declared with object scope.
+    */
+    type Field
+        def equals(field:Field) : Unit // Boolean
+        def name() : String
+        def typeOf() : Type
+
+    def reflect(object:Any) : Object
+    // def typeReflect[T]() : Type

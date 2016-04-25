@@ -1,6 +1,7 @@
 resource module main
 
 import wyvern_reflect_base
+import int_object
 import java:wyvern.tools.tests.ReflectionTests.tools
 
 type IntObj
@@ -36,3 +37,8 @@ tools.assertIntEquals(valsNotEqual, 0)
 val intMirror3 : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj3)
 val valsEqual : Int = intMirror3.equals(intMirror)
 tools.assertIntEquals(valsEqual, 1)
+
+// Test that an objects with the same type and values from different modules are equal
+/* val intMirror4 : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(int_object.intObj4)
+val moduleEqual : Int = intMirror4.equals(intMirror)
+tools.assertIntEquals(valsEqual, 1) */

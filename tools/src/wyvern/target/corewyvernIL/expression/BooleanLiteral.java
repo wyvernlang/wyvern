@@ -1,7 +1,9 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
@@ -11,7 +13,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class BooleanLiteral extends AbstractValue {
+public class BooleanLiteral extends AbstractValue implements Invokable {
 
     private boolean value;
 
@@ -49,6 +51,23 @@ public class BooleanLiteral extends AbstractValue {
 	@Override
 	public ValueType getType() {
 		return Util.booleanType();
+	}
+
+	@Override
+	public Value invoke(String methodName, List<Value> args) {
+		switch (methodName) {
+			case "ifTrue":
+				if (this.value) {
+					return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
+				}
+				return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
+			default: throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public Value getField(String fieldName) {
+		throw new RuntimeException("no fields");
 	}
 }
 
