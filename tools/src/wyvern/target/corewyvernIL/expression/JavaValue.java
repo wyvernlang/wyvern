@@ -9,6 +9,7 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
@@ -39,13 +40,16 @@ public class JavaValue extends AbstractValue implements Invokable {
 		}
 	}
 	/**
-	 * Only handles integers right now
+	 * Only handles integers, strings, and null right now.
+	 * null turns into unit.
 	 */
 	private Value javaToWyvern(Object result) {
 		if (result instanceof Integer) {
 			return new IntegerLiteral((Integer)result);
         } else if(result instanceof String) {
             return new StringLiteral((String) result);
+        } else if(result == null) {
+            return Util.unitValue();
         } else {
 			throw new RuntimeException("some Java->Wyvern cases not implemented");
 		}
