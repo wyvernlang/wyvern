@@ -149,4 +149,19 @@ public class FFITests {
     testPyFromInput(input, "256.0", true);
   }
 
+  @Test
+  public void testPythonMultipleImports() throws ParseException {
+    String input =
+      "import python:math\n" +
+      "import python:json\n" +
+      "type JsonType\n" +
+      "  def dumps(x : system.Int) : system.String\n" +
+      "type MathType\n" +
+      "  def factorial(x : system.Int) : system.Int\n" +
+      "val j : JsonType = json\n" +
+      "val m : MathType = math\n" +
+      "j.dumps(m.factorial(5))\n";
+    testPyFromInput(input, "120");
+  }
+
 }
