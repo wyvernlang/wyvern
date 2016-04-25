@@ -218,6 +218,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
 
+ 	terminal Token booleanLit_t ::= /true|false/ in (keywds) {: RESULT = token(BOOLEAN_LITERAL,lexeme); :};
  	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
 
 	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); :};
@@ -332,6 +333,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
+	          | booleanLit_t:t {: RESULT = t; :}
 	          | shortString_t:t {: RESULT = t; :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}

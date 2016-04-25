@@ -1,10 +1,13 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.List;
 import java.util.Map;
 
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -142,6 +145,9 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
+        if (this.reference == null) {
+            return new AbstractTypeMember(this.alias);
+        }
 		ValueType referenceILType = reference.getILType(ctx);
 		return new ConcreteTypeMember(getName(), referenceILType);
 	}
@@ -155,14 +161,14 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
-			GenContext ctx) {
+			GenContext ctx, List<TypedModuleSpec> dependencies) {
 		ValueType referenceILType = reference.getILType(ctx);
 		return new TypeDeclaration(getName(), referenceILType, getLocation());
 	}
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
-		wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext());
+		wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext(), null);
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}

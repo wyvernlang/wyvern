@@ -49,7 +49,7 @@ public class RossettaCodeTests {
 	}
 	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "rosetta/";
+	private static final String PATH = BASE_PATH + "rosetta2/";
 	private static final String OLD_PATH = BASE_PATH + "rosetta-old/";
 	
 	@Test
@@ -61,5 +61,10 @@ public class RossettaCodeTests {
 		TypedAST ast = TestUtil.getAST(program);
 		
 		TestUtil.evaluate(ast);
+	}
+	
+	@Test
+	public void testNewHello() throws ParseException {		
+		ILTests.doTestScriptModularly("rosetta.hello", null, null);
 	}
 }

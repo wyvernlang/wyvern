@@ -148,7 +148,7 @@ public class ModuleSystemTests {
 		for(String fileName : fileList) {
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
@@ -172,7 +172,7 @@ public class ModuleSystemTests {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
 			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx);
+			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
@@ -191,7 +191,7 @@ public class ModuleSystemTests {
 	
 		// Load and link Database.wyv.
 		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.
@@ -216,7 +216,7 @@ public class ModuleSystemTests {
 	
 		// Load and link Database.wyv.
 		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.

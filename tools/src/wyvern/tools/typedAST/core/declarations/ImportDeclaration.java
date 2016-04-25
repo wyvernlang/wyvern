@@ -6,6 +6,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import wyvern.target.corewyvernIL.FormalArg;
@@ -18,6 +19,8 @@ import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
@@ -166,12 +169,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public Pair<VarBinding,GenContext> genBinding(GenContext ctx) {
+	public Pair<VarBinding,GenContext> genBinding(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// add the import's type to the context, and get the import value
 		Expression importExp = null;
 		String importName = this.getUri().getSchemeSpecificPart();
@@ -208,7 +211,13 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			if (ctx.isPresent(moduleName)) {
 				importExp = new Variable(moduleName);
 			} else {
-				importExp = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
+				final Module module = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
+				for (TypedModuleSpec spec: module.getDependencies()) {
+					ctx = ctx.extend(spec.getQualifiedName(), new Variable(spec.getQualifiedName()), spec.getType());
+				}
+				// TODO: this may not be transitive in the right way
+				dependencies.addAll(module.getDependencies());
+				importExp = module.getExpression();
 			}
 			ctx = ctx.extend(importName, new Variable(importName), importExp.typeCheck(ctx));
 		}
@@ -222,7 +231,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void genTopLevel(TopLevelContext tlc) {
-		Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext());
+		Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext(), tlc.getDependencies());
 		VarBinding binding = bindingAndCtx.first;
 		GenContext newCtx = bindingAndCtx.second;
 		ValueType type = binding.getExpression().typeCheck(newCtx);

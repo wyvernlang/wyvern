@@ -31,5 +31,4 @@ public abstract class Declaration extends ASTNode implements EmitOIR {
 	public abstract String getName();
 
 	public abstract Set<String> getFreeVariables();
-
 }

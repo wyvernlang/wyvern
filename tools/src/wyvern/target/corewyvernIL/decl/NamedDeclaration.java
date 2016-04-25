@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.decl;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.tools.errors.FileLocation;
 
 public abstract class NamedDeclaration extends Declaration {
@@ -15,4 +16,5 @@ public abstract class NamedDeclaration extends Declaration {
 		return name;
 	}
 
+	public abstract DeclType getDeclType();
 }

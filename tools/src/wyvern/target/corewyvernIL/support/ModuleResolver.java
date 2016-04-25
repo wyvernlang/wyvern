@@ -3,14 +3,25 @@ package wyvern.target.corewyvernIL.support;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 
+import wyvern.target.corewyvernIL.ContextBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decl.NamedDeclaration;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.modules.LoadedType;
+import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -19,6 +30,7 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 
 /** Resolves abstract module paths to concrete files, then parses the files into modules.
  *  Knows the root directory
@@ -27,13 +39,17 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
  */
 public class ModuleResolver {
 	private File rootDir;
-	private Map<String, Expression> moduleCache = new HashMap<String, Expression>();
+	private File libDir;
+	private Map<String, Module> moduleCache = new HashMap<String, Module>();
 	private InterpreterState state;
 	
-	public ModuleResolver(File rootDir) {
-		if (!rootDir.isDirectory())
+	public ModuleResolver(File rootDir, File libDir) {
+		if (rootDir != null && !rootDir.isDirectory())
 			throw new RuntimeException("the root path for the module resolver must be a directory");
+		if (libDir != null && !libDir.isDirectory())
+			throw new RuntimeException("the lib path for the module resolver must be a directory");
 		this.rootDir = rootDir;
+		this.libDir = libDir;
 	}
 	
 	void setInterpreterState(InterpreterState s) {
@@ -47,9 +63,25 @@ public class ModuleResolver {
 	 * @param qualifiedName
 	 * @return
 	 */
-	public ValueType resolveType(String qualifiedName) {
-		// TODO: implement me
-		return null;
+	public LoadedType resolveType(String qualifiedName) {
+		Module typeDefiningModule;
+		if (!moduleCache.containsKey(qualifiedName)) {
+			File f = resolve(qualifiedName, true);
+			typeDefiningModule = load(qualifiedName,f);
+			moduleCache.put(qualifiedName, typeDefiningModule);
+		} else {
+			typeDefiningModule = moduleCache.get(qualifiedName);
+		}
+		Expression typeDefiningObject = typeDefiningModule.getExpression();
+		final String typeName = ((New)typeDefiningObject).getDecls().get(0).getName();
+		//final String generatedVariableName = GenerationEnvironment.generateVariableName();
+		return new LoadedType(typeName, typeDefiningModule);
+		/*return new ContextBinding(generatedVariableName, typeDefiningObject, typeName) {
+
+			@Override
+			public GenContext extendContext(GenContext ctx) {
+				return new TypeGenContext(typeName, generatedVariableName, ctx);
+			}};*/
 	}
 	
 	/** The main utility function for the ModuleResolver.
@@ -59,10 +91,10 @@ public class ModuleResolver {
 	 *  or an expression to be evaluated)
 	 * @throws ParseException 
 	 */
-	public Expression resolveModule(String qualifiedName) {
+	public Module resolveModule(String qualifiedName) {
 		if (!moduleCache.containsKey(qualifiedName)) {
-			File f = resolve(qualifiedName);
-			moduleCache.put(qualifiedName, load(f));
+			File f = resolve(qualifiedName, false);
+			moduleCache.put(qualifiedName, load(qualifiedName, f));
 		}
 		return moduleCache.get(qualifiedName);
 	}
@@ -74,17 +106,27 @@ public class ModuleResolver {
 	 * @param qualifiedName
 	 * @return
 	 */
-	private File resolve(String qualifiedName) {
+	private File resolve(String qualifiedName, boolean isType) {
 		String names[] = qualifiedName.split("\\.");
 		if (names.length == 0)
 			throw new RuntimeException();
-		names[names.length - 1] += ".wyv";
-		String filename = rootDir.getAbsolutePath();
+		names[names.length - 1] += isType?".wyt":".wyv";
+		File f = findFile(names, rootDir.getAbsolutePath());
+		if (!f.exists() && libDir != null) {
+			File libFile = findFile(names, libDir.getAbsolutePath());
+			if (libFile.exists())
+				f = libFile;
+		}
+		return f;
+	}
+
+	private File findFile(String[] names, String filename) {
 		for (int i = 0; i < names.length; ++i) {
 			filename += File.separatorChar;
 			filename += names[i];
 		}
-		return new File(filename);
+		File f = new File(filename);
+		return f;
 	}
 	
 	/**
@@ -97,34 +139,52 @@ public class ModuleResolver {
 	 * @param state 
 	 * @return
 	 */
-	private Expression load(File file) {
-        String source = TestUtil.readFile(file);
-        
+	private Module load(String qualifiedName, File file) {
         TypedAST ast = null;
 		try {
-			ast = TestUtil.getNewAST(source);
+			ast = TestUtil.getNewAST(file);
 		} catch (ParseException e) {
-			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(source, e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
+			e.printStackTrace();
+			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
 		}
         
+		final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 		GenContext genCtx = TestUtil.getGenContext(state);
 		Expression program;
 		if (ast instanceof ExpressionAST) {
 			program = ((ExpressionAST)ast).generateIL(genCtx, null);
 		} else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
-			Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx);
+			Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
 			if (decl instanceof ValDeclaration) {
 				program = ((ValDeclaration)decl).getDefinition();
+			} else if (decl instanceof DefDeclaration) {
+				DefDeclaration oldDefDecl = (DefDeclaration) decl;
+				// rename according to "apply"
+				DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(), oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
+				// wrap in an object
+				program = new New(defDecl);
+				program = wrap(program, dependencies);
+			} else if (decl instanceof TypeDeclaration) {
+				program = new New((NamedDeclaration)decl);
 			} else {
-				throw new RuntimeException();
+				throw new RuntimeException("should not happen");
 			}
 		} else {
 			throw new RuntimeException();
 		}
         
 		TypeContext ctx = TestUtil.getStandardTypeContext();
-        program.typeCheck(ctx);
+        ValueType moduleType = program.typeCheck(ctx);
         
-        return program;
+        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
+		return new Module(spec, program, dependencies);
+	}
+
+	public Expression wrap(Expression program, List<TypedModuleSpec> dependencies) {
+		for (TypedModuleSpec spec : dependencies) {
+			Module m = resolveModule(spec.getQualifiedName());
+			program = new Let(m.getSpec().getQualifiedName(), m.getExpression(), program);
+		}
+		return program;
 	}
 }

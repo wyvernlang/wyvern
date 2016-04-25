@@ -24,7 +24,6 @@ tools/out/artifacts/wyvern_jar/CopperCompiler.jar
 tools/out/artifacts/wyvern_jar/asm-debug-all-5.0.1.jar
 tools/tools.iml
 tools/src/wyvern/tools/lexing/WyvernLexer.java
-tools/src/wyvern/tools/parsing/coreparser/ParseException.java
 tools/src/wyvern/tools/parsing/coreparser/Token.java
 tools/src/wyvern/tools/parsing/coreparser/TokenManager.java
 tools/src/wyvern/tools/parsing/coreparser/TokenMgrError.java

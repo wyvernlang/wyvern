@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +14,16 @@ import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -46,7 +50,8 @@ import wyvern.tools.types.Type;
 
 public class TestUtil {
 	public static final String BASE_PATH = "src/wyvern/tools/tests/";
-	private static final String STDLIB_PATH = BASE_PATH + "stdlib/";
+	public static final String STDLIB_PATH = BASE_PATH + "stdlib/";
+	public static final String LIB_PATH = "src/wyvern/lib/";
 	private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
 	
 	/** Sets up the standard library and platform paths in the Wyvern resolver
@@ -90,6 +95,25 @@ public class TestUtil {
 	}
 	
 	/**
+	 * Loads and parses the given file into the TypedAST representation, using the
+	 * new Wyvern parser.
+	 * 
+	 * @param program
+	 * @return
+	 * @throws IOException 
+	 * @throws CopperParserException 
+	 */
+	public static TypedAST getNewAST(File programLocation) throws ParseException {
+		String program = readFile(programLocation);
+		clearGlobalTagInfo();
+		Reader r = new StringReader(program);
+		WyvernParser<TypedAST,Type> wp = ParseUtils.makeParser(programLocation.getPath(), r);
+		TypedAST result = wp.CompilationUnit();
+		Assert.assertEquals("Could not parse the entire file, last token ", WyvernParserConstants.EOF, wp.token_source.getNextToken().kind);
+		return result;
+	}
+	
+	/**
 	 * Completely evaluates the given AST, and compares it to the given value.
 	 * Does typechecking first, then evaluation.
 	 * 
@@ -106,34 +130,52 @@ public class TestUtil {
 	}
 	
 	public static GenContext getGenContext(InterpreterState state) {
+		if (state.getGenContext() != null)
+			return state.getGenContext();
 		GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), getSystemType());
 		return addTypeAbbrevs(genCtx);
 	}
 
 	public static GenContext getStandardGenContext() {
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), getSystemType());
-		return addTypeAbbrevs(genCtx);
+		/*GenContext genCtx = getGenContext(new InterpreterState(null)).extend("system", new Variable("system"), getSystemType());
+		return addTypeAbbrevs(genCtx);*/
+		return getGenContext(new InterpreterState(new File(BASE_PATH), null));
 	}
 
 	private static GenContext addTypeAbbrevs(GenContext genCtx) {
 		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = new TypeGenContext("String", "system", genCtx);
+		genCtx = new TypeGenContext("Boolean", "system", genCtx);
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
+		//genCtx.getInterpreterState().setGenContext(genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
 
 	private static ValueType getSystemType() {
+		List<FormalArg> ifTrueArgs = Arrays.asList(
+				new FormalArg("trueBranch", Util.unitToDynType()),
+				new FormalArg("falseBranch", Util.unitToDynType()));
+		List<DeclType> boolDeclTypes = Arrays.asList(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
 		// construct a type for the system object
 		List<DeclType> declTypes = new LinkedList<DeclType>();
-		declTypes.add(new AbstractTypeMember("Int"));
+		//declTypes.add(new AbstractTypeMember("Int"));
+		List<DeclType> intDeclTypes = new LinkedList<DeclType>();
+		intDeclTypes.add(new DefDeclType("+", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		intDeclTypes.add(new DefDeclType("-", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		intDeclTypes.add(new DefDeclType("*", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		intDeclTypes.add(new DefDeclType("/", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+		ValueType intType = new StructuralType("intSelf", intDeclTypes);
+		ValueType boolType = new StructuralType("boolean", boolDeclTypes);
+		declTypes.add(new ConcreteTypeMember("Int", intType));
+		declTypes.add(new ConcreteTypeMember("Boolean", boolType));
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
     declTypes.add(new AbstractTypeMember("Java"));
     declTypes.add(new AbstractTypeMember("Python"));
-		ValueType systemType = new StructuralType("this", declTypes);
+		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;
 	}
 	

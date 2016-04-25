@@ -4,10 +4,12 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
@@ -156,7 +158,7 @@ public class JavaField extends Declaration {
 	}
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}

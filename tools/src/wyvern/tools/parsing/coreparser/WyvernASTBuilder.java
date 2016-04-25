@@ -28,6 +28,7 @@ import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.expressions.Variable;
+import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -153,6 +154,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	@Override
 	public TypedAST integerLit(int value, FileLocation loc) {
 		return new IntegerConstant(value, loc);
+	}
+
+	@Override
+	public TypedAST booleanLit(boolean value, FileLocation loc) {
+		return new BooleanConstant(value);
 	}
 
 	@Override

@@ -175,7 +175,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 		CallableExprGenerator generator = getCallableExpr(ctx);
 		
         if (argument != null) {
-			Expression arg  = ((Variable)argument).generateIL(ctx, null);
+			Expression arg  = ((ExpressionAST)argument).generateIL(ctx, null);
 			List<Expression> args = new ArrayList<Expression>();
 			args.add(arg);
 			

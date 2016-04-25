@@ -83,7 +83,6 @@ TOKEN : /* Keywords */
 {
   < VAL: "val" >
 | < VAR: "var" >
-| < FN: "fn" >
 | < DEF: "def" >
 | < TYPE: "type" >
 | < CLASS: "class" >
@@ -152,6 +151,7 @@ TOKEN : /* Literals */
 {
   < STRING_LITERAL >
 | < DECIMAL_LITERAL >
+| < BOOLEAN_LITERAL >
 | < RATIONAL_LITERAL >
 }
 
@@ -233,9 +233,6 @@ AST DeclSequence(boolean inModule) :
 AST Declaration(boolean inModule) :
 { AST exp; }
 {
-  
-
-  
   exp = DefDeclaration()  { return exp; }
 |
   exp = ValDeclaration()  { return exp; }
@@ -244,7 +241,7 @@ AST Declaration(boolean inModule) :
 |
    LOOKAHEAD(3) exp =   TypeDeclaration()  { return exp; }
 |
-   LOOKAHEAD(3) exp = TypeAbbrevDeclaration() {return exp; }
+   LOOKAHEAD(3) exp = TypeAbbrevDeclaration() { return exp; }
 |
   exp = DelegateDeclaration()  { return exp; }
 |
@@ -270,9 +267,10 @@ AST ValDeclaration() :
 }
 
 AST TypeAbbrevDeclaration() :
-{Token t = null; Type reference = null; Token alias = null; }
+{ Token t = null; Type reference = null; Token alias = null; }
 {
-   t = <TYPE> alias = <IDENTIFIER> <EQUALS> reference = Type() <NEWLINE> {
+   t = <TYPE> alias = <IDENTIFIER>
+    ( <EQUALS> reference = Type())? <NEWLINE> {
      return build.typeAbbrevDecl(alias.image, reference, loc(t));
    }
 }
@@ -584,6 +582,8 @@ AST Literal() :
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
 |
   lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
+|
+  lit = <BOOLEAN_LITERAL> { return build.booleanLit(Boolean.parseBoolean(lit.image), loc(lit)); }
 |
   <RATIONAL_LITERAL>
 }

@@ -2,9 +2,11 @@ package wyvern.tools.typedAST.core.expressions;
 
 import java.net.URI;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -154,7 +156,7 @@ public class Instantiation extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx) {
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}
