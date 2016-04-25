@@ -141,13 +141,12 @@ public class FFITests {
       "import python:math\n\n" +
       "type MathType\n" +
       "    def factorial(x : system.Int) : system.Int\n" +
-      "    def gcd(x : system.Int, y : system.Int) : system.Int\n" +
       "    def pow(x : system.Int, y : system.Int) : system.Int\n" +
       "    val pi : system.Int\n" +
       "val m : MathType = math\n" +
-      "val x : system.Int = m.gcd(18, 36)\n" +
+      "val x : system.Int = m.pow(2, 8)\n" +
       "x\n";
-    testPyFromInput(input, "18", true);
+    testPyFromInput(input, "256.0", true);
   }
 
 }

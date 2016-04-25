@@ -19,6 +19,8 @@ import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
 import wyvern.target.oir.expressions.OIRExpression;
+import wyvern.target.oir.expressions.OIRFFIImport;
+import wyvern.target.oir.expressions.FFIType;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
 import wyvern.target.oir.expressions.OIRIfThenElse;
@@ -223,6 +225,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         + "\n" + indent + newFieldSet.acceptVisitor(this, state)
         + "\n" + indent;
       toReplaceString = newVar;
+    } else if (oirLet.getToReplace() instanceof OIRFFIImport) {
+      OIRFFIImport oirImport = (OIRFFIImport)oirLet.getToReplace();
+      prefix = oirImport.acceptVisitor(this, state) + "\n" + indent;
+      toReplaceString = oirImport.getModule();
     } else {
       prefix = "";
       toReplaceString = oirLet.getToReplace().acceptVisitor(this, state);
@@ -424,5 +430,13 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     if (state.expectingReturn)
       return def + body + "\n" + indent + "return " + oirMethod.getDeclaration().getName();
     return def + body;
+  }
+
+  public String visit(PrettyPrintState state,
+                      OIRFFIImport oirImport) {
+    if (oirImport.getFFIType() != FFIType.PYTHON) {
+      throw new RuntimeException("Python backend does not support non-python FFIs!");
+    }
+    return "import " + oirImport.getModule();
   }
 }

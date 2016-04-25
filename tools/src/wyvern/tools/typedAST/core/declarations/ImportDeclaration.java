@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -191,7 +192,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		} else if (this.getUri().getScheme().equals("python")) {
       String moduleName = this.getUri().getRawSchemeSpecificPart();
       System.out.println("Python import: " + moduleName);
-      importExp = new Variable(moduleName);
+      importExp = new FFIImport(new NominalType("system", "Python"), moduleName);
       // how to handle arg lists?
       // does wyvern have a list type yet?
       // ArrayList<DeclType> declTypes = new ArrayList();
