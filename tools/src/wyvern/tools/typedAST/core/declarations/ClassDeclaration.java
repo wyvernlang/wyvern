@@ -478,7 +478,7 @@ public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST
         wyvern.target.corewyvernIL.Environment.getRootEnvironment().extend(
         		new wyvern.target.corewyvernIL.binding.NewBinding (nameBinding.getName(), valueType));
         String newVar = GenerationEnvironment.generateVariableName();
-        writer.wrap(e->new Let(newVar, new New(classMembers, "this", valueType), (Expression)e));
+        writer.wrap(e->new Let(newVar, valueType, new New(classMembers, "this", valueType), (Expression)e));
         environment.register(nameBinding.getName(), valueType);
         //TODO: Tags support
         writer.write(new TypeDeclaration(nameBinding.getName(), valueType, getLocation()));

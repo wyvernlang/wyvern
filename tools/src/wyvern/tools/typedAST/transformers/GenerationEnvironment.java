@@ -73,7 +73,7 @@ public class GenerationEnvironment {
             return (Variable) lookup;
         } else if (lookup != null) {
             String nvname = generateVariableName();
-            writer.wrap(outer -> new Let(nvname, (Expression)lookup, (Expression)outer));
+            writer.wrap(outer -> new Let(nvname, null, (Expression)lookup, (Expression)outer));
             return new Variable(nvname);
         }
         throw new WyvernException("Variable not found in codegen.");

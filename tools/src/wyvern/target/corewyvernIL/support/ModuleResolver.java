@@ -183,7 +183,7 @@ public class ModuleResolver {
 	public Expression wrap(Expression program, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
 			Module m = resolveModule(spec.getQualifiedName());
-			program = new Let(m.getSpec().getQualifiedName(), m.getExpression(), program);
+			program = new Let(m.getSpec().getQualifiedName(), m.getSpec().getType(), m.getExpression(), program);
 		}
 		return program;
 	}

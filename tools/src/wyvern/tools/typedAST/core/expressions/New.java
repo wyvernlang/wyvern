@@ -238,7 +238,7 @@ public class New extends CachingTypedAST implements CoreAST {
         null);
         Expression output = exn;
         for (String key : variables.keySet()) {
-            output = new Let(key, variables.get(key), output);
+            output = new Let(key, null, variables.get(key), output);
         }
         variables.clear();
         writer.write(output);

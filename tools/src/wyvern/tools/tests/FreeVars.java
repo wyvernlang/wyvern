@@ -74,7 +74,7 @@ public class FreeVars {
 		//     x = y
 		//     x
 
-		Let varAssign = new Let("x", new Variable("y"), new Variable("x"));
+		Let varAssign = new Let("x", systemInt(), new Variable("y"), new Variable("x"));
 		DefDeclaration defDecl = new DefDeclaration("method", new ArrayList<>(), systemInt(), varAssign, FileLocation.UNKNOWN);
 		
 		Set<String> freeVars = defDecl.getFreeVariables();
@@ -93,7 +93,7 @@ public class FreeVars {
 		//     x
 		
 		// The body of the method.
-		Let assignYtoX = new Let("x", new Variable("y"), new Variable("x"));
+		Let assignYtoX = new Let("x", systemInt(), new Variable("y"), new Variable("x"));
 		
 		// The method declaration, wrapped inside a New expression.
 		LinkedList<Declaration> decls = new LinkedList<>();	
@@ -110,7 +110,7 @@ public class FreeVars {
 		New newDecls = new New(decls, "this", typeOfDecls);
 		
 		// Enclose with the declaration of y.
-		Let assign5toY = new Let("y", new IntegerLiteral(5), newDecls);
+		Let assign5toY = new Let("y", systemInt(), new IntegerLiteral(5), newDecls);
 		
 		// Check the free variables.
 		Set<String> freeVars = assign5toY.getFreeVariables();

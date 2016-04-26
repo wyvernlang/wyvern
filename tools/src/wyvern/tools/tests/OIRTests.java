@@ -232,7 +232,7 @@ public class OIRTests {
   public void testDefDecl() throws ParseException {
     String input =
       "val obj = new\n" +
-      "    val v : system.int = 5\n" +
+      "    val v : system.Int = 5\n" +
       "    def m() : system.Int = 5\n" +
       "obj.v\n";
     testPyFromInput(input, "5");
@@ -315,7 +315,7 @@ public class OIRTests {
     String input =
       "val obj = new\n" +
       "    var x : system.Int = 3\n" +
-      "    def identity(x : system.Int) : system.Int = x\n" +
+      "    def identity(x : Unit) : Unit = x\n" +
       "obj.identity(obj.x = 7)\n" +
       "obj.x\n";
     testPyFromInput(input, "7");

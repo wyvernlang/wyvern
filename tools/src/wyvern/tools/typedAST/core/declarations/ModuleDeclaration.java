@@ -306,10 +306,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 					new MethodCall(
 							new wyvern.target.corewyvernIL.expression.Variable(inst.getUri().getSchemeSpecificPart().toString()) /*path*/,
 							inst.getUri().getSchemeSpecificPart().toString(), args, this);
-			GenContext newContext = ctx.extend(inst.getName(), instValue, instValue.typeCheck(ctx));
+			final ValueType type = instValue.typeCheck(ctx);
+			GenContext newContext = ctx.extend(inst.getName(), instValue, type);
 
 			Expression e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
-			return new Let(inst.getName(), instValue, e);
+			return new Let(inst.getName(), type, instValue, e);
 		}
 	}
 

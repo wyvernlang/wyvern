@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -20,7 +21,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.util.Pair;
 
 public class TopLevelContext {
-	private Stack<Pair<String,Expression>> pending = new Stack<Pair<String,Expression>>();
+	private Stack<VarBinding> pending = new Stack<VarBinding>();
 	//private List<Pair<Declaration,DeclType>> moduleDecls = new LinkedList<Pair<Declaration,DeclType>>();
 	private List<Declaration> moduleDecls = new LinkedList<Declaration>();
 	private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
@@ -41,11 +42,11 @@ public class TopLevelContext {
 	}
 
 	public Expression getExpression() {
-		Pair<String,Expression> pair = pending.pop();
-		Expression exp = pair.second;
+		VarBinding binding = pending.pop();
+		Expression exp = binding.getExpression();
 		while (!pending.isEmpty()) {
-			pair = pending.pop();
-			exp = new Let(pair.first, pair.second, exp);
+			binding = pending.pop();
+			exp = new Let(binding, exp);
 		}
 		exp = ctx.getInterpreterState().getResolver().wrap(exp, dependencies);
 		return exp;
@@ -66,7 +67,7 @@ public class TopLevelContext {
 		}
 		
 		Expression exp = new New(moduleDecls, newName, vt);
-		addExpression(exp);
+		addExpression(exp, vt);
 		
 		return getExpression();
 	}
@@ -88,8 +89,8 @@ public class TopLevelContext {
 		return vt;
 	}
 	
-	public void addExpression(Expression exp) {
-		pending.push(new Pair<String,Expression>(GenContext.generateName(), exp));
+	public void addExpression(Expression exp, ValueType type) {
+		pending.push(new VarBinding(GenContext.generateName(), type, exp));
 		/*if (expression == null) {
 			expression = exp;
 		} else {
@@ -108,7 +109,7 @@ public class TopLevelContext {
 	 * @param isDeclBlock flags a let statement that represents a block of recursive declarations, or a var
 	 */
 	public void addLet(String name, ValueType type, Expression exp, boolean isDeclBlock) {
-		pending.push(new Pair<String,Expression>(name, exp));
+		pending.push(new VarBinding(name, type, exp));
 		ctx = ctx.extend(name, new Variable(name), type);
 		avoidanceMap.put(name, isDeclBlock);
 	}

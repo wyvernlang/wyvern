@@ -170,6 +170,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 		// add the import's type to the context, and get the import value
 		Expression importExp = null;
 		String importName = this.getUri().getSchemeSpecificPart();
+		ValueType type = null;
 		if (importName.contains(".")) {
 			importName = importName.substring(importName.lastIndexOf(".")+1);
 		}
@@ -178,7 +179,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			try {
 				FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
 				ctx = GenUtil.ensureJavaTypesPresent(ctx);
-				ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
+				type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
 				importExp = new JavaValue(obj, type);
 				ctx = ctx.extend(importName, new Variable(importName), type);
 			} catch (ReflectiveOperationException e1) {
@@ -189,6 +190,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			String moduleName = this.getUri().getSchemeSpecificPart();
 			if (ctx.isPresent(moduleName)) {
 				importExp = new Variable(moduleName);
+				type = ctx.lookupType(moduleName);
 			} else {
 				final Module module = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
 				for (TypedModuleSpec spec: module.getDependencies()) {
@@ -197,10 +199,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 				// TODO: this may not be transitive in the right way
 				dependencies.addAll(module.getDependencies());
 				importExp = module.getExpression();
+				type = module.getSpec().getType();
 			}
 			ctx = ctx.extend(importName, new Variable(importName), importExp.typeCheck(ctx));
 		}
-		return new Pair<VarBinding, GenContext>(new VarBinding(importName, importExp), ctx);
+		return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
 	}
 	
 	@Override

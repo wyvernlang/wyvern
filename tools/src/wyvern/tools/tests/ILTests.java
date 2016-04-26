@@ -59,7 +59,7 @@ public class ILTests {
     	NominalType Int = new NominalType("system", "Int");
     	Variable x = new Variable("x");
     	IntegerLiteral five = new IntegerLiteral(5);
-    	Expression letExpr = new Let("x", five, x);
+    	Expression letExpr = new Let("x", Int, five, x);
     	
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = letExpr.typeCheck(ctx);
@@ -331,7 +331,7 @@ public class ILTests {
 					 + "val i : Int = 5\n\n"
 					 + "i\n"
 				     ;
-        doTestInt(input, 5);
+        doTest(input, null, new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -352,9 +352,9 @@ public class ILTests {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), null);
+		GenContext genCtx = new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), Util.unitType());
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
-    	TypeContext ctx = TypeContext.empty().extend("D", null);
+    	TypeContext ctx = TypeContext.empty().extend("D", Util.unitType());
     	
 		DeclType t = decl.typeCheck(ctx, ctx);
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
@@ -499,7 +499,7 @@ public class ILTests {
     	 String source = "type IntIntFn \n"
     	            + "     def apply(x:system.Int):system.Int \n"
     	            + "def getLambda():IntIntFn\n"
-    	            + "    val t:system.int = 1\n"
+    	            + "    val t:system.Int = 1\n"
     	            + "    x => x\n"
     	            + "val lambda = getLambda()\n"
     	            + "lambda(5)";
@@ -538,7 +538,7 @@ public class ILTests {
                      + "    val n:Int\n\n"
 				
                      + "type Cell\n"
-                     + "    type T = system.Int\n"
+                     + "    type T = Numeric\n"
                      + "    val element:this.T\n\n"
 
                      + "type Holder\n"
@@ -551,7 +551,7 @@ public class ILTests {
                      + "    val n:Int = 5\n\n"
                      
                      + "val c:h.U = new\n"
-                     + "    type T = system.Int\n"
+                     + "    type T = Numeric\n"
                      + "    val element:this.T = num\n\n"
                      
                      + "c.element.n"

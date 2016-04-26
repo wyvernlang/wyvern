@@ -24,7 +24,7 @@ public class ExpressionWriter implements ILWriter {
 
     @Override
     public void writePrefix(ASTNode node) {
-        output = new Let(GenerationEnvironment.generateVariableName(), (Expression)node, output);
+        output = new Let(GenerationEnvironment.generateVariableName(), null, (Expression)node, output);
     }
 
     @Override

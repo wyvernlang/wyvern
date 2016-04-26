@@ -1,5 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
+import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
+import static wyvern.tools.errors.ToolError.reportError;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -10,14 +13,15 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
 
 public class Let extends Expression {
 
 	private VarBinding binding;
 	private Expression inExpr;
 
-	public Let(String varName, Expression toReplace, Expression inExpr) {
-		this(new VarBinding(varName, toReplace), inExpr);
+	public Let(String varName, ValueType type, Expression toReplace, Expression inExpr) {
+		this(new VarBinding(varName, type, toReplace), inExpr);
 	}
 
 	public Let(VarBinding binding, Expression inExpr) {
@@ -42,7 +46,10 @@ public class Let extends Expression {
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType t = getToReplace().typeCheck(ctx);
-		this.setExprType(inExpr.typeCheck(ctx.extend(getVarName(), t)));
+		if (!t.isSubtypeOf(binding.getType(), ctx)) {
+			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
+		}
+		this.setExprType(inExpr.typeCheck(ctx.extend(getVarName(), binding.getType())));
 		return getExprType();
 	}
 
@@ -50,7 +57,9 @@ public class Let extends Expression {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		String newIndent = indent + "    ";
 		dest.append("let\n").append(newIndent)
-		.append(getVarName()).append(" = ");
+		.append(getVarName()).append(" : ");
+		binding.getType().doPrettyPrint(dest, newIndent);
+		dest.append(" = ");
 		getToReplace().doPrettyPrint(dest,newIndent);
 		dest.append('\n').append(indent).append("in ");
 		inExpr.doPrettyPrint(dest,indent);

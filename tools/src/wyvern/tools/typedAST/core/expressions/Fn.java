@@ -178,7 +178,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 	
 	public  void genTopLevel(TopLevelContext topLevelContext, ValueType expectedType) {
-		topLevelContext.addExpression(generateIL(topLevelContext.getContext(), expectedType));
+		final Expression exp = generateIL(topLevelContext.getContext(), expectedType);
+		topLevelContext.addExpression(exp, expectedType);
 	}
 
     private List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx, ValueType declType) {

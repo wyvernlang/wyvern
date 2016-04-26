@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -188,7 +189,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	@Override
 	public void genTopLevel (TopLevelContext tlc) {
 		Expression expr = generateIL(tlc.getContext(), null);
-		tlc.addExpression(expr);
+		tlc.addExpression(expr, Util.unitType());
 	}
 
 }
