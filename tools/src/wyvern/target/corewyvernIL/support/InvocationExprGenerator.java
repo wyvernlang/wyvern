@@ -12,8 +12,10 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 
 public class InvocationExprGenerator implements CallableExprGenerator {
 
@@ -25,9 +27,9 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 		this.receiver = receiver;
 		ValueType rt = receiver.typeCheck(ctx);
 		declType = rt.findDecl(operationName, ctx);
-		if (declType == null)
-			throw new RuntimeException("typechecking error: operation " + operationName + " not found");
 		location = loc;
+		if (declType == null)
+			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, loc, operationName);
 	}
 	
 	@Override

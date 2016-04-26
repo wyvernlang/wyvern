@@ -9,6 +9,7 @@ import org.junit.experimental.categories.Category;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -66,5 +67,10 @@ public class RossettaCodeTests {
 	@Test
 	public void testNewHello() throws ParseException {		
 		ILTests.doTestScriptModularly("rosetta.hello", null, null);
+	}
+	
+	@Test
+	public void testFib() throws ParseException {		
+		ILTests.doTestScriptModularly("rosetta.fibonacci", null, null);
 	}
 }

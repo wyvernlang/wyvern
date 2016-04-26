@@ -82,7 +82,9 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 		case "-": return new IntegerLiteral(this.value - ((IntegerLiteral)args.get(0)).getValue());
 		case "*": return new IntegerLiteral(this.value * ((IntegerLiteral)args.get(0)).getValue());
 		case "/": return new IntegerLiteral(this.value / ((IntegerLiteral)args.get(0)).getValue());
-		default: throw new RuntimeException();
+		case "<": return new BooleanLiteral(this.value < ((IntegerLiteral)args.get(0)).getValue());
+		case ">": return new BooleanLiteral(this.value > ((IntegerLiteral)args.get(0)).getValue());
+		default: throw new RuntimeException("runtime error: integer operation " + methodName + "not supported by the runtime");
 		}
 	}
 

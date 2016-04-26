@@ -461,16 +461,18 @@ AST Expression(ExpFlags flags) :
   LOOKAHEAD(4)
     exp = LambdaFn(flags) { return exp; }
 |  
-  LOOKAHEAD(3)
-  exp = AdditiveExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
-  	if (exp2 != null) {
-  		return build.assignment(exp, exp2, loc(t));
-  	}
+    exp = AssignmentExpression(flags) { return exp; }
+}
+
+AST AssignmentExpression(ExpFlags flags) :
+{ AST exp; AST exp2 = null; Object formal; Token t = null; }
+{
+  exp = RelationalExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
+    if (exp2 != null) {
+        return build.assignment(exp, exp2, loc(t));
+    }
     return exp;
   }
-/*|
-  <FN> formal = Formal() t=<ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp, loc(t)); }
-*/
 }
 
 AST LambdaFn(ExpFlags flags) :
@@ -518,6 +520,16 @@ Type Type() :
         return build.arrowType(t, arrowResult);
     }
  }
+}
+
+AST RelationalExpression(ExpFlags flags) :
+{ AST exp; AST exp2 = null; Token t; }
+{
+  exp = AdditiveExpression(flags)
+  [ ( t=<GT> | t=<LT> ) exp2=AdditiveExpression(flags) {
+    exp = build.invocation(exp, t.image, exp2, loc(t)); 
+  } ]
+  { return exp; }
 }
 
 AST AdditiveExpression(ExpFlags flags) :
