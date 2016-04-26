@@ -111,7 +111,7 @@ public class TypeInv implements Type {
 
     private Expression resolvePath() {
         if (innerType instanceof TypeInv) {
-            return new FieldGet(((TypeInv) innerType).resolvePath(), invName);
+            return new FieldGet(((TypeInv) innerType).resolvePath(), invName, getLocation());
         } else if (innerType instanceof Variable) {
             return new wyvern.target.corewyvernIL.expression.Variable(((Variable) innerType).getName());
         }

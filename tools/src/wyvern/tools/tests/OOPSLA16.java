@@ -60,7 +60,7 @@ public class OOPSLA16 {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "x", null); 
 		
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
@@ -91,7 +91,7 @@ public class OOPSLA16 {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
@@ -123,7 +123,7 @@ public class OOPSLA16 {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
@@ -151,7 +151,7 @@ public class OOPSLA16 {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "x", null); 
 		
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
@@ -180,7 +180,7 @@ public class OOPSLA16 {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);

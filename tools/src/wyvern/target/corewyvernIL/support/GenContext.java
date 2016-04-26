@@ -74,7 +74,7 @@ public abstract class GenContext extends TypeContext {
 			//assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
 			wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
 			String methodName = methodDecl.getName();
-			return new MethodGenContext(methodName, newName, this); 
+			return new MethodGenContext(methodName, newName, this, ast.getLocation()); 
 		}
 		else {
 			assert (ast instanceof TypeAbbrevDeclaration);

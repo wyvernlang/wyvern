@@ -80,7 +80,7 @@ public class TopLevelContext {
 			Variable receiver = new Variable(thisName);
 			Path newPath = receiver;
 			if (!isDeclBlock) {
-				newPath = new FieldGet(receiver, e.getKey());
+				newPath = new FieldGet(receiver, e.getKey(), receiver.getLocation());
 			}
 			View view = new ReceiverView(v, newPath);
 			vt = vt.adapt(view);

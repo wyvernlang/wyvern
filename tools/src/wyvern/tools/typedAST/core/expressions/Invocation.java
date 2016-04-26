@@ -188,6 +188,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	
 	@Override
 	public CallableExprGenerator getCallableExpr(GenContext genCtx) {
-		return new InvocationExprGenerator(receiver.generateIL(genCtx, null), operationName, genCtx);
+		return new InvocationExprGenerator(receiver.generateIL(genCtx, null), operationName, genCtx, getLocation());
 	}
 }

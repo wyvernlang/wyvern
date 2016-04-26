@@ -12,25 +12,28 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 
 public class InvocationExprGenerator implements CallableExprGenerator {
 
 	private final Expression receiver;
 	private final DeclType declType;
+	private final FileLocation location;
 	
-	public InvocationExprGenerator(Expression receiver, String operationName, GenContext ctx) {
+	public InvocationExprGenerator(Expression receiver, String operationName, GenContext ctx, FileLocation loc) {
 		this.receiver = receiver;
 		ValueType rt = receiver.typeCheck(ctx);
 		declType = rt.findDecl(operationName, ctx);
 		if (declType == null)
 			throw new RuntimeException("typechecking error: operation " + operationName + " not found");
+		location = loc;
 	}
 	
 	@Override
 	public Expression genExpr() {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
-			return new FieldGet(receiver, declType.getName());
+			return new FieldGet(receiver, declType.getName(), location);
 		} else {
 			throw new RuntimeException("eta-expansion of a method reference not implemented");
 		}

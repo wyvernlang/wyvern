@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class FieldGet extends Expression implements Path {
@@ -23,8 +24,8 @@ public class FieldGet extends Expression implements Path {
 	private IExpr objectExpr;
 	private String fieldName;
 
-	public FieldGet(IExpr objectExpr, String fieldName) {
-		super();
+	public FieldGet(IExpr objectExpr, String fieldName, FileLocation loc) {
+		super(loc);
 		this.objectExpr = objectExpr;
 		this.fieldName = fieldName;
 	}
@@ -74,7 +75,7 @@ public class FieldGet extends Expression implements Path {
 	public Path adapt(View v) {
 		if (!(objectExpr instanceof Path))
 			throw new RuntimeException("tried to adapt something that's not a path or type");
-		return new FieldGet((Expression)((Path)objectExpr).adapt(v), fieldName);
+		return new FieldGet((Expression)((Path)objectExpr).adapt(v), fieldName, getLocation());
 	}
 
 	@Override

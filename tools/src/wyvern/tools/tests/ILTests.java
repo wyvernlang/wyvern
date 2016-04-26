@@ -387,7 +387,7 @@ public class ILTests {
 		
 		Expression mainProgram = GenUtil.genExp(decls, genCtx);
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x"); 
+		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
@@ -595,7 +595,7 @@ public class ILTests {
 		TypeContext ctx = TestUtil.getStandardTypeContext();
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 		Expression mainProgram = ((DefDeclaration)decl).getBody();
-		Expression program = new FieldGet(mainProgram, fieldName); // slightly hacky		
+		Expression program = new FieldGet(mainProgram, fieldName, null); // slightly hacky		
         doChecks(program, expectedType, expectedValue);
 	}
 

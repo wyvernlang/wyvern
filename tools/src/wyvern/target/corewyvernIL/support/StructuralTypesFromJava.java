@@ -42,7 +42,7 @@ public class StructuralTypesFromJava extends StructuralType {
 			newDeclTypes.add(classDecl);
 			packageType.declTypes = newDeclTypes;
 		}
-		Path path = new FieldGet(GenUtil.getJavaTypesObject(), packageName);
+		Path path = new FieldGet(GenUtil.getJavaTypesObject(), packageName, null);
 		ValueType type = new NominalType(path, className);
 		return type;
 	}
