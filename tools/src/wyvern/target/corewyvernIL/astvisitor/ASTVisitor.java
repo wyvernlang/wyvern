@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -61,4 +62,5 @@ public abstract class ASTVisitor<T> {
   public abstract T visit(Environment env, OIREnvironment oirenv, CaseType caseType);
   public abstract T visit(Environment env, OIREnvironment oirenv, ExtensibleTagType extensibleTagType);
   public abstract T visit(Environment env, OIREnvironment oirenv, DataType dataType);
+  public abstract T visit(Environment env, OIREnvironment oirenv, FFIImport ffiImport);
 }

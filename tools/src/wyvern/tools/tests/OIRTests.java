@@ -355,4 +355,12 @@ public class OIRTests {
       + "ifSt(True, IntegerTen, IntegerFive)";
     testPyFromInput(input, "10");
   }
+
+  @Test
+  public void testArithmetic() throws ParseException {
+    String input =
+      "val x = ((5 + 3) / 2) * 2 - 1\n" +
+      "x\n";
+    testPyFromInput(input, "7", true);
+  }
 }
