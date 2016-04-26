@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +28,15 @@ public class FFIImport extends AbstractValue {
                              Environment env,
                              OIREnvironment oirenv) {
     return emitILVisitor.visit(env, oirenv, this);
+  }
+
+  @Override
+  public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+    dest.append("FFI(");
+    this.ffiType.doPrettyPrint(dest, indent);
+    dest.append(", ");
+    dest.append(this.path);
+    dest.append(")");
   }
 
   public String getPath() {

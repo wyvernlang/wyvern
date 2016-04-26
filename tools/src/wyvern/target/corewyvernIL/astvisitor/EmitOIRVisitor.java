@@ -621,10 +621,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
                       FFIImport ffiImport) {
     NominalType javaType = new NominalType("system", "Java");
     NominalType pythonType = new NominalType("system", "Python");
-    TypeContext cxt = TestUtil.getStandardGenContext();
-    if (javaType.equals(pythonType))
-      System.out.println("We're gonna have a bad time");
-    System.out.println("FFI Import type is " + ffiImport.getFFIType());
+
     if (ffiImport.getFFIType().equals(javaType)) {
       System.out.println("Java FFI!");
       return new OIRFFIImport(FFIType.JAVA, ffiImport.getPath());
