@@ -195,7 +195,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
 	terminal Token delegateKwd_t::= /delegate/ in (keywds) {: RESULT = token(DELEGATE,lexeme); :};
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
-	terminal Token fnKwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
+	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
 	terminal Token metadataKwd_t 	::= /metadata/ in (keywds) {: RESULT = token(METADATA,lexeme); :};
 	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); :};
@@ -317,7 +317,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | varKwd_t:t {: RESULT = t; :}
 	       | delegateKwd_t:t {: RESULT = t; :}
 	       | toKwd_t:t {: RESULT = t; :}
-	       | fnKwd_t:t {: RESULT = t; :}
+//	       | fnKwd_t:t {: RESULT = t; :}
 	       | requireKwd_t:t {: RESULT = t; :}
 	       | metadataKwd_t:t {: RESULT = t; :}
 	       | newKwd_t:t {: RESULT = t; :}

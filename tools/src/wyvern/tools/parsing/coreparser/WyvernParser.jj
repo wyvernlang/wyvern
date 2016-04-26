@@ -468,9 +468,9 @@ AST Expression(ExpFlags flags) :
   	}
     return exp;
   }
-|
+/*|
   <FN> formal = Formal() t=<ARROW> exp = Expression(flags) { return build.fn(Arrays.asList(formal), exp, loc(t)); }
-
+*/
 }
 
 AST LambdaFn(ExpFlags flags) :

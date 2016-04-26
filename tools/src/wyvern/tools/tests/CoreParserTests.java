@@ -38,7 +38,7 @@ public class CoreParserTests {
 	
 	@Test
 	public void testIdentityApp() throws ParseException {
-		String input = "(fn x : Int => x)(3)";
+		String input = "((x : Int) => x)(3)";
 		Reader r = new StringReader(input);
 		//TokenManager tm = new WyvernTokenManager(r, "test input");
 		//WyvernParser wp = new WyvernParser(tm);
