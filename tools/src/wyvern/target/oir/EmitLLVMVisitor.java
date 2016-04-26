@@ -12,6 +12,7 @@ import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
 import wyvern.target.oir.expressions.OIRExpression;
+import wyvern.target.oir.expressions.OIRFFIImport;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
 import wyvern.target.oir.expressions.OIRIfThenElse;
@@ -296,4 +297,9 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 		
 		return "";
 	}
+
+  @Override
+  public String visit(OIREnvironment oirenv, OIRFFIImport ffiImport) {
+    throw new RuntimeException("FFI not implemented in LLVM");
+  }
 }
