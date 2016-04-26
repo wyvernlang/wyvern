@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -59,6 +60,8 @@ import wyvern.target.oir.declarations.OIRMethodDeclarationGroup;
 import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.OIRCast;
 import wyvern.target.oir.expressions.OIRExpression;
+import wyvern.target.oir.expressions.OIRFFIImport;
+import wyvern.target.oir.expressions.FFIType;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
 import wyvern.target.oir.expressions.OIRIfThenElse;
@@ -610,6 +613,23 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
                       OIREnvironment oirenv,
                       DataType dataType) {
     throw new RuntimeException("DataType -> OIR unimplemented");
+  }
+
+  @Override
+  public OIRAST visit(Environment env,
+                      OIREnvironment oirenv,
+                      FFIImport ffiImport) {
+    NominalType javaType = new NominalType("system", "Java");
+    NominalType pythonType = new NominalType("system", "Python");
+
+    if (ffiImport.getFFIType().equals(javaType)) {
+      System.out.println("Java FFI!");
+      return new OIRFFIImport(FFIType.JAVA, ffiImport.getPath());
+    } else if (ffiImport.getFFIType().equals(pythonType)) {
+      return new OIRFFIImport(FFIType.PYTHON, ffiImport.getPath());
+    } else {
+      throw new RuntimeException("Unknown FFI type!");
+    }
   }
 
 }

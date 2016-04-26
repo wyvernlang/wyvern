@@ -7,6 +7,7 @@ import wyvern.target.oir.declarations.OIRMethod;
 import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
+import wyvern.target.oir.expressions.OIRFFIImport;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
 import wyvern.target.oir.expressions.OIRIfThenElse;
@@ -22,6 +23,7 @@ public abstract class ASTVisitor<S, T> {
 	public abstract T visit(S state, OIRInteger oirInteger);
 	public abstract T visit(S state, OIRBoolean oirBoolean);
 	public abstract T visit(S state, OIRCast oirCast);
+	public abstract T visit(S state, OIRFFIImport oirFFIImport);
 	public abstract T visit(S state, OIRFieldGet oirFieldGet);
 	public abstract T visit(S state, OIRFieldSet oirFieldSet);
 	public abstract T visit(S state, OIRIfThenElse oirIfThenElse);
