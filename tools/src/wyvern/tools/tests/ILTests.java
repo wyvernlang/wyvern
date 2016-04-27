@@ -696,11 +696,19 @@ public class ILTests {
 	
 	@Test
 	public void testDSLParsing() throws ParseException {
+        String inp0t = "type PostfixExpr\n"
+                     + "    def eval():Int\n"
+                     + "    metadata 3\n\n"
+                     
+                     + "val n : PostfixExpr = ~\n"
+                     + "    4 5 +\n"
+                     ;
         String input = "def id(x:Int):Int = x\n"
-                     + "val n : Int = ~\n"
+                     + "val n : Int = id(~)\n"
                      + "    4 5 +\n"
                      ;
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ast = (ExpressionAST) TestUtil.getNewAST(inp0t);
 		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
 		// IL generation doesn't work yet!
 		//Expression program = ast.generateIL(genCtx, null);

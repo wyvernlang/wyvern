@@ -317,10 +317,11 @@ AST TypeDeclaration() :
 }
 
 AST DeclTypes() :
-{ AST decl1; AST decl2; }
+{ AST decl1; AST decl2; AST body; }
 {
   decl1 = DeclType()
   ( decl2 = DeclType() { decl1 = build.sequence(decl1, decl2, true); } )*
+  [ <METADATA> body = ExpressionLine(false) ]
     { return decl1; }
 }
 
