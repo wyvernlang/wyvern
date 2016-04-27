@@ -693,6 +693,18 @@ public class ILTests {
 		} catch (ToolError e) {
 		}
 	}
+	
+	@Test
+	public void testDSLParsing() throws ParseException {
+        String input = "def id(x:Int):Int = x\n"
+                     + "val n : Int = ~\n"
+                     + "    4 5 +\n"
+                     ;
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
+		// IL generation doesn't work yet!
+		//Expression program = ast.generateIL(genCtx, null);
+	}
 
 	@Test
 	public void testResourceTypecheckingDef() throws ParseException {

@@ -4,8 +4,10 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -234,6 +236,16 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	public TypedAST typeAbbrevDecl(String alias, Type reference, FileLocation loc) {
 		
 		return new TypeAbbrevDeclaration(alias, reference, loc);
+	}
+
+	@Override
+	public TypedAST dsl(FileLocation loc) {
+		return new DSLLit(Optional.empty(), loc);
+	}
+
+	@Override
+	public void setDSLBody(TypedAST dslExp, String text) {
+		((DSLLit)dslExp).setText(text);
 	}
 
 }

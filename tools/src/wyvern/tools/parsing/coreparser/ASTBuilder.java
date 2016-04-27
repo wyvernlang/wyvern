@@ -33,6 +33,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc);
+	public AST dsl(FileLocation loc);
 	public AST tuple(List<AST> members, FileLocation loc);
 	public AST match(AST exp, List cases, FileLocation loc);
 	
@@ -45,6 +46,7 @@ public interface ASTBuilder<AST,Type> {
 	public Type qualifiedType(AST base, String name);
 	
 	public void setNewBody(AST newExp, AST decls);
+	public void setDSLBody(AST dslExp, String text);
 
 	public AST instantiation(URI uri, AST arg, Token name, FileLocation loc);
 

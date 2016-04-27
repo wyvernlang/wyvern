@@ -56,17 +56,24 @@ public class WyvernParser<AST,Type> {
     private ASTBuilder<AST,Type> build;
     public void setBuilder(ASTBuilder<AST,Type> builder) { build = builder; }
 
+    private enum IndentedExpKind {
+        NEW_KIND, DSL_KIND,
+    }
+
 	private class ExpFlags {
-		public boolean isEmpty() { return newExp == null; }
-		public void setNewExp(AST a) throws ParseException {
+		public boolean isEmpty() { return exp == null; }
+		public void setExp(AST a, IndentedExpKind kind) throws ParseException {
 		  	// error to have two news in one expression
 		  	if (!isEmpty())
 		  		throw new ParseException("May not have two \"new\" or \"DSL literal\" expressions within the same line"); 
-			newExp = a;
+			exp = a;
+			this.kind = kind;
 		} 
-		public AST getNewExp() { return newExp; }
+		public AST getExp() { return exp; }
+        public IndentedExpKind getExpKind() { return kind; }
 		
-	    private AST newExp;
+	    private AST exp;
+	    private IndentedExpKind kind;
 	}    
 }
 
@@ -424,10 +431,20 @@ AST ExpressionLine(boolean makeValDecl) :
 { AST exp; AST decls = null; Token t; Token t2 = null; Object caseArm; List cases; ExpFlags flags = new ExpFlags(); }
 {
   exp = Expression(flags) t=<NEWLINE>
-  [ t2=<INDENT> decls = DeclSequence(true) <DEDENT> ]
+  [
+    t2=<INDENT> decls = DeclSequence(true) <DEDENT>
+  |
+    t2=<DSLLINE>
+  ]
   {
     if (!flags.isEmpty()) {
-    	build.setNewBody(flags.getNewExp(), decls);
+        if (flags.getExpKind() == IndentedExpKind.NEW_KIND) {
+            build.setNewBody(flags.getExp(), decls);
+    	} else if (t2 == null) {
+            ToolError.reportError(ErrorMessage.EXPECTED_DSL_BLOCK, (HasLocation)flags.getExp());
+        } else {
+    	    build.setDSLBody(flags.getExp(), t2.image);
+    	}
     } else if (t2 != null) {
         ToolError.reportError(ErrorMessage.ILLEGAL_INDENTED_BLOCK, loc(t2));
     }
@@ -581,11 +598,17 @@ AST PrimaryPrefix(ExpFlags flags) :
     exp = build.newObj(loc(t)); 
     
     // store a reference to the new expression so we can fill in the fields later!
-    flags.setNewExp(exp);
+    flags.setExp(exp, IndentedExpKind.NEW_KIND);
     return exp;
   }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
+|
+  t=<TILDE> {
+    exp = build.dsl(loc(t));
+    flags.setExp(exp, IndentedExpKind.DSL_KIND);
+    return exp;
+  }
 }
 
 AST Literal() :

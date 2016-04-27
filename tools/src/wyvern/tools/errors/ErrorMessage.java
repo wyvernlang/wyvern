@@ -29,6 +29,8 @@ public enum ErrorMessage {
 	UNEXPECTED_INPUT_WITH_ARGS("Unexpected input: %ARG", 1),
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),
+	EXPECTED_NEW_BLOCK("Expected an indented block with definitions for the new expression", 0),
+	EXPECTED_DSL_BLOCK("Expected an indented DSL block defining this DSL expression", 0),
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),
 	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
 	ILLEGAL_INDENTED_BLOCK("Indented block cannot appear here", 0),

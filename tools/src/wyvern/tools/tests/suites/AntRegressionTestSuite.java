@@ -48,7 +48,6 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				
 				
 				// these tests use the new parser but old IL
-				RossettaCodeTests.class,
 				DemoTests.class,
 				
 				CodegenTests.class,		// tests the old translation to the new IL
@@ -57,6 +56,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				LexingTests.class,		// tests the new lexer
 				CoreParserTests.class,	// tests the new parser
 				ILTests.class,			// tests the new IL
+				RossettaCodeTests.class,// a few of these are out of date, but some use new everything
         FFITests.class,
         OIRTests.class,
 				OOPSLA16.class,		// tests the new IL

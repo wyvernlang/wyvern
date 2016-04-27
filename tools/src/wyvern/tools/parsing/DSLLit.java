@@ -28,6 +28,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 	Optional<String> dslText = Optional.empty();
 	TypedAST dslAST = null;
 	Type dslASTType = null;
+	FileLocation location;
 
 	public void setText(String text) {
 		if (dslText == null)
@@ -38,6 +39,11 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 	public Optional<String> getText() { return dslText; }
 
 	public DSLLit(Optional<String> dslText) {
+		this.dslText = (dslText);
+	}
+
+	public DSLLit(Optional<String> dslText, FileLocation loc) {
+		location = loc;
 		this.dslText = (dslText);
 	}
 
@@ -92,7 +98,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 
 	@Override
 	public FileLocation getLocation() {
-		return null;
+		return location;
 	}
 
 	@Override
@@ -102,7 +108,6 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented");
 	}
 }
