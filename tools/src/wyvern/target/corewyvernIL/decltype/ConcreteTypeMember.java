@@ -4,17 +4,29 @@ import java.io.IOException;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 
 
 public class ConcreteTypeMember extends DeclTypeWithResult {
 	
 	public ConcreteTypeMember(String name, ValueType sourceType) {
-		super(name, sourceType);
+		this(name, sourceType, null);
 	}
+	public ConcreteTypeMember(String name, ValueType sourceType, IExpr metadata) {
+		super(name, sourceType);
+		this.metadata = metadata;
+	}
+	
+	private IExpr metadata;
 
 	/*public void setSourceType (ValueType _type)
 	{
@@ -24,6 +36,13 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 	public ValueType getSourceType ()
 	{
 		return getRawResultType();
+	}
+	
+	public Value getMetadataValue() {
+		if (!(metadata instanceof Value)) {
+			ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);;			
+		}
+		return (Value) metadata;
 	}
 
 	@Override
@@ -81,6 +100,13 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 
 	@Override
 	public DeclType adapt(View v) {
-		return new ConcreteTypeMember(getName(), this.getRawResultType().adapt(v));
+		return new ConcreteTypeMember(getName(), this.getRawResultType().adapt(v), metadata);
+	}
+	
+	@Override
+	public DeclType interpret(EvalContext ctx) {
+		if (metadata == null)
+			return this;
+		return new ConcreteTypeMember(getName(), this.getRawResultType(), metadata.interpret(ctx));
 	}
 }

@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
@@ -63,5 +64,12 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 
 	public boolean equalsInContext(ValueType otherType, TypeContext ctx) {
 		return this.isSubtypeOf(otherType, ctx) && otherType.isSubtypeOf(this, ctx);
+	}
+
+	/**
+	 * Evaluates any metadata that might be present in this type to a value  
+	 */
+	public ValueType interpret(EvalContext ctx) {
+		return this;
 	}
 }

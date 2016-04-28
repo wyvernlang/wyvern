@@ -152,10 +152,10 @@ public class New extends Expression {
 		// evaluate all decls
 		List<Declaration> ds = new LinkedList<Declaration>();
 		for (Declaration d : decls_ExceptDelegate()) {;
-		Declaration newD = d.interpret(ctx);
-		ds.add(newD);
+		    Declaration newD = d.interpret(ctx);
+		    ds.add(newD);
 		}
-		result = new ObjectValue(ds, selfName, getExprType(),delegateDeclaration, ctx);
+		result = new ObjectValue(ds, selfName, getExprType().interpret(ctx),delegateDeclaration, ctx);
 
 		return result;
 	}

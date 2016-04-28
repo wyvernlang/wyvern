@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.decltype;
 
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
@@ -19,4 +20,11 @@ public abstract class DeclType extends ASTNode implements EmitOIR {
 	public abstract boolean isSubtypeOf(DeclType dt, TypeContext ctx);
 
 	public abstract DeclType adapt(View v);
+
+	/**
+	 * Evaluates any metadata that might be present in this type to a value  
+	 */
+	public DeclType interpret(EvalContext ctx) {
+		return this;
+	}
 }

@@ -1,0 +1,11 @@
+module postfix
+
+import stdout	// TODO: should be "require" - but for metadata shouldn't exist :-)
+
+type PostfixExpr
+    def eval():Int
+// TODO: get metadata to work in this situation as well!
+//    type T = Int
+//        val x:Int
+//        metadata "hello"+7
+    metadata stdout.print("ran metadata!")

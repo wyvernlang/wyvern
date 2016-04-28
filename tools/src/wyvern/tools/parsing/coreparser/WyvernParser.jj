@@ -299,7 +299,7 @@ AST DelegateDeclaration() :
 }
 
 AST TypeDeclaration() :
-{ Token name; AST body = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
+{ Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
   Object tagInfo = null; boolean isResource = false;
 }
 {
@@ -308,11 +308,13 @@ AST TypeDeclaration() :
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
-  <NEWLINE> [<INDENT> body=DeclTypes() <DEDENT>] {
+  <NEWLINE> [<INDENT> body=DeclTypes()
+                    [ <METADATA> metadata = ExpressionLine(false) ]
+             <DEDENT>] {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     } 
-	return build.typeDecl(name.image, body, tagInfo, null, loc(name), isResource);
+	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource);
   }
 }
 
@@ -321,7 +323,6 @@ AST DeclTypes() :
 {
   decl1 = DeclType()
   ( decl2 = DeclType() { decl1 = build.sequence(decl1, decl2, true); } )*
-  [ <METADATA> body = ExpressionLine(false) ]
     { return decl1; }
 }
 

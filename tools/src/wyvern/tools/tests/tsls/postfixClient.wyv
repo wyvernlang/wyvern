@@ -1,0 +1,6 @@
+import tsls.postfix
+
+val expr:postfix.PostfixExpr = new
+	def eval():Int = 3
+	
+expr.eval()

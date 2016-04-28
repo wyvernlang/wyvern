@@ -30,6 +30,7 @@ import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -52,6 +53,7 @@ public class TypeVarDecl extends Declaration {
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
+    private Expression metadataExp = null;
 
 	/**
 	 * Helper class to allow easy variation of bound types
@@ -279,13 +281,27 @@ public class TypeVarDecl extends Declaration {
 	@Override
 	public DeclType genILType(GenContext ctx) {
 		StructuralType type = computeInternalILType(ctx);
-		return new ConcreteTypeMember(getName(), type);
+		return new ConcreteTypeMember(getName(), type, getMetadata(ctx));
 	}
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		return computeInternalDecl(ctx);
+	}
+	
+	private Expression getMetadata(GenContext ctx) {
+		if (metadata.get().isPresent()) {
+			if (metadataExp == null)
+				metadataExp = ((ExpressionAST)metadata.get().get()).generateIL(ctx, null);
+			return metadataExp;
+		} else {
+			return null;
+		}
+	}
+
+	private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
 		StructuralType type = computeInternalILType(ctx);
-		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getLocation());
+		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
 	}
 	
 	public boolean isResource() {
@@ -294,15 +310,12 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		StructuralType type = computeInternalILType(ctx);
-		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getLocation());
+		return computeInternalDecl(ctx);
 	}
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
-		wyvern.target.corewyvernIL.decl.Declaration decl =
-			new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(),
-					computeInternalILType(tlc.getContext()), getLocation());
+		wyvern.target.corewyvernIL.decl.Declaration decl = computeInternalDecl(tlc.getContext());
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}

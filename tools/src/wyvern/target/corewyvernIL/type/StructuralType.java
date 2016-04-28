@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -143,6 +144,15 @@ public class StructuralType extends ValueType {
 			newDTs.add(dt.adapt(v));
 		}
 		return new StructuralType(selfName, newDTs, isResource(GenContext.empty()));
+	}
+
+	@Override
+	public ValueType interpret(EvalContext ctx) {
+		List<DeclType> newDTs = new LinkedList<DeclType>();
+		for (DeclType dt : getDeclTypes()) {
+			newDTs.add(dt.interpret(ctx));
+		}
+		return new StructuralType(selfName, newDTs, isResource(ctx));
 	}
 
 	/*@Override

@@ -22,12 +22,14 @@ public enum ErrorMessage {
 	CANNOT_INFER_ARG_TYPE("Cannot infer the argument type as there is no expected type for the function expression", 0),
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
 	MUST_BE_RESOURCE_TYPE("%ARG type must be resource", 1),
+	CANNOT_USE_METADATA_IN_SAME_FILE("Cannot use a TSL in the same file as the defining type",0),
 	
 	// Syntax errors
 	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
 	UNEXPECTED_INPUT("Unexpected input", 0),
 	UNEXPECTED_INPUT_WITH_ARGS("Unexpected input: %ARG", 1),
 	INDENT_DEDENT_MISMATCH("Expected dedent to match earlier indent", 0),
+	INCONSISTENT_INDENT("Expected indent to match or extend earlier indent", 0),
 	EXPECTED_TOKEN_NOT_EOF("Expected an expression but reached end of file", 0),
 	EXPECTED_NEW_BLOCK("Expected an indented block with definitions for the new expression", 0),
 	EXPECTED_DSL_BLOCK("Expected an indented DSL block defining this DSL expression", 0),
@@ -67,7 +69,8 @@ public enum ErrorMessage {
 	
 	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
 	
-	PARSE_ERROR("%ARG", 1);
+	PARSE_ERROR("%ARG", 1),
+	;
 	
 	private ErrorMessage(String message, int numArgs) {
 		this.errorMessage = message;
