@@ -1,5 +1,11 @@
 import java:wyvern.stdlib.support.Stdio.stdio
 
+// TODO: define me, probably using a stream abstraction for efficiency
+// actually this should probably go in a stream library
+// not associated with the standard output stream in particular
+type Printable
+
+
 def print(text:String):Unit
 	stdio.print(text)
 
