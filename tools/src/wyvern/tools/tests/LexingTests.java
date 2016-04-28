@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.lexing.WyvernLexer;
 import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.tests.suites.RegressionTests;
@@ -271,7 +272,7 @@ public class LexingTests {
 				"\t baz\n";
 		tryLex(input);
 	}
-	@Test(expected = CopperParserException.class)
+	@Test(expected = ToolError.class)
 	public void badDedent() throws IOException, CopperParserException {
 		String input =
 				"foo\n" +
