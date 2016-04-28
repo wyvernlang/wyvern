@@ -23,6 +23,8 @@ import java.net.URI;
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.parsing.coreparser.Token;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 
 %%
 %parser WyvernLexer
@@ -35,6 +37,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	Stack<String> indents = new Stack<String>();	// the stack of indents
 	
 	/********************** HELPER FUNCTIONS ************************/
+	
+    FileLocation loc(Token t) {
+        return new FileLocation(virtualLocation.getFileName(), t.beginLine, t.beginColumn);
+    }
 	
 	/** @return 1 for an indent, -n for n dedents, or 0 for the same indentation level
 	 */
@@ -51,7 +57,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 			if (newIndent.equals(currentIndent))
 				return dedentCount;
 			else
-				throw new CopperParserException("Illegal dedent at line "+tokenLoc.beginLine+": does not match any previous indent level");
+				ToolError.reportError(ErrorMessage.INCONSISTENT_INDENT, loc(tokenLoc));
+                throw new CopperParserException("Illegal dedent at line "+tokenLoc.beginLine+": does not match any previous indent level");
 		} else if (newIndent.length() > currentIndent.length()) {
 			// indent
 			if (newIndent.startsWith(currentIndent)) {
