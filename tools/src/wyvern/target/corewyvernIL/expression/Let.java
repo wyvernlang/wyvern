@@ -1,6 +1,5 @@
 package wyvern.target.corewyvernIL.expression;
 
-import static wyvern.tools.errors.ErrorMessage.MODULE_TYPE_ERROR;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.io.IOException;
@@ -45,11 +44,15 @@ public class Let extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		ValueType t = getToReplace().typeCheck(ctx);
-		if (!t.isSubtypeOf(binding.getType(), ctx)) {
+		return doTypeCheck(ctx, ctx);
+	}
+
+	protected ValueType doTypeCheck(TypeContext preambleCtx, TypeContext bodyCtx) {
+		ValueType t = getToReplace().typeCheck(preambleCtx);
+		if (!t.isSubtypeOf(binding.getType(), preambleCtx)) {
 			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
 		}
-		this.setExprType(inExpr.typeCheck(ctx.extend(getVarName(), binding.getType())));
+		this.setExprType(inExpr.typeCheck(bodyCtx.extend(getVarName(), binding.getType())));
 		return getExprType();
 	}
 

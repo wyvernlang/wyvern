@@ -9,9 +9,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -24,7 +25,6 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
-import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -55,20 +55,50 @@ public class ILTests {
     }
 
 	@Test
-    public void testLetVal() {
-    	NominalType Int = new NominalType("system", "Int");
-    	Variable x = new Variable("x");
-    	IntegerLiteral five = new IntegerLiteral(5);
-    	Expression letExpr = new Let("x", Int, five, x);
-    	
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = letExpr.typeCheck(ctx);
+	public void testLet() {
+		NominalType Int = new NominalType("system", "Int");
+		IntegerLiteral five = new IntegerLiteral(5);
+		Expression letExpr = new Let("x", Int, five, new Variable("x"));
+		ValueType t = letExpr.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Int, t);
 		Value v = letExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(five, v);
-    }
-    
-    @Test
+	}
+
+	@Test
+	public void testLetOutside() {
+		NominalType Int = new NominalType("system", "Int");
+		IntegerLiteral six = new IntegerLiteral(6);
+		Expression letExpr = new Let(new VarBinding("x", Int, new IntegerLiteral(5)), new Variable("y"));
+		ValueType t = letExpr.typeCheck(TypeContext.empty().extend("y", Int));
+		Assert.assertEquals(Int, t);
+		Value v = letExpr.interpret(EvalContext.empty().extend("y", six));
+		Assert.assertEquals(six, v);
+	}
+
+	@Test
+	public void testBind() {
+		NominalType Int = new NominalType("system", "Int");
+		IntegerLiteral five = new IntegerLiteral(5);
+		Expression bindExpr = new Bind(new VarBinding("x", Int, five), new Variable("x"));
+		ValueType t = bindExpr.typeCheck(TypeContext.empty());
+		Assert.assertEquals(Int, t);
+		Value v = bindExpr.interpret(EvalContext.empty());
+		Assert.assertEquals(five, v);
+	}
+
+	@Test
+	public void testBindOutside() {
+		NominalType Int = new NominalType("system", "Int");
+		Expression bindExpr = new Bind(new VarBinding("x", Int, new IntegerLiteral(5)), new Variable("y"));
+		try {
+			bindExpr.typeCheck(TypeContext.empty().extend("y", Int));
+			Assert.fail("Typechecking should have failed.");
+		} catch (RuntimeException e) {
+		}
+	}
+
+	@Test
     public void testLetValWithParse() throws ParseException {
         String input =
                   "val x = 5\n"
