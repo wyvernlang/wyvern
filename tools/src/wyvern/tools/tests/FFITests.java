@@ -146,7 +146,7 @@ public class FFITests {
       "val m : MathType = math\n" +
       "val x : system.Int = m.pow(2, 8)\n" +
       "x\n";
-    testPyFromInput(input, "256.0", true);
+    testPyFromInput(input, "256.0");
   }
 
   @Test

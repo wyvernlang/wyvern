@@ -363,4 +363,13 @@ public class OIRTests {
       "x\n";
     testPyFromInput(input, "7");
   }
+
+  @Test
+  public void testNameCollision() throws ParseException {
+    String input =
+      "val letFn0 = 3\n" +
+      "val x = 5\n" +
+      "x + letFn0\n";
+    testPyFromInput(input, "8", true);
+  }
 }

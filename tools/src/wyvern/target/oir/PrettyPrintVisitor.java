@@ -100,7 +100,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     }
 
     String python =
-      oirast.acceptVisitor(this, state);
+      NameMangleVisitor.mangleAST(oirast).acceptVisitor(this, state);
     String[] lines = python.split("\\n");
     int lastIndex = lines.length-1;
     lines[lastIndex] = "print(" + lines[lastIndex] + ")";
