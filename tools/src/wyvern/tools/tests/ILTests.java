@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -126,8 +127,8 @@ public class ILTests {
         String input = "val identity = (x: system.Int) => x\n"
                      + "   identity(5)";
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(TestUtil.getStandardGenContext(), null);
-        TypeContext ctx = TestUtil.getStandardTypeContext();
+        Expression program = ast.generateIL(Globals.getStandardGenContext(), null);
+        TypeContext ctx = Globals.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.intType(), t);
         Value v = program.interpret(EvalContext.empty());
@@ -292,7 +293,7 @@ public class ILTests {
 	// TODO: make other string tests call this function
 	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), null));
 		Expression program = ast.generateIL(genCtx, null);
         doChecks(program, expectedType, expectedResult);
 	}
@@ -621,8 +622,8 @@ public class ILTests {
 
 	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
 		TypedAST ast = TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
-		TypeContext ctx = TestUtil.getStandardTypeContext();
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
+		TypeContext ctx = Globals.getStandardTypeContext();
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 		Expression mainProgram = ((DefDeclaration)decl).getBody();
 		Expression program = new FieldGet(mainProgram, fieldName, null); // slightly hacky		
@@ -658,7 +659,7 @@ public class ILTests {
         String source = TestUtil.readFile(PATH + fileName);
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
         InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), null);
-		GenContext genCtx = TestUtil.getGenContext(state);
+		GenContext genCtx = Globals.getGenContext(state);
         Expression program = ast.generateIL(genCtx, null);
         doChecks(program, expectedType, expectedValue);
 	}
@@ -672,13 +673,13 @@ public class ILTests {
 	
 	private static void doChecks(Expression program, ValueType expectedType, Value expectedValue) {
         // resolveModule already typechecked, but we'll do it again to verify the type
-		TypeContext ctx = TestUtil.getStandardTypeContext();
+		TypeContext ctx = Globals.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
         if (expectedType != null)
         	Assert.assertEquals(expectedType, t);
         
         // check the result
-        Value v = program.interpret(TestUtil.getStandardEvalContext());
+        Value v = program.interpret(Globals.getStandardEvalContext());
         if (expectedValue != null)
         	Assert.assertEquals(expectedValue, v);
 	}
@@ -715,10 +716,10 @@ public class ILTests {
 
 	private void doTestTypeFail(String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		try {
 			Expression program = ast.generateIL(genCtx, null);
-			program.typeCheck(TestUtil.getStandardTypeContext());
+			program.typeCheck(Globals.getStandardTypeContext());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
 		}
@@ -731,7 +732,7 @@ public class ILTests {
                      + "    4 5 +\n"
                      ;
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		// IL generation doesn't work yet!
 		//Expression program = ast.generateIL(genCtx, null);
 	}
@@ -749,7 +750,7 @@ public class ILTests {
                      
                      ;
         TypedAST ast = TestUtil.getNewAST(input);
-		GenContext genCtx = TestUtil.getGenContext(new InterpreterState(null, null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		// IL generation doesn't work yet!
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 	}

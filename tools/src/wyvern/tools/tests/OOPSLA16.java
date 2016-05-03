@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -22,7 +23,6 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -43,8 +43,8 @@ public class OOPSLA16 {
 	public void testFigure5Corrected() throws ParseException {
 
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
+		GenContext genCtx = Globals.getStandardGenContext();
+		TypeContext ctx = Globals.getStandardTypeContext();
 		//GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
@@ -135,8 +135,8 @@ public class OOPSLA16 {
 	@Test
 	public void testFigure2() throws ParseException {
 		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
-		GenContext genCtx = TestUtil.getStandardGenContext();
-		TypeContext ctx = TestUtil.getStandardTypeContext();
+		GenContext genCtx = Globals.getStandardGenContext();
+		TypeContext ctx = Globals.getStandardTypeContext();
 
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
