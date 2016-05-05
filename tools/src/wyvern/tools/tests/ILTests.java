@@ -1,6 +1,9 @@
 package wyvern.tools.tests;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +61,7 @@ public class ILTests {
 	public void testLet() {
 		NominalType Int = new NominalType("system", "Int");
 		IntegerLiteral five = new IntegerLiteral(5);
-		Expression letExpr = new Let("x", Int, five, new Variable("x"));
+		Expression letExpr = new Let(new VarBinding("x", Int, five), new Variable("x"));
 		ValueType t = letExpr.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Int, t);
 		Value v = letExpr.interpret(EvalContext.empty());
@@ -80,7 +83,9 @@ public class ILTests {
 	public void testBind() {
 		NominalType Int = new NominalType("system", "Int");
 		IntegerLiteral five = new IntegerLiteral(5);
-		Expression bindExpr = new Bind(new VarBinding("x", Int, five), new Variable("x"));
+		Expression bindExpr = new Bind(
+				new ArrayList<VarBinding>(Arrays.asList(new VarBinding("x", Int, five))),
+				new Variable("x"));
 		ValueType t = bindExpr.typeCheck(TypeContext.empty());
 		Assert.assertEquals(Int, t);
 		Value v = bindExpr.interpret(EvalContext.empty());
@@ -88,9 +93,25 @@ public class ILTests {
 	}
 
 	@Test
+	public void testMultiVarBind() {
+		NominalType Int = new NominalType("system", "Int");
+		Expression bindExpr = new Bind(new ArrayList<VarBinding>(Arrays.asList(
+				new VarBinding("x", Int, new IntegerLiteral(1)),
+				new VarBinding("y", Int, new IntegerLiteral(2)),
+				new VarBinding("z", Int, new IntegerLiteral(3)))),
+				new Variable("y"));
+		ValueType t = bindExpr.typeCheck(TypeContext.empty());
+		Assert.assertEquals(Int, t);
+		Value v = bindExpr.interpret(EvalContext.empty());
+		Assert.assertEquals(new IntegerLiteral(2), v);
+	}
+
+	@Test
 	public void testBindOutside() {
 		NominalType Int = new NominalType("system", "Int");
-		Expression bindExpr = new Bind(new VarBinding("x", Int, new IntegerLiteral(5)), new Variable("y"));
+		Expression bindExpr = new Bind(
+				new ArrayList<VarBinding>(Arrays.asList(new VarBinding("x", Int, new IntegerLiteral(5)))),
+				new Variable("y"));
 		try {
 			bindExpr.typeCheck(TypeContext.empty().extend("y", Int));
 			Assert.fail("Typechecking should have failed.");
