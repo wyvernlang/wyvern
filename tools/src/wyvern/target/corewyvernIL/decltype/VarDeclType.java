@@ -77,4 +77,13 @@ public class VarDeclType extends DeclTypeWithResult implements EmitOIR{
 		getRawResultType().doPrettyPrint(dest, indent);
 		dest.append('\n');
 	}
+	@Override
+	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
+		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
+		if (t.equals(this.getRawResultType())) {
+			return this;
+		} else {
+			return new VarDeclType(this.getName(),t);
+		}
+	}
 }

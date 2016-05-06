@@ -282,7 +282,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(ctx, dependencies);
 			
 			Expression e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second, dependencies);
-			return new Let(bindingAndCtx.first, e);
+			final Let letBinding = new Let(bindingAndCtx.first, e);
+			
+			ValueType t = letBinding.typeCheck(ctx); // sanity check - catch errors early
+			return letBinding;
 		} else {
 			// must be instantiate
 

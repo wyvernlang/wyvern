@@ -155,6 +155,36 @@ public class StructuralType extends ValueType {
 		return new StructuralType(selfName, newDTs, isResource(ctx));
 	}
 
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		final TypeContext selfCtx = ctx.extend(selfName, this);
+		for (DeclType dt : declTypes) {
+			dt.checkWellFormed(selfCtx);
+		}
+	}
+
+	@Override
+	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
+		if (count > MAX_RECURSION_DEPTH)
+			return this;
+		if (varName.equals(selfName))
+			return this;
+		List<DeclType> newDeclTypes = new LinkedList<DeclType>();
+		boolean changed = false;
+		for (DeclType dt : declTypes) {
+			DeclType newDT = dt.doAvoid(varName, ctx, count+1);
+			newDeclTypes.add(newDT);
+			if (newDT != dt) {
+				changed = true;
+			}
+		}
+		if (!changed) {
+			return this;
+		} else {
+			return new StructuralType(selfName, newDeclTypes, resourceFlag);
+		}
+	}
+
 	/*@Override
 	public String toString() {
 		String ret = (resourceFlag?"[resource ":"[") + selfName + " => ";

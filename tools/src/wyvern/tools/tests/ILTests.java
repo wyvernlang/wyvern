@@ -59,7 +59,7 @@ public class ILTests {
 		NominalType Int = new NominalType("system", "Int");
 		IntegerLiteral five = new IntegerLiteral(5);
 		Expression letExpr = new Let("x", Int, five, new Variable("x"));
-		ValueType t = letExpr.typeCheck(TypeContext.empty());
+		ValueType t = letExpr.typeCheck(TestUtil.getStandardTypeContext());
 		Assert.assertEquals(Int, t);
 		Value v = letExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(five, v);
@@ -67,11 +67,10 @@ public class ILTests {
 
 	@Test
 	public void testLetOutside() {
-		NominalType Int = new NominalType("system", "Int");
 		IntegerLiteral six = new IntegerLiteral(6);
-		Expression letExpr = new Let(new VarBinding("x", Int, new IntegerLiteral(5)), new Variable("y"));
-		ValueType t = letExpr.typeCheck(TypeContext.empty().extend("y", Int));
-		Assert.assertEquals(Int, t);
+		Expression letExpr = new Let(new VarBinding("x", Util.intType(), new IntegerLiteral(5)), new Variable("y"));
+		ValueType t = letExpr.typeCheck(TestUtil.getStandardTypeContext().extend("y", Util.intType()));
+		Assert.assertEquals(Util.intType(), t);
 		Value v = letExpr.interpret(EvalContext.empty().extend("y", six));
 		Assert.assertEquals(six, v);
 	}
@@ -81,7 +80,7 @@ public class ILTests {
 		NominalType Int = new NominalType("system", "Int");
 		IntegerLiteral five = new IntegerLiteral(5);
 		Expression bindExpr = new Bind(new VarBinding("x", Int, five), new Variable("x"));
-		ValueType t = bindExpr.typeCheck(TypeContext.empty());
+		ValueType t = bindExpr.typeCheck(TestUtil.getStandardTypeContext());
 		Assert.assertEquals(Int, t);
 		Value v = bindExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(five, v);
@@ -92,7 +91,7 @@ public class ILTests {
 		NominalType Int = new NominalType("system", "Int");
 		Expression bindExpr = new Bind(new VarBinding("x", Int, new IntegerLiteral(5)), new Variable("y"));
 		try {
-			bindExpr.typeCheck(TypeContext.empty().extend("y", Int));
+			bindExpr.typeCheck(TestUtil.getStandardTypeContext().extend("y", Int));
 			Assert.fail("Typechecking should have failed.");
 		} catch (RuntimeException e) {
 		}
@@ -382,9 +381,9 @@ public class ILTests {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
 		
-		GenContext genCtx = new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), Util.unitType());
+		GenContext genCtx = TestUtil.getStandardGenContext().extend("D",  new Variable("D"), Util.unitType());//new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system")).extend("D",  new Variable("D"), Util.unitType());
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
-    	TypeContext ctx = TypeContext.empty().extend("D", Util.unitType());
+    	TypeContext ctx = TestUtil.getStandardTypeContext().extend("D", Util.unitType());
     	
 		DeclType t = decl.typeCheck(ctx, ctx);
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
@@ -400,8 +399,8 @@ public class ILTests {
 	public void testMultipleModules() throws ParseException {
 		
 		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv", "main.wyv"};
-		GenContext genCtx = new EmptyGenContext(new InterpreterState(null, null)).extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
+		GenContext genCtx = TestUtil.getStandardGenContext();
+		//genCtx = new TypeGenContext("Int", "system", genCtx);
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
@@ -419,7 +418,7 @@ public class ILTests {
 		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
 		Expression program = new FieldGet(mainProgram, "x", null); 
 		
-    	TypeContext ctx = TypeContext.empty();
+    	TypeContext ctx = TestUtil.getStandardTypeContext();
 		ValueType t = program.typeCheck(ctx);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral three = new IntegerLiteral(3);
@@ -451,6 +450,7 @@ public class ILTests {
 	}
 	
 	@Test
+    @Category(CurrentlyBroken.class)
 	public void testFact() throws ParseException {
 		doTestScriptModularly("modules.module.bool-nat-fact", null, null);
 		
@@ -737,8 +737,15 @@ public class ILTests {
 	}
 
 	@Test
+    @Category(CurrentlyBroken.class)
 	public void testTSL() throws ParseException {
 		doTestScriptModularly("tsls.postfixClient", Util.intType(), new IntegerLiteral(3));
+	}
+	
+	// tests import-dependent types
+	@Test
+	public void testIDT() throws ParseException {
+		doTestScriptModularly("modules.IDT3", Util.intType(), new IntegerLiteral(3));
 	}
 	
 	@Test

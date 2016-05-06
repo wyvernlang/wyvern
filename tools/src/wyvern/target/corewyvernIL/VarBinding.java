@@ -1,9 +1,11 @@
 package wyvern.target.corewyvernIL;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.ValueType;
 
-public class VarBinding {
+public class VarBinding extends ASTNode {
 	private String varName;
 	private ValueType type;
 	private Expression expr;
@@ -25,5 +27,13 @@ public class VarBinding {
 
 	public Expression getExpression() {
 		return expr;
+	}
+	
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append(getVarName()).append(" : ");
+		getType().doPrettyPrint(dest, indent);
+		dest.append(" = ");
+		getExpression().doPrettyPrint(dest,indent);
+		dest.append('\n');
 	}
 }

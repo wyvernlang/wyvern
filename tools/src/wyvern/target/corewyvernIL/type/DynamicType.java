@@ -44,4 +44,14 @@ public class DynamicType extends ValueType {
 	public ValueType adapt(View v) {
 		return this;
 	}
+
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		// this type is always well-formed!
+	}
+
+	@Override
+	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
+		return this;
+	}
 }

@@ -34,6 +34,6 @@ public class VarBindingContext extends TypeContext {
 	
 	@Override
 	protected String endToString() {
-		return "]";
+		return varName + " : " + type + ", " + getNext().endToString();
 	}
 }

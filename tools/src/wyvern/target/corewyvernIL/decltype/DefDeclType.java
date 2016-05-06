@@ -112,4 +112,33 @@ public class DefDeclType extends DeclTypeWithResult {
 		}
 		return new DefDeclType(this.getName(), this.getRawResultType().adapt(v), newArgs);
 	}
+	
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		for (FormalArg arg : args) {
+			arg.getType().checkWellFormed(ctx);
+		}
+		super.checkWellFormed(ctx);
+	}
+
+	@Override
+	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
+		boolean changed = false;
+		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
+		if (t.equals(this.getRawResultType())) {
+			changed = true;
+		}
+		List<FormalArg> newArgs = new LinkedList<FormalArg>();
+		for (FormalArg arg : args) {
+			ValueType argT = arg.getType().doAvoid(varName, ctx, count);
+			if (!argT.equals(arg.getType())) {
+				changed = true;
+			}
+			newArgs.add(new FormalArg(arg.getName(), argT));
+		}
+		if (!changed)
+			return this;
+		else
+			return new DefDeclType(this.getName(), t, newArgs);
+	}
 }

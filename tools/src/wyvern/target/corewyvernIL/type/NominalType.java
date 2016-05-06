@@ -8,10 +8,14 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 
 public class NominalType extends ValueType {
 	private Path path;
@@ -47,7 +51,7 @@ public class NominalType extends ValueType {
 
 	@Override
 	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
-		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 			return vt.getStructuralType(ctx, theDefault);
@@ -55,10 +59,14 @@ public class NominalType extends ValueType {
 			return super.getStructuralType(ctx, theDefault);
 		}
 	}
+
+	private DeclType getSourceDeclType(TypeContext ctx) {
+		return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+	}
 	
 	@Override
 	public ValueType getCanonicalType(TypeContext ctx) {
-		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			return ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx)).getCanonicalType(ctx);
 		} else {
@@ -88,7 +96,7 @@ public class NominalType extends ValueType {
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
 		if (super.isSubtypeOf(t, ctx))
 			return true;
-		DeclType dt = path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 			return vt.isSubtypeOf(t, ctx);
@@ -109,4 +117,38 @@ public class NominalType extends ValueType {
 		return new NominalType(path.adapt(v), typeMember);
 	}
 	
+	@Override
+	public Value getMetadata(TypeContext ctx) {
+		DeclType t = getSourceDeclType(ctx);
+		return t.getMetadataValue();
+	}
+
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		// we are well-formed as long as we can get this without an error
+		this.getSourceDeclType(ctx);
+	}
+
+	@Override
+	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
+		if (count > MAX_RECURSION_DEPTH)
+			return this;
+		if (path.getFreeVariables().contains(varName)) {
+			DeclType dt = this.getSourceDeclType(ctx);
+			if (dt instanceof ConcreteTypeMember) {
+				final ValueType type = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+				if (type.equals(this)) {
+					// avoid infinite loops, just in case
+					ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+				}
+				return type.doAvoid(varName, ctx, count+1);
+			} else {
+				ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+				throw new RuntimeException(); // cannot get here
+			}
+		} else {
+			return this;
+		}
+	}
+
 }

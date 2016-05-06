@@ -6,7 +6,9 @@ import java.util.Optional;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.TSLBlock;
@@ -108,6 +110,19 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
-		throw new RuntimeException("not implemented");
+		if (expectedType == null) {
+			ToolError.reportError(ErrorMessage.NO_EXPECTED_TYPE, this);
+		}
+		try {
+			return (Expression) expectedType.getMetadata(ctx);
+		} catch (ToolError e) {
+			if (e.getTypecheckingErrorMessage() == ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE) {
+				if (e.getLocation() == null) {
+					// provide an error with the usage location
+					ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
+				}
+			}
+			throw e;
+		}
 	}
 }

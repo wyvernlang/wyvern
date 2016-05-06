@@ -135,7 +135,7 @@ public class New extends Expression {
 		StructuralType requiredT = type.getStructuralType(ctx);
 		StructuralType actualT = new StructuralType(selfName, dts);
 		if (!actualT.isSubtypeOf(requiredT, ctx)) {
-			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName());;
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName());
 		}
 
 		if (isResource && !requiredT.isResource(GenContext.empty())) {

@@ -1,3 +1,6 @@
+// TODO: make a resource module!
+module stdout
+
 import java:wyvern.stdlib.support.Stdio.stdio
 
 // TODO: define me, probably using a stream abstraction for efficiency

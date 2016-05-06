@@ -283,6 +283,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		
 		ValueType expectedType = getILValueType(thisContext);
+		/* uses ctx for generating the definition, as the selfName is not in scope */
 		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType), location);
 	}
 

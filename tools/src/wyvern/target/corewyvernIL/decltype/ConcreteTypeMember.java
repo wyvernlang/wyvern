@@ -38,9 +38,18 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 		return getRawResultType();
 	}
 	
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		/*if (metadata != null) {
+			ValueType t = metadata.typeCheck(ctx);
+			t.checkWellFormed(ctx);
+		}*/
+		super.checkWellFormed(ctx);
+	}
+	@Override
 	public Value getMetadataValue() {
 		if (!(metadata instanceof Value)) {
-			ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);;			
+			ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
 		}
 		return (Value) metadata;
 	}
@@ -108,5 +117,14 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 		if (metadata == null)
 			return this;
 		return new ConcreteTypeMember(getName(), this.getRawResultType(), metadata.interpret(ctx));
+	}
+	@Override
+	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
+		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
+		if (t.equals(this.getRawResultType())) {
+			return this;
+		} else {
+			return new ConcreteTypeMember(this.getName(),t, metadata);
+		}
 	}
 }

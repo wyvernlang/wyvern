@@ -471,7 +471,7 @@ import java.net.URI;
 	impSeq ::= impSeq:a Newline_t import:b {: RESULT = DeclSequence.simplify(new DeclSequence(a,b)); :}
 			|  import:a {: RESULT = a; :};
 
-	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos), null, false); :};
+	import ::= importKwd_t fragaddr:ur {: RESULT = new ImportDeclaration((URI)ur, new FileLocation(currentState.pos), null, false, false); :};
 
 	module ::= moduleKwd_t moduleName_t:id {: RESULT = id; :};
 

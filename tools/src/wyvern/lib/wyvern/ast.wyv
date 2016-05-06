@@ -1,0 +1,16 @@
+module ast
+
+type AST
+
+type Decl
+
+type Type
+
+def object(d:Decl):AST = new
+
+def defn(name:String,resultType:Type,body:AST):Decl = new
+
+def int(i:Int):AST = new
+
+val types = new
+	def int():Type = new

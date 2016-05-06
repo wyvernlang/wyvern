@@ -1,6 +1,12 @@
-import tsls.postfix
+
+import wyvern.ast // TODO: should not be necessary
+import wyvern.Int // TODO: should not be necessary
+import metadata tsls.postfix
 
 val expr:postfix.PostfixExpr = new
-	def eval():Int = 3
+	def eval():Int = 4
 	
-expr.eval()
+val expr2:postfix.PostfixExpr = ~
+	yeah, ignore all this!  woo hoo!
+
+expr2.eval()

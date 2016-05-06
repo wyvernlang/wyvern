@@ -44,7 +44,9 @@ public class Let extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		return doTypeCheck(ctx, ctx);
+		final ValueType type = doTypeCheck(ctx, ctx);
+		type.checkWellFormed(ctx);
+		return type;
 	}
 
 	protected ValueType doTypeCheck(TypeContext preambleCtx, TypeContext bodyCtx) {
@@ -52,19 +54,22 @@ public class Let extends Expression {
 		if (!t.isSubtypeOf(binding.getType(), preambleCtx)) {
 			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
 		}
-		this.setExprType(inExpr.typeCheck(bodyCtx.extend(getVarName(), binding.getType())));
+		final TypeContext extendedCtx = bodyCtx.extend(getVarName(), binding.getType());
+		final ValueType exprType = inExpr.typeCheck(extendedCtx);
+		final ValueType cleanExprType = exprType.avoid(binding.getVarName(), extendedCtx);
+		cleanExprType.checkWellFormed(preambleCtx);
+		this.setExprType(cleanExprType);
 		return getExprType();
 	}
 
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		String newIndent = indent + "    ";
-		dest.append("let\n").append(newIndent)
-		.append(getVarName()).append(" : ");
-		binding.getType().doPrettyPrint(dest, newIndent);
-		dest.append(" = ");
-		getToReplace().doPrettyPrint(dest,newIndent);
-		dest.append('\n').append(indent).append("in ");
+		dest.append("let\n");
+		
+		binding.doPrettyPrint(dest, newIndent);
+		
+		dest.append(indent).append("in ");
 		inExpr.doPrettyPrint(dest,indent);
 	}
 

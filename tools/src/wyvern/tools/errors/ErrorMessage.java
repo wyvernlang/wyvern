@@ -23,6 +23,10 @@ public enum ErrorMessage {
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
 	MUST_BE_RESOURCE_TYPE("%ARG type must be resource", 1),
 	CANNOT_USE_METADATA_IN_SAME_FILE("Cannot use a TSL in the same file as the defining type",0),
+	NO_EXPECTED_TYPE("Cannot parse a DSL block without an expected type", 0),
+	NO_METADATA_FROM_RESOURCE("Cannot load metadata from a resource module",0),
+	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
+	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression", 1),
 	
 	// Syntax errors
 	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),

@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.support.ViewExtension;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
@@ -88,9 +89,14 @@ public class MethodCall extends Expression {
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
             }
 			ctx = ctx.extend(name, argType);
+			if (e instanceof Variable) {
+				v = new ViewExtension(new Variable(ddt.getFormalArgs().get(i).getName()),(Variable)e,v);
+			}
 		}
 		// compute result type
-		this.setExprType(ddt.getResultType(v));
+		ValueType resultType = ddt.getResultType(v);
+		resultType = resultType.adapt(v);
+		this.setExprType(resultType);
 		return getExprType();
 	}
 

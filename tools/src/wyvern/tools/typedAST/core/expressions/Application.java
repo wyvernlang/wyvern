@@ -20,7 +20,9 @@ import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
@@ -153,6 +155,9 @@ public class Application extends CachingTypedAST implements CoreAST {
         } else if (argument instanceof UnitVal) {
         	// leave args empty
         } else {
+        	if (formals.size() != 1)
+    			ToolError.reportError(ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS, this, ""+formals.size());
+        	
     		// TODO: propagate types downward from formals
         	args.add(argument.generateIL(ctx, formals.get(0).getType()));
         }

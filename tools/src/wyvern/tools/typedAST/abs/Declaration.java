@@ -95,6 +95,14 @@ public abstract class Declaration extends AbstractTreeWritable implements Enviro
 
 	public abstract DeclType genILType(GenContext ctx);
 
+	/** Generates code for a IL Declaration.
+	 * We pass in the context with and without a "this" binding. Most cases use thisContext but for var and val
+	 * we typecheck (and evaluate) the body before "this" is in scope, so ctx is used in that case.
+	 *  
+	 * @param ctx
+	 * @param thisContext
+	 * @return
+	 */
 	public abstract wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext);
 	
 	/**
