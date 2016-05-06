@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -221,7 +222,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         if (this.metadataFlag) {
         	if (module.getSpec().getType().isResource(ctx))
         		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
-        	Value v = importExp.interpret(TestUtil.getStandardEvalContext());
+        	Value v = importExp.interpret(Globals.getStandardEvalContext());
         	type = v.getType();
         } else {
         	type = module.getSpec().getType();

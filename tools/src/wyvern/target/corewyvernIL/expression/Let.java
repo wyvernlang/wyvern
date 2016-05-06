@@ -15,7 +15,6 @@ import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
 
 public class Let extends Expression {
-
 	private VarBinding binding;
 	private Expression inExpr;
 
@@ -44,20 +43,14 @@ public class Let extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		final ValueType type = doTypeCheck(ctx, ctx);
-		type.checkWellFormed(ctx);
-		return type;
-	}
-
-	protected ValueType doTypeCheck(TypeContext preambleCtx, TypeContext bodyCtx) {
-		ValueType t = getToReplace().typeCheck(preambleCtx);
-		if (!t.isSubtypeOf(binding.getType(), preambleCtx)) {
+		ValueType t = getToReplace().typeCheck(ctx);
+		if (!t.isSubtypeOf(binding.getType(), ctx)) {
 			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
 		}
-		final TypeContext extendedCtx = bodyCtx.extend(getVarName(), binding.getType());
+		final TypeContext extendedCtx = ctx.extend(getVarName(), binding.getType());
 		final ValueType exprType = inExpr.typeCheck(extendedCtx);
 		final ValueType cleanExprType = exprType.avoid(binding.getVarName(), extendedCtx);
-		cleanExprType.checkWellFormed(preambleCtx);
+		cleanExprType.checkWellFormed(ctx);
 		this.setExprType(cleanExprType);
 		return getExprType();
 	}
@@ -87,13 +80,11 @@ public class Let extends Expression {
 
 	@Override
 	public Set<String> getFreeVariables() {
-		
 		// Get free variables in the sub-expressions.
 		Set<String> freeVars = inExpr.getFreeVariables();
 		// Remove the name that just became bound.
 		freeVars.remove(getVarName());
 		freeVars.addAll(getToReplace().getFreeVariables());
-		
 		return freeVars;
 	}
 }
