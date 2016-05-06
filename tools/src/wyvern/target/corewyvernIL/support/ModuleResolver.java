@@ -1,15 +1,12 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-
-import wyvern.target.corewyvernIL.ContextBinding;
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
@@ -18,7 +15,6 @@ import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
-import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -30,7 +26,6 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 
 /** Resolves abstract module paths to concrete files, then parses the files into modules.
  *  Knows the root directory
@@ -149,7 +144,7 @@ public class ModuleResolver {
 		}
         
 		final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-		GenContext genCtx = TestUtil.getGenContext(state);
+		GenContext genCtx = Globals.getGenContext(state);
 		Expression program;
 		if (ast instanceof ExpressionAST) {
 			program = ((ExpressionAST)ast).generateIL(genCtx, null);
@@ -173,7 +168,7 @@ public class ModuleResolver {
 			throw new RuntimeException();
 		}
         
-		TypeContext ctx = TestUtil.getStandardTypeContext();
+		TypeContext ctx = Globals.getStandardTypeContext();
         ValueType moduleType = program.typeCheck(ctx);
         
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
