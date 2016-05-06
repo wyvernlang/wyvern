@@ -1,9 +1,17 @@
 package wyvern.tools.parsing;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Invokable;
+import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -114,7 +122,21 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			ToolError.reportError(ErrorMessage.NO_EXPECTED_TYPE, this);
 		}
 		try {
-			return (Expression) expectedType.getMetadata(ctx);
+			final wyvern.target.corewyvernIL.expression.Value metadata = expectedType.getMetadata(ctx);
+			if (!(metadata instanceof Invokable)) {
+				ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
+			}
+			ValueType metaType = metadata.getType();			
+			final DeclType parseTSLDecl = metaType.getStructuralType(ctx).findDecl("parseTSL", ctx);
+			if (parseTSLDecl == null) {
+				ToolError.reportError(ErrorMessage.METADATA_MUST_INCLUDE_PARSETSL, this, expectedType.toString());				
+			}
+			// TODO: check that parseTSLDecl has the right signature
+			List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
+			args.add(new StringLiteral(dslText.get()));
+			wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable)metadata).invoke("parseTSL", args);
+			ValDeclaration astDecl = (ValDeclaration)((ObjectValue)parsedAST).findDecl("ast");
+			return (Expression) ((JavaValue)astDecl.getDefinition()).getWrappedValue();
 		} catch (ToolError e) {
 			if (e.getTypecheckingErrorMessage() == ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE) {
 				if (e.getLocation() == null) {

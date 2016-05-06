@@ -7,6 +7,6 @@ val expr:postfix.PostfixExpr = new
 	def eval():Int = 4
 	
 val expr2:postfix.PostfixExpr = ~
-	yeah, ignore all this!  woo hoo!
+	7
 
 expr2.eval()

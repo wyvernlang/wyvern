@@ -113,12 +113,12 @@ public class GenUtil {
 
 		// TODO: might be unnecessary
 		if (javaClass.getName().equals("wyvern.target.corewyvernIL.expression.ObjectValue")) {
-			return Util.emptyType();
+			return Util.dynType();
 		}
 
 		// TODO: might be unnecessary
 		if (javaClass.getName().equals("java.lang.Object")) {
-			return Util.unitToDynType();
+			return Util.dynType();
 		}
 
 		if (javaClass.getName().equals("java.util.List")) {

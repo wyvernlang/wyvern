@@ -4,6 +4,6 @@ public class Int {
 	public static Int utils = new Int();
 
 	public int from(String s) {
-		return Integer.parseInt(s);
+		return Integer.parseInt(s.trim());
 	}
 }

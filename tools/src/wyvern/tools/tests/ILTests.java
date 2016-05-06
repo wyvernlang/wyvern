@@ -759,9 +759,8 @@ public class ILTests {
 	}
 
 	@Test
-    @Category(CurrentlyBroken.class)
 	public void testTSL() throws ParseException {
-		doTestScriptModularly("tsls.postfixClient", Util.intType(), new IntegerLiteral(3));
+		doTestScriptModularly("tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
 	}
 	
 	// tests import-dependent types

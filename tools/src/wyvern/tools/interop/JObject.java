@@ -94,5 +94,10 @@ public class JObject implements FObject {
 	public Class<?> getJavaClass() {
 		return jObject.getClass();
 	}
+	
+	@Override
+	public Object getWrappedValue() {
+		return jObject;
+	}
 
 }
