@@ -17,5 +17,7 @@ type PostfixExpr
     metadata new
         def parseTSL(input:String):AST
             ast.object(
-                ast.defn("eval",ast.types.int(),ast.int(Int.from(input)))
+                ast.defn("eval",ast.types.int(),
+					ast.call(ast.variable("Int"), "from", ast.string(input)) //ast.int(Int.from(input))
+				)
             )
