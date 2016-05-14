@@ -34,10 +34,6 @@ import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 
 class NameMangleState {
-    public HashSet<String> doNotMangle;
-    public NameMangleState() {
-        doNotMangle = new HashSet<String>();
-    }
 }
 
 public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
