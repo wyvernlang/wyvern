@@ -50,7 +50,7 @@ public class Let extends Expression {
 		final TypeContext extendedCtx = ctx.extend(getVarName(), binding.getType());
 		final ValueType exprType = inExpr.typeCheck(extendedCtx);
 		final ValueType cleanExprType = exprType.avoid(binding.getVarName(), extendedCtx);
-		cleanExprType.checkWellFormed(ctx);
+		//cleanExprType.checkWellFormed(ctx);
 		this.setExprType(cleanExprType);
 		return getExprType();
 	}

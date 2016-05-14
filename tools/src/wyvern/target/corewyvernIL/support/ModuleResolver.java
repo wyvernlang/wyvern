@@ -79,6 +79,15 @@ public class ModuleResolver {
 			}};*/
 	}
 	
+	public EvalContext contextWith(String qualifiedName) {
+		String names[] = qualifiedName.split("\\.");
+		String simpleName = names[names.length-1];
+		Module module = resolveModule(qualifiedName);
+		EvalContext ctx = Globals.getStandardEvalContext();
+		ctx = ctx.extend(simpleName, module.getExpression().interpret(ctx));
+		return ctx;
+	}
+	
 	/** The main utility function for the ModuleResolver.
 	 *  Accepts a string argument of the module name to import
 	 *  Loads a module expression from the file (or looks it up in a cache)
@@ -181,5 +190,9 @@ public class ModuleResolver {
 			program = new Let(m.getSpec().getQualifiedName(), m.getSpec().getType(), m.getExpression(), program);
 		}
 		return program;
+	}
+	
+	public static ModuleResolver getLocal() {
+		return InterpreterState.getLocalThreadInterpreter().getResolver();
 	}
 }
