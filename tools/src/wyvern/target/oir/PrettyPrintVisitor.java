@@ -75,7 +75,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       String name = pair.getKey();
       OIRType type = pair.getValue();
       if (type instanceof OIRClassDeclaration) {
-        state.classDecls.put(name, (OIRClassDeclaration)type);
+          state.classDecls.put(name, (OIRClassDeclaration)NameMangleVisitor.mangleAST(type));
       }
     }
     for (OIREnvironment child : oirenv.getChildren())
@@ -322,7 +322,8 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                       OIRVariable oirVariable) {
     String var;
     if (state.freeVarSet.contains(oirVariable.getName()))
-      var = "this.env['" + oirVariable.getName() + "']";
+        var = NameMangleVisitor.mangle("this") +
+            ".env['" + oirVariable.getName() + "']";
     else
       var = oirVariable.getName();
     if (state.expectingReturn)
@@ -409,32 +410,32 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRMethod oirMethod) {
-    String args = "this";
-    for (OIRFormalArg formalArg : oirMethod.getDeclaration().getArgs()) {
-      args += ", " + formalArg.getName();
-    }
-    String name = oirMethod.getDeclaration().getName();
-    String oldMethod = state.currentMethod;
-    state.currentMethod = name;
-    String def = "def " + name +
-      "(" + args + ")"+ ":";
+      String args = NameMangleVisitor.mangle("this");
+      for (OIRFormalArg formalArg : oirMethod.getDeclaration().getArgs()) {
+          args += ", " + formalArg.getName();
+      }
+      String name = oirMethod.getDeclaration().getName();
+      String oldMethod = state.currentMethod;
+      state.currentMethod = name;
+      String def = "def " + name +
+          "(" + args + ")"+ ":";
 
-    String oldIndent = indent;
-    indent += indentIncrement;
+      String oldIndent = indent;
+      indent += indentIncrement;
 
-    boolean oldExpectingReturn = state.expectingReturn;
-    state.expectingReturn = true;
+      boolean oldExpectingReturn = state.expectingReturn;
+      state.expectingReturn = true;
 
-    String body = "\n" + indent +
-      oirMethod.getBody().acceptVisitor(this, state);
+      String body = "\n" + indent +
+          oirMethod.getBody().acceptVisitor(this, state);
 
-    state.expectingReturn = oldExpectingReturn;
-    indent = oldIndent;
-    state.currentMethod = oldMethod;
+      state.expectingReturn = oldExpectingReturn;
+      indent = oldIndent;
+      state.currentMethod = oldMethod;
 
-    if (state.expectingReturn)
-      return def + body + "\n" + indent + "return " + oirMethod.getDeclaration().getName();
-    return def + body;
+      if (state.expectingReturn)
+          return def + body + "\n" + indent + "return " + oirMethod.getDeclaration().getName();
+      return def + body;
   }
 
   public String visit(PrettyPrintState state,
