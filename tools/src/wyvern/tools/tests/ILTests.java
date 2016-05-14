@@ -195,10 +195,6 @@ public class ILTests {
 		doTestInt(input, 5);
 	}
 	
-	private void doTestInt(String input, int expectedIntResult) throws ParseException {
-		doTest(input, Util.intType(), new IntegerLiteral(expectedIntResult));
-	}
-
 	@Test
 	public void testVarFieldWriteToWrongType() throws ParseException {
 		String input = "val obj = new\n"
@@ -310,14 +306,6 @@ public class ILTests {
 		doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
-	// TODO: make other string tests call this function
-	private void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), null));
-		Expression program = ast.generateIL(genCtx, null);
-        doChecks(program, expectedType, expectedResult);
-	}
-
 	@Test
 	public void testDefWithVarInside() throws ParseException {
 		String input = "def foo() : system.Int\n"
@@ -683,6 +671,18 @@ public class ILTests {
 		GenContext genCtx = Globals.getGenContext(state);
         Expression program = ast.generateIL(genCtx, null);
         doChecks(program, expectedType, expectedValue);
+	}
+
+	public static void doTestInt(String input, int expectedIntResult) throws ParseException {
+		doTest(input, Util.intType(), new IntegerLiteral(expectedIntResult));
+	}
+
+	// TODO: make other string tests call this function
+	private static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
+		Expression program = ast.generateIL(genCtx, null);
+        doChecks(program, expectedType, expectedResult);
 	}
 
 	// TODO: make other script tests call this function

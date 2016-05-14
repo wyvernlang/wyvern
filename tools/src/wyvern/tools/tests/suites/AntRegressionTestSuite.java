@@ -13,6 +13,7 @@ import wyvern.tools.tests.DemoTests;
 import wyvern.tools.tests.OOPSLA16;
 import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.OIRTests;
+import wyvern.tools.tests.StdlibTests;
 import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
@@ -60,6 +61,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
         FFITests.class,
         OIRTests.class,
 				OOPSLA16.class,		// tests the new IL
+				StdlibTests.class,		// tests the standard library with the new IL
 				ModuleSystemTests.class,		// tests the new IL
 				})
 public class AntRegressionTestSuite {
