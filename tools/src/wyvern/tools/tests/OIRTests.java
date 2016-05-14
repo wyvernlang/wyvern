@@ -1,52 +1,32 @@
 package wyvern.tools.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
-import java.util.LinkedList;
-import java.util.List;
 
-import org.junit.Assert;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
-import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FieldGet;
-import wyvern.target.corewyvernIL.expression.IntegerLiteral;
-import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.target.corewyvernIL.expression.StringLiteral;
-import wyvern.target.corewyvernIL.expression.Value;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.GenUtil;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
-import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.PrettyPrintVisitor;
-import wyvern.tools.Interpreter;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
-import wyvern.tools.interop.FObject;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
-import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
 public class OIRTests {
@@ -67,7 +47,7 @@ public class OIRTests {
     // Since the root OIR environment is stateful, reset it between tests
     OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-    GenContext genContext = TestUtil.getStandardGenContext();
+    GenContext genContext = Globals.getStandardGenContext();
     Expression ILprogram = ast.generateIL(genContext, null);
     if (debug) {
       System.out.println("Wyvern Program:");

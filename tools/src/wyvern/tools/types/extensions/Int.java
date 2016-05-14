@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.type.IntegerType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
@@ -100,7 +99,7 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 
     @Override
     public ValueType generateILType() {
-        return new IntegerType();
+        return wyvern.target.corewyvernIL.support.Util.intType();
     }
 
     @Override

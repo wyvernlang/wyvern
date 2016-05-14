@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.EmitOIR;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
@@ -72,4 +73,28 @@ public abstract class ValueType extends CaseType implements EmitOIR {
 	public ValueType interpret(EvalContext ctx) {
 		return this;
 	}
+	
+	/**
+	 * Gets the metadata, if any, for this type.
+	 * Returns null if no metadata is associated with this type.
+	 */
+	public Value getMetadata(TypeContext ctx) {
+		return null;
+	}
+	
+	/**
+	 * Checks if this type is well-formed, throwing an exception if not
+	 */
+	abstract public void checkWellFormed(TypeContext ctx);
+	
+	/**
+	 * Returns this type, avoiding the named variable if possible
+	 * @param count TODO
+	 */
+	public final ValueType avoid(String varName, TypeContext ctx) {
+		return doAvoid(varName, ctx, 0);
+	}
+	// TODO: depth limit is hacky, find a more principled approach to avoidance
+	abstract public ValueType doAvoid(String varName, TypeContext ctx, int depth);
+	public static final int MAX_RECURSION_DEPTH = 10; 
 }

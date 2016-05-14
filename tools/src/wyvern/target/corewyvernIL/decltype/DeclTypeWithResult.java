@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -17,6 +18,11 @@ public abstract class DeclTypeWithResult extends DeclType {
 
 	public ValueType getRawResultType() {
 		return rawType;
+	}
+
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		rawType.checkWellFormed(ctx);
 	}
 
 }

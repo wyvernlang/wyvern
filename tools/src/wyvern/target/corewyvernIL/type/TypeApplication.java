@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
 
@@ -45,5 +46,18 @@ public class TypeApplication extends ValueType {
 	@Override
 	public ValueType adapt(View v) {
 		return new TypeApplication(baseType.adapt(v), typeArgument.adapt(v), typeMember);
+	}
+
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		baseType.checkWellFormed(ctx);
+		typeArgument.checkWellFormed(ctx);
+		// also check if the typeMember is part of the baseType 
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
+		throw new RuntimeException("not implemented");
 	}
 }

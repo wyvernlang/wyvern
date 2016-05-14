@@ -1,0 +1,17 @@
+module option
+
+type DynToDyn
+	def apply(x:Dyn):Dyn
+
+type Option
+	def map(f:DynToDyn):Option
+	def orElse(x:Dyn):Dyn
+	
+def Some(x:Dyn):Option = new
+	def map(f:DynToDyn):Option = Some(f(x))
+	def orElse(defaultValue:Dyn):Dyn = x
+
+def None():Option = new
+	def map(f:DynToDyn):Option = this
+	def orElse(defaultValue:Dyn):Dyn = defaultValue
+

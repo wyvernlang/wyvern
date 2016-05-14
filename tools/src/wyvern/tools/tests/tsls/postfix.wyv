@@ -1,6 +1,10 @@
 module postfix
 
 import stdout	// TODO: should be "require" - but for metadata shouldn't exist :-)
+import wyvern.ast
+import wyvern.Int
+
+type AST = ast.AST
 
 type PostfixExpr
     def eval():Int
@@ -8,4 +12,12 @@ type PostfixExpr
 //    type T = Int
 //        val x:Int
 //        metadata "hello"+7
-    metadata stdout.print("ran metadata!")
+//    metadata new //stdout.print("ran metadata!")
+//        def eval():Int = 3
+    metadata new
+        def parseTSL(input:String):AST
+            ast.object(
+                ast.defn("eval",ast.types.int(),
+					ast.call(ast.variable("Int"), "from", ast.string(input)) //ast.int(Int.from(input))
+				)
+            )

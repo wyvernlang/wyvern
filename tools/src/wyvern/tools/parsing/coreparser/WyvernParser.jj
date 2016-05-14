@@ -200,13 +200,15 @@ AST ModuleBody(boolean inModule) :
 AST RequireDecl() :
 { URI uri; Token t; Token name = null;}
 {
-  t=<REQUIRE> uri = Uri() [<AS> name = <IDENTIFIER>] <NEWLINE>  { return build.importDecl(uri, loc(t), name, true); }
+  t=<REQUIRE> uri = Uri() [<AS> name = <IDENTIFIER>] <NEWLINE>
+    { return build.importDecl(uri, loc(t), name, true, false); }
 }
 
 AST ImportDecl() :
-{ URI uri; Token t; Token name = null;}
+{ URI uri; Token t; Token name = null; Token meta = null; }
 {
-  t=<IMPORT> uri = Uri() [<AS> name=<IDENTIFIER>] <NEWLINE> { return build.importDecl(uri, loc(t), name, false); }
+  t=<IMPORT> [meta=<METADATA>] uri = Uri() [<AS> name=<IDENTIFIER>] <NEWLINE>
+    { return build.importDecl(uri, loc(t), name, false, meta != null); }
 }
 
 URI Uri() :

@@ -2,6 +2,8 @@ package wyvern.tools.interop;
 
 import java.util.List;
 
+import wyvern.target.corewyvernIL.decl.NamedDeclaration;
+
 /**
  * Represents a foreign (Java) object in another language
  * 
@@ -30,4 +32,6 @@ public interface FObject {
 	Object invokeMethod(String methodName, List<Object> args) throws ReflectiveOperationException;
 
 	Class<?> getJavaClass();
+
+	Object getWrappedValue();
 }

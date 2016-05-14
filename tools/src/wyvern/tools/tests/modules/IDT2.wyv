@@ -1,0 +1,10 @@
+// import-dependent type test, part 2
+
+module IDT2
+
+import modules.IDT1
+
+type MyADT = IDT1.MyADT
+
+val baz = new
+	def bar(m:MyADT):Int = IDT1.foo(m)

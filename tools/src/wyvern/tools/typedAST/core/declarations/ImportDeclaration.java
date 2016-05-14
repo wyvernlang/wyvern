@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -18,6 +19,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -26,13 +28,15 @@ import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
-import wyvern.target.corewyvernIL.type.IntegerType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.interop.FObject;
+import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
@@ -54,12 +58,14 @@ public class ImportDeclaration extends Declaration implements CoreAST {
   private ImportBinder binder;
   private FileLocation location;
   private boolean requireFlag;
+  private boolean metadataFlag;
   private String asName;
 
-  public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire) {
+  public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire, boolean isMetadata) {
     this.uri = inputURI;
     this.location = location;
     this.requireFlag = isRequire;
+    this.metadataFlag = isMetadata;
     this.asName = image;
   }
 
@@ -216,9 +222,16 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         // TODO: this may not be transitive in the right way
         dependencies.addAll(module.getDependencies());
         importExp = module.getExpression();
-        type = module.getSpec().getType();
+        if (this.metadataFlag) {
+        	if (module.getSpec().getType().isResource(ctx))
+        		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
+        	Value v = importExp.interpret(Globals.getStandardEvalContext());
+        	type = v.getType();
+        } else {
+        	type = module.getSpec().getType();
+        }
       }
-      ctx = ctx.extend(importName, new Variable(importName), importExp.typeCheck(ctx));
+      ctx = ctx.extend(importName, new Variable(importName), /*importExp.typeCheck(ctx)*/ type);
     }
     return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
   }

@@ -73,4 +73,14 @@ public class ValDeclType extends DeclTypeWithResult implements EmitOIR{
 	public DeclType adapt(View v) {
 		return new ValDeclType(getName(), this.getRawResultType().adapt(v));
 	}
+
+	@Override
+	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
+		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
+		if (t.equals(this.getRawResultType())) {
+			return this;
+		} else {
+			return new ValDeclType(this.getName(),t);
+		}
+	}
 }

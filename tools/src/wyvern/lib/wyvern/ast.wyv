@@ -1,0 +1,34 @@
+module ast
+
+import java:wyvern.stdlib.support.AST.utils
+
+type AST
+	val ast:Unit
+
+type Decl
+	val decl:Unit
+
+type Type
+	val typ:Unit
+
+def object(d:Decl):AST = new
+	val ast:Unit = utils.oneDeclObject(d)
+
+def defn(name:String,resultType:Type,body:AST):Decl = new
+	val decl:Unit = utils.OneArgDefn(name, resultType, body)
+
+def int(i:Int):AST = new
+	val ast:Unit = utils.intLiteral(i)
+
+def string(s:String):AST = new
+	val ast:Unit = utils.stringLiteral(s)
+
+def variable(s:String):AST = new
+	val ast:Unit = utils.variable(s)
+
+def call(receiver:AST, methodName:String, argument:AST):AST = new
+	val ast:Unit = utils.oneArgCall(receiver,methodName, argument)
+
+val types = new
+	def int():Type = new
+		val typ:Unit = utils.intType()

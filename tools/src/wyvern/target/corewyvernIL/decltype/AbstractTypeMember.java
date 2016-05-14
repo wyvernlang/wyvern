@@ -29,4 +29,14 @@ public class AbstractTypeMember extends DeclType implements EmitOIR {
 	public DeclType adapt(View v) {
         return this;
 	}
+
+	@Override
+	public void checkWellFormed(TypeContext ctx) {
+		// always well-formed!
+	}
+
+	@Override
+	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
+		return this;
+	}
 }

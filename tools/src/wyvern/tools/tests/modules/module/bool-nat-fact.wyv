@@ -21,7 +21,7 @@ type Nat
 val True : Bool = new
 	def iff(trueCase:UnitNatFn, falsecase:UnitNatFn):Nat
 		trueCase()
-	
+	 
 val False : Bool = new
 	def iff(trueCase:UnitNatFn, falseCase:UnitNatFn):Nat
 		falseCase()

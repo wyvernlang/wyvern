@@ -4,6 +4,7 @@ import java.util.*;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -63,7 +64,9 @@ public class JavaValue extends AbstractValue implements Invokable {
 			// Needed for returning arbitrary values from reflection's invoke.
 			return (Value) result;
 		} else {
-			throw new RuntimeException("some Java->Wyvern cases not implemented");
+			// return it as a unit; try to do better than this later
+			return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
+			//throw new RuntimeException("some Java->Wyvern cases not implemented");
 		}
 	}
 
@@ -120,5 +123,9 @@ public class JavaValue extends AbstractValue implements Invokable {
 	@Override
 	public ValueType getType() {
 		return this.getExprType();
+	}
+
+	public Object getWrappedValue() {
+		return this.foreignObject.getWrappedValue();
 	}
 }

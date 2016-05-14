@@ -5,38 +5,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
-import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.expression.ObjectValue;
-import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.modules.Module;
-import wyvern.target.corewyvernIL.support.EmptyGenContext;
-import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.GenUtil;
-import wyvern.target.corewyvernIL.support.InterpreterState;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
-import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.type.DynamicType;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.StructuralType;
-import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -123,98 +97,14 @@ public class TestUtil {
 	public static void evaluateExpecting(TypedAST ast, int value) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
-		
 		String expecting = "IntegerConstant(" + value + ")";
-
 		Assert.assertEquals(expecting, v.toString());
-	}
-	
-	public static GenContext getGenContext(InterpreterState state) {
-		if (state.getGenContext() != null)
-			return state.getGenContext();
-		GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), getSystemType());
-		return addTypeAbbrevs(genCtx);
-	}
-
-	public static GenContext getStandardGenContext() {
-		/*GenContext genCtx = getGenContext(new InterpreterState(null)).extend("system", new Variable("system"), getSystemType());
-		return addTypeAbbrevs(genCtx);*/
-		return getGenContext(new InterpreterState(new File(BASE_PATH), null));
-	}
-
-	private static GenContext addTypeAbbrevs(GenContext genCtx) {
-		genCtx = new TypeGenContext("Int", "system", genCtx); // slightly weird
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
-		genCtx = new TypeGenContext("String", "system", genCtx);
-		genCtx = new TypeGenContext("Boolean", "system", genCtx);
-		genCtx = new TypeGenContext("Dyn", "system", genCtx);
-		//genCtx.getInterpreterState().setGenContext(genCtx);
-		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
-		return genCtx;
-	}
-
-	private static ValueType getSystemType() {
-		List<FormalArg> ifTrueArgs = Arrays.asList(
-				new FormalArg("trueBranch", Util.unitToDynType()),
-				new FormalArg("falseBranch", Util.unitToDynType()));
-		List<DeclType> boolDeclTypes = Arrays.asList(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
-		// construct a type for the system object
-		List<DeclType> declTypes = new LinkedList<DeclType>();
-		//declTypes.add(new AbstractTypeMember("Int"));
-		List<DeclType> intDeclTypes = new LinkedList<DeclType>();
-		intDeclTypes.add(new DefDeclType("+", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("-", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("*", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("/", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		ValueType intType = new StructuralType("intSelf", intDeclTypes);
-		ValueType boolType = new StructuralType("boolean", boolDeclTypes);
-		declTypes.add(new ConcreteTypeMember("Int", intType));
-		declTypes.add(new ConcreteTypeMember("Boolean", boolType));
-		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
-		declTypes.add(new AbstractTypeMember("String"));
-		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
-    declTypes.add(new AbstractTypeMember("Java"));
-    declTypes.add(new AbstractTypeMember("Python"));
-		ValueType systemType = new StructuralType("system", declTypes);
-		return systemType;
-	}
-	
-	private static ObjectValue getSystemValue() {
-		// construct a type for the system object
-		List<Declaration> decls = new LinkedList<Declaration>();
-		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
-    decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
-    decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
-		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, EvalContext.empty());
-		return systemVal;
-	}
-	
-	public static EvalContext getStandardEvalContext() {
-		EvalContext ctx = EvalContext.empty();
-    	ctx = ctx.extend("system", getSystemValue());
-		return ctx;
-	}
-	
-	public static TypeContext getStandardTypeContext() {
-    	GenContext ctx = GenContext.empty();
-    	ctx = ctx.extend("system", new Variable("system"), getSystemType());
-    	ctx = GenUtil.ensureJavaTypesPresent(ctx);
-		return ctx;
 	}
 	
 	public static void evaluateExpecting(TypedAST ast, String value) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
-
-		// System.out.println("Got value: " + v);
-		
 		String expecting = "StringConstant(\"" + value + "\")"; 
-
 		Assert.assertEquals(expecting, v.toString());
 	}
 
@@ -227,17 +117,13 @@ public class TestUtil {
 	 */
 	public static void evaluateExpectingPerf(TypedAST ast, int value) {
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
-		
 		String expecting = "IntegerConstant(" + value + ")"; 
-
 		Assert.assertEquals(expecting, v.toString());
 	}
 	
 	public static void evaluatePerf(TypedAST ast) {
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
-		
 		//String expecting = "IntegerConstant(" + value + ")"; 
-
 		//Assert.assertEquals(expecting, v.toString());
 	}
 	
@@ -278,12 +164,10 @@ public class TestUtil {
 	public static String readFile(File file) {
 		try {
 			StringBuffer b = new StringBuffer();
-			
 			for (String s : Files.readAllLines(file.toPath())) {
 				//Be sure to add the newline as well
 				b.append(s).append("\n");
 			}
-			
 			return b.toString();
 		} catch (IOException e) {
 			Assert.fail("Failed opening file: " + file.getPath());
