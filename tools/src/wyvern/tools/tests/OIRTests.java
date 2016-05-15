@@ -195,7 +195,7 @@ public class OIRTests {
       "    v = 10\n" +
       "    v\n" +
       "foo()\n";
-    testPyFromInput(input, "10", false);
+    testPyFromInput(input, "10", true);
   }
 
   @Test
@@ -341,6 +341,32 @@ public class OIRTests {
     String input =
       "val x = ((5 + 3) / 2) * 2 - 1\n" +
       "x\n";
-    testPyFromInput(input, "7", true);
+    testPyFromInput(input, "7");
   }
+
+  @Test
+  public void testNameCollision() throws ParseException {
+    String input =
+      "val letFn0 = 3\n" +
+      "val x = 5\n" +
+      "x + letFn0\n";
+    testPyFromInput(input, "8");
+  }
+
+    @Test
+    public void testNameCollision2() throws ParseException {
+        String input =
+            "val X = 3\n" +
+            "val x = 5\n" +
+            "x + X\n";
+        testPyFromInput(input, "8");
+    }
+
+    @Test
+    public void testThisAsLocal() throws ParseException {
+        String input =
+            "val this = 3\n" +
+            "this\n";
+        testPyFromInput(input, "3");
+    }
 }
