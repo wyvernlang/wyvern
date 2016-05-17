@@ -1124,6 +1124,50 @@ public class ILTests {
 
     @Test
 	@Category(CurrentlyBroken.class)
+    public void testSelfName() throws ParseException {
+        String source = ""
+                      + "type Body (body) => \n"
+                      + "    type T = system.Int \n"
+                      + "    val x: body.T = 5 \n\n"
+
+                      + "val b: Body = new (body) \n"
+                      + "    type T = system.Int \n"
+                      + "    val x: body.T = 3 \n\n"
+
+                      + "b.x \n";
+
+        doTest(source, null, new IntegerLiteral(3));
+    }
+
+    @Test
+	@Category(CurrentlyBroken.class)
+    public void testNestedDecl() throws ParseException {
+
+        String source = ""
+                      + "type Body (body) => \n"
+                      + "    type T \n"
+                      + "    type ThisType \n"
+                      + "        type T = body.T \n"
+                      + "        type ThisType = body.ThisType \n"
+                      + "        def apply(): body.T \n"
+                      + "    def apply(): body.T \n\n"
+
+                      + "type body1: Body = new (body) => \n"
+                      + "    type T = system.Int \n"
+                      + "    type ThisType \n"
+                      + "        type T = body.T \n"
+                      + "        type ThisType = body.ThisType \n"
+                      + "        def apply(): body.T \n"
+                      + "    def apply(): body.T \n"
+                      + "        7 \n\n"
+
+                      + "body1.apply() \n"
+                      + "";
+        doTest(source, null, new IntegerLiteral(7));
+    }
+
+    @Test
+	@Category(CurrentlyBroken.class)
     public void testGenericIfStatement() throws ParseException {
 
         String source = ""
