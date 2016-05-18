@@ -34,7 +34,7 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 		return true;
 	}
 
-	private int value;
+	private final int value;
 
 	public IntegerLiteral(int value) {
 		this(value, FileLocation.UNKNOWN);
@@ -78,9 +78,9 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 	@Override
 	public Value invoke(String methodName, List<Value> args) {
 		switch (methodName) {
-		case "+": return new IntegerLiteral(this.value + ((IntegerLiteral)args.get(0)).getValue());
-		case "-": return new IntegerLiteral(this.value - ((IntegerLiteral)args.get(0)).getValue());
-		case "*": return new IntegerLiteral(this.value * ((IntegerLiteral)args.get(0)).getValue());
+		case "+": return new IntegerLiteral(Math.addExact(this.value,((IntegerLiteral)args.get(0)).getValue()));
+		case "-": return new IntegerLiteral(Math.subtractExact(this.value, ((IntegerLiteral)args.get(0)).getValue()));
+		case "*": return new IntegerLiteral(Math.multiplyExact(this.value,((IntegerLiteral)args.get(0)).getValue()));
 		case "/": return new IntegerLiteral(this.value / ((IntegerLiteral)args.get(0)).getValue());
 		case "<": return new BooleanLiteral(this.value < ((IntegerLiteral)args.get(0)).getValue());
 		case ">": return new BooleanLiteral(this.value > ((IntegerLiteral)args.get(0)).getValue());
