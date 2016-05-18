@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,13 +13,11 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
 
-public class IntegerLiteral extends AbstractValue implements Invokable {
-
-	private final BigInteger value;
+public class BoundedIntLiteral extends AbstractValue implements Invokable {
 
 	@Override
 	public int hashCode() {
-		return value.hashCode();
+		return value;
 	}
 
 	@Override
@@ -31,37 +28,28 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		IntegerLiteral other = (IntegerLiteral) obj;
-		if (!value.equals(other.value))
+		BoundedIntLiteral other = (BoundedIntLiteral) obj;
+		if (value != other.value)
 			return false;
 		return true;
 	}
 
-	public IntegerLiteral(int value) {
+	private final int value;
+
+	public BoundedIntLiteral(int value) {
 		this(value, FileLocation.UNKNOWN);
 	}
-	public IntegerLiteral(BigInteger value) {
-		this(value, FileLocation.UNKNOWN);
-	}
-	public IntegerLiteral(int value, FileLocation loc) {
-		this(BigInteger.valueOf(value), loc);
-	}
-	public IntegerLiteral(BigInteger value, FileLocation loc) {
+	public BoundedIntLiteral(int value, FileLocation loc) {
 		super(Util.intType(), loc);
 		this.value = value;
 	}
 
-
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(value.toString());
+		dest.append(Integer.toString(value));
 	}
 
 	public int getValue() {
-		return value.intValueExact();
-	}
-
-	public BigInteger getFullValue() {
 		return value;
 	}
 
@@ -73,8 +61,7 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 	@Override
 	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
 			Environment env, OIREnvironment oirenv) {
-		return emitILVisitor.visit(env, oirenv, this);
-		//throw new RuntimeException("not implemented");
+		throw new RuntimeException("not implemented");
 	}
 	
 	@Override
@@ -91,12 +78,12 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 	@Override
 	public Value invoke(String methodName, List<Value> args) {
 		switch (methodName) {
-		case "+": return new IntegerLiteral(this.value.add(((IntegerLiteral)args.get(0)).getFullValue()));
-		case "-": return new IntegerLiteral(this.value.subtract(((IntegerLiteral)args.get(0)).getFullValue()));
-		case "*": return new IntegerLiteral(this.value.multiply(((IntegerLiteral)args.get(0)).getFullValue()));
-		case "/": return new IntegerLiteral(this.value.divide(((IntegerLiteral)args.get(0)).getFullValue()));
-		case "<": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) < 0);
-		case ">": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) > 0);
+		case "+": return new BoundedIntLiteral(Math.addExact(this.value,((BoundedIntLiteral)args.get(0)).getValue()));
+		case "-": return new BoundedIntLiteral(Math.subtractExact(this.value, ((BoundedIntLiteral)args.get(0)).getValue()));
+		case "*": return new BoundedIntLiteral(Math.multiplyExact(this.value,((BoundedIntLiteral)args.get(0)).getValue()));
+		case "/": return new BoundedIntLiteral(this.value / ((BoundedIntLiteral)args.get(0)).getValue());
+		case "<": return new BooleanLiteral(this.value < ((BoundedIntLiteral)args.get(0)).getValue());
+		case ">": return new BooleanLiteral(this.value > ((BoundedIntLiteral)args.get(0)).getValue());
 		default: throw new RuntimeException("runtime error: integer operation " + methodName + "not supported by the runtime");
 		}
 	}

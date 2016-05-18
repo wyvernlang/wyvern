@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import wyvern.target.corewyvernIL.Environment;
@@ -31,8 +32,12 @@ public class JavaValue extends AbstractValue implements Invokable {
 	@Override
 	public Value invoke(String methodName, List<Value> args) {
 		List<Object> javaArgs = new LinkedList<Object>();
+		Class[] hints = foreignObject.getTypeHints(methodName);
+		int hintNum = 0;
 		for (Value arg : args) {
-			javaArgs.add(wyvernToJava(arg));
+			Class hintClass = (hints != null && hints.length > hintNum)?hints[hintNum]:null;
+			javaArgs.add(wyvernToJava(arg, hintClass));
+			hintNum++;
 		}
 		Object result;
 		try {
@@ -72,9 +77,13 @@ public class JavaValue extends AbstractValue implements Invokable {
 
 	/**
 	 * Only handles integers right now
+	 * @param hintClass 
 	 */
-	private Object wyvernToJava(Value arg) {
+	private Object wyvernToJava(Value arg, Class hintClass) {
 		if (arg instanceof IntegerLiteral) {
+			if (hintClass != null && hintClass == BigInteger.class) {
+				return ((IntegerLiteral)arg).getFullValue();
+			}
 			return new Integer(((IntegerLiteral)arg).getValue());
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());

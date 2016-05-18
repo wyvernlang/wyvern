@@ -19,9 +19,6 @@ public interface FObject {
 	 * Invokes a method of this object.  The most applicable method
 	 * with the appropriate arguments will be invoked.
 	 * 
-	 * The objects passed in as args can only have types Integer or String (for now)
-	 * TODO: Other types will be supported in the near future.
-	 * 
 	 * Returns null if the called method is void, otherwise an
 	 * object with the same interpretation as args
 	 * 
@@ -31,7 +28,16 @@ public interface FObject {
 	 */
 	Object invokeMethod(String methodName, List<Object> args) throws ReflectiveOperationException;
 
+	/** Gets the class of the underlying Java object
+	 */
 	Class<?> getJavaClass();
 
+	/** Gets the underlying Java object
+	 */
 	Object getWrappedValue();
+
+	/** Gets hints for the argument types of methodName.
+	 * Returns null if the method is not found
+	 */
+	Class<?>[] getTypeHints(String methodName);
 }

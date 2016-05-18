@@ -1,0 +1,16 @@
+require stdout
+
+def factorial(n:Int):Int
+	(n < 2).ifTrue(
+		() => 1,
+		() => n * factorial(n-1)
+	)
+/* IDEAL SYNTAX:
+	if n < 2:
+	    2
+	  else
+	    fibRec(n-1) + fibRec(n-2)
+*/
+
+stdout.print("factorial(15) = ")
+stdout.printInt(factorial(15))

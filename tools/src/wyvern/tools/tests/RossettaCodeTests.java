@@ -73,4 +73,9 @@ public class RossettaCodeTests {
 	public void testFib() throws ParseException {		
 		ILTests.doTestScriptModularly("rosetta.fibonacci", null, null);
 	}
+	
+	@Test
+	public void testFactorial() throws ParseException {		
+		ILTests.doTestScriptModularly("rosetta.factorial", null, null);
+	}
 }

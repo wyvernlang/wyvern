@@ -91,6 +91,16 @@ public class JObject implements FObject {
 	}
 
 	@Override
+	public Class<?>[] getTypeHints(String methodName) {
+		for (Method m : jObject.getClass().getMethods()) {
+			if (m.getName().equals(methodName)) {
+				return m.getParameterTypes();
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public Class<?> getJavaClass() {
 		return jObject.getClass();
 	}

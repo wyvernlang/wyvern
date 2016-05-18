@@ -103,6 +103,10 @@ public class GenUtil {
 			return Util.intType();
 		}
 
+		if (javaClass.getName().equals("java.math.BigInteger")) {
+			return Util.intType();
+		}
+
         if (javaClass.getName().equals("java.lang.String")) {
             return Util.stringType();
         }
