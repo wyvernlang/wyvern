@@ -97,7 +97,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 	
 	@Override
-	public TypedAST typeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource) {
+	public TypedAST typeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
 		if (body == null) {
 			body = new DeclSequence();
 		}
@@ -111,7 +111,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 		//Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);
 		//return new TypeDeclaration(name, (DeclSequence) body, null, (TaggedInfo) tagInfo, loc);
-		return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource);
+		return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST newObj(FileLocation loc) {
+	public TypedAST newObj(FileLocation loc, String selfName) {
 		return new New(new HashMap<String,TypedAST>(), loc);
 	}
 

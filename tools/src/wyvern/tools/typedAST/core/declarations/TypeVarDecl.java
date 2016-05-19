@@ -53,6 +53,7 @@ public class TypeVarDecl extends Declaration {
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
+    private String activeSelfName;
     private Expression metadataExp = null;
 
 	/**
@@ -126,7 +127,7 @@ public class TypeVarDecl extends Declaration {
 		this.fileLocation = fileLocation;
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource ){
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName ) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
@@ -134,6 +135,7 @@ public class TypeVarDecl extends Declaration {
 		this.fileLocation = fileLocation;
 		this.taggedInfo = taggedInfo;
 		this.resourceFlag = isResource;
+        this.activeSelfName = selfName;
 	}
 
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation){
