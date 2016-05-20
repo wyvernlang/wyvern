@@ -296,7 +296,7 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		return computeInternalDecl(ctx);
+		return computeInternalDecl(thisContext);
 	}
 	
 	private Expression getMetadata(GenContext ctx) {

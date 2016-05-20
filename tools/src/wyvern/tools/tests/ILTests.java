@@ -1153,7 +1153,6 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNestedDecl() throws ParseException {
 
         String source = ""
@@ -1165,7 +1164,7 @@ public class ILTests {
           + "        def apply(): body.T \n"
           + "    def apply(): body.T \n\n"
 
-          + "type body1: Body = new #body# => \n"
+          + "val body1: Body = new #body# => \n"
           + "    type T = system.Int \n"
           + "    type ThisType \n"
           + "        type T = body.T \n"

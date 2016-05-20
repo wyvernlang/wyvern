@@ -340,6 +340,8 @@ AST DeclType() :
 |
   exp = VarDeclType()  { return exp; }
 |
+  LOOKAHEAD(3) exp = TypeDeclaration()  { return exp; }
+|
   exp = TypeAbbrevDeclaration() { return exp; }
 }
 
