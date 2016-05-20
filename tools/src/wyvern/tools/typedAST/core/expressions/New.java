@@ -98,6 +98,10 @@ public class New extends CachingTypedAST implements CoreAST {
         }
     }
 
+    private String self() {
+        return (this.selfName == null) ? "this" : this.selfName;
+    }
+
     @Override
     protected Type doTypecheck(Environment env, Optional<Type> expected) {
         // TODO check arg types
@@ -109,12 +113,11 @@ public class New extends CachingTypedAST implements CoreAST {
         if (classVarTypeBinding != null) { //In a class method
             Environment declEnv = classVarTypeBinding.getClassDecl().getInstanceMembersEnv();
             Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
-
-            innerEnv = env.extend(new NameBindingImpl("this",
+            innerEnv = env.extend(new NameBindingImpl(this.self(),
                         new ClassType(
-                            new Reference<>(innerEnv), 
-                            new Reference<>(innerEnv), 
-                            new LinkedList<>(), 
+                            new Reference<>(innerEnv),
+                            new Reference<>(innerEnv),
+                            new LinkedList<>(),
                             classVarTypeBinding.getClassDecl().getTaggedInfo(),
                             classVarTypeBinding.getClassDecl().getName()
             )));
@@ -154,7 +157,7 @@ public class New extends CachingTypedAST implements CoreAST {
                     tagInfo = ((RecordType)t).getTaggedInfo();
             }
             
-            Environment declEnv = env.extend(new NameBindingImpl("this", new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), tagInfo, null)));
+            Environment declEnv = env.extend(new NameBindingImpl(this.self(), new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), tagInfo, null)));
             final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
                     reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
             seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
@@ -202,13 +205,13 @@ public class New extends CachingTypedAST implements CoreAST {
         }
 
         AtomicReference<Value> objRef = new AtomicReference<>();
-        EvaluationEnvironment evalEnv = env.extend(new LateValueBinding("this", objRef, ct));
+        EvaluationEnvironment evalEnv = env.extend(new LateValueBinding(this.self(), objRef, ct));
         classDecl.evalDecl(evalEnv, classDecl.extendWithValue(EvaluationEnvironment.EMPTY));
         final EvaluationEnvironment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
                 reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, EvaluationEnvironment::extend);
         EvaluationEnvironment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
 
-        TaggedInfo goodTI = env.lookupBinding("this", HackForArtifactTaggedInfoBinding.class)
+        TaggedInfo goodTI = env.lookupBinding(this.self(), HackForArtifactTaggedInfoBinding.class)
                 .map(binding -> binding.getTaggedInfo()).orElse(classDecl.getTaggedInfo());
 
         Obj obj = new Obj(objenv.extend(argValEnv), goodTI);
@@ -250,7 +253,7 @@ public class New extends CachingTypedAST implements CoreAST {
         }
         wyvern.target.corewyvernIL.expression.New exn = new wyvern.target.corewyvernIL.expression.New(
                 genDecls,
-                "this",
+                this.self(),
         null);
         Expression output = exn;
         for (String key : variables.keySet()) {
@@ -297,13 +300,10 @@ public class New extends CachingTypedAST implements CoreAST {
     @Override
     public Expression generateIL(GenContext ctx, ValueType expectedType) {
 
-        // TODO see if another selfName is specified.
-        // TODO translate the ascribed type, if any
-        String selfName = "this";
-        ValueType type = seq.inferStructuralType(ctx);
+        ValueType type = seq.inferStructuralType(ctx, this.self());
         
         // Translate the declarations.
-        GenContext thisContext = ctx.extend(selfName, new wyvern.target.corewyvernIL.expression.Variable(selfName), type);
+        GenContext thisContext = ctx.extend(this.self(), new wyvern.target.corewyvernIL.expression.Variable(this.self()), type);
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
         for (TypedAST d : seq) {
             
@@ -320,8 +320,8 @@ public class New extends CachingTypedAST implements CoreAST {
                 
                 // Create references to "this" for the generated methods.
                 wyvern.tools.typedAST.core.expressions.Variable receiver1, receiver2;
-                receiver1 = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
-                receiver2 = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("this", null), null);
+                receiver1 = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(this.self(), null), null);
+                receiver2 = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(this.self(), null), null);
                 
                 // Generate getter and setter; add to the declarations.
                 wyvern.target.corewyvernIL.decl.Declaration getter, setter;
@@ -334,10 +334,13 @@ public class New extends CachingTypedAST implements CoreAST {
         }
         // if type is not specified, infer
         if (expectedType == null) {
-            return new wyvern.target.corewyvernIL.expression.New(decls, selfName, type);
+            return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), type);
         } else { // if type is specified, use that type
-            return new wyvern.target.corewyvernIL.expression.New(decls, selfName, expectedType);
+            return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), expectedType);
         }
     }
     
+    public void setSelfName(String n) {
+        this.selfName = n;
+    }
 }

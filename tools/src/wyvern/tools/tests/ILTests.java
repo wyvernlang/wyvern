@@ -1137,7 +1137,6 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testSelfName2() throws ParseException {
         String source = ""
           + "type Body #body# => \n"

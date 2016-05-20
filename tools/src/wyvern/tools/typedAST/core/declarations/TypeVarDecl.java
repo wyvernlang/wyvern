@@ -274,10 +274,18 @@ public class TypeVarDecl extends Declaration {
 		return body.generateIL(ctx);
 	}*/
 
+    private String getSelfName() {
+        String s = defaultSelfName;
+        if (this.activeSelfName != null && this.activeSelfName.length() != 0) {
+            s = this.activeSelfName;
+        }
+        return s;
+    }
+
 	private StructuralType computeInternalILType(GenContext ctx) {
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		GenContext localCtx = ctx.extend(defaultSelfName, new Variable(defaultSelfName), null);
-		return new StructuralType(defaultSelfName, td.genDeclTypeSeq(localCtx), this.resourceFlag);
+		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
+		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
 	}
 	
 	@Override

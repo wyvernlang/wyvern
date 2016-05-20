@@ -184,7 +184,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 	@Override
 	public TypedAST newObj(FileLocation loc, String selfName) {
-		return new New(new HashMap<String,TypedAST>(), loc);
+		New n = new New(new HashMap<String,TypedAST>(), loc);
+        n.setSelfName(selfName);
+        return n;
 	}
 
 	@Override
