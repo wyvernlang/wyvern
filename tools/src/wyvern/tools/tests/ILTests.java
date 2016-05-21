@@ -1159,4 +1159,19 @@ public class ILTests {
 
         doTest(source, null, new IntegerLiteral(5));
     }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testFuncParametricPolymorph() throws ParseException {
+
+        String source = ""
+                      + "def identity[K](value: K): K \n"
+                      + "    value \n\n"
+
+                      + "val x = 15 \n"
+                      + "identity(x) \n"
+                      + "";
+
+        doTest(source, null, new IntegerLiteral(15));
+    }
 }
