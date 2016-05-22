@@ -311,7 +311,7 @@ AST TypeDeclaration() :
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
-  [ <POUND> selfName=<IDENTIFIER> <POUND> <ARROW> ]
+  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW> ]
   <NEWLINE> [<INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT>] {
@@ -591,19 +591,11 @@ AST UnaryExpression(ExpFlags flags) :
 }
 
 AST PrimaryExpression(ExpFlags flags) :
-{ AST exp; }
-{
-  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )*  { return exp; }
-}
-
-AST PrimaryPrefix(ExpFlags flags) :
 { AST exp; Token t; Token selfName = null; }
 {
-  exp = Literal() { return exp; }
+  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )*  { return exp; }
 |
-  t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
-|
-  t = <NEW> [ <POUND> selfName=<IDENTIFIER> <POUND> <ARROW>] {
+  t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW>] {
     String self = (selfName == null) ? null : selfName.image;
     exp = build.newObj(loc(t), self);
     
@@ -611,6 +603,14 @@ AST PrimaryPrefix(ExpFlags flags) :
     flags.setExp(exp, IndentedExpKind.NEW_KIND);
     return exp;
   }
+}
+
+AST PrimaryPrefix(ExpFlags flags) :
+{ AST exp; Token t; }
+{
+  exp = Literal() { return exp; }
+|
+  t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |

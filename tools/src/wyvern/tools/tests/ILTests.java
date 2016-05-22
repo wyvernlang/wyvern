@@ -1125,10 +1125,10 @@ public class ILTests {
     @Test
     public void testSelfName() throws ParseException {
         String source = ""
-          + "type Body #body# => \n"
+          + "type Body (body) => \n"
           + "    val x: system.Int \n\n"
 
-          + "val b: Body = new #body# => \n"
+          + "val b: Body = new (body) => \n"
           + "    val x: system.Int = 3 \n\n"
 
           + "b.x \n";
@@ -1139,11 +1139,11 @@ public class ILTests {
     @Test
     public void testSelfName2() throws ParseException {
         String source = ""
-          + "type Body #body# => \n"
+          + "type Body (body) => \n"
           + "    type T = system.Int \n"
           + "    val x: body.T \n\n"
 
-          + "val b: Body = new #body# => \n"
+          + "val b: Body = new (body) => \n"
           + "    type T = system.Int \n"
           + "    val x: body.T = 3 \n\n"
 
@@ -1156,7 +1156,7 @@ public class ILTests {
     public void testNestedDecl() throws ParseException {
 
         String source = ""
-          + "type Body #body# => \n"
+          + "type Body (body) => \n"
           + "    type T \n"
           + "    type ThisType \n"
           + "        type T = body.T \n"
@@ -1164,7 +1164,7 @@ public class ILTests {
           + "        def apply(): body.T \n"
           + "    def apply(): body.T \n\n"
 
-          + "val body1: Body = new #body# => \n"
+          + "val body1: Body = new (body) => \n"
           + "    type T = system.Int \n"
           + "    type ThisType \n"
           + "        type T = body.T \n"
