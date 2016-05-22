@@ -53,6 +53,7 @@ public class TypeVarDecl extends Declaration {
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
+    private String activeSelfName;
     private Expression metadataExp = null;
 
 	/**
@@ -126,7 +127,7 @@ public class TypeVarDecl extends Declaration {
 		this.fileLocation = fileLocation;
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource ){
+	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName ) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
 		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
@@ -134,6 +135,7 @@ public class TypeVarDecl extends Declaration {
 		this.fileLocation = fileLocation;
 		this.taggedInfo = taggedInfo;
 		this.resourceFlag = isResource;
+        this.activeSelfName = selfName;
 	}
 
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation){
@@ -272,10 +274,18 @@ public class TypeVarDecl extends Declaration {
 		return body.generateIL(ctx);
 	}*/
 
+    private String getSelfName() {
+        String s = defaultSelfName;
+        if (this.activeSelfName != null && this.activeSelfName.length() != 0) {
+            s = this.activeSelfName;
+        }
+        return s;
+    }
+
 	private StructuralType computeInternalILType(GenContext ctx) {
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		GenContext localCtx = ctx.extend(defaultSelfName, new Variable(defaultSelfName), null);
-		return new StructuralType(defaultSelfName, td.genDeclTypeSeq(localCtx), this.resourceFlag);
+		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
+		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
 	}
 	
 	@Override
@@ -286,7 +296,7 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		return computeInternalDecl(ctx);
+		return computeInternalDecl(thisContext);
 	}
 	
 	private Expression getMetadata(GenContext ctx) {

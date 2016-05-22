@@ -382,10 +382,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	 * @param ctx: context to evaluate in.
 	 * @return structural type of this sequence.
 	 */
-	public StructuralType inferStructuralType (GenContext ctx) {
-		
-		// TODO: see if user specified a different self name.
-		String selfName = "this";
+	public StructuralType inferStructuralType (GenContext ctx, String selfName) {
 		
 		// Fake an appropriate context.
 		GenContext ctxTemp = ctx.extend(selfName, new Variable(selfName), null);
