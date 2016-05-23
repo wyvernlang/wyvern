@@ -263,7 +263,7 @@ AST DefDeclaration() :
 { Type resultType; Token name; AST body; List args; Type genType = null; }
 {
   <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [genType = GenericType()] args = Formals() <COLON> resultType = Type() body=DefBody() {
-	return build.defDecl(name.image, resultType, args, body, false, loc(name));
+	return build.defDecl(name.image, resultType, genType, args, body, false, loc(name));
   }
 }
 
@@ -642,9 +642,9 @@ AST PrimarySuffix(AST lhs, ExpFlags flags) :
 }
 
 AST Arguments(ExpFlags flags) :
-{ AST exp = null; Token t; }
+{ AST exp = null; Token t; Type type = null; }
 {
-  t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
+  [type = GenericType()] t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
   			if (exp == null)
   				return build.unitValue(loc(t));
   			else

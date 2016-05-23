@@ -76,7 +76,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST defDecl(String name, Type type, List args,
+	public TypedAST defDecl(String name, Type type, Type genType, List args,
 			TypedAST body, boolean isClassDef, FileLocation loc) {
 		return new DefDeclaration(name, type, args, body, isClassDef, loc);
 	}
