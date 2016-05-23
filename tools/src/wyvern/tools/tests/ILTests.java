@@ -1231,6 +1231,20 @@ public class ILTests {
     }
 
     @Test
+    public void testExplicitParametricPolymorphIsParsable() throws ParseException {
+
+        String source = ""
+                      + "def identity[K](value: K): K \n"
+                      + "    value \n\n"
+
+                      + "val x = 15 \n"
+                      + "identity[Int](x) \n"
+                      + "";
+
+		TestUtil.getNewAST(source);
+    }
+
+    @Test
     @Category(CurrentlyBroken.class)
     public void testExplicitParameterization() throws ParseException {
 
