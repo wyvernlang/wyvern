@@ -260,9 +260,9 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; }
+{ Type resultType; Token name; AST body; List args; Type genType = null; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) args = Formals() <COLON> resultType = Type() body=DefBody() {
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [genType = GenericType()] args = Formals() <COLON> resultType = Type() body=DefBody() {
 	return build.defDecl(name.image, resultType, args, body, false, loc(name));
   }
 }
@@ -688,3 +688,12 @@ Token OverrideOperator() :
     | operator = <DIVIDE> {return operator;}
 	
 }
+
+Type GenericType() :
+{ Type t;  }
+{
+    <LBRACK> t = Type() <RBRACK> {
+        return t;
+    }
+}
+
