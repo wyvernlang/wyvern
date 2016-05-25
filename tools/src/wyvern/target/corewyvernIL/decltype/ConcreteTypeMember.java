@@ -62,6 +62,9 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+		if (dt instanceof AbstractTypeMember) {
+			return true;
+		}
 		if (!(dt instanceof ConcreteTypeMember)) {
 			return false;
 		}

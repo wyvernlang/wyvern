@@ -15,15 +15,20 @@ import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -45,13 +50,20 @@ import wyvern.tools.util.TreeWriter;
 public class Application extends CachingTypedAST implements CoreAST {
 	private ExpressionAST function;
 	private ExpressionAST argument;
+    private String genericType;
 
 	public Application(TypedAST function, TypedAST argument, FileLocation location) {
 		this.function = (ExpressionAST) function;
 		this.argument = (ExpressionAST) argument;
 		this.location = location;
-		//if (location == null || location.line == -1)
-		//	throw new RuntimeException();
+        this.genericType = null;
+	}
+
+    public Application(TypedAST function, TypedAST argument, FileLocation location, String genericType) {
+		this.function = (ExpressionAST) function;
+		this.argument = (ExpressionAST) argument;
+		this.location = location;
+        this.genericType = genericType;
 	}
 
 	@Override
@@ -141,13 +153,19 @@ public class Application extends CachingTypedAST implements CoreAST {
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
 		List<FormalArg> formals = exprGen.getExpectedArgTypes(ctx);
-		
+
+        int offset = 0;
 		// generate arguments		
 		List<Expression> args = new LinkedList<Expression>();
+        if(this.genericType != null) {
+            args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", this.genericType), this.location)));
+            offset++;
+        }
+
         if (argument instanceof TupleObject) {
         	ExpressionAST[] raw_args = ((TupleObject) argument).getObjects();
         	for (int i = 0; i < raw_args.length; i++) {
-				ValueType expectedArgType = formals.get(i).getType();
+				ValueType expectedArgType = formals.get(i + offset).getType();
 				ExpressionAST ast = raw_args[i];
 				// TODO: propagate types downward from formals
 				args.add(ast.generateIL(ctx, expectedArgType));
@@ -155,8 +173,9 @@ public class Application extends CachingTypedAST implements CoreAST {
         } else if (argument instanceof UnitVal) {
         	// leave args empty
         } else {
-        	if (formals.size() != 1)
+            if (formals.size() != 1 + offset) {
     			ToolError.reportError(ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS, this, ""+formals.size());
+            }
         	
     		// TODO: propagate types downward from formals
         	args.add(argument.generateIL(ctx, formals.get(0).getType()));
