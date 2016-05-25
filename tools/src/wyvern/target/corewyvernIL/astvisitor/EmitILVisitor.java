@@ -14,7 +14,7 @@ import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Variable;
 
-public abstract class EmitILVisitor<T> extends ASTVisitor<T> {
+public abstract class EmitILVisitor<T> extends ASTVisitor<T, Environment> {
 
 	public abstract T visit (Environment env, New newExpr);
 	public abstract T visit (Environment env, MethodCall methodCall);

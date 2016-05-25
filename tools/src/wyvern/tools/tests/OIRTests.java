@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -61,7 +62,7 @@ public class OIRTests {
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
-                              null,
+                              new Environment(null, null),
                               OIREnvironment.getRootEnvironment());
 
     String pprint =
@@ -195,7 +196,7 @@ public class OIRTests {
       "    v = 10\n" +
       "    v\n" +
       "foo()\n";
-    testPyFromInput(input, "10", true);
+    testPyFromInput(input, "10");
   }
 
   @Test
@@ -368,5 +369,13 @@ public class OIRTests {
             "val this = 3\n" +
             "this\n";
         testPyFromInput(input, "3");
+    }
+
+    @Test
+    public void testBooleans() throws ParseException {
+        String input =
+            "val n = 5\n" +
+            "(n < 2).ifTrue(() => 1, () => 2)\n";
+        testPyFromInput(input, "2", true);
     }
 }

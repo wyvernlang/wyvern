@@ -254,7 +254,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     String methodName = oirMethodCall.getMethodName();
     String strVal;
     if (methodName.matches("[^a-zA-Z0-9]*"))
-      strVal = "(" + objExpr + ") " + methodName + " (" + args + ")";
+      strVal = "((" + objExpr + ") " + methodName + " (" + args + "))";
     else
       strVal = objExpr + "." + oirMethodCall.getMethodName() + "(" + args + ")";
     state.expectingReturn = oldExpectingReturn;

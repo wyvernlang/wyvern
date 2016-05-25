@@ -5,9 +5,9 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.oir.OIREnvironment;
 
 public class CaseType extends Type{
-  public <T> T acceptVisitor (ASTVisitor<T> emitILVisitor,
-                              Environment env,
-                              OIREnvironment oirenv) {
-    return emitILVisitor.visit(env, oirenv, this);
-  }
+    public <T, E> T acceptVisitor (ASTVisitor<T, E> emitILVisitor,
+                                   E env,
+                                   OIREnvironment oirenv) {
+        return emitILVisitor.visit(env, oirenv, this);
+    }
 }

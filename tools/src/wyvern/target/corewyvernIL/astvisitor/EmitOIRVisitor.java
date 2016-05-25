@@ -7,6 +7,7 @@ import java.util.Vector;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.binding.Binding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
@@ -34,6 +35,7 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EmptyTypeContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.CaseType;
@@ -74,7 +76,7 @@ import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 import wyvern.tools.tests.tagTests.TestUtil;
 
-public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
+public class EmitOIRVisitor extends ASTVisitor<OIRAST, Environment> {
   private int classCount = 0;
   private int interfaceCount = 0;
 
@@ -181,7 +183,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     List<OIRExpression> args;
     OIRMethodCall oirMethodCall;
 
-    args =	new Vector<OIRExpression> ();
+    args = new Vector<OIRExpression> ();
 
     for (Expression e : methodCall.getArgs())
     {
@@ -190,9 +192,16 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
     body = methodCall.getObjectExpr();
 
+    TypeContext cxt = new EmptyTypeContext();
+    for (Binding bnd : env.getBindings()) {
+        cxt = cxt.extend(bnd.getName(), (ValueType)bnd.getType());
+    }
+
+    //ValueType objType = body.typeCheck(cxt);
+
     oirbody = (OIRExpression)body.acceptVisitor(this, env, oirenv);
     oirMethodCall = new OIRMethodCall (oirbody,
-        methodCall.getMethodName(),  args);
+        methodCall.getMethodName(), args);
 
     return oirMethodCall;
   }
