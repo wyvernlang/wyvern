@@ -260,10 +260,11 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; Type genType = null; }
+{ Type resultType; Token name; AST body; List args; Token genType = null; }
 {
   <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [genType = GenericType()] args = Formals() <COLON> resultType = Type() body=DefBody() {
-	return build.defDecl(name.image, resultType, genType, args, body, false, loc(name));
+    String genTypeName = (genType == null) ? null : genType.image;
+	return build.defDecl(name.image, resultType, genTypeName, args, body, false, loc(name));
   }
 }
 
@@ -642,9 +643,9 @@ AST PrimarySuffix(AST lhs, ExpFlags flags) :
 }
 
 AST Arguments(ExpFlags flags) :
-{ AST exp = null; Token t; Type type = null; }
+{ AST exp = null; Token t; Token gentype = null; }
 {
-  [type = GenericType()] t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
+  [gentype = GenericType()] t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
   			if (exp == null)
   				return build.unitValue(loc(t));
   			else
@@ -689,10 +690,10 @@ Token OverrideOperator() :
 	
 }
 
-Type GenericType() :
-{ Type t;  }
+Token GenericType() :
+{ Token t;  }
 {
-    <LBRACK> t = Type() <RBRACK> {
+    <LBRACK> t=<IDENTIFIER> <RBRACK> {
         return t;
     }
 }

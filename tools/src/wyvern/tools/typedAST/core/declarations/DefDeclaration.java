@@ -55,6 +55,19 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
+    private String genTypeName;
+
+	public DefDeclaration(String name, Type returnType, String genType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location) {
+		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
+		this.type = getMethodType(argNames, returnType);
+		this.name = name;
+		this.body = (ExpressionAST) body;
+		this.argNames = argNames;
+		this.isClass = isClassDef;
+		this.location = location;
+        this.genTypeName = genType;
+	}
 
 	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
@@ -66,7 +79,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.isClass = isClassDef;
 		this.location = location;
 	}
-
 
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
 						   TypedAST body, boolean isClassDef) {
@@ -234,6 +246,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
+        ctx = genericTypeExtension(ctx);
 		List<FormalArg> args = new LinkedList<FormalArg>();
 		for (NameBinding b : argNames) {
 			String bName = b.getName();
@@ -246,6 +259,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return ret;
 	}
 
+    // TODO impl
+    private GenContext genericTypeExtension(GenContext ctx) {
+        return ctx;
+        //if(this.genericType == null) { return ctx; }
+        // Need its name, a variable with its name, and itself
+        //return ctx.extend(this.genericType)
+    }
 
 	private ValueType getResultILType(GenContext ctx) {
 		return ((Arrow)type).getResult().getILType(ctx);

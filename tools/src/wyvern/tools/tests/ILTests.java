@@ -1217,20 +1217,6 @@ public class ILTests {
     }
 
     @Test
-    public void testParametricPolymorphIsParsable() throws ParseException {
-
-        String source = ""
-                      + "def identity[K](value: K): K \n"
-                      + "    value \n\n"
-
-                      + "val x = 15 \n"
-                      + "identity(x) \n"
-                      + "";
-
-		TestUtil.getNewAST(source);
-    }
-
-    @Test
     public void testExplicitParametricPolymorphIsParsable() throws ParseException {
 
         String source = ""
@@ -1245,7 +1231,6 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testExplicitParameterization() throws ParseException {
 
         String source = ""
