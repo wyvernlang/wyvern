@@ -100,6 +100,7 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
             newArgs.add((OIRExpression) arg.acceptVisitor(this, state));
         }
         return new OIRMethodCall((OIRExpression) oirMethodCall.getObjectExpr().acceptVisitor(this, state),
+                                 oirMethodCall.getObjectType(),
                                  oirMethodCall.getMethodName(),
                                  newArgs);
     }

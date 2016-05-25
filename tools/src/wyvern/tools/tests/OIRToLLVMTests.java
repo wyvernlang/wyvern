@@ -105,7 +105,7 @@ public class OIRToLLVMTests {
 		rootEnv.addName("class1", oirClass);
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, 
-				new OIRMethodCall (new OIRVariable ("o"), "method", 
+				new OIRMethodCall (new OIRVariable ("o"), null, "method", 
 						new Vector<OIRExpression> ()));
 		OIRProgram.program.setMainExpression(oirLet);
 		OIRProgram.program.addTypeDeclaration(oirInterface);
@@ -197,7 +197,7 @@ public class OIRToLLVMTests {
 		
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, 
-				new OIRMethodCall (new OIRVariable ("o"), "me2", 
+				new OIRMethodCall (new OIRVariable ("o"), null, "me2", 
 						new Vector<OIRExpression> ()));
 		rootEnv.addName ("o", oirNew.typeCheck(rootEnv));
 		OIRProgram.program.setMainExpression(oirLet);
@@ -285,7 +285,7 @@ public class OIRToLLVMTests {
 		
 		oirNew = new OIRNew (new Vector<OIRExpression> (), "class1");
 		oirLet = new OIRLet ("o", oirNew, 
-				new OIRMethodCall (new OIRVariable ("o"), "me2", 
+				new OIRMethodCall (new OIRVariable ("o"), null, "me2", 
 						new Vector<OIRExpression> ()));
 		rootEnv.addName ("o", oirNew.typeCheck(rootEnv));
 		OIRProgram.program.setMainExpression(oirLet);

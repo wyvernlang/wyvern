@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRDelegate;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
@@ -253,10 +254,23 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                                             oirMethodCall.getArgs());
     String methodName = oirMethodCall.getMethodName();
     String strVal;
-    if (methodName.matches("[^a-zA-Z0-9]*"))
-      strVal = "((" + objExpr + ") " + methodName + " (" + args + "))";
-    else
-      strVal = objExpr + "." + oirMethodCall.getMethodName() + "(" + args + ")";
+
+    boolean isBool =
+        oirMethodCall.getObjectType().equals(new NominalType("system",
+                                                             "Boolean"));
+    boolean isInt =
+        oirMethodCall.getObjectType().equals(new NominalType("system",
+                                                             "Int"));
+
+    if (isBool && methodName.equals("ifTrue")) {
+        strVal = "\"TODO\"";
+    } else {
+        if (methodName.matches("[^a-zA-Z0-9]*"))
+            strVal = "((" + objExpr + ") " +
+                methodName + " (" + args + "))";
+        else
+            strVal = objExpr + "." + methodName + "(" + args + ")";
+    }
     state.expectingReturn = oldExpectingReturn;
     if (state.expectingReturn)
       return "return " + strVal;

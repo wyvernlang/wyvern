@@ -192,10 +192,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
 
     body = methodCall.getObjectExpr();
 
-    //ValueType objType = body.typeCheck(cxt);
-
     oirbody = (OIRExpression)body.acceptVisitor(this, cxt, oirenv);
-    oirMethodCall = new OIRMethodCall (oirbody,
+    oirMethodCall = new OIRMethodCall (oirbody, body.typeCheck(cxt),
         methodCall.getMethodName(), args);
 
     return oirMethodCall;
@@ -233,6 +231,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
       arg.add(oirTag);
       condition = new OIRMethodCall (new OIRFieldGet (
           new OIRVariable ("tmp"), "tag"),
+          null,
           "isSubtag", arg);
       oirIfExpr = new OIRIfThenElse (condition, oirThenLet, oirElseExpr);
       oirElseExpr = oirIfExpr;
@@ -265,12 +264,15 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     Expression toReplace;
     Expression inExpr;
 
+    TypeContext extendedCxt =
+        cxt.extend(let.getVarName(), let.getVarType());
+
     toReplace = let.getToReplace();
     oirToReplace = (OIRExpression)toReplace.acceptVisitor(this,
-        cxt, oirenv);
+        extendedCxt, oirenv);
     oirenv.addName(let.getVarName(), null);
     inExpr = let.getInExpr();
-    oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, cxt, oirenv);
+    oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, extendedCxt, oirenv);
     oirLet = new OIRLet (let.getVarName(), oirToReplace, oirInExpr);
 
     return oirLet;
@@ -342,9 +344,11 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     List<OIRFormalArg> listOIRFormalArgs;
     OIRExpression oirBody;
     OIREnvironment defEnv;
+    TypeContext defCxt;
 
     listOIRFormalArgs = new Vector <OIRFormalArg> ();
     defEnv = new OIREnvironment (oirenv);
+    defCxt = cxt;
 
     for (FormalArg arg : defDecl.getFormalArgs())
     {
@@ -353,6 +357,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
       formalArg = (OIRFormalArg) arg.acceptVisitor(this, cxt,
           oirenv);
       defEnv.addName(formalArg.getName(), formalArg.getType());
+      defCxt = defCxt.extend(formalArg.getName(), arg.getType());
       listOIRFormalArgs.add(formalArg);
     }
 
@@ -361,7 +366,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     oirMethodDecl = new OIRMethodDeclaration (null,
         defDecl.getName(), listOIRFormalArgs);
     oirBody = (OIRExpression) defDecl.getBody().acceptVisitor(this,
-        cxt, defEnv);
+        defCxt, defEnv);
     oirMethod = new OIRMethod (defEnv, oirMethodDecl, oirBody);
 
     return oirMethod;

@@ -63,7 +63,7 @@ public class OIRTests {
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
-                              TypeContext.empty(),
+                              Globals.getStandardTypeContext(),
                               OIREnvironment.getRootEnvironment());
 
     String pprint =
@@ -278,7 +278,7 @@ public class OIRTests {
       "val f : system.Int = 3\n" +
       "def m(y : system.Int) : system.Int = m(y)\n" +
       "f\n";
-    testPyFromInput(input, "3");
+    testPyFromInput(input, "3", true);
   }
 
   @Test

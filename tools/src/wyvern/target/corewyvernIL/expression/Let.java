@@ -33,6 +33,10 @@ public class Let extends Expression {
 		return binding.getVarName();
 	}
 
+    public ValueType getVarType() {
+        return binding.getType();
+    }
+
 	public Expression getToReplace() {
 		return binding.getExpression();
 	}
