@@ -263,7 +263,7 @@ AST DefDeclaration() :
 { Type resultType; Token name; AST body; List args; Type genType = null; }
 {
   <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [genType = GenericType()] args = Formals() <COLON> resultType = Type() body=DefBody() {
-	return build.defDecl(name.image, resultType, args, body, false, loc(name));
+	return build.defDecl(name.image, resultType, genType, args, body, false, loc(name));
   }
 }
 
