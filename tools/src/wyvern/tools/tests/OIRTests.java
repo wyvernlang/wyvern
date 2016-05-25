@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.PrettyPrintVisitor;
@@ -62,7 +63,7 @@ public class OIRTests {
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
-                              new Environment(null, null),
+                              TypeContext.empty(),
                               OIREnvironment.getRootEnvironment());
 
     String pprint =
