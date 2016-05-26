@@ -278,7 +278,7 @@ public class OIRTests {
       "val f : system.Int = 3\n" +
       "def m(y : system.Int) : system.Int = m(y)\n" +
       "f\n";
-    testPyFromInput(input, "3", true);
+    testPyFromInput(input, "3");
   }
 
   @Test
@@ -377,6 +377,17 @@ public class OIRTests {
         String input =
             "val n = 5\n" +
             "(n < 2).ifTrue(() => 1, () => 2)\n";
-        testPyFromInput(input, "2", true);
+        testPyFromInput(input, "2");
+    }
+
+    @Test
+    public void testNotBooleans() throws ParseException {
+        // Ensure that we don't translate "ifTrue" methods
+        // on non-boolean objects
+        String input =
+            "val obj = new\n" +
+            "  def ifTrue(x : Int, y : Int) : Int = x\n" +
+            "obj.ifTrue(2,3)\n";
+        testPyFromInput(input, "2");
     }
 }
