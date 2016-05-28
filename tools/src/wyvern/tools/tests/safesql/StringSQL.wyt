@@ -1,0 +1,5 @@
+resource type StringSQL
+	def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
+									 checkColumn:String):Int
+	def substitute(queryNumber:Int, searchValue:String):Int
+	def runQuery(queryNumber:Int):Int

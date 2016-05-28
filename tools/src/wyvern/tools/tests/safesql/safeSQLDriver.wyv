@@ -1,0 +1,6 @@
+resource module main // must be called main, apparently
+
+instantiate stringSQL() as sql
+instantiate sqlMain(sql) as theMain
+
+val x = theMain.x

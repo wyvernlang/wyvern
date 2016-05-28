@@ -1,0 +1,9 @@
+resource module safeSQL
+
+require StringSQL as stringSQL
+
+def querySelectFromWhereEquals(selectColumn:String, table:String, \
+							   checkColumn:String, searchValue:String):Int
+	val genericQuery = stringSQL.prepareSelectFromWhereEquals(selectColumn, table, checkColumn)
+	val actualQuery = stringSQL.substitute(genericQuery,searchValue)
+	stringSQL.runQuery(actualQuery)

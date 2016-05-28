@@ -1,0 +1,7 @@
+resource module sqlMain
+
+require StringSQL as stringSQL
+instantiate safeSQL(stringSQL) as safeSql
+instantiate application(safeSql) as app
+
+val x = app.run()
