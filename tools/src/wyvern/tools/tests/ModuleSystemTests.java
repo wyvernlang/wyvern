@@ -268,4 +268,11 @@ public class ModuleSystemTests {
 		
 	}
 	
+	@Test
+	public void testSafeSQL() throws ParseException {
+		// old version
+		//ILTests.doTestScriptModularly("modules.safeSQLmain", null, null);
+		ILTests.doTestScriptModularly("modules.safeSQLdriver", Util.intType(), new IntegerLiteral(5));
+	}
+	
 }

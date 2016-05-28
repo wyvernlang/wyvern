@@ -1,0 +1,9 @@
+resource module stringSQL
+
+def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
+								 checkColumn:String):Int
+	5
+def substitute(queryNumber:Int, searchValue:String):Int
+	5
+def runQuery(queryNumber:Int):Int
+	5
