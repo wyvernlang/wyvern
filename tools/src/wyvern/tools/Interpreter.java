@@ -51,7 +51,7 @@ public class Interpreter {
 		} catch (ParseException e) {
 			System.err.println(e.toString());
 		} catch (ToolError e) {
-			System.err.println(e.getTypecheckingErrorMessage().toString());
+			System.err.println(e.getMessage());
 		}
 	}
 }

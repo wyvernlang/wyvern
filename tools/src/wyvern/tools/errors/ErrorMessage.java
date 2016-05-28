@@ -76,6 +76,7 @@ public enum ErrorMessage {
 	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
 	
 	PARSE_ERROR("%ARG", 1),
+	READ_FILE_ERROR("Could not read file %ARG", 1),
 	;
 	
 	private ErrorMessage(String message, int numArgs) {
