@@ -1,5 +1,15 @@
 resource module stringSQL
 
+type SQL
+	def query():String
+
+type PreparedQuery
+	def apply(arg1:String, arg2:String):SQL
+	
+def prepare(q:String):PreparedQuery = new
+	def apply(arg1:String, arg2:String):SQL = new
+		def query():String = "hello!"	
+
 def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
 								 checkColumn:String):Int
 	5

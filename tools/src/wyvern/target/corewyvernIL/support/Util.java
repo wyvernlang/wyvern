@@ -41,7 +41,7 @@ public class Util {
 		return new NominalType("Lists", "List");
 	}
 	public static Value unitValue() {
-		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, EvalContext.empty());
+		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, null, EvalContext.empty());
 	}
 	public static final String APPLY_NAME = "apply";
 }

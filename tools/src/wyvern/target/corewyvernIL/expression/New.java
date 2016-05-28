@@ -23,6 +23,7 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class New extends Expression {
@@ -33,26 +34,20 @@ public class New extends Expression {
 	private DelegateDeclaration delegateDeclaration;
 
 	/** convenience method for a single declaration */
+	public New(NamedDeclaration decl, FileLocation loc) {
+		this(Arrays.asList(decl), loc);
+	}
 	public New(NamedDeclaration decl) {
-		this(Arrays.asList(decl));
+		this(decl, decl.getLocation());
 	}
 	
 	/** computes the type itself, uses a don't care selfName */
-	public New(List<NamedDeclaration> decls) {
-		this(decls, "dontcare", typeOf(decls));
+	public New(List<NamedDeclaration> decls, FileLocation loc) {
+		this(decls, "dontcare", typeOf(decls), loc);
 	}
 	
-	private static ValueType typeOf(List<NamedDeclaration> decls2) {
-		List<DeclType> declts =	new LinkedList<DeclType>();
-		for (NamedDeclaration d : decls2) {
-			declts.add(d.getDeclType());
-		}
-		ValueType type = new StructuralType("dontcare", declts);
-		return type;
-	}
-	
-	public New(List<? extends Declaration> decls, String selfName, ValueType type) {
-		super(type);
+	public New(List<? extends Declaration> decls, String selfName, ValueType type, FileLocation loc) {
+		super(type, loc);
 		this.decls = decls;
 		this.selfName = selfName;
 		for (Declaration d : decls) {
@@ -139,7 +134,7 @@ public class New extends Expression {
 		}
 
 		if (isResource && !requiredT.isResource(GenContext.empty())) {
-			ToolError.reportError(ErrorMessage.MUST_BE_RESOURCE_TYPE, this, requiredT.getSelfName());
+			ToolError.reportError(ErrorMessage.MUST_BE_ASSIGNED_TO_RESOURCE_TYPE, this);
 		}
 
 		return type;
@@ -155,7 +150,7 @@ public class New extends Expression {
 		    Declaration newD = d.interpret(ctx);
 		    ds.add(newD);
 		}
-		result = new ObjectValue(ds, selfName, getExprType().interpret(ctx),delegateDeclaration, ctx);
+		result = new ObjectValue(ds, selfName, getExprType().interpret(ctx),delegateDeclaration, getLocation(), ctx);
 
 		return result;
 	}
@@ -175,5 +170,14 @@ public class New extends Expression {
 		}
 		freeVars.remove(selfName);
 		return freeVars;
+	}
+	
+	private static ValueType typeOf(List<NamedDeclaration> decls2) {
+		List<DeclType> declts =	new LinkedList<DeclType>();
+		for (NamedDeclaration d : decls2) {
+			declts.add(d.getDeclType());
+		}
+		ValueType type = new StructuralType("dontcare", declts);
+		return type;
 	}
 }

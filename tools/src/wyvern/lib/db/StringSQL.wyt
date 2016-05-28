@@ -1,4 +1,11 @@
 resource type StringSQL
+	type SQL
+		def query():String
+	type PreparedQuery
+		def apply(arg1:String, arg2:String):this.SQL
+		
+	def prepare(q:String):this.PreparedQuery
+	
 	def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
 									 checkColumn:String):Int
 	def substitute(queryNumber:Int, searchValue:String):Int

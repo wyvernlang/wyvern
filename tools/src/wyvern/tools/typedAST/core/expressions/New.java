@@ -254,7 +254,7 @@ public class New extends CachingTypedAST implements CoreAST {
         wyvern.target.corewyvernIL.expression.New exn = new wyvern.target.corewyvernIL.expression.New(
                 genDecls,
                 this.self(),
-        null);
+        null, getLocation());
         Expression output = exn;
         for (String key : variables.keySet()) {
             output = new Let(key, null, variables.get(key), output);
@@ -333,11 +333,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
         }
         // if type is not specified, infer
-        if (expectedType == null) {
-            return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), type);
-        } else { // if type is specified, use that type
-            return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), expectedType);
-        }
+        return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), expectedType == null ? type:expectedType, getLocation());
     }
     
     public void setSelfName(String n) {

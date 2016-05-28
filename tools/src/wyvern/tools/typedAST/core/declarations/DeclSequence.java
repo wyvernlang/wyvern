@@ -265,7 +265,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
         for (Declaration ast : this.getDeclIterator()) {
             outputDecls.addAll(DeclarationWriter.generate(writer, iw -> ast.codegenToIL(innerEnv, iw)));
         }
-        writer.wrap(e->new Let(varname, null, new New(outputDecls, "this", null), (Expression)e));
+        writer.wrap(e->new Let(varname, null, new New(outputDecls, "this", null, getLocation()), (Expression)e));
     }
 
     /**
@@ -373,7 +373,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 		
 		/* wrap the declarations into an object */
-		Expression newExp = new New(decls, newName, type);
+		Expression newExp = new New(decls, newName, type, getLocation());
 		tlc.addLet(newName, type, newExp, true);
 	}
 	

@@ -66,7 +66,7 @@ public class TopLevelContext {
 			}
 		}
 		
-		Expression exp = new New(moduleDecls, newName, vt);
+		Expression exp = new New(moduleDecls, newName, vt, null);
 		addExpression(exp, vt);
 		
 		return getExpression();
