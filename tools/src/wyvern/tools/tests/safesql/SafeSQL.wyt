@@ -1,3 +1,0 @@
-resource type SafeSQL
-	def querySelectFromWhereEquals(selectColumn:String, table:String, \
-								   checkColumn:String, searchValue:String):Int

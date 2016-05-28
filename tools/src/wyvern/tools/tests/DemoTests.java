@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -37,40 +38,11 @@ public class DemoTests {
 		WyvernResolver.getInstance().addPath(PATH);
     }
     
-	private static final String SQL_PATH = BASE_PATH + "safesql/";
-	
 	@Test
-	@Category(RegressionTests.class)
-	public void testSafeSqlDemo() throws ParseException {
-
-		String[] fileList = {"StringSQL.wyt", "stringSQL.wyv", "SafeSQL.wyt", "safeSQL.wyv", "application.wyv", "sqlMain.wyv", "safeSQLDriver.wyv", };
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(SQL_PATH), new File(TestUtil.LIB_PATH)));
-
-		TypeContext ctx = Globals.getStandardTypeContext();
-		//GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		
-		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-		
-		for(String fileName : fileList) {
-			System.out.println(fileName);
-			String source = TestUtil.readFile(SQL_PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
-			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
-			decls.add(decl);
-			genCtx = GenUtil.link(genCtx, decl);
-		}
-		
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x", null); 
-		
-		ValueType t = program.typeCheck(ctx);
-		wyvern.target.corewyvernIL.expression.Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
+	public void testSafeSQL() throws ParseException {
+		ILTests.doTestScriptModularly("modules.safeSQLdriver", Util.intType(), new IntegerLiteral(5));
 	}
-
-
+	
 	@Test
 	@Category(RegressionTests.class)
 	public void testArithmeticAST() throws ParseException {
