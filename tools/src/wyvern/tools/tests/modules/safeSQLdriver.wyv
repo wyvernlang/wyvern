@@ -1,0 +1,11 @@
+import db.stringSQL
+import modules.sqlMain
+
+val sql = stringSQL()
+val main = sqlMain(sql)
+
+// in theory should be able to use this
+//instantiate db.stringSQL() as sql
+//instantiate sqlMain(sql) as main
+
+main.result

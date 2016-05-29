@@ -302,6 +302,7 @@ AST DelegateDeclaration() :
 
 AST TypeDeclaration() :
 { Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
+  Token selfName = null;
   Object tagInfo = null; boolean isResource = false;
 }
 {
@@ -310,13 +311,15 @@ AST TypeDeclaration() :
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
+  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW> ]
   <NEWLINE> [<INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT>] {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
-    } 
-	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource);
+    }
+    String self = (selfName == null) ? null : selfName.image;
+	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
   }
 }
 
@@ -336,6 +339,8 @@ AST DeclType() :
   exp = ValDeclType()  { return exp; }
 |
   exp = VarDeclType()  { return exp; }
+|
+  LOOKAHEAD(3) exp = TypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
 }
@@ -586,9 +591,18 @@ AST UnaryExpression(ExpFlags flags) :
 }
 
 AST PrimaryExpression(ExpFlags flags) :
-{ AST exp; }
+{ AST exp; Token t; Token selfName = null; }
 {
   exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )*  { return exp; }
+|
+  t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW>] {
+    String self = (selfName == null) ? null : selfName.image;
+    exp = build.newObj(loc(t), self);
+    
+    // store a reference to the new expression so we can fill in the fields later!
+    flags.setExp(exp, IndentedExpKind.NEW_KIND);
+    return exp;
+  }
 }
 
 AST PrimaryPrefix(ExpFlags flags) :
@@ -597,14 +611,6 @@ AST PrimaryPrefix(ExpFlags flags) :
   exp = Literal() { return exp; }
 |
   t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
-|
-  t = <NEW> {
-    exp = build.newObj(loc(t)); 
-    
-    // store a reference to the new expression so we can fill in the fields later!
-    flags.setExp(exp, IndentedExpKind.NEW_KIND);
-    return exp;
-  }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |

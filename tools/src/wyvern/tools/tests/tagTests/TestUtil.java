@@ -11,6 +11,9 @@ import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -170,7 +173,8 @@ public class TestUtil {
 			}
 			return b.toString();
 		} catch (IOException e) {
-			Assert.fail("Failed opening file: " + file.getPath());
+			ToolError.reportError(ErrorMessage.READ_FILE_ERROR, (FileLocation) null, file.getPath());
+			//Assert.fail("Failed opening file: " + file.getPath());
 			throw new RuntimeException(e);
 		}
 	}

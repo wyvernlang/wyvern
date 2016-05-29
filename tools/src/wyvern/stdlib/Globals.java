@@ -155,7 +155,7 @@ public class Globals {
 		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
-		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, EvalContext.empty());
+		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
 		return systemVal;
 	}
 }

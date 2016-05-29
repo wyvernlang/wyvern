@@ -43,7 +43,7 @@ public class GenUtil {
 			ValueType type = new StructuralType(decl.getName(), declts);
 			
 			/* manually wrap the method into an object*/
-			Expression newExp = new New(decls, decl.getName(), type);
+			Expression newExp = new New(decls, decl.getName(), type, decl.getLocation());
 			
 			return genCtx.extend(decl.getName(), newExp, type); // adding the object into the environment, instead of linking 
 		}
@@ -81,7 +81,7 @@ public class GenUtil {
 				ValueType type = new StructuralType(decl.getName(), declts);
 				
 				/* manually wrap the method into an object*/
-				Expression newExp = new New(decls, decl.getName(), type);
+				Expression newExp = new New(decls, decl.getName(), type, decl.getLocation());
 				if(!ai.hasNext()) {
 					//return newExp;
 					return new Let(decl.getName(), type, newExp, new wyvern.target.corewyvernIL.expression.MethodCall(new Variable("main"), "main", new LinkedList<Expression>(), decl));

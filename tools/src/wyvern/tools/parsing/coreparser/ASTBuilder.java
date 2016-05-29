@@ -14,7 +14,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST valDecl(String name, Type type, AST exp, FileLocation loc);
 	public AST varDecl(String name, Type type, AST exp, FileLocation loc);
 	public AST defDecl(String name, Type type, List args, AST body, boolean isClassDef, FileLocation loc);
-	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource);
+	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 	public AST delegateDecl(Type type, AST exp, FileLocation loc);
 	
 	public AST defDeclType(String name, Type type, List args, FileLocation loc);
@@ -32,7 +32,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST application(AST function, AST arguments, FileLocation loc);
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
-	public AST newObj(FileLocation loc);
+	public AST newObj(FileLocation loc, String selfName);
 	public AST dsl(FileLocation loc);
 	public AST tuple(List<AST> members, FileLocation loc);
 	public AST match(AST exp, List cases, FileLocation loc);

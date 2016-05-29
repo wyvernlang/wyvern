@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 
 public class ObjectValue extends New implements Invokable {
 	final EvalContext evalCtx; // captured eval context
@@ -17,8 +18,8 @@ public class ObjectValue extends New implements Invokable {
 	/** Precondition: the decls argument must be unique.
 	 * It is owned by this ObjectValue after the constructor call.
 	 */
-	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, DelegateDeclaration delegateDecl,EvalContext ctx) {
-		super(decls, selfName, exprType);
+	public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, DelegateDeclaration delegateDecl,FileLocation loc,EvalContext ctx) {
+		super(decls, selfName, exprType, loc);
 		
 		if (selfName == null || selfName.length() == 0)
 			throw new RuntimeException("selfName invariant violated");
