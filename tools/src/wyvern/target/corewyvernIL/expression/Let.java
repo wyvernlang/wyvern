@@ -33,6 +33,10 @@ public class Let extends Expression {
 		return binding.getVarName();
 	}
 
+    public ValueType getVarType() {
+        return binding.getType();
+    }
+
 	public Expression getToReplace() {
 		return binding.getExpression();
 	}
@@ -67,8 +71,8 @@ public class Let extends Expression {
 	}
 
 	@Override
-	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
-			Environment env, OIREnvironment oirenv) {
+	public <T, E> T acceptVisitor(ASTVisitor <T, E> emitILVisitor,
+			E env, OIREnvironment oirenv) {
 		return emitILVisitor.visit(env, oirenv, this);
 	}
 

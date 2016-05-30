@@ -34,7 +34,7 @@ public class DynamicType extends ValueType {
 	}
 	
 	@Override
-	public <T> T acceptVisitor(ASTVisitor<T> emitILVisitor, Environment env,
+	public <T, E> T acceptVisitor(ASTVisitor<T, E> emitILVisitor, E env,
 			OIREnvironment oirenv) {
 		// TODO Auto-generated method stub
 		return null;
