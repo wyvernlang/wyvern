@@ -175,14 +175,12 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldReadFromNonExistent() throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 5\n"
 					 + "obj.x\n";
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
@@ -201,19 +199,16 @@ public class ILTests {
 					 + "    var v : system.Int = 3\n"
 					 + "obj.v = \"hello\"\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldWriteToNonExistent () throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 3\n"
 					 + "obj.x = 5\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
@@ -940,7 +935,9 @@ public class ILTests {
 			// TODO: replace this with a standard prelude
 			program.typeCheck(TypeContext.empty().extend("system", Util.unitType()));
 			Assert.fail("A type error should have been reported.");
-		} catch (ToolError toolError) {}
+		} catch (ToolError toolError) {
+			System.err.println(toolError);
+		}
 	}
 	
 	@Test
