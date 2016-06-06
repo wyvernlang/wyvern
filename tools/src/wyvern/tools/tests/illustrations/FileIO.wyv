@@ -1,6 +1,6 @@
 resource module FileIO
 
-import java:wyvern.tools.tests.OOPSLA16.nativeFileIO
+import java:wyvern.tools.tests.Illustrations.nativeFileIO
 
 def read():system.Int
 	nativeFileIO.read()

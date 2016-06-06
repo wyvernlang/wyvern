@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -382,6 +383,11 @@ public class ILTests {
 	}
     
 	@Test
+	public void testSimpleParameterization() throws ParseException {
+		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
+	}
+	
+	/*@Test
 	public void testSingleModule() throws ParseException {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
@@ -394,11 +400,6 @@ public class ILTests {
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
 	}
 
-	@Test
-	public void testSimpleParameterization() throws ParseException {
-		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
-	}
-	
 
 	@Test
 	public void testMultipleModules() throws ParseException {
@@ -428,7 +429,7 @@ public class ILTests {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral three = new IntegerLiteral(3);
 		Assert.assertEquals(three, v);
-	}
+	}*/
 	
 	@Test
 	public void testRecursiveMethod() throws ParseException {
@@ -628,7 +629,7 @@ public class ILTests {
 		TypedAST ast = TestUtil.getNewAST(input);
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		TypeContext ctx = Globals.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
 		Expression mainProgram = ((DefDeclaration)decl).getBody();
 		Expression program = new FieldGet(mainProgram, fieldName, null); // slightly hacky		
         doChecks(program, expectedType, expectedValue);

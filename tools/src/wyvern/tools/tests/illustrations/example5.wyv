@@ -1,0 +1,11 @@
+resource module example5
+
+import illustrations.Logger
+import illustrations.WavyUnderlineV3
+
+require illustrations.SigFileIO as io
+
+val logger = Logger(io)
+val wavyUnderliner = WavyUnderlineV3(logger)
+
+val x : system.Int = wavyUnderliner.underlineIt()
