@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -29,10 +30,10 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
-public class OOPSLA16 {
+public class Illustrations {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "oopsla16/";
+	private static final String PATH = BASE_PATH + "illustrations/";
 	
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();
@@ -41,7 +42,7 @@ public class OOPSLA16 {
 
 	@Test
 	public void testFigure5Corrected() throws ParseException {
-
+		/*
 		String[] fileList = {"FileIO.wyt", "FileIO.wyv", "SigLogger.wyt", "Logger.wyv", "WavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv", };
 		GenContext genCtx = Globals.getStandardGenContext();
 		TypeContext ctx = Globals.getStandardTypeContext();
@@ -66,6 +67,10 @@ public class OOPSLA16 {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
+		*/
+		ILTests.doTestScriptModularly("illustrations.example5driver",
+				Util.intType(),
+				new IntegerLiteral(5));
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -134,7 +139,7 @@ public class OOPSLA16 {
 	
 	@Test
 	public void testFigure2() throws ParseException {
-		String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
+		/*String[] fileList = {"Lists.wyv", "SigUserInfo.wyt", "UserInfo.wyv", "DocumentLock.wyv", "example2.wyv", };
 		GenContext genCtx = Globals.getStandardGenContext();
 		TypeContext ctx = Globals.getStandardTypeContext();
 
@@ -157,6 +162,10 @@ public class OOPSLA16 {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
+		*/
+		ILTests.doTestScriptModularly("illustrations.example2",
+				Util.intType(),
+				new IntegerLiteral(5));
 	}
 	
 	@Test(expected=RuntimeException.class)

@@ -177,17 +177,24 @@ public class ModuleResolver {
 			throw new RuntimeException();
 		}
         
-		TypeContext ctx = Globals.getStandardTypeContext();
+		TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
         ValueType moduleType = program.typeCheck(ctx);
         
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
 		return new Module(spec, program, dependencies);
 	}
 
+	public TypeContext extendContext(TypeContext ctx, List<TypedModuleSpec> dependencies) {
+		for (TypedModuleSpec spec : dependencies) {
+			ctx = ctx.extend(spec.getInternalName(), spec.getType());
+		}
+		return ctx;
+	}
+	
 	public Expression wrap(Expression program, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
 			Module m = resolveModule(spec.getQualifiedName());
-			program = new Let(m.getSpec().getQualifiedName(), m.getSpec().getType(), m.getExpression(), program);
+			program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
 		}
 		return program;
 	}

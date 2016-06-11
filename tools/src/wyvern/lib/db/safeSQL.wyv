@@ -2,18 +2,18 @@ resource module safeSQL
 
 require db.StringSQL as stringSQL
 
-resource type SQL
+resource type SSQL
 	val row:String
 	val from:String
 	def execute():String
 	
 resource type SQLSelect
 	val row:String
-	def from(table:String):SQL
+	def from(table:String):SSQL
 
 def select(row:String):SQLSelect = new
 	val row:String = row
-	def from(table:String):SQL = new
+	def from(table:String):SSQL = new
 		val row:String = row
 		val from:String = table
 		def execute():String

@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -175,14 +176,12 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldReadFromNonExistent() throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 5\n"
 					 + "obj.x\n";
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
@@ -201,19 +200,16 @@ public class ILTests {
 					 + "    var v : system.Int = 3\n"
 					 + "obj.v = \"hello\"\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldWriteToNonExistent () throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 3\n"
 					 + "obj.x = 5\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
@@ -387,6 +383,11 @@ public class ILTests {
 	}
     
 	@Test
+	public void testSimpleParameterization() throws ParseException {
+		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
+	}
+	
+	/*@Test
 	public void testSingleModule() throws ParseException {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
@@ -399,11 +400,6 @@ public class ILTests {
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
 	}
 
-	@Test
-	public void testSimpleParameterization() throws ParseException {
-		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
-	}
-	
 
 	@Test
 	public void testMultipleModules() throws ParseException {
@@ -433,7 +429,7 @@ public class ILTests {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral three = new IntegerLiteral(3);
 		Assert.assertEquals(three, v);
-	}
+	}*/
 	
 	@Test
 	public void testRecursiveMethod() throws ParseException {
@@ -633,7 +629,7 @@ public class ILTests {
 		TypedAST ast = TestUtil.getNewAST(input);
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		TypeContext ctx = Globals.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
 		Expression mainProgram = ((DefDeclaration)decl).getBody();
 		Expression program = new FieldGet(mainProgram, fieldName, null); // slightly hacky		
         doChecks(program, expectedType, expectedValue);
@@ -940,7 +936,9 @@ public class ILTests {
 			// TODO: replace this with a standard prelude
 			program.typeCheck(TypeContext.empty().extend("system", Util.unitType()));
 			Assert.fail("A type error should have been reported.");
-		} catch (ToolError toolError) {}
+		} catch (ToolError toolError) {
+			System.err.println(toolError);
+		}
 	}
 	
 	@Test

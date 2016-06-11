@@ -8,4 +8,6 @@ def run() : Int
 	//val query : safeSQL.SQL = ~
 	//	SELECT ID FROM myTable WHERE name=$input
 	
+	//val query = safeSQL.
+	
     safeSQL.querySelectFromWhereEquals("ID", "myTable", "name", input)
