@@ -70,7 +70,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
   }
 
     private String stringFromPrefix(List<String> prefix, String indent) {
-        String result = "";
+        String result = "\n" + indent;
         for (String line : prefix) {
             result += line + "\n" + indent;
         }
