@@ -43,6 +43,10 @@ class PrettyPrintState {
     public HashSet <String> freeVarSet;
     public String currentMethod;
     public ArrayList <String> prefix;
+    public HashSet <String> currentlyDefining;
+    public HashMap <String, String> classRecursiveNames;
+    public String currentLetVar;
+    public boolean inClass;
 }
 
 public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
@@ -106,12 +110,16 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     state.freeVarSet = new HashSet<>();
     state.currentMethod = "";
     state.prefix = new ArrayList<>();
+    state.currentlyDefining = new HashSet<>();
+    state.inClass = false;
+    state.classRecursiveNames = new HashMap<>();
+
+    String methodDecls =
+        "def mergeDicts(l, r):\n" +
+        "  l.update(r)\n" +
+        "  return r\n\n";
 
     findClassDecls(state, oirenv);
-
-    for (OIRClassDeclaration classDecl : state.classDecls.values()) {
-      classDefs += classDecl.acceptVisitor(this, state) + "\n";
-    }
 
     String python =
       NameMangleVisitor.mangleAST(oirast).acceptVisitor(this, state);
@@ -124,13 +132,18 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       out.append("\n");
     }
 
+    for (OIRClassDeclaration classDecl : state.classDecls.values()) {
+        classDefs += classDecl.acceptVisitor(this, state) + "\n";
+    }
+
     String prefix = stringFromPrefix(state.prefix, "");
 
-    return classDefs + prefix + out.toString();
+    return methodDecls + classDefs + prefix + out.toString();
   }
 
   public String visit(PrettyPrintState state,
                       OIRInteger oirInteger) {
+      state.currentLetVar = "";
     String strVal = Integer.toString(oirInteger.getValue());
     if (state.expectingReturn)
       return state.returnType + " " + strVal;
@@ -139,6 +152,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRBoolean oirBoolean) {
+      state.currentLetVar = "";
     String strVal = (oirBoolean.isValue() ? "True" : "False");
     if (state.expectingReturn)
       return state.returnType + " " + strVal;
@@ -147,11 +161,13 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRCast oirCast) {
+      state.currentLetVar = "";
     return "OIRCast unimplemented";
   }
 
   public String visit(PrettyPrintState state,
                       OIRFieldGet oirFieldGet) {
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
     String objExpr =
@@ -167,6 +183,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRFieldSet oirFieldSet) {
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
     String objExpr =
@@ -195,6 +212,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRIfThenElse oirIfThenElse) {
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
     String conditionString = oirIfThenElse.getCondition().acceptVisitor(this, state);
@@ -216,6 +234,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRLet oirLet) {
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = true;
     ArrayList<String> oldPrefix = state.prefix;
@@ -229,9 +248,14 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     int letId = uniqueId;
     uniqueId++;
 
+    HashSet<String> oldCurrentlyDefining =
+        (HashSet<String>)state.currentlyDefining.clone();
+    state.currentlyDefining.add(oirLet.getVarName());
+
     String funDecl = "def letFn" + Integer.toString(letId) +
       "(" + oirLet.getVarName() +"):\n" + indent + indentIncrement;
     state.expectingReturn = false;
+    state.currentLetVar = oirLet.getVarName();
     String toReplaceString, prefix;
     if (oirLet.getToReplace() instanceof OIRFieldSet) {
       OIRFieldSet fieldSet = (OIRFieldSet)oirLet.getToReplace();
@@ -255,6 +279,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                                           indent + indentIncrement);
     state.expectingReturn = oldExpectingReturn;
     state.prefix = oldPrefix;
+    state.currentlyDefining = oldCurrentlyDefining;
 
     String funCall = "\n" + indent;
     if (state.expectingReturn)
@@ -266,6 +291,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRMethodCall oirMethodCall) {
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
     String objExpr =
@@ -312,6 +338,8 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRNew oirNew) {
+      String letName = state.currentLetVar;
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
 
@@ -327,18 +355,24 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     Set<String> freeVars = decl.getFreeVariables();
     String dict;
     if (args.equals(""))
-      dict = "env={";
+      dict = "env=";
     else
-      dict = ", env={";
+      dict = ", env=";
+    if (state.inClass)
+        dict += "mergeDicts(" + NameMangleVisitor.mangle("this") + ".env, {";
+    else
+        dict += "({";
     boolean first = true;
     for (String freeVar : freeVars) {
       if (!first)
         dict += ", ";
       first = false;
 
-      dict += "'" + freeVar + "': " + freeVar;
+      OIRVariable var = new OIRVariable(freeVar);
+
+      dict += "'" + freeVar + "': " + var.acceptVisitor(this, state);
     }
-    dict += "}";
+    dict += "})";
 
     String d = "";
 
@@ -347,18 +381,27 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       d = ", delegate=" + delegate.getField();
     }
 
+    String thisName = "";
+
+    if (!letName.equals("")) {
+        thisName = ", thisName = \"" + letName + "\"";
+        state.classRecursiveNames.put(oirNew.getTypeName(), letName);
+    }
+
     state.expectingReturn = oldExpectingReturn;
     classesUsed.add(oirNew.getTypeName());
-    return oirNew.getTypeName() + "(" + args + dict + d + ")";
+    return oirNew.getTypeName() + "(" + args + dict + d + thisName + ")";
   }
 
   public String visit(PrettyPrintState state,
                       OIRRational oirRational) {
+      state.currentLetVar = "";
     return "OIRRational unimplemented";
   }
 
   public String visit(PrettyPrintState state,
                       OIRString oirString) {
+      state.currentLetVar = "";
     String strVal = "\"" + oirString.getValue() + "\"";
     if (state.expectingReturn)
       return state.returnType + " " + strVal;
@@ -367,8 +410,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRVariable oirVariable) {
+      state.currentLetVar = "";
     String var;
-    if (state.freeVarSet.contains(oirVariable.getName()))
+    if (state.freeVarSet.contains(oirVariable.getName())
+        || state.currentlyDefining.contains(oirVariable.getName()))
         var = NameMangleVisitor.mangle("this") +
             ".env['" + oirVariable.getName() + "']";
     else
@@ -380,13 +425,22 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRClassDeclaration oirClassDeclaration) {
+      state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
     state.expectingReturn = false;
+    boolean oldInClass = state.inClass;
+    state.inClass = true;
 
     HashSet<String> oldFreeVarSet = state.freeVarSet;
     state.freeVarSet = new HashSet<String>(oirClassDeclaration.getFreeVariables());
 
-    String classDef = "class " + oirClassDeclaration.getName() + ":";
+    String className = oirClassDeclaration.getName();
+
+    if (state.classRecursiveNames.containsKey(className)) {
+        state.freeVarSet.add(state.classRecursiveNames.get(className));
+    }
+
+    String classDef = "class " + className + ":";
     String oldIndent = indent;
     indent += indentIncrement;
     String members = "";
@@ -407,9 +461,11 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       constructor_args.append(", " + dec.getName());
     }
     members += "\n" + indent +
-      "def __init__(this" + constructor_args.toString() + ", env={}, delegate=None):";
+      "def __init__(this" + constructor_args.toString() + ", env={}, delegate=None, thisName=None):";
     members += "\n" + indent + indentIncrement + "this.env = env";
     members += "\n" + indent + indentIncrement + "this.delegate = delegate";
+    members += "\n" + indent + indentIncrement + "if thisName is not None:";
+    members += "\n" + indent + indentIncrement + indentIncrement + "this.env[thisName] = this";
     members += constructor_body.toString();
 
     if (!oirClassDeclaration.getDelegates().isEmpty()) {
@@ -431,32 +487,38 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
     state.expectingReturn = oldExpectingReturn;
     state.freeVarSet = oldFreeVarSet;
+    state.inClass = oldInClass;
 
     return classDef + members;
   }
 
   public String visit(PrettyPrintState state,
                       OIRProgram oirProgram) {
+      state.currentLetVar = "";
     return "OIRProgram unimplemented";
   }
 
   public String visit(PrettyPrintState state,
                       OIRInterface oirInterface) {
+      state.currentLetVar = "";
     return "OIRInterface unimplemented";
   }
 
   public String visit(PrettyPrintState state,
                       OIRFieldDeclaration oirFieldDeclaration) {
+      state.currentLetVar = "";
     return "OIRFieldDeclaration unimplemented";
   }
 
   public String visit(PrettyPrintState state,
                       OIRMethodDeclaration oirMethodDeclaration) {
+      state.currentLetVar = "";
     return "OIRMethodDeclaration unimplemented";
   }
 
   public String visit(PrettyPrintState state,
                       OIRMethod oirMethod) {
+      state.currentLetVar = "";
       String args = NameMangleVisitor.mangle("this");
       OIRMethodDeclaration decl = oirMethod.getDeclaration();
       for (OIRFormalArg formalArg : decl.getArgs()) {
@@ -495,6 +557,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   public String visit(PrettyPrintState state,
                       OIRFFIImport oirImport) {
+      state.currentLetVar = "";
     if (oirImport.getFFIType() != FFIType.PYTHON) {
       throw new RuntimeException("Python backend does not support non-python FFIs!");
     }

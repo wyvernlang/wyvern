@@ -402,4 +402,16 @@ public class OIRTests {
             "sum1ToN(5)\n";
         testPyFromInput(input, "15", true);
     }
+
+    @Test
+    public void testFreeVariableTransitivity() throws ParseException {
+        String input =
+            "val x = 5\n" +
+            "def f() : Int\n" +
+            "  def g() : Int\n" +
+            "    x + x\n" +
+            "  g()\n" +
+            "f()\n";
+        testPyFromInput(input, "10", true);
+    }
 }
