@@ -1245,6 +1245,21 @@ public class ILTests {
     }
 
     @Test
+    public void testExplicitTwoParams() throws ParseException {
+
+        String source = ""
+                      + "def identity[K, L](value: K, value2: L): L \n"
+                      + "    value2 \n\n"
+
+                      + "val x = 15 \n"
+                      + "val y = 20 \n"
+                      + "identity[Int, Int](x, y) \n"
+                      + "";
+
+        doTest(source, null, new IntegerLiteral(20));
+    }
+
+    @Test
     @Category(CurrentlyBroken.class)
     public void testParameterizationInferred() throws ParseException {
 

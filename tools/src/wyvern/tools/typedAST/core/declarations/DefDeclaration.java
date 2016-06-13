@@ -23,6 +23,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.expressions.Assignment;
@@ -59,12 +60,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
-    private String genTypeName;
+    private List<String> generics;
 
     public static final String GENERIC_PREFACE = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
-	public DefDeclaration(String name, Type returnType, String genType, List<NameBinding> argNames,
+	public DefDeclaration(String name, Type returnType, List<Token> generics, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, returnType);
@@ -73,7 +74,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-        this.genTypeName = genType;
+
+        this.generics = new LinkedList<String>();
+        if(generics != null) {
+            for(Token t : generics) {
+                this.generics.add(t.image);
+            }
+        }
 	}
 
 	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
@@ -85,6 +92,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
+        this.generics = new LinkedList<String>();
 	}
 
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
@@ -95,6 +103,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.body = (ExpressionAST) body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
+        this.generics = new LinkedList<String>();
 	}
 
 	private DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
@@ -106,6 +115,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
+        this.generics = new LinkedList<String>();
 	}
 
 
@@ -263,9 +273,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     private GenContext serializeArguments(List<FormalArg> args, GenContext ctx) {
         if(isGeneric()) {
-            ValueType type = this.genericStructuralType();
-            args.add(new FormalArg(GENERIC_PREFACE, type));
-            ctx = ctx.extend(GENERIC_PREFACE, new Variable(GENERIC_PREFACE), type);
+            for(String s : this.generics) {
+                ValueType type = this.genericStructuralType();
+                args.add(new FormalArg(GENERIC_PREFACE, type));
+                ctx = ctx.extend(GENERIC_PREFACE, new Variable(GENERIC_PREFACE), type);
+            }
         }
 
         for (NameBinding b : argNames) {
@@ -275,7 +287,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
             if(
                     isGeneric() &&
                     t instanceof UnresolvedType &&
-                    ((UnresolvedType) t).getName().equals(this.genTypeName)
+                    this.generics.contains( ((UnresolvedType) b.getType()).getName() )
             ) {
                 type = new NominalType(new Variable(GENERIC_PREFACE), GENERIC_MEMBER);
             } else {
@@ -289,7 +301,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     }
 
     private boolean isGeneric() {
-        return this.genTypeName != null && this.genTypeName.length() != 0;
+        return !this.generics.isEmpty();
     }
 
 	private ValueType getResultILType(GenContext ctx) {
@@ -299,7 +311,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         if(
             isGeneric() &&
             a.getResult() instanceof UnresolvedType &&
-            ((UnresolvedType) a.getResult()).getName().equals(this.genTypeName)
+            this.generics.contains( ((UnresolvedType) a.getResult()).getName() )
           ) {
             return new NominalType(new Variable(GENERIC_PREFACE), GENERIC_MEMBER);
         }
@@ -312,11 +324,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		List<FormalArg> args = new LinkedList<FormalArg>();
 		GenContext methodContext = thisContext;
 		if(isGeneric()) {
-            ValueType type = this.genericStructuralType();
-            args.add(new FormalArg(GENERIC_PREFACE, type));
-            // Uhhh are we supposed to be keeping two copies of the same thing?
-            methodContext = methodContext.extend(GENERIC_PREFACE, new Variable(GENERIC_PREFACE), type);
-            thisContext = thisContext.extend(GENERIC_PREFACE, new Variable(GENERIC_PREFACE), type);
+
+            for(String genName : this.generics) {
+                ValueType type = this.genericStructuralType();
+                args.add(new FormalArg(GENERIC_PREFACE, type));
+                // Uhhh are we supposed to be keeping two copies of the same thing?
+                methodContext = methodContext.extend(GENERIC_PREFACE, new Variable(GENERIC_PREFACE), type);
+                thisContext = thisContext.extend(GENERIC_PREFACE, new Variable(GENERIC_PREFACE), type);
+            }
 		}
 
 		for (NameBinding b : argNames) {
@@ -324,7 +339,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			if(
 		        isGeneric() &&
 	            b.getType() instanceof UnresolvedType &&
-	            ((UnresolvedType) b.getType()).getName().equals(this.genTypeName)
+                this.generics.contains( ((UnresolvedType) b.getType()).getName() )
 	        ) {
 	           argType = new NominalType(new Variable(GENERIC_PREFACE), GENERIC_MEMBER);
 			} else {
