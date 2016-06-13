@@ -1,0 +1,38 @@
+//module lexer
+
+import wyvern.Int
+import wyvern.option
+import wyvern.util.matching.regex
+
+type TokensType
+	type Kind
+	val NUMBER:this.Kind
+	val OPERATOR:this.Kind
+
+val tokens : TokensType = new
+	type Kind = Int
+	val NUMBER:this.Kind = 0
+	val OPERATOR:this.Kind = 1
+
+type Token
+	def print():String
+	def kind():tokens.Kind
+	
+def makeToken(s:String,k:tokens.Kind):Token = new
+	def print():String = s
+	def kind():tokens.Kind = k
+
+val numRX = regex("\d+")
+val whitespaceRX = regex("[ ]+")
+val operatorRX = regex("[\+\-\*/]")
+
+def parseFirst(s:String):Token
+	val numMatch : option.Option = numRX.findPrefixOf(s).map(
+		(matchString:String) => makeToken(matchString, tokens.NUMBER))
+	val operatorMatch : option.Option = numMatch.orElse(
+		() => operatorRX.findPrefixOf(s).map(
+			(matchString:String) => makeToken(matchString, tokens.OPERATOR)))
+	operatorMatch.getOrElse(() => makeToken("+",tokens.OPERATOR))
+
+//parseFirst("54-").print()
+parseFirst("*54-").print()

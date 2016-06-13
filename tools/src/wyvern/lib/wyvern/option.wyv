@@ -2,16 +2,25 @@ module option
 
 type DynToDyn
 	def apply(x:Dyn):Dyn
+	
+type UnitToDyn
+	def apply():Dyn
+
+type UnitToOption
+	def apply():Option
 
 type Option
 	def map(f:DynToDyn):Option
-	def orElse(x:Dyn):Dyn
+	def getOrElse(x:UnitToDyn):Dyn
+	def orElse(x:UnitToOption):Option
 	
 def Some(x:Dyn):Option = new
 	def map(f:DynToDyn):Option = Some(f(x))
-	def orElse(defaultValue:Dyn):Dyn = x
+	def getOrElse(defaultValue:UnitToDyn):Dyn = x
+	def orElse(x:UnitToOption):Option = this
 
 def None():Option = new
 	def map(f:DynToDyn):Option = this
-	def orElse(defaultValue:Dyn):Dyn = defaultValue
+	def getOrElse(defaultValue:UnitToDyn):Dyn = defaultValue()
+	def orElse(x:UnitToOption):Option = x()
 
