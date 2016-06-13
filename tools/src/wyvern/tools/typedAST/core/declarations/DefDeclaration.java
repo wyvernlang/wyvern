@@ -253,7 +253,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public DeclType genILType(GenContext ctx) {
-        ctx = genericTypeExtension(ctx);
 		List<FormalArg> args = new LinkedList<FormalArg>();
 
         ctx = this.serializeArguments(args, ctx);

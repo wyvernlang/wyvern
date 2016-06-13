@@ -641,7 +641,8 @@ AST PrimarySuffix(AST lhs, ExpFlags flags) :
 |
   [gentype = GenericType()] rhs = Arguments(flags) {
     String generic = (gentype == null) ? null : gentype.image;
-    return build.application(lhs, rhs, null, generic); }
+    return build.application(lhs, rhs, null, generic);
+  }
 }
 
 AST Arguments(ExpFlags flags) :
