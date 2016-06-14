@@ -40,9 +40,9 @@ public class ModuleResolver {
 	
 	public ModuleResolver(File rootDir, File libDir) {
 		if (rootDir != null && !rootDir.isDirectory())
-			throw new RuntimeException("the root path for the module resolver must be a directory");
+			throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
 		if (libDir != null && !libDir.isDirectory())
-			throw new RuntimeException("the lib path for the module resolver must be a directory");
+			throw new RuntimeException("the lib path \""+libDir+"\" for the module resolver must be a directory");
 		this.rootDir = rootDir;
 		this.libDir = libDir;
 	}
@@ -79,12 +79,14 @@ public class ModuleResolver {
 			}};*/
 	}
 	
-	public EvalContext contextWith(String qualifiedName) {
-		String names[] = qualifiedName.split("\\.");
-		String simpleName = names[names.length-1];
-		Module module = resolveModule(qualifiedName);
+	public EvalContext contextWith(String... qualifiedNames) {
 		EvalContext ctx = Globals.getStandardEvalContext();
-		ctx = ctx.extend(simpleName, module.getExpression().interpret(ctx));
+		for (String qualifiedName : qualifiedNames) {
+			String names[] = qualifiedName.split("\\.");
+			String simpleName = names[names.length-1];
+			Module module = resolveModule(qualifiedName);
+			ctx = ctx.extend(simpleName, module.getExpression().interpret(ctx));
+		}
 		return ctx;
 	}
 	
