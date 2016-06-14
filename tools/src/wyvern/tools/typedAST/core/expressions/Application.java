@@ -27,6 +27,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -50,20 +51,26 @@ import wyvern.tools.util.TreeWriter;
 public class Application extends CachingTypedAST implements CoreAST {
 	private ExpressionAST function;
 	private ExpressionAST argument;
-    private String genericType;
+    private List<String> generics;
 
 	public Application(TypedAST function, TypedAST argument, FileLocation location) {
 		this.function = (ExpressionAST) function;
 		this.argument = (ExpressionAST) argument;
 		this.location = location;
-        this.genericType = null;
+        this.generics = new LinkedList<String>();
 	}
 
-    public Application(TypedAST function, TypedAST argument, FileLocation location, String genericType) {
+    public Application(TypedAST function, TypedAST argument, FileLocation location, List<Token> generics) {
 		this.function = (ExpressionAST) function;
 		this.argument = (ExpressionAST) argument;
 		this.location = location;
-        this.genericType = genericType;
+        this.generics = new LinkedList<String>();
+
+        if (generics != null) {
+            for(Token t: generics) {
+                this.generics.add(t.image);
+            }
+        }
 	}
 
 	@Override
@@ -157,9 +164,11 @@ public class Application extends CachingTypedAST implements CoreAST {
         int offset = 0;
 		// generate arguments		
 		List<Expression> args = new LinkedList<Expression>();
-        if(this.genericType != null) {
-            args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", this.genericType), this.location)));
-            offset++;
+        if(!this.generics.isEmpty()) {
+            for(String generic : this.generics) {
+                 args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", generic), this.location)));
+                offset++;
+            }
         }
 
         if (argument instanceof TupleObject) {

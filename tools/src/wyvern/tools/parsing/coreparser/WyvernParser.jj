@@ -260,11 +260,10 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; Token genType = null; }
+{ Type resultType; Token name; AST body; List args; List<Token> gentypes = null; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [genType = GenericType()] args = Formals() <COLON> resultType = Type() body=DefBody() {
-    String genTypeName = (genType == null) ? null : genType.image;
-	return build.defDecl(name.image, resultType, genTypeName, args, body, false, loc(name));
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = Generics()] args = Formals() <COLON> resultType = Type() body=DefBody() {
+	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
   }
 }
 
@@ -635,18 +634,17 @@ AST Literal() :
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags) :
-{ AST rhs; Token t; Token gentype = null;}
+{ AST rhs; Token t; List<Token> gentypes = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
-  [gentype = GenericType()] rhs = Arguments(flags) {
-    String generic = (gentype == null) ? null : gentype.image;
-    return build.application(lhs, rhs, null, generic);
+  [gentypes = Generics()] rhs = Arguments(flags) {
+    return build.application(lhs, rhs, null, gentypes);
   }
 }
 
 AST Arguments(ExpFlags flags) :
-{ AST exp = null; Token t; Token gentype = null; }
+{ AST exp = null; Token t; }
 {
   t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
     if (exp == null) {
@@ -695,11 +693,24 @@ Token OverrideOperator() :
 	
 }
 
-Token GenericType() :
-{ Token t;  }
+List Generics() :
+{ List gens = null; }
 {
-    <LBRACK> t=<IDENTIFIER> <RBRACK> {
-        return t;
-    }
+  <LBRACK> gens = GenericList() <RBRACK> {
+    return gens;
+  }
 }
 
+List GenericList() :
+{ LinkedList<Token> genList = new LinkedList<Token>(); Token t1, t2; }
+{
+
+  t1 = <IDENTIFIER>
+  ( <COMMA> t2 = <IDENTIFIER> {
+    genList.addLast(t2);
+  }
+  )* {
+    genList.addFirst(t1);
+    return genList;
+  }
+}

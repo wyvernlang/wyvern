@@ -1217,20 +1217,6 @@ public class ILTests {
     }
 
     @Test
-    public void testExplicitParametricPolymorphIsParsable() throws ParseException {
-
-        String source = ""
-                      + "def identity[K](value: K): K \n"
-                      + "    value \n\n"
-
-                      + "val x = 15 \n"
-                      + "identity[Int](x) \n"
-                      + "";
-
-		TestUtil.getNewAST(source);
-    }
-
-    @Test
     public void testExplicitParameterization() throws ParseException {
 
         String source = ""
@@ -1242,6 +1228,23 @@ public class ILTests {
                       + "";
 
         doTest(source, null, new IntegerLiteral(15));
+    }
+
+    @Test
+    public void testExplicitTwoParams() throws ParseException {
+
+        String source = ""
+                      + "def identity[K, L](value: K, value2: L): L \n"
+                      + "    val a: K = value \n"
+                      + "    val b: L = value2 \n"
+                      + "    value2 \n\n"
+
+                      + "val x = 15 \n"
+                      + "val y = 20 \n"
+                      + "identity[Int, Int](x, y) \n"
+                      + "";
+
+        doTest(source, null, new IntegerLiteral(20));
     }
 
     @Test
