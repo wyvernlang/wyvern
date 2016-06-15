@@ -53,10 +53,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     private List<String> generics;
 
 	public Application(TypedAST function, TypedAST argument, FileLocation location) {
-		this.function = (ExpressionAST) function;
-		this.argument = (ExpressionAST) argument;
-		this.location = location;
-        this.generics = new LinkedList<String>();
+        this(function, argument, location, null);
 	}
 
     public Application(TypedAST function, TypedAST argument, FileLocation location, List<String> generics) {
@@ -149,6 +146,14 @@ public class Application extends CachingTypedAST implements CoreAST {
 		return this.location;
 	}
 
+    private ValueType getILTypeForGeneric(GenContext ctx, String genericName) {
+        String objName = ctx.getContainerForTypeAbbrev(genericName);
+        if (objName == null) {
+            ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, genericName);
+        }
+        return new NominalType(objName, genericName);
+    }
+
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
@@ -163,8 +168,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             if(formalName.startsWith(DefDeclaration.GENERIC_PREFIX)) {
                 // then the formal is a generic argument
                 String genericName = formalName.substring(DefDeclaration.GENERIC_PREFIX.length());
-
-                args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", generic), this.location)));
+                args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", formalName), this.location)));
             }  else {
                 ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
             }
