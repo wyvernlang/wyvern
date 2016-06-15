@@ -260,7 +260,7 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; List<Token> gentypes = null; }
+{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; }
 {
   <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = Generics()] args = Formals() <COLON> resultType = Type() body=DefBody() {
 	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
@@ -634,7 +634,7 @@ AST Literal() :
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags) :
-{ AST rhs; Token t; List<Token> gentypes = null;}
+{ AST rhs; Token t; List<String> gentypes = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
@@ -702,15 +702,15 @@ List Generics() :
 }
 
 List GenericList() :
-{ LinkedList<Token> genList = new LinkedList<Token>(); Token t1, t2; }
+{ LinkedList<String> genList = new LinkedList<String>(); Token t1, t2; }
 {
 
   t1 = <IDENTIFIER>
   ( <COMMA> t2 = <IDENTIFIER> {
-    genList.addLast(t2);
+    genList.addLast(t2.image);
   }
   )* {
-    genList.addFirst(t1);
+    genList.addFirst(t1.image);
     return genList;
   }
 }

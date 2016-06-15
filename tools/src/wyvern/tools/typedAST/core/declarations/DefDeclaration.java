@@ -24,7 +24,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.expressions.Assignment;
@@ -66,7 +65,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
-	public DefDeclaration(String name, Type returnType, List<Token> generics, List<NameBinding> argNames,
+	public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, returnType);
@@ -76,12 +75,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.isClass = isClassDef;
 		this.location = location;
 
-        this.generics = new LinkedList<String>();
-        if(generics != null) {
-            for(Token t : generics) {
-                this.generics.add(t.image);
-            }
-        }
+        this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
 	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,

@@ -27,7 +27,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -60,17 +59,11 @@ public class Application extends CachingTypedAST implements CoreAST {
         this.generics = new LinkedList<String>();
 	}
 
-    public Application(TypedAST function, TypedAST argument, FileLocation location, List<Token> generics) {
+    public Application(TypedAST function, TypedAST argument, FileLocation location, List<String> generics) {
 		this.function = (ExpressionAST) function;
 		this.argument = (ExpressionAST) argument;
 		this.location = location;
-        this.generics = new LinkedList<String>();
-
-        if (generics != null) {
-            for(Token t: generics) {
-                this.generics.add(t.image);
-            }
-        }
+        this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
 	@Override
