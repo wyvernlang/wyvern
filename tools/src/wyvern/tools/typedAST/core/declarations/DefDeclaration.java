@@ -252,11 +252,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     private GenContext serializeArguments(List<FormalArg> args, GenContext ctx) {
         if(isGeneric()) {
             for(String s : this.generics) {
-                ValueType type = this.genericStructuralType();
-                args.add(new FormalArg(GENERIC_PREFIX, type));
+                ValueType type = this.genericStructuralType(s);
+                String genName = GENERIC_PREFIX + s;
+                args.add(new FormalArg(genName, type));
 
-                ctx = new TypeGenContext(s, GENERIC_PREFIX, ctx);
-                ctx = ctx.extend(GENERIC_PREFIX, new Variable(GENERIC_PREFIX), type);
+                ctx = new TypeGenContext(s, genName, ctx);
+                ctx = ctx.extend(genName, new Variable(genName), type);
             }
         }
 
@@ -286,13 +287,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		GenContext methodContext = thisContext;
 		if(isGeneric()) {
 
-            for(String genName : this.generics) {
-                ValueType type = this.genericStructuralType();
-                args.add(new FormalArg(GENERIC_PREFIX, type));
+            for(String s : this.generics) {
+                String genName = GENERIC_PREFIX + s;
+                ValueType type = this.genericStructuralType(genName);
+                args.add(new FormalArg(genName, type));
 
-                // Uhhh are we supposed to be keeping two copies of the same thing?
-                methodContext = new TypeGenContext(genName, GENERIC_PREFIX, methodContext);
-                thisContext = new TypeGenContext(genName, GENERIC_PREFIX, thisContext);
+                methodContext = new TypeGenContext(s, genName, methodContext);
+                thisContext = new TypeGenContext(s, genName, thisContext); // TODO +s
             }
 		}
 
@@ -396,11 +397,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		
 	}
 
-    public static StructuralType genericStructuralType() {
+    public static StructuralType genericStructuralType(String genericName) {
         List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
         bodyDecl.add(new AbstractTypeMember(GENERIC_MEMBER)); // the body contains only a abstract type member representing the generic type
 
-        StructuralType genType = new StructuralType(GENERIC_PREFIX, bodyDecl);
+        StructuralType genType = new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
         return genType;
     }
 }
