@@ -157,11 +157,18 @@ public class Application extends CachingTypedAST implements CoreAST {
         int offset = 0;
 		// generate arguments		
 		List<Expression> args = new LinkedList<Expression>();
-        if(!this.generics.isEmpty()) {
-            for(String generic : this.generics) {
-                 args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", generic), this.location)));
-                offset++;
+        for(int i = 0; i < generics.size(); i++) {
+            String generic = generics.get(i);
+            String formalName = formals.get(i).getName();
+            if(formalName.startsWith(DefDeclaration.GENERIC_PREFIX)) {
+                // then the formal is a generic argument
+                String genericName = formalName.substring(DefDeclaration.GENERIC_PREFIX.length());
+
+                args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", generic), this.location)));
+            }  else {
+                ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
             }
+            offset++;
         }
 
         if (argument instanceof TupleObject) {
