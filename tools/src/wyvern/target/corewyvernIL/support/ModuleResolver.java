@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -85,7 +86,9 @@ public class ModuleResolver {
 			String names[] = qualifiedName.split("\\.");
 			String simpleName = names[names.length-1];
 			Module module = resolveModule(qualifiedName);
-			ctx = ctx.extend(simpleName, module.getExpression().interpret(ctx));
+			final Value moduleValue = module.getExpression().interpret(ctx);
+			ctx = ctx.extend(simpleName, moduleValue);
+			ctx = ctx.extend(module.getSpec().getInternalName(), moduleValue);
 		}
 		return ctx;
 	}
