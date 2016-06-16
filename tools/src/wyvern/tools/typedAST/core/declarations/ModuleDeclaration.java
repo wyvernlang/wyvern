@@ -318,7 +318,17 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		}
 	}
 
-
+	/**
+	 * Computes and returns the set of arguments this module requires.
+	 * 
+	 * loadedTypes is updated with all the types that had to be loaded in
+	 * order to specify the required types.
+	 * 
+	 * @param reqSeq
+	 * @param ctx
+	 * @param loadedTypes
+	 * @return
+	 */
 	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx, List<LoadedType> loadedTypes) {
 		/* generate the formal arguments by requiring sequence */
 		List<FormalArg> types = new LinkedList<FormalArg>();
