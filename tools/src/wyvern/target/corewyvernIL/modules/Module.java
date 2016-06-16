@@ -26,4 +26,9 @@ public class Module {
 	public List<TypedModuleSpec> getDependencies() {
 		return dependencies;
 	}
+	
+	@Override
+	public String toString() {
+		return "Module("+spec.getQualifiedName()+")";
+	}
 }
