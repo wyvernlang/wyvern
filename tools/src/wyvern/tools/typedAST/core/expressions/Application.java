@@ -168,7 +168,8 @@ public class Application extends CachingTypedAST implements CoreAST {
             if(formalName.startsWith(DefDeclaration.GENERIC_PREFIX)) {
                 // then the formal is a generic argument
                 String genericName = formalName.substring(DefDeclaration.GENERIC_PREFIX.length());
-                args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, new NominalType("", formalName), this.location)));
+                ValueType vt = getILTypeForGeneric(ctx, generic);
+                args.add(new wyvern.target.corewyvernIL.expression.New(new TypeDeclaration(DefDeclaration.GENERIC_MEMBER, vt, this.location)));
             }  else {
                 ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
             }
