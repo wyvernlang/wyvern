@@ -6,6 +6,7 @@ import java:wyvern.stdlib.support.Regex.utils
 
 type Regex
 	def findPrefixOf(source:String):option.Option
+	def findPrefixMatchOf(source:String):option.Option
 
 type Match
 	def matched():String

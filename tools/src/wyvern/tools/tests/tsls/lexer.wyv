@@ -8,20 +8,32 @@ type TokensType
 	type Kind
 	val NUMBER:this.Kind
 	val OPERATOR:this.Kind
+	val ERROR:this.Kind
 
 val tokens : TokensType = new
 	type Kind = Int
 	val NUMBER:this.Kind = 0
 	val OPERATOR:this.Kind = 1
+	val ERROR:this.Kind = 2
 
 type Token
 	def print():String
 	def kind():tokens.Kind
 	
+type ScanResult
+	def token():Token
+	def rest():String
+	
 def makeToken(s:String,k:tokens.Kind):Token = new
 	def print():String = s
 	def kind():tokens.Kind = k
 
+def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
+	val tok = makeToken(s,k)
+	new
+		def token():Token = tok
+		def rest():String = r
+	
 val numRX = regex("\d+")
 val whitespaceRX = regex("[ ]+")
 val operatorRX = regex("[\+\-\*/]")
@@ -33,6 +45,18 @@ def parseFirst(s:String):Token
 		() => operatorRX.findPrefixOf(s).map(
 			(matchString:String) => makeToken(matchString, tokens.OPERATOR)))
 	operatorMatch.getOrElse(() => makeToken("+",tokens.OPERATOR))
+	
+def scanFirst(s:String):ScanResult
+	val numMatch : option.Option = numRX.findPrefixMatchOf(s).map(
+		(m:regex.Match) => makeScanResult(m.matched(), tokens.NUMBER, m.after()))
+	val operatorMatch : option.Option = numMatch.orElse(
+		() => operatorRX.findPrefixMatchOf(s).map(
+			(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
+	operatorMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
 
-//parseFirst("54-").print()
+
 parseFirst("*54-").print()
+
+val result1 = scanFirst("54*3")
+val result2 = scanFirst(result1.rest())
+result2.token().print()
