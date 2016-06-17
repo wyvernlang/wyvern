@@ -4,7 +4,9 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public abstract class DeclarationWithRHS extends NamedDeclaration {
 	private Expression definition;
@@ -24,7 +26,7 @@ public abstract class DeclarationWithRHS extends NamedDeclaration {
 	public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
 		ValueType defType = definition.typeCheck(thisCtx); 
 		if (!defType.isSubtypeOf(getType(), thisCtx))
-			throw new RuntimeException("definition doesn't match declared type");
+			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 		return getDeclType();
 	}
 	

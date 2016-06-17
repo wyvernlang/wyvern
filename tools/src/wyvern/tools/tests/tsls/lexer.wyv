@@ -20,14 +20,14 @@ type Token
 	def print():String
 	def kind():tokens.Kind
 	
-type ScanResult
-	def token():Token
-	def rest():String
-	
 def makeToken(s:String,k:tokens.Kind):Token = new
 	def print():String = s
 	def kind():tokens.Kind = k
 
+type ScanResult
+	def token():Token
+	def rest():String
+	
 def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
 	val tok = makeToken(s,k)
 	new
@@ -54,7 +54,14 @@ def scanFirst(s:String):ScanResult
 			(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
 	operatorMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
 
+resource type Lexer
+	def nextToken():Token
 
+def makeLexer(s:String):Lexer = new
+	var current:String = s
+	def nextToken():Token
+		makeToken("+",tokens.OPERATOR)
+		
 parseFirst("*54-").print()
 
 val result1 = scanFirst("54*3")
