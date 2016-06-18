@@ -6,7 +6,7 @@ type DynToDyn
 type UnitToDyn
 	def apply():Dyn
 
-type UnitToOption
+resource type UnitToOption
 	def apply():Option
 
 type Option

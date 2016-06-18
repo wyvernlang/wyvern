@@ -4,17 +4,23 @@ import wyvern.Int
 import wyvern.option
 import wyvern.util.matching.regex
 
+//require stdout
+
 type TokensType
 	type Kind
 	val NUMBER:this.Kind
 	val OPERATOR:this.Kind
+	val WHITESPACE:this.Kind
+	val EOF:this.Kind
 	val ERROR:this.Kind
 
 val tokens : TokensType = new
 	type Kind = Int
 	val NUMBER:this.Kind = 0
 	val OPERATOR:this.Kind = 1
-	val ERROR:this.Kind = 2
+	val WHITESPACE:this.Kind = 2
+	val EOF:this.Kind = 3
+	val ERROR:this.Kind = 4
 
 type Token
 	def print():String
@@ -37,6 +43,7 @@ def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
 val numRX = regex("\d+")
 val whitespaceRX = regex("[ ]+")
 val operatorRX = regex("[\+\-\*/]")
+val emptyRX = regex("\z")
 
 def parseFirst(s:String):Token
 	val numMatch : option.Option = numRX.findPrefixOf(s).map(
@@ -60,10 +67,28 @@ resource type Lexer
 def makeLexer(s:String):Lexer = new
 	var current:String = s
 	def nextToken():Token
-		makeToken("+",tokens.OPERATOR)
+		val numMatch : option.Option = numRX.findPrefixMatchOf(this.current).map(
+			(m:regex.Match) => makeScanResult(m.matched(), tokens.NUMBER, m.after()))
+		val operatorMatch : option.Option = numMatch.orElse(
+			() => operatorRX.findPrefixMatchOf(this.current).map(
+				(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
+		val wsMatch : option.Option = operatorMatch.orElse(
+			() => whitespaceRX.findPrefixMatchOf(this.current).map(
+				(m:regex.Match) => makeScanResult(m.matched(), tokens.WHITESPACE, m.after())))
+		val emptyMatch : option.Option = wsMatch.orElse(
+			() => emptyRX.findPrefixMatchOf(this.current).map(
+				(m:regex.Match) => makeScanResult(m.matched(), tokens.EOF, m.after())))
+		val result : ScanResult = emptyMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
+		this.current = result.rest()
+		result.token()
 		
 parseFirst("*54-").print()
 
 val result1 = scanFirst("54*3")
 val result2 = scanFirst(result1.rest())
 result2.token().print()
+
+val lex = makeLexer("54  *3")
+lex.nextToken()
+lex.nextToken()
+lex.nextToken().print()
