@@ -1,0 +1,21 @@
+module list
+
+import wyvern.option
+
+type Option = option.Option
+
+resource type List
+	def append(e:Dyn):Unit
+
+def make():List
+	resource type Cell
+		var element:Dyn
+		var next:Option
+	val sentinel : Cell = new
+		var element:Dyn = 0
+		var next:Option = option.None()
+	new
+		var first:Cell = sentinel
+		var last:Cell = sentinel
+		def append(e:Dyn):Unit
+			this.last.element = e

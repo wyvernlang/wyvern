@@ -3,6 +3,9 @@
 import wyvern.Int
 import wyvern.option
 import wyvern.util.matching.regex
+import wyvern.collections.list
+
+type List = list.List
 
 //require stdout
 
@@ -30,6 +33,16 @@ def makeToken(s:String,k:tokens.Kind):Token = new
 	def print():String = s
 	def kind():tokens.Kind = k
 
+type RegexpKindPair
+	val regex:regex.Regex
+	val kind:tokens.Kind
+	
+def makeRKPair(r:regex.Regex, k:tokens.Kind):RegexpKindPair = new
+	val regex:regex.Regex = r
+	val kind:tokens.Kind = k
+
+	
+////////////////////////////////////
 type ScanResult
 	def token():Token
 	def rest():String
@@ -39,6 +52,10 @@ def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
 	new
 		def token():Token = tok
 		def rest():String = r
+	
+val regexList : List = list.make()
+
+regexList.append(makeRKPair(regex("\d+"), tokens.NUMBER))
 	
 val numRX = regex("\d+")
 val whitespaceRX = regex("[ ]+")
