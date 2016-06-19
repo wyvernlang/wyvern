@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
@@ -23,7 +24,7 @@ public class VarDeclaration extends DeclarationWithRHS {
 		return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
 	}*/
 
-	public VarDeclaration(String name, ValueType type, Expression value, FileLocation loc) {
+	public VarDeclaration(String name, ValueType type, IExpr value, FileLocation loc) {
 		super(name, value, loc);
 		if (type == null) throw new RuntimeException();
 		this.type = type;

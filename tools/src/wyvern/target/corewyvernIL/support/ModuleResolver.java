@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -159,7 +160,7 @@ public class ModuleResolver {
         
 		final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 		GenContext genCtx = Globals.getGenContext(state);
-		Expression program;
+		IExpr program;
 		if (ast instanceof ExpressionAST) {
 			program = ((ExpressionAST)ast).generateIL(genCtx, null);
 		} else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
@@ -196,7 +197,7 @@ public class ModuleResolver {
 		return ctx;
 	}
 	
-	public Expression wrap(Expression program, List<TypedModuleSpec> dependencies) {
+	public IExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
 			Module m = resolveModule(spec.getQualifiedName());
 			program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);

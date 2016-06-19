@@ -86,18 +86,11 @@ public class FieldSet extends Expression {
 		if (!(decl instanceof wyvern.target.corewyvernIL.decl.VarDeclaration))
 			throw new RuntimeException("Expected assignment to var field in field set.");
 		VarDeclaration varDecl = (VarDeclaration) decl;
+		
+		// Evaluate the expression in the current context. Update the declaration.
 		Value exprInterpreted = exprToAssign.interpret(ctx);
 		VarDeclaration varDeclUpdated = null;
-
-		// Evaluate the expression in the current context. Update the declaration.
-		// VarDeclaration's constructor needs to take an expression, not a value.
-		// TODO: is this an exhaustive case analysis?
-		if (exprInterpreted instanceof AbstractValue) {
-			varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), (AbstractValue)exprInterpreted, getLocation());
-		}
-		else {
-			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
-		}
+		varDeclUpdated = new VarDeclaration(fieldName, varDecl.getType(), exprInterpreted, getLocation());
 
 		// Update object's declarations.
 		object.setDecl(varDeclUpdated);

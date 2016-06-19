@@ -3,15 +3,16 @@ package wyvern.target.corewyvernIL.modules;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 
 public class Module {
 	private final TypedModuleSpec spec;
-	private final Expression expr;
+	private final IExpr expr;
 	private final List<TypedModuleSpec> dependencies;
 	
-	public Module(TypedModuleSpec spec, Expression expr, List<TypedModuleSpec> dependencies) {
+	public Module(TypedModuleSpec spec, IExpr program, List<TypedModuleSpec> dependencies) {
 		this.spec = spec;
-		this.expr = expr;
+		this.expr = program;
 		this.dependencies=dependencies;
 	}
 	
@@ -20,7 +21,7 @@ public class Module {
 	}
 	
 	public Expression getExpression() {
-		return expr;
+		return (Expression) expr;
 	}
 	
 	public List<TypedModuleSpec> getDependencies() {
