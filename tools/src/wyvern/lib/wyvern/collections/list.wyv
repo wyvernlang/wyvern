@@ -11,11 +11,15 @@ def make():List
 	resource type Cell
 		var element:Dyn
 		var next:Option
-	val sentinel : Cell = new
-		var element:Dyn = 0
-		var next:Option = option.None()
+	def makeCell(e:Dyn, n:Option):Cell = new
+		var element:Dyn = e
+		var next:Option = n
+	val sentinel : Cell = makeCell(0, option.None())
 	new
 		var first:Cell = sentinel
 		var last:Cell = sentinel
 		def append(e:Dyn):Unit
 			this.last.element = e
+			val cell = makeCell(0, option.None())
+			this.last.next = option.Some(cell)
+			this.last = cell
