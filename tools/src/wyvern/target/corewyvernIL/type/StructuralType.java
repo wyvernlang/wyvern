@@ -101,7 +101,7 @@ public class StructuralType extends ValueType {
 		if (t instanceof NominalType) {
 			StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
 			if (st == null) 
-				return true; // abstract type; I am always a subtype of this
+				return false; // abstract type; I am always a subtype of this
 			else
 				return isSubtypeOf(st, ctx);
 		}
