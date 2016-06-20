@@ -283,7 +283,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
             for(String s : this.generics) {
                 String genName = GENERIC_PREFIX + s;
-                ValueType type = this.genericStructuralType(genName);
+                ValueType type = this.genericStructuralType(s);
                 args.add(new FormalArg(genName, type));
 
                 methodContext = new TypeGenContext(s, genName, methodContext);
@@ -393,7 +393,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     public static StructuralType genericStructuralType(String genericName) {
         List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
-        bodyDecl.add(new AbstractTypeMember(GENERIC_MEMBER)); // the body contains only a abstract type member representing the generic type
+        bodyDecl.add(new AbstractTypeMember(genericName)); // the body contains only a abstract type member representing the generic type
 
         StructuralType genType = new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
         return genType;

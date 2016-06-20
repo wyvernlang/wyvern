@@ -88,7 +88,7 @@ public class MethodCall extends Expression {
 				actualType.isSubtypeOf(argType, ctx);
 				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
             }
-			ctx = ctx.extend(name, argType);
+			ctx = ctx.extend(name, actualType);
 			if (e instanceof Variable) {
 				v = new ViewExtension(new Variable(ddt.getFormalArgs().get(i).getName()),(Variable)e,v);
 			}
