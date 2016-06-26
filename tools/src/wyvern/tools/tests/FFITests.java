@@ -59,7 +59,7 @@ public class FFITests {
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
-                              null,
+                              Globals.getStandardTypeContext(),
                               OIREnvironment.getRootEnvironment());
 
     String pprint =

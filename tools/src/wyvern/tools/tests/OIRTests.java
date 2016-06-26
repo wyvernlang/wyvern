@@ -15,10 +15,12 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.PrettyPrintVisitor;
@@ -61,7 +63,7 @@ public class OIRTests {
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
-                              null,
+                              Globals.getStandardTypeContext(),
                               OIREnvironment.getRootEnvironment());
 
     String pprint =
@@ -195,7 +197,7 @@ public class OIRTests {
       "    v = 10\n" +
       "    v\n" +
       "foo()\n";
-    testPyFromInput(input, "10", true);
+    testPyFromInput(input, "10");
   }
 
   @Test
@@ -368,5 +370,24 @@ public class OIRTests {
             "val this = 3\n" +
             "this\n";
         testPyFromInput(input, "3");
+    }
+
+    @Test
+    public void testBooleans() throws ParseException {
+        String input =
+            "val n = 5\n" +
+            "(n < 2).ifTrue(() => 1, () => 2)\n";
+        testPyFromInput(input, "2");
+    }
+
+    @Test
+    public void testNotBooleans() throws ParseException {
+        // Ensure that we don't translate "ifTrue" methods
+        // on non-boolean objects
+        String input =
+            "val obj = new\n" +
+            "  def ifTrue(x : Int, y : Int) : Int = x\n" +
+            "obj.ifTrue(2,3)\n";
+        testPyFromInput(input, "2");
     }
 }

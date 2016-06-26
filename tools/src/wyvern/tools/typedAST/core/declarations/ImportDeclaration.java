@@ -25,6 +25,7 @@ import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
@@ -211,6 +212,27 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     } else {
       // TODO: need to add types for non-java imports
       String moduleName = this.getUri().getSchemeSpecificPart();
+      // NEW SECTION
+      /**/
+      final ModuleResolver resolver = ctx.getInterpreterState().getResolver();
+      final Module module = resolver.resolveModule(moduleName);
+      final String internalName = module.getSpec().getInternalName();
+      if (this.metadataFlag) {
+      	if (module.getSpec().getType().isResource(ctx))
+      		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
+      	Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
+      	type = v.getType();
+      } else {
+      	type = module.getSpec().getType();
+      }
+      if (!ctx.isPresent(internalName)) {
+    	  ctx = ctx.extend(internalName, new Variable(internalName), type);
+      }
+      importExp = new Variable(internalName);
+      dependencies.add(module.getSpec());
+      dependencies.addAll(module.getDependencies());
+      /* */
+      /* * /
       if (ctx.isPresent(moduleName)) {
         importExp = new Variable(moduleName);
         type = ctx.lookupType(moduleName);
@@ -230,8 +252,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         } else {
         	type = module.getSpec().getType();
         }
-      }
-      ctx = ctx.extend(importName, new Variable(importName), /*importExp.typeCheck(ctx)*/ type);
+      }/ * */
+      ctx = ctx.extend(importName, new Variable(/*importName*/ internalName), /*importExp.typeCheck(ctx)*/ type);
     }
     return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
   }

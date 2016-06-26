@@ -1,5 +1,4 @@
 
-import wyvern.ast // TODO: should not be necessary
 import wyvern.Int // TODO: should not be necessary
 import metadata tsls.postfix
 

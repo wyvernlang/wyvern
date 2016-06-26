@@ -13,8 +13,10 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -40,9 +42,9 @@ public class ModuleResolver {
 	
 	public ModuleResolver(File rootDir, File libDir) {
 		if (rootDir != null && !rootDir.isDirectory())
-			throw new RuntimeException("the root path for the module resolver must be a directory");
+			throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
 		if (libDir != null && !libDir.isDirectory())
-			throw new RuntimeException("the lib path for the module resolver must be a directory");
+			throw new RuntimeException("the lib path \""+libDir+"\" for the module resolver must be a directory");
 		this.rootDir = rootDir;
 		this.libDir = libDir;
 	}
@@ -79,12 +81,16 @@ public class ModuleResolver {
 			}};*/
 	}
 	
-	public EvalContext contextWith(String qualifiedName) {
-		String names[] = qualifiedName.split("\\.");
-		String simpleName = names[names.length-1];
-		Module module = resolveModule(qualifiedName);
+	public EvalContext contextWith(String... qualifiedNames) {
 		EvalContext ctx = Globals.getStandardEvalContext();
-		ctx = ctx.extend(simpleName, module.getExpression().interpret(ctx));
+		for (String qualifiedName : qualifiedNames) {
+			String names[] = qualifiedName.split("\\.");
+			String simpleName = names[names.length-1];
+			Module module = resolveModule(qualifiedName);
+			final Value moduleValue = module.getExpression().interpret(ctx);
+			ctx = ctx.extend(simpleName, moduleValue);
+			ctx = ctx.extend(module.getSpec().getInternalName(), moduleValue);
+		}
 		return ctx;
 	}
 	
@@ -154,7 +160,7 @@ public class ModuleResolver {
         
 		final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 		GenContext genCtx = Globals.getGenContext(state);
-		Expression program;
+		IExpr program;
 		if (ast instanceof ExpressionAST) {
 			program = ((ExpressionAST)ast).generateIL(genCtx, null);
 		} else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
@@ -177,17 +183,24 @@ public class ModuleResolver {
 			throw new RuntimeException();
 		}
         
-		TypeContext ctx = Globals.getStandardTypeContext();
+		TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
         ValueType moduleType = program.typeCheck(ctx);
         
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
 		return new Module(spec, program, dependencies);
 	}
 
-	public Expression wrap(Expression program, List<TypedModuleSpec> dependencies) {
+	public TypeContext extendContext(TypeContext ctx, List<TypedModuleSpec> dependencies) {
+		for (TypedModuleSpec spec : dependencies) {
+			ctx = ctx.extend(spec.getInternalName(), spec.getType());
+		}
+		return ctx;
+	}
+	
+	public IExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
 			Module m = resolveModule(spec.getQualifiedName());
-			program = new Let(m.getSpec().getQualifiedName(), m.getSpec().getType(), m.getExpression(), program);
+			program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
 		}
 		return program;
 	}

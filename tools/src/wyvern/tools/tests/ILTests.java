@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -175,14 +176,12 @@ public class ILTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldReadFromNonExistent() throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 5\n"
 					 + "obj.x\n";
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
@@ -201,19 +200,16 @@ public class ILTests {
 					 + "    var v : system.Int = 3\n"
 					 + "obj.v = \"hello\"\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
 	public void testVarFieldWriteToNonExistent () throws ParseException {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 3\n"
 					 + "obj.x = 5\n";
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-		assertTypeCheckFails(ast, genCtx);
+		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
 	@Test
@@ -387,6 +383,11 @@ public class ILTests {
 	}
     
 	@Test
+	public void testSimpleParameterization() throws ParseException {
+		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
+	}
+	
+	/*@Test
 	public void testSingleModule() throws ParseException {
 		String source = TestUtil.readFile(PATH + "example.wyv");
 		TypedAST ast = TestUtil.getNewAST(source);
@@ -399,11 +400,6 @@ public class ILTests {
 		wyvern.target.corewyvernIL.decl.Declaration declValue = decl.interpret(EvalContext.empty());
 	}
 
-	@Test
-	public void testSimpleParameterization() throws ParseException {
-		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
-	}
-	
 
 	@Test
 	public void testMultipleModules() throws ParseException {
@@ -433,7 +429,7 @@ public class ILTests {
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral three = new IntegerLiteral(3);
 		Assert.assertEquals(three, v);
-	}
+	}*/
 	
 	@Test
 	public void testRecursiveMethod() throws ParseException {
@@ -449,7 +445,8 @@ public class ILTests {
 	
 	@Test
 	public void testInterpreterOnScript() {
-		String[] args = new String[] { PATH + "recursivetypes.wyv" };
+		String[] args = new String[] { TestUtil.BASE_PATH + "rosetta/hello.wyv" };
+		Interpreter.wyvernHome.set("..");
 		Interpreter.main(args);
 	}
 	
@@ -633,7 +630,7 @@ public class ILTests {
 		TypedAST ast = TestUtil.getNewAST(input);
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		TypeContext ctx = Globals.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
 		Expression mainProgram = ((DefDeclaration)decl).getBody();
 		Expression program = new FieldGet(mainProgram, fieldName, null); // slightly hacky		
         doChecks(program, expectedType, expectedValue);
@@ -940,7 +937,9 @@ public class ILTests {
 			// TODO: replace this with a standard prelude
 			program.typeCheck(TypeContext.empty().extend("system", Util.unitType()));
 			Assert.fail("A type error should have been reported.");
-		} catch (ToolError toolError) {}
+		} catch (ToolError toolError) {
+			System.err.println(toolError);
+		}
 	}
 	
 	@Test
@@ -1179,39 +1178,47 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testGenericIfStatement() throws ParseException {
 
         String source = ""
-                      + "type Body\n"
-                      + "    type T \n"
-                      + "    def apply(): this.T \n\n"
+            + "type Body (body) => \n"
+            + "    type T \n"
+            + "    type ThisType \n"
+            + "        type T = body.T \n"
+            + "        type ThisType = body.ThisType \n"
+            + "        def apply():body.T \n"
+            + "    def apply():body.T \n\n"
 
-                      + "type Boolean\n"
-                      + "   def iff(thenFn: Body, elseFn: Body) : thenFn.T \n\n"
+            + "val body1: Body = new (body) => \n"
+            + "    type T = Int \n"
+            + "    type ThisType \n"
+            + "        type T = body.T \n"
+            + "        type ThisType = body.ThisType \n"
+            + "        def apply():body.T \n"
+            + "    def apply():body.T \n"
+            + "        5 \n\n"
 
-                      + "val true = new \n"
-                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n\n"
-                      + "        thenFn.apply()\n\n"
+            + "val body2:body1.ThisType = new \n"
+            + "    type T = body1.T \n"
+            + "    type ThisType \n"
+            + "        type T = body1.T \n"
+            + "        type ThisType = body1.ThisType \n"
+            + "        def apply():body1.T \n"
+            + "    def apply():body1.T \n"
+            + "        7 \n\n"
 
-                      + "val false = new \n"
-                      + "    def iff(thenFn: Body, elseFn: Body): thenFn.T \n"
-                      + "        elseFn.apply()\n\n"
+            + "type BooleanFn\n"
+            + "    def iff(thenFn: Body, elseFn: thenFn.ThisType) : thenFn.T \n\n"
 
-                      + "def ifSt(bool: Boolean, thenFn: Body, elseFn: Body): thenFn.T \n"
-                      + "    bool.iff(thenFn, elseFn) \n\n"
+            + "val trueCase: BooleanFn = new \n"
+            + "    def iff(thenFn: Body, elseFn: thenFn.ThisType): thenFn.T \n"
+            + "        thenFn.apply()\n\n"
 
-                      + "val IntegerFive = new \n"
-                      + "   type T = system.Int \n"
-                      + "   def apply(): this.T \n"
-                      + "       5 \n\n"
+            + "def iff(b: BooleanFn, thenFn: Body, elseFn: thenFn.ThisType): thenFn.T \n"
+            + "    b.iff(thenFn, elseFn) \n\n"
 
-                      + "val IntegerTen = new \n"
-                      + "   type T = system.Int \n"
-                      + "   def apply(): this.T \n"
-                      + "       10 \n\n"
-
-                      + "ifSt(false, IntegerTen, IntegerFive)";
+            + "iff(trueCase, body1, body2) \n\n"
+            + "";
 
         doTest(source, null, new IntegerLiteral(5));
     }

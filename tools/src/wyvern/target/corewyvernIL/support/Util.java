@@ -30,7 +30,7 @@ public class Util {
 	public static ValueType unitToDynType() {
 		LinkedList<DeclType> arrowDecls = new LinkedList<>();
 		arrowDecls.add(new DefDeclType("apply", new DynamicType(), new LinkedList<FormalArg>()));
-		return new StructuralType("arrow", arrowDecls);
+		return new StructuralType("arrow", arrowDecls, true);
 	}
 	public static ValueType listType() {
 		/* jLinkedList<DeclType> listDecls = new LinkedList<DeclType>();
@@ -41,7 +41,7 @@ public class Util {
 		return new NominalType("Lists", "List");
 	}
 	public static Value unitValue() {
-		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, EvalContext.empty());
+		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, null, EvalContext.empty());
 	}
 	public static final String APPLY_NAME = "apply";
 }

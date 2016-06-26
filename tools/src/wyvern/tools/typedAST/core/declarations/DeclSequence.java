@@ -265,7 +265,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
         for (Declaration ast : this.getDeclIterator()) {
             outputDecls.addAll(DeclarationWriter.generate(writer, iw -> ast.codegenToIL(innerEnv, iw)));
         }
-        writer.wrap(e->new Let(varname, null, new New(outputDecls, "this", null), (Expression)e));
+        writer.wrap(e->new Let(varname, null, new New(outputDecls, "this", null, getLocation()), (Expression)e));
     }
 
     /**
@@ -373,7 +373,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 		
 		/* wrap the declarations into an object */
-		Expression newExp = new New(decls, newName, type);
+		Expression newExp = new New(decls, newName, type, getLocation());
 		tlc.addLet(newName, type, newExp, true);
 	}
 	
@@ -383,6 +383,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 	 * @return structural type of this sequence.
 	 */
 	public StructuralType inferStructuralType (GenContext ctx, String selfName) {
+		boolean isResource = false;
 		
 		// Fake an appropriate context.
 		GenContext ctxTemp = ctx.extend(selfName, new Variable(selfName), null);
@@ -402,7 +403,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			}
 		}
 		
-		// Add delegate object's declaration which has not been overridden to the structuarl type.
+		// Add delegate object's declaration which has not been overridden to the structural type.
 		if (delegateDecl != null) {
 			StructuralType delegateStructuralType = delegateDecl.getType().getILType(ctxTemp).getStructuralType(ctxTemp);
 			for (DeclType declType : delegateStructuralType.getDeclTypes()) {
@@ -412,7 +413,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 			}
 		}
 		
-		return new StructuralType(selfName, declTypes);
+		return new StructuralType(selfName, declTypes, isResource);
 	}
 	
 }

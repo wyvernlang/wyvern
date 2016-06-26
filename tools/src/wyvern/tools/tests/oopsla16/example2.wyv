@@ -1,6 +1,0 @@
-resource module main
-
-instantiate UserInfo() as uInfo
-instantiate DocumentLock(uInfo) as docLock
-
-val x : Int = docLock.sign()

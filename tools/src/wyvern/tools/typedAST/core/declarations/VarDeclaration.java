@@ -246,7 +246,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		
 		// Wrap declarations with a New expression and add to top-level.
 		wyvern.target.corewyvernIL.expression.New newExp;
-		newExp = new wyvern.target.corewyvernIL.expression.New(declarations, newName, structType);
+		newExp = new wyvern.target.corewyvernIL.expression.New(declarations, newName, structType, getLocation());
 		tlc.addLet(newName, structType, newExp, true);
 		
 		// Equate the var with a method call on its getter.

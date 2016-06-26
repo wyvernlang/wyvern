@@ -48,25 +48,27 @@ public class TopLevelContext {
 			binding = pending.pop();
 			exp = new Let(binding, exp);
 		}
-		exp = ctx.getInterpreterState().getResolver().wrap(exp, dependencies);
+		exp = (Expression) ctx.getInterpreterState().getResolver().wrap(exp, dependencies);
 		return exp;
 	}
 
 	public Expression getModuleExpression() {
 		String newName = GenContext.generateName();
-		ValueType vt = new StructuralType(newName, moduleDeclTypes);
-		vt = adapt(vt, newName);
 		
 		// determine if we need to be a resource type
+		boolean isModule = false;
 		for (Declaration d: moduleDecls) {
 			d.typeCheck(ctx, ctx);
 			if (d.containsResource()) {
-				vt = new StructuralType(newName, moduleDeclTypes, true);
+				isModule = true;
 				break;
 			}
 		}
 		
-		Expression exp = new New(moduleDecls, newName, vt);
+		ValueType vt = new StructuralType(newName, moduleDeclTypes, isModule);
+		vt = adapt(vt, newName);
+		
+		Expression exp = new New(moduleDecls, newName, vt, null);
 		addExpression(exp, vt);
 		
 		return getExpression();

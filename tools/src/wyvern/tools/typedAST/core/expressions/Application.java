@@ -178,6 +178,8 @@ public class Application extends CachingTypedAST implements CoreAST {
 
         if (argument instanceof TupleObject) {
         	ExpressionAST[] raw_args = ((TupleObject) argument).getObjects();
+        	if (formals.size() != raw_args.length)
+    			ToolError.reportError(ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS, this, ""+formals.size());
         	for (int i = 0; i < raw_args.length; i++) {
 				ValueType expectedArgType = formals.get(i + offset).getType();
 				ExpressionAST ast = raw_args[i];

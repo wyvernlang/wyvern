@@ -23,6 +23,7 @@ import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -212,7 +213,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void writeArgsToTree(TreeWriter writer) {
-
+		writer.writeArgs(name);
 	}
 
 	@Override
@@ -284,7 +285,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			Expression e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second, dependencies);
 			final Let letBinding = new Let(bindingAndCtx.first, e);
 			
-			ValueType t = letBinding.typeCheck(ctx); // sanity check - catch errors early
+			//ValueType t = letBinding.typeCheck(ctx); // sanity check - catch errors early
 			return letBinding;
 		} else {
 			// must be instantiate
@@ -317,7 +318,17 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		}
 	}
 
-
+	/**
+	 * Computes and returns the set of arguments this module requires.
+	 * 
+	 * loadedTypes is updated with all the types that had to be loaded in
+	 * order to specify the required types.
+	 * 
+	 * @param reqSeq
+	 * @param ctx
+	 * @param loadedTypes
+	 * @return
+	 */
 	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx, List<LoadedType> loadedTypes) {
 		/* generate the formal arguments by requiring sequence */
 		List<FormalArg> types = new LinkedList<FormalArg>();
@@ -329,7 +340,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 				type = ctx.lookupType(name);
 			} else {
 				LoadedType lt = ctx.getInterpreterState().getResolver().resolveType(name);
-				type = new NominalType(lt.getModule().getSpec().getQualifiedName(), lt.getTypeName());
+				type = new NominalType(lt.getModule().getSpec().getInternalName(), lt.getTypeName());
 				//bindings.add(binding);
 				loadedTypes.add(lt);
 			}
@@ -376,9 +387,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		for (LoadedType lt : loadedTypes) {
 			// include the declaration itself
 			final String qualifiedName = lt.getModule().getSpec().getQualifiedName();
-			methodContext = methodContext.extend(qualifiedName, new Variable(qualifiedName), lt.getModule().getSpec().getType());
+			final String internalName = lt.getModule().getSpec().getInternalName();
+			methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getModule().getSpec().getType());
 			// include the type abbreviation
-			methodContext = new TypeGenContext(lt.getTypeName(), qualifiedName, methodContext);
+			methodContext = new TypeGenContext(lt.getTypeName(), internalName, methodContext);
 			if (dependencies != null)
 				dependencies.add(lt.getModule().getSpec());
 		}
@@ -389,7 +401,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		}
 	    /* importing modules and instantiations are translated into let sentence */
 		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext, dependencies);
-		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(methodContext);
+		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(methodContext, dependencies);
+		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
 
 		if(isResource() == false) {
 			/* non resource module translated into value */

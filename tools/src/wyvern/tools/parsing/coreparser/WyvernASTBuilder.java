@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
@@ -106,7 +108,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		}
 
 		if (((DeclSequence)body).hasVarDeclaration() && !isResource) {
-			throw new RuntimeException(name + " must be resource");
+			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, body, name);
 		}
 
 		//Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);

@@ -1,6 +1,6 @@
 resource module UserInfo
 
-import Lists
+import illustrations.Lists
 
 val listFactory = Lists.listFactory
 

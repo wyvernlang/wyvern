@@ -10,7 +10,7 @@ import wyvern.tools.tests.CodegenTests;
 import wyvern.tools.tests.CopperTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
-import wyvern.tools.tests.OOPSLA16;
+import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.OIRTests;
 import wyvern.tools.tests.StdlibTests;
@@ -60,7 +60,7 @@ import wyvern.tools.tests.tagTests.TypeCheckTagTests;
 				RossettaCodeTests.class,// a few of these are out of date, but some use new everything
         FFITests.class,
         OIRTests.class,
-				OOPSLA16.class,		// tests the new IL
+				Illustrations.class,		// tests the new IL
 				StdlibTests.class,		// tests the standard library with the new IL
 				ModuleSystemTests.class,		// tests the new IL
 				})

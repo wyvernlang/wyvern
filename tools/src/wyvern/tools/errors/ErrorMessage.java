@@ -22,10 +22,11 @@ public enum ErrorMessage {
 	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
 	CANNOT_INFER_ARG_TYPE("Cannot infer the argument type as there is no expected type for the function expression", 0),
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
-	MUST_BE_RESOURCE_TYPE("%ARG type must be resource", 1),
+	MUST_BE_ASSIGNED_TO_RESOURCE_TYPE("This new statement captures a resource and must be assigned to a resource type", 0),
 	CANNOT_USE_METADATA_IN_SAME_FILE("Cannot use a TSL in the same file as the defining type",0),
 	NO_EXPECTED_TYPE("Cannot parse a DSL block without an expected type", 0),
 	NO_METADATA_FROM_RESOURCE("Cannot load metadata from a resource module",0),
+	MUST_BE_A_RESOURCE("%ARG must be a resource",1),
 	METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method",0),
 	METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object",1),
 	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
@@ -77,6 +78,7 @@ public enum ErrorMessage {
 	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
 	
 	PARSE_ERROR("%ARG", 1),
+	READ_FILE_ERROR("Could not read file %ARG", 1),
 	;
 	
 	private ErrorMessage(String message, int numArgs) {

@@ -1,0 +1,177 @@
+//module lexer
+
+import wyvern.Int
+import wyvern.option
+import wyvern.util.matching.regex
+import wyvern.collections.list
+
+//require stdout
+
+// TODO: just import list.List (and option.Option)
+type List = list.List
+
+// TODO: find a way to make the library generic in TokensType / tokens
+type TokensType
+	type Kind
+	val NUMBER:this.Kind
+	val OPERATOR:this.Kind
+	val WHITESPACE:this.Kind
+	val EOF:this.Kind
+	val ERROR:this.Kind
+
+val tokens : TokensType = new
+	type Kind = Int
+	val NUMBER:this.Kind = 0
+	val OPERATOR:this.Kind = 1
+	val WHITESPACE:this.Kind = 2
+	val EOF:this.Kind = 3
+	val ERROR:this.Kind = 4
+
+type Token
+	def print():String
+	def kind():tokens.Kind
+	
+def makeToken(s:String,k:tokens.Kind):Token = new
+	def print():String = s
+	def kind():tokens.Kind = k
+
+// TODO: replace with a generic Pair
+type RegexpKindPair
+	val regex:regex.Regex
+	val kind:tokens.Kind
+	
+def makeRKPair(r:regex.Regex, k:tokens.Kind):RegexpKindPair = new
+	val regex:regex.Regex = r
+	val kind:tokens.Kind = k
+
+// TODO: make private
+type ScanResult
+	def token():Token
+	def rest():String
+	
+def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
+	val tok = makeToken(s,k)
+	new
+		def token():Token = tok
+		def rest():String = r
+	
+resource type ScannerConfig
+	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
+	
+	// TODO: make this private
+	def getScanResult(s:String):ScanResult
+	
+def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new
+	val regexList : List = list.make()
+	
+	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
+		this.regexList.append(makeRKPair(r,k))
+
+	// TODO: enforce that the scanner config is frozen before calling this
+	def getScanResult(s:String):ScanResult
+		// strip whitespace, if any
+		val wsMatch : option.Option = wsRX.findPrefixMatchOf(s).map(
+		                                    (m:regex.Match) => m.after())
+		val sWithoutWS : String = wsMatch.getOrElse(()=> s)
+		
+		// find a match, if possible
+		val tokMatch : option.Option = this.regexList.find((rkp:RegexpKindPair) =>
+			rkp.regex.findPrefixMatchOf(sWithoutWS).isDefined
+		)
+		
+		// compute the resulting token
+		val resultOption : option.Option = tokMatch.flatMap((rkp:RegexpKindPair) =>
+			rkp.regex.findPrefixMatchOf(sWithoutWS).map((m:regex.Match) =>
+				makeScanResult(m.matched(), rkp.kind, m.after()))
+		)
+		
+		// return the result, or error
+		resultOption.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
+		
+resource type Scanner
+	def nextToken():Token
+
+def makeScanner(config:ScannerConfig, s:String):Scanner = new
+	var current:String = s
+	def nextToken():Token
+		val result : ScanResult = config.getScanResult(this.current)
+		this.current = result.rest()
+		result.token()
+
+//////////////////////////////////// CLIENT CODE
+
+val config = makeScannerConfig(regex("[ ]+"))
+config.addTokenKind(regex("\d+")      , tokens.NUMBER)
+config.addTokenKind(regex("[\+\-\*/]"), tokens.OPERATOR)
+config.addTokenKind(regex("\z")       , tokens.EOF)
+
+
+
+//////////////////////////////////// TESTING CODE
+val regexList : List = list.make()
+
+regexList.append(makeRKPair(regex("\d+"), tokens.NUMBER))
+regexList.append(makeRKPair(regex("[ ]+"), tokens.WHITESPACE))
+
+val numRX = regex("\d+")
+val whitespaceRX = regex("[ ]+")
+val operatorRX = regex("[\+\-\*/]")
+val emptyRX = regex("\z")
+
+config.getScanResult("*54-").token().print()
+
+val scanner = makeScanner(config, "54  *3")
+scanner.nextToken()
+scanner.nextToken().print()
+
+/*
+
+def parseFirst(s:String):Token
+	val numMatch : option.Option = numRX.findPrefixOf(s).map(
+		(matchString:String) => makeToken(matchString, tokens.NUMBER))
+	val operatorMatch : option.Option = numMatch.orElse(
+		() => operatorRX.findPrefixOf(s).map(
+			(matchString:String) => makeToken(matchString, tokens.OPERATOR)))
+	operatorMatch.getOrElse(() => makeToken("+",tokens.OPERATOR))
+	
+def scanFirst(s:String):ScanResult
+	val numMatch : option.Option = numRX.findPrefixMatchOf(s).map(
+		(m:regex.Match) => makeScanResult(m.matched(), tokens.NUMBER, m.after()))
+	val operatorMatch : option.Option = numMatch.orElse(
+		() => operatorRX.findPrefixMatchOf(s).map(
+			(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
+	operatorMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
+
+resource type Lexer
+	def nextToken():Token
+
+def makeLexer(s:String):Lexer = new
+	var current:String = s
+	def nextToken():Token
+		val numMatch : option.Option = numRX.findPrefixMatchOf(this.current).map(
+			(m:regex.Match) => makeScanResult(m.matched(), tokens.NUMBER, m.after()))
+		val operatorMatch : option.Option = numMatch.orElse(
+			() => operatorRX.findPrefixMatchOf(this.current).map(
+				(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
+		val wsMatch : option.Option = operatorMatch.orElse(
+			() => whitespaceRX.findPrefixMatchOf(this.current).map(
+				(m:regex.Match) => makeScanResult(m.matched(), tokens.WHITESPACE, m.after())))
+		val emptyMatch : option.Option = wsMatch.orElse(
+			() => emptyRX.findPrefixMatchOf(this.current).map(
+				(m:regex.Match) => makeScanResult(m.matched(), tokens.EOF, m.after())))
+		val result : ScanResult = emptyMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
+		this.current = result.rest()
+		result.token()
+		
+parseFirst("*54-").print()
+
+val result1 = scanFirst("54*3")
+val result2 = scanFirst(result1.rest())
+result2.token().print()
+
+val lex = makeLexer("54  *3")
+lex.nextToken()
+lex.nextToken()
+lex.nextToken().print()
+
+*/

@@ -38,10 +38,19 @@ public class Interpreter {
 			File rootDir = new File(System.getProperty("user.dir"));
 			String wyvernPath = System.getenv("WYVERN_HOME");
 			if (wyvernPath == null) {
-				System.err.println("must set WYVERN_HOME environmental variable to wyvern project directory");
-				return;
+				if (wyvernHome.get() != null) {
+					wyvernPath = wyvernHome.get();
+				} else {
+					System.err.println("must set WYVERN_HOME environmental variable to wyvern project directory");
+					return;
+				}
 			}
 			wyvernPath += "/tools/src/wyvern/lib/";
+			// sanity check: is the wyvernPath a valid directory?
+			if (!Files.isDirectory(Paths.get(wyvernPath))) {
+				System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
+				return;				
+			}
 			ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
 			GenContext genCtx = Globals.getGenContext(new InterpreterState(rootDir, new File(wyvernPath)));
 			Expression program = ast.generateIL(genCtx, null);
@@ -51,7 +60,10 @@ public class Interpreter {
 		} catch (ParseException e) {
 			System.err.println(e.toString());
 		} catch (ToolError e) {
-			System.err.println(e.getTypecheckingErrorMessage().toString());
+			System.err.println(e.getMessage());
 		}
 	}
+
+	// used to set WYVERN_HOME when called programatically
+	public static final ThreadLocal<String> wyvernHome = new ThreadLocal<String>();
 }

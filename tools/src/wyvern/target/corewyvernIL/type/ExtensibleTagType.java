@@ -10,9 +10,9 @@ public class ExtensibleTagType extends TagType {
 		super(caseType);
 	}
 
-  public <T> T acceptVisitor(ASTVisitor<T> emitILVisitor,
-                             Environment env,
-                             OIREnvironment oirenv) {
+  public <T, E> T acceptVisitor(ASTVisitor<T, E> emitILVisitor,
+                                E env,
+                                OIREnvironment oirenv) {
     return emitILVisitor.visit(env, oirenv, this);
   }
 }

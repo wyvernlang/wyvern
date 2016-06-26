@@ -7,6 +7,7 @@ import java.util.Vector;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.binding.Binding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
@@ -34,6 +35,7 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EmptyTypeContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.CaseType;
@@ -74,7 +76,7 @@ import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 import wyvern.tools.tests.tagTests.TestUtil;
 
-public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
+public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
   private int classCount = 0;
   private int interfaceCount = 0;
 
@@ -90,7 +92,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     return "Interface"+interfaceCount;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, New newExpr) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, New newExpr) {
     OIRClassDeclaration cd;
     ValueType exprType;
     OIRType oirtype;
@@ -105,7 +107,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
     // exprType = newExpr.getExprType();
     // if (exprType != null)
-    //   oirtype = (OIRType) exprType.acceptVisitor(this, env, oirenv);
+    //   oirtype = (OIRType) exprType.acceptVisitor(this, cxt, oirenv);
     classenv = new OIREnvironment (oirenv);
     oirMemDecls = new Vector<OIRMemberDeclaration> ();
     delegates = new Vector<OIRDelegate> ();
@@ -118,7 +120,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
       {
         OIRDelegate oirdelegate;
 
-        oirdelegate = (OIRDelegate)decl.acceptVisitor(this, env,
+        oirdelegate = (OIRDelegate)decl.acceptVisitor(this, cxt,
             classenv);
         delegates.add(oirdelegate);
       }
@@ -127,7 +129,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
         OIRMemberDeclaration oirMemDecl;
 
         oirMemDecl = (OIRMemberDeclaration) decl.acceptVisitor(this,
-            env, classenv);
+            cxt, classenv);
 
         if (decl instanceof VarDeclaration)
         {
@@ -137,7 +139,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
           varDecl = (VarDeclaration)decl;
           oirvalue = (OIRExpression) varDecl.getDefinition().acceptVisitor(this,
-              env, oirenv);
+              cxt, oirenv);
           pair = new OIRFieldValueInitializePair (
               (OIRFieldDeclaration)oirMemDecl, oirvalue);
           fieldValuePairs.add (pair);
@@ -151,7 +153,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
           varDecl = (ValDeclaration)decl;
           oirvalue = (OIRExpression) varDecl.getDefinition().acceptVisitor(this,
-              env, oirenv);
+              cxt, oirenv);
           pair = new OIRFieldValueInitializePair (
               (OIRFieldDeclaration)oirMemDecl, oirvalue);
           fieldValuePairs.add (pair);
@@ -175,30 +177,30 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     return oirexpr;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, MethodCall methodCall) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, MethodCall methodCall) {
     OIRExpression oirbody;
     Expression body;
     List<OIRExpression> args;
     OIRMethodCall oirMethodCall;
 
-    args =	new Vector<OIRExpression> ();
+    args = new Vector<OIRExpression> ();
 
     for (Expression e : methodCall.getArgs())
     {
-      args.add ((OIRExpression)e.acceptVisitor(this, env, oirenv));
+      args.add ((OIRExpression)e.acceptVisitor(this, cxt, oirenv));
     }
 
     body = methodCall.getObjectExpr();
 
-    oirbody = (OIRExpression)body.acceptVisitor(this, env, oirenv);
-    oirMethodCall = new OIRMethodCall (oirbody,
-        methodCall.getMethodName(),  args);
+    oirbody = (OIRExpression)body.acceptVisitor(this, cxt, oirenv);
+    oirMethodCall = new OIRMethodCall (oirbody, body.typeCheck(cxt),
+        methodCall.getMethodName(), args);
 
     return oirMethodCall;
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, Match match) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, Match match) {
     OIRLet oirParentLet;
     OIRIfThenElse oirIfExpr;
     OIRLet oirThenLet;
@@ -206,9 +208,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     OIRExpression oirMatchExpr;
 
     oirMatchExpr = (OIRExpression) match.getMatchExpr().acceptVisitor(this,
-        env, oirenv);
+        cxt, oirenv);
     oirElseExpr = (OIRExpression) match.getElseExpr().acceptVisitor(this,
-        env, oirenv);
+        cxt, oirenv);
 
     /* Build the let in if let in else let in if chain bottom up */
     for (int i = match.getCases().size() - 1; i >= 0; i--)
@@ -221,14 +223,15 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
       matchCase = match.getCases().get(i);
       body = (OIRExpression)matchCase.getBody().acceptVisitor(this,
-          env, oirenv);
+          cxt, oirenv);
       oirTag = (OIRExpression)matchCase.getPattern().acceptVisitor(
-          this, env, oirenv);
+          this, cxt, oirenv);
       oirThenLet = new OIRLet (matchCase.getVarName(), oirMatchExpr, body);
       arg = new Vector<OIRExpression> ();
       arg.add(oirTag);
       condition = new OIRMethodCall (new OIRFieldGet (
           new OIRVariable ("tmp"), "tag"),
+          null,
           "isSubtag", arg);
       oirIfExpr = new OIRIfThenElse (condition, oirThenLet, oirElseExpr);
       oirElseExpr = oirIfExpr;
@@ -239,21 +242,21 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, FieldGet fieldGet) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, FieldGet fieldGet) {
     OIRFieldGet oirFieldGet;
     OIRExpression oirObject;
     Expression object;
 
     object = (Expression) fieldGet.getObjectExpr();
     oirObject = (OIRExpression) object.acceptVisitor(this,
-        env, oirenv);
+        cxt, oirenv);
     oirFieldGet = new OIRFieldGet (oirObject, fieldGet.getName());
 
     return oirFieldGet;
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, Let let) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, Let let) {
 
     OIRLet oirLet;
     OIRExpression oirToReplace;
@@ -261,19 +264,22 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     Expression toReplace;
     Expression inExpr;
 
+    TypeContext extendedCxt =
+        cxt.extend(let.getVarName(), let.getVarType());
+
     toReplace = let.getToReplace();
     oirToReplace = (OIRExpression)toReplace.acceptVisitor(this,
-        env, oirenv);
+        extendedCxt, oirenv);
     oirenv.addName(let.getVarName(), null);
     inExpr = let.getInExpr();
-    oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, env, oirenv);
+    oirInExpr = (OIRExpression)inExpr.acceptVisitor(this, extendedCxt, oirenv);
     oirLet = new OIRLet (let.getVarName(), oirToReplace, oirInExpr);
 
     return oirLet;
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, FieldSet fieldSet) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, FieldSet fieldSet) {
     OIRFieldSet oirFieldSet;
     OIRExpression oirObject;
     OIRExpression oirToSet;
@@ -282,9 +288,9 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
 
     object = (Expression) fieldSet.getObjectExpr();
     toSet = fieldSet.getExprToAssign();
-    oirObject = (OIRExpression) object.acceptVisitor(this, env,
+    oirObject = (OIRExpression) object.acceptVisitor(this, cxt,
         oirenv);
-    oirToSet = (OIRExpression) toSet.acceptVisitor(this, env,
+    oirToSet = (OIRExpression) toSet.acceptVisitor(this, cxt,
         oirenv);
     oirFieldSet = new OIRFieldSet (oirObject, fieldSet.getFieldName(),
         oirToSet);
@@ -293,7 +299,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, Variable variable) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, Variable variable) {
     OIRVariable oirVar;
     OIRType oirType;
     ValueType type;
@@ -304,15 +310,15 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, Cast cast) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, Cast cast) {
     OIRCast oirCast;
     OIRType oirType;
     OIRExpression oirExpr;
     Expression expr;
 
     expr = cast.getToCastExpr();
-    oirExpr = (OIRExpression)expr.acceptVisitor(this, env, oirenv);
-    oirType = (OIRType)cast.getExprType().acceptVisitor(this, env,
+    oirExpr = (OIRExpression)expr.acceptVisitor(this, cxt, oirenv);
+    oirType = (OIRType)cast.getExprType().acceptVisitor(this, cxt,
         oirenv);
     oirCast = new OIRCast (oirExpr, oirType);
 
@@ -320,89 +326,92 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, VarDeclaration varDecl) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, VarDeclaration varDecl) {
     OIRFieldDeclaration oirMember;
     OIRType type;
     ValueType _type;
 
     _type = varDecl.getType();
-    type = (OIRType)_type.acceptVisitor(this, env, oirenv);
+    type = (OIRType)_type.acceptVisitor(this, cxt, oirenv);
     oirMember = new OIRFieldDeclaration (varDecl.getName(), type);
     return oirMember;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, DefDeclaration defDecl) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, DefDeclaration defDecl) {
     OIRMethodDeclaration oirMethodDecl;
     OIRMethod oirMethod;
     OIRType oirReturnType;
     List<OIRFormalArg> listOIRFormalArgs;
     OIRExpression oirBody;
     OIREnvironment defEnv;
+    TypeContext defCxt;
 
     listOIRFormalArgs = new Vector <OIRFormalArg> ();
     defEnv = new OIREnvironment (oirenv);
+    defCxt = cxt;
 
     for (FormalArg arg : defDecl.getFormalArgs())
     {
       OIRFormalArg formalArg;
 
-      formalArg = (OIRFormalArg) arg.acceptVisitor(this, env,
+      formalArg = (OIRFormalArg) arg.acceptVisitor(this, cxt,
           oirenv);
       defEnv.addName(formalArg.getName(), formalArg.getType());
+      defCxt = defCxt.extend(formalArg.getName(), arg.getType());
       listOIRFormalArgs.add(formalArg);
     }
 
     // oirReturnType = (OIRType) defDecl.getType().acceptVisitor(this,
-    //     env, oirenv);
+    //     cxt, oirenv);
     oirMethodDecl = new OIRMethodDeclaration (null,
         defDecl.getName(), listOIRFormalArgs);
     oirBody = (OIRExpression) defDecl.getBody().acceptVisitor(this,
-        env, defEnv);
+        defCxt, defEnv);
     oirMethod = new OIRMethod (defEnv, oirMethodDecl, oirBody);
 
     return oirMethod;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv, ValDeclaration valDecl) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, ValDeclaration valDecl) {
     OIRFieldDeclaration oirMember;
     OIRType type;
     ValueType _type;
 
     _type = valDecl.getType();
-    type = (OIRType)_type.acceptVisitor(this, env, oirenv);
+    type = (OIRType)_type.acceptVisitor(this, cxt, oirenv);
     oirMember = new OIRFieldDeclaration (valDecl.getName(), type, true);
 
     return oirMember;
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       IntegerLiteral integerLiteral) {
 
     return new OIRInteger (integerLiteral.getValue());
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       RationalLiteral rational) {
     return new OIRRational (rational.getNumerator(),
         rational.getDenominator());
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       FormalArg formalArg) {
     OIRType oirtype;
     OIRFormalArg oirarg;
 
     // oirtype = (OIRType) formalArg.getType().acceptVisitor(this,
-    //     env, oirenv);
+    //     cxt, oirenv);
     oirarg = new OIRFormalArg (formalArg.getName(), null);
     return oirarg;
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       VarDeclType varDeclType) {
     OIRInterface oirtype;
     ValueType type;
@@ -413,7 +422,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     fieldName = varDeclType.getName();
     methoDecls = new OIRMethodDeclarationGroup ();
     type = varDeclType.getRawResultType();
-    oirtype = (OIRInterface)type.acceptVisitor(this, env, oirenv);
+    oirtype = (OIRInterface)type.acceptVisitor(this, cxt, oirenv);
     methoDecls.addMethodDeclaration(new OIRMethodDeclaration (oirtype,
         "get"+fieldName, null));
     args = new Vector<OIRFormalArg> ();
@@ -424,7 +433,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     return methoDecls;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       ValDeclType valDeclType) {
     OIRInterface oirtype;
     ValueType type;
@@ -432,7 +441,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     OIRMethodDeclarationGroup methoDecls;
 
     type = valDeclType.getRawResultType();
-    oirtype = (OIRInterface)type.acceptVisitor(this, env, oirenv);
+    oirtype = (OIRInterface)type.acceptVisitor(this, cxt, oirenv);
     methodDecl = new OIRMethodDeclaration (oirtype,
         "set"+valDeclType.getName(), null);
     methoDecls = new OIRMethodDeclarationGroup ();
@@ -442,7 +451,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       DefDeclType defDeclType) {
     OIRMethodDeclaration oirMethodDecl;
     OIRType oirReturnType;
@@ -456,14 +465,14 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     {
       OIRFormalArg formalArg;
 
-      formalArg = (OIRFormalArg) arg.acceptVisitor(this, env,
+      formalArg = (OIRFormalArg) arg.acceptVisitor(this, cxt,
           oirenv);
       listOIRFormalArgs.add(formalArg);
     }
 
     returnType = defDeclType.getRawResultType();
     oirReturnType = (OIRType)returnType.acceptVisitor(this,
-        env, oirenv);
+        cxt, oirenv);
     oirMethodDecl = new OIRMethodDeclaration (oirReturnType,
         defDeclType.getName(), listOIRFormalArgs);
     methodDecls = new OIRMethodDeclarationGroup ();
@@ -473,14 +482,14 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       AbstractTypeMember abstractDeclType) {
     OIRType oirtype;
     OIRMethodDeclaration methDecl;
     OIRMethodDeclarationGroup methodDecls;
 
     oirtype = (OIRType) abstractDeclType.acceptVisitor(this,
-        env, oirenv);
+        cxt, oirenv);
     methDecl = new OIRMethodDeclaration (oirtype, "get"+abstractDeclType.getName(), null);
     methodDecls = new OIRMethodDeclarationGroup ();
     methodDecls.addMethodDeclaration(methDecl);
@@ -488,7 +497,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     return methodDecls;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       StructuralType structuralType) {
     OIRInterface oirinterface;
     List<OIRMethodDeclaration> methodDecls;
@@ -503,7 +512,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     {
       OIRMethodDeclarationGroup declTypeGroup;
 
-      OIRAST declAST = declType.acceptVisitor(this, env, oirenv);
+      OIRAST declAST = declType.acceptVisitor(this, cxt, oirenv);
       declTypeGroup = (OIRMethodDeclarationGroup) declAST;
       for (int i = 0; i < declTypeGroup.size(); i++)
       {
@@ -521,31 +530,31 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     return oirinterface;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       NominalType nominalType) {
     // Note: This code belongs more in the Match case
     // OIRExpression oirfieldget;
     // Path path;
 
     // path = nominalType.getPath();
-    // oirfieldget = (OIRExpression) path.acceptVisitor(this, env, oirenv);
+    // oirfieldget = (OIRExpression) path.acceptVisitor(this, cxt, oirenv);
 
     // return new OIRFieldGet (oirfieldget, nominalType.getTypeMember()+"tag");
 
     StructuralType defaultType =
         new StructuralType("emptyType",
                            new ArrayList<DeclType>());
-    return defaultType.acceptVisitor(this, env, oirenv);
+    return defaultType.acceptVisitor(this, cxt, oirenv);
 
     // TODO: This should also take into account types available in the OIREnvironment
     // TypeContext context = TestUtil.getStandardGenContext();
 
     // StructuralType st = nominalType.getStructuralType(context,
     //                                                   defaultType);
-    // return st.acceptVisitor(this, env, oirenv);
+    // return st.acceptVisitor(this, cxt, oirenv);
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       StringLiteral stringLiteral) {
     OIRString oirstring;
 
@@ -554,30 +563,30 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
     return oirstring;
   }
 
-  public OIRAST visit(Environment env, OIREnvironment oirenv,
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv,
       DelegateDeclaration delegateDecl) {
     OIRDelegate oirdelegate;
     OIRType oirtype;
     ValueType type;
 
     // type = delegateDecl.getValueType();
-    // oirtype = (OIRType) type.acceptVisitor(this, env, oirenv);
+    // oirtype = (OIRType) type.acceptVisitor(this, cxt, oirenv);
     oirdelegate = new OIRDelegate (null, delegateDecl.getFieldName());
 
     return oirdelegate;
   }
 
   @Override
-  public OIRAST visit(Environment env, OIREnvironment oirenv, Bind bind) {
+  public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, Bind bind) {
     throw new RuntimeException("not implemented");
   }
 
   @Override
-  public OIRAST visit(Environment env,
+  public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       ConcreteTypeMember concreteTypeMember) {
     /*OIRType type = (OIRType)concreteTypeMember.getRawResultType()
-      .acceptVisitor(this, env, oirenv);
+      .acceptVisitor(this, cxt, oirenv);
     oirenv.addType(concreteTypeMember.getName(), type);
 
     return type;*/
@@ -586,7 +595,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
   @Override
-  public OIRAST visit(Environment env,
+  public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       TypeDeclaration typeDecl) {
     // the tag field
@@ -595,28 +604,28 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST> {
   }
 
   @Override
-  public OIRAST visit(Environment env,
+  public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       CaseType caseType) {
     throw new RuntimeException("CaseType -> OIR unimplemented");
   }
 
   @Override
-  public OIRAST visit(Environment env,
+  public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       ExtensibleTagType extensibleTagType) {
     throw new RuntimeException("ExtensibleTagType -> OIR unimplemented");
   }
 
   @Override
-  public OIRAST visit(Environment env,
+  public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       DataType dataType) {
     throw new RuntimeException("DataType -> OIR unimplemented");
   }
 
   @Override
-  public OIRAST visit(Environment env,
+  public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       FFIImport ffiImport) {
     NominalType javaType = new NominalType("system", "Java");

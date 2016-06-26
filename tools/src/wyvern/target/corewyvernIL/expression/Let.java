@@ -16,13 +16,13 @@ import wyvern.tools.errors.ErrorMessage;
 
 public class Let extends Expression {
 	private VarBinding binding;
-	private Expression inExpr;
+	private IExpr inExpr;
 
-	public Let(String varName, ValueType type, Expression toReplace, Expression inExpr) {
+	public Let(String varName, ValueType type, IExpr toReplace, IExpr inExpr) {
 		this(new VarBinding(varName, type, toReplace), inExpr);
 	}
 
-	public Let(VarBinding binding, Expression inExpr) {
+	public Let(VarBinding binding, IExpr inExpr) {
 		super();
 		this.binding = binding;
 		if (inExpr == null) throw new RuntimeException();
@@ -33,12 +33,16 @@ public class Let extends Expression {
 		return binding.getVarName();
 	}
 
+    public ValueType getVarType() {
+        return binding.getType();
+    }
+
 	public Expression getToReplace() {
 		return binding.getExpression();
 	}
 
 	public Expression getInExpr() {
-		return inExpr;
+		return (Expression) inExpr;
 	}
 
 	@Override
@@ -67,8 +71,8 @@ public class Let extends Expression {
 	}
 
 	@Override
-	public <T> T acceptVisitor(ASTVisitor <T> emitILVisitor,
-			Environment env, OIREnvironment oirenv) {
+	public <T, E> T acceptVisitor(ASTVisitor <T, E> emitILVisitor,
+			E env, OIREnvironment oirenv) {
 		return emitILVisitor.visit(env, oirenv, this);
 	}
 
