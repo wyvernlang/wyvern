@@ -400,7 +400,7 @@ public class OIRTests {
             "    () => n + sum1ToN(n-1)\n" +
             "  )\n" +
             "sum1ToN(5)\n";
-        testPyFromInput(input, "15", true);
+        testPyFromInput(input, "15");
     }
 
     @Test
@@ -412,6 +412,6 @@ public class OIRTests {
             "    x + x\n" +
             "  g()\n" +
             "f()\n";
-        testPyFromInput(input, "10", true);
+        testPyFromInput(input, "10");
     }
 }
