@@ -445,7 +445,8 @@ public class ILTests {
 	
 	@Test
 	public void testInterpreterOnScript() {
-		String[] args = new String[] { PATH + "recursivetypes.wyv" };
+		String[] args = new String[] { TestUtil.BASE_PATH + "rosetta/hello.wyv" };
+		Interpreter.wyvernHome.set("..");
 		Interpreter.main(args);
 	}
 	

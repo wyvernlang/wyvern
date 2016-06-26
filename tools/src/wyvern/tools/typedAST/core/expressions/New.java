@@ -333,7 +333,7 @@ public class New extends CachingTypedAST implements CoreAST {
 
         }
         // if type is not specified, infer
-        return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), expectedType == null ? type:expectedType, getLocation());
+        return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), /*expectedType == null ?*/ type/*:expectedType*/, getLocation());
     }
     
     public void setSelfName(String n) {

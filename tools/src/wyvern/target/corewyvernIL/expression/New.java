@@ -134,7 +134,13 @@ public class New extends Expression {
 		}
 
 		if (isResource && !requiredT.isResource(GenContext.empty())) {
-			ToolError.reportError(ErrorMessage.MUST_BE_ASSIGNED_TO_RESOURCE_TYPE, this);
+			if (type instanceof StructuralType) {
+				type = new StructuralType(selfName, dts, isResource);
+				this.setExprType(type);
+			} else {
+				// can't update the type
+				ToolError.reportError(ErrorMessage.MUST_BE_ASSIGNED_TO_RESOURCE_TYPE, this);
+			}
 		}
 
 		return type;

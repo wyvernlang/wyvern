@@ -103,8 +103,8 @@ public class DefDeclaration extends NamedDeclaration {
 		ValueType bodyType = body.typeCheck(methodCtx);
 		if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
 			// for debugging
-			//ValueType resultType = getType();
-			//bodyType.isSubtypeOf(resultType, methodCtx);
+			ValueType resultType = getType();
+			bodyType.isSubtypeOf(resultType, methodCtx);
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");;
 			
 		}

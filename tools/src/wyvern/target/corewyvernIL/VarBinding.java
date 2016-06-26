@@ -3,18 +3,19 @@ package wyvern.target.corewyvernIL;
 import java.io.IOException;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarBinding extends ASTNode {
 	private String varName;
 	private ValueType type;
-	private Expression expr;
+	private IExpr expr;
 	
-	public VarBinding(String varName, ValueType type, Expression expr) {
+	public VarBinding(String varName, ValueType type, IExpr toReplace) {
 		this.varName = varName;
 		this.type = type;
-		this.expr = expr;
-		if (expr == null) throw new RuntimeException();
+		this.expr = toReplace;
+		if (toReplace == null) throw new RuntimeException();
 	}
 
 	public String getVarName() {
@@ -26,7 +27,7 @@ public class VarBinding extends ASTNode {
 	}
 
 	public Expression getExpression() {
-		return expr;
+		return (Expression) expr;
 	}
 	
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
