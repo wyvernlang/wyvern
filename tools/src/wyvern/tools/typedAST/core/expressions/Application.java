@@ -17,6 +17,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -157,7 +158,8 @@ public class Application extends CachingTypedAST implements CoreAST {
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType) {
 		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
-		List<FormalArg> formals = exprGen.getExpectedArgTypes(ctx);
+		DefDeclType defdecl = exprGen.getDeclType(ctx);
+        List<FormalArg> formals = defdecl.getFormalArgs();
 
         int offset = 0;
 		// generate arguments		

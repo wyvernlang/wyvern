@@ -2,7 +2,6 @@ package wyvern.target.corewyvernIL.support;
 
 import java.util.List;
 
-import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -29,11 +28,10 @@ public class DefaultExprGenerator implements CallableExprGenerator {
 	}
 
 	@Override
-	public List<FormalArg> getExpectedArgTypes(TypeContext ctx) {
+	public DefDeclType getDeclType(TypeContext ctx) {
 		Expression e = genExpr();
 		ValueType vt = e.typeCheck(ctx);
-		DefDeclType dt = (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
-		return dt.getFormalArgs();
+		return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
 	}
 
 }
