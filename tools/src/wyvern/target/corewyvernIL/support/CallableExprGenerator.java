@@ -2,7 +2,7 @@ package wyvern.target.corewyvernIL.support;
 
 import java.util.List;
 
-import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.tools.errors.HasLocation;
 
@@ -23,6 +23,6 @@ public interface CallableExprGenerator {
 	public Expression genExprWithArgs(List<Expression> args, HasLocation loc);
 	
 	/** Returns null if no argument type is expected */
-	public List<FormalArg> getExpectedArgTypes(TypeContext ctx);
+	public DefDeclType getDeclType(TypeContext ctx);
 
 }

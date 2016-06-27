@@ -52,15 +52,13 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	}
 
 	@Override
-	public List<FormalArg> getExpectedArgTypes(TypeContext ctx) {
+	public DefDeclType getDeclType(TypeContext ctx) {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
 			ValueType vt = e.typeCheck(ctx);
-			DefDeclType dt = (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
-			return dt.getFormalArgs();
+			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
 		} else {
-			DefDeclType dt = (DefDeclType) declType;
-			return dt.getFormalArgs();
+			return (DefDeclType) declType;
 		}
 	}
 }
