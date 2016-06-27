@@ -260,10 +260,10 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; }
+{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) args = Formals() <COLON> resultType = Type() body=DefBody() {
-	return build.defDecl(name.image, resultType, args, body, false, loc(name));
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = Generics()] args = Formals() <COLON> resultType = Type() body=DefBody() {
+	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
   }
 }
 
@@ -634,22 +634,26 @@ AST Literal() :
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags) :
-{ AST rhs; Token t; }
+{ AST rhs; Token t; List<String> gentypes = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
-  rhs = Arguments(flags) { return build.application(lhs, rhs, null); }
+  [gentypes = Generics()] rhs = Arguments(flags) {
+    return build.application(lhs, rhs, null, gentypes);
+  }
 }
 
 AST Arguments(ExpFlags flags) :
 { AST exp = null; Token t; }
 {
   t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
-  			if (exp == null)
-  				return build.unitValue(loc(t));
-  			else
-				return exp;
-		}
+    if (exp == null) {
+        return build.unitValue(loc(t));
+    }
+    else {
+        return exp;
+    }
+  }
 }
 
 AST ArgumentList(ExpFlags flags, FileLocation loc) :
@@ -687,4 +691,26 @@ Token OverrideOperator() :
 	| operator = <MULT> {return operator;}
     | operator = <DIVIDE> {return operator;}
 	
+}
+
+List Generics() :
+{ List gens = null; }
+{
+  <LBRACK> gens = GenericList() <RBRACK> {
+    return gens;
+  }
+}
+
+List GenericList() :
+{ LinkedList<String> genList = new LinkedList<String>(); Token t1, t2; }
+{
+
+  t1 = <IDENTIFIER>
+  ( <COMMA> t2 = <IDENTIFIER> {
+    genList.addLast(t2.image);
+  }
+  )* {
+    genList.addFirst(t1.image);
+    return genList;
+  }
 }

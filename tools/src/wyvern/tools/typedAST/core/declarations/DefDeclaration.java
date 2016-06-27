@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -16,6 +17,9 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -36,6 +40,7 @@ import wyvern.tools.typedAST.transformers.ExpressionWriter;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
@@ -55,8 +60,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
+    private List<String> generics;
 
-	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
+    public static final String GENERIC_PREFIX = "__generic__";
+    public static final String GENERIC_MEMBER = "T";
+
+	public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, returnType);
@@ -65,8 +74,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
+
+        this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
+	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
+						  TypedAST body, boolean isClassDef, FileLocation location) {
+        this(name, returnType, null, argNames, body, isClassDef, location);
+	}
 
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
 						   TypedAST body, boolean isClassDef) {
@@ -76,19 +91,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.body = (ExpressionAST) body;
 		this.argNames = argNames;
 		this.isClass = isClassDef;
+        this.generics = new LinkedList<String>();
 	}
-
-	private DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
-						  TypedAST body, boolean isClassDef, FileLocation location, boolean placeholder) {
-		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
-		this.type = fullType;
-		this.name = name;
-		this.body = (ExpressionAST)body;
-		this.argNames = argNames;
-		this.isClass = isClassDef;
-		this.location = location;
-	}
-
 
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
 		Type argType = null;
@@ -138,7 +142,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass, location, true);
+	    DefDeclaration dd = new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass);
+        dd.location = this.location;
+        return dd;
 	}
 
     @Override
@@ -166,12 +172,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (body != null) {
 			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for def inside type!
 			type = TypeResolver.resolve(type, env);
-			
 			Type retType = ((Arrow)type).getResult();
-			
-			// System.out.println("bodyType = " + bodyType);
-			// System.out.println("retType = " + retType);
-			
 			if (bodyType != null &&
 					!bodyType.subtype(retType))
 				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
@@ -235,29 +236,63 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public DeclType genILType(GenContext ctx) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
-		for (NameBinding b : argNames) {
-			String bName = b.getName();
-			ValueType type = b.getType().getILType(ctx);
-			FormalArg fa = new FormalArg(bName, type);
-			args.add(fa);
-			ctx = ctx.extend(bName, new Variable(bName), type);
-		}
+
+        ctx = this.serializeArguments(args, ctx);
+
 		DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args);
 		return ret;
 	}
 
+    private GenContext serializeArguments(List<FormalArg> args, GenContext ctx) {
+        if(isGeneric()) {
+            for(String s : this.generics) {
+                ValueType type = this.genericStructuralType(s);
+                String genName = GENERIC_PREFIX + s;
+                args.add(new FormalArg(genName, type));
+
+                ctx = new TypeGenContext(s, genName, ctx);
+                ctx = ctx.extend(genName, new Variable(genName), type);
+            }
+        }
+
+        for (NameBinding b : argNames) {
+			String bName = b.getName();
+            Type t =  b.getType();
+            ValueType type = t.getILType(ctx);
+            FormalArg fa = new FormalArg(bName, type);
+			args.add(fa);
+			ctx = ctx.extend(bName, new Variable(bName), type);
+		}
+        return ctx;
+    }
+
+    private boolean isGeneric() {
+        return !this.generics.isEmpty();
+    }
 
 	private ValueType getResultILType(GenContext ctx) {
-		return ((Arrow)type).getResult().getILType(ctx);
+		Arrow a = (Arrow) this.type;
+        return a.getResult().getILType(ctx);
 	}
-
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
 		GenContext methodContext = thisContext;
+		if(isGeneric()) {
+
+            for(String s : this.generics) {
+                String genName = GENERIC_PREFIX + s;
+                ValueType type = this.genericStructuralType(s);
+                args.add(new FormalArg(genName, type));
+
+                methodContext = new TypeGenContext(s, genName, methodContext);
+                thisContext = new TypeGenContext(s, genName, thisContext); // TODO +s
+            }
+		}
+
 		for (NameBinding b : argNames) {
-			ValueType argType = b.getType().getILType(thisContext);
+;			ValueType argType = b.getType().getILType(thisContext);
 			args.add(new FormalArg(b.getName(), argType));
 			methodContext = methodContext.extend(b.getName(), new Variable(b.getName()), argType);
 			thisContext = thisContext.extend(b.getName(), new Variable(b.getName()), argType);
@@ -355,5 +390,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return setterDecl;
 		
 	}
-	
+
+    public static StructuralType genericStructuralType(String genericName) {
+        List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
+        bodyDecl.add(new AbstractTypeMember(genericName)); // the body contains only a abstract type member representing the generic type
+
+        StructuralType genType = new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
+        return genType;
+    }
 }

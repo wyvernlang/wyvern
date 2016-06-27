@@ -13,7 +13,7 @@ public interface ASTBuilder<AST,Type> {
 	/** if type is null, it will be inferred*/
 	public AST valDecl(String name, Type type, AST exp, FileLocation loc);
 	public AST varDecl(String name, Type type, AST exp, FileLocation loc);
-	public AST defDecl(String name, Type type, List args, AST body, boolean isClassDef, FileLocation loc);
+	public AST defDecl(String name, Type type, List<String> generics, List args, AST body, boolean isClassDef, FileLocation loc);
 	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 	public AST delegateDecl(Type type, AST exp, FileLocation loc);
 	
@@ -29,7 +29,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST integerLit(int value, FileLocation loc);
 	public AST booleanLit(boolean value, FileLocation loc);
 	public AST invocation(AST receiver, String name, AST argument, FileLocation loc);
-	public AST application(AST function, AST arguments, FileLocation loc);
+	public AST application(AST function, AST arguments, FileLocation loc, List<String> generics);
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc, String selfName);

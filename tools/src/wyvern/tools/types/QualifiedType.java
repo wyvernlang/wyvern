@@ -21,6 +21,11 @@ public class QualifiedType extends AbstractTypeImpl {
 		this.base = (ExpressionAST) base;
 	}
 
+    public QualifiedType(ExpressionAST base, String name) {
+        this.name = name;
+        this.base = base;
+    }
+
 	@Override
 	public ValueType generateILType() {
 		// TODO Auto-generated method stub
