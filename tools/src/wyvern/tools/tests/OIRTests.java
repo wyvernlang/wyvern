@@ -390,4 +390,28 @@ public class OIRTests {
             "obj.ifTrue(2,3)\n";
         testPyFromInput(input, "2");
     }
+
+    @Test
+    public void testRecursion() throws ParseException {
+        String input =
+            "def sum1ToN(n : Int) : Int\n" +
+            "  (n < 2).ifTrue(\n" +
+            "    () => 1,\n" +
+            "    () => n + sum1ToN(n-1)\n" +
+            "  )\n" +
+            "sum1ToN(5)\n";
+        testPyFromInput(input, "15");
+    }
+
+    @Test
+    public void testFreeVariableTransitivity() throws ParseException {
+        String input =
+            "val x = 5\n" +
+            "def f() : Int\n" +
+            "  def g() : Int\n" +
+            "    x + x\n" +
+            "  g()\n" +
+            "f()\n";
+        testPyFromInput(input, "10");
+    }
 }
