@@ -108,7 +108,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		}
 
 		if (((DeclSequence)body).hasVarDeclaration() && !isResource) {
-			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, body, name);
+			ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);
 		}
 
 		//Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);
