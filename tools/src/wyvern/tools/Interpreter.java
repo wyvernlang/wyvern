@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -51,14 +52,18 @@ public class Interpreter {
 				System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
 				return;				
 			}
-			ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
-			GenContext genCtx = Globals.getGenContext(new InterpreterState(rootDir, new File(wyvernPath)));
+			final InterpreterState state = new InterpreterState(rootDir, new File(wyvernPath));
+			Module m = state.getResolver().load("unknown", filepath.toFile());
+			Expression program = m.getExpression();
+			
+			/*ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
+			GenContext genCtx = Globals.getGenContext(state);
 			Expression program = ast.generateIL(genCtx, null);
 			TypeContext ctx = Globals.getStandardTypeContext();
-			program.typeCheck(ctx);
+			program.typeCheck(ctx);*/
 			Value v = program.interpret(Globals.getStandardEvalContext());
-		} catch (ParseException e) {
-			System.err.println(e.toString());
+		/*} catch (ParseException e) {
+			System.err.println("Parse error: " + e.getMessage());*/
 		} catch (ToolError e) {
 			System.err.println(e.getMessage());
 		}

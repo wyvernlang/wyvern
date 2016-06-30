@@ -149,12 +149,11 @@ public class ModuleResolver {
 	 * @param state 
 	 * @return
 	 */
-	private Module load(String qualifiedName, File file) {
+	public Module load(String qualifiedName, File file) {
         TypedAST ast = null;
 		try {
 			ast = TestUtil.getNewAST(file);
 		} catch (ParseException e) {
-			e.printStackTrace();
 			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
 		}
         
