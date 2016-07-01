@@ -1,9 +1,11 @@
 package wyvern.tools.typedAST.core.values;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -67,7 +69,7 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 		return this.location;
 	}
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}

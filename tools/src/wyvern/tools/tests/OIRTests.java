@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.BeforeClass;
@@ -18,6 +19,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -50,7 +52,7 @@ public class OIRTests {
     OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
     GenContext genContext = Globals.getStandardGenContext();
-    Expression ILprogram = ast.generateIL(genContext, null);
+    Expression ILprogram = ast.generateIL(genContext, null, new LinkedList<TypedModuleSpec>());
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);

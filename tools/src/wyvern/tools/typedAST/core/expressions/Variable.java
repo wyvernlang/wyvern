@@ -4,10 +4,12 @@ import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -131,7 +133,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		return ctx.lookupExp(getName(), location);
 	}
 	

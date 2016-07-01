@@ -12,6 +12,7 @@ import java.util.Stack;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
@@ -344,7 +345,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		/*Iterator<TypedAST> ai = exps.iterator();
 		
 		if (!ai.hasNext())
@@ -354,6 +355,8 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	    Sequence seqWithBlocks = combine();		
 		TopLevelContext tlc = new TopLevelContext(ctx);
 		seqWithBlocks.genTopLevel(tlc, expectedType);
+		if (tlc.getDependencies().size()>0)
+			dependencies.addAll(tlc.getDependencies());
 		return tlc.getExpression();
 	}
 	

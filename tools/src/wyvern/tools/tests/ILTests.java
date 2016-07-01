@@ -19,11 +19,13 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -148,7 +150,7 @@ public class ILTests {
         String input = "val identity = (x: system.Int) => x\n"
                      + "   identity(5)";
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
-        Expression program = ast.generateIL(Globals.getStandardGenContext(), null);
+        Expression program = ast.generateIL(Globals.getStandardGenContext(), null, null);
         TypeContext ctx = Globals.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
         Assert.assertEquals(Util.intType(), t);
@@ -351,7 +353,7 @@ public class ILTests {
 			TypedAST ast = TestUtil.getNewAST(input);
 			// bogus "system" entry, but makes the text work for now
 			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-			Expression program = ((Sequence) ast).generateIL(genCtx, null);
+			Expression program = ((Sequence) ast).generateIL(genCtx, null, null);
 			TypeContext ctx = TypeContext.empty();
 			ValueType t = program.typeCheck(ctx);
 			Assert.fail("typechecking should have failed");
@@ -666,7 +668,7 @@ public class ILTests {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
         InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), null);
 		GenContext genCtx = Globals.getGenContext(state);
-        Expression program = ast.generateIL(genCtx, null);
+        Expression program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
         doChecks(program, expectedType, expectedValue);
 	}
 
@@ -678,18 +680,21 @@ public class ILTests {
 	private static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
-		Expression program = ast.generateIL(genCtx, null);
+		final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+		IExpr program = ast.generateIL(genCtx, null, dependencies);
+		program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
         doChecks(program, expectedType, expectedResult);
 	}
 
 	// TODO: make other script tests call this function
 	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
         InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH));
-        Expression program = state.getResolver().resolveModule(qualifiedName).getExpression();
+        final Module module = state.getResolver().resolveModule(qualifiedName);
+		IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
         doChecks(program, expectedType, expectedValue);
 	}
 	
-	private static void doChecks(Expression program, ValueType expectedType, Value expectedValue) {
+	private static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
         // resolveModule already typechecked, but we'll do it again to verify the type
 		TypeContext ctx = Globals.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
@@ -736,7 +741,7 @@ public class ILTests {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		try {
-			Expression program = ast.generateIL(genCtx, null);
+			Expression program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
 			program.typeCheck(Globals.getStandardTypeContext());
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
@@ -931,7 +936,7 @@ public class ILTests {
 	 */
 	private static void assertTypeCheckFails(ExpressionAST ast, GenContext genCtx) {
 		try {
-			Expression program = ast.generateIL(genCtx, null);
+			Expression program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
 			
 			// not quite right, but works for now
 			// TODO: replace this with a standard prelude

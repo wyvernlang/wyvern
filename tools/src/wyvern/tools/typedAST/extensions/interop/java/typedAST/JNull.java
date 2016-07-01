@@ -1,10 +1,12 @@
 package wyvern.tools.typedAST.extensions.interop.java.typedAST;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -62,7 +64,7 @@ public class JNull extends AbstractExpressionAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;
 	}

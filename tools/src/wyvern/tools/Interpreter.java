@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -54,7 +55,8 @@ public class Interpreter {
 			}
 			final InterpreterState state = new InterpreterState(rootDir, new File(wyvernPath));
 			Module m = state.getResolver().load("unknown", filepath.toFile());
-			Expression program = m.getExpression();
+			IExpr program = m.getExpression();
+			program = state.getResolver().wrap(program, m.getDependencies());
 			
 			/*ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
 			GenContext genCtx = Globals.getGenContext(state);

@@ -1,10 +1,12 @@
 package wyvern.tools.typedAST.core.values;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -81,7 +83,7 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return new BooleanLiteral(value);
 	}

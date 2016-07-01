@@ -249,7 +249,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	@Override
 	public void genTopLevel(TopLevelContext tlc) {
 		ValueType declType = getILValueType(tlc.getContext());
-		tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext(), declType), false);
+		tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
 	}
 
 	@Override
@@ -273,7 +273,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				vt = type.getILType(ctx);
 			} else {
 				// convert the declaration and typecheck it
-				vt = definition.generateIL(ctx, null).typeCheck(ctx);
+				vt = definition.generateIL(ctx, null, null).typeCheck(ctx);
 			}
 		}
 		return vt;
@@ -284,7 +284,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		
 		ValueType expectedType = getILValueType(thisContext);
 		/* uses ctx for generating the definition, as the selfName is not in scope */
-		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType), location);
+		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType, null), location);
 	}
 
 	@Override

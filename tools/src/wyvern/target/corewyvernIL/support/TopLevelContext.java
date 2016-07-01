@@ -48,7 +48,7 @@ public class TopLevelContext {
 			binding = pending.pop();
 			exp = new Let(binding, exp);
 		}
-		exp = (Expression) ctx.getInterpreterState().getResolver().wrap(exp, dependencies);
+		//exp = (Expression) ctx.getInterpreterState().getResolver().wrap(exp, dependencies);
 		return exp;
 	}
 

@@ -21,6 +21,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -156,7 +157,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
 		DefDeclType defdecl = exprGen.getDeclType(ctx);
         List<FormalArg> formals = defdecl.getFormalArgs();
@@ -186,7 +187,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 				ValueType expectedArgType = formals.get(i + offset).getType();
 				ExpressionAST ast = raw_args[i];
 				// TODO: propagate types downward from formals
-				args.add(ast.generateIL(ctx, expectedArgType));
+				args.add(ast.generateIL(ctx, expectedArgType, dependencies));
 			}
         } else if (argument instanceof UnitVal) {
         	// leave args empty
@@ -196,7 +197,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             }
         	
     		// TODO: propagate types downward from formals
-        	args.add(argument.generateIL(ctx, formals.get(0).getType()));
+        	args.add(argument.generateIL(ctx, formals.get(0).getType(), null));
         }
 		
 		// generate the call

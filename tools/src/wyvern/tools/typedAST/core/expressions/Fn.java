@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -138,7 +139,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
      * @param GenContext The type context of the lambda declaration
      * @return The Intermediate Representation of the inline function decl
      */
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         /*
          * First, map the NameBindings to Formal Arguments, dropping the parameters into the IR.
          * Next, find the type of the body. The type of the body is the return type of the function.
@@ -157,7 +158,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         
 
         // Generate the IL for the body, and get it's return type.
-        Expression il = this.body.generateIL(ctx, null);
+        Expression il = this.body.generateIL(ctx, null, dependencies);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
         // Create a new list of function declaration, which is a singleton, containing only Util.APPLY_NAME
@@ -178,7 +179,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 	}
 	
 	public  void genTopLevel(TopLevelContext topLevelContext, ValueType expectedType) {
-		final Expression exp = generateIL(topLevelContext.getContext(), expectedType);
+		final Expression exp = generateIL(topLevelContext.getContext(), expectedType, null);
 		topLevelContext.addExpression(exp, expectedType);
 	}
 

@@ -162,7 +162,7 @@ public class ModuleResolver {
 		GenContext genCtx = Globals.getGenContext(state);
 		IExpr program;
 		if (ast instanceof ExpressionAST) {
-			program = ((ExpressionAST)ast).generateIL(genCtx, null);
+			program = ((ExpressionAST)ast).generateIL(genCtx, null, dependencies);
 		} else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
 			Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
 			if (decl instanceof ValDeclaration) {

@@ -302,7 +302,7 @@ public class TypeVarDecl extends Declaration {
 	private Expression getMetadata(GenContext ctx) {
 		if (metadata.get().isPresent()) {
 			if (metadataExp == null)
-				metadataExp = ((ExpressionAST)metadata.get().get()).generateIL(ctx, null);
+				metadataExp = ((ExpressionAST)metadata.get().get()).generateIL(ctx, null, null);
 			return metadataExp;
 		} else {
 			return null;

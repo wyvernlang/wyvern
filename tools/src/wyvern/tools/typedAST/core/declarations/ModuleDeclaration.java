@@ -296,12 +296,12 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			List<Expression> args = new LinkedList<Expression>();
 		    if (argument instanceof TupleObject) {
 		    	for (ExpressionAST arg : ((TupleObject) argument).getObjects()) {
-		    		args.add(arg.generateIL(ctx, null));
+		    		args.add(arg.generateIL(ctx, null, dependencies));
 		    	}
 		    } else {
 		    	if(! (argument instanceof UnitVal)) {
 		    		/* single argument */
-			    	args.add(((ExpressionAST)argument).generateIL(ctx, null));
+			    	args.add(((ExpressionAST)argument).generateIL(ctx, null, null));
 		    	}
 		    	/* no argument */
 		    }

@@ -13,6 +13,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
@@ -196,7 +197,7 @@ public class ModuleSystemTests {
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.
 		String source = TestUtil.readFile(PATH + "DatabaseUser.wyv");
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-		Expression program = ast.generateIL(genCtx, Util.intType());
+		Expression program = ast.generateIL(genCtx, Util.intType(), null);
 		TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -221,7 +222,7 @@ public class ModuleSystemTests {
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.
 		String source = TestUtil.readFile(PATH + "DatabaseUserTricky.wyv");
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-		Expression program = ast.generateIL(genCtx, Util.intType());
+		Expression program = ast.generateIL(genCtx, Util.intType(), new LinkedList<TypedModuleSpec>());
 		TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
 		Assert.assertEquals(Util.intType(), t);
@@ -242,7 +243,7 @@ public class ModuleSystemTests {
 		
 		// Generate code to be evaluated.
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-		Expression program = ast.generateIL(genCtx, Util.intType());
+		Expression program = ast.generateIL(genCtx, Util.intType(), null);
 		
 		// Evaluate.
 		wyvern.target.corewyvernIL.expression.Value result = program.interpret(Globals.getStandardEvalContext());
@@ -260,7 +261,7 @@ public class ModuleSystemTests {
 		
 		// Generate code to be evaluated.
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
-		Expression program = ast.generateIL(genCtx, Util.intType());
+		Expression program = ast.generateIL(genCtx, Util.intType(), null);
 		
 		// Evaluate.
 		wyvern.target.corewyvernIL.expression.Value result = program.interpret(Globals.getStandardEvalContext());

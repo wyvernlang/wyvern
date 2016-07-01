@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
@@ -136,7 +137,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		
 		// Figure out expression being assigned.
 		CallableExprGenerator cegExpr = value.getCallableExpr(ctx);
@@ -188,7 +189,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	
 	@Override
 	public void genTopLevel (TopLevelContext tlc) {
-		Expression expr = generateIL(tlc.getContext(), null);
+		Expression expr = generateIL(tlc.getContext(), null, null);
 		tlc.addExpression(expr, Util.unitType());
 	}
 

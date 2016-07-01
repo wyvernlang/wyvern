@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -298,7 +299,7 @@ public class New extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public Expression generateIL(GenContext ctx, ValueType expectedType) {
+    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 
         ValueType type = seq.inferStructuralType(ctx, this.self());
         

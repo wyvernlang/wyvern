@@ -13,6 +13,7 @@ import java.util.Optional;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InvocationExprGenerator;
@@ -170,12 +171,12 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType) {
+	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		
 		CallableExprGenerator generator = getCallableExpr(ctx);
 		
         if (argument != null) {
-			Expression arg  = ((ExpressionAST)argument).generateIL(ctx, null);
+			Expression arg  = ((ExpressionAST)argument).generateIL(ctx, null, dependencies);
 			List<Expression> args = new ArrayList<Expression>();
 			args.add(arg);
 			
@@ -188,6 +189,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 	
 	@Override
 	public CallableExprGenerator getCallableExpr(GenContext genCtx) {
-		return new InvocationExprGenerator(receiver.generateIL(genCtx, null), operationName, genCtx, getLocation());
+		return new InvocationExprGenerator(receiver.generateIL(genCtx, null, null), operationName, genCtx, getLocation());
 	}
 }
