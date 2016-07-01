@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -166,14 +167,14 @@ public class ModuleResolver {
 			Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
 			if (decl instanceof ValDeclaration) {
 				program = ((ValDeclaration)decl).getDefinition();
-				program = wrap(program, dependencies);
+				//program = wrap(program, dependencies);
 			} else if (decl instanceof DefDeclaration) {
 				DefDeclaration oldDefDecl = (DefDeclaration) decl;
 				// rename according to "apply"
 				DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(), oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
 				// wrap in an object
 				program = new New(defDecl);
-				program = wrap(program, dependencies);
+				//program = wrap(program, dependencies);
 			} else if (decl instanceof TypeDeclaration) {
 				program = new New((NamedDeclaration)decl);
 			} else {
@@ -190,9 +191,24 @@ public class ModuleResolver {
 		return new Module(spec, program, dependencies);
 	}
 
+	// KEEP THIS CONSISTENT WITH BELOW
 	public TypeContext extendContext(TypeContext ctx, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
-			ctx = ctx.extend(spec.getInternalName(), spec.getType());
+			final String internalName = spec.getInternalName();
+			if (!ctx.isPresent(internalName)) {
+				ctx = ctx.extend(internalName, spec.getType());
+			}
+		}
+		return ctx;
+	}
+	
+	// KEEP THIS CONSISTENT WITH ABOVE
+	public GenContext extendGenContext(GenContext ctx, List<TypedModuleSpec> dependencies) {
+		for (TypedModuleSpec spec : dependencies) {
+			final String internalName = spec.getInternalName();
+			if (!ctx.isPresent(internalName)) {
+				ctx = ctx.extend(internalName, new Variable(internalName), spec.getType());
+			}
 		}
 		return ctx;
 	}

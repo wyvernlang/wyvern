@@ -132,7 +132,7 @@ public class NominalType extends ValueType {
 	@Override
 	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
 		if (count > MAX_RECURSION_DEPTH)
-			return this;
+			ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
 		if (path.getFreeVariables().contains(varName)) {
 			DeclType dt = this.getSourceDeclType(ctx);
 			if (dt instanceof ConcreteTypeMember) {

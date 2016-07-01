@@ -16,6 +16,9 @@ import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 
 public class StructuralType extends ValueType {
 	private String selfName;
@@ -166,7 +169,7 @@ public class StructuralType extends ValueType {
 	@Override
 	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
 		if (count > MAX_RECURSION_DEPTH)
-			return this;
+			ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
 		if (varName.equals(selfName))
 			return this;
 		List<DeclType> newDeclTypes = new LinkedList<DeclType>();

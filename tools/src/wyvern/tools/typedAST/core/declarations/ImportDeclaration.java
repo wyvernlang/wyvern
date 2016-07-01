@@ -27,6 +27,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -113,10 +114,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return location;
   }
 
-  @Override
-  public void writeArgsToTree(TreeWriter writer) {
+	@Override
+	public void writeArgsToTree(TreeWriter writer) {
+		writer.writeArgs(uri.toString());
+	}
 
-  }
 
   @Override
   public void accept(CoreASTVisitor visitor) {
@@ -225,6 +227,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       } else {
       	type = module.getSpec().getType();
       }
+      ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, module.getDependencies());
       if (!ctx.isPresent(internalName)) {
     	  ctx = ctx.extend(internalName, new Variable(internalName), type);
       }
