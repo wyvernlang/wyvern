@@ -5,6 +5,9 @@ import java.io.Reader;
 import java.util.Iterator;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.lexing.LexerUtils;
 import wyvern.tools.lexing.WyvernLexer;
 
@@ -31,6 +34,7 @@ public class WyvernTokenManager implements TokenManager {
 			try {
 				readTokenList();
 			} catch (CopperParserException e) {
+				ToolError.reportError(ErrorMessage.PARSE_ERROR, (FileLocation)null, e.getMessage());
 				throw new RuntimeException(e);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
