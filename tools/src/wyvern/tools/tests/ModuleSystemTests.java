@@ -269,11 +269,6 @@ public class ModuleSystemTests {
 	}
 	
 	@Test
-	public void testSafeSQL() throws ParseException {
-		ILTests.doTestScriptModularly("modules.safeSQLdriver", Util.intType(), new IntegerLiteral(5));
-	}
-	
-	@Test
 	public void testSimpleADT() throws ParseException {
 		ILTests.doTestScriptModularly("modules.simpleADTdriver", Util.intType(), new IntegerLiteral(5));
 	}
