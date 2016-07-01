@@ -166,6 +166,7 @@ public class ModuleResolver {
 			Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
 			if (decl instanceof ValDeclaration) {
 				program = ((ValDeclaration)decl).getDefinition();
+				program = wrap(program, dependencies);
 			} else if (decl instanceof DefDeclaration) {
 				DefDeclaration oldDefDecl = (DefDeclaration) decl;
 				// rename according to "apply"
