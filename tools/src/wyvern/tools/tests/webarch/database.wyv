@@ -1,6 +1,7 @@
 module database
 
 import wyvern.collections.map
+import wyvern.String
 
 type KeyVal
 	def get(key:String):String
@@ -8,6 +9,7 @@ type KeyVal
 
 // currently the actual implementation ignores the dbFilePath, but it's useful for thinking about deployment properties.  Need to implement it soon.
 def make(dbFilePath:String):KeyVal = new
+	val entries = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
 	def get(key:String):String = "a value"
 	def put(key:String, value:String):Unit = new
 
