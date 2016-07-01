@@ -44,6 +44,11 @@ public class DemoTests {
 	}
 	
 	@Test
+	public void testDatabase() throws ParseException {
+		ILTests.doTestScriptModularly("webarch.databaseDriver", Util.intType(), new IntegerLiteral(5));
+	}
+	
+	@Test
 	@Category(RegressionTests.class)
 	public void testArithmeticAST() throws ParseException {
 		String program = TestUtil.readFile(PATH + "ArithmeticAST.wyv");

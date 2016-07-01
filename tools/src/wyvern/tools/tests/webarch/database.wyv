@@ -1,0 +1,13 @@
+module database
+
+import wyvern.collections.map
+
+type KeyVal
+	def get(key:String):String
+	def put(key:String, value:String):Unit
+
+// currently the actual implementation ignores the dbFilePath, but it's useful for thinking about deployment properties.  Need to implement it soon.
+def make(dbFilePath:String):KeyVal = new
+	def get(key:String):String = "a value"
+	def put(key:String, value:String):Unit = new
+
