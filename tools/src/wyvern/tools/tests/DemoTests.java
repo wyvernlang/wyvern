@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -29,6 +30,7 @@ import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 
+@Category(RegressionTests.class)
 public class DemoTests {
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
 	private static final String PATH = BASE_PATH + "demo/";	
@@ -59,6 +61,7 @@ public class DemoTests {
 	}
 	
 	@Test
+	@Category(CurrentlyBroken.class)
 	public void testCalculatorTokens() throws ParseException {
 		String program = TestUtil.readFile(PATH + "CalculatorTokens.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);
@@ -68,7 +71,6 @@ public class DemoTests {
 	}
 	
 	@Test
-	@Category(RegressionTests.class)
 	public void testSimpleDelegation() throws ParseException {
 		String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
 		TypedAST ast = TestUtil.getNewAST(program);
