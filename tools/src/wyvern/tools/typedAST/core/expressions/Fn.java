@@ -189,9 +189,11 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         List<FormalArg> result = new LinkedList<FormalArg>();
 
         if (expectedFormals != null && expectedFormals.size() != bindings.size()) {
-        	//TODO: will replace with ToolError in the future
-			throw new RuntimeException("args count does not map between declType and lambda expression");
-			
+			final int expectedSize = expectedFormals.size();
+			if (expectedSize == 0)			
+				ToolError.reportError(ErrorMessage.SYNTAX_FOR_NO_ARG_LAMBDA, this);
+			else
+				ToolError.reportError(ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS, this, Integer.toString(expectedSize));
 		}
         
         for (int i = 0; i < bindings.size(); i++) {

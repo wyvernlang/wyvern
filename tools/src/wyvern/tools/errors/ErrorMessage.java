@@ -30,6 +30,7 @@ public enum ErrorMessage {
 	METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method",0),
 	METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object",1),
 	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
+	SYNTAX_FOR_NO_ARG_LAMBDA("Use \"() => <expression>\" rather than \"x => <expression>\" for a zero-argument function expression",0),
 	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression", 1),
 	
 	// Syntax errors
