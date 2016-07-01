@@ -26,10 +26,11 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	public InvocationExprGenerator(Expression receiver, String operationName, GenContext ctx, FileLocation loc) {
 		this.receiver = receiver;
 		ValueType rt = receiver.typeCheck(ctx);
-		declType = rt.findDecl(operationName, ctx);
+		DeclType dt = rt.findDecl(operationName, ctx);
 		location = loc;
-		if (declType == null)
+		if (dt == null)
 			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, loc, operationName);
+		declType = dt.adapt(View.from(receiver, ctx));
 	}
 	
 	@Override
@@ -56,7 +57,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
 			ValueType vt = e.typeCheck(ctx);
-			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
+			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(receiver, ctx));
 		} else {
 			return (DefDeclType) declType;
 		}
