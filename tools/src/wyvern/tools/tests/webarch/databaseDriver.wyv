@@ -1,3 +1,9 @@
 import webarch.database
 
-5
+val kv:database.KeyVal = database.make("aPath")
+
+kv.put("hi","ho")
+kv.put("hi","ha")
+kv.put("good","bye")
+val s:String = kv.get("hi").getOrElse(() => "missing!")
+s

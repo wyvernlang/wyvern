@@ -1,15 +1,19 @@
 module database
 
+import wyvern.option
 import wyvern.collections.map
 import wyvern.String
 
+type Option = option.Option
+
 type KeyVal
-	def get(key:String):String
+	def get(key:String):Option
 	def put(key:String, value:String):Unit
 
 // currently the actual implementation ignores the dbFilePath, but it's useful for thinking about deployment properties.  Need to implement it soon.
 def make(dbFilePath:String):KeyVal = new
 	val entries = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
-	def get(key:String):String = "a value"
-	def put(key:String, value:String):Unit = new
+	def get(key:String):Option = this.entries.get(key)
+	def put(key:String, value:String):Unit
+		this.entries.put(key,value)
 

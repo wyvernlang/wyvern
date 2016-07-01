@@ -13,6 +13,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
@@ -47,7 +48,7 @@ public class DemoTests {
 	
 	@Test
 	public void testDatabase() throws ParseException {
-		ILTests.doTestScriptModularly("webarch.databaseDriver", Util.intType(), new IntegerLiteral(5));
+		ILTests.doTestScriptModularly("webarch.databaseDriver", Util.stringType(), new StringLiteral("ha"));
 	}
 	
 	@Test
