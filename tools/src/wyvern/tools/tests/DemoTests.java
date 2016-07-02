@@ -47,8 +47,8 @@ public class DemoTests {
 	}
 	
 	@Test
-	public void testDatabase() throws ParseException {
-		ILTests.doTestScriptModularly("webarch.databaseDriver", Util.stringType(), new StringLiteral("ha"));
+	public void testWebServer() throws ParseException {
+		ILTests.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
 	}
 	
 	@Test
