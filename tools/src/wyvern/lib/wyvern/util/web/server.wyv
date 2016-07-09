@@ -1,0 +1,14 @@
+module web
+
+import java:wyvern.stdlib.support.Web.utils
+
+type FileServer
+    val port: Int
+    def listenAndServe(root: String): Int
+
+
+def NewFileServer(portNum: Int): FileServer = new
+    val port: Int = portNum
+    def listenAndServe(root: String): Int
+        utils.listenAndServe(this.port, root)
+        0
