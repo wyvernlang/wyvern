@@ -140,6 +140,16 @@ public class StructuralType extends ValueType {
 		return null;
 	}
 
+	public List<DeclType> findDecls(String declName, TypeContext ctx) {
+		List<DeclType> mdts = new LinkedList<DeclType>();
+		for (DeclType mdt : getDeclTypes()) {
+			if (mdt.getName().equals(declName)) {
+				mdts.add(mdt);
+			}
+		}
+		return mdts;
+	}
+
 	@Override
 	public ValueType adapt(View v) {
 		List<DeclType> newDTs = new LinkedList<DeclType>();
