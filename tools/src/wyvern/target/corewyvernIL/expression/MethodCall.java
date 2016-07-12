@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
@@ -70,34 +71,67 @@ public class MethodCall extends Expression {
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType ot = objectExpr.typeCheck(ctx);
 		StructuralType st = ot.getStructuralType(ctx);
-		DeclType dt = st.findDecl(methodName, ctx);
-		if (dt == null)
+
+		List<DeclType> dts = st.findDecls(methodName, ctx);
+		if (dts.isEmpty()) {
 			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName);
-		if (!(dt instanceof DefDeclType))
-			ToolError.reportError(ErrorMessage.NOT_A_METHOD, this, methodName);
-		DefDeclType ddt = (DefDeclType)dt;
-		View v = View.from(objectExpr, ctx);
-		// check argument compatibility
+		}
+
+		ArrayList<ValueType> argTypeList = new ArrayList<ValueType>(args.size());
 		for (int i = 0; i < args.size(); ++i) {
-			Expression e = args.get(i);
-			ValueType argType = ddt.getFormalArgs().get(i).getType().adapt(v);
-			String name = ddt.getFormalArgs().get(i).getName();
-			ValueType actualType = e.typeCheck(ctx); 
-			if (!actualType.isSubtypeOf(argType, ctx)) {
-				// for debugging
-				actualType.isSubtypeOf(argType, ctx);
-				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, actualType.toString(), argType.toString());
-            }
-			ctx = ctx.extend(name, actualType);
-			if (e instanceof Variable) {
-				v = new ViewExtension(new Variable(ddt.getFormalArgs().get(i).getName()),(Variable)e,v);
+			argTypeList.add(args.get(i).typeCheck(ctx));
+		}
+
+		TypeContext newCtx = null;
+		for (DeclType dt : dts) {
+			newCtx = ctx;
+			if (!(dt instanceof DefDeclType)) continue;
+			DefDeclType ddt = (DefDeclType) dt;
+
+			// check argument compatibility
+			List<FormalArg> formalArgs = ddt.getFormalArgs();
+			if (args.size() != formalArgs.size()) continue;
+
+			boolean argsTypechecked = true;
+			View v = View.from(objectExpr, newCtx);
+			for (int i = 0; i < args.size(); ++i) {
+				ValueType argType = formalArgs.get(i).getType().adapt(v);
+				String name = formalArgs.get(i).getName();
+				ValueType actualType = argTypeList.get(i); //e.typeCheck(ctx);
+				if (!actualType.isSubtypeOf(argType, newCtx)) {
+					// for debugging
+					actualType.isSubtypeOf(argType, newCtx);
+					argsTypechecked = false;
+					break;
+				}
+				newCtx = newCtx.extend(name, actualType);
+				Expression e = args.get(i);
+				if (e instanceof Variable) {
+					v = new ViewExtension(new Variable(ddt.getFormalArgs().get(i).getName()), (Variable) e, v);
+				}
+			}
+
+			if (argsTypechecked) {
+				ctx = newCtx;
+				// compute result type
+				ValueType resultType = ddt.getResultType(v);
+				resultType = resultType.adapt(v);
+				this.setExprType(resultType);
+				return getExprType();
 			}
 		}
-		// compute result type
-		ValueType resultType = ddt.getResultType(v);
-		resultType = resultType.adapt(v);
-		this.setExprType(resultType);
-		return getExprType();
+
+		StringBuilder argTypes = new StringBuilder();
+		argTypes.append(methodName);
+		argTypes.append("(");
+		for (int i = 0; i <= args.size() - 2; ++i) {
+			argTypes.append(argTypeList.get(i).toString());
+			argTypes.append(", ");
+		}
+		argTypes.append(argTypeList.get(args.size() - 1).toString());
+		argTypes.append(")");
+		ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, argTypes.toString());
+		return null;
 	}
 
 	@Override

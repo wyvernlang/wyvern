@@ -82,4 +82,35 @@ public class FieldGet extends Expression implements Path {
 	public Set<String> getFreeVariables() {
 		return objectExpr.getFreeVariables();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+		result = prime * result + ((getObjectExpr() == null) ? 0 : getObjectExpr().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FieldGet other = (FieldGet) obj;
+		if (getName() == null) {
+			if (other.getName() != null)
+				return false;
+		} else if (!getName().equals(other.getName()))
+			return false;
+		if (getObjectExpr() == null) {
+			if (other.getObjectExpr() != null)
+				return false;
+		} else if (!getObjectExpr().equals(other.getObjectExpr()))
+			return false;
+		return true;
+	}
 }
