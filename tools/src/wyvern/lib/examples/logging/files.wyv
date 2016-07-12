@@ -1,0 +1,13 @@
+/*resource */module files
+
+import java:wyvern.stdlib.support.FileIO.file
+
+type FileWriter
+    def print(x: String): Unit
+
+def openForAppend(path: String): FileWriter
+    val printWriter = file.openForAppend(path)
+    new
+        def print(x: String): Unit
+            printWriter.println(x)
+            printWriter.flush()

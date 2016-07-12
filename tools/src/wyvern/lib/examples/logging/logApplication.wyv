@@ -1,0 +1,12 @@
+/*resource */module logApplication
+
+import examples.logging.logging
+
+def run(): Unit
+    // Create log file
+    val logFile = logging.makeLog("log.txt")
+
+    // Do something
+
+    // Log status
+    logFile.log("Test log data")
