@@ -128,6 +128,9 @@ public class ModuleResolver {
 			if (libFile.exists())
 				f = libFile;
 		}
+		if (!f.exists()) {
+			ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, (FileLocation) null, isType?"type":"module", qualifiedName);
+		}
 		return f;
 	}
 
