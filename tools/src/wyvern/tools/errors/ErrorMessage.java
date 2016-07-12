@@ -81,6 +81,7 @@ public enum ErrorMessage {
 	
 	PARSE_ERROR("Parse error: %ARG", 1),
 	READ_FILE_ERROR("Could not read file %ARG", 1),
+	MODULE_NOT_FOUND_ERROR("Could not find %ARG %ARG in either the current Wyvern path or the standard library", 2),
 	;
 	
 	private ErrorMessage(String message, int numArgs) {
