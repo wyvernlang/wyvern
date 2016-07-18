@@ -90,11 +90,13 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 
 	@Override
 	public Value invoke(String methodName, List<Value> args) {
+
 		switch (methodName) {
 		case "+": return new IntegerLiteral(this.value.add(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "-": return new IntegerLiteral(this.value.subtract(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "*": return new IntegerLiteral(this.value.multiply(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "/": return new IntegerLiteral(this.value.divide(((IntegerLiteral)args.get(0)).getFullValue()));
+		case "%": return new IntegerLiteral(this.value.remainder(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "<": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) < 0);
 		case ">": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) > 0);
 		default: throw new RuntimeException("runtime error: integer operation " + methodName + "not supported by the runtime");

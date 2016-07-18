@@ -233,7 +233,7 @@ import wyvern.tools.errors.ToolError;
 	terminal Token dash_t ::= /-/ {: RESULT = token(DASH,lexeme); :};
 	terminal Token mult_t ::= /\*/ {: RESULT = token(MULT,lexeme); :};
 	terminal Token divide_t ::= /\// {: RESULT = token(DIVIDE,lexeme); :};
-	terminal Token divide_t ::= /%/ {: RESULT = token(MOD,lexeme); :};
+	terminal Token remainder_t ::= /%/ {: RESULT = token(MOD,lexeme); :};
 	terminal Token equals_t ::= /=/ {: RESULT = token(EQUALS,lexeme); :};
 	terminal Token equalsequals_t ::= /==/ {: RESULT = token(EQUALSEQUALS,lexeme); :};
 	terminal Token openParen_t ::= /\(/ {: RESULT = token(LPAREN,lexeme); :};
@@ -348,6 +348,7 @@ import wyvern.tools.errors.ToolError;
 	           | dash_t:t {: RESULT = t; :}
 	           | mult_t:t {: RESULT = t; :}
 	           | divide_t:t {: RESULT = t; :}
+	           | remainder_t:t {: RESULT = t; :}
 	           | equals_t:t {: RESULT = t; :}
 	           | comma_t:t {: RESULT = t; :}
 	           | arrow_t:t {: RESULT = t; :}

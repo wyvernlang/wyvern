@@ -690,7 +690,8 @@ Token OverrideOperator() :
 	| operator = <DASH> {return operator;}
 	| operator = <MULT> {return operator;}
     | operator = <DIVIDE> {return operator;}
-	
+    | operator = <MOD> {return operator;}
+
 }
 
 List Generics() :
