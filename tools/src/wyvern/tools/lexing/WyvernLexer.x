@@ -253,7 +253,7 @@ import wyvern.tools.errors.ToolError;
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
- 		RESULT = token(STRING_LITERAL,lexeme.substring(1,lexeme.length()-1));
+ 		RESULT = token(STRING_LITERAL,lexeme.substring(1,lexeme.length()-1).replace("\\n", "\n"));
  	:};
 
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
