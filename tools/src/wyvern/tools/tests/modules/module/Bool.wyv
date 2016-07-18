@@ -25,4 +25,4 @@ def launderAsInt(x:Int):Int = x
 val testFive : Int = cond.ifTrue(() => 5,() => 2)
 
 // only necessary because annotations on val/Let are ignored - TO DO
-val five : Int = launderAsInt(testFive)
+val five : Int = testFive // launderAsInt(testFive)
