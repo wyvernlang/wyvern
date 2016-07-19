@@ -114,10 +114,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return location;
   }
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(uri.toString());
-	}
+    @Override
+    public void writeArgsToTree(TreeWriter writer) {
+        writer.writeArgs(uri.toString());
+    }
 
 
   @Override
@@ -194,15 +194,16 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     }
     if (this.getUri().getScheme().equals("java")) {
       String importPath = this.getUri().getRawSchemeSpecificPart();
+      FObject obj = null;
       try {
-        FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
-        ctx = GenUtil.ensureJavaTypesPresent(ctx);
-        type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
-        importExp = new FFIImport(new NominalType("system", "Java"), importPath, type);
-        ctx = ctx.extend(importName, new Variable(importName), type);
+        obj = wyvern.tools.interop.Default.importer().find(importPath);
       } catch (ReflectiveOperationException e1) {
         throw new RuntimeException(e1);
       }
+      ctx = GenUtil.ensureJavaTypesPresent(ctx);
+      type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
+      importExp = new FFIImport(new NominalType("system", "Java"), importPath, type);
+      ctx = ctx.extend(importName, new Variable(importName), type);
       //importExp = new JavaValue(obj, type);
     } else if (this.getUri().getScheme().equals("python")) {
       String moduleName = this.getUri().getRawSchemeSpecificPart();
@@ -220,16 +221,16 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       final Module module = resolver.resolveModule(moduleName);
       final String internalName = module.getSpec().getInternalName();
       if (this.metadataFlag) {
-      	if (module.getSpec().getType().isResource(ctx))
-      		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
-      	Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
-      	type = v.getType();
+        if (module.getSpec().getType().isResource(ctx))
+            ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
+        Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
+        type = v.getType();
       } else {
-      	type = module.getSpec().getType();
+        type = module.getSpec().getType();
       }
       ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, module.getDependencies());
       if (!ctx.isPresent(internalName)) {
-    	  ctx = ctx.extend(internalName, new Variable(internalName), type);
+          ctx = ctx.extend(internalName, new Variable(internalName), type);
       }
       importExp = new Variable(internalName);
       dependencies.add(module.getSpec());
@@ -248,12 +249,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         dependencies.addAll(module.getDependencies());
         importExp = module.getExpression();
         if (this.metadataFlag) {
-        	if (module.getSpec().getType().isResource(ctx))
-        		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
-        	Value v = importExp.interpret(Globals.getStandardEvalContext());
-        	type = v.getType();
+            if (module.getSpec().getType().isResource(ctx))
+                ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
+            Value v = importExp.interpret(Globals.getStandardEvalContext());
+            type = v.getType();
         } else {
-        	type = module.getSpec().getType();
+            type = module.getSpec().getType();
         }
       }/ * */
       ctx = ctx.extend(importName, new Variable(/*importName*/ internalName), /*importExp.typeCheck(ctx)*/ type);

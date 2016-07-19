@@ -144,9 +144,9 @@ public class GenUtil {
 	}
 
 	public static GenContext ensureJavaTypesPresent(GenContext ctx) {
-		if (ctx.isPresent(javaTypesObjectName))
+		if (ctx.isPresent(javaTypesObjectName)) {
 			return ctx;
-		
+		}
 		// we just reuse the Java structural types object
 		// no harm in this provided we aren't loading multiple versions of the same Java class
 		if (javaTypes == null)

@@ -1273,4 +1273,20 @@ public class ILTests {
 
         doTest(source, null, new IntegerLiteral(15));
     }
+
+    @Test
+    public void testJavaImportNamespace() throws ParseException {
+        String source = ""
+                      + "import java:java.util.ArrayList \n\n"
+
+                      + "val x = 5";
+                      /*
+                      + "val x = new ArrayList \n"
+                      + "x.add(5) \n"
+                      + "x.get(0) \n"
+                      + "";
+                      */
+
+        doTest(source, null, new IntegerLiteral(5));
+    }
 }
