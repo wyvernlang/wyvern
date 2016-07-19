@@ -1279,14 +1279,12 @@ public class ILTests {
         String source = ""
                       + "import java:java.util.ArrayList \n\n"
 
-                      + "val x = 5";
-                      /*
-                      + "val x = new ArrayList \n"
-                      + "x.add(5) \n"
-                      + "x.get(0) \n"
-                      + "";
-                      */
+                      + "type Foo \n"
+                      + "    val x: ArrayList \n\n"
 
-        doTest(source, null, new IntegerLiteral(5));
+                      + "val y = 7 \n"
+                      + "";
+
+        doTest(source, null, new IntegerLiteral(7));
     }
 }
