@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
@@ -149,7 +150,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
     private ValueType getILTypeForGeneric(GenContext ctx, String genericName) {
-        String objName = ctx.getContainerForTypeAbbrev(genericName);
+        Path objName = ctx.getContainerForTypeAbbrev(genericName);
         if (objName == null) {
             ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, genericName);
         }

@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarGenContext extends GenContext {
@@ -42,7 +43,7 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public String getContainerForTypeAbbrev(String typeName) {
+	public Path getContainerForTypeAbbrev(String typeName) {
 		return getNext().getContainerForTypeAbbrev(typeName);
 	}
 
