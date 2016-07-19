@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -95,7 +96,7 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		String objName = ctx.getContainerForTypeAbbrev(typeName);
+		Path objName = ctx.getContainerForTypeAbbrev(typeName);
 		if (objName == null) {
 			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, typeName);
 		}

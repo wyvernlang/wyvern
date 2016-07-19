@@ -4,6 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.errors.ErrorMessage;
@@ -40,7 +41,7 @@ public abstract class GenContext extends TypeContext {
 	 * @param typeName the type abbreviation's name
 	 * @return the name of the container object for the type abbreviation
 	 */
-	public abstract String getContainerForTypeAbbrev(String typeName);
+	public abstract Path getContainerForTypeAbbrev(String typeName);
 	
 	public static GenContext empty() {
 		return theEmpty;

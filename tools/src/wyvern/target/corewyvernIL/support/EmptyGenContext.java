@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class EmptyGenContext extends GenContext {
@@ -25,7 +26,7 @@ public class EmptyGenContext extends GenContext {
 	}
 
 	@Override
-	public String getContainerForTypeAbbrev(String typeName) {
+	public Path getContainerForTypeAbbrev(String typeName) {
 		return null;
 		//throw new RuntimeException("Type " + varName + " not found");
 	}
