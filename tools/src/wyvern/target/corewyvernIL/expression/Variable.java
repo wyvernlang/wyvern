@@ -14,6 +14,13 @@ import wyvern.target.oir.OIREnvironment;
 
 public class Variable extends Expression implements Path {
 
+	private String name;
+
+	public Variable(String name) {
+		super();
+		this.name = name;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -39,16 +46,9 @@ public class Variable extends Expression implements Path {
 		return true;
 	}
 
-	private String name;
-
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(name);
-	}
-
-	public Variable(String name) {
-		super();
-		this.name = name;
 	}
 
 	public String getName() {

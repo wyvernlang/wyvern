@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -28,6 +29,7 @@ import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -114,10 +116,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return location;
   }
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(uri.toString());
-	}
+    @Override
+    public void writeArgsToTree(TreeWriter writer) {
+        writer.writeArgs(uri.toString());
+    }
 
 
   @Override
@@ -184,6 +186,23 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return null;
   }
 
+  public GenContext extendWithImportCtx(FObject obj, GenContext ctx) {
+      if(obj.getWrappedValue() instanceof java.lang.Class) {
+          // then this is a Class import
+          // and we need to extend the context
+          String qualifiedName = ((Class) obj.getWrappedValue()).getName();
+          int lastDot = qualifiedName.lastIndexOf('.');
+          String className = qualifiedName.substring(lastDot+1);
+          String packageName = qualifiedName.substring(0, lastDot);
+          ctx = new TypeGenContext(
+                  className,
+                  new Variable(GenUtil.javaTypesObjectName + packageName),
+                  ctx
+          );
+      }
+      return ctx;
+  }
+
   public Pair<VarBinding,GenContext> genBinding(GenContext ctx, List<TypedModuleSpec> dependencies) {
     // add the import's type to the context, and get the import value
     Expression importExp = null;
@@ -194,15 +213,19 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     }
     if (this.getUri().getScheme().equals("java")) {
       String importPath = this.getUri().getRawSchemeSpecificPart();
+      FObject obj = null;
       try {
-        FObject obj = wyvern.tools.interop.Default.importer().find(importPath);
-        ctx = GenUtil.ensureJavaTypesPresent(ctx);
-        type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
-        importExp = new FFIImport(new NominalType("system", "Java"), importPath, type);
-        ctx = ctx.extend(importName, new Variable(importName), type);
+        obj = wyvern.tools.interop.Default.importer().find(importPath);
       } catch (ReflectiveOperationException e1) {
         throw new RuntimeException(e1);
       }
+
+      ctx = GenUtil.ensureJavaTypesPresent(ctx);
+      ctx = extendWithImportCtx(obj, ctx);
+
+      type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
+      importExp = new FFIImport(new NominalType("system", "Java"), importPath, type);
+      ctx = ctx.extend(importName, new Variable(importName), type);
       //importExp = new JavaValue(obj, type);
     } else if (this.getUri().getScheme().equals("python")) {
       String moduleName = this.getUri().getRawSchemeSpecificPart();
@@ -220,16 +243,16 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       final Module module = resolver.resolveModule(moduleName);
       final String internalName = module.getSpec().getInternalName();
       if (this.metadataFlag) {
-      	if (module.getSpec().getType().isResource(ctx))
-      		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
-      	Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
-      	type = v.getType();
+        if (module.getSpec().getType().isResource(ctx))
+            ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
+        Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
+        type = v.getType();
       } else {
-      	type = module.getSpec().getType();
+        type = module.getSpec().getType();
       }
       ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, module.getDependencies());
       if (!ctx.isPresent(internalName)) {
-    	  ctx = ctx.extend(internalName, new Variable(internalName), type);
+          ctx = ctx.extend(internalName, new Variable(internalName), type);
       }
       importExp = new Variable(internalName);
       dependencies.add(module.getSpec());
@@ -248,12 +271,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         dependencies.addAll(module.getDependencies());
         importExp = module.getExpression();
         if (this.metadataFlag) {
-        	if (module.getSpec().getType().isResource(ctx))
-        		ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
-        	Value v = importExp.interpret(Globals.getStandardEvalContext());
-        	type = v.getType();
+            if (module.getSpec().getType().isResource(ctx))
+                ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
+            Value v = importExp.interpret(Globals.getStandardEvalContext());
+            type = v.getType();
         } else {
-        	type = module.getSpec().getType();
+            type = module.getSpec().getType();
         }
       }/ * */
       ctx = ctx.extend(importName, new Variable(/*importName*/ internalName), /*importExp.typeCheck(ctx)*/ type);
