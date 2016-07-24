@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Path;
@@ -46,7 +47,13 @@ public class NominalType extends ValueType {
 	
 	@Override
 	public boolean isResource(TypeContext ctx) {
-		return this.getStructuralType(ctx).isResource(ctx);
+		DeclType dt = getSourceDeclType(ctx);
+		if (dt instanceof ConcreteTypeMember) {
+			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+			return vt.isResource(ctx);
+		} else {
+			return ((AbstractTypeMember)dt).isResource();
+		}
 	}
 
 	@Override
