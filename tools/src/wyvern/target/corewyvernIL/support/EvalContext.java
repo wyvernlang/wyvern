@@ -9,7 +9,7 @@ public abstract class EvalContext extends TypeContext {
 	}
 
 	@Override
-	public ValueType lookupType(String varName) {
+	public ValueType lookupTypeOf(String varName) {
 		return lookupValue(varName).getType();
 	}
 

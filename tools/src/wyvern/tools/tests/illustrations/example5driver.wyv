@@ -1,7 +1,9 @@
+require java
+
 import illustrations.FileIO
 import illustrations.example5
 
-val fileIO = FileIO()
+val fileIO = FileIO(java)
 val ex5 = example5(fileIO)
 
 ex5.x

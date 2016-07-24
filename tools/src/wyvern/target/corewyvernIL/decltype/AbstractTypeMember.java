@@ -9,9 +9,15 @@ import wyvern.target.oir.OIREnvironment;
 
 
 public class AbstractTypeMember extends DeclType implements EmitOIR {
+	boolean isResource;
 
 	public AbstractTypeMember(String name) {
+		this(name, false);
+	}
+
+	public AbstractTypeMember(String name, boolean isResource) {
 		super(name);
+		this.isResource = isResource;
 	}
 
 	@Override
@@ -38,5 +44,9 @@ public class AbstractTypeMember extends DeclType implements EmitOIR {
 	@Override
 	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
 		return this;
+	}
+	
+	public boolean isResource() {
+		return isResource;
 	}
 }

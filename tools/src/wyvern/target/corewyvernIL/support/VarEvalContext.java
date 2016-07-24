@@ -14,11 +14,11 @@ public class VarEvalContext extends EvalContext {
 	}
 	
 	@Override
-	public boolean isPresent(String varName) {
-		if (this.varName.equals(varName))
+	public boolean isPresent(String varName, boolean isValue) {
+		if (isValue && this.varName.equals(varName))
 			return true;
 		else
-			return super.isPresent(varName);
+			return super.isPresent(varName, isValue);
 	}
 
 	@Override

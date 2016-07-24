@@ -618,7 +618,7 @@ public class ILTests {
 	@Test
 	public void testJavaImport1() throws ParseException {
 		String input = "resource module main\n\n"
-//					 + "require ffi/java\n\n"
+					 + "require java\n\n"
 //					 + "import testcode/Adder\n\n"
 //					 + "type Adder\n"
 //					 + "    def addOne(i:system.Int):system.Int\n\n"
@@ -715,7 +715,7 @@ public class ILTests {
 	@Test
 	public void testJavaImport2() throws ParseException {
 		String input = "resource module main\n\n"
-//					 + "require ffi/java\n\n"
+					 + "require java\n\n"
 //					 + "import testcode/Adder\n\n"
 //					 + "type Adder\n"
 //					 + "    def addOne(i:system.Int):system.Int\n\n"
@@ -1276,7 +1276,7 @@ public class ILTests {
 
     @Test
     public void testJavaImportNamespace() throws ParseException {
-        String source = ""
+        String source = "require java\n"
                       + "import java:java.util.ArrayList \n\n"
 
                       + "type Foo \n"

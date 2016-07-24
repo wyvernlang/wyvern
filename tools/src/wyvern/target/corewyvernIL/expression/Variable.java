@@ -57,7 +57,7 @@ public class Variable extends Expression implements Path {
 
 	@Override
 	public ValueType typeCheck(TypeContext env) {
-		return env.lookupType(name);
+		return env.lookupTypeOf(name);
 	}
 
 	@Override

@@ -27,7 +27,10 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
@@ -336,15 +339,16 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			ImportDeclaration req = (ImportDeclaration) d;
 			String name = req.getUri().getSchemeSpecificPart();
 			wyvern.target.corewyvernIL.type.ValueType type = null;
-			if (ctx.isPresent(name)) {
-				type = ctx.lookupType(name);
+			if (ctx.isPresent(name, false)) {
+				type = ctx.lookupType(name, req.getLocation());
 			} else {
 				LoadedType lt = ctx.getInterpreterState().getResolver().resolveType(name);
 				type = new NominalType(lt.getModule().getSpec().getInternalName(), lt.getTypeName());
 				//bindings.add(binding);
 				loadedTypes.add(lt);
 			}
-			types.add(new FormalArg(req.getAsName(), type));
+			final String asName = req.getAsName();
+			types.add(new FormalArg(asName == null ? name : asName, type));
 		}
 		return types;
 	}
@@ -404,7 +408,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(methodContext, dependencies);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
 
-		if(isResource() == false) {
+		if (isResource() == false) {
+			if (returnType.isResource(tempContext))
+				ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE_MODULE, this, this.getName());
+		}
+		if(isResource() == false && formalArgs.isEmpty()) {
 			/* non resource module translated into value */
 			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
 		}

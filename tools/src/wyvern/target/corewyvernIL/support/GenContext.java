@@ -5,6 +5,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.errors.ErrorMessage;
@@ -25,6 +26,12 @@ public abstract class GenContext extends TypeContext {
 		return new VarGenContext(var, expr, type, this);
 	}
 	
+	/** Looks up an expression to use in translation when varName occurs in the source
+	 * 
+	 * @param varName	the name to look up
+	 * @param loc		the location to report in an error message, if the name is not found
+	 * @return
+	 */
 	public final Expression lookupExp(String varName, FileLocation loc) {
 		try {
 			return getCallableExpr(varName).genExpr();
@@ -33,6 +40,15 @@ public abstract class GenContext extends TypeContext {
 			throw new RuntimeException("impossible");
 		}
 	}
+	
+	public final ValueType lookupType(String typeName, FileLocation loc) {
+		Path objName = getContainerForTypeAbbrev(typeName);
+		if (objName == null) {
+			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, loc, typeName);
+		}
+		return new NominalType(objName, typeName);
+	}
+
 	
 	/**
 	 * Gets the name of the container object for a type abbreviation.

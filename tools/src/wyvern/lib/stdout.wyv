@@ -1,5 +1,6 @@
-// TODO: make a resource module!
-module stdout
+resource module stdout
+
+require java
 
 import java:wyvern.stdlib.support.Stdio.stdio
 

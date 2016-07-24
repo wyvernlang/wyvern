@@ -1,3 +1,5 @@
+require java
+
 import java:wyvern.tools.tests.ILTests.importTest
 
 // this is just normal ints for now, but will be bigints soon

@@ -28,6 +28,7 @@ public enum ErrorMessage {
 	NO_EXPECTED_TYPE("Cannot parse a DSL block without an expected type", 0),
 	NO_METADATA_FROM_RESOURCE("Cannot load metadata from a resource module",0),
 	MUST_BE_A_RESOURCE("%ARG must be a resource type",1),
+	MUST_BE_A_RESOURCE_MODULE("%ARG must be a resource module",1),
 	METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method",0),
 	METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object",1),
 	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
@@ -82,6 +83,10 @@ public enum ErrorMessage {
 	PARSE_ERROR("Parse error: %ARG", 1),
 	READ_FILE_ERROR("Could not read file %ARG", 1),
 	MODULE_NOT_FOUND_ERROR("Could not find %ARG %ARG in either the current Wyvern path or the standard library", 2),
+	SCRIPT_REQUIRED_MODULE_ONLY_JAVA("A module required by a top-level script can only have java as its requirement", 0),
+	NOT_AN_FFI("Expected an FFI object as the schema in an import URI", 0),
+	SCHEME_NOT_RECOGNIZED("import scheme %ARG not recognized; did you forget to \"require java\"?", 1),
+	UNSAFE_JAVA_IMPORT("To import the java package %ARG, make sure you \"require java\" or add the package to the built-in whitelist (experts only)", 1),
 	;
 	
 	private ErrorMessage(String message, int numArgs) {

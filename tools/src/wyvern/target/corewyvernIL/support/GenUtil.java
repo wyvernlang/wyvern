@@ -135,7 +135,7 @@ public class GenUtil {
 			return Util.listType();
 		}
 
-		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupType(javaTypesObjectName);
+		StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupTypeOf(javaTypesObjectName);
 		return type.getJavaType(javaClass, ctx);
 	}
 		
@@ -144,7 +144,7 @@ public class GenUtil {
 	}
 
 	public static GenContext ensureJavaTypesPresent(GenContext ctx) {
-		if (ctx.isPresent(javaTypesObjectName)) {
+		if (ctx.isPresent(javaTypesObjectName, true)) {
 			return ctx;
 		}
 		// we just reuse the Java structural types object

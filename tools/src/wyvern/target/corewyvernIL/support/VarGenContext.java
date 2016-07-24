@@ -11,17 +11,19 @@ public class VarGenContext extends GenContext {
 	
 	public VarGenContext(String var, Expression expr, ValueType type, GenContext genContext) {
 		super(genContext);
+		if (var == null)
+			throw new NullPointerException();
 		this.var = var;
 		this.expr = expr;
 		this.type = type;
 	}
 	
 	@Override
-	public boolean isPresent(String varName) {
-		if (this.var.equals(varName))
+	public boolean isPresent(String varName, boolean isValue) {
+		if (isValue && this.var.equals(varName))
 			return true;
 		else
-			return super.isPresent(varName);
+			return super.isPresent(varName, isValue);
 	}
 
 @Override
@@ -35,11 +37,11 @@ public class VarGenContext extends GenContext {
 	}
 	
 	@Override
-	public ValueType lookupType(String varName) {
+	public ValueType lookupTypeOf(String varName) {
 		if (varName.equals(var))
 			return type;
 		else
-			return getNext().lookupType(varName);
+			return getNext().lookupTypeOf(varName);
 	}
 	
 	@Override

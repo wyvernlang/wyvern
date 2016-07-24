@@ -38,12 +38,21 @@ public class TypeGenContext extends GenContext {
     }
 
     @Override
-    public ValueType lookupType(String varName) {
-        return getNext().lookupType(varName);
+    public ValueType lookupTypeOf(String varName) {
+        return getNext().lookupTypeOf(varName);
     }
 
     @Override
     public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
         return getNext().getCallableExprRec(varName, origCtx);
     }
+    
+	@Override
+	public boolean isPresent(String varName, boolean isValue) {
+		if (!isValue && this.typeName.equals(varName))
+			return true;
+		else
+			return super.isPresent(varName, isValue);
+	}
+
 }

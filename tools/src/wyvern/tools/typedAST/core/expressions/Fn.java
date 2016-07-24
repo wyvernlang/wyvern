@@ -173,7 +173,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 
         // set up containsResources() properly by typechecking applyDef
         applyDef.typeCheck(ctx, ctx);
-        ValueType newType = new StructuralType("@lambda-structual-decl", declTypes, applyDef.containsResource());
+        ValueType newType = new StructuralType("@lambda-structual-decl", declTypes, applyDef.containsResource(ctx));
 
         return new New(declList, "@lambda-decl", newType, getLocation());
 	}

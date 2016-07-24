@@ -128,7 +128,8 @@ public class MethodCall extends Expression {
 			argTypes.append(argTypeList.get(i).toString());
 			argTypes.append(", ");
 		}
-		argTypes.append(argTypeList.get(args.size() - 1).toString());
+		if (args.size() > 0)
+			argTypes.append(argTypeList.get(args.size() - 1).toString());
 		argTypes.append(")");
 		ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, argTypes.toString());
 		return null;

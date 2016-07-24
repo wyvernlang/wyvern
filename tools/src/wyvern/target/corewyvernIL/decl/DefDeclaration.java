@@ -35,7 +35,7 @@ public class DefDeclaration extends NamedDeclaration {
 	}
 
 	@Override
-	public boolean containsResource() {
+	public boolean containsResource(TypeContext ctx) {
 		return this.hasResource;
 	}
 
@@ -91,7 +91,7 @@ public class DefDeclaration extends NamedDeclaration {
 		for (FormalArg arg : formalArgs) {
 			methodCtx = methodCtx.extend(arg.getName(), arg.getType());
 		}
-		if (!this.containsResource()) {
+		if (!this.containsResource(methodCtx)) {
 			for (String freeVar : this.getFreeVariables()) {
 				ValueType t = (new Variable(freeVar)).typeCheck(methodCtx);
 				if (t != null && t.isResource(methodCtx)) {

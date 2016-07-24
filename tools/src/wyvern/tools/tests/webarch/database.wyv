@@ -6,7 +6,7 @@ import wyvern.String
 
 type Option = option.Option
 
-type KeyVal
+resource type KeyVal
 	def get(key:String):Option
 	def put(key:String, value:String):Unit
 

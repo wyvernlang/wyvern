@@ -628,7 +628,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
   public OIRAST visit(TypeContext cxt,
                       OIREnvironment oirenv,
                       FFIImport ffiImport) {
-    NominalType javaType = new NominalType("system", "Java");
+    NominalType javaType = new NominalType("system", "java");
     NominalType pythonType = new NominalType("system", "Python");
 
     if (ffiImport.getFFIType().equals(javaType)) {

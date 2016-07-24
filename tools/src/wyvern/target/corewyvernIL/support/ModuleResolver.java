@@ -198,7 +198,7 @@ public class ModuleResolver {
 	public TypeContext extendContext(TypeContext ctx, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
 			final String internalName = spec.getInternalName();
-			if (!ctx.isPresent(internalName)) {
+			if (!ctx.isPresent(internalName, true)) {
 				ctx = ctx.extend(internalName, spec.getType());
 			}
 		}
@@ -209,7 +209,7 @@ public class ModuleResolver {
 	public GenContext extendGenContext(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		for (TypedModuleSpec spec : dependencies) {
 			final String internalName = spec.getInternalName();
-			if (!ctx.isPresent(internalName)) {
+			if (!ctx.isPresent(internalName, true)) {
 				ctx = ctx.extend(internalName, new Variable(internalName), spec.getType());
 			}
 		}

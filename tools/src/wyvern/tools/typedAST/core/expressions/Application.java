@@ -150,11 +150,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 	}
 
     private ValueType getILTypeForGeneric(GenContext ctx, String genericName) {
-        Path objName = ctx.getContainerForTypeAbbrev(genericName);
-        if (objName == null) {
-            ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, genericName);
-        }
-        return new NominalType(objName, genericName);
+		return ctx.lookupType(genericName, this.getLocation());
     }
 
 	@Override

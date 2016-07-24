@@ -96,10 +96,6 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		Path objName = ctx.getContainerForTypeAbbrev(typeName);
-		if (objName == null) {
-			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this, typeName);
-		}
-		return new NominalType(objName, typeName);
+		return ctx.lookupType(typeName, this.getLocation());
 	}
 }

@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
@@ -27,6 +28,11 @@ public class ValDeclaration extends DeclarationWithRHS {
 	}
 
 	private ValueType type;
+
+	@Override
+	public boolean containsResource(TypeContext ctx) {
+		return type.isResource(ctx);
+	}
 
 	@Override
 	public ValueType getType() {

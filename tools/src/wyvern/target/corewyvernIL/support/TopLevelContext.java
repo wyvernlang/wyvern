@@ -59,7 +59,7 @@ public class TopLevelContext {
 		boolean isModule = false;
 		for (Declaration d: moduleDecls) {
 			d.typeCheck(ctx, ctx);
-			if (d.containsResource()) {
+			if (d.containsResource(ctx)) {
 				isModule = true;
 				break;
 			}

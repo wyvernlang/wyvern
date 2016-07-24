@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.tools.errors.FileLocation;
 
 public abstract class Declaration extends ASTNode implements EmitOIR {
-	public boolean containsResource() {
+	public boolean containsResource(TypeContext ctx) {
 		return false;
 	}
 

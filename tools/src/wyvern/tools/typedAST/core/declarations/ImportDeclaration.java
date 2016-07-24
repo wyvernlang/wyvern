@@ -6,6 +6,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +17,11 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -31,6 +34,7 @@ import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -186,7 +190,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return null;
   }
 
-  public GenContext extendWithImportCtx(FObject obj, GenContext ctx) {
+  public static GenContext extendWithImportCtx(FObject obj, GenContext ctx) {
       if(obj.getWrappedValue() instanceof java.lang.Class) {
           // then this is a Class import
           // and we need to extend the context
@@ -211,22 +215,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     if (importName.contains(".")) {
       importName = importName.substring(importName.lastIndexOf(".")+1);
     }
-    if (this.getUri().getScheme().equals("java")) {
-      String importPath = this.getUri().getRawSchemeSpecificPart();
-      FObject obj = null;
-      try {
-        obj = wyvern.tools.interop.Default.importer().find(importPath);
-      } catch (ReflectiveOperationException e1) {
-        throw new RuntimeException(e1);
-      }
-
-      ctx = GenUtil.ensureJavaTypesPresent(ctx);
-      ctx = extendWithImportCtx(obj, ctx);
-
-      type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
-      importExp = new FFIImport(new NominalType("system", "Java"), importPath, type);
-      ctx = ctx.extend(importName, new Variable(importName), type);
-      //importExp = new JavaValue(obj, type);
+    final String scheme = this.getUri().getScheme();
+    if (ctx.isPresent(scheme, true)) {
+      // TODO: hack; replace this by getting FFI metadata from the type of the scheme
+      return FFI.importURI(this.getUri(), ctx);
+    } else if (scheme.equals("java")) {
+      // we are not using Java like a capability in this branch, so check the whitelist!
+      if (!Globals.checkSafeJavaImport(this.getUri().getSchemeSpecificPart()))
+          ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, this.getUri().getSchemeSpecificPart());
+      return FFI.doJavaImport(getUri(), ctx);
     } else if (this.getUri().getScheme().equals("python")) {
       String moduleName = this.getUri().getRawSchemeSpecificPart();
       importExp = new FFIImport(new NominalType("system", "Python"),
@@ -234,11 +231,46 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                                 new NominalType("system", "Dyn"));
       ctx = ctx.extend(importName, new Variable(importName), Util.dynType());
       type = Util.dynType();
-    } else {
+    } else if (this.isRequire()) {
+		// invariant: modules that require things won't call this 
+		// so special case for scripts that require things
+		// right now the only supported case is java
+		// TODO: make this more generic
+		if (importName.equals("java")) {
+			// TODO: implement me
+			type = Globals.JAVA_IMPORT_TYPE;
+			importExp = new FFI(importName, type, this.getLocation());
+		    ctx = ctx.extend(importName, importExp, type);
+		} else {
+			// special case: a script is importing a module called "importName"
+			// that requires only java
+			
+			// load the module
+		    String moduleName = this.getUri().getRawSchemeSpecificPart();
+			Module m = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
+			
+			// instantiate the module
+			DefDeclType modDeclType = (DefDeclType) ((StructuralType)m.getSpec().getType()).findDecl(Util.APPLY_NAME, ctx);
+			List<FormalArg> modArgs = modDeclType.getFormalArgs();
+			if (modArgs.size() != 1) {
+				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
+			}
+			final ValueType argType = modArgs.get(0).getType();
+			if (!argType.equals(Globals.JAVA_IMPORT_TYPE)) {
+				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
+			}
+			List<Expression> args = new LinkedList<Expression>();
+			args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
+			importExp = new MethodCall(m.getExpression(), Util.APPLY_NAME, args , this);
+			
+			// type is the result type of the module
+			type = modDeclType.getRawResultType();
+			// ctx gets extended in the standard way, with a variable
+		    ctx = ctx.extend(importName, new Variable(importName), type);
+		}
+    } else if (scheme.equals("wyv")) {
       // TODO: need to add types for non-java imports
       String moduleName = this.getUri().getSchemeSpecificPart();
-      // NEW SECTION
-      /**/
       final ModuleResolver resolver = ctx.getInterpreterState().getResolver();
       final Module module = resolver.resolveModule(moduleName);
       final String internalName = module.getSpec().getInternalName();
@@ -251,35 +283,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         type = module.getSpec().getType();
       }
       ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, module.getDependencies());
-      if (!ctx.isPresent(internalName)) {
+      if (!ctx.isPresent(internalName, true)) {
           ctx = ctx.extend(internalName, new Variable(internalName), type);
       }
       importExp = new Variable(internalName);
       dependencies.add(module.getSpec());
       dependencies.addAll(module.getDependencies());
-      /* */
-      /* * /
-      if (ctx.isPresent(moduleName)) {
-        importExp = new Variable(moduleName);
-        type = ctx.lookupType(moduleName);
-      } else {
-        final Module module = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
-        for (TypedModuleSpec spec: module.getDependencies()) {
-          ctx = ctx.extend(spec.getQualifiedName(), new Variable(spec.getQualifiedName()), spec.getType());
-        }
-        // TODO: this may not be transitive in the right way
-        dependencies.addAll(module.getDependencies());
-        importExp = module.getExpression();
-        if (this.metadataFlag) {
-            if (module.getSpec().getType().isResource(ctx))
-                ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
-            Value v = importExp.interpret(Globals.getStandardEvalContext());
-            type = v.getType();
-        } else {
-            type = module.getSpec().getType();
-        }
-      }/ * */
-      ctx = ctx.extend(importName, new Variable(/*importName*/ internalName), /*importExp.typeCheck(ctx)*/ type);
+      ctx = ctx.extend(importName, new Variable(internalName), type);
+    } else {
+        ToolError.reportError(ErrorMessage.SCHEME_NOT_RECOGNIZED, this, scheme);
     }
     return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
   }
@@ -291,21 +303,14 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
   @Override
   public void genTopLevel(TopLevelContext tlc) {
-    Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext(), tlc.getDependencies());
-    VarBinding binding = bindingAndCtx.first;
+	Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext(), tlc.getDependencies());
+	VarBinding binding = bindingAndCtx.first;
     GenContext newCtx = bindingAndCtx.second;
     ValueType type = binding.getExpression().typeCheck(newCtx);
     tlc.addLet(binding.getVarName(), type, binding.getExpression(), false);
     tlc.updateContext(newCtx);
-
-    /*wyvern.target.corewyvernIL.expression.Variable variable = new wyvern.target.corewyvernIL.expression.Variable(binding.getVarName());
-    wyvern.target.corewyvernIL.decl.Declaration decl =
-        new wyvern.target.corewyvernIL.decl.ValDeclaration(binding.getVarName(),
-            type,
-            variable, location);
-    DeclType dt = new VarDeclType(binding.getVarName(), type);
-    tlc.addModuleDecl(decl,dt);*/
   }
+
 
   public String getAsName() {
     return asName;

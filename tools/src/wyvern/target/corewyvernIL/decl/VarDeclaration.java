@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
@@ -28,6 +29,11 @@ public class VarDeclaration extends DeclarationWithRHS {
 		super(name, value, loc);
 		if (type == null) throw new RuntimeException();
 		this.type = type;
+	}
+
+	@Override
+	public boolean containsResource(TypeContext ctx) {
+		return true;
 	}
 
 	@Override

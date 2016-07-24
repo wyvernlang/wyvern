@@ -3,7 +3,7 @@ module option
 type DynToDyn
 	def apply(x:Dyn):Dyn
 	
-type UnitToDyn
+resource type UnitToDyn
 	def apply():Dyn
 
 resource type UnitToOption

@@ -3,7 +3,7 @@ package wyvern.target.corewyvernIL.support;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class EmptyTypeContext extends TypeContext {
-	public ValueType lookupType(String varName) {
+	public ValueType lookupTypeOf(String varName) {
 		throw new RuntimeException("Variable " + varName + " not found");
 	}
 

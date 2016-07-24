@@ -7,8 +7,10 @@ import static wyvern.tools.types.TypeUtils.unit;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
@@ -52,7 +54,22 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Globals {
+	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "java");
 	public static final boolean checkRuntimeTypes = false;
+	private static final Set<String> javaWhiteList = new HashSet<String>();
+	
+	static {
+		// the whitelist that anyone can import without requiring java or becoming a resource module
+		// WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
+		javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
+		javaWhiteList.add("wyvern.stdlib.support.Int.utils");
+		javaWhiteList.add("wyvern.stdlib.support.AST.utils");
+		javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
+	}
+	
+	public static boolean checkSafeJavaImport(String packageName) {
+		return javaWhiteList.contains(packageName);
+	}
 
 	public static Environment getStandardEnv() {
 		Environment env = Environment.getEmptyEnvironment();
@@ -102,6 +119,7 @@ public class Globals {
 		genCtx = new TypeGenContext("String", "system", genCtx);
 		genCtx = new TypeGenContext("Boolean", "system", genCtx);
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
+		genCtx = new TypeGenContext("java", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
@@ -128,7 +146,7 @@ public class Globals {
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
-		declTypes.add(new AbstractTypeMember("Java"));
+		declTypes.add(new AbstractTypeMember("java", true));
 		declTypes.add(new AbstractTypeMember("Python"));
 		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;
@@ -154,7 +172,7 @@ public class Globals {
 		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("java", new NominalType("this", "java"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
 		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
 		return systemVal;

@@ -366,7 +366,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		// determine if we need to be a resource type
 		for (wyvern.target.corewyvernIL.decl.Declaration d: decls) {
 			d.typeCheck(tlc.getContext(), tlc.getContext());
-			if (d.containsResource()) {
+			if (d.containsResource(tlc.getContext())) {
 				type = new StructuralType(newName, declts, true);
 				break;
 			}

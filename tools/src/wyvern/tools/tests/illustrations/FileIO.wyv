@@ -1,5 +1,6 @@
 resource module FileIO
 
+require java
 import java:wyvern.tools.tests.Illustrations.nativeFileIO
 
 def read():system.Int

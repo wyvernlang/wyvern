@@ -16,6 +16,14 @@ public class MethodGenContext extends GenContext {
 		this.objectName = objectName;
 		this.methodName = methodName;
 	}
+	
+	@Override
+	public boolean isPresent(String varName, boolean isValue) {
+		if (isValue && this.methodName.equals(varName))
+			return true;
+		else
+			return super.isPresent(varName, isValue);
+	}
 
 	@Override
 	public String toString() {
@@ -28,8 +36,8 @@ public class MethodGenContext extends GenContext {
 	}
 
 	@Override
-	public ValueType lookupType(String varName) {
-		return getNext().lookupType(varName);
+	public ValueType lookupTypeOf(String varName) {
+		return getNext().lookupTypeOf(varName);
 	}
 
 	@Override
