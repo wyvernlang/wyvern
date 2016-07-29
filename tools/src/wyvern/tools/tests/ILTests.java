@@ -1294,6 +1294,7 @@ public class ILTests {
     }
     
     @Test
+    @Category(CurrentlyBroken.class)
     public void testTopLevelAnnotations2() throws ParseException {
     	this.doTestScript("TopLevelAnnotations2.wyv", Util.intType(), new IntegerLiteral(5));
     }
