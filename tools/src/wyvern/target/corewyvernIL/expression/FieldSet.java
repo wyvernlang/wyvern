@@ -62,7 +62,10 @@ public class FieldSet extends Expression {
 		// Make sure assigned type is compatible with the field's type.
 		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
-		return Util.unitType();
+		
+		// Return the type of the expression being assigned.
+		return valTypeExpr;
+		
 	}
 
 	@Override
@@ -94,7 +97,8 @@ public class FieldSet extends Expression {
 
 		// Update object's declarations.
 		object.setDecl(varDeclUpdated);
-		return Util.unitValue();
+		return exprInterpreted;
+		
 	}
 
 	@Override
