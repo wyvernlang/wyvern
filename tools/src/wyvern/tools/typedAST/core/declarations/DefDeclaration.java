@@ -378,15 +378,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
 		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
 		
-		// The setter takes one argument x : varType; its signature is varType -> Unit
+		// The setter takes one argument x : varType; its signature is varType -> varType
 		LinkedList<NameBinding> setterArgs = new LinkedList<>();
 		setterArgs.add(new NameBindingImpl("x", varType));
-		Type unitType = new UnresolvedType("Unit", receiver.getLocation());
-		//Arrow setterArrType = new Arrow(varType, unitType);
 		
 		// Make and return the declaration.
 		DefDeclaration setterDecl;
-		setterDecl = new DefDeclaration(setterName, unitType, setterArgs, setterBody, false, null);
+		setterDecl = new DefDeclaration(setterName, varType, setterArgs, setterBody, false, null);
 		return setterDecl;
 		
 	}
