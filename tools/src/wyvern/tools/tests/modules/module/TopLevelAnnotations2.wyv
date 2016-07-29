@@ -1,0 +1,2 @@
+val something : Dyn = 5
+val five : Int = something

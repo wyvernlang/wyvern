@@ -1287,4 +1287,15 @@ public class ILTests {
 
         doTest(source, null, new IntegerLiteral(7));
     }
+    
+    @Test
+    public void testTopLevelAnnotations1() throws ParseException {
+    	this.doTestScript("TopLevelAnnotations1.wyv", Util.intType(), new IntegerLiteral(5));
+    }
+    
+    @Test
+    public void testTopLevelAnnotations2() throws ParseException {
+    	this.doTestScript("TopLevelAnnotations2.wyv", Util.intType(), new IntegerLiteral(5));
+    }
+    
 }
