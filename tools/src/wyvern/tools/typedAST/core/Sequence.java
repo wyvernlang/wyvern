@@ -418,6 +418,12 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		if (ast instanceof Fn) {
 			((Fn)ast).genTopLevel(tlc, expectedType);			
 		}
+		// Add a unit value on the end, so the declaration evaluates to Unit.
+		else if (ast instanceof Declaration) {
+			Value v = UnitVal.getInstance(this.getLocation());
+			ast.genTopLevel(tlc);
+			v.genTopLevel(tlc);
+		}
 		else {
 			ast.genTopLevel(tlc);
 		}

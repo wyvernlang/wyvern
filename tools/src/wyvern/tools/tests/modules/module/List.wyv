@@ -36,3 +36,4 @@ def pickLast(list:List, seed:Int):Int
 	list.caseAnalyze(() => seed, (x,l) => pickLast(l,x))
 
 val five = pickLast(aList,0)
+five

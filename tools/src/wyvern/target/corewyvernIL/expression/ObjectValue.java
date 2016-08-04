@@ -80,4 +80,22 @@ public class ObjectValue extends New implements Invokable {
 	public EvalContext getEvalCtx() {
 		return this.evalCtx;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ObjectValue other = (ObjectValue) obj;
+		
+		// Other ObjectValue needs the same declarations, in the same order.
+		if (this.getDecls().size() != other.getDecls().size())
+			return false;
+		return this.getDecls().equals(other.getDecls());
+		
+	}
+	
 }

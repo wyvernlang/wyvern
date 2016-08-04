@@ -1283,22 +1283,25 @@ public class ILTests {
                       + "    val x: ArrayList \n\n"
 
                       + "val y = 7 \n"
-                      + "";
+                      + "y";
 
         doTest(source, null, new IntegerLiteral(7));
     }
     
     
     @Test
-    @Category(CurrentlyBroken.class)
-    public void testTopLevelAnnotations1() throws ParseException {
-    	doTestScript("Annotations.wyv", Util.unitType(), Util.unitValue());
+    public void testDeclarationReturn1() throws ParseException {
+    	String src = "val something : Dyn = 5\n"
+    			      + "val five : Int = something";
+    	doTest(src, Util.unitType(), Util.unitValue());
     }
     
     @Test
-    @Category(CurrentlyBroken.class)
-    public void testTopLevelAnnotations2() throws ParseException {
-    	doTestScript("Annotations.wyv", Util.intType(), new IntegerLiteral(5));
+    public void testDeclarationReturn2() throws ParseException {
+    	String src = "val something : Dyn = 5\n"
+    			   + "val five : Int = something\n"
+    			   + "five";
+    	doTest(src, Util.intType(), new IntegerLiteral(5));
     }
     
 }
