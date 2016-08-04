@@ -1287,4 +1287,18 @@ public class ILTests {
 
         doTest(source, null, new IntegerLiteral(7));
     }
+    
+    
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testTopLevelAnnotations1() throws ParseException {
+    	doTestScript("Annotations.wyv", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testTopLevelAnnotations2() throws ParseException {
+    	doTestScript("Annotations.wyv", Util.intType(), new IntegerLiteral(5));
+    }
+    
 }
