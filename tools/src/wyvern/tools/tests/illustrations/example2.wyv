@@ -5,3 +5,4 @@ val uInfo = UserInfo()
 val docLock = DocumentLock(uInfo)
 
 val x : Int = docLock.sign()
+x
