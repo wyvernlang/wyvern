@@ -1283,8 +1283,25 @@ public class ILTests {
                       + "    val x: ArrayList \n\n"
 
                       + "val y = 7 \n"
-                      + "";
+                      + "y";
 
         doTest(source, null, new IntegerLiteral(7));
     }
+    
+    
+    @Test
+    public void testDeclarationReturn1() throws ParseException {
+    	String src = "val something : Dyn = 5\n"
+    			      + "val five : Int = something";
+    	doTest(src, Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testDeclarationReturn2() throws ParseException {
+    	String src = "val something : Dyn = 5\n"
+    			   + "val five : Int = something\n"
+    			   + "five";
+    	doTest(src, Util.intType(), new IntegerLiteral(5));
+    }
+    
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
@@ -70,7 +71,6 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	}
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		// TODO Auto-generated method stub
-		return null;
+		return Util.unitValue();
 	}
 }
