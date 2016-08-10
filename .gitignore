@@ -1,3 +1,5 @@
+.classpath
+.project
 bin
 .idea
 tools/wyvern-tools.iml
