@@ -88,7 +88,7 @@ public class Illustrations {
 		for(String fileName : fileList) {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
+			TypedAST ast = TestUtil.getNewAST(source, "test input");
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
@@ -120,7 +120,7 @@ public class Illustrations {
 		for(String fileName : fileList) {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
+			TypedAST ast = TestUtil.getNewAST(source, "test input");
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
@@ -181,7 +181,7 @@ public class Illustrations {
 		for(String fileName : fileList) {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
+			TypedAST ast = TestUtil.getNewAST(source, "test input");
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);

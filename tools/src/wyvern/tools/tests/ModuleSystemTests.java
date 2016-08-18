@@ -47,7 +47,7 @@ public class ModuleSystemTests {
 	@Test
 	public void testResource() throws ParseException {
 		String program = TestUtil.readFile(PATH + "testModule.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		WyvernResolver.getInstance().setNewParser(true);
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
@@ -56,7 +56,7 @@ public class ModuleSystemTests {
 	@Test
 	public void testImport() throws ParseException {
 		String program = TestUtil.readFile(PATH + "import.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		WyvernResolver.getInstance().setNewParser(true);
 		typeCheckfailWith(ast, ErrorMessage.MODULE_TYPE_ERROR);
 	}
@@ -64,7 +64,7 @@ public class ModuleSystemTests {
 	@Test
 	public void testRequire() throws ParseException {
 		String program = TestUtil.readFile(PATH + "require.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		WyvernResolver.getInstance().setNewParser(true);
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
@@ -73,7 +73,7 @@ public class ModuleSystemTests {
 	@Test
 	public void testRsType() throws ParseException {
 		String program = TestUtil.readFile(PATH + "rsType.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		WyvernResolver.getInstance().setNewParser(true);
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
@@ -82,7 +82,7 @@ public class ModuleSystemTests {
 	@Test
 	public void testWyt() throws ParseException {
 		String program = TestUtil.readFile(PATH + "Log.wyt");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		WyvernResolver.getInstance().setNewParser(true);
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
@@ -91,14 +91,14 @@ public class ModuleSystemTests {
 	@Test
 	public void testInst() throws ParseException {
 		String program = TestUtil.readFile(PATH + "inst.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 	}
 
 	@Test
 	@Category(CurrentlyBroken.class)
 	public void testDaryaModuleExample() throws ParseException {
 		String program = TestUtil.readFile(PATH + "paper-module-example/Main.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		WyvernResolver.getInstance().setNewParser(true);
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
@@ -147,7 +147,7 @@ public class ModuleSystemTests {
 		
 		for(String fileName : fileList) {
 			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
+			TypedAST ast = TestUtil.getNewAST(source, "test input");
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
@@ -171,7 +171,7 @@ public class ModuleSystemTests {
 		for(String fileName : fileList) {
 			System.out.println(fileName);
 			String source = TestUtil.readFile(PATH + fileName);
-			TypedAST ast = TestUtil.getNewAST(source);
+			TypedAST ast = TestUtil.getNewAST(source, "test input");
 			wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
@@ -190,13 +190,13 @@ public class ModuleSystemTests {
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 	
 		// Load and link Database.wyv.
-		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"), "test input");
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.
 		String source = TestUtil.readFile(PATH + "DatabaseUser.wyv");
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
 		Expression program = ast.generateIL(genCtx, Util.intType(), null);
 		TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
@@ -215,13 +215,13 @@ public class ModuleSystemTests {
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 	
 		// Load and link Database.wyv.
-		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"));
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"), "test input");
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
 		// Interpret DatabaseUser.wyv with Database.wyv in the context.
 		String source = TestUtil.readFile(PATH + "DatabaseUserTricky.wyv");
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
 		Expression program = ast.generateIL(genCtx, Util.intType(), new LinkedList<TypedModuleSpec>());
 		TypeContext ctx = TypeContext.empty();
 		ValueType t = program.typeCheck(ctx);
@@ -242,7 +242,7 @@ public class ModuleSystemTests {
 					  + "v\n";
 		
 		// Generate code to be evaluated.
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
 		Expression program = ast.generateIL(genCtx, Util.intType(), null);
 		
 		// Evaluate.
@@ -260,7 +260,7 @@ public class ModuleSystemTests {
 					  + "v\n";
 		
 		// Generate code to be evaluated.
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
 		Expression program = ast.generateIL(genCtx, Util.intType(), null);
 		
 		// Evaluate.

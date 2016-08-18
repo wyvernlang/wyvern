@@ -149,7 +149,7 @@ public class ILTests {
     public void testLetValWithString4() throws ParseException {
         String input = "val identity = (x: system.Int) => x\n"
                      + "   identity(5)";
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
         Expression program = ast.generateIL(Globals.getStandardGenContext(), null, null);
         TypeContext ctx = Globals.getStandardTypeContext();
         ValueType t = program.typeCheck(ctx);
@@ -182,7 +182,7 @@ public class ILTests {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 5\n"
 					 + "obj.x\n";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
@@ -201,7 +201,7 @@ public class ILTests {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 3\n"
 					 + "obj.v = \"hello\"\n";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
@@ -210,7 +210,7 @@ public class ILTests {
 		String input = "val obj = new\n"
 					 + "    var v : system.Int = 3\n"
 					 + "obj.x = 5\n";
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 		assertTypeCheckFails(ast, Globals.getStandardGenContext());
 	}
 	
@@ -263,7 +263,7 @@ public class ILTests {
 					 + "    case Nil => 0\n"
 					 + "    case c:Cons => c.element\n"
 					 ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 	}
 	
 	@Test
@@ -350,7 +350,7 @@ public class ILTests {
 						 + "val i : Int = 5\n\n"
 						 + "i\n"
 				     	 ;
-			TypedAST ast = TestUtil.getNewAST(input);
+			TypedAST ast = TestUtil.getNewAST(input, "test input");
 			// bogus "system" entry, but makes the text work for now
 			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 			Expression program = ((Sequence) ast).generateIL(genCtx, null, null);
@@ -629,7 +629,7 @@ public class ILTests {
 	}
 
 	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
-		TypedAST ast = TestUtil.getNewAST(input);
+		TypedAST ast = TestUtil.getNewAST(input, "test input");
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		TypeContext ctx = Globals.getStandardTypeContext();
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
@@ -665,7 +665,7 @@ public class ILTests {
 	
 	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
         InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), null);
 		GenContext genCtx = Globals.getGenContext(state);
         Expression program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
@@ -678,7 +678,7 @@ public class ILTests {
 
 	// TODO: make other string tests call this function
 	private static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
 		final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 		IExpr program = ast.generateIL(genCtx, null, dependencies);
@@ -738,7 +738,7 @@ public class ILTests {
 	}
 
 	private void doTestTypeFail(String input) throws ParseException {
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		try {
 			Expression program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
@@ -754,7 +754,7 @@ public class ILTests {
                      + "val n : Int = id(~)\n"
                      + "    4 5 +\n"
                      ;
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		// IL generation doesn't work yet!
 		//Expression program = ast.generateIL(genCtx, null);
@@ -778,7 +778,7 @@ public class ILTests {
                      + "    metadata 3\n\n"
                      
                      ;
-        TypedAST ast = TestUtil.getNewAST(input);
+        TypedAST ast = TestUtil.getNewAST(input, "test input");
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
 		// IL generation doesn't work yet!
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
@@ -882,7 +882,7 @@ public class ILTests {
 					 + "	var two : system.Int = 2\n"
 					 + "x.one";
 		try {
-			TestUtil.getNewAST(input);
+			TestUtil.getNewAST(input, "test input");
 			Assert.fail("AST creation should have failed.");
 		} catch (RuntimeException e) {
 		}

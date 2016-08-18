@@ -43,7 +43,7 @@ public class DemoTests {
     
 	@Test
 	public void testSafeSQL() throws ParseException {
-		ILTests.doTestScriptModularly("modules.safeSQLdriver", Util.intType(), new IntegerLiteral(5));
+		ILTests.doTestScriptModularly("modules.sqlMain", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -55,7 +55,7 @@ public class DemoTests {
 	@Category(RegressionTests.class)
 	public void testArithmeticAST() throws ParseException {
 		String program = TestUtil.readFile(PATH + "ArithmeticAST.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		Value out = TestUtil.evaluateNew(ast);
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(2, finalRes);
@@ -65,7 +65,7 @@ public class DemoTests {
 	@Category(CurrentlyBroken.class)
 	public void testCalculatorTokens() throws ParseException {
 		String program = TestUtil.readFile(PATH + "CalculatorTokens.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		Value out = TestUtil.evaluateNew(ast);
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(3, finalRes);
@@ -74,7 +74,7 @@ public class DemoTests {
 	@Test
 	public void testSimpleDelegation() throws ParseException {
 		String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		//Value out = TestUtil.evaluateNew(ast);
 		//int finalRes = ((IntegerConstant)out).getValue();
 		//Assert.assertEquals(3, finalRes);

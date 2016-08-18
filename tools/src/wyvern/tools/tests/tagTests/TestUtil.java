@@ -18,6 +18,7 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
+import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernParserConstants;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
@@ -58,16 +59,20 @@ public class TestUtil {
 	 * new Wyvern parser.
 	 * 
 	 * @param program
+	 * @param programName TODO
 	 * @return
 	 * @throws IOException 
 	 * @throws CopperParserException 
 	 */
-	public static TypedAST getNewAST(String program) throws ParseException {
+	public static TypedAST getNewAST(String program, String programName) throws ParseException {
 		clearGlobalTagInfo();
 		Reader r = new StringReader(program);
-		WyvernParser<TypedAST,Type> wp = ParseUtils.makeParser("test input", r);
+		WyvernParser<TypedAST,Type> wp = ParseUtils.makeParser(programName, r);
 		TypedAST result = wp.CompilationUnit();
-		Assert.assertEquals("Could not parse the entire file, last token ", WyvernParserConstants.EOF, wp.token_source.getNextToken().kind);
+		final Token nextToken = wp.token_source.getNextToken();
+		if (nextToken.kind != WyvernParserConstants.EOF) {
+			ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, wp.loc(nextToken));			
+		}
 		return result;
 	}
 	
@@ -82,12 +87,7 @@ public class TestUtil {
 	 */
 	public static TypedAST getNewAST(File programLocation) throws ParseException {
 		String program = readFile(programLocation);
-		clearGlobalTagInfo();
-		Reader r = new StringReader(program);
-		WyvernParser<TypedAST,Type> wp = ParseUtils.makeParser(programLocation.getPath(), r);
-		TypedAST result = wp.CompilationUnit();
-		Assert.assertEquals("Could not parse the entire file, last token ", WyvernParserConstants.EOF, wp.token_source.getNextToken().kind);
-		return result;
+		return getNewAST(program, programLocation.getPath());
 	}
 	
 	/**

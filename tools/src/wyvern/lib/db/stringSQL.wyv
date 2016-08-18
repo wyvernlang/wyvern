@@ -1,5 +1,7 @@
 resource module stringSQL
 
+require java
+
 type SQL
 	def query():String
 

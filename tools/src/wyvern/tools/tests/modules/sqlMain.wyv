@@ -1,13 +1,10 @@
-resource module sqlMain
+require db.stringSQL
 
-require db.StringSQL as stringSQL
 import db.safeSQL
 import modules.sqlApplication
 
-//instantiate db.safeSQL(stringSQL) as safeSQL
 val sql = safeSQL(stringSQL)
 
-//instantiate modules.sqlApplication(sql) as sqlApplication
 val app = sqlApplication(sql)
 
-val result = app.run()
+app.run()

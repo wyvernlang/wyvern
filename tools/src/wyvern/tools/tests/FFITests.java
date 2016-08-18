@@ -47,7 +47,7 @@ public class FFITests {
   private void testPyFromInput(String input, String expected, boolean debug) throws ParseException {
     // Since the root OIR environment is stateful, reset it between tests
     OIREnvironment.resetRootEnvironment();
-    ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input);
+    ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
     GenContext genContext = Globals.getStandardGenContext();
     Expression ILprogram = ast.generateIL(genContext, null, new LinkedList<TypedModuleSpec>());
     if (debug) {

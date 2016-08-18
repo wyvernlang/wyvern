@@ -60,7 +60,7 @@ public class CoreParserTests {
 				     + "stdout.print(x)\n"
 				     + "stdout.print(y)\n"
 				     + "stdout.print(z)\n";
-		TypedAST ast = TestUtil.getNewAST(input);
+		TypedAST ast = TestUtil.getNewAST(input, "test input");
 		TestUtil.evaluateNew(ast);
 	}
 	
@@ -71,7 +71,7 @@ public class CoreParserTests {
 				     + "        5\n"
 				     + "obj.getValue()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		TypedAST ast = TestUtil.getNewAST(input, "test input");
 		Value out = TestUtil.evaluateNew(ast);
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(5, finalRes);
@@ -83,7 +83,7 @@ public class CoreParserTests {
 				     + "    val v:Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		TypedAST ast = TestUtil.getNewAST(input, "test input");
 		Value out = TestUtil.evaluateNew(ast);
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(5, finalRes);
@@ -95,7 +95,7 @@ public class CoreParserTests {
 				     + "obj.v = 3\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		TypedAST ast = TestUtil.getNewAST(input, "test input");
 		Value out = TestUtil.evaluateNew(ast);
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(3, finalRes);
@@ -111,7 +111,7 @@ public class CoreParserTests {
 				     + "        5\n"
 				     + "obj.getValue()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input);
+		TypedAST ast = TestUtil.getNewAST(input, "test input");
 		Value out = TestUtil.evaluateNew(ast);
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(5, finalRes);

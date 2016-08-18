@@ -40,7 +40,7 @@ public class RossettaCodeTests {
 		String stdoutSig = "type stdout\n"						// type sig for stdout; part of std prelude, so this is always in scope
                          + "    def print(String text):void";
         */
-		TypedAST ast = TestUtil.getNewAST(program);
+		TypedAST ast = TestUtil.getNewAST(program, "test input");
 		//Type resultType = ast.typecheck(Globals.getStandardEnv(), Optional.<Type>empty());
 		TestUtil.evaluateNew(ast);
 		//Assert.assertEquals(resultType, new Int());
@@ -67,6 +67,11 @@ public class RossettaCodeTests {
 	@Test
 	public void testNewHello() throws ParseException {		
 		ILTests.doTestScriptModularly("rosetta.hello", null, null);
+	}
+	
+	@Test
+	public void testExplicitHello() throws ParseException {		
+		ILTests.doTestScriptModularly("rosetta.hello-explicit", null, null);
 	}
 	
 	@Test
