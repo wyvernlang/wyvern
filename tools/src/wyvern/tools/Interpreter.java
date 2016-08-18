@@ -60,9 +60,9 @@ public class Interpreter {
 			
 			/*ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
 			GenContext genCtx = Globals.getGenContext(state);
-			Expression program = ast.generateIL(genCtx, null);
+			Expression program = ast.generateIL(genCtx, null);*/
 			TypeContext ctx = Globals.getStandardTypeContext();
-			program.typeCheck(ctx);*/
+			program.typeCheck(ctx);
 			Value v = program.interpret(Globals.getStandardEvalContext());
 		/*} catch (ParseException e) {
 			System.err.println("Parse error: " + e.getMessage());*/
