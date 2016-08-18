@@ -1,0 +1,7 @@
+require java
+
+import stdout
+
+val stdout2 = stdout(java)
+
+stdout2.print("Hello, World!")
