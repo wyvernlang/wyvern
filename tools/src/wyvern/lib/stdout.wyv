@@ -15,3 +15,6 @@ def print(text:String):Unit
 
 def printInt(n:Int):Unit
 	stdio.printInt(n)
+
+def println():Unit
+	stdio.println()

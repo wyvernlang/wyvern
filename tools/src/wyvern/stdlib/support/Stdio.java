@@ -7,6 +7,9 @@ public class Stdio {
 	public void print(String text) {
 		java.lang.System.out.print(text);
 	}
+	public void println() {
+		java.lang.System.out.println();
+	}
 	public void printInt(BigInteger n) {
 		java.lang.System.out.print(n);
 	}

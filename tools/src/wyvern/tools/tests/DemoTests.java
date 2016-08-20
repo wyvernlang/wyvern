@@ -72,6 +72,12 @@ public class DemoTests {
 	}
 	
 	@Test
+	public void testListClient() throws ParseException {
+		ILTests.doTestScriptModularly("demo.ListClient", Util.intType(), new IntegerLiteral(8));
+	}
+	
+	
+	@Test
 	public void testSimpleDelegation() throws ParseException {
 		String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
