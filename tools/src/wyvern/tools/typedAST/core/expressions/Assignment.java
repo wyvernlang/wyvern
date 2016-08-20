@@ -140,8 +140,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		
 		// Figure out expression being assigned.
-		CallableExprGenerator cegExpr = value.getCallableExpr(ctx);
-		Expression exprToAssign = cegExpr.genExpr();
+		Expression exprToAssign = value.generateIL(ctx, expectedType, dependencies);
 		ValueType exprType = exprToAssign.getExprType();
 		
 		// Figure out receiver and field.
