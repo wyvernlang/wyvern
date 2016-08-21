@@ -167,6 +167,69 @@ import wyvern.tools.errors.ToolError;
 		return false;
 	}
 	
+    /**
+     * Find occurrences of escape sequences in the input string and replaces them with the
+     * appropriate character.
+     */
+    String replaceEscapeSequences(String s) {
+        StringBuilder new_s = new StringBuilder();
+
+        int i;
+        for (i = 0; i < s.length() - 1; ++i) {
+            char c = s.charAt(i);
+
+            if (c == '\\') {
+                switch (s.charAt(i + 1)) {
+                    case '\'':
+                        c = '\''; ++i;
+                        break;
+
+                    case '\"':
+                        c = '\"'; ++i;
+                        break;
+
+                    case '\\':
+                        c = '\\'; ++i;
+                        break;
+
+                    case 'b':
+                        c = '\b'; ++i;
+                        break;
+
+                    case 'f':
+                        c = '\f'; ++i;
+                        break;
+
+                    case 'n':
+                        c = '\n'; ++i;
+                        break;
+
+                    case 'r':
+                        c = '\r'; ++i;
+                        break;
+
+                    case 't':
+                        c = '\t'; ++i;
+                        break;
+
+                    default:
+                        ToolError.reportError(ErrorMessage.ILLEGAL_ESCAPE_SEQUENCE,
+                                              new FileLocation(virtualLocation.getFileName(),
+                                                               virtualLocation.getLine(),
+                                                               virtualLocation.getColumn() + i + 2));
+                }
+            }
+
+            new_s.append(c);
+        }
+
+        if (i < s.length()) {
+            new_s.append(s.charAt(i));
+        }
+
+        return new_s.toString();
+    }
+
 %aux}
 
 %init{
@@ -253,7 +316,7 @@ import wyvern.tools.errors.ToolError;
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
- 		RESULT = token(STRING_LITERAL,lexeme.substring(1,lexeme.length()-1));
+ 		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
  	:};
 
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};

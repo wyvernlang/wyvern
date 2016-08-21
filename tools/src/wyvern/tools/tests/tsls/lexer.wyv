@@ -101,22 +101,22 @@ def makeScanner(config:ScannerConfig, s:String):Scanner = new
 //////////////////////////////////// CLIENT CODE
 
 val config = makeScannerConfig(regex("[ ]+"))
-config.addTokenKind(regex("\d+")      , tokens.NUMBER)
-config.addTokenKind(regex("[\+\-\*/]"), tokens.OPERATOR)
-config.addTokenKind(regex("\z")       , tokens.EOF)
+config.addTokenKind(regex("\\d+")      , tokens.NUMBER)
+config.addTokenKind(regex("[\\+\\-\\*/]"), tokens.OPERATOR)
+config.addTokenKind(regex("\\z")       , tokens.EOF)
 
 
 
 //////////////////////////////////// TESTING CODE
 val regexList : List = list.make()
 
-regexList.append(makeRKPair(regex("\d+"), tokens.NUMBER))
+regexList.append(makeRKPair(regex("\\d+"), tokens.NUMBER))
 regexList.append(makeRKPair(regex("[ ]+"), tokens.WHITESPACE))
 
-val numRX = regex("\d+")
+val numRX = regex("\\d+")
 val whitespaceRX = regex("[ ]+")
-val operatorRX = regex("[\+\-\*/]")
-val emptyRX = regex("\z")
+val operatorRX = regex("[\\+\\-\\*/]")
+val emptyRX = regex("\\z")
 
 config.getScanResult("*54-").token().print()
 
