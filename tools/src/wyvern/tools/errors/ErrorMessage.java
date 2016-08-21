@@ -88,6 +88,7 @@ public enum ErrorMessage {
 	SCHEME_NOT_RECOGNIZED("import scheme %ARG not recognized; did you forget to \"require java\"?", 1),
 	UNSAFE_JAVA_IMPORT("To import the java package %ARG, make sure you \"require java\" or add the package to the built-in whitelist (experts only)", 1),
 	ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
+	UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
 	;
 	
 	private ErrorMessage(String message, int numArgs) {
