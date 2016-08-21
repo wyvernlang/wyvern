@@ -224,6 +224,14 @@ import wyvern.tools.errors.ToolError;
         }
 
         if (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                ToolError.reportError(ErrorMessage.UNCLOSED_STRING_LITERAL,
+                                      new FileLocation(virtualLocation.getFileName(),
+                                                       virtualLocation.getLine(),
+                                                       virtualLocation.getColumn() + 1));
+            }
+
             new_s.append(s.charAt(i));
         }
 
