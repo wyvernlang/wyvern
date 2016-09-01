@@ -10,6 +10,7 @@
 		<pathelement location="lib/CopperRuntime.jar" />
 		<pathelement location="lib/hamcrest-core-1.3.jar" />
 		<pathelement location="lib/javatuples-1.2.jar" />
+        <pathelement location="lib/checkstyle-7.1-all.jar" />        
 	</path>
 	
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
@@ -100,4 +101,15 @@
 		<!-- Delete the ${build.dir} directory tree -->
 		<delete dir="${build.dir}"/>
 	</target>
+
+    <target name="lint">
+        <checkstyle config="checkstyle.xml" >
+            <fileset dir="${src.dir}" includes="**/*.java"/>
+        </checkstyle>
+    </target>
+
+    <taskdef 
+        resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+        classpathref="classpath.base"
+    />
 </project>
