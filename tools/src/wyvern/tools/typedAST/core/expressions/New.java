@@ -53,41 +53,68 @@ import wyvern.tools.util.Reference;
 import wyvern.tools.util.TreeWriter;
 
 public class New extends CachingTypedAST implements CoreAST {
-    ClassDeclaration cls;
-
-    Map<String, TypedAST> args = new HashMap<String, TypedAST>();
-    boolean isGeneric = false;
 
     private static int generic_num = 0;
+    private static int uniqueCounter = 0;
+    private static Map<String, Expression> variables = new HashMap<>();
+
+    private FileLocation location = FileLocation.UNKNOWN;
+    private ClassDeclaration cls;
+    private Map<String, TypedAST> args = new HashMap<String, TypedAST>();
+    private boolean isGeneric = false;
     private DeclSequence seq;
     private Type ct;
     private String selfName;
 
-    public void setBody(DeclSequence seq) {
-        this.seq = seq;
-    }
-
-    public DeclSequence getDecls() { return seq; }
-
-    public static void resetGenNum() {
-        generic_num = 0;
-    }
-
+    /**
+      * Makes a New expression with the provided mapping, file location, and self name.
+      *
+      * @param args The mapping from arg name to Expression.
+      * @param fileLocation the location in the file where the New expression occurs 
+      * @param selfName the name of the object created by this expression, like 'this' in Java
+      */
     public New(Map<String, TypedAST> args, FileLocation fileLocation, String selfName) {
         this.args = args;
         this.location = fileLocation;
         this.selfName = selfName;
     }
 
+    /**
+      * Makes a New expression with the provided mapping and file location.
+      *
+      * @param args The mapping from arg name to Expression.
+      * @param fileLocation the location in the file where the New expression occurs 
+      */
     public New(Map<String, TypedAST> args, FileLocation fileLocation) {
         this.args = args;
         this.location = fileLocation;
         this.selfName = null;
     }
 
+    /**
+      * This constructor makes a New expression with the provided declaration sequence.
+      *
+      * @param seq the list of declaration internal to the object created by this expression
+      * @param fileLocation the location in the file where the New expression occurs 
+      */
     public New(DeclSequence seq, FileLocation fileLocation) {
         this.seq = seq;
         this.location = fileLocation;
+    }
+
+    public void setBody(DeclSequence seq) {
+        this.seq = seq;
+    }
+
+    public DeclSequence getDecls() {
+        return seq;
+    }
+
+    /**
+     * Resets the count of generics.
+     */
+    public static void resetGenNum() {
+        generic_num = 0;
     }
 
     @Override
@@ -108,12 +135,18 @@ public class New extends CachingTypedAST implements CoreAST {
         // TODO check arg types
         // Type argTypes = args.typecheck();
 
-        ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding("class", ClassBinding.class).orElse(null);
+        ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding(
+            "class", ClassBinding.class
+        ).orElse(null);
 
 
         if (classVarTypeBinding != null) { //In a class method
-            Environment declEnv = classVarTypeBinding.getClassDecl().getInstanceMembersEnv();
-            Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env).extend(declEnv);
+            Environment declEnv = classVarTypeBinding.getClassDecl()
+                .getInstanceMembersEnv();
+
+            Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env)
+                .extend(declEnv);
+
             innerEnv = env.extend(new NameBindingImpl(this.self(),
                         new ClassType(
                             new Reference<>(innerEnv),
@@ -130,12 +163,22 @@ public class New extends CachingTypedAST implements CoreAST {
             environment = seq.extendName(environment, environment.extend(env));
             Environment nnames = environment;//seq.extend(environment, environment);
 
-            Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(declEnv));
-            Type classVarType = new ClassType(new Reference<>(nnames.extend(declEnv)), new Reference<>(objTee), new LinkedList<>(),
-                    classVarTypeBinding.getClassDecl().getTaggedInfo(), classVarTypeBinding.getClassDecl().getName());
+            Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(
+                    nnames.extend(declEnv)
+            );
+            Type classVarType = new ClassType(
+                    new Reference<>(nnames.extend(declEnv)), 
+                    new Reference<>(objTee), 
+                    new LinkedList<>(),
+                    classVarTypeBinding.getClassDecl().getTaggedInfo(), 
+                    classVarTypeBinding.getClassDecl().getName()
+            );
             if (!(classVarType instanceof ClassType)) {
-                // System.out.println("Type checking classVarType: " + classVarType + " and clsVar = " + clsVar);
-                ToolError.reportError(ErrorMessage.MUST_BE_LITERAL_CLASS, this, classVarType.toString());
+                ToolError.reportError(
+                        ErrorMessage.MUST_BE_LITERAL_CLASS, 
+                        this, 
+                        classVarType.toString()
+                );
             }
 
             // TODO SMELL: do I really need to store this?  Can get it any time from the type
@@ -154,15 +197,36 @@ public class New extends CachingTypedAST implements CoreAST {
             TaggedInfo tagInfo = null;
             if (expected.isPresent()) {
                 Type t = expected.get();
-                if (t instanceof RecordType)
+                if (t instanceof RecordType) {
                     tagInfo = ((RecordType)t).getTaggedInfo();
+                }
             }
             
-            Environment declEnv = env.extend(new NameBindingImpl(this.self(), new ClassType(new Reference<>(innerEnv), new Reference<>(innerEnv), new LinkedList<>(), tagInfo, null)));
-            final Environment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
-                    reduce(declEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.extend(oenv, savedInner):oenv,(a,b)->a.extend(b));
-            seq.getDeclIterator().forEach(decl -> decl.typecheck(ideclEnv, Optional.<Type>empty()));
-
+            Environment declEnv = env.extend(
+                new NameBindingImpl(
+                    this.self(), 
+                    new ClassType(
+                        new Reference<>(innerEnv), 
+                        new Reference<>(innerEnv), 
+                        new LinkedList<>(), 
+                        tagInfo, null
+                    )
+                )
+            );
+            final Environment ideclEnv = StreamSupport.stream(
+                seq.getDeclIterator().spliterator(), 
+                false
+            ).reduce(
+                declEnv, 
+                (oenv,decl) -> (decl instanceof ClassDeclaration)
+                        ? decl.extend(oenv, savedInner)
+                        : oenv,(a,b) -> a.extend(b)
+            );
+            seq.getDeclIterator().forEach(
+                decl -> decl.typecheck(
+                    ideclEnv, Optional.<Type>empty()
+                )
+            );
 
             Environment mockEnv = Environment.getEmptyEnvironment();
 
@@ -172,28 +236,57 @@ public class New extends CachingTypedAST implements CoreAST {
             nnames = (seq.extendName(nnames,mockEnv.extend(env)));
             //nnames = seq.extend(nnames, mockEnv.extend(env));
 
-            ClassDeclaration classDeclaration = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(decls), mockEnv, new LinkedList<String>(), getLocation());
+            ClassDeclaration classDeclaration = new ClassDeclaration(
+                "generic" + generic_num++,
+                "",
+                "",
+                new DeclSequence(decls), 
+                mockEnv, 
+                new LinkedList<String>(), 
+                getLocation()
+            );
             cls = classDeclaration;
-            Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(nnames.extend(mockEnv));
+            Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(
+                    nnames.extend(mockEnv)
+            );
 
-            ct = new ClassType(new Reference<>(nnames.extend(mockEnv)), new Reference<>(tee), new LinkedList<String>(), tagInfo, null);
+            ct = new ClassType(
+                    new Reference<>(
+                        nnames.extend(mockEnv)
+                    ), 
+                    new Reference<>(tee), 
+                    new LinkedList<String>(), 
+                    tagInfo, 
+                    null
+            );
             return ct;
         }
     }
 
-    private EvaluationEnvironment getGenericDecls(EvaluationEnvironment env, EvaluationEnvironment mockEnv, LinkedList<Declaration> decls) {
+    private EvaluationEnvironment getGenericDecls(
+            EvaluationEnvironment env, 
+            EvaluationEnvironment mockEnv, 
+            LinkedList<Declaration> decls
+    ) {
         return mockEnv;
     }
 
     @Override
     public Value evaluate(EvaluationEnvironment env) {
         EvaluationEnvironment argValEnv = EvaluationEnvironment.EMPTY;
-        for (Entry<String, TypedAST> elem : args.entrySet())
-            argValEnv = argValEnv.extend(new ValueBinding(elem.getKey(), elem.getValue().evaluate(env)));
+        for (Entry<String, TypedAST> elem : args.entrySet()) {
+            argValEnv = argValEnv.extend(
+                    new ValueBinding(
+                        elem.getKey(),
+                        elem.getValue().evaluate(env)
+                    )
+            );
+        }
 
-
-
-        ClassBinding classVarTypeBinding = (ClassBinding) env.lookupValueBinding("class", ClassBinding.class).orElse(null);
+        ClassBinding classVarTypeBinding = (ClassBinding) env.lookupValueBinding(
+                "class", 
+                ClassBinding.class
+        ).orElse(null);
         ClassDeclaration classDecl;
 
         if (classVarTypeBinding != null) {
@@ -202,18 +295,48 @@ public class New extends CachingTypedAST implements CoreAST {
 
             Environment mockEnv = Environment.getEmptyEnvironment();
 
-            classDecl = new ClassDeclaration("generic" + generic_num++, "", "", new DeclSequence(), mockEnv, new LinkedList<String>(), getLocation());
+            classDecl = new ClassDeclaration(
+                    "generic" + generic_num++,
+                    "",
+                    "",
+                    new DeclSequence(),
+                    mockEnv,
+                    new LinkedList<String>(),
+                    getLocation()
+            );
         }
 
         AtomicReference<Value> objRef = new AtomicReference<>();
-        EvaluationEnvironment evalEnv = env.extend(new LateValueBinding(this.self(), objRef, ct));
-        classDecl.evalDecl(evalEnv, classDecl.extendWithValue(EvaluationEnvironment.EMPTY));
-        final EvaluationEnvironment ideclEnv = StreamSupport.stream(seq.getDeclIterator().spliterator(), false).
-                reduce(evalEnv, (oenv,decl)->(decl instanceof ClassDeclaration)?decl.evalDecl(oenv):oenv, EvaluationEnvironment::extend);
-        EvaluationEnvironment objenv = seq.bindDecls(ideclEnv, seq.extendWithDecls(classDecl.getFilledBody(objRef)));
+        EvaluationEnvironment evalEnv = env.extend(
+                new LateValueBinding(
+                    this.self(),
+                    objRef,
+                    ct)
+        );
+        classDecl.evalDecl(
+                evalEnv,
+                classDecl.extendWithValue(EvaluationEnvironment.EMPTY)
+        );
+        final EvaluationEnvironment ideclEnv = StreamSupport.stream(
+            seq.getDeclIterator().spliterator(), false)
+            .reduce(evalEnv,
+                    ((oenv,decl) -> 
+                        (decl instanceof ClassDeclaration)
+                        ? decl.evalDecl(oenv)
+                        : oenv),
+                    EvaluationEnvironment::extend
+            );
+        EvaluationEnvironment objenv = seq.bindDecls(
+                ideclEnv,
+                seq.extendWithDecls(classDecl.getFilledBody(objRef))
+        );
 
-        TaggedInfo goodTI = env.lookupBinding(this.self(), HackForArtifactTaggedInfoBinding.class)
-                .map(binding -> binding.getTaggedInfo()).orElse(classDecl.getTaggedInfo());
+        TaggedInfo goodTI = env.lookupBinding(
+                this.self(),
+                HackForArtifactTaggedInfoBinding.class
+        )
+            .map(binding -> binding.getTaggedInfo())
+            .orElse(classDecl.getTaggedInfo());
 
         Obj obj = new Obj(objenv.extend(argValEnv), goodTI);
 
@@ -235,27 +358,46 @@ public class New extends CachingTypedAST implements CoreAST {
     @Override
     public Map<String, TypedAST> getChildren() {
         HashMap<String,TypedAST> outMap = new HashMap<>();
-        outMap.put("seq", (seq==null)? new DeclSequence(Arrays.asList()) : seq);
+        outMap.put(
+                "seq",
+                (seq == null) ? new DeclSequence(Arrays.asList()) : seq
+        );
         return outMap;
     }
 
-    private static int uniqueCounter = 0;
-    private static Map<String, Expression> variables = new HashMap<>();
+    /**
+      * addNewFile evaluates the expression and adds that expression 
+      * to the field generated by this New expression
+      *
+      * @param value the Expression which should be evaluated as a new field.
+      */
     public static String addNewField(Expression value) {
         String name = "field " + uniqueCounter++;
         variables.put(name, value);
         return name;
     }
+
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) { //TODO: support new inside classes
+    public void codegenToIL(
+            GenerationEnvironment environment,
+            ILWriter writer
+    ) {
+        //TODO: support new inside classes
         List<wyvern.target.corewyvernIL.decl.Declaration> genDecls = new LinkedList<>();
         for (Declaration decl : getDecls().getDeclIterator()) {
-            genDecls.addAll(DeclarationWriter.generate(writer, dw -> decl.codegenToIL(environment, dw)));
+            genDecls.addAll(
+                    DeclarationWriter.generate(
+                        writer, 
+                        dw -> decl.codegenToIL(environment, dw)
+                    )
+            );
         }
-        wyvern.target.corewyvernIL.expression.New exn = new wyvern.target.corewyvernIL.expression.New(
+        wyvern.target.corewyvernIL.expression.New exn = 
+            new wyvern.target.corewyvernIL.expression.New(
                 genDecls,
                 this.self(),
-        null, getLocation());
+                null, getLocation()
+            );
         Expression output = exn;
         for (String key : variables.keySet()) {
             output = new Let(key, null, variables.get(key), output);
@@ -287,8 +429,6 @@ public class New extends CachingTypedAST implements CoreAST {
         return args;
     }
 
-    private FileLocation location = FileLocation.UNKNOWN;
-
     @Override
     public FileLocation getLocation() {
         return location;
@@ -299,20 +439,33 @@ public class New extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+    public Expression generateIL(
+            GenContext ctx,
+            ValueType expectedType,
+            List<TypedModuleSpec> dependencies
+    ) {
 
         ValueType type = seq.inferStructuralType(ctx, this.self());
         
         // Translate the declarations.
-        GenContext thisContext = ctx.extend(this.self(), new wyvern.target.corewyvernIL.expression.Variable(this.self()), type);
-        List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
-        for (TypedAST d : seq) {
-            
-            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d).generateDecl(ctx, thisContext);
-            if (decl == null) throw new NullPointerException();
+        GenContext thisContext = ctx.extend(
+                this.self(),
+                new wyvern.target.corewyvernIL.expression.Variable(this.self()),
+                type
+        );
+        List<wyvern.target.corewyvernIL.decl.Declaration> decls = 
+            new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+
+        for (TypedAST d : seq) {            
+            wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d)
+                .generateDecl(ctx, thisContext);
+            if (decl == null) {
+                throw new NullPointerException();
+            }
             decls.add(decl);
             
-            // A VarDeclaration also generates declarations for the getter and setter to the var field.
+            // A VarDeclaration also generates declarations for 
+            // the getter and setter to the var field.
             // TODO: is the best place for this to happen?
             if (d instanceof VarDeclaration) {
                 VarDeclaration varDecl = (VarDeclaration) d;
@@ -320,21 +473,36 @@ public class New extends CachingTypedAST implements CoreAST {
                 Type varType = varDecl.getType();
                 
                 // Create references to "this" for the generated methods.
-                wyvern.tools.typedAST.core.expressions.Variable receiver1, receiver2;
-                receiver1 = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(this.self(), null), null);
-                receiver2 = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(this.self(), null), null);
+                wyvern.tools.typedAST.core.expressions.Variable receiver1;
+                wyvern.tools.typedAST.core.expressions.Variable receiver2;
+
+                receiver1 = new wyvern.tools.typedAST.core.expressions.Variable(
+                        new NameBindingImpl(this.self(), null),
+                        null
+                );
+                receiver2 = new wyvern.tools.typedAST.core.expressions.Variable(
+                        new NameBindingImpl(this.self(), null),
+                        null
+                );
                 
                 // Generate getter and setter; add to the declarations.
-                wyvern.target.corewyvernIL.decl.Declaration getter, setter;
-                getter = DefDeclaration.generateGetter(ctx, receiver1, varName, varType).generateDecl(thisContext, thisContext);
-                setter = DefDeclaration.generateSetter(ctx, receiver2, varName, varType).generateDecl(thisContext, thisContext);
+                wyvern.target.corewyvernIL.decl.Declaration getter;
+                wyvern.target.corewyvernIL.decl.Declaration setter;
+                getter = DefDeclaration.generateGetter(ctx, receiver1, varName, varType)
+                    .generateDecl(thisContext, thisContext);
+                setter = DefDeclaration.generateSetter(ctx, receiver2, varName, varType)
+                    .generateDecl(thisContext, thisContext);
                 decls.add(getter);
                 decls.add(setter);  
             }
-
         }
         // if type is not specified, infer
-        return new wyvern.target.corewyvernIL.expression.New(decls, this.self(), /*expectedType == null ?*/ type/*:expectedType*/, getLocation());
+        return new wyvern.target.corewyvernIL.expression.New(
+                decls,
+                this.self(),
+                type,
+                getLocation()
+        );
     }
     
     public void setSelfName(String n) {

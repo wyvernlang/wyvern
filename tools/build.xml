@@ -10,6 +10,7 @@
 		<pathelement location="lib/CopperRuntime.jar" />
 		<pathelement location="lib/hamcrest-core-1.3.jar" />
 		<pathelement location="lib/javatuples-1.2.jar" />
+        <pathelement location="lib/checkstyle-7.1-all.jar" />        
 	</path>
 	
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
@@ -100,4 +101,21 @@
 		<!-- Delete the ${build.dir} directory tree -->
 		<delete dir="${build.dir}"/>
 	</target>
+
+    <target name="lint">
+        <checkstyle config="checkstyle.xml" >
+            <!-- This is the fileset of all java files in our project.
+                 Uncommenting this line would be useful only have we've trimmed down the number of lint violations we have. Right now this takes 16 seconds just to dump the output of all the lint violations. Instead, we'll add files one at a time until we've got a lot covered.
+                <fileset dir="${src.dir}" includes="**/*.java"/>
+            -->
+            <fileset dir="${src.dir}"
+                includes="wyvern/tools/typedAST/core/expressions/New.java"
+            />
+        </checkstyle>
+    </target>
+
+    <taskdef 
+        resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+        classpathref="classpath.base"
+    />
 </project>
