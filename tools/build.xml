@@ -84,7 +84,7 @@
         <echo message="Build done" />	
     </target>
 	
-	<target name="test" depends="build">
+	<target name="test" depends="build,lint">
 		<junit printsummary="on" haltonfailure="yes" fork="yes">
 			<classpath>
 				<path refid="classpath.base" />
@@ -103,7 +103,7 @@
 	</target>
 
     <target name="lint">
-        <checkstyle config="checkstyle.xml" >
+        <checkstyle config="checkstyle.xml" maxWarnings="5">
             <!-- This is the fileset of all java files in our project.
                  Uncommenting this line would be useful only have we've trimmed down the number of lint violations we have. Right now this takes 16 seconds just to dump the output of all the lint violations. Instead, we'll add files one at a time until we've got a lot covered.
                 <fileset dir="${src.dir}" includes="**/*.java"/>
