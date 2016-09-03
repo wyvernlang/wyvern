@@ -54,7 +54,7 @@ import wyvern.tools.util.TreeWriter;
 
 public class New extends CachingTypedAST implements CoreAST {
 
-    private static int generic_num = 0;
+    private static int genericNum = 0;
     private static int uniqueCounter = 0;
     private static Map<String, Expression> variables = new HashMap<>();
 
@@ -63,6 +63,7 @@ public class New extends CachingTypedAST implements CoreAST {
     private Map<String, TypedAST> args = new HashMap<String, TypedAST>();
     private boolean isGeneric = false;
     private DeclSequence seq;
+
     private Type ct;
     private String selfName;
 
@@ -114,7 +115,7 @@ public class New extends CachingTypedAST implements CoreAST {
      * Resets the count of generics.
      */
     public static void resetGenNum() {
-        generic_num = 0;
+        genericNum = 0;
     }
 
     @Override
@@ -130,137 +131,198 @@ public class New extends CachingTypedAST implements CoreAST {
         return (this.selfName == null) ? "this" : this.selfName;
     }
 
+    private ClassBinding fetchClassBinding(Environment env) {
+        return env.lookupBinding(
+            "class", ClassBinding.class
+        ).orElse(null);
+    }
+
+    private Environment buildInnerEnv(Environment env, Environment declEnv, ClassBinding clsBind) {
+        Environment innerEnv;
+             
+        innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env);
+        innerEnv = innerEnv.extend(declEnv);
+
+        innerEnv = env.extend(
+            new NameBindingImpl(this.self(),
+            new ClassType(
+                new Reference<>(innerEnv),
+                new Reference<>(innerEnv),
+                new LinkedList<>(),
+                clsBind.getClassDecl().getTaggedInfo(),
+                clsBind.getClassDecl().getName()
+        )));
+        return innerEnv;
+    }
+
+    private Type typecheckClassMethod(
+            Environment env,
+            Optional<Type> expected,
+            ClassBinding clsBind) {
+
+        ClassBinding classVarTypeBinding = clsBind;
+        Type classVarType = buildClassVarType(clsBind, env);
+
+        if (!(classVarType instanceof ClassType)) {
+            ToolError.reportError(
+                ErrorMessage.MUST_BE_LITERAL_CLASS,
+                this,
+                classVarType.toString()
+            );
+        }
+
+        // Cache these guys for later use, since they're dependent on the Environment
+        this.cls = classVarTypeBinding.getClassDecl();
+        this.ct = classVarType;
+
+        return classVarType;
+    }
+
+    private Type buildClassVarType(ClassBinding varType, Environment env) {
+        Environment declEnv = varType.getClassDecl()
+            .getInstanceMembersEnv();
+
+        Environment innerEnv = buildInnerEnv(env, declEnv, varType);
+        seq.typecheck(innerEnv, Optional.empty());
+
+        Environment nnames = seq.extendType(declEnv, declEnv.extend(env));
+        nnames = seq.extendName(nnames, nnames.extend(env));
+
+        Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(
+                nnames.extend(declEnv)
+        );
+
+        return buildClassType(nnames.extend(declEnv), objTee, varType);
+    }
+
+    private Type buildClassType(Environment env, Environment objTee, ClassBinding varTypeBinding) {
+        return new ClassType(
+            new Reference<>(env),
+            new Reference<>(objTee),
+            new LinkedList<>(),
+            varTypeBinding.getClassDecl().getTaggedInfo(),
+            varTypeBinding.getClassDecl().getName()
+        );
+    }
+
+    // compute tag info
+    private TaggedInfo infoFromExpected(Optional<Type> expected) {
+        TaggedInfo tagInfo = null;
+        if (expected.isPresent()) {
+            Type t = expected.get();
+            if (t instanceof RecordType) {
+                tagInfo = ((RecordType)t).getTaggedInfo();
+            }
+        }
+        return tagInfo;
+    }
+
+    private Environment buildDeclEnv(
+            Environment env, Environment innerEnv, Optional<Type> expected) {
+        TaggedInfo tagInfo = infoFromExpected(expected);
+        return env.extend(
+            new NameBindingImpl(
+                this.self(), 
+                new ClassType(
+                    new Reference<>(innerEnv), 
+                    new Reference<>(innerEnv), 
+                    new LinkedList<>(), 
+                    tagInfo, null
+                )
+            )
+        );
+    }
+
+    private Environment buildInnerDeclEnv(
+            Environment declEnv,
+            Environment savedInner) {
+        return StreamSupport.stream(
+            this.seq.getDeclIterator().spliterator(),
+            false
+        ).reduce(
+            declEnv, 
+            (oenv,decl) -> (decl instanceof ClassDeclaration)
+                    ? decl.extend(oenv, savedInner)
+                    : oenv,(a,b) -> a.extend(b)
+        );
+    }
+
+    private void typecheckInnerDecl(Environment innerDeclEnv) {
+        this.seq.getDeclIterator().forEach(
+            decl -> decl.typecheck(
+                innerDeclEnv, Optional.<Type>empty()
+            )
+        );
+    }
+
+    private Type typecheckStandaloneMethod(
+            Environment env,
+            Optional<Type> expected,
+            ClassBinding clsBind) {
+
+        ClassBinding classVarTypeBinding = clsBind;
+        this.isGeneric = true;
+        Environment innerEnv = seq.extendType(Environment.getEmptyEnvironment(), env);
+        Environment savedInner = env.extend(innerEnv);
+        innerEnv = seq.extendName(innerEnv, savedInner);
+
+        final Environment declEnv  = buildDeclEnv(env, innerEnv, expected);
+        final Environment ideclEnv = buildInnerDeclEnv(declEnv, savedInner);
+        final Environment mockEnv  = Environment.getEmptyEnvironment();
+        typecheckInnerDecl(ideclEnv);
+
+        Environment nnames = seq.extendType(mockEnv, mockEnv.extend(env));
+        nnames = seq.extendName(nnames, mockEnv.extend(env));
+        ClassDeclaration classDeclaration = simpleClassDeclaration();
+
+        this.cls = classDeclaration;
+        this.ct = classTypeFromNames(nnames, expected);
+        return this.ct;
+    }
+
+    private ClassDeclaration simpleClassDeclaration() {
+        return new ClassDeclaration(
+            "generic" + this.genericNum++,
+            "",
+            "",
+            new DeclSequence(new LinkedList<Declaration>()),
+            Environment.getEmptyEnvironment(),
+            new LinkedList<String>(), 
+            getLocation()
+        );
+    }
+
+    private ClassType classTypeFromNames(Environment nnames, Optional<Type> expected) {
+        Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(
+            nnames.extend(Environment.getEmptyEnvironment())
+        );
+
+        return new ClassType(
+            new Reference<>(
+                nnames.extend(Environment.getEmptyEnvironment())
+            ),
+            new Reference<>(tee),
+            new LinkedList<String>(),
+            infoFromExpected(expected),
+            null
+        );
+    }
+
     @Override
     protected Type doTypecheck(Environment env, Optional<Type> expected) {
         // TODO check arg types
         // Type argTypes = args.typecheck();
 
-        ClassBinding classVarTypeBinding = (ClassBinding) env.lookupBinding(
-            "class", ClassBinding.class
-        ).orElse(null);
+        ClassBinding classVarTypeBinding = fetchClassBinding(env);
 
+        Type result = null;
 
-        if (classVarTypeBinding != null) { //In a class method
-            Environment declEnv = classVarTypeBinding.getClassDecl()
-                .getInstanceMembersEnv();
-
-            Environment innerEnv = seq.extendName(Environment.getEmptyEnvironment(), env)
-                .extend(declEnv);
-
-            innerEnv = env.extend(new NameBindingImpl(this.self(),
-                        new ClassType(
-                            new Reference<>(innerEnv),
-                            new Reference<>(innerEnv),
-                            new LinkedList<>(),
-                            classVarTypeBinding.getClassDecl().getTaggedInfo(),
-                            classVarTypeBinding.getClassDecl().getName()
-            )));
-
-            seq.typecheck(innerEnv, Optional.empty());
-
-
-            Environment environment = seq.extendType(declEnv, declEnv.extend(env));
-            environment = seq.extendName(environment, environment.extend(env));
-            Environment nnames = environment;//seq.extend(environment, environment);
-
-            Environment objTee = TypeDeclUtils.getTypeEquivalentEnvironment(
-                    nnames.extend(declEnv)
-            );
-            Type classVarType = new ClassType(
-                    new Reference<>(nnames.extend(declEnv)), 
-                    new Reference<>(objTee), 
-                    new LinkedList<>(),
-                    classVarTypeBinding.getClassDecl().getTaggedInfo(), 
-                    classVarTypeBinding.getClassDecl().getName()
-            );
-            if (!(classVarType instanceof ClassType)) {
-                ToolError.reportError(
-                        ErrorMessage.MUST_BE_LITERAL_CLASS, 
-                        this, 
-                        classVarType.toString()
-                );
-            }
-
-            // TODO SMELL: do I really need to store this?  Can get it any time from the type
-            cls = classVarTypeBinding.getClassDecl();
-            ct = classVarType;
-
-            return classVarType;
+        if (classVarTypeBinding != null) { // In a class method
+            result = typecheckClassMethod(env, expected, classVarTypeBinding);
         } else { // Standalone
-
-            isGeneric = true;
-            Environment innerEnv = seq.extendType(Environment.getEmptyEnvironment(), env);
-            Environment savedInner = env.extend(innerEnv);
-            innerEnv = seq.extendName(innerEnv, savedInner);
-
-            // compute tag info
-            TaggedInfo tagInfo = null;
-            if (expected.isPresent()) {
-                Type t = expected.get();
-                if (t instanceof RecordType) {
-                    tagInfo = ((RecordType)t).getTaggedInfo();
-                }
-            }
-            
-            Environment declEnv = env.extend(
-                new NameBindingImpl(
-                    this.self(), 
-                    new ClassType(
-                        new Reference<>(innerEnv), 
-                        new Reference<>(innerEnv), 
-                        new LinkedList<>(), 
-                        tagInfo, null
-                    )
-                )
-            );
-            final Environment ideclEnv = StreamSupport.stream(
-                seq.getDeclIterator().spliterator(), 
-                false
-            ).reduce(
-                declEnv, 
-                (oenv,decl) -> (decl instanceof ClassDeclaration)
-                        ? decl.extend(oenv, savedInner)
-                        : oenv,(a,b) -> a.extend(b)
-            );
-            seq.getDeclIterator().forEach(
-                decl -> decl.typecheck(
-                    ideclEnv, Optional.<Type>empty()
-                )
-            );
-
-            Environment mockEnv = Environment.getEmptyEnvironment();
-
-            LinkedList<Declaration> decls = new LinkedList<>();
-
-            Environment nnames = (seq.extendType(mockEnv, mockEnv.extend(env)));
-            nnames = (seq.extendName(nnames,mockEnv.extend(env)));
-            //nnames = seq.extend(nnames, mockEnv.extend(env));
-
-            ClassDeclaration classDeclaration = new ClassDeclaration(
-                "generic" + generic_num++,
-                "",
-                "",
-                new DeclSequence(decls), 
-                mockEnv, 
-                new LinkedList<String>(), 
-                getLocation()
-            );
-            cls = classDeclaration;
-            Environment tee = TypeDeclUtils.getTypeEquivalentEnvironment(
-                    nnames.extend(mockEnv)
-            );
-
-            ct = new ClassType(
-                    new Reference<>(
-                        nnames.extend(mockEnv)
-                    ), 
-                    new Reference<>(tee), 
-                    new LinkedList<String>(), 
-                    tagInfo, 
-                    null
-            );
-            return ct;
+            result = typecheckStandaloneMethod(env, expected, classVarTypeBinding);
         }
+        return result;
     }
 
     private EvaluationEnvironment getGenericDecls(
@@ -296,7 +358,7 @@ public class New extends CachingTypedAST implements CoreAST {
             Environment mockEnv = Environment.getEmptyEnvironment();
 
             classDecl = new ClassDeclaration(
-                    "generic" + generic_num++,
+                    "generic" + genericNum++,
                     "",
                     "",
                     new DeclSequence(),
