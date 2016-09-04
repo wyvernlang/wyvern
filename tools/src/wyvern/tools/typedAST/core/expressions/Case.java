@@ -11,106 +11,111 @@ import wyvern.tools.types.UnresolvedType;
 
 public class Case {
 
-	public void resolve(Environment env, Match m) {
-		if (taggedType instanceof UnresolvedType) {
-			String name = ((UnresolvedType) taggedType).getName();
-			if (env.lookup(name) == null && env.lookupType(name) == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, m, name);
-			}
+    private TypedAST ast;
+    private Type taggedType;
+    // may be null if we are not binding a name
+    private NameBinding binding;
+    //TODO refactor this class into two classes for each type?
+    private CaseType caseType;
 
-			this.taggedType = ((UnresolvedType) taggedType).resolve(env);
-		}
-	}
+    /**
+     * Instantiates a new Case statement, which matches over the given tagged type name,
+     * binding a variable and executing the given AST.
+     *
+     * @param name the name of the case type
+     * @param taggedType the type of the case instance
+     * @param ast the body of the expression to be executed
+     */
+    public Case(String name, Type taggedType, TypedAST ast) {
+        this(taggedType, ast);
+        this.binding = new NameBindingImpl(name, taggedType);
+    }
 
-	private Type taggedType;
+    /**
+     * Instantiates a new Case statement, which matches over the given tagged type name,
+     * executing the given AST.
+     *
+     * @param taggedType the type of the case instance
+     * @param ast the body of the expression to be executed
+     */
+    public Case(Type taggedType, TypedAST ast) {
+        this.taggedType = taggedType;
+        this.ast = ast;
+        this.caseType = CaseType.TYPED;
+    }
 
-	private TypedAST ast;
-	
-	/** may be null if we are not binding a name */
-	private NameBinding binding;
+    /**
+     * Instantiates a new default Case statement, which is executed if no others match.
+     *
+     * @param ast the body of the expression to be executed
+     */
+    public Case(TypedAST ast) {
+        this.ast = ast;
+        this.caseType = CaseType.DEFAULT;
+    }
 
-	public String toString() {
-		if (taggedType != null)
-			return "Case " + taggedType.toString() + " with expression: " + ast;
-		else
-			return "Case with null taggedType and ast = " + ast;
-	}
 
-	//TODO refactor this class into two classes for each type?
-	private CaseType caseType;
+    /**
+      * resolve converts this case expression to the corresponding tagged type and resolves that
+      *
+      * @param env the Environment in which to resolve the case.
+      * @param m the Match to resolve against.
+      */
+    public void resolve(Environment env, Match m) {
+        if (taggedType instanceof UnresolvedType) {
+            String name = ((UnresolvedType) taggedType).getName();
+            if (env.lookup(name) == null && env.lookupType(name) == null) {
+                ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, m, name);
+            }
 
-	/**
-	 * Instantiates a new Case statement, which matches over the given tagged type name,
-	 * binding a variable and executing the given AST.
-	 *
-	 * @param caseType
-	 * @param decls
-	 */
-	public Case(String name, Type taggedType, TypedAST ast) {
-		this.taggedType = taggedType;
-		this.ast = ast;
-		this.binding = new NameBindingImpl(name, taggedType);
+            this.taggedType = ((UnresolvedType) taggedType).resolve(env);
+        }
+    }
 
-		caseType = CaseType.TYPED;
-	}
+    /**
+      * toString generates a String representation of this Case, and embeds the tag as well.
+      */
+    public String toString() {
+        if (taggedType != null) {
+            return "Case " + taggedType.toString() + " with expression: " + ast;
+        } else {
+            return "Case with null taggedType and ast = " + ast;
+        }
+    }
 
-	/**
-	 * Instantiates a new Case statement, which matches over the given tagged type name,
-	 * executing the given AST.
-	 *
-	 * @param caseType
-	 * @param decls
-	 */
-	public Case(Type taggedType, TypedAST ast) {
-		this.taggedType = taggedType;
-		this.ast = ast;
 
-		caseType = CaseType.TYPED;
-	}
+    public Type getTaggedTypeMatch() {
+        return taggedType;
+    }
 
-	/**
-	 * Instantiates a new default Case statement, which is executed if no others match.
-	 *
-	 * @param decls
-	 */
-	public Case(TypedAST ast) {
-		this.ast = ast;
+    public TypedAST getAST() {
+        return ast;
+    }
 
-		caseType = CaseType.DEFAULT;
-	}
+    public CaseType getCaseType() {
+        return caseType;
+    }
 
-	public Type getTaggedTypeMatch() {
-		return taggedType;
-	}
+    //TODO: remove this helper function?
+    public boolean isDefault() {
+        return caseType == CaseType.DEFAULT;
+    }
 
-	public TypedAST getAST() {
-		return ast;
-	}
+    //TODO: remove this helper function?
+    public boolean isTyped() {
+        return caseType == CaseType.TYPED;
+    }
 
-	public CaseType getCaseType() {
-		return caseType;
-	}
-
-	//TODO: remove this helper function?
-	public boolean isDefault() {
-		return caseType == CaseType.DEFAULT;
-	}
-
-	//TODO: remove this helper function?
-	public boolean isTyped() {
-		return caseType == CaseType.TYPED;
-	}
-
-	/**
-	 * The different types a case can be.
-	 *
-	 * @author troy
-	 *
-	 */
-	public enum CaseType {
-		/** If the user specifies no type to match against. */
-		DEFAULT,
-		/** If the user specifies a type to match against. */
-		TYPED
-	}
+    /**
+     * The different types a case can be.
+     *
+     * @author troy
+     *
+     */
+    public enum CaseType {
+        /** If the user specifies no type to match against. */
+        DEFAULT,
+        /** If the user specifies a type to match against. */
+        TYPED
+    }
 }

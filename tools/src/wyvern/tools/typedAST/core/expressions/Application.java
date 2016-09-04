@@ -152,7 +152,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             );
         }
 
-        List<Argument> args = ((Invocation) function).getArgument();
+        TypedAST args = ((Invocation) function).getArgument();
         if (function instanceof Invocation && args == null) { // straight MethodCall
             writer.write(
                 new MethodCall(

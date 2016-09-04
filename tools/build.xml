@@ -112,7 +112,8 @@
                 includes="wyvern/tools/typedAST/core/expressions/New.java
                 wyvern/tools/typedAST/core/expressions/Variable.java
                 wyvern/tools/typedAST/core/expressions/Application.java
-                wyvern/tools/typedAST/core/expressions/Assignment.java"
+                wyvern/tools/typedAST/core/expressions/Assignment.java
+                wyvern/tools/typedAST/core/expressions/Case.java"
             />
         </checkstyle>
     </target>
