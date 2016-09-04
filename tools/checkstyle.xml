@@ -66,6 +66,7 @@
     <module name="ModifierOrder"/>
     <module name="EmptyLineSeparator">
         <property name="allowNoEmptyLineBetweenFields" value="true"/>
+        <property name="tokens" value="PACKAGE_DEF, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, INSTANCE_INIT, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
     </module>
     <module name="SeparatorWrap">
         <property name="tokens" value="DOT"/>
@@ -83,11 +84,6 @@
         <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
         <message key="name.invalidPattern"
          value="Member name ''{0}'' must match pattern ''{1}''."/>
-    </module>
-    <module name="CatchParameterName">
-        <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
-        <message key="name.invalidPattern"
-         value="Catch parameter name ''{0}'' must match pattern ''{1}''."/>
     </module>
     <module name="LocalVariableName">
         <property name="tokens" value="VARIABLE_DEF"/>
@@ -128,7 +124,6 @@
     <module name="DeclarationOrder" />
     <module name="VariableDeclarationUsageDistance"/>
     <module name="CustomImportOrder">
-        <property name="specialImportsRegExp" value="com.google"/>
         <property name="sortImportsInGroupAlphabetically" value="true"/>
     </module>
     <module name="MethodParamPad"/>
@@ -175,5 +170,10 @@
     </module>
     <module name="CommentsIndentation"/>
     <module name="InnerTypeLast"/>
+    <module name="BooleanExpressionComplexity" />
+    <module name="CyclomaticComplexity">
+        <property name="max" value="15" />
+    </module>
+    <module name="ArrayTrailingComma"/>
     </module>
 </module>
