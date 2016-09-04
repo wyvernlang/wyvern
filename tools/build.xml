@@ -115,7 +115,8 @@
                 wyvern/tools/typedAST/core/expressions/Assignment.java
                 wyvern/tools/typedAST/core/expressions/Case.java
                 wyvern/tools/typedAST/core/expressions/Fn.java
-                wyvern/tools/typedAST/core/expressions/IfExpr.java"
+                wyvern/tools/typedAST/core/expressions/IfExpr.java
+                wyvern/tools/typedAST/core/expressions/Instantiation.java"
             />
         </checkstyle>
     </target>
