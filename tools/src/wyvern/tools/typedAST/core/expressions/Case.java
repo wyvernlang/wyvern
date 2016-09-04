@@ -13,8 +13,7 @@ public class Case {
 
     private TypedAST ast;
     private Type taggedType;
-    // may be null if we are not binding a name
-    private NameBinding binding;
+    private NameBinding binding; // may be null if we are not binding a name
     //TODO refactor this class into two classes for each type?
     private CaseType caseType;
 
@@ -54,7 +53,6 @@ public class Case {
         this.caseType = CaseType.DEFAULT;
     }
 
-
     /**
       * resolve converts this case expression to the corresponding tagged type and resolves that
       *
@@ -83,7 +81,6 @@ public class Case {
         }
     }
 
-
     public Type getTaggedTypeMatch() {
         return taggedType;
     }
@@ -96,12 +93,10 @@ public class Case {
         return caseType;
     }
 
-    //TODO: remove this helper function?
     public boolean isDefault() {
         return caseType == CaseType.DEFAULT;
     }
 
-    //TODO: remove this helper function?
     public boolean isTyped() {
         return caseType == CaseType.TYPED;
     }
@@ -110,12 +105,11 @@ public class Case {
      * The different types a case can be.
      *
      * @author troy
-     *
      */
     public enum CaseType {
-        /** If the user specifies no type to match against. */
+        // If the user specifies no type to match against.
         DEFAULT,
-        /** If the user specifies a type to match against. */
+        // If the user specifies a type to match against.
         TYPED
     }
 }

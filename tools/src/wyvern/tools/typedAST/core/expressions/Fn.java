@@ -46,100 +46,139 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
-	private List<NameBinding> bindings;
-	ExpressionAST body;
+    private List<NameBinding> bindings;
+    private ExpressionAST body;
+    private FileLocation location = FileLocation.UNKNOWN;
 
-	@Deprecated
-	public Fn(List<NameBinding> bindings, TypedAST body) {
-		this(bindings, body, FileLocation.UNKNOWN);
-	}
-	
-	public Fn(List<NameBinding> bindings, TypedAST body, FileLocation loc) {
-		this.bindings = bindings;
-		this.body = (ExpressionAST) body;
-		this.location = loc;
-	}
+    @Deprecated
+    public Fn(List<NameBinding> bindings, TypedAST body) {
+        this(bindings, body, FileLocation.UNKNOWN);
+    }
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(bindings, body);
-	}
+    /**
+      * Creates a new function with the argument bindings and the AST node pointing to the body.
+      *
+      * @param bindings The arguments to the function call
+      * @param body the body of the function
+      * @param loc the location in the source code where this function is defined.
+      */
+    public Fn(List<NameBinding> bindings, TypedAST body, FileLocation loc) {
+        this.bindings = bindings;
+        this.body = (ExpressionAST) body;
+        this.location = loc;
+    }
 
-	@Override
-	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		Type argType = null;
-		for (int i = 0; i < bindings.size(); i++) {
-			NameBinding bdgs = bindings.get(i);
-			bindings.set(i, new NameBindingImpl(bdgs.getName(), TypeResolver.resolve(bdgs.getType(), env)));
-		}
+    @Override
+    public void writeArgsToTree(TreeWriter writer) {
+        writer.writeArgs(bindings, body);
+    }
 
-		if (bindings.size() == 0)
-			argType = new Unit();
-		else if (bindings.size() == 1)
-			argType = bindings.get(0).getType();
-		else
-			// TODO: implement multiple args
-			throw new RuntimeException("tuple args not implemented");
-		
-		Environment extEnv = env;
-		for (NameBinding bind : bindings) {
-			extEnv = extEnv.extend(bind);
-		}
+    @Override
+    protected Type doTypecheck(Environment env, Optional<Type> expected) {
+        Type argType = null;
+        for (int i = 0; i < bindings.size(); i++) {
+            NameBinding bdgs = bindings.get(i);
+            bindings.set(
+                    i,
+                    new NameBindingImpl(
+                        bdgs.getName(),
+                        TypeResolver.resolve(bdgs.getType(), env)
+                    )
+            );
+        }
 
-		Type resultType = body.typecheck(extEnv, expected.map(exp -> ((Arrow)exp).getResult()));
-		return new Arrow(argType, resultType);
-	}
+        if (bindings.size() == 0) {
+            argType = new Unit();
+        } else if (bindings.size() == 1) {
+            argType = bindings.get(0).getType();
+        } else {
+            // TODO: implement multiple args
+            throw new RuntimeException("tuple args not implemented");
+        }
 
-	@Override
-	public Value evaluate(EvaluationEnvironment env) {
-		return new Closure(this, env);
-	}
+        Environment extEnv = env;
+        for (NameBinding bind : bindings) {
+            extEnv = extEnv.extend(bind);
+        }
 
-	@Override
-	public List<NameBinding> getArgBindings() {
-		return bindings;
-	}
+        Type resultType = body.typecheck(extEnv, expected.map(exp -> ((Arrow)exp).getResult()));
+        return new Arrow(argType, resultType);
+    }
 
-	@Override
-	public TypedAST getBody() {
-		return body;
-	}
+    @Override
+    public Value evaluate(EvaluationEnvironment env) {
+        return new Closure(this, env);
+    }
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public List<NameBinding> getArgBindings() {
+        return bindings;
+    }
 
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Hashtable<String, TypedAST> children = new Hashtable<>();
-		children.put("body", body);
-		return children;
-	}
+    @Override
+    public TypedAST getBody() {
+        return body;
+    }
 
-	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		writer.write(new New(Arrays.asList(new DefDeclaration("call",
-				bindings.stream().map(b->new FormalArg(b.getName(), (ValueType)b.getType().generateILType())).collect(Collectors.toList()),
-                (ValueType)getType().generateILType(), ExpressionWriter.generate(iwriter->body.codegenToIL(new GenerationEnvironment(environment), iwriter)), getLocation())), null, null, getLocation()));
-	}
+    @Override
+    public void accept(CoreASTVisitor visitor) {
+        visitor.visit(this);
+    }
 
-	@Override
-	public ExpressionAST doClone(Map<String, TypedAST> nc) {
-		return new Fn(bindings, nc.get("body"), this.location);
-	}
+    @Override
+    public Map<String, TypedAST> getChildren() {
+        Hashtable<String, TypedAST> children = new Hashtable<>();
+        children.put("body", body);
+        return children;
+    }
 
-	private FileLocation location = FileLocation.UNKNOWN;
-	public FileLocation getLocation() {
-		return this.location;
-	}
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        writer.write(
+            new New(
+                Arrays.asList(
+                    new DefDeclaration("call",
+                        bindings.stream().map(
+                            b -> new FormalArg(
+                                b.getName(),
+                                (ValueType) b.getType().generateILType()
+                            )
+                        ).collect(Collectors.toList()),
+                        (ValueType) getType().generateILType(),
+                        ExpressionWriter.generate(
+                            iwriter -> body.codegenToIL(
+                                new GenerationEnvironment(environment),
+                                iwriter
+                            )
+                        ),
+                        getLocation()
+                    )
+                ),
+                null,
+                null,
+                getLocation()
+            )
+        );
+    }
 
-	@Override
+    @Override
+    public ExpressionAST doClone(Map<String, TypedAST> nc) {
+        return new Fn(bindings, nc.get("body"), this.location);
+    }
+
+    public FileLocation getLocation() {
+        return this.location;
+    }
+
+    @Override
     /**
      * @param GenContext The type context of the lambda declaration
      * @return The Intermediate Representation of the inline function decl
      */
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+    public Expression generateIL(
+            GenContext ctx,
+            ValueType expectedType,
+            List<TypedModuleSpec> dependencies) {
         /*
          * First, map the NameBindings to Formal Arguments, dropping the parameters into the IR.
          * Next, find the type of the body. The type of the body is the return type of the function.
@@ -149,20 +188,29 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
          * Use the StructualType and the DefDeclaration to make a New. Return.
          */
 
-		// Convert the bindings into formals
-        List<FormalArg> intermediateArgs = convertBindingToArgs(this.bindings, ctx, expectedType);
-		
+        // Convert the bindings into formals
+        List<FormalArg> intermediateArgs = convertBindingToArgs(
+            this.bindings,
+            ctx,
+            expectedType
+        );
+
         // Extend the generalContext to include the parameters passed into the function.
         ctx = extendCtxWithParams(ctx, intermediateArgs);
-
-        
 
         // Generate the IL for the body, and get it's return type.
         Expression il = this.body.generateIL(ctx, null, dependencies);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
-        // Create a new list of function declaration, which is a singleton, containing only Util.APPLY_NAME
-        DefDeclaration applyDef = new DefDeclaration(Util.APPLY_NAME, intermediateArgs, bodyReturnType, il, getLocation());
+        // Create a new list of function declaration,
+        // which is a singleton, containing only Util.APPLY_NAME
+        DefDeclaration applyDef = new DefDeclaration(
+            Util.APPLY_NAME,
+            intermediateArgs,
+            bodyReturnType,
+            il,
+            getLocation()
+        );
         List<Declaration> declList = new LinkedList<>();
         declList.add(applyDef);
 
@@ -173,72 +221,85 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
 
         // set up containsResources() properly by typechecking applyDef
         applyDef.typeCheck(ctx, ctx);
-        ValueType newType = new StructuralType("@lambda-structual-decl", declTypes, applyDef.containsResource(ctx));
+        ValueType newType = new StructuralType(
+            "@lambda-structual-decl",
+            declTypes,
+            applyDef.containsResource(ctx)
+        );
 
         return new New(declList, "@lambda-decl", newType, getLocation());
-	}
-	
-	public  void genTopLevel(TopLevelContext topLevelContext, ValueType expectedType) {
-		final Expression exp = generateIL(topLevelContext.getContext(), expectedType, null);
-		topLevelContext.addExpression(exp, expectedType);
-	}
+    }
 
-    private List<FormalArg> convertBindingToArgs(List<NameBinding> bindings, GenContext ctx, ValueType declType) {
+    public  void genTopLevel(TopLevelContext topLevelContext, ValueType expectedType) {
+        final Expression exp = generateIL(topLevelContext.getContext(), expectedType, null);
+        topLevelContext.addExpression(exp, expectedType);
+    }
 
-    	List<FormalArg> expectedFormals = declType == null?null:getExpectedFormls(ctx, declType);
-    	
+    private List<FormalArg> convertBindingToArgs(
+            List<NameBinding> bindings,
+            GenContext ctx,
+            ValueType declType) {
+
+        List<FormalArg> expectedFormals =
+            declType == null ? null : getExpectedFormls(ctx, declType);
+
         List<FormalArg> result = new LinkedList<FormalArg>();
 
         if (expectedFormals != null && expectedFormals.size() != bindings.size()) {
-			final int expectedSize = expectedFormals.size();
-			if (expectedSize == 0)			
-				ToolError.reportError(ErrorMessage.SYNTAX_FOR_NO_ARG_LAMBDA, this);
-			else
-				ToolError.reportError(ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS, this, Integer.toString(expectedSize));
-		}
+            final int expectedSize = expectedFormals.size();
+            if (expectedSize == 0) {
+                ToolError.reportError(ErrorMessage.SYNTAX_FOR_NO_ARG_LAMBDA, this);
+            } else {
+                ToolError.reportError(
+                    ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
+                    this,
+                    Integer.toString(expectedSize)
+                );
+            }
+        }
         
         for (int i = 0; i < bindings.size(); i++) {
-        	NameBinding binding = bindings.get(i);
-        	
-        	ValueType argType = null;        	
-        	if (binding.getType() != null) {
-				argType = binding.getType().getILType(ctx);
-			}
-        	else {
-        		if (expectedFormals == null)
-        			ToolError.reportError(ErrorMessage.CANNOT_INFER_ARG_TYPE, this);
-				argType = expectedFormals.get(i).getType();
-			}
-        	
-        	result.add( new FormalArg(
+            NameBinding binding = bindings.get(i);
+            ValueType argType = null;
+
+            if (binding.getType() != null) {
+                argType = binding.getType().getILType(ctx);
+            } else {
+                if (expectedFormals == null) {
+                    ToolError.reportError(ErrorMessage.CANNOT_INFER_ARG_TYPE, this);
+                }
+                argType = expectedFormals.get(i).getType();
+            }
+
+            result.add( new FormalArg(
                     binding.getName(),
                     argType
-                ));
-		}
+                )
+            );
+        }
         
         
 
         return result;
     }
 
-	private static List<FormalArg> getExpectedFormls(GenContext ctx, ValueType declType) {
-		StructuralType declStructuralType = declType.getStructuralType(ctx);
-    	
-    	
-    	DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
-    	
-    	if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
-			//TODO: will replace with ToolError in the future
-    		throw new RuntimeException("the declType is not a lambda type(it has no apply method)");
-		}
-    	
-    	DefDeclType applyDef = (DefDeclType) applyDecl;
-    	
-    	return applyDef.getFormalArgs();
-	}
+    private static List<FormalArg> getExpectedFormls(GenContext ctx, ValueType declType) {
+        StructuralType declStructuralType = declType.getStructuralType(ctx);
+
+        DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
+
+        if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
+            //TODO: will replace with ToolError in the future
+            throw new RuntimeException("the declType is not a lambda type(it has no apply method)");
+        }
+
+        DefDeclType applyDef = (DefDeclType) applyDecl;
+
+        return applyDef.getFormalArgs();
+    }
 
     private static GenContext extendCtxWithParams(GenContext ctx, List<FormalArg> formalArgs) {
-        for(FormalArg binding : formalArgs) {
+        for (FormalArg binding : formalArgs) {
             ctx = ctx.extend(
                 binding.getName(),
                 new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
