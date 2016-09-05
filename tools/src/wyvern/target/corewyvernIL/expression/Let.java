@@ -37,7 +37,7 @@ public class Let extends Expression {
         return binding.getType();
     }
 
-	public Expression getToReplace() {
+	public IExpr getToReplace() {
 		return binding.getExpression();
 	}
 

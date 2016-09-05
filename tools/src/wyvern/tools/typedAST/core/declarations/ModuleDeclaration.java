@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -242,7 +243,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param ctx the context
 	 * @return the IL expression
 	 */
-	private Expression innerTranslate(Sequence normalSeq, GenContext ctx) {
+	private IExpr innerTranslate(Sequence normalSeq, GenContext ctx) {
 		/* Sequence.innerTranslate */
 		return normalSeq.generateModuleIL(ctx, true);
 	}
@@ -256,7 +257,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param ctx the context
 	 * @return new IL expression
 	 */
-	private Expression wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
+	private IExpr wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
 		Iterator<TypedAST> ai = impInstSeq.iterator();
 		return wrapLetWithIterator(ai, normalSeq, ctx, dependencies);
 	}
@@ -272,7 +273,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param ctx the context
 	 * @return the whole expression
 	 */
-	private Expression wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
+	private IExpr wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
 		if(!ai.hasNext()) {
 			return innerTranslate(normalSeq, ctx);
 		}
@@ -285,7 +286,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			
 			Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(ctx, dependencies);
 			
-			Expression e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second, dependencies);
+			IExpr e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second, dependencies);
 			final Let letBinding = new Let(bindingAndCtx.first, e);
 			
 			//ValueType t = letBinding.typeCheck(ctx); // sanity check - catch errors early
@@ -296,7 +297,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			Instantiation inst = (Instantiation) ast;
 			// generate arguments
 			TypedAST argument = inst.getArgs();
-			List<Expression> args = new LinkedList<Expression>();
+			List<IExpr> args = new LinkedList<IExpr>();
 		    if (argument instanceof TupleObject) {
 		    	for (ExpressionAST arg : ((TupleObject) argument).getObjects()) {
 		    		args.add(arg.generateIL(ctx, null, dependencies));
@@ -316,7 +317,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			final ValueType type = instValue.typeCheck(ctx);
 			GenContext newContext = ctx.extend(inst.getName(), instValue, type);
 
-			Expression e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
+			IExpr e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
 			return new Let(inst.getName(), type, instValue, e);
 		}
 	}
@@ -404,7 +405,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
 	    /* importing modules and instantiations are translated into let sentence */
-		wyvern.target.corewyvernIL.expression.Expression body = wrapLet(impInstSeq, normalSeq, methodContext, dependencies);
+		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(impInstSeq, normalSeq, methodContext, dependencies);
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(methodContext, dependencies);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
 

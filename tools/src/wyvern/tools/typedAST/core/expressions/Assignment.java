@@ -168,51 +168,54 @@ public class Assignment extends CachingTypedAST implements CoreAST {
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
-
+        
         // Figure out expression being assigned.
-        Expression exprToAssign = value.generateIL(ctx, expectedType, dependencies);
-        ValueType exprType = exprToAssign.getExprType();
-
+        IExpr exprToAssign = value.generateIL(ctx, expectedType, dependencies);
+        ValueType exprType = exprToAssign.typeCheck(ctx);
+        
         // Figure out receiver and field.
         CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
-        Expression exprFieldGet = cegReceiver.genExpr();
-
+        IExpr exprFieldGet = cegReceiver.genExpr();
+        
         // TODO: is this robust?
         // TODO: is this an exhaustive case analysis?
-
+        
         // Assigning to a top-level var.
         if (exprFieldGet instanceof MethodCall) {
-
+            
             // Figure out the var being assigned and get the name of its setter.
             MethodCall methCall = (MethodCall) exprFieldGet;
             String methName     = methCall.getMethodName();
             String varName      = VarDeclaration.getterToVarName(methName);
             String setterName   = VarDeclaration.varNameToSetter(varName);
-
+            
             // Return an invocation to the setter w/ appropriate argmuents supplied.
-            Expression receiver         = methCall.getObjectExpr();
-            List<Expression> setterArgs = new LinkedList<>();
+            IExpr receiver = methCall.getObjectExpr();
+            List<IExpr> setterArgs = new LinkedList<>();
             setterArgs.add(exprToAssign);
             return new MethodCall(receiver, setterName, setterArgs, this);
-
+            
+        }
+        
         // Assigning to an object's field.
-        } else if (exprFieldGet instanceof FieldGet) {
+        else if (exprFieldGet instanceof FieldGet) {
 
             // Return a FieldSet to the appropriate field.
             FieldGet fieldGet = (FieldGet) exprFieldGet;
             String fieldName = fieldGet.getName();
             IExpr objExpr = fieldGet.getObjectExpr();
-            return new FieldSet(exprType, objExpr, fieldName, exprToAssign);
-        } else {
-            // Unknown what's going on.
+            return new wyvern.target.corewyvernIL.expression.FieldSet(
+                exprType,
+                objExpr,
+                fieldName,
+                exprToAssign);
+        }
+        
+        // Unknown what's going on.
+        else {
             ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
             return null; // dead code
         }
-    }
-
-    @Override
-    public void genTopLevel(TopLevelContext tlc) {
-        Expression expr = generateIL(tlc.getContext(), null, null);
-        tlc.addExpression(expr, Util.unitType());
+        
     }
 }

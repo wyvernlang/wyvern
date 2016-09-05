@@ -26,6 +26,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Match;
@@ -179,13 +180,13 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
 
   public OIRAST visit(TypeContext cxt, OIREnvironment oirenv, MethodCall methodCall) {
     OIRExpression oirbody;
-    Expression body;
+    IExpr body;
     List<OIRExpression> args;
     OIRMethodCall oirMethodCall;
 
     args = new Vector<OIRExpression> ();
 
-    for (Expression e : methodCall.getArgs())
+    for (IExpr e : methodCall.getArgs())
     {
       args.add ((OIRExpression)e.acceptVisitor(this, cxt, oirenv));
     }
@@ -261,8 +262,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     OIRLet oirLet;
     OIRExpression oirToReplace;
     OIRExpression oirInExpr;
-    Expression toReplace;
-    Expression inExpr;
+    IExpr toReplace;
+    IExpr inExpr;
 
     TypeContext extendedCxt =
         cxt.extend(let.getVarName(), let.getVarType());
@@ -283,8 +284,8 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     OIRFieldSet oirFieldSet;
     OIRExpression oirObject;
     OIRExpression oirToSet;
-    Expression object;
-    Expression toSet;
+    IExpr object;
+    IExpr toSet;
 
     object = (Expression) fieldSet.getObjectExpr();
     toSet = fieldSet.getExprToAssign();
@@ -314,7 +315,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     OIRCast oirCast;
     OIRType oirType;
     OIRExpression oirExpr;
-    Expression expr;
+    IExpr expr;
 
     expr = cast.getToCastExpr();
     oirExpr = (OIRExpression)expr.acceptVisitor(this, cxt, oirenv);

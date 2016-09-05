@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
@@ -41,6 +42,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
+
     private String operationName;
     private ExpressionAST receiver;
     private TypedAST argument;
@@ -56,6 +58,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
       */
     public Invocation(TypedAST op1, String operatorName, TypedAST op2, FileLocation fileLocation) {
         this.receiver = (ExpressionAST) op1;
+
         this.argument = op2;
         this.operationName = operatorName;
         this.location = fileLocation;
@@ -195,7 +198,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
     }
 
     @Override
-    public Expression generateIL(
+    public IExpr generateIL(
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
@@ -203,10 +206,10 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         CallableExprGenerator generator = getCallableExpr(ctx);
 
         if (argument != null) {
-            Expression arg  = ((ExpressionAST) argument)
+            IExpr arg  = ((ExpressionAST) argument)
                 .generateIL(ctx, null, dependencies);
 
-            List<Expression> args = new ArrayList<Expression>();
+            List<IExpr> args = new ArrayList<IExpr>();
             args.add(arg);
 
             return generator.genExprWithArgs(args, this);
@@ -225,3 +228,4 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         );
     }
 }
+

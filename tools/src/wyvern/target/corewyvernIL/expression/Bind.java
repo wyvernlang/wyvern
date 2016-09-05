@@ -19,9 +19,9 @@ import wyvern.tools.errors.ErrorMessage;
 
 public class Bind extends Expression {
 	private List<VarBinding> bindings;
-	private Expression inExpr;
+	private IExpr inExpr;
 
-	public Bind(List<VarBinding> bindings, Expression inExpr) {
+	public Bind(List<VarBinding> bindings, IExpr inExpr) {
 		super();
 		this.bindings = bindings;
 		if (inExpr == null) throw new RuntimeException();
@@ -36,8 +36,8 @@ public class Bind extends Expression {
 		return varNames;
 	}
 
-	public List<Expression> getToReplaceExps() {
-		List<Expression> toReplaceExps = new ArrayList<Expression>();
+	public List<? extends IExpr> getToReplaceExps() {
+		List<IExpr> toReplaceExps = new ArrayList<IExpr>();
 		for (VarBinding vb : bindings) {
 			toReplaceExps.add(vb.getExpression());
 		}

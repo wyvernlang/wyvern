@@ -23,20 +23,20 @@ import wyvern.tools.errors.ToolError;
 
 public class MethodCall extends Expression {
 
-	private Expression objectExpr;
+	private IExpr objectExpr;
 	private String methodName;
-	private List<Expression> args;
+	private List<? extends IExpr> args;
 
-	public MethodCall(Expression objectExpr, String methodName,
-			List<Expression> args, HasLocation location) {
+	public MethodCall(IExpr e, String methodName,
+			List<? extends IExpr> args2, HasLocation location) {
 		super(location != null ? location.getLocation():null);
 		//if (getLocation() == null || getLocation().line == -1)
 		//	throw new RuntimeException("missing location");
-		this.objectExpr = objectExpr;
+		this.objectExpr = e;
 		this.methodName = methodName;
-		this.args = args;
+		this.args = args2;
 		// sanity check
-		if (args.size() > 0 && args.get(0) == null)
+		if (args2.size() > 0 && args2.get(0) == null)
 			throw new NullPointerException("invariant: no null args");
 	}
 
@@ -45,7 +45,7 @@ public class MethodCall extends Expression {
 		objectExpr.doPrettyPrint(dest,indent);
 		dest.append('.').append(methodName).append('(');
 		boolean first = true;
-		for (Expression arg : args) {
+		for (IExpr arg : args) {
 			if (first)
 				first = false;
 			else
@@ -55,7 +55,7 @@ public class MethodCall extends Expression {
 		dest.append(')');
 	}
 
-	public Expression getObjectExpr() {
+	public IExpr getObjectExpr() {
 		return objectExpr;
 	}
 
@@ -63,7 +63,7 @@ public class MethodCall extends Expression {
 		return methodName;
 	}
 
-	public List<Expression> getArgs() {
+	public List<? extends IExpr> getArgs() {
 		return args;
 	}
 
@@ -105,7 +105,7 @@ public class MethodCall extends Expression {
 					break;
 				}
 				newCtx = newCtx.extend(name, actualType);
-				Expression e = args.get(i);
+				IExpr e = args.get(i);
 				if (e instanceof Variable) {
 					v = new ViewExtension(new Variable(ddt.getFormalArgs().get(i).getName()), (Variable) e, v);
 				}
@@ -146,7 +146,7 @@ public class MethodCall extends Expression {
 		Invokable receiver = (Invokable)objectExpr.interpret(ctx);
 		List<Value> argValues = new ArrayList<Value>(args.size());
 		for (int i = 0; i < args.size(); ++i) {
-			Expression e = args.get(i);
+			IExpr e = args.get(i);
 			argValues.add(e.interpret(ctx));
 		}
 		return receiver.invoke(methodName, argValues);		
@@ -155,7 +155,7 @@ public class MethodCall extends Expression {
 	@Override
 	public Set<String> getFreeVariables() {
 		Set<String> freeVars = objectExpr.getFreeVariables();
-		for (Expression arg : args) {
+		for (IExpr arg : args) {
 			freeVars.addAll(arg.getFreeVariables());
 		}
 		return freeVars;

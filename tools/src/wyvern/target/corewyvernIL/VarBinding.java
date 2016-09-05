@@ -26,8 +26,8 @@ public class VarBinding extends ASTNode {
 		return type;
 	}
 
-	public Expression getExpression() {
-		return (Expression) expr;
+	public IExpr getExpression() {
+		return expr;
 	}
 	
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {

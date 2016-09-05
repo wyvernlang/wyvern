@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -199,7 +200,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         ctx = extendCtxWithParams(ctx, intermediateArgs);
 
         // Generate the IL for the body, and get it's return type.
-        Expression il = this.body.generateIL(ctx, null, dependencies);
+        IExpr il = this.body.generateIL(ctx, null, dependencies);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
         // Create a new list of function declaration,
