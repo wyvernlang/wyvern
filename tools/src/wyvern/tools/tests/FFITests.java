@@ -18,6 +18,7 @@ import org.junit.experimental.categories.Category;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.oir.OIRAST;
@@ -49,12 +50,12 @@ public class FFITests {
     OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
     GenContext genContext = Globals.getStandardGenContext();
-    Expression ILprogram = ast.generateIL(genContext, null, new LinkedList<TypedModuleSpec>());
+    IExpr ILprogram = ast.generateIL(genContext, null, new LinkedList<TypedModuleSpec>());
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);
       try {
-        System.out.println("IL program:\n" + ILprogram.prettyPrint());
+        System.out.println("IL program:\n" + ((Expression)ILprogram).prettyPrint());
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }

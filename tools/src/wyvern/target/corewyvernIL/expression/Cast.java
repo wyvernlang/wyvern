@@ -7,25 +7,26 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 
 public class Cast extends Expression{
 
-	private Expression toCastExpr;
+	private IExpr toCastExpr;
 
-
-	public Cast(Expression toCastExpr, ValueType exprType) {
+	public Cast(IExpr toCastExpr, ValueType exprType) {
 		super(exprType);
 		this.toCastExpr = toCastExpr;
 	}
 
-	public Expression getToCastExpr() {
+	public IExpr getToCastExpr() {
 		return toCastExpr;
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext env) {
-		// TODO Auto-generated method stub
-		return null;
+	public ValueType typeCheck(TypeContext ctx) {
+		toCastExpr.typeCheck(ctx);
+		return getExprType();
 	}
 
 	@Override
@@ -36,8 +37,12 @@ public class Cast extends Expression{
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		Value value = getToCastExpr().interpret(ctx);
+		ValueType actualType = value.typeCheck(ctx);
+		ValueType goalType = getExprType();
+		if (!actualType.isSubtypeOf(goalType, ctx))
+			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString());
+		return value;
 	}
 
 	@Override

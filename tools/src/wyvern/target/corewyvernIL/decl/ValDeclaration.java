@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -22,8 +23,8 @@ public class ValDeclaration extends DeclarationWithRHS {
 		return "ValDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
 	}*/
 
-	public ValDeclaration(String fieldName, ValueType type, Expression value, FileLocation loc) {
-		super(fieldName, value, loc);
+	public ValDeclaration(String fieldName, ValueType type, IExpr iExpr, FileLocation loc) {
+		super(fieldName, iExpr, loc);
 		this.type = type;
 	}
 

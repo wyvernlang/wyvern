@@ -23,10 +23,10 @@ public class FieldSet extends Expression {
 
 	private IExpr objectExpr;
 	private String fieldName;
-	private Expression exprToAssign;
+	private IExpr exprToAssign;
 
 	public FieldSet(ValueType exprType, IExpr objectExpr,
-			String fieldName, Expression exprToAssign) {
+			String fieldName, IExpr exprToAssign) {
 		super(exprType);
 		this.objectExpr = objectExpr;
 		this.fieldName = fieldName;
@@ -41,7 +41,7 @@ public class FieldSet extends Expression {
 		return fieldName;
 	}
 
-	public Expression getExprToAssign() {
+	public IExpr getExprToAssign() {
 		return exprToAssign;
 	}
 

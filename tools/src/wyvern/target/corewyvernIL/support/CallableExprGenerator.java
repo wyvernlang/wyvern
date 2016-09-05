@@ -4,6 +4,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.tools.errors.HasLocation;
 
 /**
@@ -18,9 +19,9 @@ import wyvern.tools.errors.HasLocation;
  * @author aldrich
  */
 public interface CallableExprGenerator {
-	public Expression genExpr();
+	public IExpr genExpr();
 
-	public Expression genExprWithArgs(List<Expression> args, HasLocation loc);
+	public IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc);
 	
 	/** Returns null if no argument type is expected */
 	public DefDeclType getDeclType(TypeContext ctx);

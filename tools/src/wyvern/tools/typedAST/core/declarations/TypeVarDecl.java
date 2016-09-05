@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -54,7 +55,7 @@ public class TypeVarDecl extends Declaration {
 	private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
     private String activeSelfName;
-    private Expression metadataExp = null;
+    private IExpr metadataExp = null;
 
 	/**
 	 * Helper class to allow easy variation of bound types
@@ -299,7 +300,7 @@ public class TypeVarDecl extends Declaration {
 		return computeInternalDecl(thisContext);
 	}
 	
-	private Expression getMetadata(GenContext ctx) {
+	private IExpr getMetadata(GenContext ctx) {
 		if (metadata.get().isPresent()) {
 			if (metadataExp == null)
 				metadataExp = ((ExpressionAST)metadata.get().get()).generateIL(ctx, null, null);

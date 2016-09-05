@@ -1,6 +1,7 @@
 package wyvern.tools.types;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -38,7 +39,7 @@ public class QualifiedType extends AbstractTypeImpl {
 	}
 
 	private static Path getPath(ExpressionAST ast, GenContext ctx) {
-		Expression exp = ast.generateIL(ctx, null, null);
+		IExpr exp = ast.generateIL(ctx, null, null);
 		return (Path) exp;
 	}
 	

@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -18,18 +19,18 @@ import wyvern.tools.errors.FileLocation;
 
 public class TypeDeclaration extends NamedDeclaration {
 
+	private IExpr metadata;
+	private Type sourceType;
+
 	public TypeDeclaration(String typeName, Type sourceType, FileLocation loc) {
 		this(typeName, sourceType, null, loc);
 	}
-	public TypeDeclaration(String typeName, Type sourceType, Expression metadata, FileLocation loc) {
+	public TypeDeclaration(String typeName, Type sourceType, IExpr metadata, FileLocation loc) {
 		super(typeName, loc);
 		this.sourceType = sourceType;
 		this.metadata = metadata;
 	}
 	
-	private Expression metadata;
-	private Type sourceType;
-
 	public Type getSourceType() {
 		return sourceType;
 	}

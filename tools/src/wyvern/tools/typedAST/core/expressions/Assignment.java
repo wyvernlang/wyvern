@@ -140,12 +140,12 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		
 		// Figure out expression being assigned.
-		Expression exprToAssign = value.generateIL(ctx, expectedType, dependencies);
-		ValueType exprType = exprToAssign.getExprType();
+		IExpr exprToAssign = value.generateIL(ctx, expectedType, dependencies);
+		ValueType exprType = exprToAssign.typeCheck(ctx);
 		
 		// Figure out receiver and field.
 		CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
-		Expression exprFieldGet = cegReceiver.genExpr();
+		IExpr exprFieldGet = cegReceiver.genExpr();
 		
 		// TODO: is this robust?
 		// TODO: is this an exhaustive case analysis?
@@ -160,8 +160,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 			String setterName = wyvern.tools.typedAST.core.declarations.VarDeclaration.varNameToSetter(varName);
 			
 			// Return an invocation to the setter w/ appropriate argmuents supplied.
-			Expression receiver = methCall.getObjectExpr();
-			List<Expression> setterArgs = new LinkedList<>();
+			IExpr receiver = methCall.getObjectExpr();
+			List<IExpr> setterArgs = new LinkedList<>();
 			setterArgs.add(exprToAssign);
 			return new MethodCall(receiver, setterName, setterArgs, this);
 			

@@ -4,6 +4,7 @@ import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -32,7 +33,7 @@ public abstract class GenContext extends TypeContext {
 	 * @param loc		the location to report in an error message, if the name is not found
 	 * @return
 	 */
-	public final Expression lookupExp(String varName, FileLocation loc) {
+	public final IExpr lookupExp(String varName, FileLocation loc) {
 		try {
 			return getCallableExpr(varName).genExpr();
 		} catch (RuntimeException e) {
