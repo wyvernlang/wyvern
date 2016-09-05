@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -22,16 +23,16 @@ import wyvern.tools.errors.ToolError;
 public class DefDeclaration extends NamedDeclaration {
 	private List<FormalArg> formalArgs;
 	private ValueType type;
-	private Expression body;
+	private IExpr body;
 	private boolean hasResource = false;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
-			ValueType type, Expression body, FileLocation loc) {
+			ValueType type, IExpr iExpr, FileLocation loc) {
 		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
-		this.body = body;
+		this.body = iExpr;
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class DefDeclaration extends NamedDeclaration {
 		return type;
 	}
 
-	public Expression getBody() {
+	public IExpr getBody() {
 		return body;
 	}
 

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -133,7 +134,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+	public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		return ctx.lookupExp(getName(), location);
 	}
 	

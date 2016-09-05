@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Stack;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -345,13 +346,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	}
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		/*Iterator<TypedAST> ai = exps.iterator();
-		
-		if (!ai.hasNext())
-			throw new RuntimeException("expected an expression in the list");
-		
-		return GenUtil.doGenIL(ctx, ai);*/
+	public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 	    Sequence seqWithBlocks = combine();		
 		TopLevelContext tlc = new TopLevelContext(ctx);
 		seqWithBlocks.genTopLevel(tlc, expectedType);
@@ -378,19 +373,11 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	 * 			true for the body of a module, false for the body of a script 
 	 * @return the IL expression of a module
 	 */
-	public Expression generateModuleIL(GenContext ctx, boolean isModule) {
+	public IExpr generateModuleIL(GenContext ctx, boolean isModule) {
 		Sequence seqWithBlocks = combine();
-		
 		TopLevelContext tlc = new TopLevelContext(ctx);
 		seqWithBlocks.genTopLevel(tlc);
-		Expression result = isModule?tlc.getModuleExpression():tlc.getExpression();
-		
-		/*Iterator<TypedAST> ai = seqWithBlocks.iterator();
-		
-		if (!ai.hasNext())
-			throw new RuntimeException("expected an expression in the list");
-		
-		Expression decl =  GenUtil.doGenModuleIL(ctx, ctx, ctx, ai, isModule);*/
+		IExpr result = isModule? tlc.getModuleExpression() : tlc.getExpression();
 		return result;
 	}
 

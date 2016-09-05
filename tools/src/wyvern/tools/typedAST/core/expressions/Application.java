@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -154,14 +155,14 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
 	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+	public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		CallableExprGenerator exprGen = function.getCallableExpr(ctx);
 		DefDeclType defdecl = exprGen.getDeclType(ctx);
         List<FormalArg> formals = defdecl.getFormalArgs();
 
         int offset = 0;
 		// generate arguments		
-		List<Expression> args = new LinkedList<Expression>();
+		List<IExpr> args = new LinkedList<IExpr>();
         for(int i = 0; i < generics.size(); i++) {
             String generic = generics.get(i);
             String formalName = formals.get(i).getName();
