@@ -15,6 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import org.junit.Assert;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
@@ -118,6 +119,7 @@ public class OIRTests {
       assertEquals(expected, result);
     } catch (Exception e) {
       System.out.println("Error running python test: " + e.toString());
+      Assert.fail("Error running python test: " + e.toString());
     }
   }
 
