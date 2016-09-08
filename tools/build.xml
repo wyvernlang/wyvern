@@ -109,7 +109,15 @@
                 <fileset dir="${src.dir}" includes="**/*.java"/>
             -->
             <fileset dir="${src.dir}"
-                includes="wyvern/tools/typedAST/core/expressions/New.java"
+                includes="wyvern/tools/typedAST/core/expressions/New.java
+                wyvern/tools/typedAST/core/expressions/Variable.java
+                wyvern/tools/typedAST/core/expressions/Application.java
+                wyvern/tools/typedAST/core/expressions/Assignment.java
+                wyvern/tools/typedAST/core/expressions/Case.java
+                wyvern/tools/typedAST/core/expressions/Fn.java
+                wyvern/tools/typedAST/core/expressions/IfExpr.java
+                wyvern/tools/typedAST/core/expressions/Instantiation.java
+                wyvern/tools/typedAST/core/expressions/Invocation.java"
             />
         </checkstyle>
     </target>
