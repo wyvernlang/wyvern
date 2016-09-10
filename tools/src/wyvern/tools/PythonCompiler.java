@@ -121,6 +121,7 @@ public class PythonCompiler {
       System.err.println("Parse error: " + e.getMessage());*/
     } catch (ToolError e) {
       System.err.println(e.getMessage());
+      System.exit(1);
     }
   }
 
