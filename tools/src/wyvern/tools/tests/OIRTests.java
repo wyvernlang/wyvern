@@ -428,4 +428,17 @@ public class OIRTests {
             "f()\n";
         testPyFromInput(input, "10");
     }
+
+    @Test
+    public void testCounter() throws ParseException {
+        String input =
+            "val counter = new\n" +
+            "  var count : Int = 0\n" +
+            "  def incr() : Int\n" +
+            "    this.count = this.count + 1\n" +
+            "    this.count\n" +
+            "counter.incr()\n" +
+            "counter.incr()\n";
+        testPyFromInput(input, "2");
+    }
 }
