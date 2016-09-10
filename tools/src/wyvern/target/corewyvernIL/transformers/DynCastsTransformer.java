@@ -42,22 +42,9 @@ public class DynCastsTransformer implements ILTransformer {
 	}
 
 	private IExpr transformIExpr(IExpr expr, GenContext ctx) {
-		
-		// Transforming Expression.
-		if (expr instanceof Expression) {
-			return transformExpr((Expression)expr, ctx);
-		}
-
-		// Transforming literal.
-		else if (expr instanceof Value) {
-			return expr;
-		}
-		
-		// Some unsupported IExpr being transformed.
-		else {
-			throw new RuntimeException("Unable to perform DynCast transformation on an AST of type " + expr.getClass());
-		}
-		
+		if (expr instanceof Expression) return transformExpr((Expression)expr, ctx);
+		if (expr instanceof Value) return expr;
+		throw new RuntimeException("Unable to perform DynCast transformation on an AST of type " + expr.getClass());
 	}
 	
 	private Expression transformExpr(Expression expr, GenContext ctx) {
@@ -66,7 +53,7 @@ public class DynCastsTransformer implements ILTransformer {
 		
 		// TODO: Transforming Bind.
 		if (expr instanceof Bind) {
-			return null;
+			throw new RuntimeException("Unable to perform DynCast.transformExpr on Bind expressions.");
 		}
 		
 		if (expr instanceof Cast) return expr;
@@ -74,7 +61,7 @@ public class DynCastsTransformer implements ILTransformer {
 		
 		// TODO: if receiver has Dyn type, cast it to something with the specified field.
 		if (expr instanceof FieldGet) {
-			return null;
+			throw new RuntimeException("Unable to perform DynCast.transformExpr on FieldGet expressions.");
 		}
 		
 		if (expr instanceof FieldSet) {
@@ -118,8 +105,7 @@ public class DynCastsTransformer implements ILTransformer {
 		
 		// TODO: transforming Match.
 		if (expr instanceof Match) {
-			// TODO
-			return null;
+			throw new RuntimeException("Unable to perform DynCast.transformExpr on Match expressions.");
 		}
 		
 		if (expr instanceof MethodCall) {
@@ -169,10 +155,8 @@ public class DynCastsTransformer implements ILTransformer {
 		}
 		
 		if (expr instanceof Variable) return expr;
-		
-			
+
 		throw new RuntimeException("Unable to perform DynCast.transformExpr on " + expr.getClass().toString());
-		
 	}
 
 	public Declaration transformDecl(Declaration decl, GenContext ctx) {
