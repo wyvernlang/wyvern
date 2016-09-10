@@ -1,6 +1,6 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <project name="wyvern" default="copper-generate" basedir=".">
-    <property name="build.dir" value="build/" />  
+    <property name="build.dir" value="build/" />
     <property name="src.dir" value="src" />
 	
 	<path id="classpath.base">
@@ -10,7 +10,8 @@
 		<pathelement location="lib/CopperRuntime.jar" />
 		<pathelement location="lib/hamcrest-core-1.3.jar" />
 		<pathelement location="lib/javatuples-1.2.jar" />
-        <pathelement location="lib/checkstyle-7.1-all.jar" />        
+        <pathelement location="lib/checkstyle-7.1-all.jar" />
+        <pathelement location="lib/jacocoant.jar" />
 	</path>
 	
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
@@ -109,13 +110,56 @@
                 <fileset dir="${src.dir}" includes="**/*.java"/>
             -->
             <fileset dir="${src.dir}"
-                includes="wyvern/tools/typedAST/core/expressions/New.java"
+                includes="wyvern/tools/typedAST/core/expressions/New.java
+                wyvern/tools/typedAST/core/expressions/Variable.java
+                wyvern/tools/typedAST/core/expressions/Application.java
+                wyvern/tools/typedAST/core/expressions/Assignment.java
+                wyvern/tools/typedAST/core/expressions/Case.java
+                wyvern/tools/typedAST/core/expressions/Fn.java
+                wyvern/tools/typedAST/core/expressions/IfExpr.java
+                wyvern/tools/typedAST/core/expressions/Instantiation.java
+                wyvern/tools/typedAST/core/expressions/Invocation.java"
             />
         </checkstyle>
     </target>
 
     <taskdef 
         resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+        classpathref="classpath.base"
+    />
+
+    <target name="coverage">
+        <coverage>
+            <junit printsummary="on" haltonfailure="yes" fork="yes">
+                <classpath>
+                    <path refid="classpath.base" />
+                    <pathelement location="${build.dir}"/>
+                </classpath>
+                <formatter type="brief" usefile="false" />
+                <batchtest>
+                    <fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
+                </batchtest>
+            </junit>
+        </coverage>
+        <report>
+            <executiondata>
+                <file file="jacoco.exec"/>
+            </executiondata>
+
+            <structure name="Wyvern">
+                <classfiles>
+                    <fileset dir="${build.dir}"/>
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${src.dir}"/>
+                </sourcefiles>
+            </structure>
+            <html destdir="report"/>
+        </report>
+    </target>
+
+    <taskdef 
+        resource="org/jacoco/ant/antlib.xml"
         classpathref="classpath.base"
     />
 </project>

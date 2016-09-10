@@ -21,144 +21,154 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
 public class Instantiation extends Declaration implements CoreAST {
-	private URI uri;
-	private TypedAST arg;
-	private FileLocation location;
-	private String name;
-	
-	public Instantiation(URI uri, TypedAST arg, String image, FileLocation loc) {
-		this.uri = uri;
-		this.arg = arg;
-		this.location = loc;
-		this.name = image;
-	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(arg);
-	}
+    private URI uri;
+    private TypedAST arg;
+    private FileLocation location;
+    private String name;
 
-	@Override
-	public FileLocation getLocation() {
-		return location;
-	}
+    /**
+      * Makes a new Instantiation.
+      *
+      * @param uri the URI at which to instantiate
+      * @param arg the argument to the instantiation
+      * @param loc the location in the source where the instantiation is to occur
+      */
+    public Instantiation(URI uri, TypedAST arg, String image, FileLocation loc) {
+        this.uri = uri;
+        this.arg = arg;
+        this.location = loc;
+        this.name = image;
+    }
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public void writeArgsToTree(TreeWriter writer) {
+        writer.writeArgs(arg);
+    }
 
-	/*
-	@Override
-	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		// TODO Auto-generated method stub
-		return new Unit();
-	}
-	*/
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Hashtable<String, TypedAST> children = new Hashtable<>();
-		children.put("arg", arg);
-		return children;
-	}
+    @Override
+    public FileLocation getLocation() {
+        return location;
+    }
 
-	/*
-	@Override
-	protected TypedAST doClone(Map<String, TypedAST> nc) {
-		return new Instantiation(uri, nc.get("arg"), name, location);
-	}
-	*/
+    @Override
+    public void accept(CoreASTVisitor visitor) {
+        visitor.visit(this);
+    }
 
-	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		// TODO Auto-generated method stub
-		
-	}
+    /*
+    @Override
+    protected Type doTypecheck(Environment env, Optional<Type> expected) {
+        // TODO Auto-generated method stub
+        return new Unit();
+    }
+    */
+    @Override
+    public Map<String, TypedAST> getChildren() {
+        Hashtable<String, TypedAST> children = new Hashtable<>();
+        children.put("arg", arg);
+        return children;
+    }
 
-	public URI getUri() {
-		return this.uri;
-	}
+    /*
+    @Override
+    protected TypedAST doClone(Map<String, TypedAST> nc) {
+        return new Instantiation(uri, nc.get("arg"), name, location);
+    }
+    */
 
-	public TypedAST getArgs() {
-		return this.arg;
-	}
+    @Override
+    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
+        // TODO Auto-generated method stub
+    }
 
-	public String getName() {
-		return name;
-	}
+    public URI getUri() {
+        return this.uri;
+    }
 
-	@Override
-	public Type getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public TypedAST getArgs() {
+        return this.arg;
+    }
 
-	/*
-	@Override
-	public Type typecheck(Environment env, Optional<Type> expected) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	*/
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Type getType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Environment extendType(Environment env, Environment against) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+    @Override
+    public Type typecheck(Environment env, Optional<Type> expected) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    */
 
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected Type doTypecheck(Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Environment extendType(Environment env, Environment against) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Environment extendName(Environment env, Environment against) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Type doTypecheck(Environment env) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected Environment doExtend(Environment old, Environment against) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
+        // TODO Auto-generated method stub
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public DeclType genILType(GenContext ctx) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(
+            GenContext ctx,
+            GenContext thisContext) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
+            GenContext ctx,
+            List<TypedModuleSpec> dependencies) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
