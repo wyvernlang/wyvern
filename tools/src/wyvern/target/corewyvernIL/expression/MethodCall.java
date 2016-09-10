@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
@@ -11,6 +12,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.support.ViewExtension;
@@ -69,51 +71,61 @@ public class MethodCall extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		ValueType ot = objectExpr.typeCheck(ctx);
-		StructuralType st = ot.getStructuralType(ctx);
+		
+		// Typecheck receiver.
+		ValueType receiver = objectExpr.typeCheck(ctx);
+		StructuralType receiverType = receiver.getStructuralType(ctx);
 
-		List<DeclType> dts = st.findDecls(methodName, ctx);
-		if (dts.isEmpty()) {
+		// Sanity check: make sure it has declarations.
+		List<DeclType> declarationTypes = receiverType.findDecls(methodName, ctx);
+		if (declarationTypes.isEmpty()) {
 			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName);
 		}
 
-		ArrayList<ValueType> argTypeList = new ArrayList<ValueType>(args.size());
-		for (int i = 0; i < args.size(); ++i) {
-			argTypeList.add(args.get(i).typeCheck(ctx));
-		}
-
+		// Go through all declarations, typechecking against the actual types passed in...
+		List<ValueType> actualArgTypes = getArgTypes(ctx);
+		
+		// ...use this context to do that.
 		TypeContext newCtx = null;
-		for (DeclType dt : dts) {
+		for (DeclType declType : declarationTypes) {
+			
+			// Ignore non-methods.
 			newCtx = ctx;
-			if (!(dt instanceof DefDeclType)) continue;
-			DefDeclType ddt = (DefDeclType) dt;
+			if (!(declType instanceof DefDeclType)) continue;
+			DefDeclType ddt = (DefDeclType) declType;
 
-			// check argument compatibility
+			// Check it has correct number of arguments.
 			List<FormalArg> formalArgs = ddt.getFormalArgs();
 			if (args.size() != formalArgs.size()) continue;
 
+			// Typecheck actual args against formal args of this declaration.
 			boolean argsTypechecked = true;
 			View v = View.from(objectExpr, newCtx);
 			for (int i = 0; i < args.size(); ++i) {
-				ValueType argType = formalArgs.get(i).getType().adapt(v);
-				String name = formalArgs.get(i).getName();
-				ValueType actualType = argTypeList.get(i); //e.typeCheck(ctx);
-				if (!actualType.isSubtypeOf(argType, newCtx)) {
-					// for debugging
-					actualType.isSubtypeOf(argType, newCtx);
+				
+				// Get info about the formal arguments.
+				FormalArg formalArg = formalArgs.get(i);
+				ValueType formalArgType = formalArg.getType().adapt(v);
+				String formalArgName = formalArg.getName();
+				ValueType actualArgType = actualArgTypes.get(i);
+				
+				// Check actual argument type accords with formal argument type.
+				if (!actualArgType.isSubtypeOf(formalArgType, newCtx)) {
 					argsTypechecked = false;
 					break;
 				}
-				newCtx = newCtx.extend(name, actualType);
+				
+				// Update context and view.
+				newCtx = newCtx.extend(formalArgName, actualArgType);
 				IExpr e = args.get(i);
 				if (e instanceof Variable) {
 					v = new ViewExtension(new Variable(ddt.getFormalArgs().get(i).getName()), (Variable) e, v);
 				}
 			}
 
+			// We were able to typecheck; figure out the return type.
 			if (argsTypechecked) {
 				ctx = newCtx;
-				// compute result type
 				ValueType resultType = ddt.getResultType(v);
 				resultType = resultType.adapt(v);
 				this.setExprType(resultType);
@@ -121,20 +133,21 @@ public class MethodCall extends Expression {
 			}
 		}
 
-		StringBuilder argTypes = new StringBuilder();
-		argTypes.append(methodName);
-		argTypes.append("(");
+		// Couldn't find an appropriate method declaration. Build up a nice error message.
+		StringBuilder errMsg = new StringBuilder();
+		errMsg.append(methodName);
+		errMsg.append("(");
 		for (int i = 0; i <= args.size() - 2; ++i) {
-			argTypes.append(argTypeList.get(i).toString());
-			argTypes.append(", ");
+			errMsg.append(actualArgTypes.get(i).toString());
+			errMsg.append(", ");
 		}
 		if (args.size() > 0)
-			argTypes.append(argTypeList.get(args.size() - 1).toString());
-		argTypes.append(")");
-		ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, argTypes.toString());
+			errMsg.append(actualArgTypes.get(args.size() - 1).toString());
+		errMsg.append(")");
+		ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
 		return null;
 	}
-
+	
 	@Override
 	public <T, E> T acceptVisitor(ASTVisitor <T, E> emitILVisitor,
 			E env, OIREnvironment oirenv) {
@@ -159,6 +172,63 @@ public class MethodCall extends Expression {
 			freeVars.addAll(arg.getFreeVariables());
 		}
 		return freeVars;
+	}
+	
+	public List<ValueType> getArgTypes(TypeContext ctx) {
+		List<? extends IExpr> args = getArgs();
+		return args.stream()
+			.map(arg -> arg.typeCheck(ctx))
+			.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Get the declaration for the method being invoked.
+	 * @param ctx: ctx in which invocation happens.
+	 * @return the declaration of the method.
+	 */
+	public DefDeclType getMethodDeclaration(TypeContext ctx) {
+
+		// Figure out type of receiver, and formal argument types.
+		IExpr receiver = getObjectExpr();
+		StructuralType receiverType = receiver.typeCheck(ctx).getStructuralType(ctx);
+		List<ValueType> argTypes = getArgTypes(ctx);
+						
+		// Get all declared methods matching name of method being invoked.
+		List<DeclType> matchingMeths = receiverType.findDecls(getMethodName(), ctx);
+		
+		// Look through each method, attempting to find the one which typechecks with these arguments.
+		for (DeclType dt : matchingMeths) {
+			
+			// Check argument compatibility.
+			if (!(dt instanceof DefDeclType)) continue;
+			DefDeclType ddt = (DefDeclType) dt;
+			List<FormalArg> formalArgs = ddt.getFormalArgs();
+			if (args.size() != formalArgs.size())
+				continue;
+			
+			// Attempt to typecheck formal argument types with actual argument types.
+			boolean argsTypechecked = true;
+			View view = View.from(receiver, ctx);
+			for (int i = 0; i < args.size(); i++) {
+				
+				// Adapt to the view and typecheck.
+				ValueType argType = formalArgs.get(i).getType().adapt(view);
+				ValueType actualType = argTypes.get(i);
+				if (!actualType.isSubtypeOf(argType, ctx)) {
+					argsTypechecked = false;
+					break;
+				}
+				
+			}
+			
+			// If we typechecked, we've found the appropriate method for the method call.
+			if (argsTypechecked) {
+				return ddt;
+			}
+			
+		}
+		
+		return null;
 	}
 
 }
