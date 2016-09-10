@@ -43,7 +43,6 @@ class PrettyPrintState {
     public HashSet <String> freeVarSet;
     public String currentMethod;
     public ArrayList <String> prefix;
-    public HashSet <String> currentlyDefining;
     public HashMap <String, String> classRecursiveNames;
     public String currentLetVar;
     public boolean inClass;
@@ -110,7 +109,6 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     state.freeVarSet = new HashSet<>();
     state.currentMethod = "";
     state.prefix = new ArrayList<>();
-    state.currentlyDefining = new HashSet<>();
     state.inClass = false;
     state.classRecursiveNames = new HashMap<>();
 
@@ -248,10 +246,6 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     int letId = uniqueId;
     uniqueId++;
 
-    HashSet<String> oldCurrentlyDefining =
-        (HashSet<String>)state.currentlyDefining.clone();
-    state.currentlyDefining.add(oirLet.getVarName());
-
     String funDecl = "def letFn" + Integer.toString(letId) +
       "(" + oirLet.getVarName() +"):\n" + indent + indentIncrement;
     state.expectingReturn = false;
@@ -279,7 +273,6 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                                           indent + indentIncrement);
     state.expectingReturn = oldExpectingReturn;
     state.prefix = oldPrefix;
-    state.currentlyDefining = oldCurrentlyDefining;
 
     String funCall = "\n" + indent;
     if (state.expectingReturn)
@@ -412,12 +405,12 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                       OIRVariable oirVariable) {
       state.currentLetVar = "";
     String var;
-    if (state.freeVarSet.contains(oirVariable.getName())
-        || state.currentlyDefining.contains(oirVariable.getName()))
+    if (state.freeVarSet.contains(oirVariable.getName())) {
         var = NameMangleVisitor.mangle("this") +
             ".env['" + oirVariable.getName() + "']";
-    else
+    } else {
       var = oirVariable.getName();
+    }
     if (state.expectingReturn)
       return state.returnType + " " + var;
     return var;

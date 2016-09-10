@@ -370,6 +370,15 @@ public class OIRTests {
     }
 
     @Test
+    public void testNameCollision3() throws ParseException {
+        String input =
+            "val x = 7\n" +
+            "val x = x\n" +
+            "x\n";
+        testPyFromInput(input, "7");
+    }
+
+    @Test
     public void testThisAsLocal() throws ParseException {
         String input =
             "val this = 3\n" +
