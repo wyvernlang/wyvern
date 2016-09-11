@@ -115,13 +115,15 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
     fieldValuePairs = new Vector<OIRFieldValueInitializePair> ();
     args = new Vector<OIRExpression> ();
 
+    TypeContext extendedCxt = cxt.extend("this", newExpr.typeCheck(cxt));
+
     for (Declaration decl : newExpr.getDecls())
     {
       if (decl instanceof DelegateDeclaration)
       {
         OIRDelegate oirdelegate;
 
-        oirdelegate = (OIRDelegate)decl.acceptVisitor(this, cxt,
+        oirdelegate = (OIRDelegate)decl.acceptVisitor(this, extendedCxt,
             classenv);
         delegates.add(oirdelegate);
       }
@@ -130,7 +132,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
         OIRMemberDeclaration oirMemDecl;
 
         oirMemDecl = (OIRMemberDeclaration) decl.acceptVisitor(this,
-            cxt, classenv);
+            extendedCxt, classenv);
 
         if (decl instanceof VarDeclaration)
         {
@@ -140,7 +142,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
 
           varDecl = (VarDeclaration)decl;
           oirvalue = (OIRExpression) varDecl.getDefinition().acceptVisitor(this,
-              cxt, oirenv);
+              extendedCxt, oirenv);
           pair = new OIRFieldValueInitializePair (
               (OIRFieldDeclaration)oirMemDecl, oirvalue);
           fieldValuePairs.add (pair);
@@ -154,7 +156,7 @@ public class EmitOIRVisitor extends ASTVisitor<OIRAST, TypeContext> {
 
           varDecl = (ValDeclaration)decl;
           oirvalue = (OIRExpression) varDecl.getDefinition().acceptVisitor(this,
-              cxt, oirenv);
+              extendedCxt, oirenv);
           pair = new OIRFieldValueInitializePair (
               (OIRFieldDeclaration)oirMemDecl, oirvalue);
           fieldValuePairs.add (pair);

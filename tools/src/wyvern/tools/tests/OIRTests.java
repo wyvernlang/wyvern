@@ -370,6 +370,15 @@ public class OIRTests {
     }
 
     @Test
+    public void testNameCollision3() throws ParseException {
+        String input =
+            "val x = 7\n" +
+            "val x = x\n" +
+            "x\n";
+        testPyFromInput(input, "7");
+    }
+
+    @Test
     public void testThisAsLocal() throws ParseException {
         String input =
             "val this = 3\n" +
@@ -418,5 +427,18 @@ public class OIRTests {
             "  g()\n" +
             "f()\n";
         testPyFromInput(input, "10");
+    }
+
+    @Test
+    public void testCounter() throws ParseException {
+        String input =
+            "val counter = new\n" +
+            "  var count : Int = 0\n" +
+            "  def incr() : Int\n" +
+            "    this.count = this.count + 1\n" +
+            "    this.count\n" +
+            "counter.incr()\n" +
+            "counter.incr()\n";
+        testPyFromInput(input, "2");
     }
 }
