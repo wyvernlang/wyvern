@@ -12,6 +12,7 @@ import org.junit.experimental.categories.Category;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRState;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
@@ -31,7 +32,7 @@ public class CodegenTests {
         TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
         Assert.assertEquals(res.typecheck(getStandardEnv(), empty()), new Int());
         Expression output = ExpressionWriter.generate(iw -> res.codegenToIL(new GenerationEnvironment(), iw));
-        OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), null, OIREnvironment.getRootEnvironment());
+        OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), new EmitOIRState(null, OIREnvironment.getRootEnvironment()));
         OIRProgram oirprogram = OIRProgram.program;
         System.out.println ("");
         //EmitLLVMNative.createMainFunction();
@@ -45,7 +46,7 @@ public class CodegenTests {
         TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
         Assert.assertEquals(res.typecheck(getStandardEnv(), empty()), new Int());
         Expression output = ExpressionWriter.generate(iw -> res.codegenToIL(new GenerationEnvironment(), iw));
-        OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), null, OIREnvironment.getRootEnvironment());
+        OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), new EmitOIRState(null, OIREnvironment.getRootEnvironment()));
         OIRProgram oirprogram = OIRProgram.program;
         System.out.println ("");
     }
@@ -57,7 +58,7 @@ public class CodegenTests {
         TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(input), "test input");
         Assert.assertEquals(res.typecheck(getStandardEnv(), empty()), new Int());
         Expression output = ExpressionWriter.generate(iw -> res.codegenToIL(new GenerationEnvironment(), iw));
-        OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), null, OIREnvironment.getRootEnvironment());
+        OIRAST oirast = output.acceptVisitor(new EmitOIRVisitor (), new EmitOIRState(null, OIREnvironment.getRootEnvironment()));
         OIRProgram oirprogram = OIRProgram.program;
         System.out.println ("");
     }
