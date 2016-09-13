@@ -17,6 +17,7 @@ import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRState;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -62,8 +63,8 @@ public class FFITests {
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
-                              Globals.getStandardTypeContext(),
-                              OIREnvironment.getRootEnvironment());
+                              new EmitOIRState(Globals.getStandardTypeContext(),
+                                               OIREnvironment.getRootEnvironment()));
 
     String pprint =
       new PrettyPrintVisitor().prettyPrint(oirast,

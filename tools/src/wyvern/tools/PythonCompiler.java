@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
+import wyvern.target.corewyvernIL.astvisitor.EmitOIRState;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -106,8 +107,8 @@ public class PythonCompiler {
 
       OIRAST oirast =
           program.acceptVisitor(new EmitOIRVisitor(),
-                                Globals.getStandardTypeContext(),
-                                OIREnvironment.getRootEnvironment());
+                                new EmitOIRState(Globals.getStandardTypeContext(),
+                                                 OIREnvironment.getRootEnvironment()));
       String python =
           new PrettyPrintVisitor().prettyPrint(oirast,
                                                OIREnvironment.getRootEnvironment());
