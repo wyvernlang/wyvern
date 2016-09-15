@@ -44,6 +44,10 @@ public class Bind extends Expression {
 		return toReplaceExps;
 	}
 
+    public IExpr getInExpr() {
+        return inExpr;
+    }
+
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		TypeContext bodyCtx = EmptyTypeContext.empty();

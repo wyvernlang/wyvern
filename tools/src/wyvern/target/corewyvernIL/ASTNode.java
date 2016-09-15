@@ -3,6 +3,11 @@ package wyvern.target.corewyvernIL;
 import java.io.IOException;
 import java.util.HashSet;
 
+import wyvern.target.corewyvernIL.metadata.HasMetadata;
+import wyvern.target.corewyvernIL.metadata.Metadata;
+
+import wyvern.target.corewyvernIL.metadata.IsTailCall;
+
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 
@@ -57,6 +62,20 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
     }
 
     public void addMetadata(Metadata metadata) {
+        if (metadata instanceof IsTailCall) {
+            System.out.println("Found a tail call:");
+            StringBuilder builder = new StringBuilder();
+            try {this.doPrettyPrint(builder, "");}
+            catch (Exception e) {}
+            System.out.println(builder.toString());
+        }
         metadataSet.add(metadata);
+    }
+
+    public void copyMetadata(HasMetadata other) {
+        Metadata[] metadata = other.getMetadata();
+        for (Metadata m : metadata) {
+            addMetadata(m);
+        }
     }
 }

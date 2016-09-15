@@ -62,35 +62,45 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
     public OIRAST visit(NameMangleState state,
                         OIRCast oirCast) {
-        return new OIRCast((OIRExpression) oirCast.getToCastEXpr().acceptVisitor(this, state),
-                           oirCast.getExprType());
+        OIRCast cast = new OIRCast((OIRExpression) oirCast.getToCastEXpr().acceptVisitor(this, state),
+                                   oirCast.getExprType());
+        cast.copyMetadata(oirCast);
+        return cast;
     }
 
     public OIRAST visit(NameMangleState state,
                         OIRFieldGet oirFieldGet) {
-        return new OIRFieldGet((OIRExpression) oirFieldGet.getObjectExpr().acceptVisitor(this, state),
-                               oirFieldGet.getFieldName());
+        OIRFieldGet fieldGet = new OIRFieldGet((OIRExpression) oirFieldGet.getObjectExpr().acceptVisitor(this, state),
+                                               oirFieldGet.getFieldName());
+        fieldGet.copyMetadata(oirFieldGet);
+        return fieldGet;
     }
 
     public OIRAST visit(NameMangleState state,
                         OIRFieldSet oirFieldSet) {
-        return new OIRFieldSet((OIRExpression) oirFieldSet.getObjectExpr().acceptVisitor(this, state),
-                               oirFieldSet.getFieldName(),
-                               (OIRExpression) oirFieldSet.getExprToAssign().acceptVisitor(this, state));
+        OIRFieldSet fieldSet = new OIRFieldSet((OIRExpression) oirFieldSet.getObjectExpr().acceptVisitor(this, state),
+                                               oirFieldSet.getFieldName(),
+                                               (OIRExpression) oirFieldSet.getExprToAssign().acceptVisitor(this, state));
+        fieldSet.copyMetadata(oirFieldSet);
+        return fieldSet;
     }
 
     public OIRAST visit(NameMangleState state,
                         OIRIfThenElse oirIfThenElse) {
-        return new OIRIfThenElse((OIRExpression) oirIfThenElse.getCondition().acceptVisitor(this, state),
-                                 (OIRExpression) oirIfThenElse.getThenExpression().acceptVisitor(this, state),
-                                 (OIRExpression) oirIfThenElse.getElseExpression().acceptVisitor(this, state));
+        OIRIfThenElse ifThenElse = new OIRIfThenElse((OIRExpression) oirIfThenElse.getCondition().acceptVisitor(this, state),
+                                                     (OIRExpression) oirIfThenElse.getThenExpression().acceptVisitor(this, state),
+                                                     (OIRExpression) oirIfThenElse.getElseExpression().acceptVisitor(this, state));
+        ifThenElse.copyMetadata(oirIfThenElse);
+        return ifThenElse;
     }
 
     public OIRAST visit(NameMangleState state,
                         OIRLet oirLet) {
-        return new OIRLet(mangle(oirLet.getVarName()),
-                          (OIRExpression) oirLet.getToReplace().acceptVisitor(this, state),
-                          (OIRExpression) oirLet.getInExpr().acceptVisitor(this, state));
+        OIRLet let = new OIRLet(mangle(oirLet.getVarName()),
+                                (OIRExpression) oirLet.getToReplace().acceptVisitor(this, state),
+                                (OIRExpression) oirLet.getInExpr().acceptVisitor(this, state));
+        let.copyMetadata(oirLet);
+        return let;
     }
 
     public OIRAST visit(NameMangleState state,
@@ -99,10 +109,12 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
         for (OIRExpression arg : oirMethodCall.getArgs()) {
             newArgs.add((OIRExpression) arg.acceptVisitor(this, state));
         }
-        return new OIRMethodCall((OIRExpression) oirMethodCall.getObjectExpr().acceptVisitor(this, state),
-                                 oirMethodCall.getObjectType(),
-                                 oirMethodCall.getMethodName(),
-                                 newArgs);
+        OIRMethodCall methodCall = new OIRMethodCall((OIRExpression) oirMethodCall.getObjectExpr().acceptVisitor(this, state),
+                                                     oirMethodCall.getObjectType(),
+                                                     oirMethodCall.getMethodName(),
+                                                     newArgs);
+        methodCall.copyMetadata(oirMethodCall);
+        return methodCall;
     }
 
     public OIRAST visit(NameMangleState state,
@@ -111,7 +123,9 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
         for (OIRExpression arg : oirNew.getArgs()) {
             newArgs.add((OIRExpression) arg.acceptVisitor(this, state));
         }
-        return new OIRNew(newArgs, oirNew.getTypeName());
+        OIRNew new_ = new OIRNew(newArgs, oirNew.getTypeName());
+        new_.copyMetadata(oirNew);
+        return new_;
     }
 
     public OIRAST visit(NameMangleState state,
@@ -126,7 +140,9 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
     public OIRAST visit(NameMangleState state,
                         OIRVariable oirVariable) {
-        return new OIRVariable(mangle(oirVariable.getName()));
+        OIRVariable var = new OIRVariable(mangle(oirVariable.getName()));
+        var.copyMetadata(oirVariable);
+        return var;
     }
 
     public OIRAST visit(NameMangleState state,
@@ -152,9 +168,11 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
         for (String freeVar : oirClassDeclaration.getFreeVariables()) {
             freeVars.add(mangle(freeVar));
         }
-        return new OIRClassDeclaration(env, name, selfName, delegates,
-                                       members, fieldValuePairs,
-                                       freeVars);
+        OIRClassDeclaration classDecl = new OIRClassDeclaration(env, name, selfName, delegates,
+                                                                members, fieldValuePairs,
+                                                                freeVars);
+        classDecl.copyMetadata(oirClassDeclaration);
+        return classDecl;
     }
 
     public OIRAST visit(NameMangleState state,
@@ -181,16 +199,19 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
             newArgs.add(new OIRFormalArg(mangle(arg.getName()),
                                          arg.getType()));
         }
-        return new OIRMethodDeclaration(oirMethodDeclaration.getReturnType(),
-                                        oirMethodDeclaration.getName(),
-                                        newArgs);
+        OIRMethodDeclaration methodDecl = new OIRMethodDeclaration(oirMethodDeclaration.getReturnType(),
+                                                                   oirMethodDeclaration.getName(),
+                                                                   newArgs);
+        return methodDecl;
     }
 
     public OIRAST visit(NameMangleState state,
                         OIRMethod oirMethod) {
-        return new OIRMethod(oirMethod.getEnvironment(),
-                             (OIRMethodDeclaration) oirMethod.getDeclaration().acceptVisitor(this, state),
-                             (OIRExpression) oirMethod.getBody().acceptVisitor(this, state));
+        OIRMethod method = new OIRMethod(oirMethod.getEnvironment(),
+                                         (OIRMethodDeclaration) oirMethod.getDeclaration().acceptVisitor(this, state),
+                                         (OIRExpression) oirMethod.getBody().acceptVisitor(this, state));
+        method.copyMetadata(oirMethod);
+        return method;
     }
 
     public OIRAST visit(NameMangleState state,

@@ -20,6 +20,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRVisitor;
 import wyvern.target.corewyvernIL.astvisitor.EmitOIRState;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -56,6 +57,7 @@ public class OIRTests {
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
     GenContext genContext = Globals.getStandardGenContext();
     IExpr ILprogram = ast.generateIL(genContext, null, new LinkedList<TypedModuleSpec>());
+    TailCallVisitor.annotate(ILprogram);
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);
