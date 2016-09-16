@@ -1,0 +1,61 @@
+module pygame
+
+import python:pygame
+import python:helper
+import python:time
+
+type Surface
+  def fill(color : Color) : Unit
+
+type Rect
+
+type Color
+
+type Clock
+  def tick(fps : Int) : Unit
+
+type Draw
+  def rect(surface : Surface,
+           color : Color,
+           rect : Rect,
+           width : Int) : Rect
+
+type Display
+  def set_mode(size : Dyn,
+               flags : Int,
+               depth : Int) : Surface
+  def flip() : Unit
+
+type Time
+  def Clock() : Clock
+
+type Helper
+  def make2Tuple(a : Dyn, b : Dyn) : Dyn
+  def fst(a : Dyn) : Dyn
+  def snd(a : Dyn) : Dyn
+  def debug(msg : String) : Unit
+val helper : Helper = helper
+
+type Pygame
+  def init() : Unit
+  def quit() : Unit
+
+  val draw : Draw
+  val display : Display
+  val time : Time
+
+  def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
+  def Color(name : String) : Color
+val pygame : Pygame = pygame
+
+def init() : Unit = pygame.init()
+def quit() : Unit = pygame.quit()
+
+val draw : Draw = pygame.draw
+val display : Display = pygame.display
+val time : Time = pygame.time
+
+def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
+  pygame.Rect(x,y,height,width)
+
+def Color(name : String) : Color = pygame.Color(name)

@@ -66,7 +66,7 @@ public class OIRTests {
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }
-      System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
+      // System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
@@ -89,7 +89,7 @@ public class OIRTests {
       fw.write(pprint);
       fw.close();
 
-      Process p = Runtime.getRuntime().exec("python " + tempFile.getAbsolutePath());
+      Process p = Runtime.getRuntime().exec("python2 " + tempFile.getAbsolutePath());
 
       BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
       BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -443,5 +443,27 @@ public class OIRTests {
             "counter.incr()\n" +
             "counter.incr()\n";
         testPyFromInput(input, "2");
+    }
+
+    @Test
+    public void testTCOShadowing() throws ParseException {
+        String input =
+            "def f() : Int\n" +
+            "  def f() : Int = 7\n" +
+            "  f()\n" +
+            "f()\n";
+        testPyFromInput(input, "7");
+    }
+
+    @Test
+    public void testTCO() throws ParseException {
+        String input =
+            "def f(n : Int) : Int\n" +
+            "  (n < 0).ifTrue(\n" +
+            "    () => 1,\n" +
+            "    () => f(n-1)\n" +
+            "  )\n" +
+            "f(50000)\n";
+        testPyFromInput(input, "1", true);
     }
 }

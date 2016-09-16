@@ -34,7 +34,6 @@ import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
-import wyvern.target.corewyvernIL.metadata.IsTailRecursive;
 import wyvern.target.corewyvernIL.support.EmptyTypeContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -45,218 +44,192 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
-class State {
-    public String method;
-    public boolean inTailPosition;
-
-    public State(String method, boolean inTailPosition) {
-        this.method = method;
-        this.inTailPosition = inTailPosition;
-    }
-
-    public State False() {
-        return new State(method, false);
-    }
-
-    public State True() {
-        return new State(method, true);
-    }
-}
-
 /** TailCallVisitor finds all MethodCall expressions in a
  *  corewyvernIL AST and attaches an IsTailCall metadata to them
  *  if the method calls are tail calls.
  */
-public class TailCallVisitor extends ASTVisitor<State, Boolean> {
+public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     public static void annotate(IExpr program) {
-        program.acceptVisitor(new TailCallVisitor(),
-                              new State(null, false));
+        program.acceptVisitor(new TailCallVisitor(), false);
     }
 
-    public Boolean visit(State state, New newExpr) {
+    public Void visit(Boolean inTailPosition, New newExpr) {
         for (Declaration decl : newExpr.getDecls()) {
-            decl.acceptVisitor(this, state);
+            decl.acceptVisitor(this, inTailPosition);
         }
-        return false;
+        return null;
     }
 
-    public Boolean visit(State state, MethodCall methodCall) {
-        methodCall.getObjectExpr().acceptVisitor(this,
-                                                 state.False());
+    public Void visit(Boolean inTailPosition, MethodCall methodCall) {
+        methodCall.getObjectExpr().acceptVisitor(this, false);
+        for (IExpr arg : methodCall.getArgs()) {
+            arg.acceptVisitor(this, false);
+        }
 
-        boolean tailCall = state.inTailPosition &&
-            (methodCall.getMethodName().equals(state.method));
-        if (tailCall) {
+        if (inTailPosition) {
             methodCall.addMetadata(new IsTailCall());
         }
-        return tailCall;
+        return null;
     }
 
 
-    public Boolean visit(State state, Match match) {
-        match.getMatchExpr().acceptVisitor(this, state.False());
-        Boolean tailRecursive =
-            match.getElseExpr().acceptVisitor(this, state);
+    public Void visit(Boolean inTailPosition, Match match) {
+        match.getMatchExpr().acceptVisitor(this, false);
+        match.getElseExpr().acceptVisitor(this, inTailPosition);
         for (Case matchCase : match.getCases()) {
-            tailRecursive = tailRecursive ||
-                (matchCase.getBody().acceptVisitor(this, state));
+            matchCase.getBody().acceptVisitor(this, inTailPosition);
         }
-        return tailRecursive;
+        return null;
     }
 
 
-    public Boolean visit(State state, FieldGet fieldGet) {
-        fieldGet.getObjectExpr().acceptVisitor(this, state.False());
-        return false;
+    public Void visit(Boolean inTailPosition, FieldGet fieldGet) {
+        fieldGet.getObjectExpr().acceptVisitor(this, inTailPosition);
+        return null;
     }
 
 
-    public Boolean visit(State state, Let let) {
-        let.getToReplace().acceptVisitor(this, state.False());
-        if (let.getVarName().equals(state.method))
-            return false;
-        else
-            return let.getInExpr().acceptVisitor(this, state);
+    public Void visit(Boolean inTailPosition, Let let) {
+        let.getToReplace().acceptVisitor(this, false);
+        let.getInExpr().acceptVisitor(this, inTailPosition);
+        return null;
     }
 
 
-    public Boolean visit(State state, FieldSet fieldSet) {
-        fieldSet.getObjectExpr().acceptVisitor(this, state.False());
-        fieldSet.getExprToAssign().acceptVisitor(this, state.False());
-        return false;
+    public Void visit(Boolean inTailPosition, FieldSet fieldSet) {
+        fieldSet.getObjectExpr().acceptVisitor(this, false);
+        fieldSet.getExprToAssign().acceptVisitor(this, false);
+        return null;
     }
 
 
-    public Boolean visit(State state, Variable variable) {
-        return false;
+    public Void visit(Boolean inTailPosition, Variable variable) {
+        return null;
     }
 
 
-    public Boolean visit(State state, Cast cast) {
-        cast.getToCastExpr().acceptVisitor(this, state.False());
-        return false;
+    public Void visit(Boolean inTailPosition, Cast cast) {
+        cast.getToCastExpr().acceptVisitor(this, false);
+        return null;
     }
 
 
-    public Boolean visit(State state, VarDeclaration varDecl) {
-        varDecl.getDefinition().acceptVisitor(this, state.False());
-        return false;
+    public Void visit(Boolean inTailPosition, VarDeclaration varDecl) {
+        varDecl.getDefinition().acceptVisitor(this, false);
+        return null;
     }
 
-    public Boolean visit(State state, DefDeclaration defDecl) {
-        if (defDecl.getBody().acceptVisitor(this,
-                                            new State(defDecl.getName(),
-                                                      true))) {
-            defDecl.addMetadata(new IsTailRecursive());
-        }
-        return false;
+    public Void visit(Boolean inTailPosition, DefDeclaration defDecl) {
+        defDecl.getBody().acceptVisitor(this, true);
+        return null;
     }
 
-    public Boolean visit(State state, ValDeclaration valDecl) {
-        valDecl.getDefinition().acceptVisitor(this, state.False());
-        return false;
+    public Void visit(Boolean inTailPosition, ValDeclaration valDecl) {
+        valDecl.getDefinition().acceptVisitor(this, false);
+        return null;
     }
 
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          IntegerLiteral integerLiteral) {
-        return false;
+        return null;
     }
 
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          RationalLiteral rational) {
-        return false;
+        return null;
     }
 
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          FormalArg formalArg) {
-        return false;
+        return null;
     }
 
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          VarDeclType varDeclType) {
-        return false;
+        return null;
     }
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          ValDeclType valDeclType) {
-        return false;
+        return null;
     }
 
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          DefDeclType defDeclType) {
-        return false;
+        return null;
     }
 
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          AbstractTypeMember abstractDeclType) {
-        return false;
+        return null;
     }
 
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          StructuralType structuralType) {
-        return false;
+        return null;
     }
 
-    public Boolean visit(State state, NominalType nominalType) {
-        return false;
+    public Void visit(Boolean inTailPosition, NominalType nominalType) {
+        return null;
     }
 
-    public Boolean visit(State state, StringLiteral stringLiteral) {
-        return false;
+    public Void visit(Boolean inTailPosition, StringLiteral stringLiteral) {
+        return null;
     }
 
-    public Boolean visit(State state, DelegateDeclaration delegateDecl) {
-        return false;
+    public Void visit(Boolean inTailPosition, DelegateDeclaration delegateDecl) {
+        return null;
     }
 
     @Override
-    public Boolean visit(State state, Bind bind) {
+    public Void visit(Boolean inTailPosition, Bind bind) {
         for (IExpr expr : bind.getToReplaceExps()) {
-            expr.acceptVisitor(this, state.False());
+            expr.acceptVisitor(this, false);
         }
-        return bind.getInExpr().acceptVisitor(this, state);
+        bind.getInExpr().acceptVisitor(this, inTailPosition);
+        return null;
     }
 
     @Override
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          ConcreteTypeMember concreteTypeMember) {
-        return false;
+        return null;
     }
 
     @Override
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          TypeDeclaration typeDecl) {
-        return false;
+        return null;
     }
 
     @Override
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          CaseType caseType) {
-        return false;
+        return null;
     }
 
     @Override
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          ExtensibleTagType extensibleTagType) {
-        return false;
+        return null;
     }
 
     @Override
-    public Boolean visit(State state,
+    public Void visit(Boolean inTailPosition,
                          DataType dataType) {
-        return false;
+        return null;
     }
 
     @Override
-    public Boolean visit(State state, FFIImport ffiImport) {
-        return false;
+    public Void visit(Boolean inTailPosition, FFIImport ffiImport) {
+        return null;
     }
 
 }

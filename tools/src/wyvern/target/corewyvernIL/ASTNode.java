@@ -63,7 +63,6 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
 
     public void addMetadata(Metadata metadata) {
         if (metadata instanceof IsTailCall) {
-            System.out.println("Found a tail call:");
             StringBuilder builder = new StringBuilder();
             try {this.doPrettyPrint(builder, "");}
             catch (Exception e) {}

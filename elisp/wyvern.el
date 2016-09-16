@@ -5,7 +5,7 @@
 
 (defvar wyvern-mode-keymap
   (let ((map (make-keymap)))
-    (define-key map "C-j" 'newline-and-indent)
+    ;; (define-key map "C-j" 'newline-and-indent)
     map)
   "Keymap for Wyvern major mode")
 
