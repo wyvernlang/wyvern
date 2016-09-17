@@ -37,8 +37,7 @@ public class BooleanLiteral extends AbstractValue implements Invokable {
     }
 
 	@Override
-	public <T, E> T acceptVisitor(ASTVisitor<T, E> emitILVisitor, E env,
-			OIREnvironment oirenv) {
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
 		// TODO Auto-generated method stub
 		return null;
 	}

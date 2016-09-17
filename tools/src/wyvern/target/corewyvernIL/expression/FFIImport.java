@@ -27,10 +27,9 @@ public class FFIImport extends Expression {
   }
 
   @Override
-  public <T, E> T acceptVisitor(ASTVisitor<T, E> emitILVisitor,
-                                E env,
-                                OIREnvironment oirenv) {
-    return emitILVisitor.visit(env, oirenv, this);
+  public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor,
+                                S state) {
+    return emitILVisitor.visit(state, this);
   }
 
   @Override
