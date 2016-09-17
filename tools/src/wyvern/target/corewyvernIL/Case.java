@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL;
 
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.NominalType;
 
@@ -22,5 +23,10 @@ public class Case extends ASTNode {
 	}
 	public String getVarName() {
 		return varName;
+	}
+	@Override
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+		// TODO Auto-generated method stub
+		return visitor.visit(state, this);
 	}
 }

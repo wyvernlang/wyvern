@@ -3,13 +3,13 @@ package wyvern.target.corewyvernIL.decl;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.ASTNode;
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.tools.errors.FileLocation;
 
-public abstract class Declaration extends ASTNode implements EmitOIR {
+public abstract class Declaration extends ASTNode implements IASTNode {
 	public boolean containsResource(TypeContext ctx) {
 		return false;
 	}

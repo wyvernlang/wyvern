@@ -3,13 +3,13 @@ package wyvern.target.corewyvernIL.expression;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.ASTNode;
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
-public abstract class Expression extends ASTNode implements EmitOIR,IExpr {
+public abstract class Expression extends ASTNode implements IASTNode,IExpr {
 
 	private ValueType exprType;
 	@Override

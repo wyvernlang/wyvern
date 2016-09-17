@@ -633,4 +633,9 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
     }
   }
 
+@Override
+public OIRAST visit(EmitOIRState state, Case c) {
+    throw new RuntimeException("Case -> OIR implemented as part of match");
+}
+
 }

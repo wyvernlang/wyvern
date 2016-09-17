@@ -5,7 +5,7 @@ import java.io.IOException;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 
-public abstract class ASTNode implements HasLocation {
+public abstract class ASTNode implements HasLocation, IASTNode {
 	private FileLocation location;
 
 	/* TODO: eventually get rid of this constructor if we can,

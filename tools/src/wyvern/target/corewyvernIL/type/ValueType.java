@@ -1,13 +1,13 @@
 package wyvern.target.corewyvernIL.type;
 
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
-public abstract class ValueType extends CaseType implements EmitOIR {
+public abstract class ValueType extends CaseType implements IASTNode {
 	/**
 	 * Returns the equivalent structural type.  If the structural type
 	 * is unknown (e.g. because this is a nominal type and the

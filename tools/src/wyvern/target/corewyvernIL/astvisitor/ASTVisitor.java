@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.astvisitor;
 
+import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -30,10 +31,10 @@ import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
-import wyvern.target.oir.OIREnvironment;
 
 public abstract class ASTVisitor<S, T> {
 	public abstract T visit(S state, New newExpr);
+	public abstract T visit(S state, Case c);
 	public abstract T visit(S state, MethodCall methodCall);
 	public abstract T visit(S state, Match match);
 	public abstract T visit(S state, FieldGet fieldGet);
