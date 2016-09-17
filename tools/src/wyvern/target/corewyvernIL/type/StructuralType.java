@@ -51,7 +51,7 @@ public class StructuralType extends ValueType {
 	public static StructuralType getEmptyType() {
 		return emptyType;
 	}
-	
+
 	@Override
 	public boolean isResource(TypeContext ctx) {
 		return this.resourceFlag;
@@ -69,7 +69,7 @@ public class StructuralType extends ValueType {
 		dest.append("type { ").append(selfName).append(" =>\n");
 		for (DeclType dt : getDeclTypes()) {
 			dt.doPrettyPrint(dest, newIndent);
-		}		
+		}
 		dest.append(indent).append("  }");
 	}
 
@@ -103,7 +103,7 @@ public class StructuralType extends ValueType {
 			return true;
 		if (t instanceof NominalType) {
 			StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
-			if (st == null) 
+			if (st == null)
 				return false; // abstract type; I am always a subtype of this
 			else
 				return isSubtypeOf(st, ctx);

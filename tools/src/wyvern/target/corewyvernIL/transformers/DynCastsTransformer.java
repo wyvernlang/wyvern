@@ -116,7 +116,7 @@ public class DynCastsTransformer implements ILTransformer {
 			IExpr receiver = transform(methCall.getObjectExpr(), ctx);
 			
 			// Get formal arguments of the method being invoked.
-			DefDeclType formalMethCall = methCall.getMethodDeclaration(ctx);
+			DefDeclType formalMethCall = methCall.typeMethodDeclaration(ctx);
 			List<FormalArg> formalArgs = formalMethCall.getFormalArgs();
 			
 			// We will transform each argument to this method call.
