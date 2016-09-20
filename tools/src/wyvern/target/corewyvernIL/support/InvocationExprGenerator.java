@@ -59,8 +59,11 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 			Expression e = genExpr();
 			ValueType vt = e.typeCheck(ctx);
 			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(receiver, ctx));
-		} else {
+		} else if (declType instanceof DefDeclType) {
 			return (DefDeclType) declType;
+		} else {
+			ToolError.reportError(ErrorMessage.NOT_A_METHOD, location, declType.getName());
+			throw new RuntimeException("can't get here");
 		}
 	}
 }
