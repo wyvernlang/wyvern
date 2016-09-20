@@ -93,6 +93,7 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         return wyvern.target.corewyvernIL.support.Util.intType();
     }

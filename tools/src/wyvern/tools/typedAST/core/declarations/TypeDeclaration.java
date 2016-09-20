@@ -143,6 +143,7 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	}
 
 	@Override
+    @Deprecated
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		declEvalEnv = declEnv;
 		if (metaValue.get() == null)

@@ -167,6 +167,7 @@ public class JavaClassDecl extends ClassDeclaration {
 		if (creator.isPresent())
 				typeBinding = new TypeBinding(typeBinding.getName(), typeBinding.getType(), new Reference<Value>() {
 					@Override
+                    @Deprecated
 					public Value get() {
 						try {
 							return Util.toWyvObj(creator.get().invoke(null));

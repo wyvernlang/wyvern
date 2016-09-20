@@ -11,7 +11,7 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
@@ -22,6 +22,7 @@ public class RossettaCodeTests {
     }
 
 	@Test
+    @Deprecated
 	public void testHello() throws ParseException {
 		String program = TestUtil.readFile(PATH + "hello.wyv");
 
@@ -54,38 +55,27 @@ public class RossettaCodeTests {
 	private static final String OLD_PATH = BASE_PATH + "rosetta-old/";
 
 	@Test
-	/**
-	 * This test ensures that hello world works with the old parser
-	 */
-	public void testOldHello() throws CopperParserException, IOException {
-		String program = TestUtil.readFile(OLD_PATH + "helloOld.wyv");
-		TypedAST ast = TestUtil.getAST(program);
-
-		TestUtil.evaluate(ast);
-	}
-
-	@Test
 	public void testNewHello() throws ParseException {
-		ILTests.doTestScriptModularly("rosetta.hello", null, null);
+		TestUtil.doTestScriptModularly("rosetta.hello", null, null);
 	}
 
 	@Test
 	public void testExplicitHello() throws ParseException {
-		ILTests.doTestScriptModularly("rosetta.hello-explicit", null, null);
+		TestUtil.doTestScriptModularly("rosetta.hello-explicit", null, null);
 	}
 
 	@Test
 	public void testFib() throws ParseException {
-		ILTests.doTestScriptModularly("rosetta.fibonacci", null, null);
+		TestUtil.doTestScriptModularly("rosetta.fibonacci", null, null);
 	}
 
 	@Test
 	public void testFactorial() throws ParseException {
-		ILTests.doTestScriptModularly("rosetta.factorial", null, null);
+		TestUtil.doTestScriptModularly("rosetta.factorial", null, null);
 	}
 
 	@Test
 	public void testInsertionSort() throws ParseException {
-		ILTests.doTestScriptModularly("rosetta.insertion-sort", null, null);
+		TestUtil.doTestScriptModularly("rosetta.insertion-sort", null, null);
 	}
 }

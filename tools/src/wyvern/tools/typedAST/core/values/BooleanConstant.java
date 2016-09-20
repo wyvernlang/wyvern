@@ -40,6 +40,7 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		BooleanConstant argValue = (BooleanConstant) exp.getArgument().evaluate(env);
 		String operator = exp.getOperationName();

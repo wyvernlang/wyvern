@@ -88,6 +88,7 @@ public class TypeVarDecl extends Declaration {
 		}
 
 		@Override
+        @Deprecated
 		public Value evaluate(EvaluationEnvironment env) {
 			return UnitVal.getInstance(loc);
 		}
@@ -212,6 +213,7 @@ public class TypeVarDecl extends Declaration {
 		return body.extendName(env, against);
 	}
 
+    @Deprecated
 	private void evalMeta(Environment evalEnv) {
 		MetadataInnerBinding extMetaEnv = evalEnv
 				.lookupBinding("metaEnv", MetadataInnerBinding.class).orElseGet(() -> MetadataInnerBinding.EMPTY);

@@ -113,6 +113,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         return new StructuralType("this", Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.generateILType(), Arrays.asList(new FormalArg("arg1", argument.generateILType())))));
     }

@@ -71,6 +71,7 @@ public class JavaField extends Declaration {
 		}
 
 		@Override
+        @Deprecated
 		public Value getValue(EvaluationEnvironment env) {
 			Object value = null;
 			try {

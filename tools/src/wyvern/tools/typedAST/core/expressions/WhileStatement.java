@@ -60,11 +60,13 @@ public class WhileStatement extends AbstractExpressionAST implements CoreAST, Ex
 		return new Unit();
 	}
 	
+    @Deprecated
 	private boolean evaluateConditional(EvaluationEnvironment env) {
 		return ((BooleanConstant)conditional.evaluate(env)).getValue();
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		while (evaluateConditional(env)) {
 			body.evaluate(env);

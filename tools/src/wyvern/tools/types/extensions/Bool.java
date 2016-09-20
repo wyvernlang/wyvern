@@ -68,6 +68,7 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         throw new WyvernException("Boolean primitive not implemented", FileLocation.UNKNOWN); //TODO
     }

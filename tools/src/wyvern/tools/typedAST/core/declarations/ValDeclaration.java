@@ -164,6 +164,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
+    @Deprecated
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		if (!declEnv.lookup(binding.getName()).isPresent()) return;
 			
