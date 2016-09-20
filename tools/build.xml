@@ -28,23 +28,6 @@
                   extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
                   output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
     </target>
-    <target name="copper-subparsers">
-        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
-        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
-                  hostgrammar="Wyvern"
-                  newfc="objd"
-                  newpackage="wyvern.tools.parsing.parselang"
-                  newname="WyvernDecls"
-                  target="src/wyvern/tools/parsing/parselang/WyvernDecls.java"
-                  extrapackage="wyvern.tools.parsing.*"/>
-        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
-                  hostgrammar="Wyvern"
-                  newfc="type"
-                  newpackage="wyvern.tools.parsing"
-                  newname="TypeParser"
-                  target="src/wyvern/tools/parsing/TypeParser.java"
-                  extrapackage="wyvern.tools.parsing.*"/>
-    </target>
     <target name="lexer">
         <copper outputfile="src/wyvern/tools/lexing/WyvernLexer.java" packagename="wyvern.tools.lexing">
             <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
@@ -57,7 +40,7 @@
     	    javacchome="lib/"
     	/>
     </target>
-    <target name="copper-generate" depends="copper-compose,copper-subparsers,lexer,javacc-parser">
+    <target name="copper-generate" depends="copper-compose,lexer,javacc-parser">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" packagename="wyvern.tools.parsing">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
         </copper>
