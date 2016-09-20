@@ -200,7 +200,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         int offset = 0;
         // generate arguments       
         List<IExpr> args = new LinkedList<IExpr>();
-        for(int i = 0; i < generics.size(); i++) {
+        for (int i = 0; i < generics.size(); i++) {
 
             String generic = generics.get(i);
             String formalName = formals.get(i).getName();

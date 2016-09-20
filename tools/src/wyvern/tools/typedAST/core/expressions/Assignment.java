@@ -195,11 +195,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
             setterArgs.add(exprToAssign);
             return new MethodCall(receiver, setterName, setterArgs, this);
             
-        }
-        
-        // Assigning to an object's field.
-        else if (exprFieldGet instanceof FieldGet) {
-
+        } else if (exprFieldGet instanceof FieldGet) {
+            // Assigning to an object's field.
             // Return a FieldSet to the appropriate field.
             FieldGet fieldGet = (FieldGet) exprFieldGet;
             String fieldName = fieldGet.getName();
@@ -209,13 +206,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
                 objExpr,
                 fieldName,
                 exprToAssign);
-        }
-        
-        // Unknown what's going on.
-        else {
+        } else {
+            // Unknown what's going on.
             ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
             return null; // dead code
         }
-        
     }
 }
