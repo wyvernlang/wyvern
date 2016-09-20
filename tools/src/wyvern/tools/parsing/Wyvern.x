@@ -538,7 +538,7 @@ import java.net.URI;
     def ::= defKwd_t identifier_t:name params:argNames typeasc:fullType declbody:body {: RESULT = new DefDeclaration((String)name, (Type)fullType, (List<NameBinding>)argNames, (TypedAST)body, false, new FileLocation(currentState.pos));:}
     	;
 
-    var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body); :}
+    var ::= varKwd_t identifier_t:id typeasc:type declbody:body {: RESULT = new VarDeclaration((String)id, (Type)type, (TypedAST)body, new FileLocation(currentState.pos)); :}
     	;
 
 	non terminal DeclSequence objv;
@@ -664,7 +664,7 @@ import java.net.URI;
 
 	non terminal a;
 
-    e ::= fnKwd_t identifier_t:id typeasc:t arrow_t e:inner {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, (Type)t)), (TypedAST)inner); :}
+    e ::= fnKwd_t identifier_t:id typeasc:t arrow_t e:inner {: RESULT = new Fn(Arrays.asList(new NameBindingImpl((String)id, (Type)t)), (TypedAST)inner, new FileLocation(currentState.pos)); :}
     	|	 openParen_t e:src typeasc:as closeParen_t {: RESULT = new TypeAsc((TypedAST)src, (Type)as); :}
     	|	 ifKwd_t e:check thenKwd_t e:thenE elseKwd_t e:elseE {:
     		RESULT = new IfExpr(Arrays.asList(new IfExpr.CondClause((TypedAST)check, (TypedAST)thenE, new FileLocation(currentState.pos)),
@@ -710,7 +710,7 @@ import java.net.URI;
     	|	 etuple:tpe {: RESULT = tpe; :}
     	|	 term:src tuple:tgt {: RESULT = new Application((TypedAST)src, (TypedAST)tgt, new FileLocation(currentState.pos)); :}
     	|	 inlinelit:lit {: RESULT = new DSLLit(Optional.of((String)lit)); :}
-    	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res); :}
+    	|	 decimalInteger_t:res {: RESULT = new IntegerConstant((Integer)res, new FileLocation(currentState.pos)); :}
     	|	 newKwd_t {: RESULT = new New(new HashMap<String,TypedAST>(), new FileLocation(currentState.pos)); :}
     	|	 tilde_t {: RESULT = new DSLLit(Optional.empty()); :}
     	|	 shortString_t:str {: RESULT = new StringConstant((String)str); :}

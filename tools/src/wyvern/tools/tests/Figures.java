@@ -9,7 +9,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.tests.TestUtil;
 
 @Category(RegressionTests.class)
 public class Figures {
@@ -24,21 +24,21 @@ public class Figures {
 
 	@Test
 	public void testFigure2() throws ParseException {
-		ILTests.doTestScriptModularly("figs.figure2driver",
+		TestUtil.doTestScriptModularly("figs.figure2driver",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testFigure3() throws ParseException {
-		ILTests.doTestScriptModularly("figs.figure3driver",
+		TestUtil.doTestScriptModularly("figs.figure3driver",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testFigure4() throws ParseException {
-		ILTests.doTestScriptModularly("figs.figure4driver",
+		TestUtil.doTestScriptModularly("figs.figure4driver",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}

@@ -13,10 +13,8 @@ import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.VarBinding;
-import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -39,7 +37,7 @@ import wyvern.tools.interop.FObject;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -49,7 +47,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public class ILTests {
     	
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "modules/module/";
+	private static final String PATH = TestUtil.PATH;
 	
     @BeforeClass public static void setupResolver() {
     	TestUtil.setPaths();
@@ -122,7 +120,7 @@ public class ILTests {
         String input =
                   "val x = 5\n"
         		+ "x\n";
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
     }
 
     @Test
@@ -130,14 +128,14 @@ public class ILTests {
         String input =
                   "val x = \"five\"\n"
         		+ "x\n";
-        doTest(input, Util.stringType(), new StringLiteral("five"));
+        TestUtil.doTest(input, Util.stringType(), new StringLiteral("five"));
     }
 
     @Test
     public void testLetValWithString3() throws ParseException {
         String input = "val identity = (x: system.Int) => x\n"
                      + "identity(5)";
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
     }
 
     @Test(expected=ToolError.class)
@@ -160,7 +158,7 @@ public class ILTests {
 				     + "    val v = 5\n"
 				     + "obj.v\n"
 				     ;
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
 	}
 	
 	@Test
@@ -169,7 +167,7 @@ public class ILTests {
 				     + "    var v : system.Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		doTest(input, Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -188,7 +186,7 @@ public class ILTests {
 				     + "obj.v = 5\n"
 				     + "obj.v\n"
 				     ;
-		doTestInt(input, 5);
+		TestUtil.doTestInt(input, 5);
 	}
 	
 	@Test
@@ -218,7 +216,7 @@ public class ILTests {
 				     + "    var b : system.Int = 10\n"
 				     + "firstObj.a = secondObj.b\n"
 				     + "firstObj.a";
-        doTestInt(input, 10);
+        TestUtil.doTestInt(input, 10);
 	}
 	
 	@Test
@@ -226,7 +224,7 @@ public class ILTests {
 		String input = "val object = new \n"
 					 + "    val field : system.Int = 5 \n"
 					 + "object.field = 10\n";
-		doTestTypeFail(input);
+		TestUtil.doTestTypeFail(input);
 	}
 
 	@Test
@@ -238,7 +236,7 @@ public class ILTests {
 					 + "	def double (argument : system.Int) : system.Int\n"
 					 + "		argument\n"
 					 + "d.double(10)";
-		doTestInt(input, 10);
+		TestUtil.doTestInt(input, 10);
 	}
 	
 	@Test
@@ -268,7 +266,7 @@ public class ILTests {
 				     + "    def m() : system.Int = 5\n"
 				     + "obj.v\n"
 				     ;
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
 	}
 	@Test
 	public void testDefWithValInside() throws ParseException {
@@ -277,7 +275,7 @@ public class ILTests {
 				     + "    v\n"
 				     + "foo()\n"
 				     ;
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
 	}
 	
 	// TODO: add cast checks to make Dyn sound, and wrappers to make it capability-safe
@@ -287,7 +285,7 @@ public class ILTests {
 				     + "val v2 : system.Int = v\n"
 				     + "v2\n"
 				     ;
-		doTest(input, Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -296,7 +294,7 @@ public class ILTests {
 				     + "def invoke(f:Int -> Int, x:Int) : Int = f(x)\n"
 				     + "invoke(id, 5)\n"
 				     ;
-		doTest(input, Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTest(input, Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -306,7 +304,7 @@ public class ILTests {
 					 + "    v = 10\n"
 					 + "    v\n"
 					 + "foo()\n";
-		doTest(input, Util.intType(), new IntegerLiteral(10));
+		TestUtil.doTest(input, Util.intType(), new IntegerLiteral(10));
 	}
 	
     @Test
@@ -314,7 +312,7 @@ public class ILTests {
 		String input = "val obj = new\n"
 				     + "    def id(x:system.Int) : system.Int = x\n"
 				     + "obj.id(5)\n";
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
 	}
 
 	@Test
@@ -323,7 +321,7 @@ public class ILTests {
 				     + "    def id(x:system.String) : system.String = x\n"
 				     + "obj.id(\"five\")\n"
 				     ;
-        doTest(input, Util.stringType(), new StringLiteral("five"));
+        TestUtil.doTest(input, Util.stringType(), new StringLiteral("five"));
 	}
 
 	@Test
@@ -334,7 +332,7 @@ public class ILTests {
 					 + "    def getResult():system.Int = 5\n\n"
 					 + "r.getResult()\n"
 				     ;
-		doTestInt(input, 5);
+		TestUtil.doTestInt(input, 5);
 	}
 	
 	@Test()
@@ -363,7 +361,7 @@ public class ILTests {
 					 + "val i : Int = 5\n\n"
 					 + "i\n"
 				     ;
-        doTest(input, null, new IntegerLiteral(5));
+        TestUtil.doTest(input, null, new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -376,12 +374,12 @@ public class ILTests {
 					 + "    delegate IntResult to r\n\n"
 					 + "r2.getResult()\n"
 				     ;
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
 	}
     
 	@Test
 	public void testSimpleParameterization() throws ParseException {
-		doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.pclient", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	/*@Test
@@ -430,14 +428,14 @@ public class ILTests {
 	
 	@Test
 	public void testRecursiveMethod() throws ParseException {
-		doTestScriptModularly("modules.module.recursive", null, null);
+		TestUtil.doTestScriptModularly("modules.module.recursive", null, null);
 	}
 	
 	
 	
 	@Test
 	public void testRecursiveTypes() throws ParseException {
-		doTestScriptModularly("modules.module.recursivetypes", null, null);
+		TestUtil.doTestScriptModularly("modules.module.recursivetypes", null, null);
 	}
 	
 	@Test
@@ -450,13 +448,13 @@ public class ILTests {
 	
 	@Test
 	public void testRecursiveFunctions() throws ParseException {
-		doTestScriptModularly("modules.module.recursivefunctions", Util.intType(), new IntegerLiteral(5));		
+		TestUtil.doTestScriptModularly("modules.module.recursivefunctions", Util.intType(), new IntegerLiteral(5));		
 	}
 	
 	@Test
     @Category(CurrentlyBroken.class)
 	public void testFact() throws ParseException {
-		doTestScriptModularly("modules.module.bool-nat-fact", null, null);
+		TestUtil.doTestScriptModularly("modules.module.bool-nat-fact", null, null);
 		
         /*String source = TestUtil.readFile(PATH + "bool-nat-fact.wyv");
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source);
@@ -474,7 +472,7 @@ public class ILTests {
 
 	@Test
 	public void testLambda() throws ParseException {
-		doTestScriptModularly("modules.module.lambdatest", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.module.lambdatest", Util.intType(), new IntegerLiteral(5));
 	}
 
     @Test
@@ -485,7 +483,7 @@ public class ILTests {
             + "val getFive:UnitIntFn = () => 5\n"
             + "getFive.apply()";
 
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
     }
 
     @Test
@@ -499,7 +497,7 @@ public class ILTests {
             + "val getFive:UnitIntFn = () => 5\n"
             + "getFive()";
 
-        doTestInt(input, 5);
+        TestUtil.doTestInt(input, 5);
     }
 
     @Test
@@ -510,7 +508,7 @@ public class ILTests {
             + "val getFive:IntIntFn = x => x\n"
             + "getFive(5)";
         
-        doTestInt(source, 5);
+        TestUtil.doTestInt(source, 5);
     }
     
     @Test
@@ -524,7 +522,7 @@ public class ILTests {
             + "    def runLambda(x:IntIntFn):system.Int\n"
             + "        x(5)\n" 
             + "t.runLambda(x=>x)";
-        doTestInt(source, 5);
+        TestUtil.doTestInt(source, 5);
     }
     
     @Test
@@ -538,7 +536,7 @@ public class ILTests {
     	            + "val lambda = getLambda()\n"
     	            + "lambda(5)";
 
-    	 doTestInt(source, 5);
+    	 TestUtil.doTestInt(source, 5);
     }
     
     @Test
@@ -550,7 +548,7 @@ public class ILTests {
     	            + "var t:IntIntFn = x=>x\n"
     	            + "t(5)";
     	 
-    	 doTestInt(source, 5);
+    	 TestUtil.doTestInt(source, 5);
     }
     
     @Test
@@ -563,7 +561,7 @@ public class ILTests {
     	            + "t = x=>5\n"
     	            + "t(4)";
 
-    	doTestInt(source, 5);
+    	TestUtil.doTestInt(source, 5);
     }
 
 	@Test
@@ -590,7 +588,7 @@ public class ILTests {
                      
                      + "c.element.n"
 				     ;
-		doTestInt(input, 5);
+		TestUtil.doTestInt(input, 5);
 	}
 
 	@Test
@@ -619,93 +617,37 @@ public class ILTests {
 					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
 					 + "val x : Int = importTest.addOne(4)\n"
 				     ;
-		doTestModule(input, "x", Util.intType(), new IntegerLiteral(5));
-	}
-
-	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
-		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
-		TypeContext ctx = Globals.getStandardTypeContext();
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
-		IExpr mainProgram = ((DefDeclaration)decl).getBody();
-		IExpr program = new FieldGet(mainProgram, fieldName, null); // slightly hacky		
-        doChecks(program, expectedType, expectedValue);
+		TestUtil.doTestModule(input, "x", Util.intType(), new IntegerLiteral(5));
 	}
 
 	@Test
 	public void testBigInt() throws ParseException {
-		doTestScriptModularly("modules.module.bigint", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.module.bigint", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testBool() throws ParseException {
-		doTestScript("bool.wyv", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScript("bool.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testList() throws ParseException {
-		doTestScript("list.wyv", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScript("list.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testListModularly() throws ParseException {
-		doTestScriptModularly("modules.module.List", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.module.List", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testListClient() throws ParseException {
-		doTestScriptModularly("modules.module.listClient", Util.intType(), new IntegerLiteral(5));
-	}
-	
-	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
-        String source = TestUtil.readFile(PATH + fileName);
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
-        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), null);
-		GenContext genCtx = Globals.getGenContext(state);
-        IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
-        doChecks(program, expectedType, expectedValue);
-	}
-
-	public static void doTestInt(String input, int expectedIntResult) throws ParseException {
-		doTest(input, Util.intType(), new IntegerLiteral(expectedIntResult));
-	}
-
-	// TODO: make other string tests call this function
-	private static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                                                                   new File(TestUtil.BASE_PATH),
-                                                                   new File(TestUtil.LIB_PATH)));
-		final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-		IExpr program = ast.generateIL(genCtx, null, dependencies);
-		program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
-        doChecks(program, expectedType, expectedResult);
-	}
-
-	// TODO: make other script tests call this function
-	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
-      InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH));
-      final Module module = state.getResolver().resolveModule(qualifiedName);
-      IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
-      doChecks(program, expectedType, expectedValue);
-	}
-	
-	private static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
-        // resolveModule already typechecked, but we'll do it again to verify the type
-		TypeContext ctx = Globals.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx);
-        if (expectedType != null)
-        	Assert.assertEquals(expectedType, t);
-        
-        // check the result
-        Value v = program.interpret(Globals.getStandardEvalContext());
-        if (expectedValue != null)
-        	Assert.assertEquals(expectedValue, v);
-	}
+		TestUtil.doTestScriptModularly("modules.module.listClient", Util.intType(), new IntegerLiteral(5));
+	}	
 
 	@Test
 	public void testOperatorPlus() throws ParseException {
-		doTestScriptModularly("modules.module.operator-plus", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.module.operator-plus", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -717,7 +659,7 @@ public class ILTests {
 					 + "import java:wyvern.tools.tests.ILTests.importTest\n\n"
 					 + "val x : system.String = importTest.addOneString(\"4\")\n"
 				     ;
-		doTestModule(input, "x", Util.stringType(), new StringLiteral("5"));
+		TestUtil.doTestModule(input, "x", Util.stringType(), new StringLiteral("5"));
 	}
 	
 	@Test
@@ -729,18 +671,7 @@ public class ILTests {
 				     + "	def getConstant() : system.Int\n"
 				     + "		42\n"
 				     + "c.getConstant()";
-		doTestTypeFail(input);
-	}
-
-	private void doTestTypeFail(String input) throws ParseException {
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
-		try {
-			IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
-			program.typeCheck(Globals.getStandardTypeContext());
-			Assert.fail("Typechecking should have failed.");
-		} catch (ToolError e) {
-		}
+		TestUtil.doTestTypeFail(input);
 	}
 	
 	@Test
@@ -757,13 +688,13 @@ public class ILTests {
 
 	@Test
 	public void testTSL() throws ParseException {
-		doTestScriptModularly("tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
+		TestUtil.doTestScriptModularly("tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
 	}
 	
 	// tests import-dependent types
 	@Test
 	public void testIDT() throws ParseException {
-		doTestScriptModularly("modules.idtDriver", Util.intType(), new IntegerLiteral(3));
+		TestUtil.doTestScriptModularly("modules.idtDriver", Util.intType(), new IntegerLiteral(3));
 	}
 	
 	@Test
@@ -792,7 +723,7 @@ public class ILTests {
 					 + "		var c : Resource = a\n"
 					 + "		0\n"
 					 + "b.saveState()";
-		doTestTypeFail(input);
+		TestUtil.doTestTypeFail(input);
 	}
 
 	@Test
@@ -816,7 +747,7 @@ public class ILTests {
 					 + "	val m : SubType = aSub\n"
 					 + "val aDepthSuper : DepthSuperType = aDepthSub\n"
 					 + "";
-        doTest(input, null, null);
+        TestUtil.doTest(input, null, null);
 	}
 
 	@Test
@@ -834,7 +765,7 @@ public class ILTests {
 					 + "		var c : MarkedResource = a\n"
 					 + "		0\n"
 					 + "b.bar()";
-		doTestTypeFail(input);
+		TestUtil.doTestTypeFail(input);
 	}
 
 	@Test
@@ -852,7 +783,7 @@ public class ILTests {
 				 + "		var c : MarkedResource = a\n"
 				 + "		0\n"
 				 + "b.bar()";
-		doTestTypeFail(input);
+		TestUtil.doTestTypeFail(input);
 	}
 
 	@Test
@@ -870,7 +801,7 @@ public class ILTests {
 					 + "		var c : Pure1 = a\n"
 					 + "		0\n"
 					 + "b.bar()";
-		doTestTypeFail(input);
+		TestUtil.doTestTypeFail(input);
 	}
 
 	@Test
@@ -888,7 +819,7 @@ public class ILTests {
 				 + "		var c : Pure1 = a\n"
 				 + "		0\n"
 				 + "b.bar()";
-		doTestInt(input, 0);
+		TestUtil.doTestInt(input, 0);
 	}
 
 	@Test
@@ -916,7 +847,7 @@ public class ILTests {
 					 + "	var one : system.Int = 1\n"
 					 + "	var two : system.Int = 2\n"
 					 + "x.one";
-		doTest(input, Util.intType(), new IntegerLiteral(1));
+		TestUtil.doTest(input, Util.intType(), new IntegerLiteral(1));
 	}
 
 	public static ImportTestClass importTest = new ImportTestClass();
@@ -972,7 +903,7 @@ public class ILTests {
                 + "val x : Int = 5\n"
                 + "val y : Int = x + 5\n"
                 + "y";		
-		doTest(source, null, new IntegerLiteral(10));
+		TestUtil.doTest(source, null, new IntegerLiteral(10));
 	}
 
 	@Test
@@ -981,7 +912,7 @@ public class ILTests {
                 + "val x : Int = 2\n"
                 + "val y : Int = 4 / 2 - x * 2\n"
                 + "y";		
-		doTest(source, null, new IntegerLiteral(-2));
+		TestUtil.doTest(source, null, new IntegerLiteral(-2));
 	}
 
     @Test
@@ -989,7 +920,7 @@ public class ILTests {
 
         String source = "val identity: system.Int->system.Int = (x: system.Int) => x\n"
             + "identity(10)";
-		doTestInt(source, 10);
+		TestUtil.doTestInt(source, 10);
     }
     
     @Test
@@ -1009,7 +940,7 @@ public class ILTests {
 
                       + "Identity(five)";
 
-        doTest(source, null, null);
+        TestUtil.doTest(source, null, null);
     }
 
 
@@ -1030,7 +961,7 @@ public class ILTests {
 
                       + "Identity(five)";
 
-        doTest(input, null, new IntegerLiteral(5));
+        TestUtil.doTest(input, null, new IntegerLiteral(5));
     }
 
     @Test
@@ -1049,7 +980,7 @@ public class ILTests {
                       + "    val element: this.heldType = 5\n\n"
 
                       + "Identity(five, 5)";
-        doTest(source, null, new IntegerLiteral(5));
+        TestUtil.doTest(source, null, new IntegerLiteral(5));
     }
 
     @Test
@@ -1086,7 +1017,7 @@ public class ILTests {
 
                       + "ifSt(True, IntegerTen, IntegerFive)";
 
-        doTest(source, null, new IntegerLiteral(10));
+        TestUtil.doTest(source, null, new IntegerLiteral(10));
     }
 
     @Test
@@ -1123,7 +1054,7 @@ public class ILTests {
 
                       + "ifSt(False, IntegerTen, IntegerFive)";
 
-        doTest(source, null, new IntegerLiteral(5));
+        TestUtil.doTest(source, null, new IntegerLiteral(5));
     }
 
     @Test
@@ -1142,7 +1073,7 @@ public class ILTests {
 
             + "intHolder.giveThing()";
 
-        doTest(source, null, new IntegerLiteral(10));
+        TestUtil.doTest(source, null, new IntegerLiteral(10));
     }
 
     @Test
@@ -1156,7 +1087,7 @@ public class ILTests {
 
           + "b.x \n";
 
-        doTest(source, null, new IntegerLiteral(3));
+        TestUtil.doTest(source, null, new IntegerLiteral(3));
     }
 
     @Test
@@ -1172,7 +1103,7 @@ public class ILTests {
 
           + "b.x \n";
 
-        doTest(source, null, new IntegerLiteral(3));
+        TestUtil.doTest(source, null, new IntegerLiteral(3));
     }
 
     // TODO: the "right fix" for this bug is to allow an expression at the top level to refer
@@ -1203,7 +1134,7 @@ public class ILTests {
 
           + "body1.apply() \n"
           + "";
-        doTest(source, null, new IntegerLiteral(7));
+        TestUtil.doTest(source, null, new IntegerLiteral(7));
     }
 
     @Test
@@ -1249,7 +1180,7 @@ public class ILTests {
             + "iff(trueCase, body1, body2) \n\n"
             + "";
 
-        doTest(source, null, new IntegerLiteral(5));
+        TestUtil.doTest(source, null, new IntegerLiteral(5));
     }
 
     @Test
@@ -1263,7 +1194,7 @@ public class ILTests {
                       + "identity[Int](x) \n"
                       + "";
 
-        doTest(source, null, new IntegerLiteral(15));
+        TestUtil.doTest(source, null, new IntegerLiteral(15));
     }
 
     @Test
@@ -1280,7 +1211,7 @@ public class ILTests {
                       + "identity[Int, Int](x, y) \n"
                       + "";
 
-        doTest(source, null, new IntegerLiteral(20));
+        TestUtil.doTest(source, null, new IntegerLiteral(20));
     }
 
     @Test
@@ -1294,7 +1225,7 @@ public class ILTests {
                       + "identity(x) \n"
                       + "";
 
-        doTest(source, null, new IntegerLiteral(15));
+        TestUtil.doTest(source, null, new IntegerLiteral(15));
     }
 
     @Test
@@ -1309,7 +1240,7 @@ public class ILTests {
                       + "identity(x, y) \n"
                       + "";
 
-        doTest(source, null, new IntegerLiteral(15));
+        TestUtil.doTest(source, null, new IntegerLiteral(15));
     }
 
     @Test
@@ -1323,7 +1254,7 @@ public class ILTests {
                       + "val y = 7 \n"
                       + "y";
 
-        doTest(source, null, new IntegerLiteral(7));
+        TestUtil.doTest(source, null, new IntegerLiteral(7));
     }
     
     
@@ -1331,7 +1262,7 @@ public class ILTests {
     public void testDeclarationReturn1() throws ParseException {
     	String src = "val something : Dyn = 5\n"
     			      + "val five : Int = something";
-    	doTest(src, Util.unitType(), Util.unitValue());
+    	TestUtil.doTest(src, Util.unitType(), Util.unitValue());
     }
     
     @Test
@@ -1339,7 +1270,7 @@ public class ILTests {
     	String src = "val something : Dyn = 5\n"
     			   + "val five : Int = something\n"
     			   + "five";
-    	doTest(src, Util.intType(), new IntegerLiteral(5));
+    	TestUtil.doTest(src, Util.intType(), new IntegerLiteral(5));
     }
     
     @Test
@@ -1348,7 +1279,7 @@ public class ILTests {
     	String src = "val obj : Dyn = new\n"
     			   + "    def method(): Int = 5\n"
     			   + "obj.method()";
-    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    	TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(5));
     	
     }
     
@@ -1357,7 +1288,7 @@ public class ILTests {
     	String src = "val obj: Dyn = new\n"
     			   + "    val field: Int = 5\n"
     			   + "obj.field";
-    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    	TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(5));
     }
     
     @Test
@@ -1365,7 +1296,7 @@ public class ILTests {
     	String src = "val obj: Dyn = new\n"
     			   + "    var field: Int = 5\n"
     			   + "obj.field";
-    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    	TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(5));
     }
     
     @Test
@@ -1374,7 +1305,7 @@ public class ILTests {
     			   + "    var field: Int = 5\n"
     			   + "obj.field = 10\n"
     			   + "obj.field";
-    	doTest(src, Util.dynType(), new IntegerLiteral(10));
+    	TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(10));
     }
     
     @Test
@@ -1382,7 +1313,7 @@ public class ILTests {
     	String src = "val obj: Dyn = new\n"
     			   + "    def method(x: Int): Int = x\n"
     			   + "obj.method(5)";
-    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    	TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(5));
     }
     
 }
