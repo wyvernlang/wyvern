@@ -41,6 +41,7 @@ public class ToastExpression extends AbstractExpressionAST implements Expression
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		Value res = exn.evaluate(env);
 

@@ -82,6 +82,7 @@ public class Str extends AbstractTypeImpl implements OperatableType {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         throw new WyvernException("Primitive type conversion unimplmented"); //TODO
     }

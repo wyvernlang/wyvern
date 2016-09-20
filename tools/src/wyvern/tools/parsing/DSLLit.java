@@ -72,6 +72,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
+    @Deprecated
 	public Type typecheck(Environment env, Optional<Type> expected) {
 		Type dslType = expected.orElseGet(this::getDefaultType);
 
@@ -89,6 +90,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		return null;
 	}

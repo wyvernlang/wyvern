@@ -104,6 +104,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
         TypedAST lhs = function.evaluate(env);
         if (Globals.checkRuntimeTypes && !(lhs instanceof ApplyableValue)) {

@@ -42,6 +42,7 @@ public class Unit extends AbstractTypeImpl {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         throw new WyvernException("Primitive type conversion unimplmented"); //TODO
     }

@@ -51,6 +51,7 @@ public class TypeInstance extends AbstractTreeWritable implements CoreAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		Value value = env.lookup(binding.getName()).get().getValue(env);
 		assert value != null;

@@ -91,6 +91,7 @@ public class Match extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		//TaggedInfo.resolveAll(env, this);
 

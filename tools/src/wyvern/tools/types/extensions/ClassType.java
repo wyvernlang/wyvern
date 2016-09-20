@@ -218,6 +218,7 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 	}
 
     @Override
+    @Deprecated
     public wyvern.target.corewyvernIL.type.ValueType generateILType() {
         if (getTaggedInfo() != null) {
             TaggedInfo ti = this.tagInfo;

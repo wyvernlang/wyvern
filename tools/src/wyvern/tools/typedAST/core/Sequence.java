@@ -148,6 +148,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		EvaluationEnvironment iEnv = env;
 		Value lastVal = UnitVal.getInstance(this.getLocation());

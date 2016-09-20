@@ -126,6 +126,7 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 
 
 	@Override
+    @Deprecated
 	public Value evaluateApplication(Application app, EvaluationEnvironment env) {
 		EvaluationEnvironment iEnv = evalEnv.extend(env);
 		Value[] values = vFromV(app.getArgument().evaluate(env));;

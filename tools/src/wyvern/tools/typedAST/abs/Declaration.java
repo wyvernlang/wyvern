@@ -26,6 +26,7 @@ public abstract class Declaration extends AbstractTreeWritable implements Enviro
 	 * Most declarations simply evaluate to unit without any computation
 	 */
 	@Override
+    @Deprecated
 	public final Value evaluate(EvaluationEnvironment env) {
 		// code smell - can we eliminate this function?
 		// throw new RuntimeException("cannot evaluate a decl to a value - use evalDecls to get an updated environment");

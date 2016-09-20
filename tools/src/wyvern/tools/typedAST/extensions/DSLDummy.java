@@ -48,6 +48,7 @@ public class DSLDummy extends AbstractExpressionAST implements ExpressionAST {
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
         return dslDef.evaluate(env);
     }

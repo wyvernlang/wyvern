@@ -88,6 +88,7 @@ public class JavaClassType extends ClassType implements MetaType {
 
 
 	@Override
+    @Deprecated
 	public Value getMetaObj() {
 
 		Method creator = Arrays.asList(decl.getClazz().getDeclaredMethods()).stream()
