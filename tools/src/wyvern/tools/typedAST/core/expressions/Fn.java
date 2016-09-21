@@ -43,7 +43,6 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     private List<NameBinding> bindings;

@@ -1,2 +1,0 @@
-tagged type Type1
-    def getValue1() : Int

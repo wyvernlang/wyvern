@@ -1,4 +1,0 @@
-//we capatilised "tagged"
-Tagged class X
-    class def create() : X
-        new
