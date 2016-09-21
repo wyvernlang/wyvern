@@ -55,11 +55,6 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	}
 	
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(argument, result);		
-	}
-	
-	@Override
 	public String toString() {
 		String argString = (argument == null)?null:argument.toString();
 		if (!argument.isSimple())

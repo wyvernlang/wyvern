@@ -113,11 +113,6 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
-	}
-
-	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		if (expectedType == null) {
 			ToolError.reportError(ErrorMessage.NO_EXPECTED_TYPE, this);

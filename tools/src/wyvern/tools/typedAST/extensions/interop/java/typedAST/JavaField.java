@@ -125,11 +125,6 @@ public class JavaField extends Declaration {
         return FileLocation.UNKNOWN;
     }
 
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-
-    }
-
 	@Override
 	public Environment extendType(Environment env, Environment against) {
 		return env;

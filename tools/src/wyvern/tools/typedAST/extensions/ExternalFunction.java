@@ -14,7 +14,6 @@ import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.Executor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -53,11 +52,6 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
     public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
         throw new WyvernException("Cannot generate IL for an external function", this);
     }
-
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// no arguments at the moment; also not intended for serialization		
-	}
 
 	@Override
 	public Value evaluateApplication(Application app, EvaluationEnvironment env) {

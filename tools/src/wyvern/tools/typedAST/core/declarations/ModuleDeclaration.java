@@ -43,7 +43,6 @@ import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -213,11 +212,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	public FileLocation getLocation() {
 		return location;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(name);
 	}
 
 	@Override

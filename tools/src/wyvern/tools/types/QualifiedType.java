@@ -42,10 +42,4 @@ public class QualifiedType extends AbstractTypeImpl {
 		IExpr exp = ast.generateIL(ctx, null, null);
 		return (Path) exp;
 	}
-	
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(base, name);
-	}
-
 }

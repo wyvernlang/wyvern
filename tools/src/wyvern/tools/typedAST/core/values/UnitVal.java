@@ -12,7 +12,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -31,11 +30,6 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	@Override
 	public Type getType() {
 		return new Unit();
-	}
-	
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write		
 	}
 	
 	@Override

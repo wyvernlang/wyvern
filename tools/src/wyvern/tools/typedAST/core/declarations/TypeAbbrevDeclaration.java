@@ -17,7 +17,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -64,13 +63,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
 		// TODO Auto-generated method stub
 		
 	}

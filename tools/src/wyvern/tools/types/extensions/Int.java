@@ -61,11 +61,6 @@ public class Int extends AbstractTypeImpl implements OperatableType {
 	}
 	
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write		
-	}
-	
-	@Override
 	public String toString() {
 		return "Int";
 	}

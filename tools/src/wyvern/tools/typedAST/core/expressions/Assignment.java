@@ -27,7 +27,6 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -58,11 +57,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         this.target = (ExpressionAST) target;
         this.value = (ExpressionAST) value;
         this.location = fileLocation;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(target, value);
     }
 
     @Override

@@ -26,7 +26,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -62,11 +61,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         this.argument = op2;
         this.operationName = operatorName;
         this.location = fileLocation;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(receiver, operationName, argument);
     }
 
     @Override

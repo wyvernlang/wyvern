@@ -10,7 +10,6 @@ import java.util.Optional;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -35,11 +34,6 @@ public class TypeInstance extends AbstractTreeWritable implements CoreAST {
 	@Override
 	public Type getType() {
 		return binding.getType();
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName());		
 	}
 
 	@Override

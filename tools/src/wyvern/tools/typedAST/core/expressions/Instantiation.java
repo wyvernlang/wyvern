@@ -11,7 +11,6 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -39,11 +38,6 @@ public class Instantiation extends Declaration implements CoreAST {
         this.arg = arg;
         this.location = loc;
         this.name = image;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(arg);
     }
 
     @Override

@@ -21,7 +21,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -96,12 +95,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	
     public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
 		this(name, decls, metadata, null, clsNameLine);
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		//TODO: implement me
-		//writer.writeArgs(definition);
 	}
 
 	@Override

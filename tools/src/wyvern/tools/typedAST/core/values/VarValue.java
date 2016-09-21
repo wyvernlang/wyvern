@@ -52,11 +52,6 @@ public class VarValue extends AbstractValue {
         throw new WyvernException("Cannot generate code for runtime values", FileLocation.UNKNOWN);
     }
 
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(innerValue);
-	}
-	
 	public Value getValue() {
 		return innerValue;
 	}

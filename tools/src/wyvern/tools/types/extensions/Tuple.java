@@ -78,11 +78,6 @@ public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResol
     }
 	
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(types);	
-	}
-	
-	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder(types.length + 2);
 		

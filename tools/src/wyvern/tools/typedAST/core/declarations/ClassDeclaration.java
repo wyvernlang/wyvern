@@ -35,7 +35,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -159,12 +158,6 @@ public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST
 
 	protected Type getClassType() {
 		return new ClassType(this);
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		//TODO: implement me`
-		writer.writeArgs(decls); // FIXME: This can be recursive! Sometimes crashes with StackOverflow!!!
 	}
 
 	@Override

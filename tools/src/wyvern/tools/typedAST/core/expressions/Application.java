@@ -35,7 +35,6 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -74,11 +73,6 @@ public class Application extends CachingTypedAST implements CoreAST {
         this.argument = (ExpressionAST) argument;
         this.location = location;
         this.generics = (generics != null) ? generics : new LinkedList<String>();
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(function, argument);
     }
 
     @Override

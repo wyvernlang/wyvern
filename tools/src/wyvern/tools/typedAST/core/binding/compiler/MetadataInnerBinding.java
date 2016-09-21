@@ -47,10 +47,6 @@ public class MetadataInnerBinding implements Binding {
 		return new Unit();
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
-	}
 	public Environment getInnerEnv() {
 		return tcEnv.get();
 	}

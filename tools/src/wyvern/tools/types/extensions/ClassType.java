@@ -74,11 +74,6 @@ public class ClassType extends AbstractTypeImpl implements OperatableType, Recor
 		// System.out.println("Creating ClassType with declEnv " + declEnv.get());
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write
-	}
-
 	private boolean recursive = false;
 	@Override
 	public String toString() {

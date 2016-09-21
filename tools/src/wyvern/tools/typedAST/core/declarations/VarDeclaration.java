@@ -26,7 +26,6 @@ import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -60,11 +59,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		this.definition=(ExpressionAST)definition;
 		binding = new AssignableNameBinding(varName, parsedType);
 		this.location = loc;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definition);
 	}
 
 	@Override

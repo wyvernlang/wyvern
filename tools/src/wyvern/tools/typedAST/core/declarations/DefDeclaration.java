@@ -33,7 +33,6 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -115,11 +114,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(name, type, body);
 	}
 
 	@Override

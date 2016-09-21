@@ -51,24 +51,28 @@ public class TreeWriter {
 		writeGenericObject(o2);
 		writeGenericObject(o3);
 	}
+
+    // TODO delete this whole file
 	public void writeArgs(Object o1, Object o2, Object o3, Object o4) {
 		writeGenericObject(o1);
 		writeGenericObject(o2);
 		writeGenericObject(o3);
 		writeGenericObject(o4);
 	}
+
+    // TODO delete this
 	public void writeArgs(Object[] objs) {
 		for (Object o : objs) {
 			writeGenericObject(o);
 		}
 	}
 	
+    // TODO delete this
 	public void writeObject(TreeWritable o) {
 		String className = o.getClass().getSimpleName();
 		buf.append(className);
 		buf.append('(');
 		first = true;
-		o.writeArgsToTree(this);
 		first = false;
 		buf.append(')');
 	}

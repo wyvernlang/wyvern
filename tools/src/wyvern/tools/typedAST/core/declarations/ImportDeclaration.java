@@ -49,7 +49,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -118,11 +117,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
   @Override
   public FileLocation getLocation() {
     return location;
-  }
-
-  @Override
-  public void writeArgsToTree(TreeWriter writer) {
-      writer.writeArgs(uri.toString());
   }
 
   @Override

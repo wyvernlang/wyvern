@@ -32,10 +32,6 @@ public class ClassBinding extends ValueBinding {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-	}
-
-	@Override
 	public String toString() {
 		return "{" + name + " as class  " + cd + "}";
 	}

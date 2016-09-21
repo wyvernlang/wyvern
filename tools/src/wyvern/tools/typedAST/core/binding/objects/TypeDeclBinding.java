@@ -29,10 +29,6 @@ public class TypeDeclBinding implements Binding {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-	}
-
-	@Override
 	public String toString() {
 		return "{" + name + " as type  " + td + "}";
 	}

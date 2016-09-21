@@ -13,7 +13,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -40,11 +39,6 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	@Override
 	public Type getType() {
 		return new Int();
-	}
-	
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(value);		
 	}
 
 	public int getValue() {

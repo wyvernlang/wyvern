@@ -74,11 +74,6 @@ public class SpliceExn extends AbstractExpressionAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
-	}
-
-	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;

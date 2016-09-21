@@ -34,7 +34,6 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -115,15 +114,6 @@ public class New extends CachingTypedAST implements CoreAST {
      */
     public static void resetGenNum() {
         generic_num = 0;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(cls);
-        // FIXME: Not sure if this is rigth (Alex).
-        for (TypedAST a : this.args.values()) {
-            writer.writeArgs(a);
-        }
     }
 
     private String self() {

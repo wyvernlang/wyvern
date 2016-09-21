@@ -79,11 +79,6 @@ public class DSLDummy extends AbstractExpressionAST implements ExpressionAST {
             return FileLocation.UNKNOWN;
     }
 
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-
-    }
-
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub

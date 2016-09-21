@@ -22,7 +22,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -52,11 +51,6 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     @Override
     public Type getType() {
         return binding.getType();
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(binding.getName());
     }
 
     @Override

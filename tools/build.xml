@@ -28,6 +28,25 @@
                   extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
                   output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
     </target>
+    <target name="copper-subparsers">
+        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
+        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
+            hostgrammar="Wyvern"
+            newfc="objd"
+            newpackage="wyvern.tools.parsing.parselang"
+            newname="WyvernDecls"
+            target="src/wyvern/tools/parsing/parselang/WyvernDecls.java"
+            extrapackage="wyvern.tools.parsing.*"
+        />
+        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
+            hostgrammar="Wyvern"
+            newfc="type"
+            newpackage="wyvern.tools.parsing"
+            newname="TypeParser"
+            target="src/wyvern/tools/parsing/TypeParser.java"
+            extrapackage="wyvern.tools.parsing.*"
+        />
+    </target>
     <target name="lexer">
         <copper outputfile="src/wyvern/tools/lexing/WyvernLexer.java" packagename="wyvern.tools.lexing">
             <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
@@ -101,7 +120,8 @@
                 wyvern/tools/typedAST/core/expressions/Fn.java
                 wyvern/tools/typedAST/core/expressions/IfExpr.java
                 wyvern/tools/typedAST/core/expressions/Instantiation.java
-                wyvern/tools/typedAST/core/expressions/Invocation.java"
+                wyvern/tools/typedAST/core/expressions/Invocation.java
+                wyvern/tools/util/TreeWritable.java"
             />
         </checkstyle>
     </target>
