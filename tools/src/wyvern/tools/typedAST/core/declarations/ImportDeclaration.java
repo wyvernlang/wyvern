@@ -120,15 +120,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return location;
   }
 
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(uri.toString());
-    }
-
-
   @Override
-  public void accept(CoreASTVisitor visitor) {
-    visitor.visit(this);
+  public void writeArgsToTree(TreeWriter writer) {
+      writer.writeArgs(uri.toString());
   }
 
   @Override

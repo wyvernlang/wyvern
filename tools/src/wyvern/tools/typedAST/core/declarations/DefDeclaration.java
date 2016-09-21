@@ -123,11 +123,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Type getType() {
 		return type;
 	}

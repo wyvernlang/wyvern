@@ -77,11 +77,6 @@ public class WhileStatement extends AbstractExpressionAST implements CoreAST, Ex
 		return UnitVal.getInstance(this.getLocation());
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	public TypedAST getConditional() {
 		return conditional;
 	}

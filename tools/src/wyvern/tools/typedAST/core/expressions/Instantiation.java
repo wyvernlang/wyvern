@@ -51,11 +51,6 @@ public class Instantiation extends Declaration implements CoreAST {
         return location;
     }
 
-    @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
     /*
     @Override
     protected Type doTypecheck(Environment env, Optional<Type> expected) {

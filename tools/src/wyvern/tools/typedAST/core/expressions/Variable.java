@@ -96,11 +96,6 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     public void checkAssignment(Assignment ass, Environment env) {
         AssignableNameBinding vb =
                 env.lookupBinding(binding.getName(), AssignableNameBinding.class)

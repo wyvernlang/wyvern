@@ -66,11 +66,6 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Value evaluate(EvaluationEnvironment env) {
 		Value[] evaluatedResults = new Value[objects.length];
 		for (int i = 0; i < objects.length; i++) {

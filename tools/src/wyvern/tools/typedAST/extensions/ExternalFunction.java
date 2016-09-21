@@ -27,7 +27,8 @@ import wyvern.tools.util.TreeWriter;
 public class ExternalFunction extends AbstractValue implements ApplyableValue, CoreAST {
 	private Type type;
 	private Executor exec;
-	
+	private FileLocation location = FileLocation.UNKNOWN;
+
 	public ExternalFunction(Type type, Executor exec) {
 		this.type = type;
 		this.exec = exec;
@@ -64,12 +65,6 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 		return exec.execute(env, argValue);
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO  Not really sure what to do here.
-	}
-
-	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
 	}

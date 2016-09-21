@@ -72,11 +72,6 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	/*
 	// TODO: SMELL: maybe should have a list of decls here? but reuse between letexpr and class?
 	// depends on declToAdd adding the returned decl to itself

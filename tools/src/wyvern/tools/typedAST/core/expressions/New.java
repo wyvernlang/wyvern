@@ -419,12 +419,6 @@ public class New extends CachingTypedAST implements CoreAST {
         return cls;
     }
 
-    @Override
-    public void accept(CoreASTVisitor visitor) {
-        //TODO: fix args
-        visitor.visit(this);
-    }
-
     public Map<String, TypedAST> getArgs() {
         return args;
     }

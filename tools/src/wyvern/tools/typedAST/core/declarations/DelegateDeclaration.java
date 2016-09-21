@@ -87,11 +87,6 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public String getName() {
 		return "aDelegation";
 	}

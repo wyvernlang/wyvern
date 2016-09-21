@@ -64,10 +64,6 @@ public class TypeInstance extends AbstractTreeWritable implements CoreAST {
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	@Override
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> childMap = new HashMap<>();
 		return childMap;

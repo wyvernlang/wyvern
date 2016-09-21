@@ -121,11 +121,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     public void checkAssignment(Assignment ass, Environment env) {
         Type recType = receiver.typecheck(env, Optional.empty());
         if (!(recType instanceof ClassType)) { //TODO: Hack

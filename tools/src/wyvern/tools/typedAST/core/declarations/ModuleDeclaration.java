@@ -221,11 +221,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public DeclType genILType(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;

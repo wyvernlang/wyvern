@@ -85,11 +85,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     protected Type doTypecheck(Environment env, Optional<Type> expected) {
         Type lastType = null;
         for (IfClause clause : clauses) {

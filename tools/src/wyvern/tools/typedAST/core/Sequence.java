@@ -210,11 +210,6 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		return this.location;
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public String toString() {
 		return this.exps.toString();
 	}

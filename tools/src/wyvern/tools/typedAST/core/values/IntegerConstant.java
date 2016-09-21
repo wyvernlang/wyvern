@@ -84,11 +84,6 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 		}
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;

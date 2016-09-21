@@ -30,9 +30,6 @@ import wyvern.tools.util.TreeWriter;
 
 public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
-
-	
-	
 	private String alias;
 	private Type reference;
 	private FileLocation location;
@@ -94,12 +91,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	public Environment extendName(Environment env, Environment against) {
 		// TODO Auto-generated method stub
 		return env;
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

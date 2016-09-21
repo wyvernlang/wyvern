@@ -256,11 +256,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return location;
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	public void resolve(Environment env) {
 		if (this.defaultCase != null)
 			this.defaultCase.resolve(env, this);

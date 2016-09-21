@@ -78,11 +78,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return binding.getType();
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public NameBinding getBinding() {
 		return binding;
 	}

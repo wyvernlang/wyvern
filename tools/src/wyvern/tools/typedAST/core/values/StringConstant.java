@@ -82,11 +82,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Map<String, TypedAST> getChildren() {
 		Hashtable<String, TypedAST> children = new Hashtable<>();
 		return children;
