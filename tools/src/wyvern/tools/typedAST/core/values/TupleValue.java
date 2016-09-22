@@ -56,11 +56,6 @@ public class TupleValue extends AbstractValue implements InvokableValue {
 		return new TupleValue(tuple, ast);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate IL for a runtime object", FileLocation.UNKNOWN);
-    }
-
 	public Value getValue(int index) {
 		return values[index];
 	}

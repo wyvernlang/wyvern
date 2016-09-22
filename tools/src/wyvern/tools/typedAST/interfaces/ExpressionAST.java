@@ -30,5 +30,4 @@ public interface ExpressionAST extends TypedAST {
 		topLevelContext.addExpression(exp, type);
 		Expression e;
 	}
-
 }

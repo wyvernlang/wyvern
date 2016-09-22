@@ -137,22 +137,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-    	ValueType valueType = getType ().generateILType();
-        environment.register(getName(), valueType);
-        GenerationEnvironment igen = new GenerationEnvironment(environment);
-
-        for (NameBinding nb : argNames)
-            igen.register(nb.getName(), valueType);
-        writer.write(new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
-                argNames.stream().map(nb -> new FormalArg(nb.getName(), nb.getType().generateILType())).collect(Collectors.toList()),
-                        type.generateILType(),
-                        ExpressionWriter.generate(iw -> {
-                            body.codegenToIL(igen, iw);
-                        }), getLocation()));
-    }
-
-    @Override
 	protected Type doTypecheck(Environment env) {
 		Environment extEnv = env;
 		for (NameBinding bind : argNames) {

@@ -124,16 +124,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return new VarDeclaration(getName(), getType(), nc.get("definition"), location);
 	}
 
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-    	ValueType valType = getType().generateILType();
-        environment.register(getName(), valType);
-        String genName = GenerationEnvironment.generateVariableName();
-        writer.wrap(e->new Let(genName, valType, Optional.ofNullable(definition).<Expression>map(d -> ExpressionWriter.generate(ew -> d.codegenToIL(environment, ew))).orElse(null), (Expression)e));
-        writer.write(new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), valType, new Variable(genName), location));
-    }
-
     @Override
 	public Environment extendType(Environment env, Environment against) {
 		return env;
@@ -149,7 +139,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
-		return this.location; //TODO
+		return this.location;
 	}
 
 	@Override

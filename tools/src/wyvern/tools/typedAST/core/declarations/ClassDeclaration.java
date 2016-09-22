@@ -422,58 +422,6 @@ public class ClassDeclaration extends AbstractTypeDeclaration implements CoreAST
 		return classDeclaration;
 	}
 
-    public List<wyvern.target.corewyvernIL.decl.Declaration> getObjectDecls(GenerationEnvironment environment, ILWriter writer) {
-        //Class declarations
-        LinkedList<wyvern.target.corewyvernIL.decl.Declaration> classMembers = new LinkedList<>();
-        for (Declaration decl : this.decls.getDeclIterator()) {
-            if (!decl.isClassMember()) {
-                ILWriter dwriter = getIlWriter(writer, classMembers);
-                decl.codegenToIL(environment, dwriter);
-            }
-        }
-        return classMembers;
-    }
-
-    private ILWriter getIlWriter(final ILWriter writer, final LinkedList<wyvern.target.corewyvernIL.decl.Declaration> classMembers) {
-        return new ILWriter() {
-                        @Override
-                        public void write(ASTNode node) {
-                            classMembers.add((wyvern.target.corewyvernIL.decl.Declaration)node);
-                        }
-
-                        @Override
-                        public void writePrefix(ASTNode node) {
-                            classMembers.add((wyvern.target.corewyvernIL.decl.Declaration)node); // Will always go before
-                        }
-
-                        @Override
-                        public void wrap(Function<ASTNode, ASTNode> wrapper) {
-                            writer.wrap(wrapper);
-                        }
-                    };
-    }
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        //Class declarations
-        LinkedList<wyvern.target.corewyvernIL.decl.Declaration> classMembers = new LinkedList<>();
-        for (Declaration decl : this.decls.getDeclIterator()) {
-            if (decl.isClassMember()) {
-                decl.codegenToIL(environment, getIlWriter(writer, classMembers));
-            }
-        }
-        ValueType valueType = nameBinding.getType().generateILType();
-        wyvern.target.corewyvernIL.Environment.getRootEnvironment().extend(
-        		new wyvern.target.corewyvernIL.binding.NewBinding (nameBinding.getName(), valueType));
-        String newVar = GenerationEnvironment.generateVariableName();
-        writer.wrap(e->new Let(newVar, valueType, new New(classMembers, "this", valueType, getLocation()), (Expression)e));
-        environment.register(nameBinding.getName(), valueType);
-        //TODO: Tags support
-        writer.write(new TypeDeclaration(nameBinding.getName(), valueType, getLocation()));
-        writer.write(new ValDeclaration(nameBinding.getName(), valueType, new Variable(newVar), getLocation()));
-    }
-
-
     public List<String> getTypeParams() {
 		return typeParams;
 	}

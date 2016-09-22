@@ -68,11 +68,6 @@ public class TypeAsc extends AbstractExpressionAST implements ExpressionAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(ExpressionWriter.generate(wi -> exn.codegenToIL(environment, wi))); // Can just ignore
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
 	}

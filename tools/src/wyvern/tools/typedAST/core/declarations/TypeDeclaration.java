@@ -116,12 +116,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Unimplemented", this);
-        //return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), null); //TODO
-    }
-
-    @Override
 	public Type doTypecheck(Environment env) {
 		Environment eenv = decls.extend(env, env);
 		

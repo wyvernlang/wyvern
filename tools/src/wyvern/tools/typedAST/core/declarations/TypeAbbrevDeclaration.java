@@ -62,12 +62,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public FileLocation getLocation() {
 		// TODO Auto-generated method stub
 		return null;

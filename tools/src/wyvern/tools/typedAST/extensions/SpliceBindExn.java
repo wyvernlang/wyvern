@@ -96,11 +96,6 @@ public class SpliceBindExn extends AbstractExpressionAST implements BoundCode {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(ExpressionWriter.generate(wi -> exn.codegenToIL(environment, wi)));
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
 	}

@@ -108,39 +108,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        Expression objectExpr = null;
-        String fieldName = null;
-
-        if (target instanceof Invocation) {
-            objectExpr = ExpressionWriter.generate(
-                iwriter -> ((Invocation) target)
-                .getReceiver()
-                .codegenToIL(environment, iwriter)
-            );
-
-            fieldName = ((Invocation) target).getOperationName();
-
-        } else if (target instanceof wyvern.tools.typedAST.core.expressions.Variable) {
-
-            objectExpr = new Variable("this");
-            fieldName = ((wyvern.tools.typedAST.core.expressions.Variable) target)
-                .getName();
-        } else {
-            throw new RuntimeException("Invalid assignment for codegen");
-        }
-        writer.write(
-                new FieldSet(
-                    value.getType().generateILType(),
-                    objectExpr,
-                    fieldName,
-                    ExpressionWriter.generate(
-                        iwriter -> value.codegenToIL(environment, iwriter))
-                )
-        );
-    }
-
-    @Override
     public ExpressionAST doClone(Map<String, TypedAST> nc) {
         return new Assignment(nc.get("target"), nc.get("value"), location);
     }

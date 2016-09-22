@@ -205,11 +205,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		throw new RuntimeException("Cannot codegen modules yet");
-	}
-
-	@Override
 	public FileLocation getLocation() {
 		return location;
 	}

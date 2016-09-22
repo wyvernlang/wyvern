@@ -115,11 +115,6 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
         return new Variable(binding, location);
     }
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(environment.lookupVar(binding.getName(), writer));
-    }
-
     public FileLocation getLocation() {
         return this.location;
     }

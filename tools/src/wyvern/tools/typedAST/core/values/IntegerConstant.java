@@ -95,11 +95,6 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new IntegerLiteral(value, location));
-    }
-
-    @Override
 	public boolean equals(Object o) {
 		if (!(o instanceof IntegerConstant))
 			return false;

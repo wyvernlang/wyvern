@@ -93,11 +93,6 @@ public class WhileStatement extends AbstractExpressionAST implements CoreAST, Ex
 		return new WhileStatement(newChildren.get("cond"), newChildren.get("body"), location);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("Not implemented codegen for whilestatement"); //TODO remove this
-    }
-
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub

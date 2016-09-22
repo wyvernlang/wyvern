@@ -362,35 +362,6 @@ public class New extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void codegenToIL(
-            GenerationEnvironment environment,
-            ILWriter writer
-    ) {
-        //TODO: support new inside classes
-        List<wyvern.target.corewyvernIL.decl.Declaration> genDecls = new LinkedList<>();
-        for (Declaration decl : getDecls().getDeclIterator()) {
-            genDecls.addAll(
-                    DeclarationWriter.generate(
-                        writer, 
-                        dw -> decl.codegenToIL(environment, dw)
-                    )
-            );
-        }
-        wyvern.target.corewyvernIL.expression.New exn = 
-            new wyvern.target.corewyvernIL.expression.New(
-                genDecls,
-                this.self(),
-                null, getLocation()
-            );
-        Expression output = exn;
-        for (String key : variables.keySet()) {
-            output = new Let(key, null, variables.get(key), output);
-        }
-        variables.clear();
-        writer.write(output);
-    }
-
-    @Override
     public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
 
         New aNew = new New(new HashMap<>(), location);

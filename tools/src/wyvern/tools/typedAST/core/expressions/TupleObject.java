@@ -96,11 +96,6 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("Cannot codegen a tuple");
-    }
-
-    @Override
 	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
     	ExpressionAST[] objs = new ExpressionAST[newChildren.size()];
 		for (String s : newChildren.keySet()) {
