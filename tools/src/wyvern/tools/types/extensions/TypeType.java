@@ -52,11 +52,6 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 		return this.decl;
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write		
-	}
-
 	private boolean toStringing = false;
 	@Override
 	public String toString() {

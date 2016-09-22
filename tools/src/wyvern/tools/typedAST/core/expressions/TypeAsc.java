@@ -78,11 +78,6 @@ public class TypeAsc extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(exn, should);
-	}
-
-	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		// TODO Auto-generated method stub
 		return null;

@@ -26,7 +26,6 @@ import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -63,11 +62,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definition);
-	}
-
-	@Override
 	protected Type doTypecheck(Environment env) {
 		if (this.definition != null) {
 			Type varType = definitionType;
@@ -78,11 +72,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return binding.getType();
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public NameBinding getBinding() {
 		return binding;
 	}

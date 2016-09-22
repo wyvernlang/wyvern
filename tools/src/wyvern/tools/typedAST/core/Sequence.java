@@ -32,7 +32,6 @@ import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -199,22 +198,11 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
         }
     }
 
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(exps.toArray());
-		// TODO Auto-generated method stub
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public String toString() {
 		return this.exps.toString();
 	}

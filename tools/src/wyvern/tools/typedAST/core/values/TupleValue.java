@@ -61,11 +61,6 @@ public class TupleValue extends AbstractValue implements InvokableValue {
         throw new WyvernException("Cannot generate IL for a runtime object", FileLocation.UNKNOWN);
     }
 
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(values);
-	}
-	
 	public Value getValue(int index) {
 		return values[index];
 	}

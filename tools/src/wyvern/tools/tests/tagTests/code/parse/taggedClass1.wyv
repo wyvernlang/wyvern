@@ -1,3 +1,0 @@
-tagged class X
-    class def create() : X
-        new

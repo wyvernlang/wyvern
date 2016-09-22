@@ -123,9 +123,6 @@ public class TypeInv implements Type {
         return new NominalType((Path)resolvePath(), invName);
     }
 
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-	}
 	@Override
 	public ValueType getILType(GenContext ctx) {
 		// TODO Auto-generated method stub

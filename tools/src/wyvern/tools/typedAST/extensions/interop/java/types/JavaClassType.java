@@ -111,10 +111,5 @@ public class JavaClassType extends ClassType implements MetaType {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(decl.getClazz().getName());
-	}
-
-	@Override
 	public Type cloneWithChildren(Map<String, Type> children) { return new JavaClassType(decl); }
 }

@@ -10,13 +10,10 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.StreamSupport;
 
-import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -34,7 +31,6 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -44,13 +40,10 @@ import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeDeclUtils;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
-import wyvern.tools.util.TreeWriter;
 
 public class New extends CachingTypedAST implements CoreAST {
 
@@ -115,15 +108,6 @@ public class New extends CachingTypedAST implements CoreAST {
      */
     public static void resetGenNum() {
         generic_num = 0;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(cls);
-        // FIXME: Not sure if this is rigth (Alex).
-        for (TypedAST a : this.args.values()) {
-            writer.writeArgs(a);
-        }
     }
 
     private String self() {
@@ -417,12 +401,6 @@ public class New extends CachingTypedAST implements CoreAST {
 
     public ClassDeclaration getClassDecl() {
         return cls;
-    }
-
-    @Override
-    public void accept(CoreASTVisitor visitor) {
-        //TODO: fix args
-        visitor.visit(this);
     }
 
     public Map<String, TypedAST> getArgs() {

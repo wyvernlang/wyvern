@@ -64,10 +64,6 @@ public class JavaType extends AbstractTreeWritable implements EnvironmentExtende
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-	}
-
-	@Override
 	public Environment extend(Environment env, Environment against) {
 		return env
 				.extend(new TypeBinding(name, equivType))

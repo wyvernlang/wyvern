@@ -11,17 +11,13 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.MethodCall;
-import wyvern.target.corewyvernIL.expression.Path;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
@@ -35,7 +31,6 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -48,7 +43,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Application extends CachingTypedAST implements CoreAST {
     private ExpressionAST function;
@@ -74,11 +68,6 @@ public class Application extends CachingTypedAST implements CoreAST {
         this.argument = (ExpressionAST) argument;
         this.location = location;
         this.generics = (generics != null) ? generics : new LinkedList<String>();
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(function, argument);
     }
 
     @Override
@@ -122,11 +111,6 @@ public class Application extends CachingTypedAST implements CoreAST {
         ApplyableValue fnValue = (ApplyableValue) lhs;
 
         return fnValue.evaluateApplication(this, env);
-    }
-
-    @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
     }
 
     @Override
@@ -200,7 +184,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         int offset = 0;
         // generate arguments       
         List<IExpr> args = new LinkedList<IExpr>();
-        for(int i = 0; i < generics.size(); i++) {
+        for (int i = 0; i < generics.size(); i++) {
 
             String generic = generics.get(i);
             String formalName = formals.get(i).getName();

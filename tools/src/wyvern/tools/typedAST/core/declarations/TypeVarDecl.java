@@ -107,18 +107,11 @@ public class TypeVarDecl extends Declaration {
 			return loc;
 		}
 
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-
-		}
-
         @Override
         public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
             throw new WyvernException("Cannot generate code for a placeholder", TypeVarDecl.this);
         }
-
 	}
-
 
 	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
@@ -263,11 +256,6 @@ public class TypeVarDecl extends Declaration {
     @Override
 	public FileLocation getLocation() {
 		return fileLocation;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	/*@Override

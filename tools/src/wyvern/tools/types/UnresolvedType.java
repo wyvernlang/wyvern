@@ -26,11 +26,6 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 		this.typeName = typeName;
 	}
 	
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(typeName);
-	}
-	
 	public Type resolve(Environment env) {
 		if (env.lookupType(typeName) == null) {
 			if (env.lookup(this.typeName) != null) {

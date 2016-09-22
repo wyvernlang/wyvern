@@ -45,11 +45,6 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 			return null;
 		}
 
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-
-		}
-
 		public EvaluationEnvironment getStore() {
 			return store;
 		}
@@ -70,11 +65,6 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 		@Override
 		public Type getType() {
 			return null;
-		}
-
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-
 		}
 
 		public Environment getStore() {
@@ -121,11 +111,6 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
     @Override
 	public FileLocation getLocation() {
 		return null;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import java.util.List;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.parsing.ParseBuffer;
-import wyvern.tools.parsing.TypeParser;
 import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.extensions.SpliceBindExn;
@@ -88,15 +87,6 @@ public class LangUtil {
 		try {
 			TypedAST res = (TypedAST)new Wyvern().parse(new StringReader(buffer.getSrcString()), filename);
 			return new SpliceBindExn(res, bindings);
-		} catch (IOException | CopperParserException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static SpliceType spliceType(ParseBuffer inpType) {
-		try {
-			Type res = (Type)new TypeParser().parse(new StringReader(inpType.getSrcString()), "inner type");
-			return new SpliceType(res);
 		} catch (IOException | CopperParserException e) {
 			throw new RuntimeException(e);
 		}

@@ -15,7 +15,6 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -33,11 +32,6 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	public LetExpr(DeclSequence decl, TypedAST body) {
 		this.decl = decl;
 		this.body = body;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(decl, body);
 	}
 
 	@Override
@@ -70,11 +64,6 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
     @Override
 	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
 		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
 	}
 
 	/*

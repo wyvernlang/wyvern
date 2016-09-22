@@ -1,5 +1,3 @@
 package wyvern.tools.typedAST.interfaces;
 
-public interface CoreAST extends TypedAST {
-	void accept(CoreASTVisitor visitor);
-}
+public interface CoreAST extends TypedAST {}

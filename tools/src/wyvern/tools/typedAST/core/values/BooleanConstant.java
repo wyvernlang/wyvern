@@ -13,7 +13,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -36,11 +35,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 		return new Bool(this.getLocation());
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(this.value);
-	}
-
 	public boolean getValue() {
 		return this.value;
 	}
@@ -54,11 +48,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 			case "||": return new BooleanConstant(value || argValue.value);
 			default: throw new RuntimeException("forgot to typecheck!");
 		}
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
 	}
 
 	@Override

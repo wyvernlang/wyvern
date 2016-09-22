@@ -18,7 +18,6 @@ import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -28,7 +27,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Bool;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class IfExpr extends CachingTypedAST implements CoreAST {
 
@@ -76,17 +74,8 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void writeArgsToTree(TreeWriter writer) {
-    }
-
-    @Override
     public FileLocation getLocation() {
         return location;
-    }
-
-    @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
     }
 
     @Override
@@ -210,11 +199,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         }
 
         @Override
-        public void writeArgsToTree(TreeWriter writer) {
-
-        }
-
-        @Override
         public Expression generateIL(
                 GenContext ctx,
                 ValueType expectedType,
@@ -272,11 +256,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         @Override
         public FileLocation getLocation() {
             return location;
-        }
-
-        @Override
-        public void writeArgsToTree(TreeWriter writer) {
-
         }
 
         @Override

@@ -31,7 +31,6 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -44,7 +43,6 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     private List<NameBinding> bindings;
@@ -67,11 +65,6 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         this.bindings = bindings;
         this.body = (ExpressionAST) body;
         this.location = loc;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(bindings, body);
     }
 
     @Override
@@ -119,11 +112,6 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     @Override
     public TypedAST getBody() {
         return body;
-    }
-
-    @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
     }
 
     @Override

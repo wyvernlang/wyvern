@@ -24,7 +24,6 @@ import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -90,11 +89,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definition);
-	}
-
-	@Override
 	protected Type doTypecheck(Environment env) {
 		Type resolved = null;
 		if (binding.getType() != null)
@@ -135,11 +129,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		return binding.getType();
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public NameBinding getBinding() {
 		return binding;
 	}

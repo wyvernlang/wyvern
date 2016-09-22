@@ -59,11 +59,6 @@ public class Closure extends AbstractValue implements ApplyableValue {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(function, env);
-	}
-
-	@Override
 	public Value evaluateApplication(Application app, EvaluationEnvironment argEnv) {
 		Value argValue = app.getArgument().evaluate(argEnv);
 		EvaluationEnvironment bodyEnv = env;

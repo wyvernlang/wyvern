@@ -15,7 +15,6 @@ import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -37,11 +36,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 		return new Str();
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(this.value);
-	}
-	
 	public String getValue() {
 		return value;
 	}
@@ -79,11 +73,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 //			shouldn't get here.
 			throw new RuntimeException("forgot to typecheck!");
 		}
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
 	}
 
 	@Override
