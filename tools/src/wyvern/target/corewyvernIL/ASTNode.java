@@ -21,7 +21,6 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
 	 * so that every ASTNode has a valid FileLocation */
 	public ASTNode() {
       this((FileLocation)null);
-      location = null;
 	}
 	
 	public ASTNode(FileLocation location) {
