@@ -1,6 +1,8 @@
 package wyvern.target.oir;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
@@ -13,8 +15,8 @@ public abstract class OIRAST implements EmitLLVM, HasMetadata {
         metadataSet = new HashSet<>();
     }
 
-    public Metadata[] getMetadata() {
-        return metadataSet.toArray(new Metadata[metadataSet.size()]);
+    public Set<Metadata> getMetadata() {
+        return Collections.unmodifiableSet(metadataSet);
     }
 
     public void addMetadata(Metadata metadata) {
@@ -22,7 +24,7 @@ public abstract class OIRAST implements EmitLLVM, HasMetadata {
     }
 
     public void copyMetadata(HasMetadata other) {
-        Metadata[] metadata = other.getMetadata();
+        Set<Metadata> metadata = other.getMetadata();
         for (Metadata m : metadata) {
             addMetadata(m);
         }

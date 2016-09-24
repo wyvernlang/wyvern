@@ -1,7 +1,9 @@
 package wyvern.target.corewyvernIL;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
@@ -18,8 +20,8 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
 	/* TODO: eventually get rid of this constructor if we can,
 	 * so that every ASTNode has a valid FileLocation */
 	public ASTNode() {
-		location = null;
-    metadataSet = new HashSet<>();
+      this((FileLocation)null);
+      location = null;
 	}
 	
 	public ASTNode(FileLocation location) {
@@ -29,7 +31,6 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
 	
 	public ASTNode(HasLocation hasLocation) {
 		this(hasLocation.getLocation());
-    metadataSet = new HashSet<>();
 	}
 	
 	public final String prettyPrint() throws IOException {
@@ -57,8 +58,8 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
 		return location;
 	}
 
-    public Metadata[] getMetadata() {
-        return metadataSet.toArray(new Metadata[metadataSet.size()]);
+    public Set<Metadata> getMetadata() {
+        return Collections.unmodifiableSet(metadataSet);
     }
 
     public void addMetadata(Metadata metadata) {
@@ -72,7 +73,7 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
     }
 
     public void copyMetadata(HasMetadata other) {
-        Metadata[] metadata = other.getMetadata();
+        Set<Metadata> metadata = other.getMetadata();
         for (Metadata m : metadata) {
             addMetadata(m);
         }

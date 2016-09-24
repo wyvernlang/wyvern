@@ -56,7 +56,7 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     public Void visit(Boolean inTailPosition, New newExpr) {
         for (Declaration decl : newExpr.getDecls()) {
-            decl.acceptVisitor(this, inTailPosition);
+            decl.acceptVisitor(this, false);
         }
         return null;
     }
@@ -90,7 +90,7 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
 
     public Void visit(Boolean inTailPosition, FieldGet fieldGet) {
-        fieldGet.getObjectExpr().acceptVisitor(this, inTailPosition);
+        fieldGet.getObjectExpr().acceptVisitor(this, false);
         return null;
     }
 
