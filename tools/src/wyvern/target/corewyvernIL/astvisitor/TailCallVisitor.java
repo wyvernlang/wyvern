@@ -61,6 +61,11 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
         return null;
     }
 
+    public Void visit(Boolean inTailPosition, Case c) {
+        c.getBody().acceptVisitor(this, inTailPosition);
+        return null;
+    }
+
     public Void visit(Boolean inTailPosition, MethodCall methodCall) {
         methodCall.getObjectExpr().acceptVisitor(this, false);
         for (IExpr arg : methodCall.getArgs()) {
