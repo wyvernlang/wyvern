@@ -68,11 +68,6 @@ public class TypeInstance extends AbstractTreeWritable implements CoreAST {
 		return new TypeInstance(binding);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("Invalid type instance"); // TODO is this used?
-    }
-
     private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;

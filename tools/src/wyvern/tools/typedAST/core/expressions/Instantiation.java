@@ -44,30 +44,11 @@ public class Instantiation extends Declaration implements CoreAST {
         return location;
     }
 
-    /*
-    @Override
-    protected Type doTypecheck(Environment env, Optional<Type> expected) {
-        // TODO Auto-generated method stub
-        return new Unit();
-    }
-    */
     @Override
     public Map<String, TypedAST> getChildren() {
         Hashtable<String, TypedAST> children = new Hashtable<>();
         children.put("arg", arg);
         return children;
-    }
-
-    /*
-    @Override
-    protected TypedAST doClone(Map<String, TypedAST> nc) {
-        return new Instantiation(uri, nc.get("arg"), name, location);
-    }
-    */
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        // TODO Auto-generated method stub
     }
 
     public URI getUri() {
@@ -87,14 +68,6 @@ public class Instantiation extends Declaration implements CoreAST {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /*
-    @Override
-    public Type typecheck(Environment env, Optional<Type> expected) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    */
 
     @Override
     public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {

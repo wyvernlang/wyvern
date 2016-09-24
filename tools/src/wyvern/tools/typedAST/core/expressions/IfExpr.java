@@ -59,11 +59,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        //TODO: compile to a match
-    }
-
-    @Override
     public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
         ArrayList<IfClause> clauses = new ArrayList<>(newChildren.size());
         int i = 0;
@@ -189,11 +184,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         }
 
         @Override
-        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-            //TODO: match case
-        }
-
-        @Override
         public FileLocation getLocation() {
             return location;
         }
@@ -246,11 +236,6 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         @Override
         public Value evaluate(EvaluationEnvironment env) {
             return body.evaluate(env);
-        }
-
-        @Override
-        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-            //TODO: match case
         }
 
         @Override

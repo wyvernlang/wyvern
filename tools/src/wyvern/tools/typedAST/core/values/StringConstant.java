@@ -86,11 +86,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 		return new StringConstant(value);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new StringLiteral(value, location));
-    }
-
     private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;

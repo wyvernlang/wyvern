@@ -122,40 +122,6 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        List<Expression> arguments;
-        if (argument instanceof TupleObject) {
-            arguments = Arrays.stream(
-                ((TupleObject) argument).getObjects())
-                .map(a -> ExpressionWriter.generate(
-                    iw -> a.codegenToIL(environment, iw)))
-                .collect(Collectors.toList());
-        } else {
-            arguments = Arrays.asList(
-                ExpressionWriter.generate(
-                    iw -> argument.codegenToIL(environment, iw))
-            );
-        }
-
-        TypedAST args = ((Invocation) function).getArgument();
-        if (function instanceof Invocation && args == null) { // straight MethodCall
-            writer.write(
-                new MethodCall(
-                    ExpressionWriter.generate(
-                        iw -> function.codegenToIL(environment, iw)),
-                    ((Invocation) function).getOperationName(),
-                    arguments,
-                    this
-                )
-            );
-        }
-        Expression expr = ExpressionWriter.generate(
-            iw -> function.codegenToIL(environment, iw)
-        );
-        writer.write(new MethodCall(expr, "call", arguments, this));
-    }
-
-    @Override
     public ExpressionAST doClone(Map<String, TypedAST> nc) {
         return new Application(
             (ExpressionAST) nc.get("function"),

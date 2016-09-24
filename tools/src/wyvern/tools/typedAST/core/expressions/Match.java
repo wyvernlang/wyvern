@@ -240,11 +240,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return new Match(matchingOver, cases, defaultCase, location);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        //TODO: Part of tags support
-    }
-
 	@Override
 	public FileLocation getLocation() {
 		return location;

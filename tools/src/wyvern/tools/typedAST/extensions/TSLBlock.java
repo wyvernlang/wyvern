@@ -104,11 +104,6 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(ExpressionWriter.generate(wr -> inner.codegenToIL(environment, wr)));
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
 	}

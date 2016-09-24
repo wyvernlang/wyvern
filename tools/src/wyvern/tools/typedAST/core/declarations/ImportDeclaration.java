@@ -130,11 +130,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return this;
   }
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("I'm scared"); //TODO implement me
-    }
-
   @Override
   public String getName() {
     return "";

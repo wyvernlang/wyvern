@@ -67,11 +67,6 @@ public class DSLDummy extends AbstractExpressionAST implements ExpressionAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("DSL internal compilation error - DSL literal not resolved" , this);
-    }
-
-    @Override
     public FileLocation getLocation() {
         if (dslDef != null)
             return dslDef.getLocation();

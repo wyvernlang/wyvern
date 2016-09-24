@@ -190,15 +190,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-    	ValueType valueType = getType ().generateILType();
-        environment.register(getName(), valueType);
-        String genName = GenerationEnvironment.generateVariableName();
-        writer.wrap(e->new Let(genName, valueType, Optional.ofNullable(definition).<Expression>map(d ->ExpressionWriter.generate(ew->d.codegenToIL(environment, ew))).orElse(null), (Expression)e));
-        writer.write(new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), getType().generateILType(), new Variable(genName), location));
-    }
-
-    @Override
 	public Environment extendType(Environment env, Environment against) {
 		return env;
 	}

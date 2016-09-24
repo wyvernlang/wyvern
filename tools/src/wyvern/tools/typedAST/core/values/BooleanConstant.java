@@ -61,11 +61,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 		return new BooleanConstant(value);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new BooleanLiteral(value));
-    }
-
     private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;

@@ -257,16 +257,6 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 		return new DeclSequence(result);
 	}
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        List<wyvern.target.corewyvernIL.decl.Declaration> outputDecls = new LinkedList<>();
-        String varname = GenerationEnvironment.generateVariableName();
-        GenerationEnvironment innerEnv = new GenerationEnvironment(environment, varname);
-        for (Declaration ast : this.getDeclIterator()) {
-            outputDecls.addAll(DeclarationWriter.generate(writer, iw -> ast.codegenToIL(innerEnv, iw)));
-        }
-        writer.wrap(e->new Let(varname, null, new New(outputDecls, "this", null, getLocation()), (Expression)e));
-    }
 
     /**
      * 

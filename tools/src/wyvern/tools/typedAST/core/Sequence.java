@@ -181,23 +181,6 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		return new Sequence(result);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        for (TypedAST ast : exps) {
-            if (ast instanceof ValDeclaration) {
-                environment.register(((ValDeclaration)ast).getName(), ast.getType().generateILType());
-                writer.wrap(e->new Let(((ValDeclaration)ast).getName(), ast.getType().generateILType(), ExpressionWriter.generate(iw -> ((ValDeclaration) ast).getDefinition().codegenToIL(environment, iw)), (Expression)e));
-            } else if (ast instanceof Declaration) {
-                String genName = GenerationEnvironment.generateVariableName();
-                List<wyvern.target.corewyvernIL.decl.Declaration> generated =
-                        DeclarationWriter.generate(writer, iw -> ast.codegenToIL(new GenerationEnvironment(environment, genName), iw));
-                writer.wrap(e->new Let(genName, null, new New(generated, "this", null, ast.getLocation()), (Expression)e));
-            } else {
-                ast.codegenToIL(environment, writer);
-            }
-        }
-    }
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;

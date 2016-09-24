@@ -36,9 +36,6 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 */
 	TypedAST cloneWithChildren(Map<String, TypedAST> newChildren);
 
-	@Deprecated
-	void codegenToIL(GenerationEnvironment environment, ILWriter writer);
-
 	public static HasParser meta$get() {
 		return () -> new QuoteParser();
 	}

@@ -48,11 +48,6 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 		return this;
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate IL for an external function", this);
-    }
-
 	@Override
 	public Value evaluateApplication(Application app, EvaluationEnvironment env) {
 		Value argValue = app.getArgument().evaluate(env);

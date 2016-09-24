@@ -60,11 +60,6 @@ public class KeywordInvocation extends AbstractExpressionAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Unimplemented case of TSLs used", this);
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
 	}

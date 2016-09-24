@@ -122,35 +122,6 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     }
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(
-            new New(
-                Arrays.asList(
-                    new DefDeclaration("call",
-                        bindings.stream().map(
-                            b -> new FormalArg(
-                                b.getName(),
-                                (ValueType) b.getType().generateILType()
-                            )
-                        ).collect(Collectors.toList()),
-                        (ValueType) getType().generateILType(),
-                        ExpressionWriter.generate(
-                            iwriter -> body.codegenToIL(
-                                new GenerationEnvironment(environment),
-                                iwriter
-                            )
-                        ),
-                        getLocation()
-                    )
-                ),
-                null,
-                null,
-                getLocation()
-            )
-        );
-    }
-
-    @Override
     public ExpressionAST doClone(Map<String, TypedAST> nc) {
         return new Fn(bindings, nc.get("body"), this.location);
     }

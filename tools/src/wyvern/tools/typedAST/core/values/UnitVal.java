@@ -48,12 +48,6 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 		return new UnitVal(location);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        //TODO: Design this component
-        throw new RuntimeException("What to do here?");
-    }
-
     private FileLocation location;
 	public FileLocation getLocation() {
 		return this.location;

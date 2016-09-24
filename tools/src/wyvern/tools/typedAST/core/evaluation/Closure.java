@@ -49,11 +49,6 @@ public class Closure extends AbstractValue implements ApplyableValue {
 		return this;
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate IL for runtime closure", this);
-    }
-
     public TypedAST getInner() {
 		return function.getBody();
 	}
