@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.metadata.HasMetadata;
+import wyvern.target.corewyvernIL.metadata.Metadata;
+import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRDelegate;
@@ -49,15 +52,23 @@ class PrettyPrintState {
 }
 
 public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
-  String indent = "";
-  final String indentIncrement = "  ";
-  int uniqueId = 0;
+    String indent = "";
+    final String indentIncrement = "  ";
+    final String tco_prefix = "tco_";
+    int uniqueId = 0;
 
   HashSet<String> classesUsed;
 
   public PrettyPrintVisitor() {
     classesUsed = new HashSet<String>();
   }
+
+    private boolean isTailCall(OIRAST oirast) {
+        for (Metadata m : oirast.getMetadata()) {
+            if (m instanceof IsTailCall) return true;
+        }
+        return false;
+    }
 
   private String commaSeparatedExpressions(PrettyPrintState state,
                                            List<OIRExpression> exps) {
@@ -115,7 +126,12 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     String methodDecls =
         "def mergeDicts(l, r):\n" +
         "  l.update(r)\n" +
-        "  return r\n\n";
+        "  return r\n\n" +
+        "def trampoline(f, *args, **kwargs):\n" +
+        "  res = f(*args, **kwargs)\n" +
+        "  while callable(res):\n" +
+        "    res = res()\n" +
+        "  return res\n\n";
 
     findClassDecls(state, oirenv);
 
@@ -192,7 +208,8 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       fieldName.substring(1);
 
     String strVal;
-    if (state.currentMethod.equals(setterName)) {
+    if (state.currentMethod.equals(setterName) ||
+        state.currentMethod.equals("tco_" + setterName)) {
       strVal =
         objExpr + "." + fieldName + " = " +
         oirFieldSet.getExprToAssign().acceptVisitor(this, state);
@@ -292,6 +309,9 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     String args = commaSeparatedExpressions(state,
                                             oirMethodCall.getArgs());
     String methodName = oirMethodCall.getMethodName();
+    boolean isOperator = methodName.matches("[^a-zA-Z0-9]*");
+    if (isTailCall(oirMethodCall) && !isOperator)
+        methodName = tco_prefix + methodName;
     String strVal;
 
     boolean isBool =
@@ -301,31 +321,55 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         oirMethodCall.getObjectType().equals(new NominalType("system",
                                                              "Int"));
 
-    if (isBool && methodName.equals("ifTrue")) {
+    if (isBool && (methodName.equals("ifTrue") || methodName.equals("tco_ifTrue"))) {
         OIRExpression trueBranch = oirMethodCall.getArgs().get(0);
         OIRExpression falseBranch = oirMethodCall.getArgs().get(1);
 
         String varName = generateVariable(state);
         String oldIndent = indent;
         indent = indent + indentIncrement;
+
+        String trueText, falseText;
+
+        if (oldExpectingReturn) {
+            if (isTailCall(oirMethodCall)) {
+                trueText = indent + "return " + trueBranch.acceptVisitor(this, state) + ".tco_apply()\n";
+                falseText = indent + "return " + falseBranch.acceptVisitor(this, state) + ".tco_apply()\n";
+            } else {
+                trueText = indent + "return " + trueBranch.acceptVisitor(this, state) + ".apply()\n";
+                falseText = indent + "return " + falseBranch.acceptVisitor(this, state) + ".apply()\n";
+            }
+        } else {
+            trueText = indent + varName + " = " + trueBranch.acceptVisitor(this, state) + ".apply()\n";
+            falseText = indent + varName + " = " + falseBranch.acceptVisitor(this, state) + ".apply()\n";
+        }
+
         String pfx = "if " + objExpr + ":\n" +
-            indent + varName + " = " + trueBranch.acceptVisitor(this, state) + ".apply()\n" +
+            trueText +
             oldIndent + "else:\n" +
-            indent + varName + " = " + falseBranch.acceptVisitor(this, state) + ".apply()\n" +
+            falseText +
             oldIndent;
+
+        if (oldExpectingReturn) {
+            return pfx;
+        }
         indent = oldIndent;
         state.prefix.add(pfx);
         strVal = varName;
     } else {
-        if (methodName.matches("[^a-zA-Z0-9]*"))
+        if (isOperator)
             strVal = "(" + objExpr + " " +
                 methodName + " " + args + ")";
         else
             strVal = objExpr + "." + methodName + "(" + args + ")";
     }
     state.expectingReturn = oldExpectingReturn;
-    if (state.expectingReturn)
-      return state.returnType + " " + strVal;
+    if (state.expectingReturn) {
+        if (isTailCall(oirMethodCall))
+            return state.returnType + " lambda: " + strVal;
+        else
+            return state.returnType + " " + strVal;
+    }
     return strVal;
   }
 
@@ -513,11 +557,23 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
                       OIRMethod oirMethod) {
       state.currentLetVar = "";
       String args = NameMangleVisitor.mangle("this");
+      String argsWithoutThis = "";
       OIRMethodDeclaration decl = oirMethod.getDeclaration();
+      boolean firstArg = true;
       for (OIRFormalArg formalArg : decl.getArgs()) {
+          argsWithoutThis += ", " + formalArg.getName();
           args += ", " + formalArg.getName();
       }
       String name = decl.getName();
+      String trampolineDecl = "";
+
+      trampolineDecl =
+          "def " + name + "(" + args + ")" + ":\n" +
+          indent + indentIncrement + "return trampoline(" + NameMangleVisitor.mangle("this") + "." +
+          tco_prefix + name + argsWithoutThis + ")\n"
+          + indent;
+      name = tco_prefix + name;
+
       String oldMethod = state.currentMethod;
       state.currentMethod = name;
       String def = "def " + name +
@@ -544,8 +600,8 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
       if (state.expectingReturn)
           return def + prefix + body + "\n"
-              + indent + state.returnType + " " + decl.getName();
-      return def + prefix + body;
+              + indent + state.returnType + " " + name + "\n" + indent + trampolineDecl;
+      return def + prefix + body + "\n" + indent + trampolineDecl;
   }
 
   public String visit(PrettyPrintState state,

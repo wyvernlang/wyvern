@@ -2,6 +2,7 @@ bin
 .idea
 tools/wyvern-tools.iml
 *.class
+*.pyc
 *.prefs
 *~
 tools/src/wyvern/tools/parsing/Wyvern.java
