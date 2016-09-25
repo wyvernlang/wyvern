@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFIImport;
@@ -138,6 +139,12 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     public Void visit(Boolean inTailPosition,
                          IntegerLiteral integerLiteral) {
+        return null;
+    }
+
+
+    public Void visit(Boolean inTailPosition,
+                      BooleanLiteral booleanLiteral) {
         return null;
     }
 

@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFIImport;
@@ -57,6 +58,7 @@ import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.declarations.OIRMethodDeclarationGroup;
 import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.FFIType;
+import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
 import wyvern.target.oir.expressions.OIRExpression;
 import wyvern.target.oir.expressions.OIRFFIImport;
@@ -283,6 +285,13 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		return oirInt;
 	}
 
+
+  public OIRAST visit(EmitOIRState state, BooleanLiteral booleanLiteral) {
+    OIRBoolean oirBool = new OIRBoolean(booleanLiteral.getValue());
+    oirBool.copyMetadata(booleanLiteral);
+    return oirBool;
+  }
+
 	public OIRAST visit(EmitOIRState state, RationalLiteral rational) {
 		OIRRational oirRational = new OIRRational(rational.getNumerator(), rational.getDenominator());
 		oirRational.copyMetadata(rational);
@@ -469,5 +478,4 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 	public OIRAST visit(EmitOIRState state, Case c) {
 		throw new RuntimeException("EMITOIRVisitor: Case -> OIR implemented inside the visit method for Match expressions.");
 	}
-
 }

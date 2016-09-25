@@ -468,12 +468,12 @@ public class OIRTests {
     }
 
     @Test
-    public void testIfBug() throws ParseException {
+    public void testBooleanLiterals() throws ParseException {
         String input =
             "(true).ifTrue(\n" +
             "  () => 1,\n" +
             "  () => 0)\n";
-        testPyFromInput(input, "2", true);
+        testPyFromInput(input, "1", true);
     }
 
     @Test
