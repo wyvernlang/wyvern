@@ -61,6 +61,9 @@ type Pygame
   val MOUSEBUTTONUP : EventType
   val NOEVENT : EventType
 
+  val K_UP : Key
+  val K_DOWN : Key
+
 type Time
   def sleep(t : Int) : Unit
 val time : Time = time
@@ -92,26 +95,51 @@ def run(gameLoop : GameLoop) : Unit
 val screen = pygame.display.set_mode(helper.make2Tuple(640,480), 0, 0)
 
 val loop : GameLoop = new
-  val fps = 30
+  val fps = 144
   var y : Int = 10
-  var y_velocity : Int = 1
   var done : Boolean = false
+
+  var upPressed : Boolean = false
+  var downPressed : Boolean = false
 
   def oneIteration() : Unit
     screen.fill(helper.black)
     pygame.draw.rect(screen, helper.white, pygame.Rect(10, this.y, 20, 30), 0)
     pygame.display.flip()
-    this.y = this.y + this.y_velocity
-    // this.y_velocity = this.y_velocity + 1
+
+    val gameLoop = this
+    this.upPressed.ifTrue(() => gameLoop.y = gameLoop.y - 2,
+                          () => 0)
+    this.downPressed.ifTrue(() => gameLoop.y = gameLoop.y + 2,
+                            () => 0)
+
     (this.y > 500).ifTrue(
       () => this.done = true,
       () => 7
     )
 
   def processEvent(e : Event) : Unit
-    helper.getType(e).equals(pygame.QUIT).ifTrue(
+    val gameLoop = this
+    val eventType = helper.getType(e)
+    eventType.equals(pygame.QUIT).ifTrue(
       () => this.done = true,
-      () => 0)
+      () => eventType.equals(pygame.KEYDOWN).ifTrue(
+         () => e.key.equals(pygame.K_UP).ifTrue(
+           () => gameLoop.upPressed = true,
+           () => e.key.equals(pygame.K_DOWN).ifTrue(
+             () => gameLoop.downPressed = true,
+             () => 0)
+         ),
+         () => eventType.equals(pygame.KEYUP).ifTrue(
+           () => e.key.equals(pygame.K_UP).ifTrue(
+             () => gameLoop.upPressed = false,
+             () => e.key.equals(pygame.K_DOWN).ifTrue(
+               () => gameLoop.downPressed = false,
+               () => 0)
+           ),
+           () => 0
+         )
+      ))
 
 run(loop)
 pygame.quit()
