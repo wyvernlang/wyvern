@@ -462,7 +462,6 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 
 		OIRFFIImport result;
 		if (ffiImport.getFFIType().equals(javaType)) {
-			System.out.println("Java FFI!");
 			result = new OIRFFIImport(FFIType.JAVA, ffiImport.getPath());
 		} else if (ffiImport.getFFIType().equals(pythonType)) {
 			result = new OIRFFIImport(FFIType.PYTHON, ffiImport.getPath());
