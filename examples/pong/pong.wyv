@@ -5,7 +5,11 @@ import python:time
 type Surface
   def fill(color : Color) : Unit
 
-type Rect
+resource type Rect
+  var top : Int
+  var left : Int
+  var bottom : Int
+  var right : Int
 
 type Color
 
@@ -17,6 +21,10 @@ type Draw
            color : Color,
            rect : Rect,
            width : Int) : Rect
+  def circle(surface : Surface,
+             color : Color,
+             center : Dyn,
+             radius : Int) : Unit
 
 type EventType = Int
 type Key = Int
@@ -92,7 +100,46 @@ def run(gameLoop : GameLoop) : Unit
     () => 0,
     () => run(gameLoop))
 
-val screen = pygame.display.set_mode(helper.make2Tuple(640,480), 0, 0)
+val width = 640
+val height = 480
+val screen = pygame.display.set_mode(helper.make2Tuple(width, height), 0, 0)
+
+// def ifTrue(bool : Boolean, f : Unit -> Dyn) : Unit
+//   bool.ifTrue(() => f(), () => 0)
+
+val ball = new
+  var x : Int = 0
+  var y : Int = 0
+  val radius = 10
+  var xSpeed : Int = 2
+  var ySpeed : Int = 2
+
+  def draw(screen : Surface) : Unit
+    pygame.draw.circle(screen, helper.white, helper.make2Tuple(this.x, this.y), this.radius)
+    7
+
+  def update(paddleHitbox : Rect) : Unit
+    (this.x < 0).ifTrue(() => this.xSpeed = (0 - 1) * this.xSpeed, () => 0)
+    (this.x > width).ifTrue(() => this.xSpeed = (0 - 1) * this.xSpeed, () => 0)
+    (this.y < 0).ifTrue(() => this.ySpeed = (0 - 1) * this.ySpeed, () => 0)
+    (this.y > height).ifTrue(() => this.ySpeed = (0 - 1) * this.ySpeed, () => 0)
+
+    // backwards comparisons for better ifTrue nesting
+    val me = this
+    (me.x > paddleHitbox.right).ifTrue(() => 0,
+      () => (me.x < paddleHitbox.left).ifTrue(() => 0,
+        () => (me.y < paddleHitbox.top).ifTrue(() => 0,
+          () => (me.y > paddleHitbox.bottom).ifTrue(() => 0,
+            () => (me.xSpeed > 0).ifTrue(() => 0,
+              () => me.xSpeed = (0 - 1) * me.xSpeed
+            )
+          )
+        )
+      )
+    )
+
+    this.x = this.x + this.xSpeed
+    this.y = this.y + this.ySpeed
 
 val loop : GameLoop = new
   val fps = 144
@@ -102,9 +149,13 @@ val loop : GameLoop = new
   var upPressed : Boolean = false
   var downPressed : Boolean = false
 
+  val width = 20
+  val height = 60
+
   def oneIteration() : Unit
     screen.fill(helper.black)
-    pygame.draw.rect(screen, helper.white, pygame.Rect(10, this.y, 20, 30), 0)
+    pygame.draw.rect(screen, helper.white, pygame.Rect(10, this.y, this.width, this.height), 0)
+    ball.draw(screen)
     pygame.display.flip()
 
     val gameLoop = this
@@ -112,11 +163,12 @@ val loop : GameLoop = new
                           () => 0)
     this.downPressed.ifTrue(() => gameLoop.y = gameLoop.y + 2,
                             () => 0)
+    ball.update(pygame.Rect(10, this.y, this.width, this.height))
 
-    (this.y > 500).ifTrue(
-      () => this.done = true,
-      () => 7
-    )
+    // (this.y > 500).ifTrue(
+    //   () => this.done = true,
+    //   () => 7
+    // )
 
   def processEvent(e : Event) : Unit
     val gameLoop = this
