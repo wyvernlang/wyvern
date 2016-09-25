@@ -29,7 +29,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
-import wyvern.target.oir.PrettyPrintVisitor;
+import wyvern.target.oir.EmitPythonVisitor;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
@@ -74,8 +74,8 @@ public class OIRTests {
                                                OIREnvironment.getRootEnvironment()));
 
     String pprint =
-      new PrettyPrintVisitor().prettyPrint(oirast,
-                                           OIREnvironment.getRootEnvironment());
+      new EmitPythonVisitor().emitPython(oirast,
+                                         OIREnvironment.getRootEnvironment());
 
     if (debug)
       System.out.println("OIR Program:\n" + pprint);
