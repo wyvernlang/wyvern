@@ -18,6 +18,15 @@ type Draw
            rect : Rect,
            width : Int) : Rect
 
+type EventType = Int
+type Key = Int
+
+type Event
+  val key : Key
+
+type PygameEvent
+  def poll() : Event
+
 type Display
   def set_mode(size : Dyn,
                flags : Int,
@@ -33,6 +42,7 @@ type Helper
   val black : Color
   def makeClock() : Clock
   def debug(msg : String) : Unit
+  def getType(event : Event) : EventType
 val helper : Helper = helper
 
 type Pygame
@@ -41,8 +51,15 @@ type Pygame
 
   val draw : Draw
   val display : Display
+  val event : PygameEvent
 
   def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
+  val QUIT : EventType
+  val KEYDOWN : EventType
+  val KEYUP : EventType
+  val MOUSEBUTTONDOWN : EventType
+  val MOUSEBUTTONUP : EventType
+  val NOEVENT : EventType
 
 type Time
   def sleep(t : Int) : Unit
@@ -52,24 +69,49 @@ val pygame : Pygame = pygame
 
 resource type GameLoop
   val fps : Int
+  val done : Boolean
   def oneIteration() : Unit
+  def processEvent(e : Event) : Unit
 val clock : Clock = helper.makeClock()
+def processEvents(gameLoop : GameLoop) : Unit
+  val event = pygame.event.poll()
+  def f() : Unit
+    gameLoop.processEvent(event)
+    processEvents(gameLoop)
+  helper.getType(event).equals(pygame.NOEVENT).ifTrue(
+    () => 0,
+    () => f())
 def run(gameLoop : GameLoop) : Unit
   clock.tick(gameLoop.fps)
   gameLoop.oneIteration()
-  run(gameLoop)
+  processEvents(gameLoop)
+  gameLoop.done.ifTrue(
+    () => 0,
+    () => run(gameLoop))
 
 val screen = pygame.display.set_mode(helper.make2Tuple(640,480), 0, 0)
 
 val loop : GameLoop = new
   val fps = 30
   var y : Int = 10
+  var y_velocity : Int = 1
+  var done : Boolean = false
 
   def oneIteration() : Unit
     screen.fill(helper.black)
     pygame.draw.rect(screen, helper.white, pygame.Rect(10, this.y, 20, 30), 0)
     pygame.display.flip()
-    this.y = this.y + 1
+    this.y = this.y + this.y_velocity
+    // this.y_velocity = this.y_velocity + 1
+    (this.y > 500).ifTrue(
+      () => this.done = true,
+      () => 7
+    )
+
+  def processEvent(e : Event) : Unit
+    helper.getType(e).equals(pygame.QUIT).ifTrue(
+      () => this.done = true,
+      () => 0)
 
 run(loop)
 pygame.quit()
