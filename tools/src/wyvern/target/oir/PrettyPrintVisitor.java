@@ -259,6 +259,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     indent += indentIncrement;
     String inString = oirLet.getInExpr().acceptVisitor(this, state);
     indent = oldIndent;
+    if (state.prefix.size() > 0) {
+        inString = stringFromPrefix(state.prefix, indent) + "\n" + indent + inString;
+        state.prefix = new ArrayList<>();
+    }
 
     int letId = uniqueId;
     uniqueId++;
@@ -287,16 +291,16 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       toReplaceString = oirLet.getToReplace().acceptVisitor(this, state);
     }
     String statePrefix = stringFromPrefix(state.prefix,
-                                          indent + indentIncrement);
+                                          indent);
     state.expectingReturn = oldExpectingReturn;
     state.prefix = oldPrefix;
 
     String funCall = "\n" + indent;
     if (state.expectingReturn)
-      funCall += state.returnType + " ";
-     funCall += "letFn" + Integer.toString(letId) + "(" + toReplaceString + ")";
+        funCall += state.returnType + " ";
+    funCall += "letFn" + Integer.toString(letId) + "(" + toReplaceString + ")";
 
-    return (prefix + funDecl + statePrefix + inString + funCall);
+    return (prefix + funDecl + inString + statePrefix + funCall);
   }
 
   public String visit(PrettyPrintState state,

@@ -66,7 +66,7 @@ public class OIRTests {
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }
-      // System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
+      System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
@@ -235,7 +235,7 @@ public class OIRTests {
       "val obj = new\n" +
       "    def id(x:system.Int) : system.Int = x\n" +
       "obj.id(13)\n";
-    testPyFromInput(input, "13");
+    testPyFromInput(input, "13", true);
   }
 
   @Test
@@ -464,6 +464,25 @@ public class OIRTests {
             "    () => f(n-1)\n" +
             "  )\n" +
             "f(50000)\n";
-        testPyFromInput(input, "1", true);
+        testPyFromInput(input, "1");
+    }
+
+    @Test
+    public void testIfBug() throws ParseException {
+        String input =
+            "(true).ifTrue(\n" +
+            "  () => 1,\n" +
+            "  () => 0)\n";
+        testPyFromInput(input, "2", true);
+    }
+
+    @Test
+    public void testImperativeIf() throws ParseException {
+        String input =
+            "(5 > 3).ifTrue(\n" +
+            "  () => 1,\n" +
+            "  () => 0)\n" +
+            "7\n";
+        testPyFromInput(input, "7", true);
     }
 }
