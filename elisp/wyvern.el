@@ -47,6 +47,14 @@
                 "false")
                'words))
 
+(defconst wyvern-builtin-types
+  (regexp-opt '("Int"
+                "Dyn"
+                "String"
+                "Unit"
+                "Boolean")
+              'words))
+
 (defconst wyvern-font-lock-keywords
   `(
    (,(rx
@@ -57,6 +65,8 @@
        (zero-or-more (any "a-z" "A-Z" "0-9" "_")))
       )
     1 font-lock-type-face)
+
+   (,wyvern-builtin-types . font-lock-type-face)
 
    (,(rx
       ":"
