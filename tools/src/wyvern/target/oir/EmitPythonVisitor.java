@@ -360,6 +360,8 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         indent = oldIndent;
         state.prefix.add(pfx);
         strVal = varName;
+    } else if (isInt && (methodName.equals("equals") || methodName.equals("tco_equals"))) {
+        strVal = "(" + objExpr + " == " + args + ")";
     } else {
         if (isOperator)
             strVal = "(" + objExpr + " " +
