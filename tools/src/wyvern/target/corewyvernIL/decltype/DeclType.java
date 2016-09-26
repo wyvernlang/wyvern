@@ -1,13 +1,13 @@
 package wyvern.target.corewyvernIL.decltype;
 
 import wyvern.target.corewyvernIL.ASTNode;
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
-public abstract class DeclType extends ASTNode implements EmitOIR {
+public abstract class DeclType extends ASTNode implements IASTNode {
 	private String name;
 	
 	DeclType(String name) {

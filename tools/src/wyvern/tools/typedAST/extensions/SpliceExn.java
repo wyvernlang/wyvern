@@ -64,18 +64,8 @@ public class SpliceExn extends AbstractExpressionAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("How do we handle splice expressions in code generation?");
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	@Override

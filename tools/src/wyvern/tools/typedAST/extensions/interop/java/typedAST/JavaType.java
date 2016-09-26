@@ -54,17 +54,8 @@ public class JavaType extends AbstractTreeWritable implements EnvironmentExtende
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate IL for a Java type", FileLocation.UNKNOWN);
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return FileLocation.UNKNOWN;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
 	}
 
 	@Override

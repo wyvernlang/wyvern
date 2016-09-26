@@ -21,7 +21,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -99,17 +98,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		//TODO: implement me
-		//writer.writeArgs(definition);
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Type getType() {
 		return this.typeBinding.getType();
 	}
@@ -126,12 +114,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 		TypeDeclaration decls1 = new TypeDeclaration(nameBinding.getName(), (DeclSequence) newChildren.get("decls"), metaValue, getTaggedInfo(), location);
 		return decls1;
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Unimplemented", this);
-        //return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), null); //TODO
-    }
 
     @Override
 	public Type doTypecheck(Environment env) {

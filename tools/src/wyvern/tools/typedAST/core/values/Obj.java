@@ -67,15 +67,6 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		return this;
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Value conversion to IL not possible", this);
-    }
-
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-	}
-
 	@Override
 	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		String operation = exp.getOperationName();

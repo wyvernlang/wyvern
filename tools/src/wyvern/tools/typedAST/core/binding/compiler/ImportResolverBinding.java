@@ -28,9 +28,4 @@ public class ImportResolverBinding implements Binding {
 	public ImportResolver getBound() {
 		return bound;
 	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
-	}
 }

@@ -2,7 +2,7 @@ package wyvern.target.corewyvernIL.decltype;
 
 import java.io.IOException;
 
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class ValDeclType extends DeclTypeWithResult implements EmitOIR{
+public class ValDeclType extends DeclTypeWithResult implements IASTNode{
 
 	public ValDeclType(String field, ValueType type) {
 		super(field, type);

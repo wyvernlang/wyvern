@@ -103,18 +103,8 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		throw new RuntimeException("DSLLit found when generating code at " + this.getLocation());
-	}
-
-	@Override
 	public FileLocation getLocation() {
 		return location;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	@Override

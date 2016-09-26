@@ -12,7 +12,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
@@ -34,18 +33,8 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	}
 	
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write		
-	}
-	
-	@Override
 	public String toString() {
 		return "()";
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
 	}
 
 	@Override
@@ -58,12 +47,6 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
 		return new UnitVal(location);
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        //TODO: Design this component
-        throw new RuntimeException("What to do here?");
-    }
 
     private FileLocation location;
 	public FileLocation getLocation() {

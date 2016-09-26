@@ -32,7 +32,6 @@ import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -182,39 +181,11 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		return new Sequence(result);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        for (TypedAST ast : exps) {
-            if (ast instanceof ValDeclaration) {
-                environment.register(((ValDeclaration)ast).getName(), ast.getType().generateILType());
-                writer.wrap(e->new Let(((ValDeclaration)ast).getName(), ast.getType().generateILType(), ExpressionWriter.generate(iw -> ((ValDeclaration) ast).getDefinition().codegenToIL(environment, iw)), (Expression)e));
-            } else if (ast instanceof Declaration) {
-                String genName = GenerationEnvironment.generateVariableName();
-                List<wyvern.target.corewyvernIL.decl.Declaration> generated =
-                        DeclarationWriter.generate(writer, iw -> ast.codegenToIL(new GenerationEnvironment(environment, genName), iw));
-                writer.wrap(e->new Let(genName, null, new New(generated, "this", null, ast.getLocation()), (Expression)e));
-            } else {
-                ast.codegenToIL(environment, writer);
-            }
-        }
-    }
-
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(exps.toArray());
-		// TODO Auto-generated method stub
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public String toString() {
 		return this.exps.toString();
 	}

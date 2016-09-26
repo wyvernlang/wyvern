@@ -47,12 +47,6 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// TODO Auto-generated method stub
-		// POTANIN: At this stage as this was based on Int class, I assume there is nothing to write.
-	}
-
-	@Override
 	public String toString() {
 		return "Bool";
 	}

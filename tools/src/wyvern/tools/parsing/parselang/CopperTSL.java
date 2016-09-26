@@ -420,26 +420,6 @@ public class CopperTSL implements ExtParser {
 		};
 	}
 
-	private Pair<String, Type> parseType(NonTerminal elem) {
-		Type parsedType = null;
-		try {
-			parsedType = LangUtil.spliceType(new IParseBuffer(elem.getReturnType()));
-			((NonTerminal) elem).setReturnType("Value");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return new Pair<String, Type>(elem.getName().toString(), parsedType);
-	}
-	private Pair<String, Type> parseType(Terminal elem) {
-		Type parsedType = null;
-		try {
-			parsedType = LangUtil.spliceType(new IParseBuffer(elem.getReturnType()));
-			elem.setReturnType("Value");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return new Pair<String, Type>(elem.getName().toString(), parsedType);
-	}
 	private Pair<String, Type> parseType(GrammarElement elem) {
 		if (elem instanceof Terminal)
 			return this.parseType((Terminal)elem);

@@ -71,11 +71,6 @@ public class SpliceType implements Type {
         return inner.generateILType(); // Todo: validate me - fails for bindings that are shadowed
     }
 
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-
-	}
-
 	public Type getInner() {
 		return inner;
 	}

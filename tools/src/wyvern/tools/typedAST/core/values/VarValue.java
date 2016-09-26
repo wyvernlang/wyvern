@@ -47,16 +47,6 @@ public class VarValue extends AbstractValue {
 		return new VarValue((Value)newChildren.get("inner"));
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate code for runtime values", FileLocation.UNKNOWN);
-    }
-
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(innerValue);
-	}
-	
 	public Value getValue() {
 		return innerValue;
 	}

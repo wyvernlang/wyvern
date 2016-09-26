@@ -26,7 +26,6 @@ import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -63,11 +62,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(binding.getName(), definition);
-	}
-
-	@Override
 	protected Type doTypecheck(Environment env) {
 		if (this.definition != null) {
 			Type varType = definitionType;
@@ -78,11 +72,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return binding.getType();
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 	public NameBinding getBinding() {
 		return binding;
 	}
@@ -135,16 +124,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return new VarDeclaration(getName(), getType(), nc.get("definition"), location);
 	}
 
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-    	ValueType valType = getType().generateILType();
-        environment.register(getName(), valType);
-        String genName = GenerationEnvironment.generateVariableName();
-        writer.wrap(e->new Let(genName, valType, Optional.ofNullable(definition).<Expression>map(d -> ExpressionWriter.generate(ew -> d.codegenToIL(environment, ew))).orElse(null), (Expression)e));
-        writer.write(new wyvern.target.corewyvernIL.decl.VarDeclaration(getName(), valType, new Variable(genName), location));
-    }
-
     @Override
 	public Environment extendType(Environment env, Environment against) {
 		return env;
@@ -160,7 +139,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
-		return this.location; //TODO
+		return this.location;
 	}
 
 	@Override

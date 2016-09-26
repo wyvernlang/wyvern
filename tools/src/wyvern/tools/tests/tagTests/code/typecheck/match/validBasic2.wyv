@@ -1,9 +1,0 @@
-tagged class TaggedClass            
-    class def create() : TaggedClass
-        new               
-                          
-val obj : TaggedClass = TaggedClass.create()    
-                          
-match(obj):                 
-   TaggedClass => 25
-   default => 15     

@@ -6,7 +6,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class FormalArg extends ASTNode implements EmitOIR {
+public class FormalArg extends ASTNode implements IASTNode {
 
 	private String name;
 	private ValueType type;

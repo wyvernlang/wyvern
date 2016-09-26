@@ -106,19 +106,7 @@ public class TypeVarDecl extends Declaration {
 		public FileLocation getLocation() {
 			return loc;
 		}
-
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-
-		}
-
-        @Override
-        public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-            throw new WyvernException("Cannot generate code for a placeholder", TypeVarDecl.this);
-        }
-
 	}
-
 
 	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
@@ -256,18 +244,8 @@ public class TypeVarDecl extends Declaration {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(ExpressionWriter.generate(ow -> new wyvern.target.corewyvernIL.decl.TypeDeclaration(name, body.getType().generateILType(), getLocation()))); // TODO better tag support
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return fileLocation;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	/*@Override

@@ -26,7 +26,6 @@ import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -39,7 +38,6 @@ import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
@@ -62,11 +60,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         this.argument = op2;
         this.operationName = operatorName;
         this.location = fileLocation;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(receiver, operationName, argument);
     }
 
     @Override
@@ -121,11 +114,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     public void checkAssignment(Assignment ass, Environment env) {
         Type recType = receiver.typecheck(env, Optional.empty());
         if (!(recType instanceof ClassType)) { //TODO: Hack
@@ -159,28 +147,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
             children.put("argument", argument);
         }
         return children;
-    }
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        LinkedList<Expression> arguments = new LinkedList<>();
-        if (!(argument instanceof TupleObject)) {
-            arguments.add(ExpressionWriter.generate(
-                iwriter -> argument.codegenToIL(environment, iwriter)
-            ));
-
-        } else {
-            for (TypedAST arg : ((TupleObject)(argument)).getObjects()) {
-                arguments.add(ExpressionWriter.generate(
-                    iwriter -> arg.codegenToIL(environment, iwriter)));
-            }
-        }
-        writer.write(new MethodCall(ExpressionWriter.generate(
-            iwriter -> receiver.codegenToIL(environment, iwriter)),
-                operationName,
-                arguments,
-                this
-        ));
     }
 
     @Override

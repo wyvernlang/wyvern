@@ -14,7 +14,6 @@ import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.Executor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -27,7 +26,8 @@ import wyvern.tools.util.TreeWriter;
 public class ExternalFunction extends AbstractValue implements ApplyableValue, CoreAST {
 	private Type type;
 	private Executor exec;
-	
+	private FileLocation location = FileLocation.UNKNOWN;
+
 	public ExternalFunction(Type type, Executor exec) {
 		this.type = type;
 		this.exec = exec;
@@ -48,28 +48,12 @@ public class ExternalFunction extends AbstractValue implements ApplyableValue, C
 		return this;
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate IL for an external function", this);
-    }
-
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// no arguments at the moment; also not intended for serialization		
-	}
-
 	@Override
 	public Value evaluateApplication(Application app, EvaluationEnvironment env) {
 		Value argValue = app.getArgument().evaluate(env);
 		return exec.execute(env, argValue);
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO  Not really sure what to do here.
-	}
-
-	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
 	}

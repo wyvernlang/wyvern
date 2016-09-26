@@ -1,6 +1,6 @@
 package wyvern.target.corewyvernIL.decltype;
 
-import wyvern.target.corewyvernIL.EmitOIR;
+import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -8,7 +8,7 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
 
 
-public class AbstractTypeMember extends DeclType implements EmitOIR {
+public class AbstractTypeMember extends DeclType implements IASTNode {
 	boolean isResource;
 
 	public AbstractTypeMember(String name) {

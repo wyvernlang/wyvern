@@ -15,8 +15,6 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
@@ -27,7 +25,6 @@ import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -38,7 +35,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
 
@@ -58,11 +54,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         this.target = (ExpressionAST) target;
         this.value = (ExpressionAST) value;
         this.location = fileLocation;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(target, value);
     }
 
     @Override
@@ -109,49 +100,11 @@ public class Assignment extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     public Map<String, TypedAST> getChildren() {
         Hashtable<String, TypedAST> children = new Hashtable<>();
         children.put("target", target);
         children.put("value", value);
         return children;
-    }
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        Expression objectExpr = null;
-        String fieldName = null;
-
-        if (target instanceof Invocation) {
-            objectExpr = ExpressionWriter.generate(
-                iwriter -> ((Invocation) target)
-                .getReceiver()
-                .codegenToIL(environment, iwriter)
-            );
-
-            fieldName = ((Invocation) target).getOperationName();
-
-        } else if (target instanceof wyvern.tools.typedAST.core.expressions.Variable) {
-
-            objectExpr = new Variable("this");
-            fieldName = ((wyvern.tools.typedAST.core.expressions.Variable) target)
-                .getName();
-        } else {
-            throw new RuntimeException("Invalid assignment for codegen");
-        }
-        writer.write(
-                new FieldSet(
-                    value.getType().generateILType(),
-                    objectExpr,
-                    fieldName,
-                    ExpressionWriter.generate(
-                        iwriter -> value.codegenToIL(environment, iwriter))
-                )
-        );
     }
 
     @Override
@@ -195,11 +148,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
             setterArgs.add(exprToAssign);
             return new MethodCall(receiver, setterName, setterArgs, this);
             
-        }
-        
-        // Assigning to an object's field.
-        else if (exprFieldGet instanceof FieldGet) {
-
+        } else if (exprFieldGet instanceof FieldGet) {
+            // Assigning to an object's field.
             // Return a FieldSet to the appropriate field.
             FieldGet fieldGet = (FieldGet) exprFieldGet;
             String fieldName = fieldGet.getName();
@@ -209,13 +159,10 @@ public class Assignment extends CachingTypedAST implements CoreAST {
                 objExpr,
                 fieldName,
                 exprToAssign);
-        }
-        
-        // Unknown what's going on.
-        else {
+        } else {
+            // Unknown what's going on.
             ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
             return null; // dead code
         }
-        
     }
 }

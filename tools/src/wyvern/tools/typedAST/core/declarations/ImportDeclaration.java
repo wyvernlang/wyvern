@@ -49,7 +49,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -120,17 +119,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     return location;
   }
 
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(uri.toString());
-    }
-
-
-  @Override
-  public void accept(CoreASTVisitor visitor) {
-    visitor.visit(this);
-  }
-
   @Override
   public Map<String, TypedAST> getChildren() {
     Map<String, TypedAST> childMap = new HashMap<>();
@@ -141,11 +129,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
   public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
     return this;
   }
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("I'm scared"); //TODO implement me
-    }
 
   @Override
   public String getName() {

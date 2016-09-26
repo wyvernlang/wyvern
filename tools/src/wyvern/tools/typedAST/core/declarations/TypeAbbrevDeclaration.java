@@ -17,7 +17,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -30,9 +29,6 @@ import wyvern.tools.util.TreeWriter;
 
 public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
-
-	
-	
 	private String alias;
 	private Type reference;
 	private FileLocation location;
@@ -66,19 +62,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public FileLocation getLocation() {
 		// TODO Auto-generated method stub
 		return null;
@@ -94,12 +77,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	public Environment extendName(Environment env, Environment against) {
 		// TODO Auto-generated method stub
 		return env;
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

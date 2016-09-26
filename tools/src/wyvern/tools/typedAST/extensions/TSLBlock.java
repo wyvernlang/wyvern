@@ -45,11 +45,6 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 			return null;
 		}
 
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-
-		}
-
 		public EvaluationEnvironment getStore() {
 			return store;
 		}
@@ -70,11 +65,6 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 		@Override
 		public Type getType() {
 			return null;
-		}
-
-		@Override
-		public void writeArgsToTree(TreeWriter writer) {
-
 		}
 
 		public Environment getStore() {
@@ -114,18 +104,8 @@ public class TSLBlock extends AbstractExpressionAST implements ExpressionAST {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(ExpressionWriter.generate(wr -> inner.codegenToIL(environment, wr)));
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	@Override

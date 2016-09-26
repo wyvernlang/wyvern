@@ -78,15 +78,6 @@ public class Environment implements TreeWritable {
 		return parentEnvironment.lookupBinding(name, bindingType);
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		/*Environment env = this;
-		while (env != null) {
-			writer.writeArgs(binding);
-			env = env.parentEnvironment;
-		}*/
-	}
-
 	public Environment setInternalEnv(Environment internalEnv) {
 		internalEnv.extEnv = this;
 		return internalEnv;

@@ -13,7 +13,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -36,11 +35,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 		return new Bool(this.getLocation());
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(this.value);
-	}
-
 	public boolean getValue() {
 		return this.value;
 	}
@@ -57,11 +51,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Map<String, TypedAST> getChildren() {
 		Hashtable<String, TypedAST> children = new Hashtable<>();
 		return children;
@@ -71,11 +60,6 @@ public class BooleanConstant extends AbstractValue implements InvokableValue, Co
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
 		return new BooleanConstant(value);
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new BooleanLiteral(value));
-    }
 
     private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {

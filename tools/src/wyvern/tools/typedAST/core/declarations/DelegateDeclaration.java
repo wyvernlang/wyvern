@@ -15,7 +15,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
@@ -56,11 +55,6 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(type, target);
-	}
-
-	@Override
 	public FileLocation getLocation() {
 		return this.location;
 	}
@@ -84,11 +78,6 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 		}
 		
 		return env;
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -120,12 +109,6 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 			EvaluationEnvironment declEnv) {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented yet");
 	}
 
 	@Override

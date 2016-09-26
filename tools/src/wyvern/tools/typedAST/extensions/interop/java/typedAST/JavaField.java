@@ -116,18 +116,8 @@ public class JavaField extends Declaration {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate IL for a Java field", this);
-    }
-
-    @Override
     public FileLocation getLocation() {
         return FileLocation.UNKNOWN;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-
     }
 
 	@Override

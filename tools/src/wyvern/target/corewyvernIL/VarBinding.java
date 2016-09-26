@@ -6,7 +6,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.type.ValueType;
 
-public class VarBinding extends ASTNode {
+public class VarBinding {
 	private String varName;
 	private ValueType type;
 	private IExpr expr;

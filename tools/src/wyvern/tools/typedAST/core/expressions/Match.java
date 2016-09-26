@@ -21,7 +21,6 @@ import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -241,24 +240,9 @@ public class Match extends CachingTypedAST implements CoreAST {
 		return new Match(matchingOver, cases, defaultCase, location);
 	}
 
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        //TODO: Part of tags support
-    }
-
-    @Override
-	public void writeArgsToTree(TreeWriter writer) {
-		//TODO: is this meant to be empty?
-	}
-
 	@Override
 	public FileLocation getLocation() {
 		return location;
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
 	}
 
 	public void resolve(Environment env) {

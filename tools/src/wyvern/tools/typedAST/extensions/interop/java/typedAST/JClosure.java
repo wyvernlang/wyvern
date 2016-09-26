@@ -209,17 +209,8 @@ public class JClosure extends AbstractValue implements ApplyableValue {
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate a IL equivalent for a Java object", this);
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
 	}
 
 	@Override

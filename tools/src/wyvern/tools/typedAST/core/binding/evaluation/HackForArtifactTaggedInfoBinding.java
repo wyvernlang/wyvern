@@ -29,9 +29,4 @@ public class HackForArtifactTaggedInfoBinding implements EvaluationBinding {
     public Type getType() {
         return null;
     }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-
-    }
 }

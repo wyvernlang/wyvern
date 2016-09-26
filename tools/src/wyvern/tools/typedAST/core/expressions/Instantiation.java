@@ -11,14 +11,12 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Instantiation extends Declaration implements CoreAST {
 
@@ -42,44 +40,15 @@ public class Instantiation extends Declaration implements CoreAST {
     }
 
     @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(arg);
-    }
-
-    @Override
     public FileLocation getLocation() {
         return location;
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    /*
-    @Override
-    protected Type doTypecheck(Environment env, Optional<Type> expected) {
-        // TODO Auto-generated method stub
-        return new Unit();
-    }
-    */
-    @Override
     public Map<String, TypedAST> getChildren() {
         Hashtable<String, TypedAST> children = new Hashtable<>();
         children.put("arg", arg);
         return children;
-    }
-
-    /*
-    @Override
-    protected TypedAST doClone(Map<String, TypedAST> nc) {
-        return new Instantiation(uri, nc.get("arg"), name, location);
-    }
-    */
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        // TODO Auto-generated method stub
     }
 
     public URI getUri() {
@@ -99,14 +68,6 @@ public class Instantiation extends Declaration implements CoreAST {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /*
-    @Override
-    public Type typecheck(Environment env, Optional<Type> expected) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    */
 
     @Override
     public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {

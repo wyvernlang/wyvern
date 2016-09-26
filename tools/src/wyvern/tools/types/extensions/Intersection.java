@@ -67,10 +67,6 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 		return false;
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-	}
-
 	/**One-way only, or
 	 * T |- e : A_1  T |- e : A_2
 	 * --------------------------

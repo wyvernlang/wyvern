@@ -17,11 +17,6 @@ public class Unit extends AbstractTypeImpl {
 	public Unit() {  }
 	
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		// nothing to write		
-	}
-	
-	@Override
 	public String toString() {
 		return "Unit";
 	}

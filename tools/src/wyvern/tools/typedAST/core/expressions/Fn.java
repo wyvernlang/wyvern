@@ -31,7 +31,6 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -44,7 +43,6 @@ import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.TreeWriter;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     private List<NameBinding> bindings;
@@ -67,11 +65,6 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         this.bindings = bindings;
         this.body = (ExpressionAST) body;
         this.location = loc;
-    }
-
-    @Override
-    public void writeArgsToTree(TreeWriter writer) {
-        writer.writeArgs(bindings, body);
     }
 
     @Override
@@ -122,44 +115,10 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     }
 
     @Override
-    public void accept(CoreASTVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     public Map<String, TypedAST> getChildren() {
         Hashtable<String, TypedAST> children = new Hashtable<>();
         children.put("body", body);
         return children;
-    }
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(
-            new New(
-                Arrays.asList(
-                    new DefDeclaration("call",
-                        bindings.stream().map(
-                            b -> new FormalArg(
-                                b.getName(),
-                                (ValueType) b.getType().generateILType()
-                            )
-                        ).collect(Collectors.toList()),
-                        (ValueType) getType().generateILType(),
-                        ExpressionWriter.generate(
-                            iwriter -> body.codegenToIL(
-                                new GenerationEnvironment(environment),
-                                iwriter
-                            )
-                        ),
-                        getLocation()
-                    )
-                ),
-                null,
-                null,
-                getLocation()
-            )
-        );
     }
 
     @Override

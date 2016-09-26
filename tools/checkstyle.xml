@@ -175,5 +175,6 @@
         <property name="max" value="15" />
     </module>
     <module name="ArrayTrailingComma"/>
+    <module name="UnusedImports"/>
     </module>
 </module>

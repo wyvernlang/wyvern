@@ -33,7 +33,6 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.transformers.ExpressionWriter;
@@ -118,16 +117,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(name, type, body);
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Type getType() {
 		return type;
 	}
@@ -146,22 +135,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         dd.location = this.location;
         return dd;
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-    	ValueType valueType = getType ().generateILType();
-        environment.register(getName(), valueType);
-        GenerationEnvironment igen = new GenerationEnvironment(environment);
-
-        for (NameBinding nb : argNames)
-            igen.register(nb.getName(), valueType);
-        writer.write(new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
-                argNames.stream().map(nb -> new FormalArg(nb.getName(), nb.getType().generateILType())).collect(Collectors.toList()),
-                        type.generateILType(),
-                        ExpressionWriter.generate(iw -> {
-                            body.codegenToIL(igen, iw);
-                        }), getLocation()));
-    }
 
     @Override
 	protected Type doTypecheck(Environment env) {

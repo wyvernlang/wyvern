@@ -35,12 +35,6 @@ public class ValueBinding extends NameBindingImpl implements EvaluationBinding {
 	}
 	
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		super.writeArgsToTree(writer);
-		writer.writeArgs(value);
-	}
-
-	@Override
 	public String toString() {
 		return "{" + getName() + " : " + getType() + " = " + getValue(null) + "}";
 	}

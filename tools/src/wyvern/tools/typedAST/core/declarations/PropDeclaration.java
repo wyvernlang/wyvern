@@ -86,17 +86,6 @@ public class PropDeclaration extends Declaration {
 	}
 
 	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
-	}
-
-	@Override
-	public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public DeclType genILType(GenContext ctx) {
 		// TODO Auto-generated method stub
 		return null;

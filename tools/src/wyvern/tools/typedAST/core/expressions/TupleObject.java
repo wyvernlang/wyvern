@@ -16,7 +16,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -56,18 +55,8 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		this.location = commaLine;
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(objects);	
-	}
-	
 	public ExpressionAST getObject(int index) {
 		return (ExpressionAST) objects[index];
-	}
-
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
 	}
 
 	@Override
@@ -105,11 +94,6 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 		}
 		return childMap;
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("Cannot codegen a tuple");
-    }
 
     @Override
 	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {

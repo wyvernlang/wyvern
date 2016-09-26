@@ -15,7 +15,6 @@ import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.extensions.interop.java.objects.JavaObj;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -37,11 +36,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 		return new Str();
 	}
 
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-		writer.writeArgs(this.value);
-	}
-	
 	public String getValue() {
 		return value;
 	}
@@ -82,11 +76,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	}
 
 	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
 	public Map<String, TypedAST> getChildren() {
 		Hashtable<String, TypedAST> children = new Hashtable<>();
 		return children;
@@ -96,11 +85,6 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
 		return new StringConstant(value);
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        writer.write(new StringLiteral(value, location));
-    }
 
     private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {

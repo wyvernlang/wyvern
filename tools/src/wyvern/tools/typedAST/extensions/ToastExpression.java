@@ -60,18 +60,8 @@ public class ToastExpression extends AbstractExpressionAST implements Expression
 	}
 
     @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new WyvernException("Cannot generate code for a toast - run at compile time", this); //TODO: fixme for compiler
-    }
-
-    @Override
 	public FileLocation getLocation() {
 		return null;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
-
 	}
 
 	@Override

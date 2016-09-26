@@ -16,7 +16,6 @@ import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.CoreASTVisitor;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -40,10 +39,6 @@ public class WhileStatement extends AbstractExpressionAST implements CoreAST, Ex
 		this.conditional = conditional;
 		this.body = body;
 		this.location = location;
-	}
-
-	@Override
-	public void writeArgsToTree(TreeWriter writer) {
 	}
 
 	@Override
@@ -77,11 +72,6 @@ public class WhileStatement extends AbstractExpressionAST implements CoreAST, Ex
 		return UnitVal.getInstance(this.getLocation());
 	}
 
-	@Override
-	public void accept(CoreASTVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	public TypedAST getConditional() {
 		return conditional;
 	}
@@ -102,11 +92,6 @@ public class WhileStatement extends AbstractExpressionAST implements CoreAST, Ex
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		return new WhileStatement(newChildren.get("cond"), newChildren.get("body"), location);
 	}
-
-    @Override
-    public void codegenToIL(GenerationEnvironment environment, ILWriter writer) {
-        throw new RuntimeException("Not implemented codegen for whilestatement"); //TODO remove this
-    }
 
 	@Override
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
