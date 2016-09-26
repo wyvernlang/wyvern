@@ -8,6 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.ASTNode;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -17,7 +19,6 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.transformers.DynCastsTransformer;
-import wyvern.target.corewyvernIL.transformers.ILTransformer;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -98,10 +99,11 @@ public class TransformTests {
 	 * @return a program in IL code.
 	 * @throws ParseException: if the source code is malformed.
 	 */
-	private static IExpr compile (String input, ILTransformer... transformations) throws ParseException {
+	private static IExpr compile (String input, ASTVisitor<GenContext, ASTNode>... transformations) throws ParseException {
 		IExpr program = compile(input);
-		for (ILTransformer transformer : transformations) {
-			program = transformer.transform(program);
+		for (ASTVisitor<GenContext, ASTNode> transformer : transformations) {
+			GenContext ctx = Globals.getStandardGenContext();
+			program = (IExpr) program.acceptVisitor(transformer, ctx);
 		}
         return program;
 	}
