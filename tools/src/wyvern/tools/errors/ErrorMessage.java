@@ -34,7 +34,7 @@ public enum ErrorMessage {
 	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
 	SYNTAX_FOR_NO_ARG_LAMBDA("Use \"() => <expression>\" rather than \"x => <expression>\" for a zero-argument function expression",0),
 	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression", 1),
-	
+
 	// Syntax errors
 	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
 	UNEXPECTED_INPUT("Unexpected input", 0),
@@ -47,16 +47,16 @@ public enum ErrorMessage {
 	MISMATCHED_PARENTHESES("No matching close parenthesis", 0),
 	UNEXPECTED_EMPTY_BLOCK("Indented block parsing error: nothing inside", 0),
 	ILLEGAL_INDENTED_BLOCK("Indented block cannot appear here", 0),
-	
+
 	// Tagged Type errors
 	//TODO: these need parameters that give more information
-	
+
 	//For tagged declaration
 	TYPE_NOT_TAGGED("Type is not tagged: %ARG", 1),
 	CIRCULAR_TAGGED_RELATION("Circular tagged hierarchy found with tag: %ARG, case-of: %ARG", 2),
 	COMPRISES_RELATION_NOT_RECIPROCATED("The tag declared to comprise this tag is not a case-of this tag", 0),
 	COMPRISES_EXCLUDES_TAG("The comprises clause of: %ARG, excludes a tag which is a case-of of this tag: %ARG", 2),
-	
+
 	//For match expression
 	BOUNDED_EXHAUSTIVE_WITH_DEFAULT("Default cannot be present in satisfied bounded match", 0),
 	BOUNDED_INEXHAUSTIVE_WITHOUT_DEFAULT("Default must be present in inexhaustive bounded match", 0),
@@ -67,7 +67,7 @@ public enum ErrorMessage {
 	UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
 	UNMATCHABLE_CASE("A variable of tag-type %ARG cannot possibly match against case %ARG", 2),
 	MATCH_NO_COMMON_RETURN("Match statement does not have a common return type", 0),
-	
+
 	// Evaluation errors
 	VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
 	CANNOT_INVOKE("Cannot invoke operations on the value %ARG", 1),
@@ -77,9 +77,9 @@ public enum ErrorMessage {
 	IMPORT_CYCLE("Import cycles have been found, with cycles\n%ARG", 1),
 
 	ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2),// end of error list
-	
+
 	MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
-	
+
 	PARSE_ERROR("Parse error: %ARG", 1),
 	READ_FILE_ERROR("Could not read file %ARG", 1),
 	MODULE_NOT_FOUND_ERROR("Could not find %ARG %ARG in either the current Wyvern path or the standard library", 2),
@@ -90,7 +90,7 @@ public enum ErrorMessage {
 	ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
 	UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
 	;
-	
+
 	private ErrorMessage(String message, int numArgs) {
 		this.errorMessage = message;
 		this.numArgs = numArgs;
@@ -105,11 +105,11 @@ public enum ErrorMessage {
         }
         return str;
     }
-	
+
 	public int numberOfArguments() {
 		return numArgs;
 	}
-	
+
 	private String errorMessage;
 	private int numArgs;
 }
