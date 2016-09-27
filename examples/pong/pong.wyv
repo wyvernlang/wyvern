@@ -2,6 +2,8 @@ import python:pygame
 import python:helper
 import python:time
 
+type Float
+
 type Surface
   def fill(color : Color) : Unit
 
@@ -41,6 +43,27 @@ type Display
                depth : Int) : Surface
   def flip() : Unit
 
+type Music
+  def load(file : String) : Unit
+  def play() : Unit
+  def rewind() : Unit
+  def stop() : Unit
+  def pause() : Unit
+  def unpause() : Unit
+  def set_volume(volume : Float) : Unit
+
+type Channel
+
+type Sound
+  def play() : Channel
+  def stop() : Unit
+
+type Mixer
+  def pre_init(frequency : Int, size : Int, channels : Int, buffersize : Int) : Unit
+  def init() : Unit
+  val music : Music
+  def Sound(filename : String) : Sound
+
 type Helper
   def make2Tuple(a : Dyn, b : Dyn) : Dyn
   def fst(a : Dyn) : Dyn
@@ -51,6 +74,7 @@ type Helper
   def makeClock() : Clock
   def debug(msg : String) : Unit
   def getType(event : Event) : EventType
+  def floatOfString(float : String) : Float
 val helper : Helper = helper
 
 type Pygame
@@ -60,6 +84,7 @@ type Pygame
   val draw : Draw
   val display : Display
   val event : PygameEvent
+  val mixer : Mixer
 
   def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
   val QUIT : EventType
@@ -104,6 +129,12 @@ val width = 640
 val height = 480
 val screen = pygame.display.set_mode(helper.make2Tuple(width, height), 0, 0)
 
+pygame.mixer.pre_init(44100, 0 - 16, 1, 512)
+pygame.mixer.init()
+
+val blip = pygame.mixer.Sound("blip.wav")
+val blop = pygame.mixer.Sound("blop.wav")
+
 // def ifTrue(bool : Boolean, f : Unit -> Dyn) : Unit
 //   bool.ifTrue(() => f(), () => 0)
 
@@ -118,11 +149,26 @@ val ball = new
     pygame.draw.circle(screen, helper.white, helper.make2Tuple(this.x, this.y), this.radius)
     7
 
+  def flipX() : Unit
+    this.xSpeed = (0 - 1) * this.xSpeed
+    blip.play()
+    0 // Avoid TCO / FFI bad interaction
+
+  def flipXBlop() : Unit
+    this.xSpeed = (0 - 1) * this.xSpeed
+    blop.play()
+    0 // Avoid TCO / FFI bad interaction
+
+  def flipY() : Unit
+    this.ySpeed = (0 - 1) * this.ySpeed
+    blip.play()
+    0 // Avoid same bad interaction
+
   def update(paddleHitbox : Rect) : Unit
-    (this.x < 0).ifTrue(() => this.xSpeed = (0 - 1) * this.xSpeed, () => 0)
-    (this.x > width).ifTrue(() => this.xSpeed = (0 - 1) * this.xSpeed, () => 0)
-    (this.y < 0).ifTrue(() => this.ySpeed = (0 - 1) * this.ySpeed, () => 0)
-    (this.y > height).ifTrue(() => this.ySpeed = (0 - 1) * this.ySpeed, () => 0)
+    (this.x < 0).ifTrue(() => this.flipX(), () => 0)
+    (this.x > width).ifTrue(() => this.flipX(), () => 0)
+    (this.y < 0).ifTrue(() => this.flipY(), () => 0)
+    (this.y > height).ifTrue(() => this.flipY(), () => 0)
 
     // backwards comparisons for better ifTrue nesting
     val me = this
@@ -131,7 +177,7 @@ val ball = new
         () => (me.y < paddleHitbox.top).ifTrue(() => 0,
           () => (me.y > paddleHitbox.bottom).ifTrue(() => 0,
             () => (me.xSpeed > 0).ifTrue(() => 0,
-              () => me.xSpeed = (0 - 1) * me.xSpeed
+              () => me.flipXBlop()
             )
           )
         )
@@ -195,3 +241,6 @@ val loop : GameLoop = new
 
 run(loop)
 pygame.quit()
+
+// blip.wav made by NoiseCollector at https://www.freesound.org/people/NoiseCollector/sounds/4391/
+// blop.wav made by NoiseCollector at https://www.freesound.org/people/NoiseCollector/sounds/4385/

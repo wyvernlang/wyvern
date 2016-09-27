@@ -25,3 +25,6 @@ def debug(msg):
 
 def getType(e):
     return e.type
+
+def floatOfString(s):
+    return float(s)
