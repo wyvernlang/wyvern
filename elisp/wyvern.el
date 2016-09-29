@@ -9,6 +9,15 @@
     map)
   "Keymap for Wyvern major mode")
 
+(defvar wyvern-mode-syntax-table nil "Syntax table for `wyvern-mode'")
+
+(setq wyvern-mode-syntax-table
+      (let ((synTable (make-syntax-table)))
+        (modify-syntax-entry ?\n "> b" synTable)
+        (modify-syntax-entry ?\/ ". 124b" synTable)
+        (modify-syntax-entry ?* ". 23" synTable)
+        synTable))
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wyv\\'" . wyvern-mode))
 (add-to-list 'auto-mode-alist '("\\.wyt\\'" . wyvern-mode))
@@ -126,6 +135,7 @@
   (use-local-map wyvern-mode-keymap)
   (set (make-local-variable 'font-lock-defaults)
        '(wyvern-font-lock-keywords))
+  (set-syntax-table wyvern-mode-syntax-table)
   (setq major-mode 'wyvern-mode)
   (setq mode-name "Wyvern")
   (run-hooks 'wyvern-mode-hook))
