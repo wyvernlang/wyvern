@@ -490,13 +490,27 @@ public class OIRTests {
     public void testEquality() throws ParseException {
         String input =
             "val x = 7\n" +
-            "val a : Int = (x.equals(7)).ifTrue(\n" +
+            "val a : Int = (x == 7).ifTrue(\n" +
             "  () => 3,\n" +
             "  () => 2)\n" +
-            "val b : Int = (x.equals(13)).ifTrue(\n" +
+            "val b : Int = (x == 13).ifTrue(\n" +
             "  () => 5,\n" +
             "  () => 0)\n" +
             "a + b\n";
         testPyFromInput(input, "3", true);
+    }
+
+    @Test
+    public void testBooleanAnd() throws ParseException {
+        String input =
+            "true && false\n";
+        testPyFromInput(input, "false");
+    }
+
+    @Test
+    public void testBooleanOr() throws ParseException {
+        String input =
+            "true || false\n";
+        testPyFromInput(input, "true");
     }
 }

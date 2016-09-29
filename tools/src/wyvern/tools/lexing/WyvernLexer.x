@@ -322,6 +322,8 @@ import wyvern.tools.errors.ToolError;
  	terminal Token lt_t ::= /</ {: RESULT = token(LT,lexeme); :};
     terminal Token oSquareBracket_t ::= /\[/ {: RESULT = token(LBRACK,lexeme); :};
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
+    terminal Token booleanAnd_t ::= /&&/ {: RESULT = token(AND,lexeme); :}
+    terminal Token booleanOr_t ::= /||/ {: RESULT = token(AND,lexeme); :}
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
@@ -421,6 +423,7 @@ import wyvern.tools.errors.ToolError;
 	           | divide_t:t {: RESULT = t; :}
 	           | remainder_t:t {: RESULT = t; :}
 	           | equals_t:t {: RESULT = t; :}
+             | equalsequals_t:t {: RESULT = t; :}
 	           | comma_t:t {: RESULT = t; :}
 	           | arrow_t:t {: RESULT = t; :}
 	           | tarrow_t:t {: RESULT = t; :}
@@ -432,6 +435,9 @@ import wyvern.tools.errors.ToolError;
 	           | and_t:t {: RESULT = t; :}
 	           | gt_t:t {: RESULT = t; :}
 	           | lt_t:t {: RESULT = t; :}
+             | equalsequals_t:t {: RESULT = t; :}
+             | booleanAnd_t:t {: RESULT = t; :}
+             | booleanOr_t:t {: RESULT = t; :}
 	           ;
 	           
 	anyLineElement ::= whitespace_t:n {: RESULT = makeList(n); :}

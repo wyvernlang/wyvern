@@ -99,7 +99,7 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 		case "%": return new IntegerLiteral(this.value.remainder(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "<": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) < 0);
 		case ">": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) > 0);
-    case "equals": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) == 0);
+    case "==": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) == 0);
 		default: throw new RuntimeException("runtime error: integer operation " + methodName + "not supported by the runtime");
 		}
 	}
