@@ -114,7 +114,7 @@ def processEvents(gameLoop : GameLoop) : Unit
   def f() : Unit
     gameLoop.processEvent(event)
     processEvents(gameLoop)
-  helper.getType(event).equals(pygame.NOEVENT).ifTrue(
+  (helper.getType(event) == pygame.NOEVENT).ifTrue(
     () => 0,
     () => f())
 def run(gameLoop : GameLoop) : Unit
@@ -219,19 +219,19 @@ val loop : GameLoop = new
   def processEvent(e : Event) : Unit
     val gameLoop = this
     val eventType = helper.getType(e)
-    eventType.equals(pygame.QUIT).ifTrue(
+    (eventType == pygame.QUIT).ifTrue(
       () => this.done = true,
-      () => eventType.equals(pygame.KEYDOWN).ifTrue(
-         () => e.key.equals(pygame.K_UP).ifTrue(
+      () => (eventType == pygame.KEYDOWN).ifTrue(
+         () => (e.key == pygame.K_UP).ifTrue(
            () => gameLoop.upPressed = true,
-           () => e.key.equals(pygame.K_DOWN).ifTrue(
+           () => (e.key == pygame.K_DOWN).ifTrue(
              () => gameLoop.downPressed = true,
              () => 0)
          ),
-         () => eventType.equals(pygame.KEYUP).ifTrue(
-           () => e.key.equals(pygame.K_UP).ifTrue(
+         () => (eventType == pygame.KEYUP).ifTrue(
+           () => (e.key == pygame.K_UP).ifTrue(
              () => gameLoop.upPressed = false,
-             () => e.key.equals(pygame.K_DOWN).ifTrue(
+             () => (e.key == pygame.K_DOWN).ifTrue(
                () => gameLoop.downPressed = false,
                () => 0)
            ),
