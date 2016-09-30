@@ -511,6 +511,16 @@ public class OIRTests {
     public void testBooleanOr() throws ParseException {
         String input =
             "true || false\n";
-        testPyFromInput(input, "True", true);
+        testPyFromInput(input, "True");
+    }
+
+    @Test
+    public void testNestedLambda() throws ParseException {
+        String input =
+            "val obj = new\n" +
+            "  val x = 5\n" +
+            "  def f() : Unit = (() => (() => this.x)())()\n" +
+            "obj.f()\n";
+        testPyFromInput(input, "5", true);
     }
 }

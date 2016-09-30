@@ -98,7 +98,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 
 		// Add the object to the context.
 		TypeContext ctx = state.getContext();
-		ctx = ctx.extend("this", newExpr.typeCheck(state.getContext()));
+		ctx = ctx.extend(newExpr.getSelfName(), newExpr.typeCheck(state.getContext()));
 		
 		// Process each declaration.
 		for (Declaration decl : newExpr.getDecls()) {
