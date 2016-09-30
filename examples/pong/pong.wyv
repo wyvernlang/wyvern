@@ -109,7 +109,9 @@ resource type GameLoop
   val done : Boolean
   def oneIteration() : Unit
   def processEvent(e : Event) : Unit
+
 val clock : Clock = helper.makeClock()
+
 def processEvents(gameLoop : GameLoop) : Unit
   val event = pygame.event.poll()
   def f() : Unit
@@ -118,6 +120,7 @@ def processEvents(gameLoop : GameLoop) : Unit
   (helper.getType(event) == pygame.NOEVENT).ifTrue(
     () => 0,
     () => f())
+
 def run(gameLoop : GameLoop) : Unit
   clock.tick(gameLoop.fps)
   gameLoop.oneIteration()
@@ -135,9 +138,6 @@ pygame.mixer.init()
 
 val blip = pygame.mixer.Sound("blip.wav")
 val blop = pygame.mixer.Sound("blop.wav")
-
-// def ifTrue(bool : Boolean, f : Unit -> Dyn) : Unit
-//   bool.ifTrue(() => f(), () => 0)
 
 val ball = new
   var x : Int = 0
@@ -166,24 +166,16 @@ val ball = new
     0 // Avoid same bad interaction
 
   def update(paddleHitbox : Rect) : Unit
-    (this.x < 0).ifTrue(() => this.flipX(), () => 0)
-    (this.x > width).ifTrue(() => this.flipX(), () => 0)
-    (this.y < 0).ifTrue(() => this.flipY(), () => 0)
-    (this.y > height).ifTrue(() => this.flipY(), () => 0)
+    (this.x < 0 || this.x > width).ifTrue(() => this.flipX(), () => 0)
+    (this.y < 0 || this.y > height).ifTrue(() => this.flipY(), () => 0)
 
     // backwards comparisons for better ifTrue nesting
     val me = this
-    (me.x > paddleHitbox.right).ifTrue(() => 0,
-      () => (me.x < paddleHitbox.left).ifTrue(() => 0,
-        () => (me.y < paddleHitbox.top).ifTrue(() => 0,
-          () => (me.y > paddleHitbox.bottom).ifTrue(() => 0,
-            () => (me.xSpeed > 0).ifTrue(() => 0,
-              () => me.flipXBlop()
-            )
-          )
-        )
-      )
-    )
+    (me.x < paddleHitbox.right &&
+     me.x > paddleHitbox.left &&
+     me.y > paddleHitbox.top &&
+     me.y < paddleHitbox.bottom &&
+     me.xSpeed < 0).ifTrue(() => me.flipXBlop(), () => 0)
 
     this.x = this.x + this.xSpeed
     this.y = this.y + this.ySpeed
@@ -211,11 +203,6 @@ val loop : GameLoop = new
     this.downPressed.ifTrue(() => gameLoop.y = gameLoop.y + 2,
                             () => 0)
     ball.update(pygame.Rect(10, this.y, this.width, this.height))
-
-    // (this.y > 500).ifTrue(
-    //   () => this.done = true,
-    //   () => 7
-    // )
 
   def processEvent(e : Event) : Unit
     val gameLoop = this
