@@ -96,6 +96,7 @@ type Pygame
 
   val K_UP : Key
   val K_DOWN : Key
+  val K_ESCAPE : Key
 
 type Time
   def sleep(t : Int) : Unit
@@ -219,25 +220,13 @@ val loop : GameLoop = new
   def processEvent(e : Event) : Unit
     val gameLoop = this
     val eventType = helper.getType(e)
-    (eventType == pygame.QUIT).ifTrue(
-      () => this.done = true,
-      () => (eventType == pygame.KEYDOWN).ifTrue(
-         () => (e.key == pygame.K_UP).ifTrue(
-           () => gameLoop.upPressed = true,
-           () => (e.key == pygame.K_DOWN).ifTrue(
-             () => gameLoop.downPressed = true,
-             () => 0)
-         ),
-         () => (eventType == pygame.KEYUP).ifTrue(
-           () => (e.key == pygame.K_UP).ifTrue(
-             () => gameLoop.upPressed = false,
-             () => (e.key == pygame.K_DOWN).ifTrue(
-               () => gameLoop.downPressed = false,
-               () => 0)
-           ),
-           () => 0
-         )
-      ))
+    (eventType == pygame.QUIT).ifTrue(() => this.done = true, () => 0)
+    def keyEvents() : Unit
+      (e.key == pygame.K_UP).ifTrue(() => gameLoop.upPressed = (eventType == pygame.KEYDOWN), () => 0)
+      (e.key == pygame.K_DOWN).ifTrue(() => gameLoop.downPressed = (eventType == pygame.KEYDOWN), () => 0)
+      (e.key == pygame.K_ESCAPE).ifTrue(() => gameLoop.done = true, () => 0)
+    (eventType == pygame.KEYDOWN || eventType == pygame.KEYUP).ifTrue( () => keyEvents(), () => 0)
+    
 
 run(loop)
 pygame.quit()

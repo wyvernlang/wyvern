@@ -362,6 +362,8 @@ import java.net.URI;
  	terminal lt_t ::= /</ ;
     terminal oSquareBracket_t ::= /\[/;
     terminal cSquareBracket_t ::= /\]/;
+    terminal booleanand_t ::= /&&/;
+    terminal booleanor_t ::= /\|\|/;
 
  	terminal shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = lexeme.substring(1,lexeme.length()-1);

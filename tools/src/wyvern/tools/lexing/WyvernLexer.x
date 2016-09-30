@@ -322,8 +322,8 @@ import wyvern.tools.errors.ToolError;
  	terminal Token lt_t ::= /</ {: RESULT = token(LT,lexeme); :};
     terminal Token oSquareBracket_t ::= /\[/ {: RESULT = token(LBRACK,lexeme); :};
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
-    terminal Token booleanAnd_t ::= /&&/ {: RESULT = token(AND,lexeme); :}
-    terminal Token booleanOr_t ::= /||/ {: RESULT = token(AND,lexeme); :}
+    terminal Token booleanand_t ::= /&&/ {: RESULT = token(BOOLEANAND,lexeme); :};
+    terminal Token booleanor_t ::= /\|\|/ {: RESULT = token(BOOLEANOR,lexeme); :};
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
@@ -338,7 +338,7 @@ import wyvern.tools.errors.ToolError;
  	// error if DSLNext but not indented further
  	// DSL if DSLNext and indented (unsets DSLNext, sets inDSL)
  	// DSL if inDSL and indented
- 	// intent_t otherwise 
+ 	// indent_t otherwise 
 	disambiguate d1:(dsl_indent_t,indent_t)
 	{:
 		String currentIndent = indents.peek();
@@ -436,8 +436,8 @@ import wyvern.tools.errors.ToolError;
 	           | gt_t:t {: RESULT = t; :}
 	           | lt_t:t {: RESULT = t; :}
              | equalsequals_t:t {: RESULT = t; :}
-             | booleanAnd_t:t {: RESULT = t; :}
-             | booleanOr_t:t {: RESULT = t; :}
+             | booleanand_t:t {: RESULT = t; :}
+             | booleanor_t:t {: RESULT = t; :}
 	           ;
 	           
 	anyLineElement ::= whitespace_t:n {: RESULT = makeList(n); :}

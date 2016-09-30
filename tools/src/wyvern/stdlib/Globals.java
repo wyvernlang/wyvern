@@ -128,7 +128,10 @@ public class Globals {
 		List<FormalArg> ifTrueArgs = Arrays.asList(
 				new FormalArg("trueBranch", Util.unitToDynType()),
 				new FormalArg("falseBranch", Util.unitToDynType()));
-		List<DeclType> boolDeclTypes = Arrays.asList(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
+    List<DeclType> boolDeclTypes = new LinkedList<DeclType>();
+    boolDeclTypes.add(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
+    boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
+    boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
 		// construct a type for the system object
 		List<DeclType> declTypes = new LinkedList<DeclType>();
 		List<DeclType> intDeclTypes = new LinkedList<DeclType>();

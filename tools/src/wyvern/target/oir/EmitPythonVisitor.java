@@ -360,6 +360,10 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         indent = oldIndent;
         state.prefix.add(pfx);
         strVal = varName;
+    } else if (isBool && methodName.equals("||")) {
+        strVal = "(" + objExpr + " or " + args + ")";
+    } else if (isBool && methodName.equals("&&")) {
+        strVal = "(" + objExpr + " and " + args + ")";
     } else {
         if (isOperator)
             strVal = "(" + objExpr + " " +

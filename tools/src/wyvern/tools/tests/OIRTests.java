@@ -235,7 +235,7 @@ public class OIRTests {
       "val obj = new\n" +
       "    def id(x:system.Int) : system.Int = x\n" +
       "obj.id(13)\n";
-    testPyFromInput(input, "13", true);
+    testPyFromInput(input, "13");
   }
 
   @Test
@@ -497,20 +497,20 @@ public class OIRTests {
             "  () => 5,\n" +
             "  () => 0)\n" +
             "a + b\n";
-        testPyFromInput(input, "3", true);
+        testPyFromInput(input, "3");
     }
 
     @Test
     public void testBooleanAnd() throws ParseException {
         String input =
             "true && false\n";
-        testPyFromInput(input, "false");
+        testPyFromInput(input, "False");
     }
 
     @Test
     public void testBooleanOr() throws ParseException {
         String input =
             "true || false\n";
-        testPyFromInput(input, "true");
+        testPyFromInput(input, "True", true);
     }
 }
