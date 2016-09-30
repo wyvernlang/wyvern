@@ -521,6 +521,6 @@ public class OIRTests {
             "  val x = 5\n" +
             "  def f() : Unit = (() => (() => this.x)())()\n" +
             "obj.f()\n";
-        testPyFromInput(input, "5", true);
+        testPyFromInput(input, "5");
     }
 }
