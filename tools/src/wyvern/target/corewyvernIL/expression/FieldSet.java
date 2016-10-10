@@ -54,6 +54,8 @@ public class FieldSet extends Expression {
 
 		// Figure out the type of the field.
 		DeclType declTypeField = structTypeObj.findDecl(fieldName, ctx);
+		if (declTypeField == null)
+			ToolError.reportError(ErrorMessage.NO_SUCH_FIELD, this, fieldName);
 		if (!(declTypeField instanceof VarDeclType))
 			ToolError.reportError(ErrorMessage.CANNOT_BE_ASSIGNED, this,
 								  declTypeField.getName());

@@ -49,7 +49,7 @@ public class FieldGet extends Expression implements Path {
 		ValueType vt = objectExpr.typeCheck(ctx);
 		DeclType dt = vt.findDecl(fieldName, ctx);
 		if (dt == null)
-			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, fieldName);
+			ToolError.reportError(ErrorMessage.NO_SUCH_FIELD, this, fieldName);
 		if (!(dt instanceof ValDeclType || dt instanceof VarDeclType))
 			ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, this, dt.getName());
 		this.setExprType(((DeclTypeWithResult)dt).getResultType(View.from(objectExpr, ctx)));
