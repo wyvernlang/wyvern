@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.CoreParserTests;
+import wyvern.tools.tests.DemoTests;
 import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.Illustrations;
@@ -37,6 +38,7 @@ import wyvern.tools.tests.StdlibTests;
         FFITests.class,
         OIRTests.class,
         Illustrations.class,        // tests the new IL
+        DemoTests.class,        // tests demonstration code
         StdlibTests.class,      // tests the standard library with the new IL
         ModuleSystemTests.class,        // tests the new IL
     }
