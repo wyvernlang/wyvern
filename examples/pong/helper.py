@@ -22,3 +22,9 @@ def makeClock():
 def debug(msg):
     print(msg)
     sys.stdout.flush()
+
+def getType(e):
+    return e.type
+
+def floatOfString(s):
+    return float(s)

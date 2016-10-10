@@ -38,8 +38,7 @@ public class BooleanLiteral extends AbstractValue implements Invokable {
 
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
-		// TODO Auto-generated method stub
-		return null;
+      return emitILVisitor.visit(state, this);
 	}
 
 	@Override
@@ -60,6 +59,10 @@ public class BooleanLiteral extends AbstractValue implements Invokable {
 					return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
 				}
 				return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
+      case "&&":
+        return new BooleanLiteral(this.value && ((BooleanLiteral) args.get(0)).value);
+      case "||":
+        return new BooleanLiteral(this.value || ((BooleanLiteral) args.get(0)).value);
 			default: throw new RuntimeException();
 		}
 	}

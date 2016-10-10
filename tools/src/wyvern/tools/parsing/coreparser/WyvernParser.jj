@@ -151,6 +151,8 @@ TOKEN : /* Symbols */
 | <RBRACK>
 | <LBRACE>
 | <RBRACE>
+| <BOOLEANAND>
+| <BOOLEANOR>
 //| <>
 }
 
@@ -493,7 +495,7 @@ AST Expression(ExpFlags flags) :
 AST AssignmentExpression(ExpFlags flags) :
 { AST exp; AST exp2 = null; Object formal; Token t = null; }
 {
-  exp = RelationalExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
+  exp = BooleanRelationalExpression(flags) [ t=<EQUALS> exp2 = Expression(flags) ] {
     if (exp2 != null) {
         return build.assignment(exp, exp2, loc(t));
     }
@@ -548,11 +550,21 @@ Type Type() :
  }
 }
 
+AST BooleanRelationalExpression(ExpFlags flags) :
+{ AST exp; AST exp2 = null; Token t; }
+{
+    exp = RelationalExpression(flags)
+    [ ( t=<BOOLEANAND> | t=<BOOLEANOR> ) exp2=BooleanRelationalExpression(flags) {
+      exp = build.invocation(exp, t.image, exp2, loc(t));
+    } ]
+    { return exp; }
+}
+
 AST RelationalExpression(ExpFlags flags) :
 { AST exp; AST exp2 = null; Token t; }
 {
   exp = AdditiveExpression(flags)
-  [ ( t=<GT> | t=<LT> ) exp2=AdditiveExpression(flags) {
+  [ ( t=<GT> | t=<LT> | t=<EQUALSEQUALS> ) exp2=AdditiveExpression(flags) {
     exp = build.invocation(exp, t.image, exp2, loc(t)); 
   } ]
   { return exp; }

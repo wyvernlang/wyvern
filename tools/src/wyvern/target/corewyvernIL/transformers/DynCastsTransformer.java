@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -199,6 +200,11 @@ public class DynCastsTransformer extends ASTVisitor<GenContext, ASTNode> {
 	@Override
 	public IntegerLiteral visit(GenContext ctx, IntegerLiteral integerLiteral) {
 		return integerLiteral;
+	}
+
+  @Override
+  public BooleanLiteral visit(GenContext ctx, BooleanLiteral booleanLiteral) {
+    return booleanLiteral;
 	}
 
 	@Override

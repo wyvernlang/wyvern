@@ -21,7 +21,7 @@ import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
-import wyvern.target.oir.PrettyPrintVisitor;
+import wyvern.target.oir.EmitPythonVisitor;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
@@ -112,8 +112,8 @@ public class PythonCompiler {
                                 new EmitOIRState(Globals.getStandardTypeContext(),
                                                  OIREnvironment.getRootEnvironment()));
       String python =
-          new PrettyPrintVisitor().prettyPrint(oirast,
-                                               OIREnvironment.getRootEnvironment());
+          new EmitPythonVisitor().emitPython(oirast,
+                                             OIREnvironment.getRootEnvironment());
 
       try (PrintWriter out = new PrintWriter(output_file)) {
           out.println(python);

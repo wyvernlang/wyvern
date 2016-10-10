@@ -37,7 +37,7 @@ import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 
-class PrettyPrintState {
+class EmitPythonState {
     public OIREnvironment oirenv;
     public boolean expectingReturn;
     public String returnType;
@@ -51,7 +51,7 @@ class PrettyPrintState {
     public boolean inClass;
 }
 
-public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
+public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     String indent = "";
     final String indentIncrement = "  ";
     final String tco_prefix = "tco_";
@@ -59,7 +59,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
 
   HashSet<String> classesUsed;
 
-  public PrettyPrintVisitor() {
+  public EmitPythonVisitor() {
     classesUsed = new HashSet<String>();
   }
 
@@ -70,7 +70,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         return false;
     }
 
-  private String commaSeparatedExpressions(PrettyPrintState state,
+  private String commaSeparatedExpressions(EmitPythonState state,
                                            List<OIRExpression> exps) {
     String args = "";
     int nArgs = exps.size();
@@ -91,12 +91,12 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         return result;
     }
 
-  private String generateVariable(PrettyPrintState state) {
+  private String generateVariable(EmitPythonState state) {
     state.variableCounter++;
     return "var" + state.variableCounter;
   }
 
-  private void findClassDecls(PrettyPrintState state, OIREnvironment oirenv) {
+  private void findClassDecls(EmitPythonState state, OIREnvironment oirenv) {
     for (HashMap.Entry<String, OIRType> pair : oirenv.getTypeTable().entrySet()) {
       String name = pair.getKey();
       OIRType type = pair.getValue();
@@ -108,10 +108,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       findClassDecls(state, child);
   }
 
-  public String prettyPrint(OIRAST oirast,
-                            OIREnvironment oirenv) {
+  public String emitPython(OIRAST oirast,
+                           OIREnvironment oirenv) {
     String classDefs = "";
-    PrettyPrintState state = new PrettyPrintState();
+    EmitPythonState state = new EmitPythonState();
     state.oirenv = oirenv;
     state.expectingReturn = false;
     state.returnType = "return";
@@ -155,7 +155,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return methodDecls + classDefs + prefix + out.toString();
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRInteger oirInteger) {
       state.currentLetVar = "";
     String strVal = Integer.toString(oirInteger.getValue());
@@ -164,7 +164,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return strVal;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRBoolean oirBoolean) {
       state.currentLetVar = "";
     String strVal = (oirBoolean.isValue() ? "True" : "False");
@@ -173,13 +173,13 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return strVal;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRCast oirCast) {
       state.currentLetVar = "";
     return "OIRCast unimplemented";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRFieldGet oirFieldGet) {
       state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
@@ -195,7 +195,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return strVal;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRFieldSet oirFieldSet) {
       state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
@@ -225,7 +225,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return strVal;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRIfThenElse oirIfThenElse) {
       state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
@@ -247,7 +247,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
             elseString);
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRLet oirLet) {
       state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
@@ -259,6 +259,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     indent += indentIncrement;
     String inString = oirLet.getInExpr().acceptVisitor(this, state);
     indent = oldIndent;
+    if (state.prefix.size() > 0) {
+        inString = stringFromPrefix(state.prefix, indent) + "\n" + indent + inString;
+        state.prefix = new ArrayList<>();
+    }
 
     int letId = uniqueId;
     uniqueId++;
@@ -287,19 +291,19 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       toReplaceString = oirLet.getToReplace().acceptVisitor(this, state);
     }
     String statePrefix = stringFromPrefix(state.prefix,
-                                          indent + indentIncrement);
+                                          indent);
     state.expectingReturn = oldExpectingReturn;
     state.prefix = oldPrefix;
 
     String funCall = "\n" + indent;
     if (state.expectingReturn)
-      funCall += state.returnType + " ";
-     funCall += "letFn" + Integer.toString(letId) + "(" + toReplaceString + ")";
+        funCall += state.returnType + " ";
+    funCall += "letFn" + Integer.toString(letId) + "(" + toReplaceString + ")";
 
-    return (prefix + funDecl + statePrefix + inString + funCall);
+    return (prefix + funDecl + inString + statePrefix + funCall);
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRMethodCall oirMethodCall) {
       state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
@@ -356,6 +360,10 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
         indent = oldIndent;
         state.prefix.add(pfx);
         strVal = varName;
+    } else if (isBool && methodName.equals("||")) {
+        strVal = "(" + objExpr + " or " + args + ")";
+    } else if (isBool && methodName.equals("&&")) {
+        strVal = "(" + objExpr + " and " + args + ")";
     } else {
         if (isOperator)
             strVal = "(" + objExpr + " " +
@@ -373,7 +381,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return strVal;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRNew oirNew) {
       String letName = state.currentLetVar;
       state.currentLetVar = "";
@@ -430,13 +438,13 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return oirNew.getTypeName() + "(" + args + dict + d + thisName + ")";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRRational oirRational) {
       state.currentLetVar = "";
     return "OIRRational unimplemented";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRString oirString) {
       state.currentLetVar = "";
     String strVal = "\"" + oirString.getValue() + "\"";
@@ -445,7 +453,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return strVal;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRVariable oirVariable) {
       state.currentLetVar = "";
     String var;
@@ -460,7 +468,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return var;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRClassDeclaration oirClassDeclaration) {
       state.currentLetVar = "";
     boolean oldExpectingReturn = state.expectingReturn;
@@ -529,31 +537,31 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
     return classDef + members;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRProgram oirProgram) {
       state.currentLetVar = "";
     return "OIRProgram unimplemented";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRInterface oirInterface) {
       state.currentLetVar = "";
     return "OIRInterface unimplemented";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRFieldDeclaration oirFieldDeclaration) {
       state.currentLetVar = "";
     return "OIRFieldDeclaration unimplemented";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRMethodDeclaration oirMethodDeclaration) {
       state.currentLetVar = "";
     return "OIRMethodDeclaration unimplemented";
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRMethod oirMethod) {
       state.currentLetVar = "";
       String args = NameMangleVisitor.mangle("this");
@@ -604,7 +612,7 @@ public class PrettyPrintVisitor extends ASTVisitor<PrettyPrintState, String> {
       return def + prefix + body + "\n" + indent + trampolineDecl;
   }
 
-  public String visit(PrettyPrintState state,
+  public String visit(EmitPythonState state,
                       OIRFFIImport oirImport) {
       state.currentLetVar = "";
     if (oirImport.getFFIType() != FFIType.PYTHON) {

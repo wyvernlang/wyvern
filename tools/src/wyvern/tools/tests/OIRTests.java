@@ -29,7 +29,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
-import wyvern.target.oir.PrettyPrintVisitor;
+import wyvern.target.oir.EmitPythonVisitor;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
@@ -66,7 +66,7 @@ public class OIRTests {
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }
-      // System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
+      System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
@@ -74,8 +74,8 @@ public class OIRTests {
                                                OIREnvironment.getRootEnvironment()));
 
     String pprint =
-      new PrettyPrintVisitor().prettyPrint(oirast,
-                                           OIREnvironment.getRootEnvironment());
+      new EmitPythonVisitor().emitPython(oirast,
+                                         OIREnvironment.getRootEnvironment());
 
     if (debug)
       System.out.println("OIR Program:\n" + pprint);
@@ -464,6 +464,63 @@ public class OIRTests {
             "    () => f(n-1)\n" +
             "  )\n" +
             "f(50000)\n";
-        testPyFromInput(input, "1", true);
+        testPyFromInput(input, "1");
+    }
+
+    @Test
+    public void testBooleanLiterals() throws ParseException {
+        String input =
+            "(true).ifTrue(\n" +
+            "  () => 1,\n" +
+            "  () => 0)\n";
+        testPyFromInput(input, "1");
+    }
+
+    @Test
+    public void testImperativeIf() throws ParseException {
+        String input =
+            "(5 > 3).ifTrue(\n" +
+            "  () => 1,\n" +
+            "  () => 0)\n" +
+            "7\n";
+        testPyFromInput(input, "7");
+    }
+
+    @Test
+    public void testEquality() throws ParseException {
+        String input =
+            "val x = 7\n" +
+            "val a : Int = (x == 7).ifTrue(\n" +
+            "  () => 3,\n" +
+            "  () => 2)\n" +
+            "val b : Int = (x == 13).ifTrue(\n" +
+            "  () => 5,\n" +
+            "  () => 0)\n" +
+            "a + b\n";
+        testPyFromInput(input, "3");
+    }
+
+    @Test
+    public void testBooleanAnd() throws ParseException {
+        String input =
+            "true && false\n";
+        testPyFromInput(input, "False");
+    }
+
+    @Test
+    public void testBooleanOr() throws ParseException {
+        String input =
+            "true || false\n";
+        testPyFromInput(input, "True");
+    }
+
+    @Test
+    public void testNestedLambda() throws ParseException {
+        String input =
+            "val obj = new\n" +
+            "  val x = 5\n" +
+            "  def f() : Unit = (() => (() => this.x)())()\n" +
+            "obj.f()\n";
+        testPyFromInput(input, "5");
     }
 }
