@@ -143,6 +143,7 @@ public class Globals {
 		intDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 		intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 		intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+    intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
 		ValueType intType = new StructuralType("intSelf", intDeclTypes);
 		ValueType boolType = new StructuralType("boolean", boolDeclTypes);
 		declTypes.add(new ConcreteTypeMember("Int", intType));

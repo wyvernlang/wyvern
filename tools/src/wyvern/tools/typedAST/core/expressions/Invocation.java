@@ -20,6 +20,7 @@ import wyvern.tools.errors.ToolError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
+import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -170,7 +171,8 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
                 .generateIL(ctx, null, dependencies);
 
             List<IExpr> args = new ArrayList<IExpr>();
-            args.add(arg);
+            if (!(argument instanceof UnitVal)) // TODO: This is hacky. Refactor me to avoid
+                args.add(arg);
 
             return generator.genExprWithArgs(args, this);
         } else {

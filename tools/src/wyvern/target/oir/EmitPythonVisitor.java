@@ -367,6 +367,9 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     } else if (isInt && methodName.equals("/")) {
         // Make int division result in an int on Python 3
         strVal = "int(" + objExpr + " " + methodName + " " + args + ")";
+    } else if (isInt && (methodName.equals("negate")
+                         || methodName.equals("tco_negate"))) {
+        strVal = "-(" + objExpr + ")";
     } else {
         if (isOperator)
             strVal = "(" + objExpr + " " +
