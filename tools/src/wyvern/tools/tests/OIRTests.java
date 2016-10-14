@@ -531,14 +531,14 @@ public class OIRTests {
             "  val x = 5\n" +
             "  val f = () => (() => this.x)()\n" +
             "obj.f()\n";
-        testPyFromInput(input, "5", true);
+        testPyFromInput(input, "5");
     }
 
     @Test
     public void testNegativeInt() throws ParseException {
         String input =
             "-5\n";
-        testPyFromInput(input, "-5", true);
+        testPyFromInput(input, "-5");
     }
 
     @Test
@@ -547,6 +547,18 @@ public class OIRTests {
             "def f() : Int\n" +
             "  -5\n" +
             "f()\n";
-        testPyFromInput(input, "-5", true);
+        testPyFromInput(input, "-5");
     }
+
+    @Test
+    public void testReturnNew() throws ParseException {
+        String input =
+            "type T\n" +
+            "  val x : Int\n" +
+            "def makeT() : T = new\n" +
+            "  val x = 23\n" +
+            "makeT().x\n";
+        testPyFromInput(input, "23");
+    }
+
 }

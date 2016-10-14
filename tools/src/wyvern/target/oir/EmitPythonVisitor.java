@@ -441,7 +441,11 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
 
     state.expectingReturn = oldExpectingReturn;
     classesUsed.add(oirNew.getTypeName());
-    return oirNew.getTypeName() + "(" + args + dict + d + thisName + ")";
+    String constructorCall =
+        oirNew.getTypeName() + "(" + args + dict + d + thisName + ")";
+    if (state.expectingReturn)
+        return state.returnType + " " + constructorCall;
+    return constructorCall;
   }
 
   public String visit(EmitPythonState state,
