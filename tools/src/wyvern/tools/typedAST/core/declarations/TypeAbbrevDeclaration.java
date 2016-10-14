@@ -1,5 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import static wyvern.tools.errors.ToolError.reportError;
+
 import java.util.List;
 import java.util.Map;
 
@@ -139,6 +141,8 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
 			GenContext ctx, List<TypedModuleSpec> dependencies) {
+		if (reference == null)
+			reportError(ErrorMessage.NO_ABSTRACT_TYPES_IN_OBJECTS, this);
 		ValueType referenceILType = reference.getILType(ctx);
 		return new TypeDeclaration(getName(), referenceILType, getLocation());
 	}

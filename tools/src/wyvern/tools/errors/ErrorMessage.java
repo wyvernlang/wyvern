@@ -90,6 +90,7 @@ public enum ErrorMessage {
 	UNSAFE_JAVA_IMPORT("To import the java package %ARG, make sure you \"require java\" or add the package to the built-in whitelist (experts only)", 1),
 	ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
 	UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
+	NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),
 	;
 
 	private ErrorMessage(String message, int numArgs) {
