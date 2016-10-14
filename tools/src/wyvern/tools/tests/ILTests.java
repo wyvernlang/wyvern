@@ -1184,7 +1184,6 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testGenericIfStatement() throws ParseException {
 
         String source = ""
@@ -1196,7 +1195,7 @@ public class ILTests {
             + "        def apply():body.T \n"
             + "    def apply():body.T \n\n"
 
-            + "val body1: Body = new (body) => \n"
+            + "val body1 = new (body) => \n"
             + "    type T = Int \n"
             + "    type ThisType \n"
             + "        type T = body.T \n"
