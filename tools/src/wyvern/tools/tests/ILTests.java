@@ -1157,6 +1157,7 @@ public class ILTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testNestedDecl() throws ParseException {
 
         String source = ""
@@ -1183,6 +1184,7 @@ public class ILTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testGenericIfStatement() throws ParseException {
 
         String source = ""

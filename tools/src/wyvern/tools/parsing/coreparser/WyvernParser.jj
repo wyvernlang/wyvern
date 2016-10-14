@@ -250,9 +250,9 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
-   LOOKAHEAD(3) exp =   TypeDeclaration()  { return exp; }
+   LOOKAHEAD(4) exp =   TypeDeclaration()  { return exp; }
 |
-   LOOKAHEAD(3) exp = TypeAbbrevDeclaration() { return exp; }
+   LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
 |
   exp = DelegateDeclaration()  { return exp; }
 |
@@ -314,9 +314,9 @@ AST TypeDeclaration() :
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
   [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW> ]
-  <NEWLINE> [<INDENT> body=DeclTypes()
+  <NEWLINE> <INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
-             <DEDENT>] {
+             <DEDENT> {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
@@ -342,7 +342,7 @@ AST DeclType() :
 |
   exp = VarDeclType()  { return exp; }
 |
-  LOOKAHEAD(3) exp = TypeDeclaration()  { return exp; }
+  LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
 }

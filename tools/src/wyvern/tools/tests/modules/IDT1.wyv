@@ -2,6 +2,6 @@
 
 module IDT1
 
-type MyADT
+type MyADT = Unit
 
 def foo(m:MyADT):Int = 3
