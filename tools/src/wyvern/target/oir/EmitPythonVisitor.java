@@ -364,6 +364,9 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         strVal = "(" + objExpr + " or " + args + ")";
     } else if (isBool && methodName.equals("&&")) {
         strVal = "(" + objExpr + " and " + args + ")";
+    } else if (isInt && methodName.equals("/")) {
+        // Make int division result in an int on Python 3
+        strVal = "int(" + objExpr + " " + methodName + " " + args + ")";
     } else {
         if (isOperator)
             strVal = "(" + objExpr + " " +
