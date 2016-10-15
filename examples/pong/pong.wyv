@@ -133,7 +133,7 @@ val width = 640
 val height = 480
 val screen = pygame.display.set_mode(helper.make2Tuple(width, height), 0, 0)
 
-pygame.mixer.pre_init(44100, 0 - 16, 1, 512)
+pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 
 val blip = pygame.mixer.Sound("blip.wav")
@@ -151,17 +151,17 @@ val ball = new
     7
 
   def flipX() : Unit
-    this.xSpeed = (0 - 1) * this.xSpeed
+    this.xSpeed = -this.xSpeed
     blip.play()
     0 // Avoid TCO / FFI bad interaction
 
   def flipXBlop() : Unit
-    this.xSpeed = (0 - 1) * this.xSpeed
+    this.xSpeed = -this.xSpeed
     blop.play()
     0 // Avoid TCO / FFI bad interaction
 
   def flipY() : Unit
-    this.ySpeed = (0 - 1) * this.ySpeed
+    this.ySpeed = -this.ySpeed
     blip.play()
     0 // Avoid same bad interaction
 
