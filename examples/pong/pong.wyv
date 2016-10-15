@@ -139,6 +139,53 @@ pygame.mixer.init()
 val blip = pygame.mixer.Sound("blip.wav")
 val blop = pygame.mixer.Sound("blop.wav")
 
+resource type Paddle
+  def draw(screen : Surface) : Unit
+  def update() : Unit
+  def processEvent(e : Event) : Unit
+  def hitbox() : Rect
+
+resource type NonInteractivePaddle
+  var speed : Int
+  def draw(screen : Surface) : Unit
+  def update() : Unit
+  def hitbox() : Rect
+  def setSpeed(speed : Int) : Unit
+
+val paddleWidth = 20
+val paddleHeight = 60
+
+def makePaddle(paddleX : Int) : NonInteractivePaddle = new
+  val x = paddleX
+  var y : Int = (height - paddleHeight) / 2
+  var speed : Int = 0
+
+  def draw(screen : Surface) : Unit
+    pygame.draw.rect(screen, helper.white, this.hitbox(), 0)
+    0
+  def hitbox() : Rect = pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
+  def update() : Unit
+    this.y = this.y + this.speed
+  def setSpeed(speed : Int) : Unit
+    this.speed = speed
+
+def makePlayerPaddle() : Paddle = new
+  val paddle = makePaddle(10)
+  def draw(screen : Surface) : Unit = this.paddle.draw(screen)
+  def update() : Unit = this.paddle.update()
+  def hitbox() : Rect = this.paddle.hitbox()
+  def processEvent(e : Event) : Unit
+    val eventType = helper.getType(e)
+    val paddle = this.paddle
+    val obj = new
+      def keyEvents() : Unit
+        val speed : Int = (eventType == pygame.KEYDOWN).ifTrue(() => 3, () => 0)
+        (e.key == pygame.K_UP).ifTrue(() => paddle, () => 0)
+        (e.key == pygame.K_DOWN).ifTrue(() => paddle, () => 0)
+    val ke : Dyn = () => obj.keyEvents
+    val ke2 : Unit -> Dyn = ke
+    (eventType == pygame.KEYDOWN || eventType == pygame.KEYUP).ifTrue( ke2, () => 0)
+
 val ball = new
   var x : Int = 0
   var y : Int = 0
