@@ -3,4 +3,4 @@ module String
 import java:wyvern.stdlib.support.StringHelper.utils
 
 def equals(str1:String,str2:String):Boolean
-	utils.equals(str1,str2)
+	utils.testEqual(str1,str2)

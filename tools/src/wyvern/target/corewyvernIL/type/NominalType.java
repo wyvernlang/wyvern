@@ -68,7 +68,8 @@ public class NominalType extends ValueType {
 	}
 
 	private DeclType getSourceDeclType(TypeContext ctx) {
-		return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
+		return path.typeCheck(ctx).getStructuralType(ctx).findMatchingDecl(typeMember, cdt -> !(cdt instanceof ConcreteTypeMember || cdt instanceof AbstractTypeMember), ctx);
+		//return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 	}
 	
 	@Override
@@ -106,7 +107,8 @@ public class NominalType extends ValueType {
 		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
-			return vt.isSubtypeOf(t, ctx);
+			ValueType ct = t.getCanonicalType(ctx);
+			return vt.isSubtypeOf(ct, ctx);
 		} else {
 			ValueType ct = t.getCanonicalType(ctx);
 			return super.isSubtypeOf(ct, ctx); // check for equality with the canonical type 

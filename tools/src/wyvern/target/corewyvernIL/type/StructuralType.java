@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -117,7 +118,8 @@ public class StructuralType extends ValueType {
 
 		TypeContext extendedCtx = ctx.extend(selfName, this);
 		for (DeclType dt : st.getDeclTypes()) {
-			DeclType candidateDT = findDecl(dt.getName(), ctx);
+			DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
+			//DeclType candidateDT = findDecl(dt.getName(), ctx);
 			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx)) {
 				return false;
 			}
@@ -130,16 +132,30 @@ public class StructuralType extends ValueType {
 		return true;
 	}
 
+	// if there is exactly one decl type of name and class given, return it, otherwise null
+	DeclType findMatchingDecl(String name, Predicate<? super DeclType> filter, TypeContext ctx) {
+		List<DeclType> ds = findDecls(name, ctx);
+		ds.removeIf(filter);
+		if (ds.size() != 1)
+			return null;
+		else
+			return ds.get(0);
+	}
+	
 	@Override
 	public DeclType findDecl(String declName, TypeContext ctx) {
+		DeclType theDecl = null;
 		for (DeclType mdt : getDeclTypes()) {
 			if (mdt.getName().equals(declName)) {
-				return mdt;
+				if (theDecl != null)
+					throw new RuntimeException("ambiguous findDecl!");
+				theDecl = mdt;
 			}
 		}
-		return null;
+		return theDecl;
 	}
 
+	@Override
 	public List<DeclType> findDecls(String declName, TypeContext ctx) {
 		List<DeclType> mdts = new LinkedList<DeclType>();
 		for (DeclType mdt : getDeclTypes()) {

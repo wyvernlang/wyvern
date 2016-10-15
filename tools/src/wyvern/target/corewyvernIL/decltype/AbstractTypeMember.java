@@ -49,4 +49,9 @@ public class AbstractTypeMember extends DeclType implements IASTNode {
 	public boolean isResource() {
 		return isResource;
 	}
+
+	@Override
+	public boolean isTypeDecl() {
+		return true;
+	}
 }

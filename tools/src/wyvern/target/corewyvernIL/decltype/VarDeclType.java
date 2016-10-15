@@ -86,4 +86,9 @@ public class VarDeclType extends DeclTypeWithResult implements IASTNode{
 			return new VarDeclType(this.getName(),t);
 		}
 	}
+	
+	@Override
+	public boolean isTypeDecl() {
+		return false;
+	}
 }

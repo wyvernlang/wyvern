@@ -32,6 +32,7 @@ import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.EmitPythonVisitor;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -218,6 +219,15 @@ public class OIRTests {
     testPyFromInput(input, "17");
   }
 
+  @Test
+  @Category(CurrentlyBroken.class)
+  public void testImportsWithPython() throws ParseException {
+	    String input =
+	    	      "import python.iso\n\n" +
+	    	      "iso.Color(\"green\")\n";
+   	    testPyFromInput(input, "17");
+  }
+  
   @Test
   public void testDefDecl() throws ParseException {
     String input =

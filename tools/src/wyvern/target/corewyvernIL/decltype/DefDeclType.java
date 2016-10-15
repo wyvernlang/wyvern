@@ -141,4 +141,9 @@ public class DefDeclType extends DeclTypeWithResult {
 		else
 			return new DefDeclType(this.getName(), t, newArgs);
 	}
+	
+	@Override
+	public boolean isTypeDecl() {
+		return false;
+	}
 }

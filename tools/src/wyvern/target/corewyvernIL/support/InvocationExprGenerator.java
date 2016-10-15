@@ -27,10 +27,15 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	public InvocationExprGenerator(IExpr iExpr, String operationName, GenContext ctx, FileLocation loc) {
 		this.receiver = iExpr;
 		ValueType rt = iExpr.typeCheck(ctx);
-		DeclType dt = rt.findDecl(operationName, ctx);
+		List<DeclType> dts = rt.findDecls(operationName, ctx);
 		location = loc;
-		if (dt == null)
+		// not interested in finding Type Decls (abstract or not)
+		dts.removeIf(cdt -> cdt.isTypeDecl());
+		if (dts.size() == 0)
 			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, loc, operationName);
+		if (dts.size() >1)
+			ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, loc, rt.toString(), operationName);
+		DeclType dt = dts.get(0);
 		declType = dt.adapt(View.from(iExpr, ctx));
 	}
 	

@@ -45,4 +45,6 @@ public abstract class DeclType extends ASTNode implements IASTNode {
 	 * @param count TODO
 	 */
 	public abstract DeclType doAvoid(String varName, TypeContext ctx, int count);
+
+	public abstract boolean isTypeDecl();
 }

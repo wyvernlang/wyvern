@@ -130,4 +130,9 @@ public class ConcreteTypeMember extends DeclTypeWithResult {
 			return new ConcreteTypeMember(this.getName(),t, metadata);
 		}
 	}
+	
+	@Override
+	public boolean isTypeDecl() {
+		return true;
+	}
 }

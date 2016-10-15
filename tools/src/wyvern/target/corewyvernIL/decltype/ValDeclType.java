@@ -83,4 +83,9 @@ public class ValDeclType extends DeclTypeWithResult implements IASTNode{
 			return new ValDeclType(this.getName(),t);
 		}
 	}
+	
+	@Override
+	public boolean isTypeDecl() {
+		return false;
+	}
 }

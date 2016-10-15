@@ -1,5 +1,8 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.util.Collections;
+import java.util.List;
+
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -53,6 +56,14 @@ public abstract class ValueType extends CaseType implements IASTNode {
 		if (st == null)
 			return null;
 		return st.findDecl(declName, ctx);
+	}
+
+	/** Find the declaration type with the specified name, or return null if it is not present */
+	public List<DeclType> findDecls(String declName, TypeContext ctx) {
+		StructuralType st = getStructuralType(ctx);
+		if (st == null)
+			return (List<DeclType>) Collections.EMPTY_LIST;
+		return st.findDecls(declName, ctx);
 	}
 
 	/**
