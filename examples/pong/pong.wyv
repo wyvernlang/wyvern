@@ -147,6 +147,7 @@ resource type Paddle
 
 resource type NonInteractivePaddle
   var speed : Int
+  var y : Int
   def draw(screen : Surface) : Unit
   def update() : Unit
   def hitbox() : Rect
@@ -163,28 +164,40 @@ def makePaddle(paddleX : Int) : NonInteractivePaddle = new
   def draw(screen : Surface) : Unit
     pygame.draw.rect(screen, helper.white, this.hitbox(), 0)
     0
-  def hitbox() : Rect = pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
+  def hitbox() : Rect
+    val result = pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
+    result
   def update() : Unit
     this.y = this.y + this.speed
+    (this.y + paddleHeight > height).ifTrue(() => this.y = height - paddleHeight, () => 0)
+    (this.y < 0).ifTrue(() => this.y = 0, () => 0)
+
   def setSpeed(speed : Int) : Unit
     this.speed = speed
 
 def makePlayerPaddle() : Paddle = new
+  var upPressed : Boolean = false
+  var downPressed : Boolean = false
   val paddle = makePaddle(10)
   def draw(screen : Surface) : Unit = this.paddle.draw(screen)
   def update() : Unit = this.paddle.update()
   def hitbox() : Rect = this.paddle.hitbox()
   def processEvent(e : Event) : Unit
     val eventType = helper.getType(e)
-    val paddle = this.paddle
-    val obj = new
-      def keyEvents() : Unit
-        val speed : Int = (eventType == pygame.KEYDOWN).ifTrue(() => 3, () => 0)
-        (e.key == pygame.K_UP).ifTrue(() => paddle, () => 0)
-        (e.key == pygame.K_DOWN).ifTrue(() => paddle, () => 0)
-    val ke : Dyn = () => obj.keyEvents
-    val ke2 : Unit -> Dyn = ke
-    (eventType == pygame.KEYDOWN || eventType == pygame.KEYUP).ifTrue( ke2, () => 0)
+    (eventType == pygame.KEYDOWN
+     || eventType == pygame.KEYUP).ifTrue(
+      () => (e.key == pygame.K_UP).ifTrue(
+          () => this.upPressed = (eventType == pygame.KEYDOWN),
+          () => (e.key == pygame.K_DOWN).ifTrue(
+              () => this.downPressed = (eventType == pygame.KEYDOWN),
+              () => 0)),
+      () => 0)
+
+    this.upPressed.ifTrue(
+      () => this.paddle.speed = -3,
+      () => this.downPressed.ifTrue(
+        () => this.paddle.speed = 3,
+        () => this.paddle.speed = 0))
 
 val ball = new
   var x : Int = 0
@@ -212,19 +225,37 @@ val ball = new
     blip.play()
     0 // Avoid same bad interaction
 
-  def update(paddleHitbox : Rect) : Unit
+  def update(leftHitbox : Rect, rightHitbox : Rect) : Unit
     (this.x < 0 || this.x > width).ifTrue(() => this.flipX(), () => 0)
     (this.y < 0 || this.y > height).ifTrue(() => this.flipY(), () => 0)
 
-    // backwards comparisons for better ifTrue nesting
-    (this.x < paddleHitbox.right &&
-     this.x > paddleHitbox.left &&
-     this.y > paddleHitbox.top &&
-     this.y < paddleHitbox.bottom &&
+    (this.x < leftHitbox.right &&
+     this.x > leftHitbox.left &&
+     this.y > leftHitbox.top &&
+     this.y < leftHitbox.bottom &&
      this.xSpeed < 0).ifTrue(() => this.flipXBlop(), () => 0)
+
+    (this.x < rightHitbox.right &&
+     this.x > rightHitbox.left &&
+     this.y > rightHitbox.top &&
+     this.y < rightHitbox.bottom &&
+     this.xSpeed > 0).ifTrue(() => this.flipXBlop(), () => 0)
 
     this.x = this.x + this.xSpeed
     this.y = this.y + this.ySpeed
+
+def makeAIPaddle() : Paddle = new
+  val paddle = makePaddle(width - 30)
+  def draw(screen : Surface) : Unit = this.paddle.draw(screen)
+  def update() : Unit
+    val center = this.paddle.y + paddleWidth / 2
+    (center > ball.y).ifTrue(() => this.paddle.speed = -2,
+                             () => this.paddle.speed = 0)
+    (center < ball.y).ifTrue(() => this.paddle.speed = 2,
+                             () => 0)
+    this.paddle.update()
+  def hitbox() : Rect = this.paddle.hitbox()
+  def processEvent(e : Event) : Unit = 0
 
 val loop : GameLoop = new
   val fps = 144
@@ -237,21 +268,28 @@ val loop : GameLoop = new
   val width = 20
   val height = 60
 
+  val playerPaddle = makePlayerPaddle()
+  val aiPaddle = makeAIPaddle()
+
   def oneIteration() : Unit
     screen.fill(helper.black)
-    pygame.draw.rect(screen, helper.white, pygame.Rect(10, this.y, this.width, this.height), 0)
+    this.playerPaddle.draw(screen)
+    this.aiPaddle.draw(screen)
     ball.draw(screen)
     pygame.display.flip()
 
     val gameLoop = this
+    this.playerPaddle.update()
     this.upPressed.ifTrue(() => gameLoop.y = gameLoop.y - 2,
                           () => 0)
     this.downPressed.ifTrue(() => gameLoop.y = gameLoop.y + 2,
                             () => 0)
-    ball.update(pygame.Rect(10, this.y, this.width, this.height))
+    ball.update(this.playerPaddle.hitbox(), this.aiPaddle.hitbox())
+    this.aiPaddle.update()
 
   def processEvent(e : Event) : Unit
     val eventType = helper.getType(e)
+    this.playerPaddle.processEvent(e)
     (eventType == pygame.QUIT).ifTrue(() => this.done = true, () => 0)
     def keyEvents() : Unit
       (e.key == pygame.K_UP).ifTrue(() => this.upPressed = (eventType == pygame.KEYDOWN), () => 0)
