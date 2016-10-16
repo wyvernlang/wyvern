@@ -3,6 +3,7 @@ import python:helper
 import python:time
 
 type Float
+  val concrete : Unit
 
 type Surface
   def fill(color : Color) : Unit
@@ -14,6 +15,7 @@ resource type Rect
   var right : Int
 
 type Color
+  val concrete : Unit
 
 type Clock
   def tick(fps : Int) : Unit
@@ -53,6 +55,7 @@ type Music
   def set_volume(volume : Float) : Unit
 
 type Channel
+  val concrete : Unit
 
 type Sound
   def play() : Channel
@@ -151,7 +154,7 @@ resource type NonInteractivePaddle
   def draw(screen : Surface) : Unit
   def update() : Unit
   def hitbox() : Rect
-  def setSpeed(speed : Int) : Unit
+  def setPaddleSpeed(speed : Int) : Unit
 
 val paddleWidth = 20
 val paddleHeight = 60
@@ -172,7 +175,7 @@ def makePaddle(paddleX : Int) : NonInteractivePaddle = new
     (this.y + paddleHeight > height).ifTrue(() => this.y = height - paddleHeight, () => 0)
     (this.y < 0).ifTrue(() => this.y = 0, () => 0)
 
-  def setSpeed(speed : Int) : Unit
+  def setPaddleSpeed(speed : Int) : Unit
     this.speed = speed
 
 def makePlayerPaddle() : Paddle = new
