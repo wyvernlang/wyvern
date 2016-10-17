@@ -122,7 +122,8 @@
                 wyvern/tools/typedAST/core/expressions/Instantiation.java
                 wyvern/tools/typedAST/core/expressions/Invocation.java
                 wyvern/tools/util/TreeWritable.java
-                wyvern/tools/tests/suites/AntRegressionTestSuite.java"
+                wyvern/tools/tests/suites/AntRegressionTestSuite.java
+                wyvern/target/corewyvernIL/support/CallableExprGenerator.java"
             />
         </checkstyle>
     </target>

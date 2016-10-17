@@ -143,51 +143,23 @@ public class Application extends CachingTypedAST implements CoreAST {
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
+
         CallableExprGenerator exprGen = function.getCallableExpr(ctx);
         DefDeclType defdecl = exprGen.getDeclType(ctx);
         List<FormalArg> formals = defdecl.getFormalArgs();
 
-        int offset = 0;
         // generate arguments       
         List<IExpr> args = new LinkedList<IExpr>();
-        for (int i = 0; i < generics.size(); i++) {
 
-            String generic = generics.get(i);
-            String formalName = formals.get(i).getName();
-            if (formalName.startsWith(DefDeclaration.GENERIC_PREFIX)) {
-                // then the formal is a generic argument
-                String genericName = formalName.substring(DefDeclaration.GENERIC_PREFIX.length());
-                ValueType vt = getILTypeForGeneric(ctx, generic);
-                args.add(
-                        new wyvern.target.corewyvernIL.expression.New(
-                            new TypeDeclaration(genericName, vt, this.location)
-                        )
-                );
-            }  else {
-                ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
-            }
-            offset++;
-        }
+        // Add generic arguments to the argslist
+        generateGenericArgs(args, formals, ctx);
 
         if (argument instanceof TupleObject) {
-            ExpressionAST[] rawArgs = ((TupleObject) argument).getObjects();
-            if (formals.size() != rawArgs.length + offset) {
-                ToolError.reportError(
-                    ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
-                    this,
-                    "" + formals.size()
-                );
-            }
-            for (int i = 0; i < rawArgs.length; i++) {
-                ValueType expectedArgType = formals.get(i + offset).getType();
-                ExpressionAST ast = rawArgs[i];
-                // TODO: propagate types downward from formals
-                args.add(ast.generateIL(ctx, expectedArgType, dependencies));
-            }
+             generateILForTuples(formals, args, ctx, dependencies);
         } else if (argument instanceof UnitVal) {
             // leave args empty
         } else {
-            if (formals.size() != 1 + offset) {
+            if (formals.size() != 1 + args.size()) {
                 ToolError.reportError(
                     ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                     this,
@@ -201,5 +173,92 @@ public class Application extends CachingTypedAST implements CoreAST {
 
         // generate the call
         return exprGen.genExprWithArgs(args, this);
+    }
+
+    private int countFormalGenerics(List<FormalArg> formals) {
+
+        int count = 0;
+        for(FormalArg formal : formals) {
+            String name = formal.getName();
+            if(!name.startsWith(DefDeclaration.GENERIC_PREFIX)) {
+                // We're hit the end of the generic args!
+                break;
+            }
+            count++;
+        }
+        return count;
+    }
+
+    private void addGenericToArgList(
+          String formalName,
+          String generic,
+          List<IExpr> args,
+          GenContext ctx
+     ) {
+        
+        String genericName = formalName
+            .substring(DefDeclaration.GENERIC_PREFIX.length());
+
+        ValueType vt = getILTypeForGeneric(ctx, generic);
+        args.add(
+            new wyvern.target.corewyvernIL.expression.New(
+                new TypeDeclaration(genericName, vt, this.location)
+            )
+        );
+    }
+
+    private void generateILForTuples(
+            List<FormalArg> formals,
+            List<IExpr> args, 
+            GenContext ctx,
+            List<TypedModuleSpec> dependencies
+    ) {
+        
+        ExpressionAST[] raw_args = ((TupleObject) this.argument).getObjects();
+        if (formals.size() != raw_args.length + this.generics.size()) {
+            ToolError.reportError(
+                ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
+                this,
+                ""+formals.size()
+            );
+        }
+        for (int i = 0; i < raw_args.length; i++) {
+            ValueType expectedArgType = formals.get(i + this.generics.size()).getType();
+            ExpressionAST ast = raw_args[i];
+            // TODO: propagate types downward from formals
+            args.add(ast.generateIL(ctx, expectedArgType, dependencies));
+        }
+    }
+
+    private void generateGenericArgs(
+            List<IExpr> args,
+            List<FormalArg> formals,
+            GenContext ctx
+     ) {
+        int count = countFormalGenerics(formals);
+        if (count < this.generics.size()) {
+            // then the number of actual generics is greater than the number of formal generics
+            // this is not permitted.
+            ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
+        } else if(count == this.generics.size()) {
+            // then we can simply add each of the actual generics to the argument's list
+            for(int i = 0; i < count; i++) {
+                String formalName = formals.get(i).getName();
+                String generic = this.generics.get(i);
+                addGenericToArgList(formalName, generic, args, ctx);    
+            }
+        } else {
+            // this case executes when count > this.generics.size()
+            // In this case, we can do type inference to determine what types have been elided
+            inferGenericArgs(args, formals, ctx);
+        }
+    }
+
+    private void inferGenericArgs(
+            List<IExpr> args,
+            List<FormalArg> formals,
+            GenContext ctx
+    ) {
+        // TODO: implement @Robbie
     }
 }
