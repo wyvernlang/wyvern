@@ -87,7 +87,7 @@
         <echo message="Build done" />	
     </target>
 	
-	<target name="test" depends="build">
+	<target name="test" depends="build, lint">
 		<junit printsummary="on" haltonfailure="yes" fork="yes">
 			<classpath>
 				<path refid="classpath.base" />
