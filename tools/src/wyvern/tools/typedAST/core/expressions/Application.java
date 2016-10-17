@@ -149,7 +149,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         generateGenericArgs(args, formals, ctx);
 
         if (argument instanceof TupleObject) {
-             generateILForTuples(formals, args, ctx, dependencies);
+            generateILForTuples(formals, args, ctx, dependencies);
         } else if (argument instanceof UnitVal) {
             // leave args empty
         } else {
@@ -172,9 +172,9 @@ public class Application extends CachingTypedAST implements CoreAST {
     private int countFormalGenerics(List<FormalArg> formals) {
 
         int count = 0;
-        for(FormalArg formal : formals) {
+        for (FormalArg formal : formals) {
             String name = formal.getName();
-            if(!name.startsWith(DefDeclaration.GENERIC_PREFIX)) {
+            if (!name.startsWith(DefDeclaration.GENERIC_PREFIX)) {
                 // We're hit the end of the generic args!
                 break;
             }
@@ -188,7 +188,7 @@ public class Application extends CachingTypedAST implements CoreAST {
           String generic,
           List<IExpr> args,
           GenContext ctx
-     ) {
+    ) {
         
         String genericName = formalName
             .substring(DefDeclaration.GENERIC_PREFIX.length());
@@ -208,35 +208,35 @@ public class Application extends CachingTypedAST implements CoreAST {
             List<TypedModuleSpec> dependencies
     ) {
         
-        ExpressionAST[] raw_args = ((TupleObject) this.argument).getObjects();
-        if (formals.size() != raw_args.length + this.generics.size()) {
+        ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
+        if (formals.size() != rawArgs.length + this.generics.size()) {
             ToolError.reportError(
                 ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                 this,
-                ""+formals.size()
+                "" + formals.size()
             );
         }
-        for (int i = 0; i < raw_args.length; i++) {
+        for (int i = 0; i < rawArgs.length; i++) {
             ValueType expectedArgType = formals.get(i + this.generics.size()).getType();
-            ExpressionAST ast = raw_args[i];
+            ExpressionAST ast = rawArgs[i];
             // TODO: propagate types downward from formals
             args.add(ast.generateIL(ctx, expectedArgType, dependencies));
         }
     }
 
     private void generateGenericArgs(
-            List<IExpr> args,
-            List<FormalArg> formals,
-            GenContext ctx
-     ) {
+        List<IExpr> args,
+        List<FormalArg> formals,
+        GenContext ctx
+    ) {
         int count = countFormalGenerics(formals);
         if (count < this.generics.size()) {
             // then the number of actual generics is greater than the number of formal generics
             // this is not permitted.
             ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
-        } else if(count == this.generics.size()) {
+        } else if (count == this.generics.size()) {
             // then we can simply add each of the actual generics to the argument's list
-            for(int i = 0; i < count; i++) {
+            for (int i = 0; i < count; i++) {
                 String formalName = formals.get(i).getName();
                 String generic = this.generics.get(i);
                 addGenericToArgList(formalName, generic, args, ctx);    
