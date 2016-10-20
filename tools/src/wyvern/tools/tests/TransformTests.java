@@ -29,7 +29,7 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 public class TransformTests {
 
-	public static final String LIB_PATH = "src/wyvern/lib/";
+	public static final String LIB_PATH = "../stdlib/";
 
 	private static final NominalType systemDotDyn = new NominalType("system", "Dyn");
 	
