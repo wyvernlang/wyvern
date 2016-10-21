@@ -81,7 +81,7 @@ public class PythonCompiler {
           return;
         }
       }
-      wyvernPath += "/tools/src/wyvern/lib/";
+      wyvernPath += "/stdlib/";
       // sanity check: is the wyvernPath a valid directory?
       if (!Files.isDirectory(Paths.get(wyvernPath))) {
         System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
