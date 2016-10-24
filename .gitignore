@@ -4,6 +4,7 @@ bin
 tools/wyvern-tools.iml
 *.class
 *.pyc
+*.wyv.py
 *.prefs
 *~
 tools/src/wyvern/tools/parsing/Wyvern.java

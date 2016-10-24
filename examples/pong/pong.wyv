@@ -1,123 +1,19 @@
-import python:pygame
-import python:helper
-import python:time
-
-type Float
-
-type Surface
-  def fill(color : Color) : Unit
-
-resource type Rect
-  var top : Int
-  var left : Int
-  var bottom : Int
-  var right : Int
-
-type Color
-
-type Clock
-  def tick(fps : Int) : Unit
-
-type Draw
-  def rect(surface : Surface,
-           color : Color,
-           rect : Rect,
-           width : Int) : Rect
-  def circle(surface : Surface,
-             color : Color,
-             center : Dyn,
-             radius : Int) : Unit
-
-type EventType = Int
-type Key = Int
-
-type Event
-  val key : Key
-
-type PygameEvent
-  def poll() : Event
-
-type Display
-  def set_mode(size : Dyn,
-               flags : Int,
-               depth : Int) : Surface
-  def flip() : Unit
-
-type Music
-  def load(file : String) : Unit
-  def play() : Unit
-  def rewind() : Unit
-  def stop() : Unit
-  def pause() : Unit
-  def unpause() : Unit
-  def set_volume(volume : Float) : Unit
-
-type Channel
-
-type Sound
-  def play() : Channel
-  def stop() : Unit
-
-type Mixer
-  def pre_init(frequency : Int, size : Int, channels : Int, buffersize : Int) : Unit
-  def init() : Unit
-  val music : Music
-  def Sound(filename : String) : Sound
-
-type Helper
-  def make2Tuple(a : Dyn, b : Dyn) : Dyn
-  def fst(a : Dyn) : Dyn
-  def snd(a : Dyn) : Dyn
-  def makeRect(left : Int, top : Int, width : Int, height : Int) : Rect
-  val white : Color
-  val black : Color
-  def makeClock() : Clock
-  def debug(msg : String) : Unit
-  def getType(event : Event) : EventType
-  def floatOfString(float : String) : Float
-val helper : Helper = helper
-
-type Pygame
-  def init() : Unit
-  def quit() : Unit
-
-  val draw : Draw
-  val display : Display
-  val event : PygameEvent
-  val mixer : Mixer
-
-  def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
-  val QUIT : EventType
-  val KEYDOWN : EventType
-  val KEYUP : EventType
-  val MOUSEBUTTONDOWN : EventType
-  val MOUSEBUTTONUP : EventType
-  val NOEVENT : EventType
-
-  val K_UP : Key
-  val K_DOWN : Key
-  val K_ESCAPE : Key
-
-type Time
-  def sleep(t : Int) : Unit
-val time : Time = time
-
-val pygame : Pygame = pygame
+import pygame
 
 resource type GameLoop
   val fps : Int
   val done : Boolean
   def oneIteration() : Unit
-  def processEvent(e : Event) : Unit
+  def processEvent(e : pygame.Event) : Unit
 
-val clock : Clock = helper.makeClock()
+val clock : pygame.Clock = pygame.helper.makeClock()
 
 def processEvents(gameLoop : GameLoop) : Unit
   val event = pygame.event.poll()
   def f() : Unit
     gameLoop.processEvent(event)
     processEvents(gameLoop)
-  (helper.getType(event) == pygame.NOEVENT).ifTrue(
+  (pygame.helper.getType(event) == pygame.NOEVENT).ifTrue(
     () => 0,
     () => f())
 
@@ -131,13 +27,73 @@ def run(gameLoop : GameLoop) : Unit
 
 val width = 640
 val height = 480
-val screen = pygame.display.set_mode(helper.make2Tuple(width, height), 0, 0)
+val screen = pygame.display.set_mode(pygame.helper.make2Tuple(width, height), 0, 0)
 
-pygame.mixer.pre_init(44100, 0 - 16, 1, 512)
+pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 
 val blip = pygame.mixer.Sound("blip.wav")
 val blop = pygame.mixer.Sound("blop.wav")
+
+resource type Paddle
+  def draw(screen : pygame.Surface) : Unit
+  def update() : Unit
+  def processEvent(e : pygame.Event) : Unit
+  def hitbox() : pygame.Rect
+
+resource type NonInteractivePaddle
+  var speed : Int
+  var y : Int
+  def draw(screen : pygame.Surface) : Unit
+  def update() : Unit
+  def hitbox() : pygame.Rect
+  def setPaddleSpeed(speed : Int) : Unit
+
+val paddleWidth = 20
+val paddleHeight = 60
+
+def makePaddle(paddleX : Int) : NonInteractivePaddle = new
+  val x = paddleX
+  var y : Int = (height - paddleHeight) / 2
+  var speed : Int = 0
+
+  def draw(screen : pygame.Surface) : Unit
+    pygame.draw.rect(screen, pygame.helper.white, this.hitbox(), 0)
+    0
+  def hitbox() : pygame.Rect
+    val result = pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
+    result
+  def update() : Unit
+    this.y = this.y + this.speed
+    (this.y + paddleHeight > height).ifTrue(() => this.y = height - paddleHeight, () => 0)
+    (this.y < 0).ifTrue(() => this.y = 0, () => 0)
+
+  def setPaddleSpeed(speed : Int) : Unit
+    this.speed = speed
+
+def makePlayerPaddle() : Paddle = new
+  var upPressed : Boolean = false
+  var downPressed : Boolean = false
+  val paddle = makePaddle(10)
+  def draw(screen : pygame.Surface) : Unit = this.paddle.draw(screen)
+  def update() : Unit = this.paddle.update()
+  def hitbox() : pygame.Rect = this.paddle.hitbox()
+  def processEvent(e : pygame.Event) : Unit
+    val eventType = pygame.helper.getType(e)
+    (eventType == pygame.KEYDOWN
+     || eventType == pygame.KEYUP).ifTrue(
+      () => (e.key == pygame.K_UP).ifTrue(
+          () => this.upPressed = (eventType == pygame.KEYDOWN),
+          () => (e.key == pygame.K_DOWN).ifTrue(
+              () => this.downPressed = (eventType == pygame.KEYDOWN),
+              () => 0)),
+      () => 0)
+
+    this.upPressed.ifTrue(
+      () => this.paddle.speed = -3,
+      () => this.downPressed.ifTrue(
+        () => this.paddle.speed = 3,
+        () => this.paddle.speed = 0))
 
 val ball = new
   var x : Int = 0
@@ -146,38 +102,59 @@ val ball = new
   var xSpeed : Int = 2
   var ySpeed : Int = 2
 
-  def draw(screen : Surface) : Unit
-    pygame.draw.circle(screen, helper.white, helper.make2Tuple(this.x, this.y), this.radius)
+  def draw(screen : pygame.Surface) : Unit
+    pygame.draw.circle(screen,
+                       pygame.helper.white,
+                       pygame.helper.make2Tuple(this.x, this.y),
+                       this.radius)
     7
 
   def flipX() : Unit
-    this.xSpeed = (0 - 1) * this.xSpeed
+    this.xSpeed = -this.xSpeed
     blip.play()
     0 // Avoid TCO / FFI bad interaction
 
   def flipXBlop() : Unit
-    this.xSpeed = (0 - 1) * this.xSpeed
+    this.xSpeed = -this.xSpeed
     blop.play()
     0 // Avoid TCO / FFI bad interaction
 
   def flipY() : Unit
-    this.ySpeed = (0 - 1) * this.ySpeed
+    this.ySpeed = -this.ySpeed
     blip.play()
     0 // Avoid same bad interaction
 
-  def update(paddleHitbox : Rect) : Unit
+  def update(leftHitbox : pygame.Rect, rightHitbox : pygame.Rect) : Unit
     (this.x < 0 || this.x > width).ifTrue(() => this.flipX(), () => 0)
     (this.y < 0 || this.y > height).ifTrue(() => this.flipY(), () => 0)
 
-    // backwards comparisons for better ifTrue nesting
-    (this.x < paddleHitbox.right &&
-     this.x > paddleHitbox.left &&
-     this.y > paddleHitbox.top &&
-     this.y < paddleHitbox.bottom &&
+    (this.x < leftHitbox.right &&
+     this.x > leftHitbox.left &&
+     this.y > leftHitbox.top &&
+     this.y < leftHitbox.bottom &&
      this.xSpeed < 0).ifTrue(() => this.flipXBlop(), () => 0)
+
+    (this.x < rightHitbox.right &&
+     this.x > rightHitbox.left &&
+     this.y > rightHitbox.top &&
+     this.y < rightHitbox.bottom &&
+     this.xSpeed > 0).ifTrue(() => this.flipXBlop(), () => 0)
 
     this.x = this.x + this.xSpeed
     this.y = this.y + this.ySpeed
+
+def makeAIPaddle() : Paddle = new
+  val paddle = makePaddle(width - 30)
+  def draw(screen : pygame.Surface) : Unit = this.paddle.draw(screen)
+  def update() : Unit
+    val center = this.paddle.y + paddleWidth / 2
+    (center > ball.y).ifTrue(() => this.paddle.speed = -2,
+                             () => this.paddle.speed = 0)
+    (center < ball.y).ifTrue(() => this.paddle.speed = 2,
+                             () => 0)
+    this.paddle.update()
+  def hitbox() : pygame.Rect = this.paddle.hitbox()
+  def processEvent(e : pygame.Event) : Unit = 0
 
 val loop : GameLoop = new
   val fps = 144
@@ -190,21 +167,28 @@ val loop : GameLoop = new
   val width = 20
   val height = 60
 
+  val playerPaddle = makePlayerPaddle()
+  val aiPaddle = makeAIPaddle()
+
   def oneIteration() : Unit
-    screen.fill(helper.black)
-    pygame.draw.rect(screen, helper.white, pygame.Rect(10, this.y, this.width, this.height), 0)
+    screen.fill(pygame.helper.black)
+    this.playerPaddle.draw(screen)
+    this.aiPaddle.draw(screen)
     ball.draw(screen)
     pygame.display.flip()
 
     val gameLoop = this
+    this.playerPaddle.update()
     this.upPressed.ifTrue(() => gameLoop.y = gameLoop.y - 2,
                           () => 0)
     this.downPressed.ifTrue(() => gameLoop.y = gameLoop.y + 2,
                             () => 0)
-    ball.update(pygame.Rect(10, this.y, this.width, this.height))
+    ball.update(this.playerPaddle.hitbox(), this.aiPaddle.hitbox())
+    this.aiPaddle.update()
 
-  def processEvent(e : Event) : Unit
-    val eventType = helper.getType(e)
+  def processEvent(e : pygame.Event) : Unit
+    val eventType = pygame.helper.getType(e)
+    this.playerPaddle.processEvent(e)
     (eventType == pygame.QUIT).ifTrue(() => this.done = true, () => 0)
     def keyEvents() : Unit
       (e.key == pygame.K_UP).ifTrue(() => this.upPressed = (eventType == pygame.KEYDOWN), () => 0)

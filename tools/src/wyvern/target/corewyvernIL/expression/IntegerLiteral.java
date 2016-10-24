@@ -97,6 +97,7 @@ public class IntegerLiteral extends AbstractValue implements Invokable {
 		case "*": return new IntegerLiteral(this.value.multiply(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "/": return new IntegerLiteral(this.value.divide(((IntegerLiteral)args.get(0)).getFullValue()));
 		case "%": return new IntegerLiteral(this.value.remainder(((IntegerLiteral)args.get(0)).getFullValue()));
+    case "negate": return new IntegerLiteral(this.value.negate());
 		case "<": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) < 0);
 		case ">": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) > 0);
     case "==": return new BooleanLiteral(this.value.compareTo(((IntegerLiteral)args.get(0)).getFullValue()) == 0);

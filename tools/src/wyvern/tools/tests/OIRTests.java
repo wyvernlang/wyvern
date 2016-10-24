@@ -525,12 +525,53 @@ public class OIRTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testNestedLambda() throws ParseException {
         String input =
             "val obj = new\n" +
             "  val x = 5\n" +
-            "  def f() : Unit = (() => (() => this.x)())()\n" +
+            "  val f = () => (() => this.x)()\n" +
             "obj.f()\n";
         testPyFromInput(input, "5");
     }
+
+    @Test
+    public void testNegativeInt() throws ParseException {
+        String input =
+            "-5\n";
+        testPyFromInput(input, "-5");
+    }
+
+    @Test
+    public void testNegativeInt2() throws ParseException {
+        String input =
+            "def f() : Int\n" +
+            "  -5\n" +
+            "f()\n";
+        testPyFromInput(input, "-5");
+    }
+
+    @Test
+    public void testReturnNew() throws ParseException {
+        String input =
+            "type T\n" +
+            "  val x : Int\n" +
+            "def makeT() : T = new\n" +
+            "  val x = 23\n" +
+            "makeT().x\n";
+        testPyFromInput(input, "23");
+    }
+
+    @Test
+    public void testTailCall() throws ParseException {
+        String input =
+            "def f() : Int\n" +
+            "  3\n" +
+            "def g() : Int\n" +
+            "  7\n" +
+            "  f()\n" +
+            "g()\n";
+        testPyFromInput(input, "3");
+    }
+
 }
