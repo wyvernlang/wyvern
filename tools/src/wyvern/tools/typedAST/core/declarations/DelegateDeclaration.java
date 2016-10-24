@@ -119,6 +119,11 @@ public class DelegateDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+      if (!(target instanceof Variable)) {
+          ToolError.reportError(ErrorMessage.DELEGATE_MUST_BE_VARIABLE,
+                                this,
+                                target.toString());
+      }
 		String targetName = ((Variable)target).getName();
 		wyvern.target.corewyvernIL.decl.DelegateDeclaration iLDelegateDecl = new wyvern.target.corewyvernIL.decl.DelegateDeclaration(type.getILType(ctx), targetName, location);
 		return iLDelegateDecl;
