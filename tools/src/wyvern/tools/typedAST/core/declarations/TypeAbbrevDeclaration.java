@@ -29,6 +29,8 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWriter;
 
+// TODO: this represents an abstract type when the reference is null.
+// would be better to have a separate class for representing an abstract type
 public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	private String alias;
