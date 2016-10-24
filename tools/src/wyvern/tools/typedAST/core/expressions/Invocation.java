@@ -171,8 +171,9 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
                 .generateIL(ctx, null, dependencies);
 
             List<IExpr> args = new ArrayList<IExpr>();
-            if (!(argument instanceof UnitVal)) // TODO: This is hacky. Refactor me to avoid
+            if (!(argument instanceof UnitVal)) { // TODO: This is hacky. Refactor me to avoid
                 args.add(arg);
+            }
 
             return generator.genExprWithArgs(args, this);
         } else {
