@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
 import wyvern.target.oir.declarations.OIRDelegate;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
@@ -49,6 +50,28 @@ class EmitPythonState {
     public HashMap <String, String> classRecursiveNames;
     public String currentLetVar;
     public boolean inClass;
+
+    EmitPythonState copy() {
+        EmitPythonState eps = new EmitPythonState();
+        eps.oirenv = oirenv;
+        eps.expectingReturn = expectingReturn;
+        eps.returnType = returnType;
+        eps.variableCounter = variableCounter;
+        eps.classDecls = classDecls;
+        eps.freeVarSet = freeVarSet;
+        eps.currentMethod = currentMethod;
+        eps.prefix = prefix;
+        eps.classRecursiveNames = classRecursiveNames;
+        eps.currentLetVar = currentLetVar;
+        eps.inClass = inClass;
+        return eps;
+    }
+
+    EmitPythonState withExpectingReturn(Boolean er) {
+        EmitPythonState eps = this.copy();
+        eps.expectingReturn = er;
+        return eps;
+    }
 }
 
 public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
@@ -258,11 +281,11 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     String oldIndent = indent;
     indent += indentIncrement;
     String inString = oirLet.getInExpr().acceptVisitor(this, state);
-    indent = oldIndent;
     if (state.prefix.size() > 0) {
         inString = stringFromPrefix(state.prefix, indent) + "\n" + indent + inString;
         state.prefix = new ArrayList<>();
     }
+    indent = oldIndent;
 
     int letId = uniqueId;
     uniqueId++;
@@ -286,6 +309,17 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
       OIRFFIImport oirImport = (OIRFFIImport)oirLet.getToReplace();
       prefix = oirImport.acceptVisitor(this, state) + "\n" + indent;
       toReplaceString = oirImport.getModule();
+    } else if (oirLet.getToReplace() instanceof OIRLet) {
+        OIRLet innerLet = (OIRLet)oirLet.getToReplace();
+        int innerLetId = uniqueId;
+        uniqueId++;
+        prefix = "def letFn" + Integer.toString(innerLetId) + "():\n" + indent + indentIncrement;
+        oldIndent = indent;
+        indent = indent + indentIncrement;
+        prefix += innerLet.acceptVisitor(this, state.withExpectingReturn(true));
+        indent = oldIndent;
+        prefix += "\n" + indent;
+        toReplaceString = "letFn" + Integer.toString(innerLetId) + "()";
     } else {
       prefix = "";
       toReplaceString = oirLet.getToReplace().acceptVisitor(this, state);
@@ -303,89 +337,123 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     return (prefix + funDecl + inString + statePrefix + funCall);
   }
 
-  public String visit(EmitPythonState state,
-                      OIRMethodCall oirMethodCall) {
-      state.currentLetVar = "";
-    boolean oldExpectingReturn = state.expectingReturn;
-    state.expectingReturn = false;
-    String objExpr =
-      oirMethodCall.getObjectExpr().acceptVisitor(this, state);
-    String args = commaSeparatedExpressions(state,
-                                            oirMethodCall.getArgs());
-    String methodName = oirMethodCall.getMethodName();
-    boolean isOperator = methodName.matches("[^a-zA-Z0-9]*");
-    if (isTailCall(oirMethodCall) && !isOperator)
-        methodName = tco_prefix + methodName;
-    String strVal;
+    private Boolean methodCallIsIfStmt(OIRMethodCall oirMethodCall) {
+        return oirMethodCall.getObjectType().equals(new NominalType("system", "Boolean"))
+            && oirMethodCall.getMethodName().equals("ifTrue");
+    }
 
-    boolean isBool =
-        oirMethodCall.getObjectType().equals(new NominalType("system",
-                                                             "Boolean"));
-    boolean isInt =
-        oirMethodCall.getObjectType().equals(new NominalType("system",
-                                                             "Int"));
+    private String visitMethodCallTco(EmitPythonState state,
+                                      OIRMethodCall oirMethodCall,
+                                      Boolean tco) {
+        String objExpr = oirMethodCall.getObjectExpr().acceptVisitor(this, state.withExpectingReturn(false));
+        String args = commaSeparatedExpressions(state.withExpectingReturn(false), oirMethodCall.getArgs());
+        String methodName = oirMethodCall.getMethodName();
+        if (tco)
+            methodName = tco_prefix + methodName;
+        boolean isOperator = methodName.matches("[^a-zA-Z0-9]*");
 
-    if (isBool && (methodName.equals("ifTrue") || methodName.equals("tco_ifTrue"))) {
-        OIRExpression trueBranch = oirMethodCall.getArgs().get(0);
-        OIRExpression falseBranch = oirMethodCall.getArgs().get(1);
+        ValueType objType = oirMethodCall.getObjectType();
+        boolean isBool = objType.equals(new NominalType("system", "Boolean"));
+        boolean isInt = objType.equals(new NominalType("system", "Int"));
 
-        String varName = generateVariable(state);
-        String oldIndent = indent;
-        indent = indent + indentIncrement;
+        if (isBool && methodName.equals("||")) {
+            return "(" + objExpr + " or " + args + ")";
+        } else if (isBool && methodName.equals("&&")) {
+            return "(" + objExpr + " and " + args + ")";
+        } else if (isInt && methodName.equals("/")) {
+            // Make int division result in an int on Python 3
+            return "int(" + objExpr + " " + methodName + " " + args + ")";
+        } else if (isInt && (methodName.equals("negate")
+                             || methodName.equals("tco_negate"))) {
+            return "-(" + objExpr + ")";
+        } else {
+            if (isOperator)
+                return "(" + objExpr + " " + methodName + " " + args + ")";
+            else
+                return objExpr + "." + methodName + "(" + args + ")";
+        }
+    }
 
-        String trueText, falseText;
+    private String wrapTcoTry(EmitPythonState state, String tryTco, String tryNoTco, String indent) {
+        String retStr = "";
+        if (state.expectingReturn) {
+            retStr = state.returnType + " ";
+        }
+        return "try:\n" +
+            indent + indentIncrement + retStr + tryTco + "\n" +
+            indent + "except AttributeError:\n" +
+            indent + indentIncrement + retStr + tryNoTco + "\n" +
+            indent;
+    }
 
-        if (oldExpectingReturn) {
-            if (isTailCall(oirMethodCall)) {
-                trueText = indent + "return " + trueBranch.acceptVisitor(this, state) + ".tco_apply()\n";
-                falseText = indent + "return " + falseBranch.acceptVisitor(this, state) + ".tco_apply()\n";
+    public String visit(EmitPythonState state,
+                        OIRMethodCall oirMethodCall) {
+        state.currentLetVar = "";
+
+        if (methodCallIsIfStmt(oirMethodCall)) {
+            OIRExpression trueBranch = oirMethodCall.getArgs().get(0);
+            OIRExpression falseBranch = oirMethodCall.getArgs().get(1);
+
+            String objExpr = oirMethodCall.getObjectExpr().acceptVisitor(this, state.withExpectingReturn(false));
+
+            String varName = generateVariable(state);
+            String oldIndent = indent;
+            indent = indent + indentIncrement;
+
+            String trueText, falseText;
+
+            if (state.expectingReturn) {
+                EmitPythonState stateNoReturn = state.withExpectingReturn(false);
+                if (isTailCall(oirMethodCall)) {
+                    trueText = indent + "return " + trueBranch.acceptVisitor(this, stateNoReturn) + ".tco_apply()\n";
+                    falseText = indent + "return " + falseBranch.acceptVisitor(this, stateNoReturn) + ".tco_apply()\n";
+                } else {
+                    trueText = indent + "return " + trueBranch.acceptVisitor(this, stateNoReturn) + ".apply()\n";
+                    falseText = indent + "return " + falseBranch.acceptVisitor(this, stateNoReturn) + ".apply()\n";
+                }
             } else {
-                trueText = indent + "return " + trueBranch.acceptVisitor(this, state) + ".apply()\n";
-                falseText = indent + "return " + falseBranch.acceptVisitor(this, state) + ".apply()\n";
+                trueText = indent + varName + " = " + trueBranch.acceptVisitor(this, state) + ".apply()\n";
+                falseText = indent + varName + " = " + falseBranch.acceptVisitor(this, state) + ".apply()\n";
+            }
+
+            String pfx = "if " + objExpr + ":\n" +
+                trueText +
+                oldIndent + "else:\n" +
+                falseText +
+                oldIndent;
+
+            if (state.expectingReturn) {
+                return pfx;
+            }
+            indent = oldIndent;
+            state.prefix.add(pfx);
+            return varName;
+        }
+
+        String resultNoTco = visitMethodCallTco(state, oirMethodCall, false);
+        if (isTailCall(oirMethodCall)) {
+            String resultTco = visitMethodCallTco(state, oirMethodCall, true);
+            if (state.expectingReturn) {
+                int tcoId = uniqueId;
+                uniqueId++;
+
+                String tcoWrapper =
+                    "def tcoFn" + Integer.toString(tcoId) + "():\n" +
+                    indent + indentIncrement + wrapTcoTry(state, resultTco, resultNoTco, indent + indentIncrement) + "\n" +
+                    indent;
+                state.prefix.add(tcoWrapper);
+                return state.returnType + " " + "tcoFn" + tcoId;
+            } else {
+                return wrapTcoTry(state, resultTco, resultNoTco, indent);
             }
         } else {
-            trueText = indent + varName + " = " + trueBranch.acceptVisitor(this, state) + ".apply()\n";
-            falseText = indent + varName + " = " + falseBranch.acceptVisitor(this, state) + ".apply()\n";
+            if (state.expectingReturn) {
+                return state.returnType + " " + resultNoTco;
+            } else {
+                return resultNoTco;
+            }
         }
-
-        String pfx = "if " + objExpr + ":\n" +
-            trueText +
-            oldIndent + "else:\n" +
-            falseText +
-            oldIndent;
-
-        if (oldExpectingReturn) {
-            return pfx;
-        }
-        indent = oldIndent;
-        state.prefix.add(pfx);
-        strVal = varName;
-    } else if (isBool && methodName.equals("||")) {
-        strVal = "(" + objExpr + " or " + args + ")";
-    } else if (isBool && methodName.equals("&&")) {
-        strVal = "(" + objExpr + " and " + args + ")";
-    } else if (isInt && methodName.equals("/")) {
-        // Make int division result in an int on Python 3
-        strVal = "int(" + objExpr + " " + methodName + " " + args + ")";
-    } else if (isInt && (methodName.equals("negate")
-                         || methodName.equals("tco_negate"))) {
-        strVal = "-(" + objExpr + ")";
-    } else {
-        if (isOperator)
-            strVal = "(" + objExpr + " " +
-                methodName + " " + args + ")";
-        else
-            strVal = objExpr + "." + methodName + "(" + args + ")";
     }
-    state.expectingReturn = oldExpectingReturn;
-    if (state.expectingReturn) {
-        if (isTailCall(oirMethodCall))
-            return state.returnType + " lambda: " + strVal;
-        else
-            return state.returnType + " " + strVal;
-    }
-    return strVal;
-  }
 
   public String visit(EmitPythonState state,
                       OIRNew oirNew) {

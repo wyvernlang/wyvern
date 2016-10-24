@@ -543,7 +543,7 @@ public class OIRTests {
     }
 
     @Test
-    public void testNegativeIntLiteral() throws ParseException {
+    public void testNegativeInt2() throws ParseException {
         String input =
             "def f() : Int\n" +
             "  -5\n" +
@@ -560,6 +560,18 @@ public class OIRTests {
             "  val x = 23\n" +
             "makeT().x\n";
         testPyFromInput(input, "23");
+    }
+
+    @Test
+    public void testTailCall() throws ParseException {
+        String input =
+            "def f() : Int\n" +
+            "  3\n" +
+            "def g() : Int\n" +
+            "  7\n" +
+            "  f()\n" +
+            "g()\n";
+        testPyFromInput(input, "3");
     }
 
 }
