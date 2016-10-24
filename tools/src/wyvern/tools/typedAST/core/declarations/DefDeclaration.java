@@ -243,6 +243,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         return !this.generics.isEmpty();
     }
 
+    public static  boolean isGeneric(FormalArg a) {
+        return a.getName().startsWith(GENERIC_PREFIX);
+    }
+
 	private ValueType getResultILType(GenContext ctx) {
 		Arrow a = (Arrow) this.type;
         return a.getResult().getILType(ctx);
