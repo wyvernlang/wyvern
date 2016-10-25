@@ -120,7 +120,7 @@ public class StructuralType extends ValueType {
 		for (DeclType dt : st.getDeclTypes()) {
 			DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
 			//DeclType candidateDT = findDecl(dt.getName(), ctx);
-			if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx)) {
+			if (candidateDT == null || !dt.isSubtypeOf(candidateDT, extendedCtx)) {
 				return false;
 			}
 		}
