@@ -288,7 +288,11 @@ public class Application extends CachingTypedAST implements CoreAST {
             if (this.argument instanceof TupleObject) {
                 ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
                 if (formalPos == rawArgs.length) {
-                // then we're inferring from the result type
+                    // then we're inferring from the result type
+                    throw new UnsupportedOperationException(
+                        "Can't infer the result type yet."
+                    );
+
                 } else {
                     ExpressionAST inferArg = rawArgs[formalPos];
                     args.add(inferArg.generateIL(
@@ -298,6 +302,9 @@ public class Application extends CachingTypedAST implements CoreAST {
             } else if (this.argument instanceof UnitVal) {
                 // uhhhhh?
                 // The arg is a unit value. We must be inferring from the result type
+                throw new UnsupportedOperationException(
+                    "Can't infer the result type yet.");
+
             } else {
             
                 // Then the arg must be a single element
