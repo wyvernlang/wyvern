@@ -801,6 +801,30 @@ public class ILTests {
 	}
 
 	@Test
+	public void testWidthAndDepthSubtyping() throws ParseException {
+		String input = "type SuperType\n"
+					 + "    val x:Int\n"
+					 + "type SubType\n"
+					 + "    val x:Int\n"
+					 + "    val y:Int\n"
+					 + "//check width subtyping\n"
+					 + "val aSub : SubType = new\n"
+					 + "	val x : Int = 1\n"
+					 + "	val y : Int = 2\n"
+					 + "val aSuper : SuperType = aSub\n"
+					 + "// types to use in depth subtyping\n"
+					 + "type DepthSuperType\n"
+					 + "    val m:SuperType\n"
+					 + "type DepthSubType\n"
+					 + "    val m:SubType\n"
+					 + "val aDepthSub : DepthSubType = new\n"
+					 + "	val m : SubType = aSub\n"
+					 + "val aDepthSuper : DepthSuperType = aDepthSub\n"
+					 + "";
+        doTest(input, null, null);
+	}
+
+	@Test
 	public void testVarMarkedResource() throws ParseException {
 		String input = "resource type MarkedResource\n"
 					 + "	def foo() : system.Int\n"
