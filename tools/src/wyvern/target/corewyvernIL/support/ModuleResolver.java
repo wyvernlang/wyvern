@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,8 +37,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
  * @author aldrich
  */
 public class ModuleResolver {
-	private File rootDir;
-	private File libDir;
+    private List<File> searchPath;
 	private Map<String, Module> moduleCache = new HashMap<String, Module>();
 	private InterpreterState state;
 	
@@ -46,8 +46,10 @@ public class ModuleResolver {
 			throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
 		if (libDir != null && !libDir.isDirectory())
 			throw new RuntimeException("the lib path \""+libDir+"\" for the module resolver must be a directory");
-		this.rootDir = rootDir;
-		this.libDir = libDir;
+    ArrayList<File> searchPath = new ArrayList<File>();
+    searchPath.add(rootDir);
+    searchPath.add(libDir);
+    this.searchPath = searchPath;
 	}
 	
 	void setInterpreterState(InterpreterState s) {
@@ -124,13 +126,14 @@ public class ModuleResolver {
 		if (names.length == 0)
 			throw new RuntimeException();
 		names[names.length - 1] += isType?".wyt":".wyv";
-		File f = findFile(names, rootDir.getAbsolutePath());
-		if (!f.exists() && libDir != null) {
-			File libFile = findFile(names, libDir.getAbsolutePath());
-			if (libFile.exists())
-				f = libFile;
-		}
-		if (!f.exists()) {
+
+    File f = null;
+    for (File searchDir : searchPath) {
+        f = findFile(names, searchDir.getAbsolutePath());
+        if (f.exists())
+            break;
+    }
+		if (f == null || !f.exists()) {
 			ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, (FileLocation) null, isType?"type":"module", qualifiedName);
 		}
 		return f;
