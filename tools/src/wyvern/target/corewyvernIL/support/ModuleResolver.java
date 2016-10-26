@@ -41,16 +41,21 @@ public class ModuleResolver {
 	private Map<String, Module> moduleCache = new HashMap<String, Module>();
 	private InterpreterState state;
 	
-	public ModuleResolver(File rootDir, File libDir) {
-		if (rootDir != null && !rootDir.isDirectory())
-			throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
-		if (libDir != null && !libDir.isDirectory())
-			throw new RuntimeException("the lib path \""+libDir+"\" for the module resolver must be a directory");
-    ArrayList<File> searchPath = new ArrayList<File>();
-    searchPath.add(rootDir);
-    searchPath.add(libDir);
-    this.searchPath = searchPath;
-	}
+    public ModuleResolver(String platform, File rootDir, File libDir) {
+        ArrayList<File> searchPath = new ArrayList<File>();
+        if (rootDir != null && !rootDir.isDirectory())
+            throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
+        if (libDir != null && !libDir.isDirectory())
+            throw new RuntimeException("the lib path \""+libDir+"\" for the module resolver must be a directory");
+        if (rootDir != null) {
+            searchPath.add(rootDir);
+        }
+        if (libDir != null) {
+            searchPath.add(libDir);
+            searchPath.add(libDir.toPath().resolve("platform").resolve(platform).toFile());
+        }
+        this.searchPath = searchPath;
+    }
 	
 	void setInterpreterState(InterpreterState s) {
 		state = s;

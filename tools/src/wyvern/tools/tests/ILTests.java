@@ -630,7 +630,7 @@ public class ILTests {
 
 	private void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
 		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
 		TypeContext ctx = Globals.getStandardTypeContext();
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
 		IExpr mainProgram = ((DefDeclaration)decl).getBody();
@@ -666,7 +666,7 @@ public class ILTests {
 	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
         String source = TestUtil.readFile(PATH + fileName);
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
-        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), null);
+        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), null);
 		GenContext genCtx = Globals.getGenContext(state);
         IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
         doChecks(program, expectedType, expectedValue);
@@ -679,7 +679,9 @@ public class ILTests {
 	// TODO: make other string tests call this function
 	private static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                                                                   new File(TestUtil.BASE_PATH),
+                                                                   new File(TestUtil.LIB_PATH)));
 		final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 		IExpr program = ast.generateIL(genCtx, null, dependencies);
 		program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
@@ -688,10 +690,10 @@ public class ILTests {
 
 	// TODO: make other script tests call this function
 	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
-        InterpreterState state = new InterpreterState(new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH));
-        final Module module = state.getResolver().resolveModule(qualifiedName);
-		IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
-        doChecks(program, expectedType, expectedValue);
+      InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH));
+      final Module module = state.getResolver().resolveModule(qualifiedName);
+      IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
+      doChecks(program, expectedType, expectedValue);
 	}
 	
 	private static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
@@ -739,7 +741,7 @@ public class ILTests {
 
 	private void doTestTypeFail(String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
 		try {
 			IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
 			program.typeCheck(Globals.getStandardTypeContext());
@@ -755,7 +757,7 @@ public class ILTests {
                      + "    4 5 +\n"
                      ;
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
 		// IL generation doesn't work yet!
 		//Expression program = ast.generateIL(genCtx, null);
 	}
@@ -779,7 +781,7 @@ public class ILTests {
                      
                      ;
         TypedAST ast = TestUtil.getNewAST(input, "test input");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(null, null));
+        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
 		// IL generation doesn't work yet!
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
 	}

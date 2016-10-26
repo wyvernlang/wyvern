@@ -26,6 +26,7 @@ import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
@@ -56,8 +57,11 @@ public class OIRTests {
     // Since the root OIR environment is stateful, reset it between tests
     OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
-    GenContext genContext = Globals.getStandardGenContext();
-    IExpr ILprogram = ast.generateIL(genContext, null, new LinkedList<TypedModuleSpec>());
+    GenContext javaGenContext = Globals.getStandardGenContext();
+    GenContext pythonGenContext = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_PYTHON,
+                                                                             new File(TestUtil.BASE_PATH),
+                                                                             new File(TestUtil.LIB_PATH)));
+    IExpr ILprogram = ast.generateIL(javaGenContext, null, new LinkedList<TypedModuleSpec>());
     TailCallVisitor.annotate(ILprogram);
     if (debug) {
       System.out.println("Wyvern Program:");

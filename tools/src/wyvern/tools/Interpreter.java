@@ -53,7 +53,7 @@ public class Interpreter {
 				System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
 				return;				
 			}
-			final InterpreterState state = new InterpreterState(rootDir, new File(wyvernPath));
+			final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, rootDir, new File(wyvernPath));
 			Module m = state.getResolver().load("unknown", filepath.toFile());
 			IExpr program = m.getExpression();
 			program = state.getResolver().wrap(program, m.getDependencies());

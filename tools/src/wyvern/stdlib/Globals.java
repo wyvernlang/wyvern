@@ -107,7 +107,7 @@ public class Globals {
 	}
 
 	public static GenContext getStandardGenContext() {
-		return Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), null));
+      return Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), null));
 	}
 
 	public static GenContext getGenContext(InterpreterState state) {

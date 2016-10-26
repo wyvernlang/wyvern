@@ -85,7 +85,9 @@ public class TransformTests {
 	 */
 	private static IExpr compile (String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "Transformer Test");
-		GenContext genCtx = Globals.getGenContext(new InterpreterState(new File(TestUtil.BASE_PATH), new File(LIB_PATH)));
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                                                                   new File(TestUtil.BASE_PATH),
+                                                                   new File(LIB_PATH)));
 		final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 		IExpr program = ast.generateIL(genCtx, null, dependencies);
 		program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);

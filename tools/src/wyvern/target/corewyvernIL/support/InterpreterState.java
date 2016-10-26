@@ -11,12 +11,15 @@ public class InterpreterState {
 	
 	private ModuleResolver resolver;
 	private GenContext genCtx;
+
+    public static String PLATFORM_PYTHON = "python";
+    public static String PLATFORM_JAVA = "java";
 	
-	public InterpreterState(File rootDir, File libDir) {
-		resolver = new ModuleResolver(rootDir, libDir);
-		resolver.setInterpreterState(this);
-		localInterpreter.set(this);
-	}
+  public InterpreterState(String platform, File rootDir, File libDir) {
+      resolver = new ModuleResolver(platform, rootDir, libDir);
+      resolver.setInterpreterState(this);
+      localInterpreter.set(this);
+  }
 	
 	public ModuleResolver getResolver() {
 		return resolver;
