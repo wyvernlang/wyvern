@@ -95,4 +95,12 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		return new StringLiteral(value, location);
 	}
+
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("StringConstant(");
+        sb.append(value);
+        sb.append(")");
+        return sb;
+    }
 }

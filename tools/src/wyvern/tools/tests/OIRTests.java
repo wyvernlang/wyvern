@@ -61,17 +61,19 @@ public class OIRTests {
     GenContext pythonGenContext = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_PYTHON,
                                                                              new File(TestUtil.BASE_PATH),
                                                                              new File(TestUtil.LIB_PATH)));
-    IExpr ILprogram = ast.generateIL(javaGenContext, null, new LinkedList<TypedModuleSpec>());
+    IExpr ILprogram = ast.generateIL(pythonGenContext, null, new LinkedList<TypedModuleSpec>());
     TailCallVisitor.annotate(ILprogram);
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);
+      IExpr jILprogram = ast.generateIL(javaGenContext, null, new LinkedList<TypedModuleSpec>());
+      TailCallVisitor.annotate(jILprogram);
       try {
-        System.out.println("IL program:\n" + ((Expression)ILprogram).prettyPrint());
+        System.out.println("IL program:\n" + ((Expression)jILprogram).prettyPrint());
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }
-      System.out.println("IL program output:\n" + ILprogram.interpret(EvalContext.empty()));
+      System.out.println("IL program output:\n" + jILprogram.interpret(EvalContext.empty()));
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
@@ -576,6 +578,22 @@ public class OIRTests {
             "  f()\n" +
             "g()\n";
         testPyFromInput(input, "3");
+    }
+
+    @Test
+    public void testLiteralNewline() throws ParseException {
+        String input =
+            "val x = \"line 1\\nline 2\"\n" +
+            "x";
+        testPyFromInput(input, "line 1\nline 2", true);
+    }
+
+    @Test
+    public void testBasicStdout() throws ParseException {
+        String input =
+            "require stdout\n" +
+            "stdout.print(\"Hello, world\")\n";
+        testPyFromInput(input, "\"Hello, world\"\nNone", true);
     }
 
 }

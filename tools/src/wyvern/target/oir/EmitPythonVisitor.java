@@ -99,7 +99,10 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     int nArgs = exps.size();
     for (int i = 0; i < nArgs; i++) {
       OIRExpression arg_i = exps.get(i);
-      args += arg_i.acceptVisitor(this, state);
+      if (args != null)
+          args += arg_i.acceptVisitor(this, state);
+      else
+          args += "None";
       if (i < nArgs - 1)
         args += ", ";
     }
@@ -522,14 +525,31 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     return "OIRRational unimplemented";
   }
 
-  public String visit(EmitPythonState state,
-                      OIRString oirString) {
-      state.currentLetVar = "";
-    String strVal = "\"" + oirString.getValue() + "\"";
-    if (state.expectingReturn)
-      return state.returnType + " " + strVal;
-    return strVal;
-  }
+    private String escapeString(String str) {
+        HashMap<String,String> replacements = new HashMap<String, String>() {{
+                put("\"", "\\\"");
+                put("\b", "\\b");
+                put("\f", "\\f");
+                put("\n", "\\n");
+                put("\r", "\\r");
+                put("\t", "\\t");
+            }};
+        str = str.replace("\\", "\\\\");
+        for (String key : replacements.keySet()) {
+            str = str.replace(key, replacements.get(key));
+        }
+        return str;
+    }
+
+    public String visit(EmitPythonState state,
+                        OIRString oirString) {
+        state.currentLetVar = "";
+        String stringValue = oirString.getValue();
+        String strVal = "\"" + escapeString(stringValue) + "\"";
+        if (state.expectingReturn)
+            return state.returnType + " " + strVal;
+        return strVal;
+    }
 
   public String visit(EmitPythonState state,
                       OIRVariable oirVariable) {
@@ -693,9 +713,10 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
   public String visit(EmitPythonState state,
                       OIRFFIImport oirImport) {
       state.currentLetVar = "";
-    if (oirImport.getFFIType() != FFIType.PYTHON) {
-      throw new RuntimeException("Python backend does not support non-python FFIs!");
-    }
-    return "import " + oirImport.getModule();
+      if (oirImport.getFFIType() != FFIType.PYTHON) {
+          return "Exception(\"Python backend does not support non-Python FFIs!\")";
+          //throw new RuntimeException("Python backend does not support non-python FFIs!");
+      }
+      return "import " + oirImport.getModule();
   }
 }

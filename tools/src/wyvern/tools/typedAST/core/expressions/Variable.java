@@ -134,4 +134,19 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
             throw new RuntimeException("impossible");
         }
     }
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Variable(\"");
+        sb.append(binding.getName());
+        sb.append("\" : ");
+        if (binding.getType() != null) {
+            sb.append(binding.getType().toString());
+        } else {
+            sb.append("null");
+        }
+        sb.append(")");
+        return sb;
+    }
 }

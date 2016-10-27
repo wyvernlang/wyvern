@@ -190,5 +190,26 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
             getLocation()
         );
     }
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Invocation(operationName=");
+        sb.append(operationName);
+        sb.append(", receiver=");
+        if (receiver != null) {
+            sb.append(receiver.prettyPrint());
+        } else {
+            sb.append("null");
+        }
+        sb.append(", argument=");
+        if (argument != null) {
+            sb.append(argument.prettyPrint());
+        } else {
+            sb.append("null");
+        }
+        sb.append(")");
+        return sb;
+    }
 }
 

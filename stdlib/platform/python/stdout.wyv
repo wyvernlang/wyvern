@@ -1,5 +1,7 @@
 resource module stdout
 
+require python
+
 import python:sys
 
 type Printable = Unit

@@ -144,7 +144,10 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
                         OIRMethodCall oirMethodCall) {
         ArrayList<OIRExpression> newArgs = new ArrayList<>();
         for (OIRExpression arg : oirMethodCall.getArgs()) {
-            newArgs.add((OIRExpression) arg.acceptVisitor(this, state));
+            if (arg == null)
+                newArgs.add(null);
+            else
+                newArgs.add((OIRExpression) arg.acceptVisitor(this, state));
         }
         String methodName = oirMethodCall.getMethodName();
         if (pythonKeywords.contains(methodName))

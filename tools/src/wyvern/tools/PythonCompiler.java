@@ -26,16 +26,18 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class PythonCompiler {
   public static void main(String[] args) {
     if (args.length < 1) {
-      System.err.println("usage: wyvernpy FILENAME [-o OUTPUT_FILE] [-dIL]");
+      System.err.println("usage: wyvernpy FILENAME [-o OUTPUT_FILE] [-dIL] [-dAST]");
       System.exit(1);
     }
     String filename = null;
     String output_file = null;
     boolean display_IL = false;
+    boolean display_AST = false;
 
     for (int i = 0; i < args.length; i++) {
         if ("-o".equals(args[i])) {
@@ -47,6 +49,8 @@ public class PythonCompiler {
             i++;
         } else if ("-dIL".equals(args[i])) {
             display_IL = true;
+        } else if ("-dAST".equals(args[i])) {
+            display_AST = true;
         } else {
             if (filename == null) {
                 filename = args[i];
@@ -88,6 +92,14 @@ public class PythonCompiler {
         return;
       }
       final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_PYTHON, rootDir, new File(wyvernPath));
+      if (display_AST) {
+          try {
+              TypedAST ast = TestUtil.getNewAST(filepath.toFile());
+              System.out.println("AST:\n" + ast.prettyPrint().toString());
+          } catch (ParseException e) {
+              System.out.println("Could not print AST");
+          }
+      }
       Module m = state.getResolver().load("unknown", filepath.toFile());
       IExpr program = m.getExpression();
       program = state.getResolver().wrap(program, m.getDependencies());

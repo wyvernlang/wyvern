@@ -42,4 +42,8 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	public default void genTopLevel(TopLevelContext tlc) {
 		throw new RuntimeException("genTopLevel not implemented for " + this.getClass());
 	}
+
+    public default StringBuilder prettyPrint() {
+        throw new RuntimeException("prettyPrint not implemented for " + this.getClass());
+    }
 }
