@@ -38,7 +38,43 @@ class NameMangleState {
 
 public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
+    List<String> pythonKeywords;
+    String keywordPrefix = "pykwd_";
+
     public NameMangleVisitor() {
+        pythonKeywords = new ArrayList<String>() {{
+                add("and");
+                add("as");
+                add("assert");
+                add("break");
+                add("class");
+                add("continue");
+                add("def");
+                add("del");
+                add("elif");
+                add("else");
+                add("except");
+                add("exec");
+                add("finally");
+                add("for");
+                add("from");
+                add("global");
+                add("if");
+                add("import");
+                add("in");
+                add("is");
+                add("lambda");
+                add("not");
+                add("or");
+                add("pass");
+                add("print");
+                add("raise");
+                add("return");
+                add("try");
+                add("while");
+                add("with");
+                add("yield");
+            }};
     }
 
     public static OIRAST mangleAST(OIRAST ast) {
@@ -110,9 +146,12 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
         for (OIRExpression arg : oirMethodCall.getArgs()) {
             newArgs.add((OIRExpression) arg.acceptVisitor(this, state));
         }
+        String methodName = oirMethodCall.getMethodName();
+        if (pythonKeywords.contains(methodName))
+            methodName = keywordPrefix + methodName;
         OIRMethodCall methodCall = new OIRMethodCall((OIRExpression) oirMethodCall.getObjectExpr().acceptVisitor(this, state),
                                                      oirMethodCall.getObjectType(),
-                                                     oirMethodCall.getMethodName(),
+                                                     methodName,
                                                      newArgs);
         methodCall.copyMetadata(oirMethodCall);
         return methodCall;
@@ -208,6 +247,9 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
     public OIRAST visit(NameMangleState state,
                         OIRMethod oirMethod) {
+        String methodName = oirMethod.getDeclaration().getName();
+        if (pythonKeywords.contains(methodName))
+            oirMethod.getDeclaration().setName(keywordPrefix + methodName);
         OIRMethod method = new OIRMethod(oirMethod.getEnvironment(),
                                          (OIRMethodDeclaration) oirMethod.getDeclaration().acceptVisitor(this, state),
                                          (OIRExpression) oirMethod.getBody().acceptVisitor(this, state));
