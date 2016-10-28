@@ -20,9 +20,9 @@ def isort(lst:list.List):list.List
 	(x,xs) => insert(x,isort(xs))
     )
 
-
 // sample list to sort
 val l = list.Cons(3, list.Cons(2, list.Cons(5, list.Nil)))
+val lsorted = isort(l)
 
 // print the list
 stdout.print("list contents: ")
@@ -31,5 +31,5 @@ stdout.println()
 
 // print the list
 stdout.print("list contents after sort: ")
-l.do(x => stdout.printInt(x))
+lsorted.do(x => stdout.printInt(x))
 stdout.println()
