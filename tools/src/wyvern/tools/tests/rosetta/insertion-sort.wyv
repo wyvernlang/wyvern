@@ -1,3 +1,5 @@
+require stdout
+
 import stdlib.collections.list
 
 // if l is sorted and x is an integer, insert produces a sorted permutation of
@@ -17,3 +19,17 @@ def isort(lst:list.List):list.List
 	() => list.Nil,
 	(x,xs) => insert(x,isort(xs))
     )
+
+
+// sample list to sort
+val l = list.Cons(3, list.Cons(2, list.Cons(5, list.Nil)))
+
+// print the list
+stdout.print("list contents: ")
+l.do(x => stdout.printInt(x))
+stdout.println()
+
+// print the list
+stdout.print("list contents after sort: ")
+l.do(x => stdout.printInt(x))
+stdout.println()
