@@ -1,0 +1,19 @@
+import stdlib.collections.list
+
+// if l is sorted and x is an integer, insert produces a sorted permutation of
+// x :: l
+def insert(x:Int,lst:list.List):list.List
+   lst.caseAnalyze(
+	() => list.Cons(x,list.Nil),
+        (y,ys) => (y < x).ifTrue(
+		       	            () => list.Cons(x, list.Cons(y, ys)),
+				    () => list.Cons(y, insert(x,ys))
+			        )
+    )
+
+// given any list of integers, produce a sorted permutation of that list
+def isort(lst:list.List):list.List
+    lst.caseAnalyze(
+	() => list.Nil,
+	(x,xs) => insert(x,isort(xs))
+    )
