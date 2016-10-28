@@ -5,7 +5,7 @@ import stdlib.collections.list
 def insert(x:Int,lst:list.List):list.List
    lst.caseAnalyze(
 	() => list.Cons(x,list.Nil),
-        (y,ys) => (y < x).ifTrue(
+        (y,ys) => (x < y).ifTrue(
 		       	            () => list.Cons(x, list.Cons(y, ys)),
 				    () => list.Cons(y, insert(x,ys))
 			        )
