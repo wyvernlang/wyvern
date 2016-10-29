@@ -27,6 +27,7 @@ def parse(input:String):option.Option
 	doParse(scanner)
 	
 def doParse(scanner:lexer.Scanner):option.Option
+	debug.print("start")
 	val t = scanner.nextToken()
 	(t.kind() == tokens.NUMBER).ifTrue(
 	  () => parseWithOneExpr(scanner, ast.int(Int.from(t.print()))),
@@ -34,23 +35,35 @@ def doParse(scanner:lexer.Scanner):option.Option
 	)
 
 def parseWithOneExpr(scanner:lexer.Scanner, exp:AST):option.Option
+	debug.print("p1")
 	val t = scanner.nextToken()
-	debug.printInt(t.kind())
 	(t.kind() == tokens.EOF).ifTrue(
-	  () => option.Some(exp),
-	  () => option.None()
+		() => option.Some(exp),
+		() => (t.kind() == tokens.NUMBER).ifTrue(
+			() => parseWithTwoExprs(scanner, exp, ast.int(Int.from(t.print())), false),
+			() => option.None()
+		)
 	)
 
+def parseWithTwoExprs(scanner:lexer.Scanner, exp1:AST, exp2:AST,
+                      moreOnStack:Boolean):option.Option
+	def compose(exp3:AST):option.Option
+		val expOption : option.Option = parseWithTwoExprs(scanner, exp2, exp3, true)
+		expOption.flatMap((expResult) => parseWithTwoExprs(scanner, exp1,expResult, moreOnStack))
+	debug.print("p2")
+	val t = scanner.nextToken()
+	(t.kind() == tokens.OPERATOR).ifTrue(
+		() => moreOnStack.ifTrue(
+			() => option.Some(ast.call(exp1,t.print(),exp2)),
+		    () => parseWithOneExpr(scanner, ast.call(exp1,t.print(),exp2))
+		),
+		() => (t.kind() == tokens.NUMBER).ifTrue(
+			() => compose(ast.int(Int.from(t.print()))),
+			() => option.None()
+		)
+	)
+	
 /* stackless version
-function oneExpression(scanner, exp)
-	t = scanner.getToken()
-	if EOF
-		return exp
-	else if t is a number n
-		return twoExpressions(scanner, exp, constant(n))
-	else
-		return error
-
 function twoExpressions(scanner, exp1, exp2)
 	t = scanner.getToken()
 	if t is an operator o

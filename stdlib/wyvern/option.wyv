@@ -9,16 +9,19 @@ resource type UnitToDyn
 resource type UnitToOption
 	def apply():Option
 
+resource type DynToOption
+	def apply(x:Dyn):Option
+
 type Option
 	def map(f:DynToDyn):Option
-	def flatMap(f:Dyn -> Option):Option
+	def flatMap(f:DynToOption):Option
 	def getOrElse(x:UnitToDyn):Dyn
 	def orElse(x:UnitToOption):Option
 	val isDefined:Boolean
 	
 def Some(x:Dyn):Option = new
 	def map(f:DynToDyn):Option = Some(f(x))
-	def flatMap(f:Dyn -> Option):Option = f(x)
+	def flatMap(f:DynToOption):Option = f(x)
 	def getOrElse(defaultValue:UnitToDyn):Dyn = x
 	val value:Dyn = x
 	def orElse(x:UnitToOption):Option = this
@@ -26,7 +29,7 @@ def Some(x:Dyn):Option = new
 
 def None():Option = new
 	def map(f:DynToDyn):Option = this
-	def flatMap(f:Dyn -> Option):Option = this
+	def flatMap(f:DynToOption):Option = this
 	def getOrElse(defaultValue:UnitToDyn):Dyn = defaultValue()
 	def orElse(x:UnitToOption):Option = x()
 	val isDefined:Boolean = false

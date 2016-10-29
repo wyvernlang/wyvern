@@ -333,6 +333,7 @@ import wyvern.tools.errors.ToolError;
  	terminal Token cCurly_t ::= /\}/ {: RESULT = token(RBRACE,lexeme); :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
  	
+    
  	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); :};
  	
  	// error if DSLNext but not indented further
@@ -360,6 +361,8 @@ import wyvern.tools.errors.ToolError;
 %lex}
 
 %cf{
+    non terminal innerdsl;
+    non terminal inlinelit;
 	non terminal List<Token> program;
 	non terminal List<Token> lines;
 	non terminal List<Token> logicalLine;
@@ -414,7 +417,8 @@ import wyvern.tools.errors.ToolError;
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
 	          | booleanLit_t:t {: RESULT = t; :}
-	          | shortString_t:t {: RESULT = t; :};
+	          | shortString_t:t {: RESULT = t; :}
+	          | inlinelit:lit {: RESULT = lit; :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
 	           | plus_t:t {: RESULT = t; :}
@@ -455,6 +459,9 @@ import wyvern.tools.errors.ToolError;
 
     dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = makeList(t); RESULT.add(line); :};
 	
+    inlinelit ::= oCurly_t innerdsl:idsl cCurly_t {: RESULT = idsl; :};
+    innerdsl ::= notCurly_t:str {: RESULT = str; :} | notCurly_t:str oCurly_t innerdsl:idsl cCurly_t innerdsl:stre {: RESULT = str + "{" + idsl + "}" + stre; :} | {: RESULT = ""; :};
+    
 	lineElementSequence ::= indent_t:n {: RESULT = makeList(n); :}
 	                      | nonWSLineElement:n {:
 	                            // handles lines that start without any indent
