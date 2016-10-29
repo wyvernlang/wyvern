@@ -24,7 +24,7 @@ public class RossettaCodeTests {
 	@Test
 	public void testHello() throws ParseException {
 		String program = TestUtil.readFile(PATH + "hello.wyv");
-		
+
 		/*
 		String input = "requires stdout\n\n"				// or stdio, or io, or stdres, but these are not least privilege
 				     + "stdout.print(\"Hello, World\")\n";
@@ -48,11 +48,11 @@ public class RossettaCodeTests {
 		//int finalRes = ((IntegerConstant)out).getValue();
 		//Assert.assertEquals(3, finalRes);
 	}
-	
+
 	private static final String BASE_PATH = TestUtil.BASE_PATH;
 	private static final String PATH = BASE_PATH + "rosetta2/";
 	private static final String OLD_PATH = BASE_PATH + "rosetta-old/";
-	
+
 	@Test
 	/**
 	 * This test ensures that hello world works with the old parser
@@ -60,27 +60,32 @@ public class RossettaCodeTests {
 	public void testOldHello() throws CopperParserException, IOException {
 		String program = TestUtil.readFile(OLD_PATH + "helloOld.wyv");
 		TypedAST ast = TestUtil.getAST(program);
-		
+
 		TestUtil.evaluate(ast);
 	}
-	
+
 	@Test
-	public void testNewHello() throws ParseException {		
+	public void testNewHello() throws ParseException {
 		ILTests.doTestScriptModularly("rosetta.hello", null, null);
 	}
-	
+
 	@Test
-	public void testExplicitHello() throws ParseException {		
+	public void testExplicitHello() throws ParseException {
 		ILTests.doTestScriptModularly("rosetta.hello-explicit", null, null);
 	}
-	
+
 	@Test
-	public void testFib() throws ParseException {		
+	public void testFib() throws ParseException {
 		ILTests.doTestScriptModularly("rosetta.fibonacci", null, null);
 	}
-	
+
 	@Test
-	public void testFactorial() throws ParseException {		
+	public void testFactorial() throws ParseException {
 		ILTests.doTestScriptModularly("rosetta.factorial", null, null);
+	}
+
+	@Test
+	public void testInsertionSort() throws ParseException {
+		ILTests.doTestScriptModularly("rosetta.insertion-sort", null, null);
 	}
 }
