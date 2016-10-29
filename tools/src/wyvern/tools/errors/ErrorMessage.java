@@ -91,6 +91,8 @@ public enum ErrorMessage {
 	ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
 	UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
 	NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),
+	METHODS_MUST_BE_INVOKED("Cannot access a method as if it were a field; use ()",0),
+	TSL_ERROR("Error in type-specific language: %ARG",1),
 	;
 
 	private ErrorMessage(String message, int numArgs) {

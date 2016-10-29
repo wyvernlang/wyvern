@@ -19,11 +19,12 @@ type PostfixExpr
     metadata new
         def parseTSL(input:String):option.Option
             val parseResult = parser.parse(input)
-            val exprAST = ast.object(
-                ast.defn("eval",ast.types.int(),
-					//ast.call(ast.variable("Int"), "from", ast.string(input)) 
-                    //ast.int(Int.from(input))
-                    parseResult
-				)
+            parseResult.map((r) =>
+                ast.object(
+                    ast.defn("eval",ast.types.int(),
+				    	//ast.call(ast.variable("Int"), "from", ast.string(input)) 
+                        //ast.int(Int.from(input))
+                        r
+				    )
+                )
             )
-            option.Some(exprAST)

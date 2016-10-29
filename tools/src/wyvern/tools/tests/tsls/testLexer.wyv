@@ -10,7 +10,7 @@ val operatorRegex = "[\\+\\-\\*/]"
 //////////////////////////////////// CLIENT CODE
 
 // Create a scanner configuration, setting up the whitespace operator
-val config = lexer.makeScannerConfig(regex("[ ]+"))
+val config = lexer.makeScannerConfig(regex("[ \n]+"))
 
 // Add regular expressions and corresponding tokens
 config.addTokenKind(regex("\\d+")      , tokens.NUMBER)

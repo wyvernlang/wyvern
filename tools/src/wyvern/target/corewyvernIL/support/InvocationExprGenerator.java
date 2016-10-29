@@ -44,7 +44,9 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			return new FieldGet(receiver, declType.getName(), location);
 		} else {
-			throw new RuntimeException("eta-expansion of a method reference not implemented");
+			ToolError.reportError(ErrorMessage.METHODS_MUST_BE_INVOKED, location);
+			throw new RuntimeException("can't get here");
+			//throw new RuntimeException("eta-expansion of a method reference not implemented");
 		}
 	}
 

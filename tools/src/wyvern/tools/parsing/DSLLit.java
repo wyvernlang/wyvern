@@ -136,7 +136,8 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 				ValDeclaration astDecl = (ValDeclaration)((ObjectValue)astWrapper).findDecl("ast");
 				return (Expression) ((JavaValue)astDecl.getDefinition()).getWrappedValue();
 			} else {
-				throw new RuntimeException("error in TSL");
+				ToolError.reportError(ErrorMessage.TSL_ERROR, this, "[detailed TSL error messages not supported yet]");
+				throw new RuntimeException("can't get here");
 			}
 		} catch (ToolError e) {
 			if (e.getTypecheckingErrorMessage() == ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE) {

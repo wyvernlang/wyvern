@@ -65,6 +65,7 @@ public class Globals {
 		javaWhiteList.add("wyvern.stdlib.support.Int.utils");
 		javaWhiteList.add("wyvern.stdlib.support.AST.utils");
 		javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
+		javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
 	}
 	
 	public static boolean checkSafeJavaImport(String packageName) {

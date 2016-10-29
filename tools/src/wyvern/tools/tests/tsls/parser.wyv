@@ -4,6 +4,8 @@ import wyvern.util.matching.regex
 import tsls.lexer
 import wyvern.ast
 import wyvern.Int
+import wyvern.option
+import debug
 
 // local bindings to make things easier
 val tokens = lexer.tokens
@@ -12,16 +14,9 @@ type AST = ast.AST
 // let bind the operator regular expression, because it's annoying to comment out in debugging since it has */ in it
 val operatorRegex = "[\\+\\-\\*/]"
 
-def doParse(scanner:lexer.Scanner):AST
-	val t = scanner.nextToken()
-	(t.kind() == tokens.NUMBER).ifTrue(
-	  () => ast.int(Int.from(t.print())),
-	  () => ast.int(0)
-	)
-
-def parse(input:String):AST
+def parse(input:String):option.Option
 	// Create a scanner configuration, setting up the whitespace operator
-	val config = lexer.makeScannerConfig(regex("[ ]+"))
+	val config = lexer.makeScannerConfig(regex("[ \n\t]+"))
 
 	// Add regular expressions and corresponding tokens
 	config.addTokenKind(regex("\\d+")      , tokens.NUMBER)
@@ -31,3 +26,38 @@ def parse(input:String):AST
 	val scanner = lexer.makeScanner(config, input)
 	doParse(scanner)
 	
+def doParse(scanner:lexer.Scanner):option.Option
+	val t = scanner.nextToken()
+	(t.kind() == tokens.NUMBER).ifTrue(
+	  () => parseWithOneExpr(scanner, ast.int(Int.from(t.print()))),
+	  () => option.None()
+	)
+
+def parseWithOneExpr(scanner:lexer.Scanner, exp:AST):option.Option
+	val t = scanner.nextToken()
+	debug.printInt(t.kind())
+	(t.kind() == tokens.EOF).ifTrue(
+	  () => option.Some(exp),
+	  () => option.None()
+	)
+
+/* stackless version
+function oneExpression(scanner, exp)
+	t = scanner.getToken()
+	if EOF
+		return exp
+	else if t is a number n
+		return twoExpressions(scanner, exp, constant(n))
+	else
+		return error
+
+function twoExpressions(scanner, exp1, exp2)
+	t = scanner.getToken()
+	if t is an operator o
+		return oneExpression(scanner, o(exp1,exp2))
+	else if t is a number n
+		let e = twoExpressions(scanner, exp2, constant(n))
+		return twoExpressions(scanner, exp1, e)
+	else
+		return error // EOF or unexpected
+*/
