@@ -13,7 +13,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
 
-public class BoundedIntLiteral extends AbstractValue implements Invokable {
+public class BoundedIntLiteral extends Literal implements Invokable {
 
 	@Override
 	public int hashCode() {

@@ -1,0 +1,35 @@
+import wyvern.util.matching.regex
+import tsls.lexer
+
+// local binding to make things easier
+val tokens = lexer.tokens
+
+// let bind the operator regular expression, because it's annoying to comment out in debugging since it has */ in it
+val operatorRegex = "[\\+\\-\\*/]"
+
+//////////////////////////////////// CLIENT CODE
+
+// Create a scanner configuration, setting up the whitespace operator
+val config = lexer.makeScannerConfig(regex("[ ]+"))
+
+// Add regular expressions and corresponding tokens
+config.addTokenKind(regex("\\d+")      , tokens.NUMBER)
+config.addTokenKind(regex(operatorRegex), tokens.OPERATOR)
+config.addTokenKind(regex("\\z")       , tokens.EOF)
+
+// NOTE: scanner configs can return tokens.ERROR as well
+// in order to report that they cannot lex the input
+// as any of the regular expressions provided
+
+
+//////////////////////////////////// TESTING CODE
+
+// make a scanner from the given configuration to scan the given string
+val scanner = lexer.makeScanner(config, "54  *3")
+
+// get the tokens one by one from the scanner
+scanner.nextToken()
+scanner.nextToken().print()
+
+// we can also use token.kind() and compare the result to tokens.NUMBER, tokens.ERROR, etc.
+

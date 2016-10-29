@@ -1,0 +1,33 @@
+module parser
+
+import wyvern.util.matching.regex
+import tsls.lexer
+import wyvern.ast
+import wyvern.Int
+
+// local bindings to make things easier
+val tokens = lexer.tokens
+type AST = ast.AST
+
+// let bind the operator regular expression, because it's annoying to comment out in debugging since it has */ in it
+val operatorRegex = "[\\+\\-\\*/]"
+
+def doParse(scanner:lexer.Scanner):AST
+	val t = scanner.nextToken()
+	(t.kind() == tokens.NUMBER).ifTrue(
+	  () => ast.int(Int.from(t.print())),
+	  () => ast.int(0)
+	)
+
+def parse(input:String):AST
+	// Create a scanner configuration, setting up the whitespace operator
+	val config = lexer.makeScannerConfig(regex("[ ]+"))
+
+	// Add regular expressions and corresponding tokens
+	config.addTokenKind(regex("\\d+")      , tokens.NUMBER)
+	config.addTokenKind(regex(operatorRegex), tokens.OPERATOR)
+	config.addTokenKind(regex("\\z")       , tokens.EOF)
+	
+	val scanner = lexer.makeScanner(config, input)
+	doParse(scanner)
+	

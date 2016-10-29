@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
@@ -126,8 +127,17 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
 			args.add(new StringLiteral(dslText.get()));
 			wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable)metadata).invoke("parseTSL", args);
-			ValDeclaration astDecl = (ValDeclaration)((ObjectValue)parsedAST).findDecl("ast");
-			return (Expression) ((JavaValue)astDecl.getDefinition()).getWrappedValue();
+			// we get an option back, is it success?
+			ValDeclaration isDefined = (ValDeclaration)((ObjectValue)parsedAST).findDecl("isDefined");			
+			BooleanLiteral success = (BooleanLiteral)isDefined.getDefinition();
+			if (success.getValue()) {
+				ValDeclaration valueDecl = (ValDeclaration)((ObjectValue)parsedAST).findDecl("value");
+				ObjectValue astWrapper = (ObjectValue)valueDecl.getDefinition();
+				ValDeclaration astDecl = (ValDeclaration)((ObjectValue)astWrapper).findDecl("ast");
+				return (Expression) ((JavaValue)astDecl.getDefinition()).getWrappedValue();
+			} else {
+				throw new RuntimeException("error in TSL");
+			}
 		} catch (ToolError e) {
 			if (e.getTypecheckingErrorMessage() == ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE) {
 				if (e.getLocation() == null) {

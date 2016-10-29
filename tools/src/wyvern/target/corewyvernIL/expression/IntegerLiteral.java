@@ -14,7 +14,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
 
-public class IntegerLiteral extends AbstractValue implements Invokable {
+public class IntegerLiteral extends Literal implements Invokable {
 
 	private final BigInteger value;
 

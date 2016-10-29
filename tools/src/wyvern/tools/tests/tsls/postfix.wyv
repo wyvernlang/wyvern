@@ -3,6 +3,8 @@ module postfix
 import stdout	// TODO: should be "require" - but for metadata shouldn't exist :-)
 import wyvern.ast
 import wyvern.Int
+import wyvern.option
+import tsls.parser
 
 type AST = ast.AST
 
@@ -15,9 +17,13 @@ type PostfixExpr
 //    metadata new //stdout.print("ran metadata!")
 //        def eval():Int = 3
     metadata new
-        def parseTSL(input:String):AST
-            ast.object(
+        def parseTSL(input:String):option.Option
+            val parseResult = parser.parse(input)
+            val exprAST = ast.object(
                 ast.defn("eval",ast.types.int(),
-					ast.call(ast.variable("Int"), "from", ast.string(input)) //ast.int(Int.from(input))
+					//ast.call(ast.variable("Int"), "from", ast.string(input)) 
+                    //ast.int(Int.from(input))
+                    parseResult
 				)
             )
+            option.Some(exprAST)

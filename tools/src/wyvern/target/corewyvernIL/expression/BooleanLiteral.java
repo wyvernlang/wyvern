@@ -13,7 +13,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class BooleanLiteral extends AbstractValue implements Invokable {
+public class BooleanLiteral extends Literal implements Invokable {
 
     private boolean value;
 

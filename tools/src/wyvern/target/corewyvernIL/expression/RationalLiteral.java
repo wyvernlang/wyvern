@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 
-public class RationalLiteral extends AbstractValue {
+public class RationalLiteral extends Literal {
 
 	private int numerator;
 	private int denominator;

@@ -28,7 +28,7 @@ public class AST {
 		return Util.intType();
 	}
 	
-	public Value intLiteral(int i) {
+	public Expression intLiteral(int i) {
 		return new IntegerLiteral(i);
 	}
 	

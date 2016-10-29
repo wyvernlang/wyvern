@@ -1,4 +1,4 @@
-//module lexer
+module lexer
 
 import wyvern.Int
 import wyvern.option
@@ -12,7 +12,7 @@ type List = list.List
 
 // TODO: find a way to make the library generic in TokensType / tokens
 type TokensType
-	type Kind
+	type Kind = Int
 	val NUMBER:this.Kind
 	val OPERATOR:this.Kind
 	val WHITESPACE:this.Kind
@@ -98,33 +98,23 @@ def makeScanner(config:ScannerConfig, s:String):Scanner = new
 		this.current = result.rest()
 		result.token()
 
-//////////////////////////////////// CLIENT CODE
-
-val config = makeScannerConfig(regex("[ ]+"))
-config.addTokenKind(regex("\\d+")      , tokens.NUMBER)
-config.addTokenKind(regex("[\\+\\-\\*/]"), tokens.OPERATOR)
-config.addTokenKind(regex("\\z")       , tokens.EOF)
 
 
 
-//////////////////////////////////// TESTING CODE
+/*
+
 val regexList : List = list.make()
 
 regexList.append(makeRKPair(regex("\\d+"), tokens.NUMBER))
 regexList.append(makeRKPair(regex("[ ]+"), tokens.WHITESPACE))
 
-val numRX = regex("\\d+")
-val whitespaceRX = regex("[ ]+")
-val operatorRX = regex("[\\+\\-\\*/]")
-val emptyRX = regex("\\z")
-
 config.getScanResult("*54-").token().print()
 
-val scanner = makeScanner(config, "54  *3")
-scanner.nextToken()
-scanner.nextToken().print()
-
-/*
+val numRX = regex("\\d+")
+val whitespaceRX = regex("[ ]+")
+// if you ever uncomment this, take out the space in the regexp in the next line
+val operatorRX = regex("[\\+\\-\\* /]")
+val emptyRX = regex("\\z")
 
 def parseFirst(s:String):Token
 	val numMatch : option.Option = numRX.findPrefixOf(s).map(

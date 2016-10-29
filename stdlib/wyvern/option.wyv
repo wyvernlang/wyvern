@@ -20,6 +20,7 @@ def Some(x:Dyn):Option = new
 	def map(f:DynToDyn):Option = Some(f(x))
 	def flatMap(f:Dyn -> Option):Option = f(x)
 	def getOrElse(defaultValue:UnitToDyn):Dyn = x
+	val value:Dyn = x
 	def orElse(x:UnitToOption):Option = this
 	val isDefined:Boolean = true
 

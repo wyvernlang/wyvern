@@ -1,6 +1,9 @@
 package wyvern.target.corewyvernIL.decltype;
 
 import wyvern.target.corewyvernIL.IASTNode;
+
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -29,6 +32,11 @@ public class AbstractTypeMember extends DeclType implements IASTNode {
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
         return this.getName().equals(dt.getName());
+	}
+
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("type ").append(getName()).append('\n');
 	}
 
 	@Override
