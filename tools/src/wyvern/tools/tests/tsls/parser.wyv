@@ -11,22 +11,22 @@ import debug
 val tokens = lexer.tokens
 type AST = ast.AST
 
-// let bind the operator regular expression, because it's annoying to comment out in debugging since it has */ in it
-val operatorRegex = "[\\+\\-\\*/]"
-
+// A parse function for reverse Polish notation
 def parse(input:String):option.Option
 	// Create a scanner configuration, setting up the whitespace operator
 	val config = lexer.makeScannerConfig(regex("[ \n\t]+"))
 
 	// Add regular expressions and corresponding tokens
 	config.addTokenKind(regex("\\d+")      , tokens.NUMBER)
-	config.addTokenKind(regex(operatorRegex), tokens.OPERATOR)
+	config.addTokenKind(regex("[\\+\\-\\*/]"), tokens.OPERATOR)
 	config.addTokenKind(regex("\\z")       , tokens.EOF)
-	
+
+	// create a scanner and scan the input
 	val scanner = lexer.makeScanner(config, input)
 	//debug.print(input)
 	doParse(scanner)
-	
+
+// The starting point for recursive-descent parsing	
 def doParse(scanner:lexer.Scanner):option.Option
 	val t = scanner.nextToken()
 	(t.kind() == tokens.NUMBER).ifTrue(
@@ -34,6 +34,7 @@ def doParse(scanner:lexer.Scanner):option.Option
 	  () => option.None()
 	)
 
+// We've got exactly one expression on the stack
 def parseWithOneExpr(scanner:lexer.Scanner, exp:AST):option.Option
 	val t = scanner.nextToken()
 	(t.kind() == tokens.EOF).ifTrue(
@@ -44,6 +45,7 @@ def parseWithOneExpr(scanner:lexer.Scanner, exp:AST):option.Option
 		)
 	)
 
+// We've got two (ore more, if moreOnStack is true) expressions on the stack
 def parseWithTwoExprs(scanner:lexer.Scanner, exp1:AST, exp2:AST,
                       moreOnStack:Boolean):option.Option
 	def compose(exp3:AST):option.Option
@@ -60,15 +62,3 @@ def parseWithTwoExprs(scanner:lexer.Scanner, exp1:AST, exp2:AST,
 			() => option.None()
 		)
 	)
-	
-/* stackless version
-function twoExpressions(scanner, exp1, exp2)
-	t = scanner.getToken()
-	if t is an operator o
-		return oneExpression(scanner, o(exp1,exp2))
-	else if t is a number n
-		let e = twoExpressions(scanner, exp2, constant(n))
-		return twoExpressions(scanner, exp1, e)
-	else
-		return error // EOF or unexpected
-*/

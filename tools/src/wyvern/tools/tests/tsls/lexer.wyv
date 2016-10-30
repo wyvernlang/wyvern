@@ -5,12 +5,9 @@ import wyvern.option
 import wyvern.util.matching.regex
 import wyvern.collections.list
 
-//require stdout
-
-// TODO: just import list.List (and option.Option)
 type List = list.List
 
-// TODO: find a way to make the library generic in TokensType / tokens
+// TODO: make the library generic in TokensType / tokens
 type TokensType
 	type Kind = Int
 	val NUMBER:this.Kind
@@ -97,71 +94,3 @@ def makeScanner(config:ScannerConfig, s:String):Scanner = new
 		val result : ScanResult = config.getScanResult(this.current)
 		this.current = result.rest()
 		result.token()
-
-
-
-
-/*
-
-val regexList : List = list.make()
-
-regexList.append(makeRKPair(regex("\\d+"), tokens.NUMBER))
-regexList.append(makeRKPair(regex("[ ]+"), tokens.WHITESPACE))
-
-config.getScanResult("*54-").token().print()
-
-val numRX = regex("\\d+")
-val whitespaceRX = regex("[ ]+")
-// if you ever uncomment this, take out the space in the regexp in the next line
-val operatorRX = regex("[\\+\\-\\* /]")
-val emptyRX = regex("\\z")
-
-def parseFirst(s:String):Token
-	val numMatch : option.Option = numRX.findPrefixOf(s).map(
-		(matchString:String) => makeToken(matchString, tokens.NUMBER))
-	val operatorMatch : option.Option = numMatch.orElse(
-		() => operatorRX.findPrefixOf(s).map(
-			(matchString:String) => makeToken(matchString, tokens.OPERATOR)))
-	operatorMatch.getOrElse(() => makeToken("+",tokens.OPERATOR))
-	
-def scanFirst(s:String):ScanResult
-	val numMatch : option.Option = numRX.findPrefixMatchOf(s).map(
-		(m:regex.Match) => makeScanResult(m.matched(), tokens.NUMBER, m.after()))
-	val operatorMatch : option.Option = numMatch.orElse(
-		() => operatorRX.findPrefixMatchOf(s).map(
-			(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
-	operatorMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
-
-resource type Lexer
-	def nextToken():Token
-
-def makeLexer(s:String):Lexer = new
-	var current:String = s
-	def nextToken():Token
-		val numMatch : option.Option = numRX.findPrefixMatchOf(this.current).map(
-			(m:regex.Match) => makeScanResult(m.matched(), tokens.NUMBER, m.after()))
-		val operatorMatch : option.Option = numMatch.orElse(
-			() => operatorRX.findPrefixMatchOf(this.current).map(
-				(m:regex.Match) => makeScanResult(m.matched(), tokens.OPERATOR, m.after())))
-		val wsMatch : option.Option = operatorMatch.orElse(
-			() => whitespaceRX.findPrefixMatchOf(this.current).map(
-				(m:regex.Match) => makeScanResult(m.matched(), tokens.WHITESPACE, m.after())))
-		val emptyMatch : option.Option = wsMatch.orElse(
-			() => emptyRX.findPrefixMatchOf(this.current).map(
-				(m:regex.Match) => makeScanResult(m.matched(), tokens.EOF, m.after())))
-		val result : ScanResult = emptyMatch.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
-		this.current = result.rest()
-		result.token()
-		
-parseFirst("*54-").print()
-
-val result1 = scanFirst("54*3")
-val result2 = scanFirst(result1.rest())
-result2.token().print()
-
-val lex = makeLexer("54  *3")
-lex.nextToken()
-lex.nextToken()
-lex.nextToken().print()
-
-*/
