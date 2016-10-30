@@ -418,7 +418,7 @@ import wyvern.tools.errors.ToolError;
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
 	          | booleanLit_t:t {: RESULT = t; :}
 	          | shortString_t:t {: RESULT = t; :}
-	          | inlinelit:lit {: RESULT = lit; :};
+	          | inlinelit:lit {: RESULT = RESULT = token(DSL_LITERAL,(String)lit); :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}
 	           | plus_t:t {: RESULT = t; :}

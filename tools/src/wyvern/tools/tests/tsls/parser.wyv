@@ -24,10 +24,10 @@ def parse(input:String):option.Option
 	config.addTokenKind(regex("\\z")       , tokens.EOF)
 	
 	val scanner = lexer.makeScanner(config, input)
+	//debug.print(input)
 	doParse(scanner)
 	
 def doParse(scanner:lexer.Scanner):option.Option
-	debug.print("start")
 	val t = scanner.nextToken()
 	(t.kind() == tokens.NUMBER).ifTrue(
 	  () => parseWithOneExpr(scanner, ast.int(Int.from(t.print()))),
@@ -35,7 +35,6 @@ def doParse(scanner:lexer.Scanner):option.Option
 	)
 
 def parseWithOneExpr(scanner:lexer.Scanner, exp:AST):option.Option
-	debug.print("p1")
 	val t = scanner.nextToken()
 	(t.kind() == tokens.EOF).ifTrue(
 		() => option.Some(exp),
@@ -50,7 +49,6 @@ def parseWithTwoExprs(scanner:lexer.Scanner, exp1:AST, exp2:AST,
 	def compose(exp3:AST):option.Option
 		val expOption : option.Option = parseWithTwoExprs(scanner, exp2, exp3, true)
 		expOption.flatMap((expResult) => parseWithTwoExprs(scanner, exp1,expResult, moreOnStack))
-	debug.print("p2")
 	val t = scanner.nextToken()
 	(t.kind() == tokens.OPERATOR).ifTrue(
 		() => moreOnStack.ifTrue(

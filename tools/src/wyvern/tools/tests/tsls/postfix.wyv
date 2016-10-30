@@ -1,6 +1,5 @@
 module postfix
 
-import stdout	// TODO: should be "require" - but for metadata shouldn't exist :-)
 import wyvern.ast
 import wyvern.Int
 import wyvern.option
@@ -10,21 +9,16 @@ type AST = ast.AST
 
 type PostfixExpr
     def eval():Int
-// TODO: get metadata to work in this situation as well!
-//    type T = Int
-//        val x:Int
-//        metadata "hello"+7
-//    metadata new //stdout.print("ran metadata!")
-//        def eval():Int = 3
+
+	// define a TSL for postfix expressions
     metadata new
         def parseTSL(input:String):option.Option
             val parseResult = parser.parse(input)
+			
+			// wrap the AST in an object with an eval() method
+			// to match the signature above
             parseResult.map((r) =>
                 ast.object(
-                    ast.defn("eval",ast.types.int(),
-				    	//ast.call(ast.variable("Int"), "from", ast.string(input)) 
-                        //ast.int(Int.from(input))
-                        r
-				    )
+                    ast.defn("eval", ast.types.int(), r)
                 )
             )

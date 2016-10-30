@@ -162,6 +162,7 @@ TOKEN : /* Literals */
 | < DECIMAL_LITERAL >
 | < BOOLEAN_LITERAL >
 | < RATIONAL_LITERAL >
+| < DSL_LITERAL >
 }
 
 /** Root production. */
@@ -438,6 +439,22 @@ AST DefBody() :
   <EQUALS> exp = ExpressionLine(false) { return exp; }
 }
 
+Token DSLLines() :
+{ Token t, t2; String content = ""; }
+{
+    t=<DSLLINE> {
+      content = t.image;
+  }
+  ( t2 = <DSLLINE> {
+      content = content + t2.image;
+    }
+  )*
+  { 
+    t.image = content;
+    return t;
+  }
+}
+
 AST ExpressionLine(boolean makeValDecl) :
 { AST exp; AST decls = null; Token t; Token t2 = null; Object caseArm; List cases; ExpFlags flags = new ExpFlags(); }
 {
@@ -445,7 +462,7 @@ AST ExpressionLine(boolean makeValDecl) :
   [
     t2=<INDENT> decls = DeclSequence(true) <DEDENT>
   |
-    t2=<DSLLINE>
+    t2=DSLLines() 
   ]
   {
     if (!flags.isEmpty()) {
@@ -634,13 +651,19 @@ AST PrimaryPrefix(ExpFlags flags) :
 }
 
 AST Literal() :
-{ Token lit; }
+{ AST exp; Token lit; }
 {
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
 |
   lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
 |
   lit = <BOOLEAN_LITERAL> { return build.booleanLit(Boolean.parseBoolean(lit.image), loc(lit)); }
+|
+  lit = <DSL_LITERAL> {
+    exp = build.dsl(loc(lit));
+    build.setDSLBody(exp, lit.image);
+    return exp;
+  }
 |
   <RATIONAL_LITERAL>
 }
