@@ -592,8 +592,9 @@ public class OIRTests {
     public void testBasicStdout() throws ParseException {
         String input =
             "require stdout\n" +
-            "stdout.print(\"Hello, world\")\n";
-        testPyFromInput(input, "\"Hello, world\"\nNone", true);
+            "stdout.print(\"Hello, world\")\n" +
+            "stdout.println()\n";
+        testPyFromInput(input, "Hello, world\nNone");
     }
 
 }

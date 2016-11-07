@@ -99,7 +99,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     int nArgs = exps.size();
     for (int i = 0; i < nArgs; i++) {
       OIRExpression arg_i = exps.get(i);
-      if (args != null)
+      if (arg_i != null)
           args += arg_i.acceptVisitor(this, state);
       else
           args += "None";
