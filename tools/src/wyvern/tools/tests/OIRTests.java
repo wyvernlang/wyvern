@@ -585,7 +585,7 @@ public class OIRTests {
         String input =
             "val x = \"line 1\\nline 2\"\n" +
             "x";
-        testPyFromInput(input, "line 1\nline 2", true);
+        testPyFromInput(input, "line 1\nline 2");
     }
 
     @Test
@@ -593,8 +593,9 @@ public class OIRTests {
         String input =
             "require stdout\n" +
             "stdout.print(\"Hello, world\")\n" +
-            "stdout.println()\n";
-        testPyFromInput(input, "Hello, world\nNone");
+            "stdout.println()\n" +
+            "0";
+        testPyFromInput(input, "Hello, world\n0");
     }
 
 }
