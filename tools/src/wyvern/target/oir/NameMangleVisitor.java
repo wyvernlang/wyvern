@@ -74,6 +74,7 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
                 add("while");
                 add("with");
                 add("yield");
+                add("None");
             }};
     }
 
@@ -84,6 +85,7 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
     public static String mangle(String name) {
         name = name.replaceAll("\\$", "__");
+        name = name.replaceAll("\\.", "___");
         return "wyv" + name;
     }
 
