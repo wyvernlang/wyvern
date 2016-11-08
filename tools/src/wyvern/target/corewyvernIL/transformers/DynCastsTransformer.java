@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
@@ -349,6 +350,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	@Override
 	public FFIImport visit(TypeContext ctx, FFIImport ffiImport) {
 		return ffiImport;
+	}
+
+  @Override
+  public FFI visit(GenContext ctx, FFI ffi) {
+    return ffi;
 	}
 
 }

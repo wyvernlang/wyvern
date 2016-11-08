@@ -1,0 +1,5 @@
+module String
+
+def equals(str1:String,str2:String):Boolean
+
+def ofInt(x : Int) : String

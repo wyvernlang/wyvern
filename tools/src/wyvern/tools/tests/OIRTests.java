@@ -602,4 +602,11 @@ public class OIRTests {
         testPyFromInput(input, "Hello, world\n0");
     }
 
+    @Test
+    public void testPythonBuiltins() throws ParseException {
+        String input =
+            "require python\n" +
+            "python.toString(3)\n";
+        testPyFromInput(input, "3", true);
+    }
 }

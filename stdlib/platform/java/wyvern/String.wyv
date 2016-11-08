@@ -1,0 +1,9 @@
+module String
+
+import java:wyvern.stdlib.support.StringHelper.utils
+
+def equals(str1:String,str2:String):Boolean
+	utils.testEqual(str1,str2)
+
+def ofInt(x : Int) : String
+  utils.ofInt(x)

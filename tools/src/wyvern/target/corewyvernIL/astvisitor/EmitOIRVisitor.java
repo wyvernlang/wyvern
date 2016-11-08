@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
@@ -472,6 +473,11 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		result.copyMetadata(ffiImport);
 		return result;
 	}
+
+    @Override
+    public OIRAST visit(EmitOIRState state, FFI ffi) {
+        return new OIRVariable("ffi_" + ffi.getImportName(), false);
+    }
 
 	@Override
 	public OIRAST visit(EmitOIRState state, Case c) {

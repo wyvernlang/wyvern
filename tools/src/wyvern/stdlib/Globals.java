@@ -155,7 +155,12 @@ public class Globals {
 		declTypes.add(new AbstractTypeMember("String"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
 		declTypes.add(new AbstractTypeMember("Java", true));
-		declTypes.add(new AbstractTypeMember("Python"));
+		//declTypes.add(new AbstractTypeMember("Python"));
+    List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
+    pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
+    pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
+    ValueType pythonType = new StructuralType("Python", pyDeclTypes);
+    declTypes.add(new ConcreteTypeMember("Python", pythonType));
 		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;
 	}

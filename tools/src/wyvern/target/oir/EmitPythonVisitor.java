@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
@@ -152,7 +150,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     state.inClass = false;
     state.classRecursiveNames = new HashMap<>();
 
-    String methodDecls =
+    String prelude =
         "def mergeDicts(l, r):\n" +
         "  l.update(r)\n" +
         "  return r\n\n" +
@@ -160,7 +158,12 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         "  res = f(*args, **kwargs)\n" +
         "  while callable(res):\n" +
         "    res = res()\n" +
-        "  return res\n\n";
+        "  return res\n\n" +
+        "class PythonPrelude:\n" +
+        "  def toString(self, x):\n" +
+        "    return str(x)\n" +
+        "ffi_python = PythonPrelude()\n\n"
+        ;
 
     findClassDecls(state, oirenv);
 
@@ -181,7 +184,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
 
     String prefix = stringFromPrefix(state.prefix, "");
 
-    return methodDecls + classDefs + prefix + out.toString();
+    return prelude + classDefs + prefix + out.toString();
   }
 
   public String visit(EmitPythonState state,
@@ -528,7 +531,6 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     return "OIRRational unimplemented";
   }
 
-<<<<<<< bbc1a439bb82d2003f217ef0db48b6378a9d152a
     private String escapeString(String str) {
         HashMap<String,String> replacements = new HashMap<String, String>() {{
                 put("\"", "\\\"");
@@ -544,30 +546,12 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         }
         return str;
     }
-=======
-    // private String escapeString(String str) {
-    //     HashMap<String,String> replacements = new HashMap<>() {{
-    //             put("\"", "\\\"");
-    //             put("\\", "\\\\");
-    //             put("\b", "\\b");
-    //             put("\f", "\\f");
-    //             put("\n", "\\n");
-    //             put("\r", "\\r");
-    //             put("\t", "\\t");
-    //         }};
-    //     for 
-    // }
->>>>>>> Python gen of literal strings is now escaped properly
 
     public String visit(EmitPythonState state,
                         OIRString oirString) {
         state.currentLetVar = "";
         String stringValue = oirString.getValue();
-<<<<<<< bbc1a439bb82d2003f217ef0db48b6378a9d152a
         String strVal = "\"" + escapeString(stringValue) + "\"";
-=======
-        String strVal = "\"" + StringEscapeUtils.escapeJava(stringValue) + "\"";
->>>>>>> Python gen of literal strings is now escaped properly
         if (state.expectingReturn)
             return state.returnType + " " + strVal;
         return strVal;
