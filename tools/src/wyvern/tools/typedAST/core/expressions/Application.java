@@ -163,7 +163,8 @@ public class Application extends CachingTypedAST implements CoreAST {
                 ToolError.reportError(
                     ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                     this,
-                    "" + formals.size()
+                    "" + formals.size(),
+                    new Integer(1 + args.size()).toString()
                 );
             }
 
@@ -276,15 +277,18 @@ public class Application extends CachingTypedAST implements CoreAST {
 
             if (!inferenceMap.containsKey(i)) {
                 // then we can't infer the type
-                // TODO Missing generic at call site
-                ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
+                ToolError.reportError(ErrorMessage.MISSING_GENERICS_AT_CALL_SITE, this);
             }
 
-            // formal position tells you where in the formals the argument that uses the generic is
             List<Integer> positions = inferenceMap.get(i);
+            // formal position tells you where in
+            // the formals the argument that uses the generic is
             int formalPos = positions.get(0);
-            // actual position tells you where in the actual argument list the type should be
+
+            // actual position tells you where in the actual
+            // argument list the type should be
             int actualPos = formalPos - count;
+
             if (this.argument instanceof TupleObject) {
                 ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
                 if (formalPos == rawArgs.length) {
@@ -321,27 +325,46 @@ public class Application extends CachingTypedAST implements CoreAST {
                 final IExpr argIL = this.argument
                     .generateIL(ctx, null, deps);
                 ValueType inferredType = argIL.typeCheck(ctx);
-                List<Declaration> members = new LinkedList<>();
-                TypeDeclaration typeMember = new TypeDeclaration(
-                        formals.get(0).getName()
-                            .substring(
-                                DefDeclaration.GENERIC_PREFIX.length()),
-                            inferredType, 
-                            null
-                );
-                members.add(typeMember);
-                List<DeclType> declTypes = new LinkedList<DeclType>();
-                declTypes.add(
-                    new ConcreteTypeMember(
-                        formals.get(0).getName()
-                            .substring(DefDeclaration.GENERIC_PREFIX.length()),
-                        inferredType)
-                );
-                ValueType actualArgType = new StructuralType("self", declTypes);
-                Expression newExp = new New(members, "self", actualArgType, null);
-                args.add(newExp);
+                this.addInferredType(args, formals, ctx, inferredType, i);
             }
         }
+    }
+
+    private boolean canInferResultType(
+            List<Integer> inferrableLocations,
+            List<FormalArg> formals
+    ) {
+
+        int last = inferrableLocations.get(inferrableLocations.size() - 1);
+        return last == formals.size();
+    }
+
+    private void addInferredType(
+            List<IExpr> args,
+            List<FormalArg> formals,
+            GenContext ctx,
+            ValueType inferredType,
+            int formalIndex
+    ) {
+        List<Declaration> members = new LinkedList<>();
+        TypeDeclaration typeMember = new TypeDeclaration(
+            formals.get(formalIndex).getName()
+                .substring(
+                    DefDeclaration.GENERIC_PREFIX.length()),
+                inferredType,
+                null
+        );
+        members.add(typeMember);
+        List<DeclType> declTypes = new LinkedList<DeclType>();
+        declTypes.add(
+            new ConcreteTypeMember(
+                formals.get(formalIndex).getName()
+                    .substring(DefDeclaration.GENERIC_PREFIX.length()),
+                inferredType)
+        );
+        ValueType actualArgType = new StructuralType("self", declTypes);
+        Expression newExp = new New(members, "self", actualArgType, null);
+        args.add(newExp);
     }
 
     private void addExistingGenerics(
