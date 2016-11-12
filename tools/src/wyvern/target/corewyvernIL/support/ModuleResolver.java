@@ -71,7 +71,9 @@ public class ModuleResolver {
 			typeDefiningModule = moduleCache.get(qualifiedName);
 		}
 		Expression typeDefiningObject = typeDefiningModule.getExpression();
-		final String typeName = ((New)typeDefiningObject).getDecls().get(0).getName();
+		TypeContext ctx = Globals.getStandardTypeContext();
+		final String typeName = typeDefiningObject.typeCheck(ctx).getStructuralType(ctx).getDeclTypes().get(0).getName();
+		//final String typeName = ((New)typeDefiningObject).getDecls().get(0).getName();
 		//final String generatedVariableName = GenerationEnvironment.generateVariableName();
 		return new LoadedType(typeName, typeDefiningModule);
 		/*return new ContextBinding(generatedVariableName, typeDefiningObject, typeName) {

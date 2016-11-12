@@ -1,0 +1,9 @@
+resource module wordProcessor
+
+import figs.logger
+
+require figs.FileIO as io
+
+val log = logger(io)
+
+val x : system.Int = 5

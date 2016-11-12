@@ -1,0 +1,10 @@
+resource module fileIO
+
+require java
+import java:wyvern.tools.tests.Illustrations.nativeFileIO
+
+def read():system.Int
+	nativeFileIO.read()
+	
+def write(x:system.Int):system.Int
+	nativeFileIO.write(x)

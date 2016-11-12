@@ -1,0 +1,8 @@
+resource module wordCloudFig3
+
+import figs.listFactory
+require figs.Logger as log
+
+val words : listFactory.List = listFactory.create()
+
+val x : system.Int = words.contents

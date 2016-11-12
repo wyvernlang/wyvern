@@ -1,0 +1,5 @@
+type ListFactory
+	type List
+		val contents : Int
+		
+	def create():this.List

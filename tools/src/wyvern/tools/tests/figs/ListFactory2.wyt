@@ -1,0 +1,4 @@
+type ListFactory
+	type List = Int
+		
+	def create():this.List

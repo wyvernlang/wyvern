@@ -1,0 +1,8 @@
+resource module wordCloudFig4
+
+require figs.Logger as log
+require figs.ListFactory2 as list
+
+val words : list.List = list.create()
+
+val x : system.Int = words
