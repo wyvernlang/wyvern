@@ -58,26 +58,27 @@ public class OIRTests {
     // Since the root OIR environment is stateful, reset it between tests
     OIREnvironment.resetRootEnvironment();
     ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
+    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_PYTHON,
+                                                  new File(TestUtil.BASE_PATH),
+                                                  new File(TestUtil.LIB_PATH));
     GenContext javaGenContext = Globals.getStandardGenContext();
-    GenContext pythonGenContext = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_PYTHON,
-                                                                             new File(TestUtil.BASE_PATH),
-                                                                             new File(TestUtil.LIB_PATH)));
-    
-    // Generate IL and perform tail-call optimisations.
-    IExpr ILprogram = ast.generateIL(pythonGenContext, null, new LinkedList<TypedModuleSpec>());
+    GenContext pythonGenContext = Globals.getGenContext(state);
+    LinkedList<TypedModuleSpec> dependencies = new LinkedList<>();
+    IExpr ILprogram = ast.generateIL(pythonGenContext, null, dependencies);
+    ILprogram = state.getResolver().wrap(ILprogram, dependencies);
     TailCallVisitor.annotate(ILprogram);
     
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);
-      IExpr jILprogram = ast.generateIL(javaGenContext, null, new LinkedList<TypedModuleSpec>());
-      TailCallVisitor.annotate(jILprogram);
+      // IExpr jILprogram = ast.generateIL(javaGenContext, null, new LinkedList<TypedModuleSpec>());
+      // TailCallVisitor.annotate(jILprogram);
       try {
-        System.out.println("IL program:\n" + ((Expression)jILprogram).prettyPrint());
+        System.out.println("IL program:\n" + ((Expression)ILprogram).prettyPrint());
       } catch (IOException e) {
         System.err.println("Error pretty-printing IL program.");
       }
-      System.out.println("IL program output:\n" + jILprogram.interpret(EvalContext.empty()));
+      // System.out.println("IL program output:\n" + jILprogram.interpret(EvalContext.empty()));
     }
     OIRAST oirast =
       ILprogram.acceptVisitor(new EmitOIRVisitor(),
@@ -593,6 +594,7 @@ public class OIRTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testBasicStdout() throws ParseException {
         String input =
             "require stdout\n" +
@@ -603,10 +605,27 @@ public class OIRTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testPythonBuiltins() throws ParseException {
         String input =
             "require python\n" +
             "python.toString(3)\n";
-        testPyFromInput(input, "3", true);
+        testPyFromInput(input, "3");
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testOption() throws ParseException {
+        String input =
+            "import wyvern.option\n" +
+            "require stdout\n" +
+            "val orElse : option.UnitToDyn = new\n" +
+            "  def apply() : Dyn = 5\n" +
+            "val v1 : Int = option.Some(3).getOrElse(orElse)\n" +
+            "val v2 : Int = option.None().getOrElse(orElse)\n" +
+            "stdout.printInt(v1+v2)\n" +
+            "stdout.println()\n" +
+            "v1 + v2\n";
+        testPyFromInput(input, "8\n8");
     }
 }

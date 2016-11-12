@@ -1,6 +1,7 @@
 module def stdout(python : Python)
 
 import python:sys
+import wyvern.String
 
 type Printable = Unit
 
@@ -12,5 +13,5 @@ type Sys
 val sys : Sys = sys
 
 def print(text : String) : Unit = sys.stdout.write(text)
-def printInt(n : Int) : Unit = sys.stdout.write("printInt unimplemented")
+def printInt(n : Int) : Unit = sys.stdout.write(String.ofInt(n))
 def println() : Unit = sys.stdout.write("\n")
