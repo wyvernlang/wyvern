@@ -59,10 +59,10 @@ def makePaddle(paddleX : Int) : NonInteractivePaddle = new
 
   def draw(screen : pygame.Surface) : Unit
     pygame.draw.rect(screen, pygame.helper.white, this.hitbox(), 0)
-    0
+
   def hitbox() : pygame.Rect
-    val result = pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
-    result
+    pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
+
   def update() : Unit
     this.y = this.y + this.speed
     (this.y + paddleHeight > height).ifTrue(() => this.y = height - paddleHeight, () => 0)
@@ -107,22 +107,18 @@ val ball = new
                        pygame.helper.white,
                        pygame.helper.make2Tuple(this.x, this.y),
                        this.radius)
-    7
 
   def flipX() : Unit
     this.xSpeed = -this.xSpeed
     blip.play()
-    0 // Avoid TCO / FFI bad interaction
 
   def flipXBlop() : Unit
     this.xSpeed = -this.xSpeed
     blop.play()
-    0 // Avoid TCO / FFI bad interaction
 
   def flipY() : Unit
     this.ySpeed = -this.ySpeed
     blip.play()
-    0 // Avoid same bad interaction
 
   def update(leftHitbox : pygame.Rect, rightHitbox : pygame.Rect) : Unit
     (this.x < 0 || this.x > width).ifTrue(() => this.flipX(), () => 0)

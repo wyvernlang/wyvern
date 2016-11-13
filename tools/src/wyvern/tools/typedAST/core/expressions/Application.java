@@ -355,4 +355,15 @@ public class Application extends CachingTypedAST implements CoreAST {
             addGenericToArgList(formalName, generic, args, ctx);    
         }
     }
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Application(function=");
+        sb.append(function.prettyPrint());
+        sb.append(", argument=");
+        sb.append(argument.prettyPrint());
+        sb.append(")");
+        return sb;
+    }
 }

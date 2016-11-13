@@ -458,7 +458,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 	@Override
 	public OIRAST visit(EmitOIRState state, FFIImport ffiImport) {
 		NominalType javaType = new NominalType("system", "java");
-		NominalType pythonType = new NominalType("system", "Python");
+		NominalType pythonType = new NominalType("system", "python");
 
 		OIRFFIImport result;
 		if (ffiImport.getFFIType().equals(javaType)) {
@@ -466,7 +466,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		} else if (ffiImport.getFFIType().equals(pythonType)) {
 			result = new OIRFFIImport(FFIType.PYTHON, ffiImport.getPath());
 		} else {
-			throw new RuntimeException("Unknown FFI type!");
+        throw new RuntimeException("Unknown FFI type: " + ffiImport.getFFIType());
 		}
 
 		result.copyMetadata(ffiImport);

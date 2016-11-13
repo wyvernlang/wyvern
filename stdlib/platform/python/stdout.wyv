@@ -1,0 +1,18 @@
+resource module stdout
+
+require python
+
+import python:sys
+
+type Printable = Unit
+
+type PySysStdout
+  def write(text : String) : Unit
+type Sys
+  val stdout : PySysStdout
+
+val sys : Sys = sys
+
+def print(text : String) : Unit = sys.stdout.write(text)
+def printInt(n : Int) : Unit = sys.stdout.write("printInt unimplemented")
+def println() : Unit = sys.stdout.write("\n")

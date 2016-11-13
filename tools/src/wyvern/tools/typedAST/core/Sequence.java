@@ -423,4 +423,19 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		}
 		return normalSeq;
 	}
+
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        String rtStr = "null";
+        if (retType != null)
+            rtStr = retType.toString();
+        sb.append("Sequence(" + rtStr + ", [");
+        String sep = "";
+        for (TypedAST ast : exps) {
+            sb.append(sep);
+            sb.append(ast.prettyPrint());
+            sep = ", ";
+        }
+        return sb;
+    }
 }

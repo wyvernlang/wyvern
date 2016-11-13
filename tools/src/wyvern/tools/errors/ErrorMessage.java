@@ -35,6 +35,7 @@ public enum ErrorMessage {
 	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
 	SYNTAX_FOR_NO_ARG_LAMBDA("Use \"() => <expression>\" rather than \"x => <expression>\" for a zero-argument function expression",0),
 	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression", 1),
+  DELEGATE_MUST_BE_VARIABLE("Expected variable in delegate declaration, got %ARG", 1),
 
 	// Syntax errors
 	LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),

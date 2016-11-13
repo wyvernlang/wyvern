@@ -37,7 +37,7 @@ public class ReflectionTests {
     @Test
     @Category(CurrentlyBroken.class)
     public void testBase() throws ParseException {
-        InterpreterState state = new InterpreterState(new File(PATH), null);
+        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(PATH), null);
         Expression program = state.getResolver().resolveModule("base").getExpression();
         program.interpret(Globals.getStandardEvalContext());
         /* String [] fileList = {"modules/Lists.wyv",
@@ -65,7 +65,7 @@ public class ReflectionTests {
     @Test
     @Category(CurrentlyBroken.class)
     public void testObjectEquals() throws ParseException {
-        InterpreterState state = new InterpreterState(new File(PATH), null);
+        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(PATH), null);
         Expression program = state.getResolver().resolveModule("objectEquals").getExpression();
         program.interpret(Globals.getStandardEvalContext());
 
@@ -121,14 +121,14 @@ public class ReflectionTests {
 
     @Test
     public void testLists() throws ParseException {
-        InterpreterState state = new InterpreterState(new File(PATH), null);
+        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(PATH), null);
         Expression program = state.getResolver().resolveModule("listClient").getExpression();
         program.interpret(Globals.getStandardEvalContext());
     }
 
     @Test
     public void testBools() throws ParseException {
-        InterpreterState state = new InterpreterState(new File(PATH), null);
+        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(PATH), null);
         Expression program = state.getResolver().resolveModule("boolTests").getExpression();
         program.interpret(Globals.getStandardEvalContext());
     }

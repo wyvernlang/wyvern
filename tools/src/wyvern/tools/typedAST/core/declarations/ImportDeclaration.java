@@ -76,6 +76,26 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     this.asName = image;
   }
 
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        String uriString = "null";
+        if (uriString != null)
+            uriString = uri.toString();
+        String binderString = "<todo>";
+        String locationString = "null";
+        if (location != null)
+            locationString = location.toString();
+        String requireString = String.valueOf(requireFlag);
+        String metadataString = String.valueOf(metadataFlag);
+        sb.append("ImportDeclaration(uri=" + uriString +
+                  ", binder=" + binderString +
+                  ", location=" + locationString +
+                  ", requireFlag=" + requireString +
+                  ", metadataFlag=" + metadataString +
+                  ", asName=" + asName +
+                  ")");
+        return sb;
+    }
 
   public URI getUri() {
     return uri;
@@ -209,7 +229,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       return FFI.doJavaImport(getUri(), ctx);
     } else if (this.getUri().getScheme().equals("python")) {
       String moduleName = this.getUri().getRawSchemeSpecificPart();
-      importExp = new FFIImport(new NominalType("system", "Python"),
+      importExp = new FFIImport(new NominalType("system", "python"),
                                 moduleName,
                                 new NominalType("system", "Dyn"));
       ctx = ctx.extend(importName, new Variable(importName), Util.dynType());
@@ -224,7 +244,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			type = Globals.JAVA_IMPORT_TYPE;
 			importExp = new FFI(importName, type, this.getLocation());
 		    ctx = ctx.extend(importName, importExp, type);
-		} else {
+		} else if (importName.equals("python")) {
+        type = Globals.PYTHON_IMPORT_TYPE;
+        importExp = new FFI(importName, type, this.getLocation());
+        ctx = ctx.extend(importName, importExp, type);
+    } else {
 			// special case: a script is importing a module called "importName"
 			// that requires only java
 			
@@ -236,14 +260,19 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			DefDeclType modDeclType = (DefDeclType) ((StructuralType)m.getSpec().getType()).findDecl(Util.APPLY_NAME, ctx);
 			List<FormalArg> modArgs = modDeclType.getFormalArgs();
 			if (modArgs.size() != 1) {
+          System.err.println("Expected modArgs.size() = 1, got " + modArgs.size());
 				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
 			}
-			final ValueType argType = modArgs.get(0).getType();
-			if (!argType.equals(Globals.JAVA_IMPORT_TYPE)) {
-				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
-			}
+      final ValueType argType = modArgs.get(0).getType();
 			List<Expression> args = new LinkedList<Expression>();
-			args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
+      if (argType.equals(Globals.JAVA_IMPORT_TYPE)) {
+          args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
+      } else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)) {
+          args.add(new FFI("python", Globals.PYTHON_IMPORT_TYPE, this.getLocation()));
+      } else {
+          // TODO: Better error message
+          ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
+			}
 			importExp = new MethodCall(m.getExpression(), Util.APPLY_NAME, args , this);
 			
 			// type is the result type of the module
