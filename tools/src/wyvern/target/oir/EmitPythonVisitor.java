@@ -315,9 +315,14 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         + "\n" + indent;
       toReplaceString = newVar;
     } else if (oirLet.getToReplace() instanceof OIRFFIImport) {
-      OIRFFIImport oirImport = (OIRFFIImport)oirLet.getToReplace();
-      prefix = oirImport.acceptVisitor(this, state) + "\n" + indent;
-      toReplaceString = oirImport.getModule();
+        OIRFFIImport oirImport = (OIRFFIImport)oirLet.getToReplace();
+        if (oirImport.getFFIType() == FFIType.PYTHON) {
+            prefix = oirImport.acceptVisitor(this, state) + "\n" + indent;
+            toReplaceString = oirImport.getModule();
+        } else {
+            prefix = "\n" + indent;
+            toReplaceString = "None";
+        }
     } else if (oirLet.getToReplace() instanceof OIRLet) {
         OIRLet innerLet = (OIRLet)oirLet.getToReplace();
         int innerLetId = uniqueId;
@@ -357,9 +362,9 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         String objExpr = oirMethodCall.getObjectExpr().acceptVisitor(this, state.withExpectingReturn(false));
         String args = commaSeparatedExpressions(state.withExpectingReturn(false), oirMethodCall.getArgs());
         String methodName = oirMethodCall.getMethodName();
-        if (tco)
-            methodName = tco_prefix + methodName;
         boolean isOperator = methodName.matches("[^a-zA-Z0-9]*");
+        if (tco && !isOperator)
+            methodName = tco_prefix + methodName;
 
         ValueType objType = oirMethodCall.getObjectType();
         boolean isBool = objType.equals(new NominalType("system", "Boolean"));
