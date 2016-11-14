@@ -240,11 +240,11 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public static String varNameToGetter (String s) {
-		return "get" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
+		return "__get" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 	
 	public static String varNameToSetter (String s) {
-		return "set" + Character.toUpperCase(s.charAt(0)) + s.substring(1);		
+		return "__set" + Character.toUpperCase(s.charAt(0)) + s.substring(1);		
 	}
 
 	public static String getterToVarName (String s) {
