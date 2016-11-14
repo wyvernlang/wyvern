@@ -56,4 +56,11 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
 		return Util.unitValue();
 	}
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("()");
+        return sb;
+    }
 }

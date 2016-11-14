@@ -282,4 +282,22 @@ public class ValDeclaration extends Declaration implements CoreAST {
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("val ");
+        sb.append(variableName);
+        sb.append(" : ");
+        if (declaredType != null)
+            sb.append(declaredType.toString());
+        else
+            sb.append("null");
+        sb.append(" = ");
+        if (definition != null)
+            sb.append(definition.prettyPrint());
+        else
+            sb.append("null");
+        return sb;
+    }
 }

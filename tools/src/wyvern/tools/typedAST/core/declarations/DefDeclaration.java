@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -375,5 +376,25 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
         StructuralType genType = new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
         return genType;
+    }
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("def " + name + " : (");
+        String sep = "";
+        for (FormalArg arg : argILTypes) {
+            sb.append(sep); sep = ", ";
+            try {
+                sb.append(arg.prettyPrint());
+            } catch (IOException e) {
+                sb.append("Unknown");
+            }
+        }
+        sb.append(") -> ");
+        sb.append(type.toString());
+        sb.append(" = ");
+        sb.append(body.prettyPrint());
+        return sb;
     }
 }

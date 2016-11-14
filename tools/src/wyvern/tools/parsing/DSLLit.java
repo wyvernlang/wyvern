@@ -149,4 +149,11 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			throw e;
 		}
 	}
+
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("DSLLit(TODO)");
+        return sb;
+    }
 }
