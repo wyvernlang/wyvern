@@ -82,7 +82,7 @@
 	
     <target name="build" depends="copper-generate">
         <mkdir dir="${build.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
             <classpath refid="classpath.base"/>
         </javac>
         <echo message="Build done" />	
