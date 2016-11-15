@@ -152,6 +152,8 @@ public class StructuralType extends ValueType {
 				theDecl = mdt;
 			}
 		}
+    if (theDecl == null)
+        System.err.println("Could not find declName=" + declName + " in ctx=" + ctx);
 		return theDecl;
 	}
 

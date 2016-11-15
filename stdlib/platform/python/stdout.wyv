@@ -1,7 +1,7 @@
 module def stdout(python : Python)
 
 import python:sys
-// import wyvern.String
+import wyvern.String
 
 type Printable = Unit
 

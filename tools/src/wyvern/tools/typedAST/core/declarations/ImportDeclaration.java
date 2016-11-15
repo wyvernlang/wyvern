@@ -277,6 +277,14 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			
 			// type is the result type of the module
 			type = modDeclType.getRawResultType();
+      final String internalName = m.getSpec().getInternalName();
+      ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, m.getDependencies());
+      if (!ctx.isPresent(internalName, true)) {
+          ctx = ctx.extend(internalName, new Variable(internalName), type);
+      }
+      importExp = new Variable(internalName);
+      dependencies.add(m.getSpec());
+      dependencies.addAll(m.getDependencies());
 			// ctx gets extended in the standard way, with a variable
 		    ctx = ctx.extend(importName, new Variable(importName), type);
 		}
