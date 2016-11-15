@@ -47,6 +47,7 @@ import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
+import wyvern.tools.util.GetterAndSetterGeneration;
 import wyvern.tools.util.TreeWritable;
 import wyvern.tools.util.TreeWriter;
 
@@ -326,7 +327,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 											  String varName, Type varType) {
 		
 		// The body of the getter is an invocation of the form: receiver.varName
-		String getterName = VarDeclaration.varNameToGetter(varName);
+		String getterName = GetterAndSetterGeneration.varNameToGetter(varName);
 		Invocation getterBody = new Invocation(receiver, varName, null, null);
 		
 		// Make and return the declaration.
@@ -349,7 +350,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 											  String varName, Type varType) {
 
 		// The body of the setter is an assignment of the form: receiver.varName = x
-		String setterName = VarDeclaration.varNameToSetter(varName);
+		String setterName = GetterAndSetterGeneration.varNameToSetter(varName);
 		Invocation fieldGet = new Invocation(receiver, varName, null, null);
 		wyvern.tools.typedAST.core.expressions.Variable valueToAssign;
 		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
