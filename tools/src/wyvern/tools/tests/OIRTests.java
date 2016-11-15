@@ -23,6 +23,7 @@ import wyvern.target.corewyvernIL.astvisitor.EmitOIRState;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -61,8 +62,11 @@ public class OIRTests {
     GenContext pythonGenContext = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_PYTHON,
                                                                              new File(TestUtil.BASE_PATH),
                                                                              new File(TestUtil.LIB_PATH)));
+    
+    // Generate IL and perform tail-call optimisations.
     IExpr ILprogram = ast.generateIL(pythonGenContext, null, new LinkedList<TypedModuleSpec>());
     TailCallVisitor.annotate(ILprogram);
+    
     if (debug) {
       System.out.println("Wyvern Program:");
       System.out.println(input);

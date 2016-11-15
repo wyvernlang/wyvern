@@ -229,10 +229,11 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     String objExpr =
       oirFieldSet.getObjectExpr().acceptVisitor(this, state);
     String fieldName = oirFieldSet.getFieldName();
-    String setterName =
-      "set" + fieldName.substring(0, 1).toUpperCase() +
-      fieldName.substring(1);
-
+    
+    // Setting a field: turn this into a method call to the appropriate setter method for that field.
+    String setterName = 
+    		wyvern.tools.typedAST.core.declarations.VarDeclaration.varNameToSetter(fieldName);
+ 
     String strVal;
     if (state.currentMethod.equals(setterName) ||
         state.currentMethod.equals("tco_" + setterName)) {
