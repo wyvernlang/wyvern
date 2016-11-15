@@ -236,19 +236,19 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 	
 	public static String varNameToTempObj (String s) {
-		return "__temp" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
+		return "_temp" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 	
 	public static String varNameToGetter (String s) {
-		return "__get" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
+		return "_get" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 	
 	public static String varNameToSetter (String s) {
-		return "__set" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
+		return "_set" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
 	public static String getterToVarName (String s) {
-		return s.replaceFirst("__get", "");
+		return s.replaceFirst("_get", "");
 	}
 	
 	@Override
