@@ -20,7 +20,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -30,6 +29,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
+import wyvern.tools.util.GetterAndSetterGeneration;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
 
@@ -134,8 +134,8 @@ public class Assignment extends CachingTypedAST implements CoreAST {
             // Figure out the var being assigned and get the name of its setter.
             MethodCall methCall = (MethodCall) exprFieldGet;
             String methName     = methCall.getMethodName();
-            String varName      = VarDeclaration.getterToVarName(methName);
-            String setterName   = VarDeclaration.varNameToSetter(varName);
+            String varName      = GetterAndSetterGeneration.getterToVarName(methName);
+            String setterName   = GetterAndSetterGeneration.varNameToSetter(varName);
             
             // Return an invocation to the setter w/ appropriate argmuents supplied.
             IExpr receiver = methCall.getObjectExpr();

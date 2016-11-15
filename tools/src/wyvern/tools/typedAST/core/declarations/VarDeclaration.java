@@ -36,6 +36,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.util.EvaluationEnvironment;
+import wyvern.tools.util.GetterAndSetterGeneration;
 import wyvern.tools.util.TreeWriter;
 
 import java.util.LinkedList;
@@ -188,7 +189,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		VarDeclaration varDecl = new VarDeclaration(varName, this.binding.getType(), this.definition, location);
 		DeclSequence tempObjBody = new DeclSequence(varDecl);
 		New tempObj = new New(tempObjBody, location);
-		String tempObjName = varNameToTempObj(varName);
+		String tempObjName = GetterAndSetterGeneration.varNameToTempObj(varName);
 		ValDeclaration letDecl = new ValDeclaration(tempObjName, tempObj, null);
 		
 		// Update context.
@@ -234,23 +235,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		ctx = ctx.extend(varName, methodCallExpr, varValueType);
 		tlc.updateContext(ctx);
 	}
-	
-	public static String varNameToTempObj (String s) {
-		return "_temp" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
-	}
-	
-	public static String varNameToGetter (String s) {
-		return "_get" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
-	}
-	
-	public static String varNameToSetter (String s) {
-		return "_set" + Character.toUpperCase(s.charAt(0)) + s.substring(1);
-	}
 
-	public static String getterToVarName (String s) {
-		return s.replaceFirst("_get", "");
-	}
-	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
 		// do nothing--adding module declarations handled by genTopLevel method above.

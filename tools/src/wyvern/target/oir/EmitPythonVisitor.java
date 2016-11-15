@@ -37,6 +37,7 @@ import wyvern.target.oir.expressions.OIRNew;
 import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
+import wyvern.tools.util.GetterAndSetterGeneration;
 
 class EmitPythonState {
     public OIREnvironment oirenv;
@@ -231,8 +232,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     String fieldName = oirFieldSet.getFieldName();
     
     // Setting a field: turn this into a method call to the appropriate setter method for that field.
-    String setterName = 
-    		wyvern.tools.typedAST.core.declarations.VarDeclaration.varNameToSetter(fieldName);
+    String setterName = GetterAndSetterGeneration.varNameToSetter(fieldName);
  
     String strVal;
     if (state.currentMethod.equals(setterName) ||
