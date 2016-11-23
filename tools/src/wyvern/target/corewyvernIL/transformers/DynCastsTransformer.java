@@ -35,6 +35,7 @@ import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.CaseType;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.DynamicType;
@@ -55,9 +56,7 @@ public class DynCastsTransformer extends ASTVisitor<GenContext, ASTNode> {
 	 * @param ctx: context in which typechecking happens.
 	 */
 	private boolean hasDynamicType(IExpr expr, GenContext ctx) {
-		ValueType type = expr.typeCheck(ctx);
-		return type.equals(new NominalType("system", "Dyn"))
-				|| type instanceof DynamicType;
+		return Util.isDynamicType(expr.typeCheck(ctx));
 	}
 	
 	/**
