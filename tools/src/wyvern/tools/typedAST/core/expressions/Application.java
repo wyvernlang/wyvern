@@ -159,7 +159,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         	
         	// Need to do this to find out what the method name is.
         	if (!(function instanceof Invocation))
-        		ToolError.reportError(ErrorMessage.EXPECTED_RECORD_TYPE, this);
+        		throw new RuntimeException("Getting field of dynamic object, but dynamic object isn't an invocation.");
         	Invocation invocation = (Invocation) function;
         	
         	return new MethodCall(

@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
@@ -111,22 +112,40 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         return this.location;
     }
 
+    private IExpr generateFieldGet(GenContext ctx, List<TypedModuleSpec> dependencies) {
+    
+    	// In most cases we can get a generator to do this for us.
+    	CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
+    	if (cegReceiver.getDeclType(ctx) != null)
+    		return cegReceiver.genExpr();
+    	
+    	// If the receiver is dynamic (signified by getDeclType being null), we have to manually do this.
+    	
+    	if (target instanceof Invocation) {
+        	Invocation invocation = (Invocation) target;
+        	return new FieldGet(
+        			invocation.getReceiver().generateIL(ctx, null, dependencies),
+        			invocation.getOperationName(),
+        			getLocation());
+    	}
+    	else if (target instanceof Variable) {
+    		return ctx.lookupExp(((Variable)target).getName(), getLocation());
+    	}
+    	else {
+    		throw new RuntimeException("Getting field of dynamic object, but dynamic object's AST is some unsupported type: " + target.getClass());
+    	}
+    }
+    
     @Override
     public Expression generateIL(
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
         
-        // Figure out expression being assigned.
+        // Figure out expression being assigned and target it is being assigned to.
         IExpr exprToAssign = value.generateIL(ctx, expectedType, dependencies);
-        ValueType exprType = exprToAssign.typeCheck(ctx);
-        
-        // Figure out receiver and field.
-        CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
-        IExpr exprFieldGet = cegReceiver.genExpr();
-        
-        // TODO: is this robust?
-        // TODO: is this an exhaustive case analysis?
+        ValueType exprType = exprToAssign.typeCheck(ctx); 
+        IExpr exprFieldGet = generateFieldGet(ctx, dependencies);
         
         // Assigning to a top-level var.
         if (exprFieldGet instanceof MethodCall) {
@@ -157,7 +176,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         } else {
             // Unknown what's going on.
             ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);
-            return null; // dead code
+            return null;
         }
     }
 }

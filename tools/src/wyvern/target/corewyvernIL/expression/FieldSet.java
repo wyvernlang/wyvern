@@ -45,15 +45,30 @@ public class FieldSet extends Expression {
 		return exprToAssign;
 	}
 
+	private boolean settingDynamicObject(TypeContext ctx) {
+		ValueType receiverType = null;
+		if (objectExpr instanceof FieldGet) {
+			IExpr receiver = ((FieldGet)objectExpr).getObjectExpr();
+			receiverType = receiver.typeCheck(ctx);
+		}
+		else if (objectExpr instanceof Variable) {
+			receiverType = ctx.lookupTypeOf(((Variable)objectExpr).getName());
+		}
+		else throw new RuntimeException("Target of FieldSet is unsupported. Type: " + objectExpr.getClass());
+		return Util.isDynamicType(receiverType);
+	}
+	
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 
+		if (settingDynamicObject(ctx)) return Util.dynType();
+		
 		// Figure out types of object and expression.
-		ValueType valTypeExpr = exprToAssign.typeCheck(ctx);
-		StructuralType structTypeObj = objectExpr.typeCheck(ctx).getStructuralType(ctx);
+		StructuralType varTypeStructural = objectExpr.typeCheck(ctx).getStructuralType(ctx);
+		ValueType varTypeExpr = exprToAssign.typeCheck(ctx);
 
 		// Figure out the type of the field.
-		DeclType declTypeField = structTypeObj.findDecl(fieldName, ctx);
+		DeclType declTypeField = varTypeStructural.findDecl(fieldName, ctx);
 		if (declTypeField == null)
 			ToolError.reportError(ErrorMessage.NO_SUCH_FIELD, this, fieldName);
 		if (!(declTypeField instanceof VarDeclType))
@@ -62,7 +77,7 @@ public class FieldSet extends Expression {
 		ValueType valTypeField = ((VarDeclType) declTypeField).getResultType(View.from(objectExpr, ctx));
 
 		// Make sure assigned type is compatible with the field's type.
-		if (!valTypeExpr.isSubtypeOf(valTypeField, ctx))
+		if (!varTypeExpr.isSubtypeOf(valTypeField, ctx))
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 		return Util.unitType();
 	}
