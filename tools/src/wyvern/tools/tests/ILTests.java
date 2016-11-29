@@ -1361,13 +1361,12 @@ public class ILTests {
     }
     
     @Test
-    @Category(CurrentlyBroken.class)
     public void testDynamicObjectVarFieldWithUpdate() throws ParseException {
     	String src = "val obj: Dyn = new\n"
     			   + "    var field: Int = 5\n"
     			   + "obj.field = 10\n"
     			   + "obj.field";
-    	doTest(src, Util.intType(), new IntegerLiteral(10));
+    	doTest(src, Util.dynType(), new IntegerLiteral(10));
     }
     
     @Test
