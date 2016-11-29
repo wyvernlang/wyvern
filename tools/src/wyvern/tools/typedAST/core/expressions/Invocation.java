@@ -39,7 +39,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
     private String operationName;
     private ExpressionAST receiver;
-    private TypedAST argument;
+    private ExpressionAST argument;
     private FileLocation location = FileLocation.UNKNOWN;
 
     /**
@@ -52,8 +52,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
       */
     public Invocation(TypedAST op1, String operatorName, TypedAST op2, FileLocation fileLocation) {
         this.receiver = (ExpressionAST) op1;
-
-        this.argument = op2;
+        this.argument = (ExpressionAST) op2;
         this.operationName = operatorName;
         this.location = fileLocation;
     }
@@ -84,7 +83,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         return argument;
     }
 
-    public TypedAST getReceiver() {
+    public ExpressionAST getReceiver() {
         return receiver;
     }
 
