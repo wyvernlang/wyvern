@@ -16,10 +16,12 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -146,10 +148,30 @@ public class Application extends CachingTypedAST implements CoreAST {
 
         CallableExprGenerator exprGen = function.getCallableExpr(ctx);
         
+        /* Method call on a dynamic object. We pretend there's an appropriate declaration,
+         * and ignore the expression generator. */
+        if (exprGen.getDeclType(ctx) == null) {
+        	
+        	// Generate code for the arguments.
+        	List<IExpr> args = new LinkedList<>();
+        	if (!(argument instanceof UnitVal))
+        		args.add(argument.generateIL(ctx, null, dependencies));
+        	
+        	// Need to do this to find out what the method name is.
+        	if (!(function instanceof Invocation))
+        		ToolError.reportError(ErrorMessage.EXPECTED_RECORD_TYPE, this);
+        	Invocation invocation = (Invocation) function;
+        	
+        	return new MethodCall(
+        		invocation.getReceiver().generateIL(ctx, null, dependencies),
+        		invocation.getOperationName(),
+        		args,
+        		this);
+        }
+        
+        /* Otherwise look up declaration. Ensure arguments match the declaration. */
         DefDeclType ddt = exprGen.getDeclType(ctx);
         List<FormalArg> formals = ddt.getFormalArgs();
-
-        // generate arguments       
         List<IExpr> args = new LinkedList<IExpr>();
 
         // Add generic arguments to the argslist
@@ -158,7 +180,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         if (argument instanceof TupleObject) {
             generateILForTuples(formals, args, ctx, dependencies);
         } else if (argument instanceof UnitVal) {
-            // leave args empty
+            // the method takes no arguments
         } else {
             if (formals.size() != 1 + args.size()) {
                 ToolError.reportError(

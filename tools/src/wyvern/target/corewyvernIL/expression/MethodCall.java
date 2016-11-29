@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.support.ViewExtension;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -25,13 +26,14 @@ public class MethodCall extends Expression {
 	private IExpr objectExpr;
 	private String methodName;
 	private List<? extends IExpr> args;
+	private ValueType receiverType;
 
-	public MethodCall(IExpr e, String methodName,
+	public MethodCall(IExpr receiverExpr, String methodName,
 			List<? extends IExpr> args2, HasLocation location) {
 		super(location != null ? location.getLocation():null);
 		//if (getLocation() == null || getLocation().line == -1)
 		//	throw new RuntimeException("missing location");
-		this.objectExpr = e;
+		this.objectExpr = receiverExpr;
 		this.methodName = methodName;
 		this.args = args2;
 		// sanity check
@@ -65,9 +67,17 @@ public class MethodCall extends Expression {
 	public List<? extends IExpr> getArgs() {
 		return args;
 	}
+	
+	private ValueType getReceiverType(TypeContext ctx) {
+		if (receiverType == null) {
+			receiverType = objectExpr.typeCheck(ctx);
+		}
+		return receiverType;
+	}
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
+		if (Util.isDynamicType(getReceiverType(ctx))) return Util.dynType();
 		typeMethodDeclaration(ctx);
 		return getExprType();
 	}
@@ -113,7 +123,7 @@ public class MethodCall extends Expression {
 	public DefDeclType typeMethodDeclaration(TypeContext ctx) {
 
 		// Typecheck receiver.
-		ValueType receiver = objectExpr.typeCheck(ctx);
+		ValueType receiver = getReceiverType(ctx);
 		StructuralType receiverType = receiver.getStructuralType(ctx);
 
 		// Sanity check: make sure it has declarations.
