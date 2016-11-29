@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
@@ -165,7 +166,15 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
             List<TypedModuleSpec> dependencies) {
 
         CallableExprGenerator generator = getCallableExpr(ctx);
-
+        
+        // Invoking property of a dynamic object; don't bother validating things.
+        if (generator.getDeclType(ctx) == null) {
+        	return new FieldGet(
+        		receiver.generateIL(ctx, null, null),
+        		operationName,
+        		location);
+        }
+        
         if (argument != null) {
             IExpr arg  = ((ExpressionAST) argument)
                 .generateIL(ctx, null, dependencies);
