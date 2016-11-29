@@ -145,6 +145,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             List<TypedModuleSpec> dependencies) {
 
         CallableExprGenerator exprGen = function.getCallableExpr(ctx);
+        
         DefDeclType ddt = exprGen.getDeclType(ctx);
         List<FormalArg> formals = ddt.getFormalArgs();
 
