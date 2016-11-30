@@ -77,7 +77,13 @@ public class MethodCall extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
-		if (Util.isDynamicType(getReceiverType(ctx))) return Util.dynType();
+	    // If calling on a dynamic receiver, it types to Dyn (provided the args typecheck)
+		if (Util.isDynamicType(getReceiverType(ctx))) {
+		    for (IExpr arg : args) {
+		        arg.typeCheck(ctx);
+		    }
+		    return Util.dynType();
+		}
 		typeMethodDeclaration(ctx);
 		return getExprType();
 	}
