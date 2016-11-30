@@ -168,10 +168,10 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         
         // Invoking property of a dynamic object; don't bother validating things.
         if (generator.getDeclType(ctx) == null) {
-        	return new FieldGet(
-        		receiver.generateIL(ctx, null, null),
-        		operationName,
-        		location);
+            return new FieldGet(
+                receiver.generateIL(ctx, null, null),
+                operationName,
+                location);
         }
         
         if (argument != null) {

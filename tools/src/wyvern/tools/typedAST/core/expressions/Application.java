@@ -21,7 +21,6 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -151,22 +150,25 @@ public class Application extends CachingTypedAST implements CoreAST {
         /* Method call on a dynamic object. We pretend there's an appropriate declaration,
          * and ignore the expression generator. */
         if (exprGen.getDeclType(ctx) == null) {
-        	
-        	// Generate code for the arguments.
-        	List<IExpr> args = new LinkedList<>();
-        	if (!(argument instanceof UnitVal))
-        		args.add(argument.generateIL(ctx, null, dependencies));
-        	
-        	// Need to do this to find out what the method name is.
-        	if (!(function instanceof Invocation))
-        		throw new RuntimeException("Getting field of dynamic object, but dynamic object isn't an invocation.");
-        	Invocation invocation = (Invocation) function;
-        	
-        	return new MethodCall(
-        		invocation.getReceiver().generateIL(ctx, null, dependencies),
-        		invocation.getOperationName(),
-        		args,
-        		this);
+
+            // Generate code for the arguments.
+            List<IExpr> args = new LinkedList<>();
+            if (!(argument instanceof UnitVal)) {
+                args.add(argument.generateIL(ctx, null, dependencies));
+            }
+    
+            // Need to do this to find out what the method name is.
+            if (!(function instanceof Invocation)) {
+                throw new RuntimeException("Getting field of dynamic object,"
+                                          + "which isn't an invocation.");
+            }
+            Invocation invocation = (Invocation) function;
+
+            return new MethodCall(
+                invocation.getReceiver().generateIL(ctx, null, dependencies),
+                invocation.getOperationName(),
+                args,
+                this);
         }
         
         /* Otherwise look up declaration. Ensure arguments match the declaration. */
