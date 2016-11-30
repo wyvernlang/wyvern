@@ -61,7 +61,11 @@ public class FieldSet extends Expression {
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 
-		if (settingDynamicObject(ctx)) return Util.dynType();
+	    // Setting the field of a dynamic object.
+		if (settingDynamicObject(ctx)) {
+		    exprToAssign.typeCheck(ctx);
+		    return Util.dynType();
+		}
 		
 		// Figure out types of object and expression.
 		StructuralType varTypeStructural = objectExpr.typeCheck(ctx).getStructuralType(ctx);
