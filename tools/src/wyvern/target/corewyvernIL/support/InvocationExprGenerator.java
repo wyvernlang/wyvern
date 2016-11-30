@@ -69,6 +69,9 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	public DefDeclType getDeclType(TypeContext ctx) {
 		
 		if (declType == null) {

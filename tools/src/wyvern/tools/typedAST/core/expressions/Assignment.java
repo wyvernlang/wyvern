@@ -13,7 +13,6 @@ import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
@@ -114,26 +113,26 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
     private IExpr generateFieldGet(GenContext ctx, List<TypedModuleSpec> dependencies) {
     
-    	// In most cases we can get a generator to do this for us.
-    	CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
-    	if (cegReceiver.getDeclType(ctx) != null)
-    		return cegReceiver.genExpr();
-    	
-    	// If the receiver is dynamic (signified by getDeclType being null), we have to manually do this.
-    	
-    	if (target instanceof Invocation) {
-        	Invocation invocation = (Invocation) target;
-        	return new FieldGet(
-        			invocation.getReceiver().generateIL(ctx, null, dependencies),
-        			invocation.getOperationName(),
-        			getLocation());
-    	}
-    	else if (target instanceof Variable) {
-    		return ctx.lookupExp(((Variable)target).getName(), getLocation());
-    	}
-    	else {
-    		throw new RuntimeException("Getting field of dynamic object, but dynamic object's AST is some unsupported type: " + target.getClass());
-    	}
+        // In most cases we can get a generator to do this for us.
+        CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
+        if (cegReceiver.getDeclType(ctx) != null) {
+            return cegReceiver.genExpr();
+        }
+
+        // If the receiver is dynamic (signified by getDeclType being null),
+        // we have to manually do this.
+        if (target instanceof Invocation) {
+            Invocation invocation = (Invocation) target;
+            return new FieldGet(
+                    invocation.getReceiver().generateIL(ctx, null, dependencies),
+                    invocation.getOperationName(),
+                    getLocation());
+        } else if (target instanceof Variable) {
+            return ctx.lookupExp(((Variable)target).getName(), getLocation());
+        } else {
+            throw new RuntimeException("Getting field of dynamic object,"
+                    + "but dynamic object's AST is some unsupported type: " + target.getClass());
+        }
     }
     
     @Override
