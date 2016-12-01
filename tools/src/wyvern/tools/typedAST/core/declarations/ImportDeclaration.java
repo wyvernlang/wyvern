@@ -282,7 +282,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       if (!ctx.isPresent(internalName, true)) {
           ctx = ctx.extend(internalName, new Variable(internalName), type);
       }
-      importExp = new Variable(internalName);
       dependencies.add(m.getSpec());
       dependencies.addAll(m.getDependencies());
 			// ctx gets extended in the standard way, with a variable
