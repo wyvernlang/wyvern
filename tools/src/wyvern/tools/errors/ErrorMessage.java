@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 public enum ErrorMessage {
 	// Type errors
 	ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument type %ARG does not match formal argument type %ARG", 2),
+    CANNOT_INFER_GENERIC("Cannot infer the type of the generic argument at the call site. Please provide the type of the generic argument at the call site.", 0),
     EXTRA_GENERICS_AT_CALL_SITE("More generic arguments were provided at the call site than in the declaration of the function.", 0),
     MISSING_GENERICS_AT_CALL_SITE("One or more generic arguments were defined for the method %ARG but not provided at the call site, and are not inferrable.", 1),
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
