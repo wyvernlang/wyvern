@@ -13,5 +13,5 @@ type Sys
 val sys : Sys = sys
 
 def print(text : String) : Unit = sys.stdout.write(text)
-def printInt(n : Int) : Unit = sys.stdout.write(python.toString(n))
+def printInt(n : Int) : Unit = sys.stdout.write(String.apply(python).ofInt(n))
 def println() : Unit = sys.stdout.write("\n")
