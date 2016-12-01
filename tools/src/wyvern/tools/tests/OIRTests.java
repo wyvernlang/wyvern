@@ -594,7 +594,6 @@ public class OIRTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testBasicStdout() throws ParseException {
         String input =
             "require stdout\n" +
@@ -605,7 +604,6 @@ public class OIRTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testPythonBuiltins() throws ParseException {
         String input =
             "require python\n" +
@@ -614,7 +612,6 @@ public class OIRTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testOption() throws ParseException {
         String input =
             "import wyvern.option\n" +
