@@ -1305,6 +1305,21 @@ public class ILTests {
     }
 
     @Test
+    public void testInferredTupleParams() throws ParseException {
+
+        String source = ""
+                      + "def identity[K](value: Int, ignored: K): Int \n"
+                      + "    value \n\n"
+
+                      + "val x = 15 \n"
+                      + "val y = 20 \n"
+                      + "identity(x, y) \n"
+                      + "";
+
+        doTest(source, null, new IntegerLiteral(15));
+    }
+
+    @Test
     public void testJavaImportNamespace() throws ParseException {
         String source = "require java\n"
                       + "import java:java.util.ArrayList \n\n"

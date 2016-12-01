@@ -241,7 +241,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     ) {
         
         ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
-        if (formals.size() != rawArgs.length + this.generics.size()) {
+        if (formals.size() != rawArgs.length + args.size()) {
             ToolError.reportError(
                 ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                 this,
@@ -306,6 +306,9 @@ public class Application extends CachingTypedAST implements CoreAST {
             }
 
             List<Integer> positions = inferenceMap.get(i);
+            if (positions.isEmpty()) {
+                ToolError.reportError(ErrorMessage.CANNOT_INFER_GENERIC, this);
+            }
             // formal position tells you where in
             // the formals the argument that uses the generic is
             int formalPos = positions.get(0);
@@ -316,52 +319,27 @@ public class Application extends CachingTypedAST implements CoreAST {
 
             if (this.argument instanceof TupleObject) {
                 ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
-                if (formalPos == rawArgs.length) {
-                    // then we're inferring from the result type
-                    throw new UnsupportedOperationException(
-                        "Can't infer the result type yet."
-                    );
-
-                } else {
-                    ExpressionAST inferArg = rawArgs[formalPos];
-                    args.add(inferArg.generateIL(
-                        ctx, formals.get(formalPos).getType(), deps
-                    ));
-                }
+                IExpr inferArg = rawArgs[actualPos].generateIL(ctx, null, deps);
+                this.addInferredType(args, formals, ctx, inferArg.typeCheck(ctx), i);
             } else if (this.argument instanceof UnitVal) {
-                // uhhhhh?
                 // The arg is a unit value. We must be inferring from the result type
                 throw new UnsupportedOperationException(
-                    "Can't infer the result type yet.");
-
+                    "Can't infer from the result type.");
             } else {
             
                 // Then the arg must be a single element
                 if (actualPos != 0) {
                     // Inferring from a formal arg that doesn't exist
-                    // TODO unless we're inferring from the result type.....
-                    // ToolError
                     throw new UnsupportedOperationException(
-                        "Can't infer the result type yet.");
+                        "Can't infer from the result type.");
                 }
 
                 // Now we know that the argument is the inferrable type.
-                // TODO Make this understandable @Robbie
-                final IExpr argIL = this.argument
-                    .generateIL(ctx, null, deps);
+                final IExpr argIL = this.argument.generateIL(ctx, null, deps);
                 ValueType inferredType = argIL.typeCheck(ctx);
                 this.addInferredType(args, formals, ctx, inferredType, i);
             }
         }
-    }
-
-    private boolean canInferResultType(
-            List<Integer> inferrableLocations,
-            List<FormalArg> formals
-    ) {
-
-        int last = inferrableLocations.get(inferrableLocations.size() - 1);
-        return last == formals.size();
     }
 
     private void addInferredType(
