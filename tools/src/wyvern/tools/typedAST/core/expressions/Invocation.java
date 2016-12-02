@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
@@ -38,7 +39,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
     private String operationName;
     private ExpressionAST receiver;
-    private TypedAST argument;
+    private ExpressionAST argument;
     private FileLocation location = FileLocation.UNKNOWN;
 
     /**
@@ -51,8 +52,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
       */
     public Invocation(TypedAST op1, String operatorName, TypedAST op2, FileLocation fileLocation) {
         this.receiver = (ExpressionAST) op1;
-
-        this.argument = op2;
+        this.argument = (ExpressionAST) op2;
         this.operationName = operatorName;
         this.location = fileLocation;
     }
@@ -83,7 +83,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         return argument;
     }
 
-    public TypedAST getReceiver() {
+    public ExpressionAST getReceiver() {
         return receiver;
     }
 
@@ -165,7 +165,15 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
             List<TypedModuleSpec> dependencies) {
 
         CallableExprGenerator generator = getCallableExpr(ctx);
-
+        
+        // Invoking property of a dynamic object; don't bother validating things.
+        if (generator.getDeclType(ctx) == null) {
+            return new FieldGet(
+                receiver.generateIL(ctx, null, null),
+                operationName,
+                location);
+        }
+        
         if (argument != null) {
             IExpr arg  = ((ExpressionAST) argument)
                 .generateIL(ctx, null, dependencies);

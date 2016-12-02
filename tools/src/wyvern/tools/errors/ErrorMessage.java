@@ -5,7 +5,9 @@ import java.util.regex.Matcher;
 public enum ErrorMessage {
 	// Type errors
 	ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument type %ARG does not match formal argument type %ARG", 2),
+    CANNOT_INFER_GENERIC("Cannot infer the type of the generic argument at the call site. Please provide the type of the generic argument at the call site.", 0),
     EXTRA_GENERICS_AT_CALL_SITE("More generic arguments were provided at the call site than in the declaration of the function.", 0),
+    MISSING_GENERICS_AT_CALL_SITE("One or more generic arguments were defined for the method %ARG but not provided at the call site, and are not inferrable.", 1),
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
 	CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
@@ -32,7 +34,7 @@ public enum ErrorMessage {
 	MUST_BE_A_RESOURCE_MODULE("%ARG must be a resource module",1),
 	METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method",0),
 	METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object",1),
-	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG",1),
+	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG, but found %ARG",2),
 	SYNTAX_FOR_NO_ARG_LAMBDA("Use \"() => <expression>\" rather than \"x => <expression>\" for a zero-argument function expression",0),
 	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression", 1),
   DELEGATE_MUST_BE_VARIABLE("Expected variable in delegate declaration, got %ARG", 1),

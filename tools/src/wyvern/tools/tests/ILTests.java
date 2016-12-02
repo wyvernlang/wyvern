@@ -1305,6 +1305,21 @@ public class ILTests {
     }
 
     @Test
+    public void testInferredTupleParams() throws ParseException {
+
+        String source = ""
+                      + "def identity[K](value: Int, ignored: K): Int \n"
+                      + "    value \n\n"
+
+                      + "val x = 15 \n"
+                      + "val y = 20 \n"
+                      + "identity(x, y) \n"
+                      + "";
+
+        doTest(source, null, new IntegerLiteral(15));
+    }
+
+    @Test
     public void testJavaImportNamespace() throws ParseException {
         String source = "require java\n"
                       + "import java:java.util.ArrayList \n\n"
@@ -1332,6 +1347,49 @@ public class ILTests {
     			   + "val five : Int = something\n"
     			   + "five";
     	doTest(src, Util.intType(), new IntegerLiteral(5));
+    }
+    
+    @Test
+    public void testDynamicObjectMethods() throws ParseException {
+    	
+    	String src = "val obj : Dyn = new\n"
+    			   + "    def method(): Int = 5\n"
+    			   + "obj.method()";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    	
+    }
+    
+    @Test
+    public void testDynamicObjectValField() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    val field: Int = 5\n"
+    			   + "obj.field";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    }
+    
+    @Test
+    public void testDynamicObjectVarField() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    var field: Int = 5\n"
+    			   + "obj.field";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    }
+    
+    @Test
+    public void testDynamicObjectVarFieldWithUpdate() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    var field: Int = 5\n"
+    			   + "obj.field = 10\n"
+    			   + "obj.field";
+    	doTest(src, Util.dynType(), new IntegerLiteral(10));
+    }
+    
+    @Test
+    public void testDynamicObjectMethodWithArgs() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    def method(x: Int): Int = x\n"
+    			   + "obj.method(5)";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
     }
     
 }

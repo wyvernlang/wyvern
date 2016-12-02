@@ -154,6 +154,7 @@ public class DefDeclType extends DeclTypeWithResult {
     /**
         genericMapping returns a map from each generic arguments the position in the formals list where the argument is used as a type
         If the argument is used as the result type, then the position is len(formals), i.e. the position appended to the end of the list
+        Note that you can't infer from the result type, because evaluating the result type depends on the actuals, which are what we are trying to infer.
     */
     public  Map<Integer, List<Integer>> genericMapping() {
         Map<Integer, List<Integer>> inferenceMap = new HashMap<Integer, List<Integer>>();
@@ -179,13 +180,6 @@ public class DefDeclType extends DeclTypeWithResult {
                     // Then we can add this position to the inference map
                     append(inferenceMap, i, j);
                 }
-            }
-
-            // Repeat the check with the result type for the expression
-            if(matchesGeneric(rawResultType, identifier)) {
-                // Then we can add this position to the inference map
-                // Since it's the result type, we add it as a sentinel value as the length of the list (out of bounds)
-                append(inferenceMap, i, args.size());
             }
         }
         return inferenceMap;
