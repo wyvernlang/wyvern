@@ -44,4 +44,10 @@ public class Util {
 		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, null, EvalContext.empty());
 	}
 	public static final String APPLY_NAME = "apply";
+	
+	public static boolean isDynamicType(ValueType type) {
+		return type.equals(new NominalType("system", "Dyn"))
+				|| type instanceof DynamicType;
+	}
+	
 }

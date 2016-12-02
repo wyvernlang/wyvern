@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
@@ -47,6 +48,7 @@ public class FieldGet extends Expression implements Path {
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType vt = objectExpr.typeCheck(ctx);
+		if (Util.isDynamicType(vt)) return Util.dynType();
 		DeclType dt = vt.findDecl(fieldName, ctx);
 		if (dt == null)
 			ToolError.reportError(ErrorMessage.NO_SUCH_FIELD, this, fieldName);

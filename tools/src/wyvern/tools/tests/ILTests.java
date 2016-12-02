@@ -1334,4 +1334,47 @@ public class ILTests {
     	doTest(src, Util.intType(), new IntegerLiteral(5));
     }
     
+    @Test
+    public void testDynamicObjectMethods() throws ParseException {
+    	
+    	String src = "val obj : Dyn = new\n"
+    			   + "    def method(): Int = 5\n"
+    			   + "obj.method()";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    	
+    }
+    
+    @Test
+    public void testDynamicObjectValField() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    val field: Int = 5\n"
+    			   + "obj.field";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    }
+    
+    @Test
+    public void testDynamicObjectVarField() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    var field: Int = 5\n"
+    			   + "obj.field";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    }
+    
+    @Test
+    public void testDynamicObjectVarFieldWithUpdate() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    var field: Int = 5\n"
+    			   + "obj.field = 10\n"
+    			   + "obj.field";
+    	doTest(src, Util.dynType(), new IntegerLiteral(10));
+    }
+    
+    @Test
+    public void testDynamicObjectMethodWithArgs() throws ParseException {
+    	String src = "val obj: Dyn = new\n"
+    			   + "    def method(x: Int): Int = x\n"
+    			   + "obj.method(5)";
+    	doTest(src, Util.dynType(), new IntegerLiteral(5));
+    }
+    
 }

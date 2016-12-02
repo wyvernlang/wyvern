@@ -25,16 +25,24 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	private final FileLocation location;
 	
 	public InvocationExprGenerator(IExpr iExpr, String operationName, GenContext ctx, FileLocation loc) {
+		
 		this.receiver = iExpr;
-		ValueType rt = iExpr.typeCheck(ctx);
-		List<DeclType> dts = rt.findDecls(operationName, ctx);
-		location = loc;
+		this.location = loc;
+	
+		ValueType receiverType = iExpr.typeCheck(ctx);
+		
+		if (Util.isDynamicType(receiverType)) {
+			this.declType = null;
+			return;
+		}
+		
+		List<DeclType> dts = receiverType.findDecls(operationName, ctx);
 		// not interested in finding Type Decls (abstract or not)
 		dts.removeIf(cdt -> cdt.isTypeDecl());
 		if (dts.size() == 0)
 			ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, loc, operationName);
 		if (dts.size() >1)
-			ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, loc, rt.toString(), operationName);
+			ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, loc, receiverType.toString(), operationName);
 		DeclType dt = dts.get(0);
 		declType = dt.adapt(View.from(iExpr, ctx));
 	}
@@ -61,11 +69,18 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	public DefDeclType getDeclType(TypeContext ctx) {
-		if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
+		
+		if (declType == null) {
+			return null;
+		} else if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
 			ValueType vt = e.typeCheck(ctx);
-			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(receiver, ctx));
+			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
+			// return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(receiver, ctx));
 		} else if (declType instanceof DefDeclType) {
 			return (DefDeclType) declType;
 		} else {
