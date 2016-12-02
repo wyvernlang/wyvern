@@ -188,7 +188,8 @@ public class Application extends CachingTypedAST implements CoreAST {
                 ToolError.reportError(
                     ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                     this,
-                    "" + formals.size()
+                    "" + formals.size(),
+                    new Integer(1 + args.size()).toString()
                 );
             }
 
@@ -240,7 +241,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     ) {
         
         ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
-        if (formals.size() != rawArgs.length + this.generics.size()) {
+        if (formals.size() != rawArgs.length + args.size()) {
             ToolError.reportError(
                 ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                 this,
@@ -301,72 +302,72 @@ public class Application extends CachingTypedAST implements CoreAST {
 
             if (!inferenceMap.containsKey(i)) {
                 // then we can't infer the type
-                // TODO Missing generic at call site
-                ToolError.reportError(ErrorMessage.EXTRA_GENERICS_AT_CALL_SITE, this);
+                ToolError.reportError(ErrorMessage.MISSING_GENERICS_AT_CALL_SITE, this);
             }
 
-            // formal position tells you where in the formals the argument that uses the generic is
             List<Integer> positions = inferenceMap.get(i);
+            if (positions.isEmpty()) {
+                ToolError.reportError(ErrorMessage.CANNOT_INFER_GENERIC, this);
+            }
+            // formal position tells you where in
+            // the formals the argument that uses the generic is
             int formalPos = positions.get(0);
-            // actual position tells you where in the actual argument list the type should be
+
+            // actual position tells you where in the actual
+            // argument list the type should be
             int actualPos = formalPos - count;
+
             if (this.argument instanceof TupleObject) {
                 ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
-                if (formalPos == rawArgs.length) {
-                    // then we're inferring from the result type
-                    throw new UnsupportedOperationException(
-                        "Can't infer the result type yet."
-                    );
-
-                } else {
-                    ExpressionAST inferArg = rawArgs[formalPos];
-                    args.add(inferArg.generateIL(
-                        ctx, formals.get(formalPos).getType(), deps
-                    ));
-                }
+                IExpr inferArg = rawArgs[actualPos].generateIL(ctx, null, deps);
+                this.addInferredType(args, formals, ctx, inferArg.typeCheck(ctx), i);
             } else if (this.argument instanceof UnitVal) {
-                // uhhhhh?
                 // The arg is a unit value. We must be inferring from the result type
                 throw new UnsupportedOperationException(
-                    "Can't infer the result type yet.");
-
+                    "Can't infer from the result type.");
             } else {
             
                 // Then the arg must be a single element
                 if (actualPos != 0) {
                     // Inferring from a formal arg that doesn't exist
-                    // TODO unless we're inferring from the result type.....
-                    // ToolError
                     throw new UnsupportedOperationException(
-                        "Can't infer the result type yet.");
+                        "Can't infer from the result type.");
                 }
 
                 // Now we know that the argument is the inferrable type.
-                // TODO Make this understandable @Robbie
-                final IExpr argIL = this.argument
-                    .generateIL(ctx, null, deps);
+                final IExpr argIL = this.argument.generateIL(ctx, null, deps);
                 ValueType inferredType = argIL.typeCheck(ctx);
-                List<Declaration> members = new LinkedList<>();
-                TypeDeclaration typeMember = new TypeDeclaration(
-                        formals.get(0).getName()
-                            .substring(
-                                DefDeclaration.GENERIC_PREFIX.length()),
-                            inferredType, 
-                            null
-                );
-                members.add(typeMember);
-                List<DeclType> declTypes = new LinkedList<DeclType>();
-                declTypes.add(
-                    new ConcreteTypeMember(
-                        formals.get(0).getName()
-                            .substring(DefDeclaration.GENERIC_PREFIX.length()),
-                        inferredType)
-                );
-                ValueType actualArgType = new StructuralType("self", declTypes);
-                Expression newExp = new New(members, "self", actualArgType, null);
-                args.add(newExp);
+                this.addInferredType(args, formals, ctx, inferredType, i);
             }
         }
+    }
+
+    private void addInferredType(
+            List<IExpr> args,
+            List<FormalArg> formals,
+            GenContext ctx,
+            ValueType inferredType,
+            int formalIndex
+    ) {
+        List<Declaration> members = new LinkedList<>();
+        TypeDeclaration typeMember = new TypeDeclaration(
+            formals.get(formalIndex).getName()
+                .substring(
+                    DefDeclaration.GENERIC_PREFIX.length()),
+                inferredType,
+                null
+        );
+        members.add(typeMember);
+        List<DeclType> declTypes = new LinkedList<DeclType>();
+        declTypes.add(
+            new ConcreteTypeMember(
+                formals.get(formalIndex).getName()
+                    .substring(DefDeclaration.GENERIC_PREFIX.length()),
+                inferredType)
+        );
+        ValueType actualArgType = new StructuralType("self", declTypes);
+        Expression newExp = new New(members, "self", actualArgType, null);
+        args.add(newExp);
     }
 
     private void addExistingGenerics(
