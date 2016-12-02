@@ -12,7 +12,7 @@ type PostfixExpr
 
 	// define a TSL for postfix expressions
     metadata new
-        def parseTSL(input:String):option.Option
+        def parseTSL(input:String):option.Option // option of AST
             val parseResult = parser.parse(input)
 			
 			// wrap the AST in an object with an eval() method
