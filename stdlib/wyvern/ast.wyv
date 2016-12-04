@@ -29,6 +29,9 @@ def variable(s:String):AST = new
 def call(receiver:AST, methodName:String, argument:AST):AST = new
 	val ast:Unit = utils.oneArgCall(receiver,methodName, argument)
 
+def parseExpression(input : String) : AST = new
+  val ast:Unit = utils.parseExpression(input)
+
 val types = new
 	def int():Type = new
 		val typ:Unit = utils.intType()

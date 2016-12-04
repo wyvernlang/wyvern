@@ -3,10 +3,12 @@ package wyvern.stdlib.support;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Literal;
@@ -20,6 +22,9 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.interop.JObject;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 public class AST {
 	public static AST utils = new AST();
@@ -68,4 +73,11 @@ public class AST {
 		Expression realBody = getExpr(body);
 		return new DefDeclaration(name, new LinkedList<FormalArg>(), realType, realBody, null);
 	}
+
+    public IExpr parseExpression(String input) throws ParseException {
+        System.out.println("parseExpression recieved input '"+input+"'");
+        ExpressionAST ast = (ExpressionAST)TestUtil.getNewAST(input, "TSL Parse");
+        // TODO: Handle InterpreterState/GenContext
+        return ast.generateIL(Globals.getStandardGenContext(), null, null);
+    }
 }

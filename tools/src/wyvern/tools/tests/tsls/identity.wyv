@@ -1,0 +1,14 @@
+module identity
+
+import wyvern.ast
+import wyvern.Int
+import wyvern.option
+
+type AST = ast.AST
+
+type IntExpr
+  def eval() : Int
+  metadata new
+    def parseTSL(input : String) : option.Option
+      val inputAST : AST = ast.parseExpression(input)
+      option.Some(ast.object(ast.defn("eval", ast.types.int(), inputAST)))
