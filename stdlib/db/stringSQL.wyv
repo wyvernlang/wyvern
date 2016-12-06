@@ -1,6 +1,4 @@
-resource module stringSQL
-
-require java
+module def stringSQL(java : Java)
 
 type SQL
 	def query():String
