@@ -1,6 +1,4 @@
-resource module stdout
-
-require python
+module def stdout(python : Python)
 
 import python:sys
 

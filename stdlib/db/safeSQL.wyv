@@ -1,6 +1,4 @@
-resource module safeSQL
-
-require db.StringSQL as stringSQL
+module def safeSQL(stringSQL : db.StringSQL)
 
 resource type SSQL
 	val row:String
