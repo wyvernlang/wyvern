@@ -1,7 +1,7 @@
-import modules.Actual
+import modules.actual
 import modules.parameterized
 
-val actual = Actual()
-val p = parameterized(actual)
+val a = actual()
+val p = parameterized(a)
 
 p.getFive()

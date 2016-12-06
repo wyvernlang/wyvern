@@ -1,6 +1,4 @@
-resource module DatabaseProxy
-
-require Database as db
+module def databaseProxy(db : modules.Database)
 
 def increment():Unit
 	db.contents = db.contents + 1

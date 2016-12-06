@@ -1,5 +1,5 @@
-import modules.Lists
+import modules.lists
 
-val list = Lists.create()
+val list = lists.create()
 
 list.contents

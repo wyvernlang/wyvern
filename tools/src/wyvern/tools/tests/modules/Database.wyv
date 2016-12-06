@@ -1,3 +1,3 @@
-resource module Database
+module def database()
 
 var contents : Int = 0

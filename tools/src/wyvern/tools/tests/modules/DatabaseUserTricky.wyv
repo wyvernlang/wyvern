@@ -1,9 +1,8 @@
+require database
 
-require Database
+database.contents = 0
 
-Database.contents = 0
-
-val db = Database
+val db = database
 db.contents = 10
 
-Database.contents
+database.contents

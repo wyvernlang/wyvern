@@ -1,6 +1,4 @@
-resource module DatabaseClient
-
-require DatabaseProxy as proxy
+module def databaseClient(proxy : modules.DatabaseProxy)
 
 def update () : Unit
 	proxy.db.contents = 42

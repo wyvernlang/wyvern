@@ -1,4 +1,4 @@
-resource module A : sigA
-import D
+module def a() : A
+import modules.module.d
 val f : system.Int = 3
 def m(y : system.Int) : system.Int = y

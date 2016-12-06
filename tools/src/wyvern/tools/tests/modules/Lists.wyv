@@ -1,4 +1,4 @@
-module Lists
+module lists
 
 type List
 	val contents : Int
