@@ -54,8 +54,8 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Globals {
-	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "java");
-    public static final NominalType PYTHON_IMPORT_TYPE = new NominalType("system", "python");
+	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
+    public static final NominalType PYTHON_IMPORT_TYPE = new NominalType("system", "Python");
 	public static final boolean checkRuntimeTypes = false;
 	private static final Set<String> javaWhiteList = new HashSet<String>();
 	
@@ -121,8 +121,8 @@ public class Globals {
 		genCtx = new TypeGenContext("String", "system", genCtx);
 		genCtx = new TypeGenContext("Boolean", "system", genCtx);
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
-		genCtx = new TypeGenContext("java", "system", genCtx);
-		genCtx = new TypeGenContext("python", "system", genCtx);
+		genCtx = new TypeGenContext("Java", "system", genCtx);
+		genCtx = new TypeGenContext("Python", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
@@ -154,8 +154,8 @@ public class Globals {
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 		declTypes.add(new AbstractTypeMember("String"));
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
-		declTypes.add(new AbstractTypeMember("java", true));
-		declTypes.add(new AbstractTypeMember("python"));
+		declTypes.add(new AbstractTypeMember("Java", true));
+		declTypes.add(new AbstractTypeMember("Python"));
 		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;
 	}
@@ -180,8 +180,8 @@ public class Globals {
 		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("java", new NominalType("this", "java"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("python", new NominalType("this", "python"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
 		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
 		return systemVal;
 	}
