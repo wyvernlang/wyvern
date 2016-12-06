@@ -170,7 +170,7 @@ AST CompilationUnit() :
 { AST exp; Token id; AST moduleArgs=null; Type t; boolean isResource = false; }
 {
   LOOKAHEAD(2)
-  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody(true) {
+  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody() {
 	if (moduleArgs == null) {
 	   return build.moduleDecl(id.image, exp, loc(id), true);
 	} else {
@@ -178,11 +178,11 @@ AST CompilationUnit() :
 	}
   }
 |
-  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
+  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody() {
 	return build.moduleDecl(id.image, exp, loc(id), isResource);
   }
 |
-  exp = ModuleBody(false)  { return exp; }
+  exp = TopLevelCode()  { return exp; }
 }
 
 AST ModuleArgs() :
@@ -214,14 +214,22 @@ Type OptType() :
   /* nothing */ { return null; }
 }
 
-AST ModuleBody(boolean inModule) :
+AST ModuleBody() :
 { AST ast; AST decl; }
 {
-  ast = DeclSequence(inModule)  { return ast; }
+  ast = DeclSequence(true)  { return ast; }
 |
-  decl = RequireDecl() ast = ModuleBody(inModule) { return build.sequence(decl,ast,inModule); }
+  decl = ImportDecl() ast = ModuleBody() { return build.sequence(decl,ast,true); }
+}
+
+AST TopLevelCode() :
+{ AST ast; AST decl; }
+{
+  ast = DeclSequence(false)  { return ast; }
 |
-  decl = ImportDecl() ast = ModuleBody(inModule) { return build.sequence(decl,ast,inModule); }
+  decl = RequireDecl() ast = TopLevelCode() { return build.sequence(decl,ast,false); }
+|
+  decl = ImportDecl() ast = TopLevelCode() { return build.sequence(decl,ast,false); }
 }
 
 AST RequireDecl() :
@@ -230,6 +238,7 @@ AST RequireDecl() :
   t=<REQUIRE> uri = Uri() [<AS> name = <IDENTIFIER>] <NEWLINE>
     { return build.importDecl(uri, loc(t), name, true, false); }
 }
+
 
 AST ImportDecl() :
 { URI uri; Token t; Token name = null; Token meta = null; }
