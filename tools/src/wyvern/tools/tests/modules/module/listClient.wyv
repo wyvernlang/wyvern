@@ -1,0 +1,15 @@
+import stdlib.collections.list
+
+// some test cases
+
+val aList = list.Cons(1, list.Cons(2, list.Cons(5, list.Nil)))
+
+var count : Int = 0
+
+aList.do(x => count = x)
+
+def pickLast(lst:list.List, seed:Int):Int
+	lst.caseAnalyze(() => seed, (x,l) => pickLast(l,x))
+
+val five = pickLast(aList,0)
+five

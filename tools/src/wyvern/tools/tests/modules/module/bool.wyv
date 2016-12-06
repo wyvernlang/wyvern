@@ -1,0 +1,29 @@
+// a simple library for booleans
+
+type UnitDynFn
+	def apply():Dyn
+
+type Bool
+	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
+
+val True : Bool = new
+	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
+		trueCase()
+	
+val False : Bool = new
+	def ifTrue(trueCase:UnitDynFn, falseCase:UnitDynFn):Dyn
+		falseCase()
+		
+// some test cases
+
+val cond : Bool = True
+val condf : Bool = False
+
+def launderAsInt(x:Int):Int = x
+
+//val two : Int = cond.ifTrue(() => 5, 2)
+val testFive : Int = cond.ifTrue(() => 5,() => 2)
+
+// only necessary because annotations on val/Let are ignored - TO DO
+val five : Int = testFive // launderAsInt(testFive)
+five
