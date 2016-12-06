@@ -1,2 +1,2 @@
-resource type SigLogger
+resource type Logger
 	def log(x : Int) : Int

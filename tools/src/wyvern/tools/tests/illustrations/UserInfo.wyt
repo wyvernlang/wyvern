@@ -1,3 +1,3 @@
-resource type SigUserInfo
+resource type UserInfo
 	def init(uName : Int) : Int
 	def getName() : Int

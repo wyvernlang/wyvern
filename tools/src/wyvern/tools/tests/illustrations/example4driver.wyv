@@ -1,0 +1,4 @@
+instantiate userInfo() as uInfo
+instantiate wavyUnderlineV2() as wavyUnderliner
+
+val x : Int = wavyUnderliner.leakUserInfo()

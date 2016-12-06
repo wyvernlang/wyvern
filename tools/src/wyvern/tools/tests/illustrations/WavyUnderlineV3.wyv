@@ -1,6 +1,0 @@
-resource module WavyUnderlineV3
-
-require illustrations.SigLogger as logger
-
-def underlineIt() : system.Int
-	logger.log(4)

@@ -1,7 +1,6 @@
-resource module Example5
+module def example5(fileIO : illustrations.FileIO)
 
-require SigFileIO as fileIO
-instantiate Logger(fileIO) as logger
-instantiate WavyUnderlineV1() as wavyUnderliner
+instantiate logger(fileIO) as logger
+instantiate wavyUnderlineV1() as wavyUnderliner
 
 val x : system.Int = wavyUnderliner.underlineIt()
