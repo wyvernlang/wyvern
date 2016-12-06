@@ -167,7 +167,7 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
-{ AST exp; Token id; AST moduleArgs=null; Type t; boolean isResource = false; }
+{ AST exp; Token id; AST moduleArgs=null; boolean isResource = false; }
 {
   LOOKAHEAD(2)
   <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody() {
