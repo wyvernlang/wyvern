@@ -1,8 +1,8 @@
-resource module UserInfo
+module def userInfo() : UserInfo
 
-import illustrations.Lists
+import illustrations.lists
 
-val listFactory = Lists.listFactory
+val listFactory = lists.listFactory
 
 val name : Int = 5
 

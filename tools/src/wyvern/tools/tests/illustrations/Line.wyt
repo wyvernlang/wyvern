@@ -1,2 +1,0 @@
-type Line
-	val contents : Int

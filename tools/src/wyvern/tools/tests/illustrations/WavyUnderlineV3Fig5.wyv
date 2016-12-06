@@ -1,6 +1,0 @@
-resource module WavyUnderlineV3
-
-require SigLogger as logger
-
-def underlineIt() : system.Int
-	logger.logIO.write(entry)
