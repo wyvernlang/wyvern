@@ -167,12 +167,15 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
-{ AST exp; Token id; boolean isResource = false; }
+{ AST exp; Token id; AST moduleArgs=null; Type t; boolean isResource = false; }
 {
   LOOKAHEAD(2)
-  <RESOURCE> {isResource = true;} 
-  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
-	return build.moduleDecl(id.image, exp, loc(id), isResource);
+  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody(true) {
+	if (moduleArgs == null) {
+	   return build.moduleDecl(id.image, exp, loc(id), true);
+	} else {
+	   return build.moduleDecl(id.image, build.sequence(moduleArgs,exp,true), loc(id), true);
+	}
   }
 |
   <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
@@ -180,6 +183,27 @@ AST CompilationUnit() :
   }
 |
   exp = ModuleBody(false)  { return exp; }
+}
+
+AST ModuleArgs() :
+{ AST arg; AST args=null; }
+{
+  arg = ModuleArg() {
+      args = build.sequence(args,arg,true);
+  }
+  ( <COMMA> arg = ModuleArg() {
+      args = build.sequence(args,arg,true);
+    }
+  )*
+  { return args; }
+}
+
+AST ModuleArg() :
+{ Token name; URI uri; }
+{
+  name = <IDENTIFIER> <COLON> uri = Uri() {
+      return build.importDecl(uri, loc(name), name, true, false);
+  }
 }
 
 Type OptType() :
