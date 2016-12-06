@@ -1,3 +1,0 @@
-resource module Main
-instantiate UserInfo as uInfo
-// instantiate DocumentLock(uInfo) as dl

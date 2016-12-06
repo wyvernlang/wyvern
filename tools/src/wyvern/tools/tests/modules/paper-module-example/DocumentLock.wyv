@@ -1,4 +1,0 @@
-resource module DocumentLock
-require UserInfo as uInfo
-def sign() : Bool
-  var signee : Str = uInfo.getName()
