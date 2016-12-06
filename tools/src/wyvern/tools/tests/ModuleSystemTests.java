@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -93,16 +92,6 @@ public class ModuleSystemTests {
 	public void testInst() throws ParseException {
 		String program = TestUtil.readFile(PATH + "inst.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
-	}
-
-	@Test
-	@Category(CurrentlyBroken.class)
-	public void testDaryaModuleExample() throws ParseException {
-		String program = TestUtil.readFile(PATH + "paper-module-example/Main.wyv");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		WyvernResolver.getInstance().setNewParser(true);
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEvalEnv());
 	}
 
 	/**

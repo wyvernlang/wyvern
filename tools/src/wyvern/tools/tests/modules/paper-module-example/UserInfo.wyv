@@ -1,8 +1,0 @@
-resource module UserInfo
-import List
-var name : Str = "EMPTY"
-def init(uName : Name) : Unit
-  name = uName
-  actionHistory : List = new List
-def getName() : Str =
-  name
