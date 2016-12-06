@@ -1,2 +1,2 @@
-resource module testModule
+module def testModule()
 val x : Str = "5"

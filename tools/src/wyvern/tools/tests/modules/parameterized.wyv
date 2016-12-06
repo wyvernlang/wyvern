@@ -1,5 +1,3 @@
-resource module parameterized
-
-require modules.Formal as formal
+module def parameterized(formal : modules.Formal)
 
 def getFive():Int = formal.f()

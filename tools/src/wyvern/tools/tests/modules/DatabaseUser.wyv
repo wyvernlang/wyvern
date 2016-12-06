@@ -1,5 +1,4 @@
+require database
 
-require Database
-
-Database.contents = 10
-Database.contents
+database.contents = 10
+database.contents

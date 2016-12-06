@@ -1,2 +1,2 @@
-resource type sigD
+resource type Three
 	def m(y : Int) : Int

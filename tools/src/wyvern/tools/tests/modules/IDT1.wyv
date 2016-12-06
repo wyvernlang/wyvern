@@ -1,6 +1,6 @@
 // import-dependent type test, part 1
 
-module IDT1
+module idt1
 
 type MyADT = Unit
 

@@ -119,7 +119,7 @@ public class ModuleSystemTests {
 
 	@Test
 	public void testADT() throws ParseException {
-		ILTests.doTestScriptModularly("modules.ListClient",
+		ILTests.doTestScriptModularly("modules.listClient",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}
@@ -128,7 +128,7 @@ public class ModuleSystemTests {
 	@Category(CurrentlyBroken.class)
 	public void testTransitiveAuthorityBad() throws ParseException {
 
-		String[] fileList = {"Database.wyv", "DatabaseProxy.wyv", "DatabaseClientBad.wyv"};
+		String[] fileList = {"database.wyv", "databaseProxy.wyv", "databaseClientBad.wyv"};
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
@@ -151,7 +151,7 @@ public class ModuleSystemTests {
 	@Category(CurrentlyBroken.class)
 	public void testTransitiveAuthorityGood() throws ParseException {
 
-		String[] fileList = {"Database.wyv", "DatabaseProxy.wyv", "DatabaseClientGood.wyv"};
+		String[] fileList = {"database.wyv", "databaseProxy.wyv", "databaseClientGood.wyv"};
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
@@ -179,13 +179,13 @@ public class ModuleSystemTests {
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 	
-		// Load and link Database.wyv.
-		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"), "test input");
+		// Load and link database.wyv.
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "database.wyv"), "test input");
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
-		// Interpret DatabaseUser.wyv with Database.wyv in the context.
-		String source = TestUtil.readFile(PATH + "DatabaseUser.wyv");
+		// Interpret databaseUser.wyv with database.wyv in the context.
+		String source = TestUtil.readFile(PATH + "databaseUser.wyv");
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
 		IExpr program = ast.generateIL(genCtx, Util.intType(), null);
 		TypeContext ctx = TypeContext.empty();
@@ -204,13 +204,13 @@ public class ModuleSystemTests {
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 	
-		// Load and link Database.wyv.
-		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "Database.wyv"), "test input");
+		// Load and link database.wyv.
+		TypedAST astDatabase = TestUtil.getNewAST(TestUtil.readFile(PATH + "database.wyv"), "test input");
 		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) astDatabase).topLevelGen(genCtx, null);
 		genCtx = GenUtil.link(genCtx, decl);
 		
-		// Interpret DatabaseUser.wyv with Database.wyv in the context.
-		String source = TestUtil.readFile(PATH + "DatabaseUserTricky.wyv");
+		// Interpret databaseUser.wyv with database.wyv in the context.
+		String source = TestUtil.readFile(PATH + "databaseUserTricky.wyv");
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
 		IExpr program = ast.generateIL(genCtx, Util.intType(), new LinkedList<TypedModuleSpec>());
 		TypeContext ctx = TypeContext.empty();

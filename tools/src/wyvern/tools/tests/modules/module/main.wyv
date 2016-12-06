@@ -1,4 +1,3 @@
-resource module main
-instantiate A() as copyA
-instantiate B(copyA) as copyB
+instantiate modules.module.one() as copyOfOne
+instantiate modules.module.two(copyOfOne) as copyOfTwo
 val x : Int = 3
