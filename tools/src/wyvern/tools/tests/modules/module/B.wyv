@@ -1,4 +1,0 @@
-resource module B : sigB
-import D 
-require sigA as objA
-val k : system.Int = objA.m(3)

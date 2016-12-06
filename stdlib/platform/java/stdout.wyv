@@ -1,6 +1,4 @@
-resource module stdout
-
-require java
+module def stdout(java : Java)
 
 import java:wyvern.stdlib.support.Stdio.stdio
 

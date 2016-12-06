@@ -1,8 +1,6 @@
-resource module wordProcessor
+module def wordProcessor(io : figs.FileIO) : WordProcessor
 
 import figs.logger
-
-require figs.FileIO as io
 
 val log = logger(io)
 

@@ -167,19 +167,43 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
-{ AST exp; Token id; boolean isResource = false; }
+{ AST exp; Token id; AST moduleArgs=null; boolean isResource = false; }
 {
   LOOKAHEAD(2)
-  <RESOURCE> {isResource = true;} 
-  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
+  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody() {
+	if (moduleArgs == null) {
+	   return build.moduleDecl(id.image, exp, loc(id), true);
+	} else {
+	   return build.moduleDecl(id.image, build.sequence(moduleArgs,exp,true), loc(id), true);
+	}
+  }
+|
+  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody() {
 	return build.moduleDecl(id.image, exp, loc(id), isResource);
   }
 |
-  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(true) {
-	return build.moduleDecl(id.image, exp, loc(id), isResource);
+  exp = TopLevelCode()  { return exp; }
+}
+
+AST ModuleArgs() :
+{ AST arg; AST args=null; }
+{
+  arg = ModuleArg() {
+      args = build.sequence(args,arg,true);
   }
-|
-  exp = ModuleBody(false)  { return exp; }
+  ( <COMMA> arg = ModuleArg() {
+      args = build.sequence(args,arg,true);
+    }
+  )*
+  { return args; }
+}
+
+AST ModuleArg() :
+{ Token name; URI uri; }
+{
+  name = <IDENTIFIER> <COLON> uri = Uri() {
+      return build.importDecl(uri, loc(name), name, true, false);
+  }
 }
 
 Type OptType() :
@@ -190,14 +214,22 @@ Type OptType() :
   /* nothing */ { return null; }
 }
 
-AST ModuleBody(boolean inModule) :
+AST ModuleBody() :
 { AST ast; AST decl; }
 {
-  ast = DeclSequence(inModule)  { return ast; }
+  ast = DeclSequence(true)  { return ast; }
 |
-  decl = RequireDecl() ast = ModuleBody(inModule) { return build.sequence(decl,ast,inModule); }
+  decl = ImportDecl() ast = ModuleBody() { return build.sequence(decl,ast,true); }
+}
+
+AST TopLevelCode() :
+{ AST ast; AST decl; }
+{
+  ast = DeclSequence(false)  { return ast; }
 |
-  decl = ImportDecl() ast = ModuleBody(inModule) { return build.sequence(decl,ast,inModule); }
+  decl = RequireDecl() ast = TopLevelCode() { return build.sequence(decl,ast,false); }
+|
+  decl = ImportDecl() ast = TopLevelCode() { return build.sequence(decl,ast,false); }
 }
 
 AST RequireDecl() :
@@ -206,6 +238,7 @@ AST RequireDecl() :
   t=<REQUIRE> uri = Uri() [<AS> name = <IDENTIFIER>] <NEWLINE>
     { return build.importDecl(uri, loc(t), name, true, false); }
 }
+
 
 AST ImportDecl() :
 { URI uri; Token t; Token name = null; Token meta = null; }

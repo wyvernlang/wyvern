@@ -1,9 +1,9 @@
 require java
 
-import illustrations.FileIO
+import illustrations.fileIO
 import illustrations.example5
 
-val fileIO = FileIO(java)
-val ex5 = example5(fileIO)
+val fio = fileIO(java)
+val ex5 = example5(fio)
 
 ex5.x

@@ -1,7 +1,6 @@
 package wyvern.tools.tests;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,7 +14,6 @@ import org.junit.experimental.categories.Category;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -27,13 +25,10 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
-import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -406,7 +401,7 @@ public class ILTests {
 	@Test
 	public void testMultipleModules() throws ParseException {
 		
-		String[] fileList = {"A.wyt", "B.wyt", "D.wyt", "A.wyv", "D.wyv", "B.wyv", "main.wyv"};
+		String[] fileList = {"One.wyt", "Two.wyt", "Three.wyt", "one.wyv", "two.wyv", "three.wyv", "main.wyv"};
 		GenContext genCtx = Globals.getStandardGenContext();
 		//genCtx = new TypeGenContext("Int", "system", genCtx);
 		
@@ -617,8 +612,7 @@ public class ILTests {
 	
 	@Test
 	public void testJavaImport1() throws ParseException {
-		String input = "resource module main\n\n"
-					 + "require java\n\n"
+		String input = "module def main(java : Java)\n\n"
 //					 + "import testcode/Adder\n\n"
 //					 + "type Adder\n"
 //					 + "    def addOne(i:system.Int):system.Int\n\n"
@@ -645,12 +639,12 @@ public class ILTests {
 	
 	@Test
 	public void testBool() throws ParseException {
-		doTestScript("Bool.wyv", Util.intType(), new IntegerLiteral(5));
+		doTestScript("bool.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testList() throws ParseException {
-		doTestScript("List.wyv", Util.intType(), new IntegerLiteral(5));
+		doTestScript("list.wyv", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
@@ -660,7 +654,7 @@ public class ILTests {
 	
 	@Test
 	public void testListClient() throws ParseException {
-		doTestScriptModularly("modules.module.ListClient", Util.intType(), new IntegerLiteral(5));
+		doTestScriptModularly("modules.module.listClient", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	private void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
@@ -716,8 +710,7 @@ public class ILTests {
 	
 	@Test
 	public void testJavaImport2() throws ParseException {
-		String input = "resource module main\n\n"
-					 + "require java\n\n"
+		String input = "module def main(java : Java)\n\n"
 //					 + "import testcode/Adder\n\n"
 //					 + "type Adder\n"
 //					 + "    def addOne(i:system.Int):system.Int\n\n"
@@ -770,7 +763,7 @@ public class ILTests {
 	// tests import-dependent types
 	@Test
 	public void testIDT() throws ParseException {
-		doTestScriptModularly("modules.IDT3", Util.intType(), new IntegerLiteral(3));
+		doTestScriptModularly("modules.idtDriver", Util.intType(), new IntegerLiteral(3));
 	}
 	
 	@Test

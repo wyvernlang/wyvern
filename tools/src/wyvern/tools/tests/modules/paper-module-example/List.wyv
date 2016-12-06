@@ -1,4 +1,0 @@
-module List
-def add(v : Int) : Unit
-  value = v
-var value : Int = 42

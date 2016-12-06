@@ -1,6 +1,0 @@
-resource module WavyUnderlineV2
-
-import SigUserInfo as userInfo
-
-def leakUserInfo() : system.Int
-	userInfo.getName()

@@ -1,7 +1,4 @@
-resource module wordCloudFig4
-
-require figs.Logger as log
-require figs.ListFactory2 as list
+module def wordCloudFig4(log : figs.Logger, list : figs.ListFactory2) : WordCloud
 
 val words : list.List = list.create()
 

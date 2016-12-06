@@ -1,4 +1,4 @@
-module Lists
+module lists
 
 val listFactory = new
 	type List

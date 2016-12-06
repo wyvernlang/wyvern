@@ -1,8 +1,8 @@
-import illustrations.UserInfo
-import illustrations.DocumentLock
+import illustrations.userInfo
+import illustrations.documentLock
 
-val uInfo = UserInfo()
-val docLock = DocumentLock(uInfo)
+val uInfo = userInfo()
+val docLock = documentLock(uInfo)
 
 val x : Int = docLock.sign()
 x

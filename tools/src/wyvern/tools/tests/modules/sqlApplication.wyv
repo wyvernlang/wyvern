@@ -1,10 +1,6 @@
-resource module sqlApplication
+module def sqlApplication(safeSQL : db.SafeSQL)
 
 //import db.stringSQL
-
-require db.SafeSQL as safeSQL
-
-
 
 def run() : Int
     val input = "CouldBeUnsafe"

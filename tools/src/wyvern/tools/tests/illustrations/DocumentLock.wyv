@@ -1,7 +1,0 @@
-resource module DocumentLock
-
-require illustrations.SigUserInfo as uInfo
-
-def sign() : Int
-	val signee : Int = uInfo.getName()
-	signee

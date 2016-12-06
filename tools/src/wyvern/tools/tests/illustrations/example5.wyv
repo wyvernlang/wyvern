@@ -1,11 +1,9 @@
-resource module example5
+module def example5(io : illustrations.FileIO)
 
-import illustrations.Logger
-import illustrations.WavyUnderlineV3
+import illustrations.logger
+import illustrations.wavyUnderlineV3
 
-require illustrations.SigFileIO as io
-
-val logger = Logger(io)
-val wavyUnderliner = WavyUnderlineV3(logger)
+val log = logger(io)
+val wavyUnderliner = wavyUnderlineV3(log)
 
 val x : system.Int = wavyUnderliner.underlineIt()
