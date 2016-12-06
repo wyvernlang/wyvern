@@ -32,7 +32,11 @@ public class AST {
 	public ValueType intType() {
 		return Util.intType();
 	}
-	
+
+    public ValueType dynType() {
+        return Util.dynType();
+	}
+
 	public Expression intLiteral(int i) {
 		return new IntegerLiteral(i);
 	}
@@ -54,6 +58,14 @@ public class AST {
 		NamedDeclaration realDecl = (NamedDeclaration) fieldValue.getWrappedValue();
 		return new New(realDecl);
 	}
+
+    public Expression twoDeclObject(ObjectValue decl1, ObjectValue decl2) {
+        final JavaValue fieldValue1 = (JavaValue) decl1.getField("decl");
+        NamedDeclaration realDecl1 = (NamedDeclaration) fieldValue1.getWrappedValue();
+        final JavaValue fieldValue2 = (JavaValue) decl2.getField("decl");
+        NamedDeclaration realDecl2 = (NamedDeclaration) fieldValue2.getWrappedValue();
+        return new New(realDecl1, realDecl2);
+    }
 	
 	private Expression getExpr(ObjectValue wyvernAST) {
 		final Value ast = wyvernAST.getField("ast");
@@ -76,7 +88,7 @@ public class AST {
 
     public IExpr parseExpression(String input) throws ParseException {
         System.out.println("parseExpression recieved input '"+input+"'");
-        ExpressionAST ast = (ExpressionAST)TestUtil.getNewAST(input, "TSL Parse");
+        ExpressionAST ast = (ExpressionAST)TestUtil.getNewAST(input + "\n", "TSL Parse");
         // TODO: Handle InterpreterState/GenContext
         return ast.generateIL(Globals.getStandardGenContext(), null, null);
     }

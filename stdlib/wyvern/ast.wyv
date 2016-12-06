@@ -14,6 +14,9 @@ type Type
 def object(d:Decl):AST = new
 	val ast:Unit = utils.oneDeclObject(d)
 
+def twoDeclObject(d1:Decl, d2:Decl):AST = new
+  val ast:Unit = utils.twoDeclObject(d1, d2)
+
 def defn(name:String,resultType:Type,body:AST):Decl = new
 	val decl:Unit = utils.OneArgDefn(name, resultType, body)
 
@@ -33,5 +36,9 @@ def parseExpression(input : String) : AST = new
   val ast:Unit = utils.parseExpression(input)
 
 val types = new
-	def int():Type = new
-		val typ:Unit = utils.intType()
+  def int():Type = new
+    val typ:Unit = utils.intType()
+
+  def dyn():Type = new
+    val typ:Unit = utils.dynType()
+

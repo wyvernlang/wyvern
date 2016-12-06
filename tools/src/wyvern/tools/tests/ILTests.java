@@ -762,7 +762,7 @@ public class ILTests {
 
     @Test
     public void testTSL2() throws ParseException {
-        doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(7));
+        doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
     }
 	
 	// tests import-dependent types

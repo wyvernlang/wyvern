@@ -1,0 +1,20 @@
+module IfTSL
+
+import wyvern.ast
+import wyvern.option
+
+type AST = ast.AST
+
+type IfExpr
+  def evalTrue() : Dyn
+  def evalFalse() : Dyn
+  metadata new
+    def parseTSL(input : String) : option.Option
+      val trueAST : AST = ast.parseExpression(input)
+      val falseAST : AST = trueAST
+      val trueDefn = ast.defn("evalTrue", ast.types.dyn(), trueAST)
+      val falseDefn = ast.defn("evalFalse", ast.types.dyn(), falseAST)
+      option.Some(ast.twoDeclObject(trueDefn, falseDefn))
+
+def doif(condition : Boolean, body : IfExpr) : Dyn
+  condition.ifTrue(() => body.evalTrue(), () => body.evalFalse())
