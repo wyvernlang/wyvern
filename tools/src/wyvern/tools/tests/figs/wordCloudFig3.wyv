@@ -1,7 +1,6 @@
-resource module wordCloudFig3
+module def wordCloudFig3(log : figs.Logger) : WordCloud
 
 import figs.listFactory
-require figs.Logger as log
 
 val words : listFactory.List = listFactory.create()
 

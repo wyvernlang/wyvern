@@ -1,6 +1,4 @@
-resource module logger
-
-require figs.FileIO as logIO
+module def logger(logIO : figs.FileIO) : Logger
 
 def log(entry : Int) : Int
 	logIO.write(entry)
