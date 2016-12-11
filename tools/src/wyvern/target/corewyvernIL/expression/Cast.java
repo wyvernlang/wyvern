@@ -27,7 +27,7 @@ public class Cast extends Expression{
 	@Override
 	public ValueType typeCheck(TypeContext ctx) {
 		toCastExpr.typeCheck(ctx);
-		return getExprType();
+		return getExprType().getCanonicalType(ctx);
 	}
 
 	@Override
