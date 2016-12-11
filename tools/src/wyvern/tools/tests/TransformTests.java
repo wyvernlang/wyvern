@@ -44,7 +44,7 @@ public class TransformTests {
 	 * @param program: program to typecheck.
 	 * @param expectedType: the type you should get from typechecking.l
 	 */
-	private static void typecheck (IExpr program, ValueType expectedType) {
+	private static void typecheck(IExpr program, ValueType expectedType) {
 		TypeContext ctx = Globals.getStandardTypeContext();
 		ValueType actualType = program.typeCheck(ctx);
 		if (expectedType != null)
@@ -56,7 +56,7 @@ public class TransformTests {
 	 * @param program: program to run.
 	 * @param expectedOutput: value you should get from running the program.
 	 */
-	private static void run (IExpr program, Value expectedOutput) {
+	private static void run(IExpr program, Value expectedOutput) {
 		EvalContext ctx = Globals.getStandardEvalContext();
 		Value actualOutput = program.interpret(ctx);
 		if (expectedOutput != null)
@@ -85,7 +85,7 @@ public class TransformTests {
 	 * @return a program in IL code.
 	 * @throws ParseException: if the source code is malformed.
 	 */
-	private static IExpr compile (String input) throws ParseException {
+	private static IExpr compile(String input) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "Transformer Test");
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
                                                                    new File(TestUtil.BASE_PATH),
@@ -103,9 +103,9 @@ public class TransformTests {
 	 * @return a program in IL code.
 	 * @throws ParseException: if the source code is malformed.
 	 */
-	private static IExpr compile (String input, ASTVisitor<GenContext, ASTNode>... transformations) throws ParseException {
+	private static IExpr compile(String input, ASTVisitor<TypeContext, ASTNode>... transformations) throws ParseException {
 		IExpr program = compile(input);
-		for (ASTVisitor<GenContext, ASTNode> transformer : transformations) {
+		for (ASTVisitor<TypeContext, ASTNode> transformer : transformations) {
 			GenContext ctx = Globals.getStandardGenContext();
 			program = (IExpr) program.acceptVisitor(transformer, ctx);
 		}
@@ -113,7 +113,7 @@ public class TransformTests {
 	}
 	
 	@Test
-	public void testSafeDynCasting () throws ParseException {
+	public void testSafeDynCasting() throws ParseException {
 		
 		String code = "val x : Dyn = 5\n"
 				    + "val y : Dyn = x\n"
@@ -132,7 +132,7 @@ public class TransformTests {
 	}
 	
 	@Test
-	public void testUnsafeDynCasting () throws ParseException {
+	public void testUnsafeDynCasting() throws ParseException {
 		
 		String input = "val intToInt: Dyn = new\n"
 				     + "    def app():system.Int = 5\n\n"
@@ -181,11 +181,30 @@ public class TransformTests {
 	    typecheck(program, Util.intType());
 	    run(program, new StringLiteral("hello"));
 	                 
-	    // Should through a runtime type-error with casts.
+	    // Should throw a runtime type-error with casts.
 	    program = compile(input, new DynCastsTransformer());
 	    typecheck(program, Util.intType());
 	    runWithToolError(program, ErrorMessage.NOT_SUBTYPE);    
         
+	}
+	
+	@Test
+	public void testUnsafeFieldWrite() throws ParseException {
+	    
+	    String input = "val obj: Dyn = new\n"
+	                 + "    var field: system.Int = 5\n"
+	                 + "obj.field = \"broken\"\n";
+	    
+	    // Should compile and run OK without casts.
+	    IExpr program = compile(input);
+	    typecheck(program, Util.unitType());
+	    run(program, Util.unitValue());
+	    
+	    // Should throw a runtime type-error with casts.
+	    program = compile(input, new DynCastsTransformer());
+	    typecheck(program, Util.unitType());
+	    runWithToolError(program, ErrorMessage.NOT_SUBTYPE);
+	    
 	}
 	
 }

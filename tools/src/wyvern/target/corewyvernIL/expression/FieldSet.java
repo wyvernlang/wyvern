@@ -52,9 +52,11 @@ public class FieldSet extends Expression {
 			receiverType = receiver.typeCheck(ctx);
 		} else if (objectExpr instanceof Variable) {
 			receiverType = ctx.lookupTypeOf(((Variable)objectExpr).getName());
+		} else if (objectExpr instanceof Cast) {
+		    receiverType = objectExpr.typeCheck(ctx);
 		} else {
 		    throw new RuntimeException("Target of FieldSet is unsupported. Type: " + objectExpr.getClass());
-		}
+	    }
 		return Util.isDynamicType(receiverType);
 	}
 	
