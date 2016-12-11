@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.io.IOException;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -49,4 +50,14 @@ public class Cast extends Expression{
 	public Set<String> getFreeVariables() {
 		return toCastExpr.getFreeVariables();
 	}
+	
+	@Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+	    dest.append("(");
+	    getExprType().doPrettyPrint(dest, "");
+	    dest.append(") ");
+	    this.toCastExpr.doPrettyPrint(dest, "");
+    }
+    
+	
 }
