@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -165,6 +166,26 @@ public class TransformTests {
 	    typecheck(program, Util.dynType());
 	    run(program, new IntegerLiteral(5));
 	    
+	}
+	
+	@Test
+	public void testUnsafeFieldAccess() throws ParseException {
+	    
+	    String input = "val obj: Dyn = new\n"
+	                 + "    val field: system.String = \"hello\"\n"
+	                 + "val x: system.Int = obj.field\n"
+	                 + "x";
+	    
+	    // Should compile and run OK without casts.
+	    IExpr program = compile(input);
+	    typecheck(program, Util.intType());
+	    run(program, new StringLiteral("hello"));
+	                 
+	    // Should through a runtime type-error with casts.
+	    program = compile(input, new DynCastsTransformer());
+	    typecheck(program, Util.intType());
+	    runWithToolError(program, ErrorMessage.NOT_SUBTYPE);    
+        
 	}
 	
 }
