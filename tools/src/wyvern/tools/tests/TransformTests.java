@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.transformers.DynCastsTransformer;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -132,20 +133,38 @@ public class TransformTests {
 	@Test
 	public void testUnsafeDynCasting () throws ParseException {
 		
-		String input = "val intToInt : Dyn = new\n"
+		String input = "val intToInt: Dyn = new\n"
 				     + "    def app():system.Int = 5\n\n"
-				     + "val anInt : system.Int = intToInt\n"
+				     + "val anInt: system.Int = intToInt\n"
 				     + "anInt";
 
 		// Should compile and run OK without casts.
 		IExpr program = compile(input);		
-		typecheck(program, new NominalType("system", "Int"));
+		typecheck(program, Util.intType());
 		
 		// But we should get a casting error, once we've added the casts.
 		program = compile(input, new DynCastsTransformer());
-		typecheck(program, new NominalType("system", "Int"));
+		typecheck(program, Util.intType());
 		runWithToolError(program, ErrorMessage.NOT_SUBTYPE);	
 		
+	}
+	
+	@Test
+	public void testSafeFieldAccess() throws ParseException {
+	    
+	    String input = "val obj: Dyn = new\n"
+	                 + "    val field: system.Int = 5\n"
+	                 + "obj.field\n";
+	    
+	    // Should compile and run OK without casts.
+	    IExpr program = compile(input);
+	    typecheck(program, Util.dynType());
+	    
+	    // Should compile and run OK with casts.
+	    program = compile(input, new DynCastsTransformer());
+	    typecheck(program, Util.dynType());
+	    run(program, new IntegerLiteral(5));
+	    
 	}
 	
 }

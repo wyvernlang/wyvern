@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.transformers;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -46,10 +48,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public class DynCastsTransformer extends ASTVisitor<GenContext, ASTNode> {
 
-	/**
-	
-	**/
-	
 	/**
 	 * Check if an expression has the dynamic type.
 	 * @param expr: expr whose type is to be checked.
@@ -97,7 +95,7 @@ public class DynCastsTransformer extends ASTVisitor<GenContext, ASTNode> {
 		List<FormalArg> formalArgs = formalMethCall.getFormalArgs();
 		
 		// We shall transform the actual arguments supplied to the method call.
-		// Keep track of tranasformed arguments in a separate list.
+		// Keep track of transformed arguments in a separate list.
 		List<? extends IExpr> args = methCall.getArgs();
 		List<IExpr> argsTransformed = new LinkedList<>();
 		
@@ -125,7 +123,19 @@ public class DynCastsTransformer extends ASTVisitor<GenContext, ASTNode> {
 
 	@Override
 	public FieldGet visit(GenContext ctx, FieldGet fieldGet) {
-		throw new RuntimeException("Unable to perform DynCast.transformExpr on FieldGet expressions.");
+	    IExpr receiver = fieldGet.getObjectExpr();
+	    ValueType receiverType = receiver.typeCheck(ctx);
+
+        // If accessing field of object with Dyn type, cast it to something with that field.
+	    if (Util.isDynamicType(receiverType)) {
+	        ValDeclType fieldDecl = new ValDeclType(fieldGet.getName(), Util.dynType());
+            LinkedList<DeclType> declTypes = new LinkedList<>();
+            declTypes.add(fieldDecl);
+            ValueType newType = new StructuralType("this", declTypes);
+            return new FieldGet(castFromDyn(receiver, newType), fieldGet.getName(), fieldGet.getLocation());
+	    } else {
+            return fieldGet;
+	    }
 	}
 
 	@Override
