@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.ASTNode;
@@ -26,6 +27,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
@@ -204,6 +206,88 @@ public class TransformTests {
 	    program = compile(input, new DynCastsTransformer());
 	    typecheck(program, Util.unitType());
 	    runWithToolError(program, ErrorMessage.NOT_SUBTYPE);
+	    
+	}
+	
+	@Test
+	public void testSafeFieldWrite() throws ParseException {
+	    
+	    String input = "val obj: Dyn = new\n"
+	                 + "    var field: system.Int = 5\n"
+	                 + "obj.field = 10\n";
+	    
+	    // Should compile and run OK without casts.
+	    IExpr program = compile(input);
+	    typecheck(program, Util.unitType());
+	    run(program, Util.unitValue());
+	    
+	    // Should compile and run OK with casts.
+	    program = compile(input, new DynCastsTransformer());
+	    typecheck(program, Util.unitType());
+	    run(program, Util.unitValue());
+	    
+	}
+	
+	@Test
+	public void testSafeMethodCall() throws ParseException {
+	    
+	    String input = "val obj: Dyn = new\n"
+	                 + "    def five():system.Int = 5\n"
+	                 + "obj.five()\n";
+
+        // Should compile and run OK without casts.
+        IExpr program = compile(input);
+        typecheck(program, Util.dynType());
+        run(program, new IntegerLiteral(5));
+        
+        // Should compile and run OK with casts.
+        program = compile(input, new DynCastsTransformer());
+        typecheck(program, Util.dynType());
+        run(program, new IntegerLiteral(5));
+	    
+	}
+	
+	@Test
+	public void testUnsafeMethodCall() throws ParseException {
+	    
+	    String input = "val obj: Dyn = new\n"
+	                 + "    def five():system.Int = 5\n"
+	                 + "val str: system.String = obj.five()";
+	    
+	    // Should compile and run OK without casts.
+	    IExpr program = compile(input);
+	    typecheck(program, Util.unitType());
+	    run(program, Util.unitValue());
+	    
+	    // Should give a run-time type error with casts.
+	    program = compile(input, new DynCastsTransformer());
+	    typecheck(program, Util.unitType());
+        runWithToolError(program, ErrorMessage.NOT_SUBTYPE);
+	    
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testSafeMethodCall2() throws ParseException {
+	    
+	    String input = "val ticker: Dyn = new\n"
+	                 + "    val clock = new\n"
+	                 + "        var count: Int = 0\n"
+	                 + "    def tick(): Int\n"
+	                 + "        val result: Int = this.clock.count\n"
+	                 + "        this.clock.count = this.clock.count + 1\n"
+	                 + "        result\n"
+	                 + "ticker.tick()";
+	                 
+	    // Should compile and run OK without casts.
+	    IExpr program = compile(input);
+	    typecheck(program, Util.dynType());
+	    run(program, new IntegerLiteral(0));
+	    
+	    // Should still compile and run OK with casts.
+	    program = compile(input, new DynCastsTransformer());
+	    typecheck(program, Util.dynType());
+	    run(program, new IntegerLiteral(0));
 	    
 	}
 	
