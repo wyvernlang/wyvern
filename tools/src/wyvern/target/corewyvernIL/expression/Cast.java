@@ -53,10 +53,11 @@ public class Cast extends Expression{
 	
 	@Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-	    dest.append("(");
+	    dest.append("((");
 	    getExprType().doPrettyPrint(dest, "");
 	    dest.append(") ");
-	    this.toCastExpr.doPrettyPrint(dest, "");
+	    toCastExpr.doPrettyPrint(dest, "");
+	    dest.append(")"); 
     }
     
 	
