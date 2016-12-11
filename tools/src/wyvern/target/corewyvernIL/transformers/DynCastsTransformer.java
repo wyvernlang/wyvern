@@ -95,30 +95,54 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		
 		// Transform the receiver.
 		IExpr receiver = (IExpr) methCall.getObjectExpr().acceptVisitor(this, ctx);
-		
-		// Get formal arguments of the method being invoked.
-		DefDeclType formalMethCall = methCall.typeMethodDeclaration(ctx);
-		List<FormalArg> formalArgs = formalMethCall.getFormalArgs();
-		
-		// We shall transform the actual arguments supplied to the method call.
-		// Keep track of transformed arguments in a separate list.
-		List<? extends IExpr> args = methCall.getArgs();
-		List<IExpr> argsTransformed = new LinkedList<>();
-		
-		// First we transform each argument. If the transformed argument has Dyn type,
-		// wrap in a cast to the formal type.
-		for (int i = 0; i < methCall.getArgs().size(); i++) {
-			IExpr arg = args.get(i);
-			IExpr argTransformed = (IExpr) arg.acceptVisitor(this, ctx);
-			if (hasDynamicType(argTransformed, ctx)) {
-				ValueType formalType = formalArgs.get(i).getType();
-				argTransformed = castFromDyn(argTransformed, formalType);
-			}
-			argsTransformed.add(argTransformed);
+
+		// Dynamic receiver: cast object to something with appropriate method.
+		if (hasDynamicType(receiver, ctx)) {
+		    
+		    List<? extends IExpr> actualArgs = methCall.getArgs();
+		    List<FormalArg> fargs = new LinkedList<>();
+		    
+		    // TODO: update context with a fake "this" ?
+		    for (int i = 0; i < actualArgs.size(); i++) {
+		        IExpr arg = actualArgs.get(i);
+		        arg = (IExpr) arg.acceptVisitor(this, ctx);
+		        ValueType argType = arg.typeCheck(ctx);
+		        fargs.add(new FormalArg("_arg" + i, argType));    
+		    }
+		    
+		    // Build up the type to which the receiver shall be cast.
+		    DefDeclType methodDecl = new DefDeclType(methCall.getMethodName(), Util.dynType(), fargs);
+		    List<DeclType> transformedDecls = new LinkedList<>();
+		    transformedDecls.add(methodDecl);
+		    ValueType receiverCastType = new StructuralType("this", transformedDecls);
+		    receiver = castFromDyn(receiver, receiverCastType);
+		    return new MethodCall(receiver, methCall.getMethodName(), actualArgs, methCall);
 		}
 		
-		// Construct and return the transformed method call.
-		return new MethodCall(receiver, methCall.getMethodName(), argsTransformed, methCall);
+		// Non-dynamic receiver: cast any dynamic arguments to their formal type.
+		else {
+
+	        // Get formal arguments of the method being invoked.
+	        DefDeclType formalMethCall = methCall.typeMethodDeclaration(ctx);
+	        List<FormalArg> formalArgs = formalMethCall.getFormalArgs();
+	        
+	        // Transform the actual arguments supplied to the method call.
+	        List<? extends IExpr> args = methCall.getArgs();
+	        List<IExpr> argsTransformed = new LinkedList<>();
+	        for (int i = 0; i < methCall.getArgs().size(); i++) {
+	            IExpr arg = args.get(i);
+	            IExpr argTransformed = (IExpr) arg.acceptVisitor(this, ctx);
+	            if (hasDynamicType(argTransformed, ctx)) {
+	                ValueType formalType = formalArgs.get(i).getType();
+	                argTransformed = castFromDyn(argTransformed, formalType);
+	            }
+	            argsTransformed.add(argTransformed);
+	        }
+	        
+	        // Construct and return the transformed method call.
+	        return new MethodCall(receiver, methCall.getMethodName(), argsTransformed, methCall);
+
+		}
 		
 	}
 
