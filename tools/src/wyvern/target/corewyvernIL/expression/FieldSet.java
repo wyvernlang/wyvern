@@ -50,11 +50,11 @@ public class FieldSet extends Expression {
 		if (objectExpr instanceof FieldGet) {
 			IExpr receiver = ((FieldGet)objectExpr).getObjectExpr();
 			receiverType = receiver.typeCheck(ctx);
-		}
-		else if (objectExpr instanceof Variable) {
+		} else if (objectExpr instanceof Variable) {
 			receiverType = ctx.lookupTypeOf(((Variable)objectExpr).getName());
+		} else {
+		    throw new RuntimeException("Target of FieldSet is unsupported. Type: " + objectExpr.getClass());
 		}
-		else throw new RuntimeException("Target of FieldSet is unsupported. Type: " + objectExpr.getClass());
 		return Util.isDynamicType(receiverType);
 	}
 	
@@ -64,7 +64,7 @@ public class FieldSet extends Expression {
 	    // Setting the field of a dynamic object.
 		if (settingDynamicObject(ctx)) {
 		    exprToAssign.typeCheck(ctx);
-		    return Util.dynType();
+		    return Util.unitType();
 		}
 		
 		// Figure out types of object and expression.
