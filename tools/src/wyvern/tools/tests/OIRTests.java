@@ -626,16 +626,16 @@ public class OIRTests {
         testPyFromInput(input, "8\n8");
     }
 
-    // @Test
-    // public void testTSLIf() throws ParseException {
-    //     String input =
-    //         "import metadata wyvern.IfTSL\n" +
-    //         "IfTSL.doif(true, ~)\n" +
-    //         "  then\n" +
-    //         "    7\n" +
-    //         "  else\n" +
-    //         "    8" +
-    //         "\n";
-    //     testPyFromInput(input, "7");
-    // }
+    @Test
+    public void testTSLIf() throws ParseException {
+        String input =
+            "import metadata wyvern.IfTSL\n" +
+            "IfTSL.doif(true, ~)\n" +
+            "  then\n" +
+            "    7\n" +
+            "  else\n" +
+            "    8" +
+            "\n";
+        testPyFromInput(input, "7");
+    }
 }

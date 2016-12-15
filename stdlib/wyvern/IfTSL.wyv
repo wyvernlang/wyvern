@@ -4,6 +4,24 @@ import wyvern.ast
 import wyvern.option
 import wyvern.util.matching.regex
 
+def thenMatch(input : String) : regex.Match
+  val thenRegex = regex("^then\n")
+  val mOpt = thenRegex.findPrefixMatchOf(input)
+  mOpt.getOrElse(() => regex.makeMatch("", input))
+
+def elseMatch(input : String) : regex.Match
+  val thenRegex = regex("^else\n")
+  val mOpt = thenRegex.findPrefixMatchOf(input)
+  mOpt.getOrElse(() => regex.makeMatch("", input))
+
+def indentedBlockMatch(input : String) : regex.Match
+  val blockRegex = regex("(\\s[^\n]*\n)+")
+  val blockMatchOpt = blockRegex.findPrefixMatchOf(input)
+
+  val emptymatch = regex.makeMatch("", input)
+  val m : regex.Match = blockMatchOpt.getOrElse(() => emptymatch)
+  m
+
 type AST = ast.AST
 
 type IfExpr
@@ -11,10 +29,12 @@ type IfExpr
   def evalFalse() : Dyn
   metadata new
     def parseTSL(input : String) : option.Option
-      val thenRegex = regex.apply("^then")
-      val thenMatch = thenRegex.findPrefixMatchOf(input)
-      val trueAST : AST = ast.parseExpression(input)
-      val falseAST : AST = trueAST
+      val trimmedInput = ast.stripLeadingWhitespace(input)
+      val tm = thenMatch(trimmedInput)
+      val trueMatch = indentedBlockMatch(tm.after())
+      val em = elseMatch(trueMatch.after())
+      val trueAST : AST = ast.parseExpression(ast.stripLeadingWhitespace(trueMatch.matched()))
+      val falseAST : AST = ast.parseExpression(ast.stripLeadingWhitespace(em.after()))
       val trueDefn = ast.defn("evalTrue", ast.types.dyn(), trueAST)
       val falseDefn = ast.defn("evalFalse", ast.types.dyn(), falseAST)
       option.Some(ast.twoDeclObject(trueDefn, falseDefn))
