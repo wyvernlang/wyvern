@@ -42,3 +42,4 @@ val types = new
   def dyn():Type = new
     val typ:Unit = utils.dynType()
 
+def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)

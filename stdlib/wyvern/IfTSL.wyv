@@ -2,6 +2,7 @@ module IfTSL
 
 import wyvern.ast
 import wyvern.option
+import wyvern.util.matching.regex
 
 type AST = ast.AST
 
@@ -10,6 +11,8 @@ type IfExpr
   def evalFalse() : Dyn
   metadata new
     def parseTSL(input : String) : option.Option
+      val thenRegex = regex.apply("^then")
+      val thenMatch = thenRegex.findPrefixMatchOf(input)
       val trueAST : AST = ast.parseExpression(input)
       val falseAST : AST = trueAST
       val trueDefn = ast.defn("evalTrue", ast.types.dyn(), trueAST)

@@ -476,10 +476,10 @@ Token DSLLines() :
 { Token t, t2; String content = ""; }
 {
     t=<DSLLINE> {
-      content = t.image;
+      content = t.specialToken.image + t.image;
   }
   ( t2 = <DSLLINE> {
-      content = content + t2.image;
+      content = content + t2.specialToken.image + t2.image;
     }
   )*
   { 

@@ -10,5 +10,5 @@ type IntExpr
   def eval() : Int
   metadata new
     def parseTSL(input : String) : option.Option
-      val inputAST : AST = ast.parseExpression(input)
+      val inputAST : AST = ast.parseExpression(ast.stripLeadingWhitespace(input))
       option.Some(ast.object(ast.defn("eval", ast.types.int(), inputAST)))

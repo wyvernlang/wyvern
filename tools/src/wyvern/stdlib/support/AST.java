@@ -1,7 +1,12 @@
 package wyvern.stdlib.support;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
@@ -89,7 +94,49 @@ public class AST {
     public IExpr parseExpression(String input) throws ParseException {
         System.out.println("parseExpression recieved input '"+input+"'");
         ExpressionAST ast = (ExpressionAST)TestUtil.getNewAST(input + "\n", "TSL Parse");
+        // Extend parseTSL with a second argument (abstract type representing context)
         // TODO: Handle InterpreterState/GenContext
         return ast.generateIL(Globals.getStandardGenContext(), null, null);
+    }
+
+    private String commonPrefix(String s1, String s2) {
+        if (s1 == null) return s2;
+        if (s2 == null) return s1;
+
+        int minLen = Math.min(s1.length(), s2.length());
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < minLen; i++) {
+            if (s1.charAt(i) == s2.charAt(i)) {
+                result.append(s1.charAt(i));
+            } else {
+                break;
+            }
+        }
+        return result.toString();
+    }
+
+    public String stripLeadingWhitespace(String input) throws IOException {
+        // Remove the least common whitespace prefix from all lines in [input]
+        String toStrip = null;
+        String line = null;
+        BufferedReader bufReader = new BufferedReader(new StringReader(input));
+        Pattern p = Pattern.compile("^(\\s+).+");
+        while ((line = bufReader.readLine()) != null) {
+        	Matcher m = p.matcher(line);
+        	String leadingWhitespace;
+        	if (m.matches()) {
+        		leadingWhitespace = m.group(1);
+        	} else {
+        		leadingWhitespace = "";
+        	}
+            toStrip = commonPrefix(leadingWhitespace, toStrip);
+        }
+        bufReader = new BufferedReader(new StringReader(input));
+        StringBuilder result = new StringBuilder();
+        while ((line = bufReader.readLine()) != null) {
+            result.append(line.substring(toStrip.length()));
+            result.append("\n");
+        }
+        return result.toString();
     }
 }
