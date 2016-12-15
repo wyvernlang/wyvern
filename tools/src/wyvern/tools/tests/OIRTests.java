@@ -627,14 +627,27 @@ public class OIRTests {
     }
 
     @Test
-    public void testTSLIf() throws ParseException {
+    public void testTSLIfElse() throws ParseException {
         String input =
             "import metadata wyvern.IfTSL\n" +
-            "IfTSL.doif(true, ~)\n" +
+            "IfTSL.doif(false, ~)\n" +
             "  then\n" +
             "    7\n" +
             "  else\n" +
             "    8" +
+            "\n";
+        testPyFromInput(input, "8");
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testTSLIf() throws ParseException {
+        String input =
+            "require python\n" +
+            "import metadata wyvern.IfTSLBroken\n" +
+            "IfTSLBroken(python).doif(true, ~)\n" +
+            "  then\n" +
+            "    7\n" +
             "\n";
         testPyFromInput(input, "7");
     }

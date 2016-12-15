@@ -1,8 +1,11 @@
-module IfTSL
+module IfTSLBroken
+
+require python
 
 import wyvern.ast
 import wyvern.option
 import wyvern.util.matching.regex
+import wyvern.CoreString
 
 def thenMatch(input : String) : regex.Match
   val thenRegex = regex("^then\n")
@@ -24,7 +27,7 @@ def indentedBlockMatch(input : String) : regex.Match
 
 def toUnitOrAST(input : String) : ast.AST
   val stripped = ast.stripLeadingWhitespace(input)
-  false.ifTrue(() => ast.int(0), () => ast.parseExpression(stripped))
+  CoreString(python).equals(stripped, "").ifTrue(() => ast.int(0), () => ast.parseExpression(stripped))
 
 type AST = ast.AST
 
