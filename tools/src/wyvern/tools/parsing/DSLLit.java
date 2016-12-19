@@ -15,10 +15,12 @@ import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.extensions.TSLBlock;
@@ -126,6 +128,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			// TODO: check that parseTSLDecl has the right signature
 			List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
 			args.add(new StringLiteral(dslText.get()));
+      args.add(new JavaValue(JavaWrapper.wrapObject(ctx), new NominalType("system", "Context")));
 			wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable)metadata).invoke("parseTSL", args);
 			// we get an option back, is it success?
 			ValDeclaration isDefined = (ValDeclaration)((ObjectValue)parsedAST).findDecl("isDefined");			

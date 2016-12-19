@@ -32,8 +32,10 @@ def variable(s:String):AST = new
 def call(receiver:AST, methodName:String, argument:AST):AST = new
 	val ast:Unit = utils.oneArgCall(receiver,methodName, argument)
 
-def parseExpression(input : String) : AST = new
-  val ast:Unit = utils.parseExpression(input)
+def parseExpression(input : String, ctx : system.Context) : AST
+  val ctxDyn:Dyn = ctx
+  new
+    val ast:Unit = utils.parseExpression(input, ctxDyn)
 
 val types = new
   def int():Type = new

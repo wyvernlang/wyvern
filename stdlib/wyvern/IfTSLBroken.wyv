@@ -1,6 +1,4 @@
-module IfTSLBroken
-
-require python
+module def IfTSLBroken(python : Python)
 
 import wyvern.ast
 import wyvern.option
@@ -25,9 +23,9 @@ def indentedBlockMatch(input : String) : regex.Match
   val m : regex.Match = blockMatchOpt.getOrElse(() => emptymatch)
   m
 
-def toUnitOrAST(input : String) : ast.AST
+def toUnitOrAST(input : String, ctx : system.Context) : ast.AST
   val stripped = ast.stripLeadingWhitespace(input)
-  CoreString(python).equals(stripped, "").ifTrue(() => ast.int(0), () => ast.parseExpression(stripped))
+  CoreString(python).equals(stripped, "").ifTrue(() => ast.int(0), () => ast.parseExpression(stripped, ctx))
 
 type AST = ast.AST
 
@@ -35,13 +33,13 @@ type IfExpr
   def evalTrue() : Dyn
   def evalFalse() : Dyn
   metadata new
-    def parseTSL(input : String) : option.Option
+    def parseTSL(input : String, ctx : system.Context) : option.Option
       val trimmedInput = ast.stripLeadingWhitespace(input)
       val tm = thenMatch(trimmedInput)
       val trueMatch = indentedBlockMatch(tm.after())
       val em = elseMatch(trueMatch.after())
-      val trueAST : AST = toUnitOrAST(trueMatch.matched())
-      val falseAST : AST = toUnitOrAST(em.after())
+      val trueAST : AST = toUnitOrAST(trueMatch.matched(), ctx)
+      val falseAST : AST = toUnitOrAST(em.after(), ctx)
       val trueDefn = ast.defn("evalTrue", ast.types.dyn(), trueAST)
       val falseDefn = ast.defn("evalFalse", ast.types.dyn(), falseAST)
       option.Some(ast.twoDeclObject(trueDefn, falseDefn))

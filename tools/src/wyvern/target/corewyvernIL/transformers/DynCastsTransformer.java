@@ -353,7 +353,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	}
 
   @Override
-  public FFI visit(GenContext ctx, FFI ffi) {
+  public FFI visit(TypeContext ctx, FFI ffi) {
     return ffi;
 	}
 

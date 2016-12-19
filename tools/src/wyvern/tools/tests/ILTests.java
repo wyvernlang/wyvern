@@ -764,6 +764,11 @@ public class ILTests {
     public void testTSL2() throws ParseException {
         doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
     }
+
+    // @Test
+    // public void testTSLIndentation() throws ParseException {
+    //     doTestScriptModularly("tsls.indentationTest", Util.intType(), new IntegerLiteral(5));
+    // }
 	
 	// tests import-dependent types
 	@Test

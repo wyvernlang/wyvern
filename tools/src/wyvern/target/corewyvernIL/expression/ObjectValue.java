@@ -35,6 +35,9 @@ public class ObjectValue extends New implements Invokable {
 		EvalContext methodCtx = evalCtx;
 		DefDeclaration dd = (DefDeclaration) findDecl(methodName);
 		if (dd != null) {
+      if (args.size() != dd.getFormalArgs().size()) {
+        throw new RuntimeException("invoke called on " + methodName + " with " + args.size() + " arguments, but " + dd.getFormalArgs().size() + " were expected");
+      }
 			for (int i = 0; i < args.size(); ++i) {
 				methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getName(), args.get(i));
 			}

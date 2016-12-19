@@ -4,9 +4,8 @@ import metadata tsls.identity
 
 def run(expr:identity.IntExpr):Int
   expr.eval()
-// val y = 3
+val y = 3
 val x = run(~)
-  2 + 3
-//2 + y
+  2 + y
 stdout.printInt(x)
 x

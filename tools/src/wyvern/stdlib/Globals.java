@@ -161,6 +161,7 @@ public class Globals {
     pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
     ValueType pythonType = new StructuralType("Python", pyDeclTypes);
     declTypes.add(new ConcreteTypeMember("Python", pythonType));
+    declTypes.add(new AbstractTypeMember("Context"));
 		ValueType systemType = new StructuralType("system", declTypes);
 		return systemType;
 	}

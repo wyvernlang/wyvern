@@ -1,5 +1,7 @@
 import pygame
 
+import metadata wyvern.IfTSL
+
 resource type GameLoop
   val fps : Int
   val done : Boolean
@@ -13,17 +15,21 @@ def processEvents(gameLoop : GameLoop) : Unit
   def f() : Unit
     gameLoop.processEvent(event)
     processEvents(gameLoop)
-  (pygame.helper.getType(event) == pygame.NOEVENT).ifTrue(
-    () => 0,
-    () => f())
+  (pygame.helper.getType(event) == pygame.NOEVENT).ifTrue(() => 0, () => f())
 
 def run(gameLoop : GameLoop) : Unit
   clock.tick(gameLoop.fps)
   gameLoop.oneIteration()
   processEvents(gameLoop)
-  gameLoop.done.ifTrue(
-    () => 0,
-    () => run(gameLoop))
+  // gameLoop.done.ifTrue(
+  //   () => 0,
+  //   () => run(gameLoop))
+  IfTSL.doif(gameLoop.done, ~)
+    then
+      0
+    else
+      run(gameLoop)
+  0
 
 val width = 640
 val height = 480

@@ -12,7 +12,6 @@
 		<pathelement location="lib/javatuples-1.2.jar" />
         <pathelement location="lib/checkstyle-7.1-all.jar" />
         <pathelement location="lib/jacocoant.jar" />
-        <pathelement location="lib/commons-lang3-3.5.jar" />
 	</path>
 	
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>

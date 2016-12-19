@@ -627,6 +627,17 @@ public class OIRTests {
     }
 
     @Test
+    public void testIfResourceType() throws ParseException {
+        String input =
+            "val obj = new\n" +
+            "  var x : Int = 7\n" +
+            "def setX(i : Int) : Unit = obj.x = i\n" +
+            "true.ifTrue(() => setX(1), () => setX(2))\n" +
+            "obj.x\n";
+        testPyFromInput(input, "1");
+    }
+
+    @Test
     public void testTSLIfElse() throws ParseException {
         String input =
             "import metadata wyvern.IfTSL\n" +

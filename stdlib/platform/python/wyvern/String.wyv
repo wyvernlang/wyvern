@@ -1,6 +1,4 @@
-module String
-
-require python
+module def String(python : Python)
 
 def equals(str1:String,str2:String):Boolean
 	python.isEqual(str1,str2)

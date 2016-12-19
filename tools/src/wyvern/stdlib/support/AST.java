@@ -23,6 +23,7 @@ import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.interop.FObject;
@@ -91,12 +92,13 @@ public class AST {
 		return new DefDeclaration(name, new LinkedList<FormalArg>(), realType, realBody, null);
 	}
 
-    public IExpr parseExpression(String input) throws ParseException {
+    public IExpr parseExpression(String input, JavaValue context) throws ParseException {
         System.out.println("parseExpression recieved input '"+input+"'");
         ExpressionAST ast = (ExpressionAST)TestUtil.getNewAST(input + "\n", "TSL Parse");
+        GenContext cxt = (GenContext)context.getFObject().getWrappedValue();
         // Extend parseTSL with a second argument (abstract type representing context)
         // TODO: Handle InterpreterState/GenContext
-        return ast.generateIL(Globals.getStandardGenContext(), null, null);
+        return ast.generateIL(cxt, null, null);
     }
 
     private String commonPrefix(String s1, String s2) {
