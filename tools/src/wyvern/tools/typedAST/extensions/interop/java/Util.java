@@ -114,6 +114,8 @@ public class Util {
 		//decl.initalize();
 		return decl;
 	}
+
+    @Deprecated
 	public static Value toWyvObj(Object arg) {
 		if (arg instanceof JavaWyvObject)
 			return ((JavaWyvObject) arg).getInnerObj();
@@ -308,6 +310,8 @@ public class Util {
 	}
 
 	private static volatile int n = 0; //How many classes have been generated
+
+    @Deprecated
 	private static Class<?> generateJavaWrapper(EvaluationEnvironment toWrap, Class javaType) {
 		if (typeCache.containsKey(toWrap)) {
 			Map<Class,Class> innerMap = typeCache.get(toWrap);
