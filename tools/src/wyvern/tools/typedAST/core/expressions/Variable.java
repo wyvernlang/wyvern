@@ -73,6 +73,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
         //Value value = binding.getValue(env);
         Value value = env.lookup(binding.getName())
@@ -94,6 +95,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     }
 
     @Override
+    @Deprecated
     public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
         Value value = ass.getValue().evaluate(env);
         env.lookupValueBinding(binding.getName(), AssignableValueBinding.class)
