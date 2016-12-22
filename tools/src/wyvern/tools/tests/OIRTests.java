@@ -655,8 +655,8 @@ public class OIRTests {
     public void testTSLIf() throws ParseException {
         String input =
             "require python\n" +
-            "import metadata wyvern.IfTSLBroken\n" +
-            "IfTSLBroken(python).doif(true, ~)\n" +
+            "import metadata wyvern.IfTSL\n" +
+            "IfTSL.doif(true, ~)\n" +
             "  then\n" +
             "    7\n" +
             "\n";
