@@ -436,6 +436,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
             sb.append(ast.prettyPrint());
             sep = ", ";
         }
+        sb.append("])");
         return sb;
     }
 }
