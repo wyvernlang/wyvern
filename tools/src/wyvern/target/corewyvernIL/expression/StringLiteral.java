@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.Environment;
@@ -12,7 +13,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.FileLocation;
 
-public class StringLiteral extends Literal {
+public class StringLiteral extends Literal implements Invokable {
 
 	private java.lang.String value;
 
@@ -83,4 +84,20 @@ public class StringLiteral extends Literal {
 	public ValueType getType() {
 		return Util.stringType();
 	}
+
+	public Value invoke(String methodName, List<Value> args) {
+
+		switch (methodName) {
+		case "<": return new BooleanLiteral(this.value.compareTo(((StringLiteral)args.get(0)).getValue()) < 0);
+		case ">": return new BooleanLiteral(this.value.compareTo(((StringLiteral)args.get(0)).getValue()) > 0);
+    case "==": return new BooleanLiteral(this.value.compareTo(((StringLiteral)args.get(0)).getValue()) == 0);
+		default: throw new RuntimeException("runtime error: string operation " + methodName + "not supported by the runtime");
+		}
+	}
+
+	@Override
+	public Value getField(String fieldName) {
+		throw new RuntimeException("no fields");
+	}
+
 }

@@ -651,7 +651,6 @@ public class OIRTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testTSLIf() throws ParseException {
         String input =
             "require python\n" +

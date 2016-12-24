@@ -152,7 +152,12 @@ public class Globals {
 		declTypes.add(new ConcreteTypeMember("Int", intType));
 		declTypes.add(new ConcreteTypeMember("Boolean", boolType));
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
-		declTypes.add(new AbstractTypeMember("String"));
+
+    List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
+    stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+    ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
+		declTypes.add(new ConcreteTypeMember("String", stringType));
+
 		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
 		declTypes.add(new AbstractTypeMember("Java", true));
 		//declTypes.add(new AbstractTypeMember("Python"));

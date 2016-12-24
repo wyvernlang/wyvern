@@ -21,15 +21,12 @@ def run(gameLoop : GameLoop) : Unit
   clock.tick(gameLoop.fps)
   gameLoop.oneIteration()
   processEvents(gameLoop)
-  // gameLoop.done.ifTrue(
-  //   () => 0,
-  //   () => run(gameLoop))
-  IfTSL.doif(gameLoop.done, ~)
+  IfTSL.doifR(gameLoop.done, ~)
     then
       0
     else
       run(gameLoop)
-  0
+  // Indentation needed because of parser bug
 
 val width = 640
 val height = 480
@@ -71,8 +68,13 @@ def makePaddle(paddleX : Int) : NonInteractivePaddle = new
 
   def update() : Unit
     this.y = this.y + this.speed
-    (this.y + paddleHeight > height).ifTrue(() => this.y = height - paddleHeight, () => 0)
-    (this.y < 0).ifTrue(() => this.y = 0, () => 0)
+    IfTSL.doifR(this.y + paddleHeight > height, ~)
+      then
+        this.y = height - paddleHeight
+    IfTSL.doifR(this.y < 0, ~)
+      then
+        this.y = 0
+    // Indentation workaround for parser bug
 
   def setPaddleSpeed(speed : Int) : Unit
     this.speed = speed
@@ -86,20 +88,24 @@ def makePlayerPaddle() : Paddle = new
   def hitbox() : pygame.Rect = this.paddle.hitbox()
   def processEvent(e : pygame.Event) : Unit
     val eventType = pygame.helper.getType(e)
-    (eventType == pygame.KEYDOWN
-     || eventType == pygame.KEYUP).ifTrue(
-      () => (e.key == pygame.K_UP).ifTrue(
-          () => this.upPressed = (eventType == pygame.KEYDOWN),
-          () => (e.key == pygame.K_DOWN).ifTrue(
-              () => this.downPressed = (eventType == pygame.KEYDOWN),
-              () => 0)),
-      () => 0)
-
-    this.upPressed.ifTrue(
-      () => this.paddle.speed = -3,
-      () => this.downPressed.ifTrue(
-        () => this.paddle.speed = 3,
-        () => this.paddle.speed = 0))
+    IfTSL.doifR(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP, ~)
+      then
+        IfTSL.doifR(e.key == pygame.K_UP,  ~)
+          then
+            this.upPressed = (eventType == pygame.KEYDOWN)
+          else
+            IfTSL.doifR(e.key == pygame.K_DOWN, ~)
+              then
+                this.downPressed = (eventType == pygame.KEYDOWN)
+    IfTSL.doifR(this.upPressed, ~)
+      then
+        this.paddle.speed = -3
+      else
+        IfTSL.doifR(this.downPressed, ~)
+          then
+            this.paddle.speed = 3
+          else
+            this.paddle.speed = 0
 
 val ball = new
   var x : Int = 0
@@ -127,20 +133,30 @@ val ball = new
     blip.play()
 
   def update(leftHitbox : pygame.Rect, rightHitbox : pygame.Rect) : Unit
-    (this.x < 0 || this.x > width).ifTrue(() => this.flipX(), () => 0)
-    (this.y < 0 || this.y > height).ifTrue(() => this.flipY(), () => 0)
+    IfTSL.doifR(this.x < 0 || this.x > width, ~)
+      then
+        this.flipX()
+    IfTSL.doifR(this.y < 0 || this.y > height, ~)
+      then
+        this.flipY()
 
-    (this.x < leftHitbox.right &&
-     this.x > leftHitbox.left &&
-     this.y > leftHitbox.top &&
-     this.y < leftHitbox.bottom &&
-     this.xSpeed < 0).ifTrue(() => this.flipXBlop(), () => 0)
+    IfTSL.doifR(this.x < leftHitbox.right &&
+                this.x > leftHitbox.left &&
+                this.y > leftHitbox.top &&
+                this.y < leftHitbox.bottom &&
+                this.xSpeed < 0,
+                ~)
+      then
+        this.flipXBlop()
 
-    (this.x < rightHitbox.right &&
-     this.x > rightHitbox.left &&
-     this.y > rightHitbox.top &&
-     this.y < rightHitbox.bottom &&
-     this.xSpeed > 0).ifTrue(() => this.flipXBlop(), () => 0)
+    IfTSL.doifR(this.x < rightHitbox.right &&
+                this.x > rightHitbox.left &&
+                this.y > rightHitbox.top &&
+                this.y < rightHitbox.bottom &&
+                this.xSpeed > 0,
+                ~)
+      then
+        this.flipXBlop()
 
     this.x = this.x + this.xSpeed
     this.y = this.y + this.ySpeed
@@ -150,10 +166,14 @@ def makeAIPaddle() : Paddle = new
   def draw(screen : pygame.Surface) : Unit = this.paddle.draw(screen)
   def update() : Unit
     val center = this.paddle.y + paddleWidth / 2
-    (center > ball.y).ifTrue(() => this.paddle.speed = -2,
-                             () => this.paddle.speed = 0)
-    (center < ball.y).ifTrue(() => this.paddle.speed = 2,
-                             () => 0)
+    IfTSL.doifR(center > ball.y, ~)
+      then
+        this.paddle.speed = -2
+      else
+        this.paddle.speed = 0
+    IfTSL.doifR(center < ball.y, ~)
+      then
+        this.paddle.speed = 2
     this.paddle.update()
   def hitbox() : pygame.Rect = this.paddle.hitbox()
   def processEvent(e : pygame.Event) : Unit = 0
@@ -181,22 +201,34 @@ val loop : GameLoop = new
 
     val gameLoop = this
     this.playerPaddle.update()
-    this.upPressed.ifTrue(() => gameLoop.y = gameLoop.y - 2,
-                          () => 0)
-    this.downPressed.ifTrue(() => gameLoop.y = gameLoop.y + 2,
-                            () => 0)
+    IfTSL.doifR(this.upPressed, ~)
+      then
+        gameLoop.y = gameLoop.y - 2
+    IfTSL.doifR(this.downPressed, ~)
+      then
+        gameLoop.y = gameLoop.y + 2
     ball.update(this.playerPaddle.hitbox(), this.aiPaddle.hitbox())
     this.aiPaddle.update()
 
   def processEvent(e : pygame.Event) : Unit
     val eventType = pygame.helper.getType(e)
     this.playerPaddle.processEvent(e)
-    (eventType == pygame.QUIT).ifTrue(() => this.done = true, () => 0)
+    IfTSL.doifR(eventType == pygame.QUIT, ~)
+      then
+        this.done = true
     def keyEvents() : Unit
-      (e.key == pygame.K_UP).ifTrue(() => this.upPressed = (eventType == pygame.KEYDOWN), () => 0)
-      (e.key == pygame.K_DOWN).ifTrue(() => this.downPressed = (eventType == pygame.KEYDOWN), () => 0)
-      (e.key == pygame.K_ESCAPE).ifTrue(() => this.done = true, () => 0)
-    (eventType == pygame.KEYDOWN || eventType == pygame.KEYUP).ifTrue( () => keyEvents(), () => 0)
+      IfTSL.doifR(e.key == pygame.K_UP, ~)
+        then
+          this.upPressed = (eventType == pygame.KEYDOWN)
+      IfTSL.doifR(e.key == pygame.K_DOWN, ~)
+        then
+          this.downPressed = (eventType == pygame.KEYDOWN)
+      IfTSL.doifR(e.key == pygame.K_ESCAPE, ~)
+        then
+          this.done = true
+    IfTSL.doifR(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP, ~)
+      then
+        keyEvents()
     
 
 run(loop)
