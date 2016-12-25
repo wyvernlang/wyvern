@@ -693,7 +693,7 @@ public class ILTests {
 
     @Test
     public void testTSL2() throws ParseException {
-        doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
+        TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
     }
 
     // @Test
