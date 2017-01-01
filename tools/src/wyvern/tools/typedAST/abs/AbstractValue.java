@@ -15,6 +15,7 @@ public abstract class AbstractValue extends AbstractExpressionAST implements Val
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		return this;
 	}

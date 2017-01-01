@@ -6,7 +6,6 @@ import java.util.Optional;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.parsing.HasParser;
-import wyvern.tools.parsing.quotelang.QuoteParser;
 import wyvern.tools.typedAST.transformers.GenerationEnvironment;
 import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
@@ -36,9 +35,6 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	 */
 	TypedAST cloneWithChildren(Map<String, TypedAST> newChildren);
 
-	public static HasParser meta$get() {
-		return () -> new QuoteParser();
-	}
 	public default void genTopLevel(TopLevelContext tlc) {
 		throw new RuntimeException("genTopLevel not implemented for " + this.getClass());
 	}

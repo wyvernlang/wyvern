@@ -60,6 +60,7 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		Value[] evaluatedResults = new Value[objects.length];
 		for (int i = 0; i < objects.length; i++) {

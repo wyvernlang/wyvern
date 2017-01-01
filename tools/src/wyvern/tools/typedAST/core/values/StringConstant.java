@@ -42,6 +42,7 @@ public class StringConstant extends AbstractValue implements InvokableValue, Cor
 	
 
 	@Override
+    @Deprecated
 	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		String operator = exp.getOperationName();
 		if (!operator.equals("+") && !operator.equals("==")) {

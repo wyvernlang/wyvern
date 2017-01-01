@@ -46,6 +46,7 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
 		IntegerConstant intArgValue = null;
 		String operator = exp.getOperationName();

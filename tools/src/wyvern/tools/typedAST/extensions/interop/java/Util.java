@@ -114,6 +114,8 @@ public class Util {
 		//decl.initalize();
 		return decl;
 	}
+
+    @Deprecated
 	public static Value toWyvObj(Object arg) {
 		if (arg instanceof JavaWyvObject)
 			return ((JavaWyvObject) arg).getInnerObj();
@@ -308,6 +310,8 @@ public class Util {
 	}
 
 	private static volatile int n = 0; //How many classes have been generated
+
+    @Deprecated
 	private static Class<?> generateJavaWrapper(EvaluationEnvironment toWrap, Class javaType) {
 		if (typeCache.containsKey(toWrap)) {
 			Map<Class,Class> innerMap = typeCache.get(toWrap);
@@ -412,6 +416,7 @@ public class Util {
 		}
 	}
 
+    @Deprecated
 	public static Object doInvoke(Obj receiver, String target, Object[] args) {
 		Value arguments = toWyvObjs(args);
 		return toJavaObject((
@@ -421,12 +426,14 @@ public class Util {
 						.evaluate(EvaluationEnvironment.EMPTY)), null);//Therefore, can only handle strings and ints
 	}
 
+    @Deprecated
 	public static Value getInternalValue(Obj receiver, String target) {
 		return new Invocation(receiver, target, null, FileLocation.UNKNOWN)
 						.evaluate(EvaluationEnvironment.EMPTY);//Therefore, can only handle strings and ints
 	}
 	
 
+    @Deprecated
 	public static Object doInvokeVarargs(Obj receiver, String target, Object... args) {
 		Value arguments = toWyvObjs(args);
 		return toJavaObject((
@@ -436,11 +443,14 @@ public class Util {
 						.evaluate(EvaluationEnvironment.EMPTY)), null);//Therefore, can only handle strings and ints
 	}
 
+    @Deprecated
 	public static Value invokeValue(Value reciever, String target, Value args) {
 		return new Application(
 				new Invocation(reciever,target, null, FileLocation.UNKNOWN),
 				args, FileLocation.UNKNOWN).evaluate(EvaluationEnvironment.EMPTY);
 	}
+
+    @Deprecated
 	public static Value invokeValueVarargs(Value reciever, String target, Value... args) {
 		Value iargs;
 		if (args.length == 0)

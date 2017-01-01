@@ -37,6 +37,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
         for (IfClause clause : clauses) {
             if (clause.satisfied(env)) {
@@ -149,6 +150,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         }
 
         @Override
+        @Deprecated
         public boolean satisfied(EvaluationEnvironment env) {
             return ((BooleanConstant)cond.evaluate(env)).getValue();
         }
@@ -177,6 +179,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         }
 
         @Override
+        @Deprecated
         public Value evaluate(EvaluationEnvironment env) {
             return body.evaluate(env);
         }
@@ -212,6 +215,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         }
 
         @Override
+        @Deprecated
         public TypedAST getClause() {
             return new IntegerConstant(1337);
         }
@@ -232,6 +236,7 @@ public class IfExpr extends CachingTypedAST implements CoreAST {
         }
 
         @Override
+        @Deprecated
         public Value evaluate(EvaluationEnvironment env) {
             return body.evaluate(env);
         }

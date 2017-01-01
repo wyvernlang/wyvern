@@ -220,6 +220,7 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
 	}
 
     @Override
+    @Deprecated
     public wyvern.target.corewyvernIL.type.ValueType generateILType() {
         LinkedList<DeclType> declTypes = typeDeclEnv.get().getBindings().stream()
                 .map(b -> new ValDeclType(b.getName(), (ValueType) b.getType().generateILType()))

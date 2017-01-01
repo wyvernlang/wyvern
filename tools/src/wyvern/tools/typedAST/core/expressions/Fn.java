@@ -95,6 +95,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
         return new Closure(this, env);
     }

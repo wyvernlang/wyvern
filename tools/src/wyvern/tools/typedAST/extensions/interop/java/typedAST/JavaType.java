@@ -39,6 +39,7 @@ public class JavaType extends AbstractTreeWritable implements EnvironmentExtende
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		return null;
 	}

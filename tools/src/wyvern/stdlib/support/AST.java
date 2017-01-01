@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import wyvern.tools.tests.TestUtil;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -29,7 +30,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.interop.JObject;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 public class AST {
@@ -94,7 +94,7 @@ public class AST {
 
     public IExpr parseExpression(String input, JavaValue context) throws ParseException {
         System.out.println("parseExpression recieved input '"+input+"'");
-        ExpressionAST ast = (ExpressionAST)TestUtil.getNewAST(input + "\n", "TSL Parse");
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input + "\n", "TSL Parse");
         GenContext cxt = (GenContext)context.getFObject().getWrappedValue();
         // Extend parseTSL with a second argument (abstract type representing context)
         // TODO: Handle InterpreterState/GenContext

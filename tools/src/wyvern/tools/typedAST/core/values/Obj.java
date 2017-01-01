@@ -90,6 +90,7 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
 		if (!(ass.getTarget() instanceof Invocation))
 			throw new RuntimeException("Something really, really weird happened.");

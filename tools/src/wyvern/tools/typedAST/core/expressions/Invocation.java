@@ -92,6 +92,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
 
         Value lhs = receiver.evaluate(env);
@@ -123,6 +124,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
     }
 
     @Override
+    @Deprecated
     public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
         Value lhs = receiver.evaluate(env);
         if (!(lhs instanceof Assignable)) {

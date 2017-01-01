@@ -21,32 +21,6 @@
             <classpath path="lib/CopperCompiler.jar:lib/ant.jar"/>
         </javac>
     </target>
-    <target name="copper-compose" depends="copper-compose-compile">
-        <taskdef name="composer" classname="wyvern.tools.parsing.CopperComposer" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
-        <composer hostgrammar="src/wyvern/tools/parsing/Wyvern.x"
-                  hostgrammarname="Wyvern"
-                  extensiongrammar="src/wyvern/tools/parsing/quotelang/QuoteExtension.xml"
-                  output="src/wyvern/tools/parsing/quotelang/WyvernQuote.java"/>
-    </target>
-    <target name="copper-subparsers">
-        <taskdef name="newstart" classname="wyvern.tools.parsing.FirstChanger" classpath="copper-composer/bin:lib/CopperCompiler.jar"/>
-        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
-            hostgrammar="Wyvern"
-            newfc="objd"
-            newpackage="wyvern.tools.parsing.parselang"
-            newname="WyvernDecls"
-            target="src/wyvern/tools/parsing/parselang/WyvernDecls.java"
-            extrapackage="wyvern.tools.parsing.*"
-        />
-        <newstart original="src/wyvern/tools/parsing/Wyvern.x"
-            hostgrammar="Wyvern"
-            newfc="type"
-            newpackage="wyvern.tools.parsing"
-            newname="TypeParser"
-            target="src/wyvern/tools/parsing/TypeParser.java"
-            extrapackage="wyvern.tools.parsing.*"
-        />
-    </target>
     <target name="lexer">
         <copper outputfile="src/wyvern/tools/lexing/WyvernLexer.java" packagename="wyvern.tools.lexing">
             <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
@@ -59,7 +33,7 @@
     	    javacchome="lib/"
     	/>
     </target>
-    <target name="copper-generate" depends="copper-compose,lexer,javacc-parser">
+    <target name="copper-generate" depends="lexer,javacc-parser">
         <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" packagename="wyvern.tools.parsing">
             <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
         </copper>
@@ -79,9 +53,11 @@
         </copper>
     </target>
 	
-    <target name="build" depends="copper-generate">
+    <target name="build" depends="clean,copper-generate">
         <mkdir dir="${build.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg line="-Xmaxerrs 950" />
             <classpath refid="classpath.base"/>
         </javac>
         <echo message="Build done" />	

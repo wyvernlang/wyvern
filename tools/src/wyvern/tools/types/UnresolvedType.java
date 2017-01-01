@@ -81,6 +81,7 @@ public class UnresolvedType extends AbstractTypeImpl implements Type {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         throw new WyvernException("Cannot generate IL form for unresolved type", FileLocation.UNKNOWN);
     }

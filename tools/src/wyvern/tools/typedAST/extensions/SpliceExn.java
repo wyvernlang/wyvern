@@ -44,6 +44,7 @@ public class SpliceExn extends AbstractExpressionAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		EvaluationEnvironment outerEnv = env.lookupBinding("oev", TSLBlock.OuterEnviromentBinding.class)
 				.map(oeb->oeb.getStore())

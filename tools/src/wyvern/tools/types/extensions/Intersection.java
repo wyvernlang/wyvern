@@ -152,6 +152,7 @@ public class Intersection implements Type, OperatableType, ApplyableType {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         throw new WyvernException("Invalid interop type, cannot generate IL", FileLocation.UNKNOWN);
     }

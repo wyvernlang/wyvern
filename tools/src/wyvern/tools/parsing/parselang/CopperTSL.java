@@ -124,6 +124,7 @@ public class CopperTSL implements ExtParser {
 	}
 
 	@Override
+    @Deprecated
 	public TypedAST parse(ParseBuffer input) throws Exception {
 		StringReader isr = new StringReader(input.getSrcString());
 		ArrayList<edu.umn.cs.melt.copper.runtime.auxiliary.Pair<String,Reader>> inp = new ArrayList<>();
@@ -297,7 +298,10 @@ public class CopperTSL implements ExtParser {
 			throw new RuntimeException();
 
 		loader.applyTransformer(name->name.equals(javaClassName), cw -> new ClassVisitor(Opcodes.ASM5, new CheckClassAdapter(cw)) {
+
+
 			@Override
+            @Deprecated
 			public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 				if (!name.equals("<init>"))
 					return super.visitMethod(access, name, desc, signature, exceptions);

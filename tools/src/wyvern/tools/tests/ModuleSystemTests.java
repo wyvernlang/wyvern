@@ -28,7 +28,7 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -45,6 +45,7 @@ public class ModuleSystemTests {
     }
 
 	@Test
+    @Deprecated
 	public void testResource() throws ParseException {
 		String program = TestUtil.readFile(PATH + "testModule.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -62,6 +63,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+    @Deprecated
 	public void testRequire() throws ParseException {
 		String program = TestUtil.readFile(PATH + "require.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -71,6 +73,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+    @Deprecated
 	public void testRsType() throws ParseException {
 		String program = TestUtil.readFile(PATH + "rsType.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -80,6 +83,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+    @Deprecated
 	public void testWyt() throws ParseException {
 		String program = TestUtil.readFile(PATH + "Log.wyt");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -119,7 +123,7 @@ public class ModuleSystemTests {
 
 	@Test
 	public void testADT() throws ParseException {
-		ILTests.doTestScriptModularly("modules.listClient",
+		TestUtil.doTestScriptModularly("modules.listClient",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}
@@ -261,7 +265,7 @@ public class ModuleSystemTests {
 	
 	@Test
 	public void testSimpleADT() throws ParseException {
-		ILTests.doTestScriptModularly("modules.simpleADTdriver", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.simpleADTdriver", Util.intType(), new IntegerLiteral(5));
 	}
 	
 }
