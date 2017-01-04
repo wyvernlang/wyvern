@@ -637,7 +637,7 @@ public class ILTests {
 	
 	@Test
 	public void testListModularly() throws ParseException {
-		TestUtil.doTestScriptModularly("modules.module.List", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.module.list", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
