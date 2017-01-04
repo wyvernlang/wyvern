@@ -1,4 +1,0 @@
-module def databaseClient(proxy : modules.DatabaseProxy)
-
-def update () : Unit
-	proxy.db.contents = 42
