@@ -17,6 +17,7 @@ import wyvern.tools.types.extensions.Unit;
 
 public class TrivDSLParser implements ExtParser {
 	@Override
+    @Deprecated
 	public TypedAST parse(ParseBuffer input) {
 		New newv = new New(new HashMap<>(), null);
 		TypedAST dbody = new IntegerConstant(Integer.parseInt(input.getSrcString().trim()));

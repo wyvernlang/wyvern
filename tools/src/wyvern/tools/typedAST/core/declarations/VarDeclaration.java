@@ -103,6 +103,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
+    @Deprecated
 	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
 		VarValueBinding vb = declEnv.lookupValueBinding(binding.getName(), VarValueBinding.class).get();
 		if (definition == null) {

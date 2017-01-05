@@ -185,6 +185,8 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
     public OIRAST visit(NameMangleState state,
                         OIRVariable oirVariable) {
+        if (!oirVariable.shouldMangle())
+            return oirVariable;
         OIRVariable var = new OIRVariable(mangle(oirVariable.getName()));
         var.copyMetadata(oirVariable);
         return var;

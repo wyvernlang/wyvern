@@ -82,6 +82,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
     }
 
     @Override
+    @Deprecated
     public Value evaluate(EvaluationEnvironment env) {
         if (!(target instanceof Assignable)) {
             reportEvalError(VALUE_CANNOT_BE_APPLIED, target.toString(), this);

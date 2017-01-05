@@ -43,6 +43,7 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		EvaluationEnvironment newEnv = decl.evalDecls(env);
 		return body.evaluate(newEnv);

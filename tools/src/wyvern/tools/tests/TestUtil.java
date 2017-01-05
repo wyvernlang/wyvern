@@ -10,12 +10,16 @@ import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -27,6 +31,7 @@ import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernParserConstants;
+import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -194,13 +199,19 @@ public class TestUtil {
 		TaggedInfo.clearGlobalTaggedInfos();
 	}
 
-	public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
-	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
-	    final Module module = state.getResolver().resolveModule(qualifiedName);
-	    IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
-	    TestUtil.doChecks(program, expectedType, expectedValue);
+	public static void doTestScript(String fileName, ValueType expectedType, Value expectedValue) throws ParseException {
+        String source = TestUtil.readFile(BASE_PATH + fileName);
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
+        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), null);
+		GenContext genCtx = Globals.getGenContext(state);
+        IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
+        TestUtil.doChecks(program, expectedType, expectedValue);
 	}
-
+	
+	public static void doTestInt(String input, int expectedIntResult) throws ParseException {
+		TestUtil.doTest(input, Util.intType(), new IntegerLiteral(expectedIntResult));
+	}
+	
 	// TODO: make other string tests call this function
 	public static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
 		ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
@@ -213,6 +224,18 @@ public class TestUtil {
 	    TestUtil.doChecks(program, expectedType, expectedResult);
 	}
 
+	// TODO: make other script tests call this function
+    public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+        doTestScriptModularly(BASE_PATH, qualifiedName, expectedType, expectedValue);
+	}
+    
+	public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
+	    final Module module = state.getResolver().resolveModule(qualifiedName);
+	    IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
+	    TestUtil.doChecks(program, expectedType, expectedValue);
+	}
+	
 	public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
 	    // resolveModule already typechecked, but we'll do it again to verify the type
 		TypeContext ctx = Globals.getStandardTypeContext();
@@ -225,12 +248,25 @@ public class TestUtil {
 	    if (expectedValue != null)
 	    	Assert.assertEquals(expectedValue, v);
 	}
+	
+    public static void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
+        TypedAST ast = TestUtil.getNewAST(input, "test input");
+        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
+        wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
+        IExpr mainProgram = ((DefDeclaration)decl).getBody();
+        IExpr program = new FieldGet(mainProgram, fieldName, null); // slightly hacky       
+        doChecks(program, expectedType, expectedValue);
+    }
 
-	// TODO: make other script tests call this function
-	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
-	  InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(BASE_PATH), new File(LIB_PATH));
-	  final Module module = state.getResolver().resolveModule(qualifiedName);
-	  IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
-	  doChecks(program, expectedType, expectedValue);
+    public static void doTestTypeFail(String input) throws ParseException {
+		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
+		try {
+			IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
+			program.typeCheck(Globals.getStandardTypeContext());
+			Assert.fail("Typechecking should have failed.");
+		} catch (ToolError e) {
+		}
 	}
+
 }

@@ -119,6 +119,7 @@ public class TypeInv implements Type {
     }
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         return new NominalType((Path)resolvePath(), invName);
     }

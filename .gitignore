@@ -1,3 +1,4 @@
+.DS_STORE
 tags
 bin
 .idea
@@ -7,6 +8,7 @@ tools/wyvern-tools.iml
 *.wyv.py
 *.prefs
 *~
+`.metadata/
 tools/src/wyvern/tools/parsing/Wyvern.java
 tools/src/wyvern/tools/parsing/quotelang/WyvernQuote.java
 tools/src/wyvern/tools/tests/utils/TestSuiteParser.java
@@ -16,7 +18,6 @@ tools/copper-tests-output.txt
 tools/copper-composer/copper-composer.iml
 tools/src/wyvern/tools/parsing/parselang/TypeParser.java
 tools/src/wyvern/tools/parsing/parselang/WyvernDecls.java
-.metadata/
 tools/src/wyvern/tools/parsing/TypeParser.java
 tools/src/wyvern/tools/parsing/parselang/CupSkinParser.java
 tools/out/artifacts/wyvern_jar/wyvern.jar

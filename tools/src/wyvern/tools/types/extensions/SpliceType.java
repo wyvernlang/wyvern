@@ -67,6 +67,7 @@ public class SpliceType implements Type {
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         return inner.generateILType(); // Todo: validate me - fails for bindings that are shadowed
     }

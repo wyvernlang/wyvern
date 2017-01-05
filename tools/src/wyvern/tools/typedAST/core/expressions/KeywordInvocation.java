@@ -43,6 +43,7 @@ public class KeywordInvocation extends AbstractExpressionAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		return null;
 	}

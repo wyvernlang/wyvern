@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
+import wyvern.tools.tests.TestUtil;
 
 @Category(RegressionTests.class)
 public class Figures {

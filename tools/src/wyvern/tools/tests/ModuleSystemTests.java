@@ -28,6 +28,7 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -43,7 +44,9 @@ public class ModuleSystemTests {
 		WyvernResolver.getInstance().addPath(PATH);
     }
 
+    /*
 	@Test
+    @Deprecated
 	public void testResource() throws ParseException {
 		String program = TestUtil.readFile(PATH + "testModule.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -61,6 +64,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+    @Deprecated
 	public void testRequire() throws ParseException {
 		String program = TestUtil.readFile(PATH + "require.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -70,6 +74,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+    @Deprecated
 	public void testRsType() throws ParseException {
 		String program = TestUtil.readFile(PATH + "rsType.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -79,6 +84,7 @@ public class ModuleSystemTests {
 	}
 
 	@Test
+    @Deprecated
 	public void testWyt() throws ParseException {
 		String program = TestUtil.readFile(PATH + "Log.wyt");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
@@ -86,6 +92,7 @@ public class ModuleSystemTests {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
+	*/
 
 	@Test
 	public void testInst() throws ParseException {
@@ -101,7 +108,7 @@ public class ModuleSystemTests {
 	 *
 	 * @param ast
 	 * @param errorMessage
-	 */
+	 *
 	private static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
 		try {
 			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
@@ -115,7 +122,7 @@ public class ModuleSystemTests {
 
 		Assert.fail("Should have failed with error: " + errorMessage);
 	}
-
+	*/
 	@Test
 	public void testADT() throws ParseException {
 		TestUtil.doTestScriptModularly("modules.listClient",
@@ -123,6 +130,8 @@ public class ModuleSystemTests {
 				new IntegerLiteral(5));
 	}
 	
+	// TODO: consider restoring decent versions of the tests below
+	/*
 	@Test
 	@Category(CurrentlyBroken.class)
 	public void testTransitiveAuthorityBad() throws ParseException {
@@ -219,7 +228,7 @@ public class ModuleSystemTests {
 		Assert.assertEquals(new IntegerLiteral(10), result);
 		
 	}
-	
+	*/
 	@Test
 	public void testTopLevelVarGet () throws ParseException {
 		GenContext genCtx = Globals.getStandardGenContext();

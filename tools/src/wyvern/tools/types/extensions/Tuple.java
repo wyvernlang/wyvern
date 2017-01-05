@@ -188,6 +188,7 @@ public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResol
 	}
 
     @Override
+    @Deprecated
     public ValueType generateILType() {
         throw new WyvernException("Tuple type unimplemented", FileLocation.UNKNOWN); //TODO
     }

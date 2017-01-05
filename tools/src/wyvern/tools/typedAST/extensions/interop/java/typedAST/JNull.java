@@ -35,6 +35,7 @@ public class JNull extends AbstractExpressionAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		return UnitVal.getInstance(FileLocation.UNKNOWN);
 	}

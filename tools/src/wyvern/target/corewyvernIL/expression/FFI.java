@@ -22,16 +22,17 @@ import wyvern.tools.util.Pair;
 
 public class FFI extends AbstractValue {
 	private ValueType type;
+  private String importName;
 
 	public FFI(String importName, ValueType type, FileLocation loc) {
 		super(type, loc);
 		this.type = type;
+    this.importName = importName;
 	}
 
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
-		// TODO Auto-generated method stub
-		return null;
+      return emitILVisitor.visit(state, this);
 	}
 
 	@Override
@@ -48,6 +49,10 @@ public class FFI extends AbstractValue {
 	public ValueType getType() {
 		return type;
 	}
+
+    public String getImportName() {
+        return this.importName;
+    }
 
     public static Pair<VarBinding, GenContext> importURI(URI uri, GenContext ctx) {
         final String scheme = uri.getScheme();

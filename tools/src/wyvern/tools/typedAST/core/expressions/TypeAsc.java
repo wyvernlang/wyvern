@@ -51,6 +51,7 @@ public class TypeAsc extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluate(EvaluationEnvironment env) {
 		return exn.evaluate(env);
 	}

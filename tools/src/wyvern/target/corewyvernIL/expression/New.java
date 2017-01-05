@@ -40,6 +40,11 @@ public class New extends Expression {
 	public New(NamedDeclaration decl) {
 		this(decl, decl.getLocation());
 	}
+
+    /** convenience method for two declarations */
+    public New(NamedDeclaration decl1, NamedDeclaration decl2) {
+        this(Arrays.asList(decl1, decl2), decl1.getLocation());
+    }
 	
 	/** computes the type itself, uses a don't care selfName */
 	public New(List<NamedDeclaration> decls, FileLocation loc) {

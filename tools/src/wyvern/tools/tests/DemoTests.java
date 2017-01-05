@@ -60,9 +60,7 @@ public class DemoTests {
 	public void testSimpleDelegation() throws ParseException {
 		String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		//Value out = TestUtil.evaluateNew(ast);
-		//int finalRes = ((IntegerConstant)out).getValue();
-		//Assert.assertEquals(3, finalRes);
+		// TODO: implement delegation in the new IL and run this test
 	}
 	
 }

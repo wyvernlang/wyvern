@@ -28,6 +28,7 @@ public class QualifiedType extends AbstractTypeImpl {
     }
 
 	@Override
+    @Deprecated
 	public ValueType generateILType() {
 		// TODO Auto-generated method stub
 		return null;

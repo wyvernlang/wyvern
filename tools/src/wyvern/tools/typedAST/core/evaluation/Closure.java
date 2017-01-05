@@ -54,6 +54,7 @@ public class Closure extends AbstractValue implements ApplyableValue {
 	}
 
 	@Override
+    @Deprecated
 	public Value evaluateApplication(Application app, EvaluationEnvironment argEnv) {
 		Value argValue = app.getArgument().evaluate(argEnv);
 		EvaluationEnvironment bodyEnv = env;

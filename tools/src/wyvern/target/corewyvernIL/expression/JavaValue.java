@@ -104,7 +104,9 @@ public class JavaValue extends AbstractValue implements Invokable {
 			return arg;
 		} else if (arg instanceof BooleanLiteral){
 			return new Boolean(((BooleanLiteral)arg).getValue());
-		} else {
+		} else if (arg instanceof JavaValue) {
+        return arg;
+    } else {
 			throw new RuntimeException("some Wyvern->Java cases not implemented");
 		}
 	}

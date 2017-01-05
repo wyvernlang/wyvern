@@ -251,6 +251,7 @@ public class New extends CachingTypedAST implements CoreAST {
         return mockEnv;
     }
 
+    @Deprecated
     @Override
     public Value evaluate(EvaluationEnvironment env) {
         EvaluationEnvironment argValEnv = EvaluationEnvironment.EMPTY;
