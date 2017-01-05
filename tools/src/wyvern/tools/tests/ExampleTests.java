@@ -20,6 +20,6 @@ public class ExampleTests {
 
     @Test
 	public void testHello() throws ParseException {
-		TestUtil.doTestScriptModularly(PATH, "hello", Util.unitType(), Util.unitValue());
+		TestUtil.doTestScriptModularly(PATH, "rosetta.hello", Util.unitType(), Util.unitValue());
 	}	
 }

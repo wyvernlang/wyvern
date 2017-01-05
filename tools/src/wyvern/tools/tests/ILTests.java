@@ -440,7 +440,7 @@ public class ILTests {
 	
 	@Test
 	public void testInterpreterOnScript() {
-		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "hello.wyv" };
+		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "rosetta/hello.wyv" };
 		Interpreter.wyvernHome.set("..");
 		Interpreter.main(args);
 	}
