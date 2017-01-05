@@ -36,7 +36,6 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 @Category(RegressionTests.class)

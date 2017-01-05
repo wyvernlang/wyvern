@@ -28,7 +28,6 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -119,7 +118,7 @@ public class ModuleSystemTests {
 
 	@Test
 	public void testADT() throws ParseException {
-		ILTests.doTestScriptModularly("modules.listClient",
+		TestUtil.doTestScriptModularly("modules.listClient",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}
@@ -261,7 +260,7 @@ public class ModuleSystemTests {
 	
 	@Test
 	public void testSimpleADT() throws ParseException {
-		ILTests.doTestScriptModularly("modules.simpleADTdriver", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.simpleADTdriver", Util.intType(), new IntegerLiteral(5));
 	}
 	
 }

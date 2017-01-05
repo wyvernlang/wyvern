@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
+import wyvern.tools.tests.ExampleTests;
 import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.Figures;
 import wyvern.tools.tests.ILTests;
@@ -43,6 +44,7 @@ import wyvern.tools.tests.StdlibTests;
         DemoTests.class,        // tests demonstration code
         StdlibTests.class,      // tests the standard library with the new IL
         ModuleSystemTests.class,        // tests the new IL
+        ExampleTests.class      // tests the examples 
     }
 )
 public class AntRegressionTestSuite {

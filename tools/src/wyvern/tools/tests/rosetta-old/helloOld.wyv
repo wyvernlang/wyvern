@@ -1,7 +1,0 @@
-// TODO: replace the import below with this requires
-//requires stdout
-// NOTE: could be stdio, or io, or stdres, but these are not least privilege
-
-import wyv:src/wyvern/tools/tests/rosetta-old/stdoutOld.wyv
-
-stdout.print("Hello, World!")

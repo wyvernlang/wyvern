@@ -36,7 +36,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.imports.extensions.JavaResolver;
 import wyvern.tools.imports.extensions.WyvernResolver;
-import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;

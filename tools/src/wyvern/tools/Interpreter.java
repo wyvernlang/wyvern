@@ -15,7 +15,7 @@ import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.tagTests.TestUtil;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 public class Interpreter {

@@ -1,16 +1,22 @@
-package wyvern.tools.tests.tagTests;
+package wyvern.tools.tests;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.util.Optional;
-
+import java.util.LinkedList;
 import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -22,14 +28,16 @@ import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernParserConstants;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.tools.types.Type;
 
 public class TestUtil {
 	public static final String BASE_PATH = "src/wyvern/tools/tests/";
 	public static final String STDLIB_PATH = BASE_PATH + "stdlib/";
 	public static final String LIB_PATH = "../stdlib/";
+	public static final String EXAMPLES_PATH = "../examples/";
 	private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
 	
 	/** Sets up the standard library and platform paths in the Wyvern resolver
@@ -97,7 +105,7 @@ public class TestUtil {
 	 * @param ast
 	 * @param value
 	 */
-	public static void evaluateExpecting(TypedAST ast, int value) {
+	/*public static void evaluateExpecting(TypedAST ast, int value) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
 		String expecting = "IntegerConstant(" + value + ")";
@@ -118,7 +126,7 @@ public class TestUtil {
 	 * @param ast
 	 * @param value
 	 */
-	public static void evaluateExpectingPerf(TypedAST ast, int value) {
+	/*public static void evaluateExpectingPerf(TypedAST ast, int value) {
 		Value v = ast.evaluate(Globals.getStandardEvalEnv());
 		String expecting = "IntegerConstant(" + value + ")"; 
 		Assert.assertEquals(expecting, v.toString());
@@ -137,7 +145,7 @@ public class TestUtil {
 	 * 
 	 * @param ast
 	 */
-	public static void evaluate(TypedAST ast) {
+	/*public static void evaluate(TypedAST ast) {
 		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
 		ast.evaluate(Globals.getStandardEvalEnv());
 	}
@@ -150,7 +158,7 @@ public class TestUtil {
 	 * 
 	 * @param ast
 	 */
-	public static Value evaluateNew(TypedAST ast) {
+	/*public static Value evaluateNew(TypedAST ast) {
 		boolean oldParserFlag = WyvernResolver.getInstance().setNewParser(true);
 		try {
 			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
@@ -158,7 +166,7 @@ public class TestUtil {
 		} finally {
 			WyvernResolver.getInstance().setNewParser(oldParserFlag);
 		}
-	}
+	}*/
 	
 	public static String readFile(String filename) {
 		return readFile(new File(filename));
@@ -184,5 +192,45 @@ public class TestUtil {
 	 */
 	private static void clearGlobalTagInfo() {
 		TaggedInfo.clearGlobalTaggedInfos();
+	}
+
+	public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
+	    final Module module = state.getResolver().resolveModule(qualifiedName);
+	    IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
+	    TestUtil.doChecks(program, expectedType, expectedValue);
+	}
+
+	// TODO: make other string tests call this function
+	public static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
+		ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
+		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+	                                                               new File(BASE_PATH),
+	                                                               new File(LIB_PATH)));
+		final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+		IExpr program = ast.generateIL(genCtx, null, dependencies);
+		program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
+	    TestUtil.doChecks(program, expectedType, expectedResult);
+	}
+
+	public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
+	    // resolveModule already typechecked, but we'll do it again to verify the type
+		TypeContext ctx = Globals.getStandardTypeContext();
+	    ValueType t = program.typeCheck(ctx);
+	    if (expectedType != null)
+	    	Assert.assertEquals(expectedType, t);
+	    
+	    // check the result
+	    Value v = program.interpret(Globals.getStandardEvalContext());
+	    if (expectedValue != null)
+	    	Assert.assertEquals(expectedValue, v);
+	}
+
+	// TODO: make other script tests call this function
+	public static void doTestScriptModularly(String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+	  InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(BASE_PATH), new File(LIB_PATH));
+	  final Module module = state.getResolver().resolveModule(qualifiedName);
+	  IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
+	  doChecks(program, expectedType, expectedValue);
 	}
 }

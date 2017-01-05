@@ -24,7 +24,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
@@ -42,7 +41,7 @@ public class Illustrations {
 	@Test
 	public void testFigure5Corrected() throws ParseException {
 		// uses "FileIO.wyt", "fileIO.wyv", "Logger.wyt", "logger.wyv", "wavyUnderlineV3.wyv", "example5.wyv", "example5driver.wyv"
-		ILTests.doTestScriptModularly("illustrations.example5driver",
+		TestUtil.doTestScriptModularly("illustrations.example5driver",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}
@@ -112,7 +111,7 @@ public class Illustrations {
 	@Test
 	public void testFigure2() throws ParseException {
 		// uses "lists.wyv", "UserInfo.wyt", "userInfo.wyv", "DocumentLock.wyv", "example2.wyv"
-		ILTests.doTestScriptModularly("illustrations.example2",
+		TestUtil.doTestScriptModularly("illustrations.example2",
 				Util.intType(),
 				new IntegerLiteral(5));
 	}

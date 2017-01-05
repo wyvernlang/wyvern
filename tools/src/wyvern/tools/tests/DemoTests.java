@@ -25,7 +25,6 @@ import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -43,17 +42,17 @@ public class DemoTests {
     
 	@Test
 	public void testSafeSQL() throws ParseException {
-		ILTests.doTestScriptModularly("modules.sqlMain", Util.intType(), new IntegerLiteral(5));
+		TestUtil.doTestScriptModularly("modules.sqlMain", Util.intType(), new IntegerLiteral(5));
 	}
 	
 	@Test
 	public void testWebServer() throws ParseException {
-		ILTests.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
+		TestUtil.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
 	}
 	
 	@Test
 	public void testListClient() throws ParseException {
-		ILTests.doTestScriptModularly("demo.ListClient", Util.intType(), new IntegerLiteral(8));
+		TestUtil.doTestScriptModularly("demo.ListClient", Util.intType(), new IntegerLiteral(8));
 	}
 	
 	

@@ -14,7 +14,6 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.tagTests.TestUtil;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -50,18 +49,16 @@ public class CoreParserTests {
 		int finalRes = ((IntegerConstant)out).getValue();
 		Assert.assertEquals(3, finalRes);
 	}
-	
 	@Test
 	public void testValVar() throws ParseException {
 		String input = "require stdout\n\n"
 					 + "val x = \"Hello, \"\n"
-					 + "var y : Str = \"World\"\n"
-					 + "val z : Str = \"!\"\n"
+					 + "var y : String = \"World\"\n"
+					 + "val z : String = \"!\"\n"
 				     + "stdout.print(x)\n"
 				     + "stdout.print(y)\n"
 				     + "stdout.print(z)\n";
-		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		TestUtil.evaluateNew(ast);
+		TestUtil.doTest(input, null, null);
 	}
 	
 	@Test
@@ -71,10 +68,7 @@ public class CoreParserTests {
 				     + "        5\n"
 				     + "obj.getValue()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		Value out = TestUtil.evaluateNew(ast);
-		int finalRes = ((IntegerConstant)out).getValue();
-		Assert.assertEquals(5, finalRes);
+		ILTests.doTestInt(input, 5);
 	}
 	
 	@Test
@@ -83,10 +77,7 @@ public class CoreParserTests {
 				     + "    val v:Int = 5\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		Value out = TestUtil.evaluateNew(ast);
-		int finalRes = ((IntegerConstant)out).getValue();
-		Assert.assertEquals(5, finalRes);
+		ILTests.doTestInt(input, 5);
 	}
 	@Test
 	public void testVarField() throws ParseException {
@@ -95,10 +86,7 @@ public class CoreParserTests {
 				     + "obj.v = 3\n"
 				     + "obj.v\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		Value out = TestUtil.evaluateNew(ast);
-		int finalRes = ((IntegerConstant)out).getValue();
-		Assert.assertEquals(3, finalRes);
+		ILTests.doTestInt(input, 3);
 	}
 	
 	@Test
@@ -111,10 +99,6 @@ public class CoreParserTests {
 				     + "        5\n"
 				     + "obj.getValue()\n"
 				     ;
-		TypedAST ast = TestUtil.getNewAST(input, "test input");
-		Value out = TestUtil.evaluateNew(ast);
-		int finalRes = ((IntegerConstant)out).getValue();
-		Assert.assertEquals(5, finalRes);
+		ILTests.doTestInt(input, 5);
 	}	
-	
 }

@@ -27,12 +27,12 @@ public class StdlibTests {
 
 	@Test
 	public void testRegexLexer() throws ParseException {
-		ILTests.doTestScriptModularly("tsls.testLexer", Util.stringType(), new StringLiteral("*"));
+		TestUtil.doTestScriptModularly("tsls.testLexer", Util.stringType(), new StringLiteral("*"));
 	}
 
 	@Test
 	public void testParser() throws ParseException {
-		ILTests.doTestScriptModularly("tsls.testParser", null, null);
+		TestUtil.doTestScriptModularly("tsls.testParser", null, null);
 	}
 
 }
