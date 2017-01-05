@@ -177,7 +177,7 @@ public class Globals {
 		// construct a type for the system object
 		List<Declaration> decls = new LinkedList<Declaration>();
 		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Unit", new NominalType("this", "Unit"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));

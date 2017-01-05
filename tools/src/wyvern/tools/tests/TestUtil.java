@@ -218,7 +218,7 @@ public class TestUtil {
 		TypeContext ctx = Globals.getStandardTypeContext();
 	    ValueType t = program.typeCheck(ctx);
 	    if (expectedType != null)
-	    	Assert.assertEquals(expectedType, t);
+	    	Assert.assertTrue(t.isSubtypeOf(expectedType, ctx));
 	    
 	    // check the result
 	    Value v = program.interpret(Globals.getStandardEvalContext());

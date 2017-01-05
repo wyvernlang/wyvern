@@ -19,8 +19,7 @@ public class ExampleTests {
     }
 
     @Test
-	public void testHello2() throws ParseException {
-		TestUtil.doTestScriptModularly(PATH, "hello", null /*Util.unitType()*/, Util.unitValue());
-		// TODO: get the type above to work
+	public void testHello() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "hello", Util.unitType(), Util.unitValue());
 	}	
 }
