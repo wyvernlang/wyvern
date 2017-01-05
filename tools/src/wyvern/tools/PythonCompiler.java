@@ -31,7 +31,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 public class PythonCompiler {
   public static void main(String[] args) {
     if (args.length < 1) {
-      System.err.println("usage: wyvernpy FILENAME [-o OUTPUT_FILE] [-dIL] [-dAST]");
+      System.err.println("usage: wypy FILENAME [-o OUTPUT_FILE] [-dIL] [-dAST]");
       System.exit(1);
     }
     String filename = null;

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# this is the command-line Wyvern interpreter
+
 # portions of this script are adapted from the ant script
 
 # OS specific support.  $var _must_ be set to either true or false.
