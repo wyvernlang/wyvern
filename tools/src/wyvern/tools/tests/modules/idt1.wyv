@@ -5,3 +5,4 @@ module idt1
 type MyADT = Unit
 
 def foo(m:MyADT):Int = 3
+
