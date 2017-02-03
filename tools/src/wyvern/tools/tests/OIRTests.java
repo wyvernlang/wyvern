@@ -662,4 +662,20 @@ public class OIRTests {
             "\n";
         testPyFromInput(input, "7");
     }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testTypecheckingLoop() throws ParseException {
+        String input =
+            "type A\n" +
+            "  def foo() : A\n" +
+            "type B\n" +
+            "  def foo() : B\n" +
+            "val a : A = new\n" +
+            "  def foo() : A = this\n" +
+            "def expectsB(b : B) : B = b\n" +
+            "expectsB(a)\n" +
+            "\"typechecked!\"";
+        testPyFromInput(input, "typechecked!");
+    }
 }
