@@ -28,6 +28,8 @@ import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
+/** Compiles to Python source code.  Should work with either Python 2 or Python 3.
+ */
 public class PythonCompiler {
   public static void main(String[] args) {
     if (args.length < 1) {

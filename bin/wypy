@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # this is the command-line Wyvern transpiler to Python
+# Should work with either Python 2 or Python 3
 # usage: wypy FILENAME [-o OUTPUT_FILE] [-dIL] [-dAST]
 
 # portions of this script are adapted from the ant script
