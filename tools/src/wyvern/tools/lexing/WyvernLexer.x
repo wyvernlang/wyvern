@@ -465,6 +465,8 @@ import wyvern.tools.errors.ToolError;
 	lineElementSequence ::= indent_t:n {: RESULT = makeList(n); :}
 	                      | nonWSLineElement:n {:
 	                            // handles lines that start without any indent
+	                            if (inDSL)
+	                                inDSL = false;
 								if (DSLNext)
 									throw new CopperParserException("Indicated DSL with ~ but then did not indent");
 	                      		RESULT = n;

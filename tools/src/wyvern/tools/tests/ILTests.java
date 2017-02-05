@@ -689,6 +689,11 @@ public class ILTests {
         TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
     }
 
+    @Test
+    public void testPostTSLIndentation() throws ParseException {
+    	TestUtil.doTestScriptModularly("tsls.postTSLIndentation", Util.intType(), new IntegerLiteral(23));
+    }
+    
     // @Test
     // public void testTSLIndentation() throws ParseException {
     //     doTestScriptModularly("tsls.indentationTest", Util.intType(), new IntegerLiteral(5));
