@@ -30,6 +30,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.Interpreter;
+import wyvern.tools.PythonCompiler;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
@@ -441,6 +442,14 @@ public class ILTests {
 		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "rosetta/hello.wyv" };
 		Interpreter.wyvernHome.set("..");
 		Interpreter.main(args);
+	}
+	
+	@Test
+	public void testPythonCompilerOnScript() {
+		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };
+		PythonCompiler.wyvernHome.set("..");
+		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
+		PythonCompiler.main(args);
 	}
 	
 	

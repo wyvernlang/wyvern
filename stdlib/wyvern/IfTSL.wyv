@@ -28,7 +28,7 @@ def toUnitOrAST(input : String, ctx : system.Context) : ast.AST
 
 type AST = ast.AST
 
-type IfExpr
+resource type IfExpr
   def evalTrue() : Dyn
   def evalFalse() : Dyn
   metadata new

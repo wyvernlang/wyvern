@@ -14,7 +14,7 @@ public enum ErrorMessage {
 	VARIABLE_NOT_DECLARED("No variable named %ARG is in scope", 1),
 	NO_SUCH_METHOD("There is no visible method named %ARG", 1),
 	NO_SUCH_FIELD("There is no visible field named %ARG", 1),
-	NO_METHOD_WITH_THESE_ARG_TYPES("There is no visible method '%ARG'", 1),
+	NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept the actual argument types: '%ARG'", 1),
 	NOT_A_METHOD("%ARG is not a method", 1),
 	TYPE_NOT_DECLARED("Type %ARG has no declaration in the context", 1),
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),

@@ -77,7 +77,13 @@ public class PythonCompiler {
       System.exit(1);
     }
     try {
-      File rootDir = new File(System.getProperty("user.dir"));
+      String rootLoc;
+      if (wyvernRoot.get() != null) {
+    	  rootLoc = wyvernRoot.get();
+      } else {
+    	  rootLoc = System.getProperty("user.dir");
+      }
+      File rootDir = new File(rootLoc);
       String wyvernPath = System.getenv("WYVERN_HOME");
       if (wyvernPath == null) {
         if (wyvernHome.get() != null) {
@@ -144,4 +150,7 @@ public class PythonCompiler {
 
   // used to set WYVERN_HOME when called programatically
   public static final ThreadLocal<String> wyvernHome = new ThreadLocal<String>();
+  
+  // used to set WYVERN_ROOT when called programatically
+  public static final ThreadLocal<String> wyvernRoot = new ThreadLocal<String>();
 }
