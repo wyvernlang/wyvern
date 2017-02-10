@@ -7,14 +7,15 @@ import python:time
 type Float
   val concrete : Unit
 
-type Surface
-  def fill(color : Color) : Unit
-
 resource type Rect
   var top : Int
   var left : Int
   var bottom : Int
   var right : Int
+
+type Surface
+  def fill(color : Color) : Unit
+  def blit(source : Surface, dest : Rect) : Unit
 
 type Color
   val concrete : Unit
@@ -69,6 +70,29 @@ type Mixer
   val music : Music
   def Sound(filename : String) : Sound
 
+type Font
+  def render(text : String, antialias : Boolean, color : Color) : Surface
+  def size(text : String) : Dyn
+  def set_underline(underline : Boolean) : Unit
+  def get_underline() : Boolean
+  def set_bold(bold : Boolean) : Unit
+  def get_bold() : Boolean
+  def set_italic(italic : Boolean) : Unit
+  def get_italic() : Boolean
+  def get_linesize() : Int
+  def get_height() : Int
+  def get_ascent() : Int
+  def get_descent() : Int
+
+type FontModule
+  def init() : Unit
+  def quit() : Unit
+  def get_init() : Boolean
+  def get_default_font() : String
+  // def get_fonts() : String List
+  def match_font(name : String, bold : Boolean, italic : Boolean) : String
+  def SysFont(name : String, size : Int, bold : Boolean, italic : Boolean) : Font
+
 type Helper
   def make2Tuple(a : Dyn, b : Dyn) : Dyn
   def fst(a : Dyn) : Dyn
@@ -90,6 +114,7 @@ type Pygame
   val display : Display
   val event : PygameEvent
   val mixer : Mixer
+  val font : FontModule
 
   def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
   val QUIT : EventType
@@ -116,6 +141,7 @@ val draw = pygame.draw
 val display = pygame.display
 val event = pygame.event
 val mixer = pygame.mixer
+val font = pygame.font
 
 def Rect(x : Int, y : Int, height : Int, width : Int) : Rect = pygame.Rect(x,y,height,width)
 
