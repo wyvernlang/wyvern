@@ -29,6 +29,21 @@ public class ExampleTests {
 		TestUtil.doTestScriptModularly(PATH, "rosetta.hello", Util.unitType(), Util.unitValue());
 	}
     
+    @Test
+	public void testHelloExplicit() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "rosetta.hello-explicit", Util.unitType(), Util.unitValue());
+	}
+    
+	@Test
+	public void testFib() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "rosetta.fibonacci", Util.unitType(), Util.unitValue());
+	}
+
+	@Test
+	public void testFactorial() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "rosetta.factorial", Util.unitType(), Util.unitValue());
+	}
+	
 	@Test
 	public void testPythonCompilerOnScript() {
 		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };

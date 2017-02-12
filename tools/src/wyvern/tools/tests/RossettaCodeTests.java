@@ -25,21 +25,6 @@ public class RossettaCodeTests {
 	private static final String PATH = BASE_PATH + "rosetta2/";
 	
 	@Test
-	public void testExplicitHello() throws ParseException {
-		TestUtil.doTestScriptModularly("rosetta.hello-explicit", null, null);
-	}
-
-	@Test
-	public void testFib() throws ParseException {
-		TestUtil.doTestScriptModularly("rosetta.fibonacci", null, null);
-	}
-
-	@Test
-	public void testFactorial() throws ParseException {
-		TestUtil.doTestScriptModularly("rosetta.factorial", null, null);
-	}
-
-	@Test
 	public void testInsertionSort() throws ParseException {
 		TestUtil.doTestScriptModularly("rosetta.insertion-sort", null, null);
 	}
