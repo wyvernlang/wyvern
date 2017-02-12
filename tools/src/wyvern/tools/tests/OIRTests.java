@@ -663,7 +663,6 @@ public class OIRTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testTypecheckingLoop() throws ParseException {
         String input =
             "type A\n" +
