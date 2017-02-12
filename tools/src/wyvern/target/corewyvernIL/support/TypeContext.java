@@ -11,6 +11,13 @@ public abstract class TypeContext {
 		return new VarBindingContext(var, type, this);
 	}
 	
+	public boolean isAssumedSubtype(NominalType t1, NominalType t2) {
+		if (getNext() == null)
+			return false;
+		else
+			return getNext().isAssumedSubtype(t1, t2);
+	}
+	
 	/*
 	 * Returns the type of this variable in the context
 	 */

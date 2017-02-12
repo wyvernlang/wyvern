@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.oir.OIREnvironment;
@@ -104,10 +105,15 @@ public class NominalType extends ValueType {
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
 		if (super.isSubtypeOf(t, ctx))
 			return true;
+		if (t instanceof NominalType && ctx.isAssumedSubtype(this, (NominalType)t))
+			return true;
 		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 			ValueType ct = t.getCanonicalType(ctx);
+			// if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
+			if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
+				ctx = new SubtypeAssumption(this, (NominalType)t, ctx);
 			return vt.isSubtypeOf(ct, ctx);
 		} else {
 			ValueType ct = t.getCanonicalType(ctx);

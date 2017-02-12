@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarBindingContext extends TypeContext {
