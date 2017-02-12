@@ -13,6 +13,3 @@ wyvern rosetta/hello.wyv
 
 
 To run the pong example, which requires python, see the readme.txt file in the pong subdirectory.
-
-
-(the other examples are not necessarily working - need to clean up and incorporate them into regressions tests so they stay working)

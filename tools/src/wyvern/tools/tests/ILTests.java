@@ -444,14 +444,6 @@ public class ILTests {
 		Interpreter.main(args);
 	}
 	
-	@Test
-	public void testPythonCompilerOnScript() {
-		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };
-		PythonCompiler.wyvernHome.set("..");
-		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
-		PythonCompiler.main(args);
-	}
-	
 	
 	@Test
 	public void testRecursiveFunctions() throws ParseException {

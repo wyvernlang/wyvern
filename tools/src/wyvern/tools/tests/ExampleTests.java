@@ -5,10 +5,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.tools.PythonCompiler;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
 
+/** Runs the Wyvern compiler on the example source code in the wyvern/examples directory tree
+ * 
+ * @author aldrich
+ *
+ */
 @Category(RegressionTests.class)
 public class ExampleTests {
     private static final String PATH = TestUtil.EXAMPLES_PATH;
@@ -21,5 +27,14 @@ public class ExampleTests {
     @Test
 	public void testHello() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "rosetta.hello", Util.unitType(), Util.unitValue());
-	}	
+	}
+    
+	@Test
+	public void testPythonCompilerOnScript() {
+		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };
+		PythonCompiler.wyvernHome.set("..");
+		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
+		PythonCompiler.main(args);
+	}
+	
 }
