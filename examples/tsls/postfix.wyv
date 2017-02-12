@@ -1,0 +1,24 @@
+module postfix
+
+import wyvern.ast
+import wyvern.Int
+import wyvern.option
+import tsls.parser
+
+type AST = ast.AST
+
+type PostfixExpr
+    def eval():Int
+
+	// define a TSL for postfix expressions
+    metadata new
+        def parseTSL(input:String, ctx:system.Context):option.Option // option of AST
+            val parseResult = parser.parse(input)
+			
+			// wrap the AST in an object with an eval() method
+			// to match the signature above
+            parseResult.map((r) =>
+                ast.object(
+                    ast.defn("eval", ast.types.int(), r)
+                )
+            )

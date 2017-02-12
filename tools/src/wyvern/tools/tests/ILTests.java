@@ -680,11 +680,6 @@ public class ILTests {
 		//Expression program = ast.generateIL(genCtx, null);
 	}
 
-	@Test
-	public void testTSL() throws ParseException {
-		TestUtil.doTestScriptModularly("tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
-	}
-
     @Test
     public void testTSL2() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));

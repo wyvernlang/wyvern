@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -42,6 +43,11 @@ public class ExampleTests {
 	@Test
 	public void testFactorial() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "rosetta.factorial", Util.unitType(), Util.unitValue());
+	}
+	
+	@Test
+	public void testTSL() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
 	}
 	
 	@Test
