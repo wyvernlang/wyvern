@@ -1,8 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
-import static wyvern.tools.errors.ToolError.reportError;
-
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;

@@ -3,7 +3,6 @@ package wyvern.tools.typedAST.core.binding.objects;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class TypeDeclBinding implements Binding {
 	private final String name;

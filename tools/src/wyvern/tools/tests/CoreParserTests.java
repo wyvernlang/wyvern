@@ -1,36 +1,14 @@
 package wyvern.tools.tests;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Optional;
-
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.tools.tests.suites.CurrentlyBroken;
-import wyvern.stdlib.Globals;
-import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.types.TypeUtils;
-import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.parsing.coreparser.ParseUtils;
-import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
-import wyvern.tools.typedAST.core.Sequence;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 
 @Category(RegressionTests.class)
 public class CoreParserTests {

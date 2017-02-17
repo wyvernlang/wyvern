@@ -11,7 +11,6 @@ import wyvern.tools.errors.WyvernException;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class JNullType extends AbstractTypeImpl implements Type {
 	@Override

@@ -23,7 +23,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class Str extends AbstractTypeImpl implements OperatableType {
 	public Str() {}

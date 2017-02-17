@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Set;
 
-import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.type.NominalType;

@@ -19,7 +19,6 @@ import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
-import wyvern.tools.util.TreeWriter;
 
 public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResolver.Resolvable {
 	private Type[] types;

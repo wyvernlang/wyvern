@@ -13,7 +13,6 @@ import wyvern.tools.typedAST.extensions.SpliceExn;
 import wyvern.tools.typedAST.extensions.interop.java.Util;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.SpliceType;
 
 public class LangUtil {
 

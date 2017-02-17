@@ -1,10 +1,7 @@
 package wyvern.target.corewyvernIL.transformers;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
@@ -37,12 +34,9 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.type.CaseType;
 import wyvern.target.corewyvernIL.type.DataType;
-import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -333,7 +327,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	}
 
 	@Override
-	public CaseType visit(TypeContext ctx, CaseType caseType) {
+	public ValueType visit(TypeContext ctx, ValueType caseType) {
 		return caseType;
 	}
 

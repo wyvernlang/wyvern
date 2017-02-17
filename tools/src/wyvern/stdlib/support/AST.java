@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import wyvern.tools.tests.TestUtil;
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
@@ -27,8 +26,6 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.interop.FObject;
-import wyvern.tools.interop.JObject;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 

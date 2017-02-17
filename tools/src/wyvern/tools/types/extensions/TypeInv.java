@@ -18,7 +18,6 @@ import wyvern.tools.types.RecordType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.util.TreeWriter;
 
 public class TypeInv implements Type {
 	Type innerType;

@@ -7,14 +7,12 @@ import java.util.Map;
 import java.util.HashMap;
 
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.oir.OIREnvironment;
 
 
 public class DefDeclType extends DeclTypeWithResult {

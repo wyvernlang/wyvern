@@ -2,7 +2,6 @@ package wyvern.tools.typedAST.core.binding.evaluation;
 
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class HackForArtifactTaggedInfoBinding implements EvaluationBinding {
     private final String name;

@@ -12,7 +12,7 @@ val tokens = lexer.tokens
 type AST = ast.AST
 
 // A parse function for reverse Polish notation
-def parse(input:String):option.Option
+def parse(input:String):option.Option // Option of AST
 	// Create a scanner configuration, setting up the whitespace operator
 	val config = lexer.makeScannerConfig(regex("[ \n\t]+"))
 
@@ -23,7 +23,7 @@ def parse(input:String):option.Option
 
 	// create a scanner and scan the input
 	val scanner = lexer.makeScanner(config, input)
-	//debug.print(input)
+	debug.print(input)
 	doParse(scanner)
 
 // The starting point for recursive-descent parsing	

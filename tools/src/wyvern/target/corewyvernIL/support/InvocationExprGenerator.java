@@ -2,8 +2,6 @@ package wyvern.target.corewyvernIL.support;
 
 import java.util.List;
 
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;

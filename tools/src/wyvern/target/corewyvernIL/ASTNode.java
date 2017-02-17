@@ -8,8 +8,6 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 
-import wyvern.target.corewyvernIL.metadata.IsTailCall;
-
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 

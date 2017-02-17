@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import wyvern.target.oir.ASTVisitor;
 import wyvern.target.oir.OIRAST;
-import wyvern.target.oir.OIREnvironment;
 
 public class OIRMethodDeclarationGroup  extends OIRAST {
 

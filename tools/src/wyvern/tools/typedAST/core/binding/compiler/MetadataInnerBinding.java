@@ -6,7 +6,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
-import wyvern.tools.util.TreeWriter;
 
 public class MetadataInnerBinding implements Binding {
 

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.oir.OIREnvironment;
 
 public class FormalArg extends ASTNode implements IASTNode {
 

@@ -11,7 +11,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class SpliceType implements Type {
 	private final Type inner;

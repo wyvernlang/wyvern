@@ -5,9 +5,6 @@ import java.util.Optional;
 
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.HasLocation;
-import wyvern.tools.parsing.HasParser;
-import wyvern.tools.typedAST.transformers.GenerationEnvironment;
-import wyvern.tools.typedAST.transformers.ILWriter;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;

@@ -4,16 +4,15 @@ import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
 
-import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.oir.OIREnvironment;
 
 
 public class AbstractTypeMember extends DeclType implements IASTNode {
 	boolean isResource;
-
+	// TODO: add metadata
+	
 	public AbstractTypeMember(String name) {
 		this(name, false);
 	}

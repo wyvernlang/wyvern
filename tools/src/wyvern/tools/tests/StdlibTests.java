@@ -3,11 +3,9 @@ package wyvern.tools.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)

@@ -23,7 +23,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
-import wyvern.tools.util.TreeWriter;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	private Type result;

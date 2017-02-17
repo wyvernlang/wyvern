@@ -36,7 +36,6 @@ import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.type.CaseType;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -442,7 +441,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 	}
 
 	@Override
-	public OIRAST visit(EmitOIRState state, CaseType caseType) {
+	public OIRAST visit(EmitOIRState state, ValueType caseType) {
 		throw new RuntimeException("EMITOIRVisitor: CaseType -> OIR unimplemented");
 	}
 

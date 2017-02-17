@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.nio.file.Files;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import wyvern.target.corewyvernIL.expression.ObjectValue;

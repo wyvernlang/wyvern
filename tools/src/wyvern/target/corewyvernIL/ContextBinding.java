@@ -1,11 +1,6 @@
 package wyvern.target.corewyvernIL;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 

@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.astvisitor;
 
 import wyvern.target.corewyvernIL.Case;
-import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
@@ -28,11 +27,11 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.type.CaseType;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class ASTVisitor<S, T> {
 	public abstract T visit(S state, New newExpr);
@@ -63,7 +62,7 @@ public abstract class ASTVisitor<S, T> {
 	public abstract T visit(S state, DelegateDeclaration delegateDecl);
 	public abstract T visit(S state, ConcreteTypeMember concreteTypeMember);
 	public abstract T visit(S state, TypeDeclaration typeDecl);
-  public abstract T visit(S state, CaseType caseType);
+  public abstract T visit(S state, ValueType valueType);
   public abstract T visit(S state, ExtensibleTagType extensibleTagType);
   public abstract T visit(S state, DataType dataType);
   public abstract T visit(S state, FFIImport ffiImport);

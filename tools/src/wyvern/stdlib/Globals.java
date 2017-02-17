@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
@@ -57,6 +58,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 public class Globals {
 	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
     public static final NominalType PYTHON_IMPORT_TYPE = new NominalType("system", "Python");
+	public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
 	public static final boolean checkRuntimeTypes = false;
 	private static final Set<String> javaWhiteList = new HashSet<String>();
 	
@@ -124,6 +126,7 @@ public class Globals {
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
 		genCtx = new TypeGenContext("Java", "system", genCtx);
 		genCtx = new TypeGenContext("Python", "system", genCtx);
+		genCtx = new TypeGenContext("Platform", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
@@ -160,15 +163,17 @@ public class Globals {
         declTypes.add(new ConcreteTypeMember("String", stringType));
 
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
-        declTypes.add(new AbstractTypeMember("Java", true));
+        ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType());
+        declTypes.add(new TaggedTypeMember("Platform", platformType));
+        NominalType systemPlatform = new NominalType("system", "Platform");
+        ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType());
+        declTypes.add(new TaggedTypeMember("Java", javaType));
         //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));	
         pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
-        ExtensibleTagType platformType = new ExtensibleTagType(Util.unitType());
         declTypes.add(new ConcreteTypeMember("Python", pythonType));
-        declTypes.add(new ConcreteTypeMember("Platform", platformType));
         declTypes.add(new AbstractTypeMember("Context"));
         ValueType systemType = new StructuralType("system", declTypes);
         return systemType;

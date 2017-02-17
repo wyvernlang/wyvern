@@ -1,7 +1,6 @@
 package wyvern.tools.typedAST.core.binding;
 
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public abstract class AbstractBinding implements Binding {
 	private String name;

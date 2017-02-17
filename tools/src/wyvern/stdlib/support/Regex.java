@@ -3,13 +3,10 @@ package wyvern.stdlib.support;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
-import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 
 public class Regex {

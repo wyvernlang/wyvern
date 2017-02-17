@@ -2,7 +2,6 @@ package wyvern.target.corewyvernIL;
 
 import java.io.IOException;
 
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.type.ValueType;
 

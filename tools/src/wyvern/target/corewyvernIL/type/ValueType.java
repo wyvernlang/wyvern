@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
-public abstract class ValueType extends CaseType implements IASTNode {
+public abstract class ValueType extends Type implements IASTNode {
 	/**
 	 * Returns the equivalent structural type.  If the structural type
 	 * is unknown (e.g. because this is a nominal type and the
@@ -23,6 +23,11 @@ public abstract class ValueType extends CaseType implements IASTNode {
 		return getStructuralType(ctx, StructuralType.getEmptyType());
 	}
 
+	@Override
+	public NominalType getParentType(View v) {
+		return null;
+	}
+	
 	/**
 	 * Returns the equivalent structural type.  If the structural type
 	 * is unknown (e.g. because this is a nominal type and the
@@ -66,13 +71,11 @@ public abstract class ValueType extends CaseType implements IASTNode {
 		return st.findDecls(declName, ctx);
 	}
 
-	/**
-	 * Returns a type that is equivalent to this type
-	 * under the View v.  If v maps x to y.f, for example,
-	 * then a type of the form x.g.T will be mapped to the
-	 * type y.f.g.T
-	 */
+	@Override
 	public abstract ValueType adapt(View v);
+	
+	@Override
+	abstract public ValueType doAvoid(String varName, TypeContext ctx, int depth);
 
 	public boolean equalsInContext(ValueType otherType, TypeContext ctx) {
 		return this.isSubtypeOf(otherType, ctx) && otherType.isSubtypeOf(this, ctx);
@@ -106,7 +109,5 @@ public abstract class ValueType extends CaseType implements IASTNode {
 	public final ValueType avoid(String varName, TypeContext ctx) {
 		return doAvoid(varName, ctx, 0);
 	}
-	// TODO: depth limit is hacky, find a more principled approach to avoidance
-	abstract public ValueType doAvoid(String varName, TypeContext ctx, int depth);
 	public static final int MAX_RECURSION_DEPTH = 10; 
 }

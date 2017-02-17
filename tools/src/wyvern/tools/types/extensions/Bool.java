@@ -21,7 +21,6 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class Bool extends AbstractTypeImpl implements OperatableType {
 	public Bool(FileLocation location) { super(location); }

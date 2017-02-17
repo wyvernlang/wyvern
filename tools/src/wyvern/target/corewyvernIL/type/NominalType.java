@@ -3,18 +3,17 @@ package wyvern.target.corewyvernIL.type;
 import java.io.IOException;
 import java.util.Arrays;
 
-import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
@@ -69,7 +68,7 @@ public class NominalType extends ValueType {
 	}
 
 	private DeclType getSourceDeclType(TypeContext ctx) {
-		return path.typeCheck(ctx).getStructuralType(ctx).findMatchingDecl(typeMember, cdt -> !(cdt instanceof ConcreteTypeMember || cdt instanceof AbstractTypeMember), ctx);
+		return path.typeCheck(ctx).getStructuralType(ctx).findMatchingDecl(typeMember, cdt -> !(cdt instanceof ConcreteTypeMember || cdt instanceof AbstractTypeMember || cdt instanceof TaggedTypeMember), ctx);
 		//return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 	}
 	
@@ -115,6 +114,11 @@ public class NominalType extends ValueType {
 			if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
 				ctx = new SubtypeAssumption(this, (NominalType)t, ctx);
 			return vt.isSubtypeOf(ct, ctx);
+		} else if (dt instanceof TaggedTypeMember) {
+			Type typeDefn = ((TaggedTypeMember)dt).getTypeDefinition(View.from(path, ctx));
+			NominalType superType = typeDefn.getParentType(View.from(path, ctx));
+			// TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
+			return superType.isSubtypeOf(t, ctx);
 		} else {
 			ValueType ct = t.getCanonicalType(ctx);
 			return super.isSubtypeOf(ct, ctx); // check for equality with the canonical type 

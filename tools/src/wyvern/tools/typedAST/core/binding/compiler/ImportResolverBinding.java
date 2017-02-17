@@ -3,7 +3,6 @@ package wyvern.tools.typedAST.core.binding.compiler;
 import wyvern.tools.imports.ImportResolver;
 import wyvern.tools.typedAST.core.binding.Binding;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class ImportResolverBinding implements Binding {
 

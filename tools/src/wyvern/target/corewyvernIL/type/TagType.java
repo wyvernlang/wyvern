@@ -1,30 +1,33 @@
 package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 
 public abstract class TagType extends Type {
 	
-	protected CaseType caseType;
+	private ValueType valueType;
+	protected NominalType parentType;
 	
-	public TagType(CaseType caseType) {
+	public TagType(NominalType parentType, ValueType valueType) {
 		super();
-		this.caseType = caseType;
+		this.valueType = valueType;
+		this.parentType = parentType;
 	}
 
-	public CaseType getCaseType()
-	{
-		return caseType;
+	public NominalType getParentType(View v) {
+		return (NominalType)parentType.adapt(v);
 	}
 	
 	@Override
 	public ValueType getValueType()
 	{
-		return caseType.getValueType();
+		return valueType;
 	}
 	
 	@Override
 	public void checkWellFormed(TypeContext ctx) {
-		caseType.checkWellFormed(ctx);
-	}
-	
+		valueType.checkWellFormed(ctx);
+		if (parentType != null)
+			parentType.checkWellFormed(ctx);
+	}	
 }

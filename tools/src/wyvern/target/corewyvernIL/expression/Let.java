@@ -5,13 +5,11 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.io.IOException;
 import java.util.Set;
 
-import wyvern.target.corewyvernIL.Environment;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
 
 public class Let extends Expression {
@@ -49,6 +47,8 @@ public class Let extends Expression {
 	public ValueType typeCheck(TypeContext ctx) {
 		ValueType t = getToReplace().typeCheck(ctx);
 		if (!t.isSubtypeOf(binding.getType(), ctx)) {
+			ValueType q = binding.getType();
+			t.isSubtypeOf(q, ctx);
 			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
 		}
 		final TypeContext extendedCtx = ctx.extend(getVarName(), binding.getType());

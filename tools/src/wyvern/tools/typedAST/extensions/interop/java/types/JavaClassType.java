@@ -17,7 +17,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Str;
 import wyvern.tools.util.Reference;
-import wyvern.tools.util.TreeWriter;
 
 public class JavaClassType extends ClassType implements MetaType {
 	private final Class clazz;

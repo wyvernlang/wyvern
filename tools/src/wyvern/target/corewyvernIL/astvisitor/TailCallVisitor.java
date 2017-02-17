@@ -39,7 +39,6 @@ import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.support.EmptyTypeContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.type.CaseType;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -224,7 +223,7 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     @Override
     public Void visit(Boolean inTailPosition,
-                         CaseType caseType) {
+    		ValueType caseType) {
         return null;
     }
 

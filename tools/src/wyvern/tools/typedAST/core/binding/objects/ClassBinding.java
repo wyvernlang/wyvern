@@ -5,7 +5,6 @@ import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.declarations.ClassDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.TreeWriter;
 
 public class ClassBinding extends ValueBinding {
 	private final String name;

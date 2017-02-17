@@ -9,7 +9,6 @@ import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.util.TreeWritable;
-import wyvern.tools.util.TreeWriter;
 
 public class Environment implements TreeWritable {
 	private Environment parentEnvironment;

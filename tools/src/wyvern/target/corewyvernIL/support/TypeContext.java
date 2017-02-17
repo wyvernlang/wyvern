@@ -1,10 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
-import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.ToolError;
 
 public abstract class TypeContext {
 	public TypeContext extend(String var, ValueType type) {
