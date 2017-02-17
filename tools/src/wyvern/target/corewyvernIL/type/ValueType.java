@@ -93,10 +93,11 @@ public abstract class ValueType extends CaseType implements IASTNode {
 		return null;
 	}
 	
-	/**
-	 * Checks if this type is well-formed, throwing an exception if not
-	 */
-	abstract public void checkWellFormed(TypeContext ctx);
+	@Override
+	public ValueType getValueType()
+	{
+		return this;
+	}	
 	
 	/**
 	 * Returns this type, avoiding the named variable if possible

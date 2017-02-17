@@ -30,6 +30,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
+import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -127,14 +128,14 @@ public class Globals {
 		return genCtx;
 	}
 
-	private static ValueType getSystemType() {
-		List<FormalArg> ifTrueArgs = Arrays.asList(
+    private static ValueType getSystemType() {
+        List<FormalArg> ifTrueArgs = Arrays.asList(
 				new FormalArg("trueBranch", Util.unitToDynType()),
 				new FormalArg("falseBranch", Util.unitToDynType()));
-    List<DeclType> boolDeclTypes = new LinkedList<DeclType>();
-    boolDeclTypes.add(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
-    boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
-    boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
+        List<DeclType> boolDeclTypes = new LinkedList<DeclType>();
+        boolDeclTypes.add(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
+        boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
+        boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
 		// construct a type for the system object
 		List<DeclType> declTypes = new LinkedList<DeclType>();
 		List<DeclType> intDeclTypes = new LinkedList<DeclType>();
@@ -145,30 +146,32 @@ public class Globals {
 		intDeclTypes.add(new DefDeclType("%", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 		intDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 		intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-    intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
+        intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
 		ValueType intType = new StructuralType("intSelf", intDeclTypes);
 		ValueType boolType = new StructuralType("boolean", boolDeclTypes);
 		declTypes.add(new ConcreteTypeMember("Int", intType));
 		declTypes.add(new ConcreteTypeMember("Boolean", boolType));
 		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 
-    List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
-    stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
-    ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
-		declTypes.add(new ConcreteTypeMember("String", stringType));
+        List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
+        stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
+        declTypes.add(new ConcreteTypeMember("String", stringType));
 
-		declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
-		declTypes.add(new AbstractTypeMember("Java", true));
-		//declTypes.add(new AbstractTypeMember("Python"));
-    List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
-    pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
-    pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
-    ValueType pythonType = new StructuralType("Python", pyDeclTypes);
-    declTypes.add(new ConcreteTypeMember("Python", pythonType));
-    declTypes.add(new AbstractTypeMember("Context"));
-		ValueType systemType = new StructuralType("system", declTypes);
-		return systemType;
+        declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
+        declTypes.add(new AbstractTypeMember("Java", true));
+        //declTypes.add(new AbstractTypeMember("Python"));
+        List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
+        pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));	
+        pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
+        ValueType pythonType = new StructuralType("Python", pyDeclTypes);
+        ExtensibleTagType platformType = new ExtensibleTagType(Util.unitType());
+        declTypes.add(new ConcreteTypeMember("Python", pythonType));
+        declTypes.add(new ConcreteTypeMember("Platform", platformType));
+        declTypes.add(new AbstractTypeMember("Context"));
+        ValueType systemType = new StructuralType("system", declTypes);
+        return systemType;
 	}
 
 	public static TypeContext getStandardTypeContext() {
@@ -192,6 +195,7 @@ public class Globals {
 		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
+		decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
 		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
 		return systemVal;

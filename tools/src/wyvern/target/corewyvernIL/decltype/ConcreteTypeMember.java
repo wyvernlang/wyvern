@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.tools.errors.ErrorMessage;
@@ -18,10 +19,10 @@ import wyvern.tools.errors.ToolError;
 
 public class ConcreteTypeMember extends DeclTypeWithResult {
 	
-	public ConcreteTypeMember(String name, ValueType sourceType) {
+	public ConcreteTypeMember(String name, Type sourceType) {
 		this(name, sourceType, null);
 	}
-	public ConcreteTypeMember(String name, ValueType sourceType, IExpr metadata) {
+	public ConcreteTypeMember(String name, Type sourceType, IExpr metadata) {
 		super(name, sourceType);
 		this.metadata = metadata;
 	}
