@@ -35,7 +35,7 @@ public class DataType extends TagType {
 	}
 
 	@Override
-	public Type adapt(View v) {
+	public TagType adapt(View v) {
 		NominalType newCT = (NominalType)getParentType(v);
 		List<NominalType> newCases = new LinkedList<NominalType>();
 		for (NominalType t : cases) {
@@ -45,7 +45,7 @@ public class DataType extends TagType {
 	}
 	
 	@Override
-	public Type doAvoid(String varName, TypeContext ctx, int depth) {
+	public TagType doAvoid(String varName, TypeContext ctx, int depth) {
 		NominalType newCT = parentType != null ? (NominalType)parentType.doAvoid(varName, ctx, depth) : null;
 		List<NominalType> newCases = new LinkedList<NominalType>();
 		for (NominalType t : cases) {

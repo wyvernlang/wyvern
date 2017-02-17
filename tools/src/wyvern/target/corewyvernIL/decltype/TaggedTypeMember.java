@@ -5,13 +5,14 @@ import java.io.IOException;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.type.TagType;
 import wyvern.target.corewyvernIL.type.Type;
 
 public class TaggedTypeMember extends DeclType {
-	private Type typeDefn;
+	private TagType typeDefn;
 	// TODO: add metadata, just as with a ConcreteTypeMember
 
-	public TaggedTypeMember(String name, Type typeDefn) {
+	public TaggedTypeMember(String name, TagType typeDefn) {
 		super(name);
 		this.typeDefn = typeDefn;
 	}
@@ -29,7 +30,7 @@ public class TaggedTypeMember extends DeclType {
 		return typeDefn.equals(otherTypeDefn);
 	}
 
-	public Type getTypeDefinition(View view) {
+	public TagType getTypeDefinition(View view) {
 		return typeDefn.adapt(view);
 	}
 	
@@ -52,7 +53,7 @@ public class TaggedTypeMember extends DeclType {
 
 	@Override
 	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
-		Type t = typeDefn.doAvoid(varName, ctx, count);
+		TagType t = typeDefn.doAvoid(varName, ctx, count);
 		if (t.equals(typeDefn)) {
 			return this;
 		} else {

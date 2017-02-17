@@ -30,4 +30,8 @@ public abstract class TagType extends Type {
 		if (parentType != null)
 			parentType.checkWellFormed(ctx);
 	}	
+	@Override
+	public abstract TagType doAvoid(String varName, TypeContext ctx, int depth);
+	@Override
+	public abstract TagType adapt(View v);
 }

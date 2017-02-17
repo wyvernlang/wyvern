@@ -16,12 +16,12 @@ public class ExtensibleTagType extends TagType {
     }
     
 	@Override
-	public Type adapt(View v) {
+	public TagType adapt(View v) {
 		return new ExtensibleTagType((NominalType)getParentType(v), getValueType().adapt(v));
 	}
 	
 	@Override
-	public Type doAvoid(String varName, TypeContext ctx, int depth) {
+	public TagType doAvoid(String varName, TypeContext ctx, int depth) {
 		final NominalType newPT = parentType!=null?(NominalType)parentType.doAvoid(varName, ctx, depth):null;
 		return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth));
 	}
