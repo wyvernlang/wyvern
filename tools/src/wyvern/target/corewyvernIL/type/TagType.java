@@ -15,7 +15,7 @@ public abstract class TagType extends Type {
 	}
 
 	public NominalType getParentType(View v) {
-		return (NominalType)parentType.adapt(v);
+		return parentType != null ? (NominalType)parentType.adapt(v) : null;
 	}
 	
 	@Override

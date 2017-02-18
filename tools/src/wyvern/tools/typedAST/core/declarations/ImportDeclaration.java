@@ -253,9 +253,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			}
       final ValueType argType = modArgs.get(0).getType();
 			List<Expression> args = new LinkedList<Expression>();
-      if (argType.equals(Globals.JAVA_IMPORT_TYPE)) {
+      if (argType.equals(Globals.JAVA_IMPORT_TYPE)
+    		  || (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("java"))) {
           args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
-      } else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)) {
+      } else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)
+    		  || (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("python"))) {
           args.add(new FFI("python", Globals.PYTHON_IMPORT_TYPE, this.getLocation()));
       } else {
           // TODO: Better error message

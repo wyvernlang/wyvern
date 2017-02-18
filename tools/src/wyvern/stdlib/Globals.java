@@ -173,7 +173,9 @@ public class Globals {
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));	
         pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
-        declTypes.add(new ConcreteTypeMember("Python", pythonType));
+        ExtensibleTagType pythonTagType = new ExtensibleTagType(systemPlatform, pythonType);
+        //declTypes.add(new ConcreteTypeMember("Python", pythonType));
+        declTypes.add(new TaggedTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
         ValueType systemType = new StructuralType("system", declTypes);
         return systemType;

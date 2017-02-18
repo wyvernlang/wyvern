@@ -14,7 +14,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
 
-public class ConcreteTypeMember extends DeclTypeWithResult {
+public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTypeMember {
 	
 	public ConcreteTypeMember(String name, Type sourceType) {
 		this(name, sourceType, null);

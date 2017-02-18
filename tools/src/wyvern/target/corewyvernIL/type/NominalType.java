@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
 import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -48,8 +49,8 @@ public class NominalType extends ValueType {
 	@Override
 	public boolean isResource(TypeContext ctx) {
 		DeclType dt = getSourceDeclType(ctx);
-		if (dt instanceof ConcreteTypeMember) {
-			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+		if (dt instanceof DefinedTypeMember) {
+			ValueType vt = ((DefinedTypeMember)dt).getResultType(View.from(path, ctx));
 			return vt.isResource(ctx);
 		} else {
 			return ((AbstractTypeMember)dt).isResource();
@@ -59,8 +60,8 @@ public class NominalType extends ValueType {
 	@Override
 	public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
 		DeclType dt = getSourceDeclType(ctx);
-		if (dt instanceof ConcreteTypeMember) {
-			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+		if (dt instanceof DefinedTypeMember) {
+			ValueType vt = ((DefinedTypeMember)dt).getResultType(View.from(path, ctx));
 			return vt.getStructuralType(ctx, theDefault);
 		} else {
 			return super.getStructuralType(ctx, theDefault);
@@ -68,7 +69,7 @@ public class NominalType extends ValueType {
 	}
 
 	private DeclType getSourceDeclType(TypeContext ctx) {
-		return path.typeCheck(ctx).getStructuralType(ctx).findMatchingDecl(typeMember, cdt -> !(cdt instanceof ConcreteTypeMember || cdt instanceof AbstractTypeMember || cdt instanceof TaggedTypeMember), ctx);
+		return path.typeCheck(ctx).getStructuralType(ctx).findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
 		//return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 	}
 	
@@ -118,7 +119,7 @@ public class NominalType extends ValueType {
 			Type typeDefn = ((TaggedTypeMember)dt).getTypeDefinition(View.from(path, ctx));
 			NominalType superType = typeDefn.getParentType(View.from(path, ctx));
 			// TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
-			return superType.isSubtypeOf(t, ctx);
+			return superType == null ? false : superType.isSubtypeOf(t, ctx);
 		} else {
 			ValueType ct = t.getCanonicalType(ctx);
 			return super.isSubtypeOf(ct, ctx); // check for equality with the canonical type 

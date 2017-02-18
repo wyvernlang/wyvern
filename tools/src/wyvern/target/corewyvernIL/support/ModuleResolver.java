@@ -1,11 +1,15 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decl.Declaration;
@@ -13,6 +17,7 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -22,6 +27,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -38,10 +44,13 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
  */
 public class ModuleResolver {
     private List<File> searchPath;
+    private Path platformPath;
+    private String platform;
 	private Map<String, Module> moduleCache = new HashMap<String, Module>();
 	private InterpreterState state;
 	
     public ModuleResolver(String platform, File rootDir, File libDir) {
+    	this.platform = platform;
         ArrayList<File> searchPath = new ArrayList<File>();
         if (rootDir != null && !rootDir.isDirectory())
             throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
@@ -52,7 +61,8 @@ public class ModuleResolver {
         }
         if (libDir != null) {
             searchPath.add(libDir);
-            searchPath.add(libDir.toPath().resolve("platform").resolve(platform).toFile());
+            platformPath = libDir.toPath().resolve("platform").resolve(platform).toAbsolutePath();
+			searchPath.add(platformPath.toFile());
         }
         this.searchPath = searchPath;
     }
@@ -198,10 +208,52 @@ public class ModuleResolver {
 		}
         
 		TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
-        ValueType moduleType = program.typeCheck(ctx);
         
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
+        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx);
+	}
+
+	private Module createAdaptedModule(File file, String qualifiedName,
+			final List<TypedModuleSpec> dependencies, IExpr program,
+			TypeContext ctx) {
+		
+        ValueType moduleType = program.typeCheck(ctx);
+		// if this is a platform module, adapt any arguments to take the system.Platform object
+		if (file.toPath().toAbsolutePath().startsWith(platformPath)) {
+			// if the type is in functor form
+			if (moduleType instanceof StructuralType
+				&& ((StructuralType)moduleType).getDeclTypes().size()==1
+				&& ((StructuralType)moduleType).getDeclTypes().get(0) instanceof DefDeclType
+				&& ((StructuralType)moduleType).getDeclTypes().get(0).getName().equals("apply")) {
+				DefDeclType appType = (DefDeclType)((StructuralType)moduleType).getDeclTypes().get(0);
+				// if the functor takes a system.X object for current platform type X
+				ILFactory f = ILFactory.instance();
+				ValueType platformType = f.nominalType("system", capitalize(platform));
+				ValueType genericPlatformType = f.nominalType("system", "Platform");
+				if (appType.getFormalArgs().stream().anyMatch(a -> a.getType().equals(platformType))) {
+					// adapt arguments to take the system.Platform object
+					List<IExpr> args = appType.getFormalArgs().stream().map(a -> {
+						IExpr result = f.variable(a.getName());
+						if (a.getType().equals(platformType))
+							result = f.cast(result, platformType);
+						return result;
+					}).collect(Collectors.toList());
+					List<ValueType> argTypes = appType.getFormalArgs().stream()
+							.map(a -> a.getType().equals(platformType)?genericPlatformType:a.getType())
+							.collect(Collectors.toList());
+					List<String> argNames = appType.getFormalArgs().stream().map(a -> a.getName()).collect(Collectors.toList());
+					IExpr call = f.call(program, "apply", args);
+					IExpr fn = f.function("apply", argNames, argTypes, appType.getRawResultType(), call);
+					program = fn;
+			        moduleType = program.typeCheck(ctx);
+				}
+			}
+		}
+		TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
 		return new Module(spec, program, dependencies);
+	}
+
+	private String capitalize(String input) {
+		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
 
 	// KEEP THIS CONSISTENT WITH BELOW
@@ -236,5 +288,9 @@ public class ModuleResolver {
 	
 	public static ModuleResolver getLocal() {
 		return InterpreterState.getLocalThreadInterpreter().getResolver();
+	}
+
+	public String getPlatform() {
+		return platform;
 	}
 }

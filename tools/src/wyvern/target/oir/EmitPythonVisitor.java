@@ -206,7 +206,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
   public String visit(EmitPythonState state,
                       OIRCast oirCast) {
       state.currentLetVar = "";
-    return "OIRCast unimplemented";
+    return oirCast.getToCastEXpr().acceptVisitor(this, state);
   }
 
   public String visit(EmitPythonState state,

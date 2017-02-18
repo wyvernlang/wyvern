@@ -7,8 +7,9 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.TagType;
 import wyvern.target.corewyvernIL.type.Type;
+import wyvern.target.corewyvernIL.type.ValueType;
 
-public class TaggedTypeMember extends DeclType {
+public class TaggedTypeMember extends DeclType implements DefinedTypeMember {
 	private TagType typeDefn;
 	// TODO: add metadata, just as with a ConcreteTypeMember
 
@@ -64,6 +65,11 @@ public class TaggedTypeMember extends DeclType {
 	@Override
 	public boolean isTypeDecl() {
 		return true;
+	}
+
+	@Override
+	public ValueType getResultType(View from) {
+		return typeDefn.getValueType().adapt(from);
 	}
 
 }
