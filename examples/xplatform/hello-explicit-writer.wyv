@@ -2,7 +2,6 @@ require platform
 
 import xplatform.writer
 
-val p:Platform = platform
-val w = writer(p)
+val w = writer(platform)
 
 w.print("Hello, World!")
