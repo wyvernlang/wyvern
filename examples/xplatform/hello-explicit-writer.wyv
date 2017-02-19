@@ -1,0 +1,8 @@
+require platform
+
+import xplatform.writer
+
+val p:Platform = platform
+val w = writer(p)
+
+w.print("Hello, World!")

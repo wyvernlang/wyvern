@@ -233,10 +233,20 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			importExp = new FFI(importName, type, this.getLocation());
 		    ctx = ctx.extend(importName, importExp, type);
 		} else if (importName.equals("python")) {
-        type = Globals.PYTHON_IMPORT_TYPE;
-        importExp = new FFI(importName, type, this.getLocation());
-        ctx = ctx.extend(importName, importExp, type);
-    } else {
+			type = Globals.PYTHON_IMPORT_TYPE;
+			importExp = new FFI(importName, type, this.getLocation());
+			ctx = ctx.extend(importName, importExp, type);
+		} else if (importName.equals("platform")) {
+			if (ctx.getInterpreterState().getResolver().getPlatform().equals("java")) {
+				type = Globals.JAVA_IMPORT_TYPE;
+			} else if (ctx.getInterpreterState().getResolver().getPlatform().equals("python")) {
+				type = Globals.PYTHON_IMPORT_TYPE;
+			} else {
+				throw new RuntimeException("interpreter state has an unexpected platform " + ctx.getInterpreterState().getResolver().getPlatform());
+			}
+			importExp = new FFI(importName, type, this.getLocation());
+			ctx = ctx.extend(importName, importExp, type);
+		} else {
 			// special case: a script is importing a module called "importName"
 			// that requires only java
 			
@@ -248,34 +258,34 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			DefDeclType modDeclType = (DefDeclType) ((StructuralType)m.getSpec().getType()).findDecl(Util.APPLY_NAME, ctx);
 			List<FormalArg> modArgs = modDeclType.getFormalArgs();
 			if (modArgs.size() != 1) {
-          System.err.println("Expected modArgs.size() = 1, got " + modArgs.size());
+				System.err.println("Expected modArgs.size() = 1, got " + modArgs.size());
 				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
 			}
-      final ValueType argType = modArgs.get(0).getType();
+			final ValueType argType = modArgs.get(0).getType();
 			List<Expression> args = new LinkedList<Expression>();
-      if (argType.equals(Globals.JAVA_IMPORT_TYPE)
-    		  || (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("java"))) {
-          args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
-      } else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)
-    		  || (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("python"))) {
-          args.add(new FFI("python", Globals.PYTHON_IMPORT_TYPE, this.getLocation()));
-      } else {
-          // TODO: Better error message
-          ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
+			if (argType.equals(Globals.JAVA_IMPORT_TYPE)
+					|| (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("java"))) {
+				args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
+			} else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)
+					|| (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("python"))) {
+				args.add(new FFI("python", Globals.PYTHON_IMPORT_TYPE, this.getLocation()));
+			} else {
+				// TODO: Better error message
+				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
 			}
 			importExp = new MethodCall(m.getExpression(), Util.APPLY_NAME, args , this);
-			
+				
 			// type is the result type of the module
 			type = modDeclType.getRawResultType();
-      final String internalName = m.getSpec().getInternalName();
-      ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, m.getDependencies());
-      if (!ctx.isPresent(internalName, true)) {
-          ctx = ctx.extend(internalName, new Variable(internalName), type);
-      }
-      dependencies.add(m.getSpec());
-      dependencies.addAll(m.getDependencies());
+			final String internalName = m.getSpec().getInternalName();
+			ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, m.getDependencies());
+			if (!ctx.isPresent(internalName, true)) {
+				ctx = ctx.extend(internalName, new Variable(internalName), type);
+			}
+			dependencies.add(m.getSpec());
+			dependencies.addAll(m.getDependencies());
 			// ctx gets extended in the standard way, with a variable
-		    ctx = ctx.extend(importName, new Variable(importName), type);
+			ctx = ctx.extend(importName, new Variable(importName), type);
 		}
     } else if (scheme.equals("wyv")) {
       // TODO: need to add types for non-java imports

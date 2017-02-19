@@ -52,7 +52,12 @@ public class ExampleTests {
 	
 	@Test
 	public void testCrossPlatformHello() throws ParseException {
-		TestUtil.doTestScriptModularly(PATH, "platform.hello-via-writer", Util.unitType(), Util.unitValue());
+		TestUtil.doTestScriptModularly(PATH, "xplatform.hello-via-writer", Util.unitType(), Util.unitValue());
+	}
+	
+	@Test
+	public void testExplicitCrossPlatformHello() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "xplatform.hello-explicit-writer", Util.unitType(), Util.unitValue());
 	}
 	
 	@Test

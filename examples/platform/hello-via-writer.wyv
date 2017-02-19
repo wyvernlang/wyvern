@@ -1,8 +1,0 @@
-require java
-
-import platform.writer
-
-val p:Platform = java
-val w = writer(p)
-
-w.print("Hello, World!")
