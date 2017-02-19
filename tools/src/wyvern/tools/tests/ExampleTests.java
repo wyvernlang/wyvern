@@ -51,6 +51,11 @@ public class ExampleTests {
 	}
 	
 	@Test
+	public void testCrossPlatformHello() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "platform.hello-via-writer", Util.unitType(), Util.unitValue());
+	}
+	
+	@Test
 	public void testPythonCompilerOnScript() {
 		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };
 		PythonCompiler.wyvernHome.set("..");
