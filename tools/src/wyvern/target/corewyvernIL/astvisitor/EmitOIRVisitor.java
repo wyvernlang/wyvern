@@ -475,7 +475,12 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 
     @Override
     public OIRAST visit(EmitOIRState state, FFI ffi) {
-        return new OIRVariable("ffi_" + ffi.getImportName(), false);
+        String platform = ffi.getImportName();
+
+        // Specialize FFI to python if it is currently a generic platform
+        if (platform.equals("platform"))
+            platform = "python";
+        return new OIRVariable("ffi_" + platform, false);
     }
 
 	@Override

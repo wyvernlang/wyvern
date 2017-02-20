@@ -90,7 +90,6 @@ public class AST {
 	}
 
     public IExpr parseExpression(String input, JavaValue context) throws ParseException {
-        System.out.println("parseExpression recieved input '"+input+"'");
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input + "\n", "TSL Parse");
         GenContext cxt = (GenContext)context.getFObject().getWrappedValue();
         // Extend parseTSL with a second argument (abstract type representing context)
