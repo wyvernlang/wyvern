@@ -48,9 +48,13 @@ public class ModuleResolver {
     private String platform;
 	private Map<String, Module> moduleCache = new HashMap<String, Module>();
 	private InterpreterState state;
+    private File rootDir;
+    private File libDir;
 	
     public ModuleResolver(String platform, File rootDir, File libDir) {
     	this.platform = platform;
+        this.rootDir = rootDir;
+        this.libDir = libDir;
         ArrayList<File> searchPath = new ArrayList<File>();
         if (rootDir != null && !rootDir.isDirectory())
             throw new RuntimeException("the root path \""+rootDir+"\" for the module resolver must be a directory");
@@ -293,4 +297,12 @@ public class ModuleResolver {
 	public String getPlatform() {
 		return platform;
 	}
+
+    public File getRootDir() {
+        return rootDir;
+    }
+
+    public File getLibDir() {
+        return libDir;
+    }
 }
