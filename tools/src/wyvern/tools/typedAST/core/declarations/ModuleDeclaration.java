@@ -1,11 +1,15 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.io.File;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 import wyvern.stdlib.Globals;
@@ -19,6 +23,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -333,6 +338,38 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		return this.resourceFlag;
 	}
 
+    private boolean isPlatformPath(String platform, String path) {
+        // Return true if file path ends with /platform/X/FILENAME (where X is a platform)
+        Pattern p = Pattern.compile("/platform/" + platform + "/[^/]*$");
+        return p.matcher(path).find();
+    }
+
+    private Pair<DeclSequence,DeclSequence> separatePlatformDependencies(Sequence impInstSeq) {
+        Sequence platformDependent = new DeclSequence();
+        Sequence platformIndependent = new DeclSequence();
+        for (Declaration d : impInstSeq.getDeclIterator()) {
+            URI uri = null;
+            if (d instanceof ImportDeclaration) {
+                ImportDeclaration decl = (ImportDeclaration)d;
+                uri = decl.getUri();
+            } else if (d instanceof Instantiation) {
+                Instantiation decl = (Instantiation)d;
+                uri = decl.getUri();
+            }
+            if (uri == null) {
+                platformIndependent = Sequence.append(platformIndependent, d);
+            } else {
+                System.out.println("Looking up URI path " + uri.getPath());
+                File f = ModuleResolver.getLocal().resolve(uri.getPath(), false);
+                if (isPlatformPath(ModuleResolver.getLocal().getPlatform(), f.getAbsolutePath()))
+                    platformDependent = Sequence.append(platformDependent, d);
+                else
+                    platformIndependent = Sequence.append(platformIndependent, d);
+            }
+        }
+
+        return new Pair<>((DeclSequence)platformDependent, (DeclSequence)platformIndependent);
+    }
 
 	/**
 	 * For resource module: translate into def method(list of require types) : </br>
@@ -348,11 +385,14 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		GenContext methodContext = ctx;
 		Sequence reqSeq = new DeclSequence();
 		Sequence impInstSeq = new DeclSequence();
+        Sequence platformDependentSeq = new DeclSequence();
 		Sequence normalSeq = new Sequence();
 		if(inner instanceof Sequence || inner instanceof DeclSequence) {
 			/* classify declarations */
 			reqSeq = ((DeclSequence) inner).filterRequires();
-			impInstSeq = ((DeclSequence) inner).filterImportInstantiates();
+            Pair<DeclSequence, DeclSequence> pair = separatePlatformDependencies(((DeclSequence) inner).filterImportInstantiates());
+            impInstSeq = pair.first;
+            platformDependentSeq = pair.second;
 			normalSeq = ((DeclSequence) inner).filterNormal();
 		} else {
 			/* single declaration in module */

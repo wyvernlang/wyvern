@@ -198,7 +198,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       return ctx;
   }
 
-  public Pair<VarBinding,GenContext> genBinding(GenContext ctx, List<TypedModuleSpec> dependencies) {
+    public Pair<VarBinding,GenContext> genBinding(GenContext ctx, List<TypedModuleSpec> dependencies) {
+        return genBinding(ctx.getInterpreterState().getResolver(), ctx, dependencies);
+    }
+
+  public Pair<VarBinding,GenContext> genBinding(ModuleResolver resolver, GenContext ctx, List<TypedModuleSpec> dependencies) {
     // add the import's type to the context, and get the import value
     Expression importExp = null;
     String importName = this.getUri().getSchemeSpecificPart();
@@ -237,12 +241,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			importExp = new FFI(importName, type, this.getLocation());
 			ctx = ctx.extend(importName, importExp, type);
 		} else if (importName.equals("platform")) {
-			if (ctx.getInterpreterState().getResolver().getPlatform().equals("java")) {
+			if (resolver.getPlatform().equals("java")) {
 				type = Globals.JAVA_IMPORT_TYPE;
-			} else if (ctx.getInterpreterState().getResolver().getPlatform().equals("python")) {
+			} else if (resolver.getPlatform().equals("python")) {
 				type = Globals.PYTHON_IMPORT_TYPE;
 			} else {
-				throw new RuntimeException("interpreter state has an unexpected platform " + ctx.getInterpreterState().getResolver().getPlatform());
+				throw new RuntimeException("interpreter state has an unexpected platform " + resolver.getPlatform());
 			}
 			importExp = new FFI(importName, type, this.getLocation());
 			ctx = ctx.extend(importName, importExp, type);
@@ -252,7 +256,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			
 			// load the module
 		    String moduleName = this.getUri().getRawSchemeSpecificPart();
-			Module m = ctx.getInterpreterState().getResolver().resolveModule(moduleName);
+			Module m = resolver.resolveModule(moduleName);
 			
 			// instantiate the module
 			DefDeclType modDeclType = (DefDeclType) ((StructuralType)m.getSpec().getType()).findDecl(Util.APPLY_NAME, ctx);
@@ -264,10 +268,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			final ValueType argType = modArgs.get(0).getType();
 			List<Expression> args = new LinkedList<Expression>();
 			if (argType.equals(Globals.JAVA_IMPORT_TYPE)
-					|| (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("java"))) {
+					|| (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && resolver.getPlatform().equals("java"))) {
 				args.add(new FFI("java", Globals.JAVA_IMPORT_TYPE, this.getLocation()));
 			} else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)
-					|| (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && ctx.getInterpreterState().getResolver().getPlatform().equals("python"))) {
+					|| (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && resolver.getPlatform().equals("python"))) {
 				args.add(new FFI("python", Globals.PYTHON_IMPORT_TYPE, this.getLocation()));
 			} else {
 				// TODO: Better error message
@@ -278,7 +282,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			// type is the result type of the module
 			type = modDeclType.getRawResultType();
 			final String internalName = m.getSpec().getInternalName();
-			ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, m.getDependencies());
+			ctx = resolver.extendGenContext(ctx, m.getDependencies());
 			if (!ctx.isPresent(internalName, true)) {
 				ctx = ctx.extend(internalName, new Variable(internalName), type);
 			}
@@ -290,7 +294,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     } else if (scheme.equals("wyv")) {
       // TODO: need to add types for non-java imports
       String moduleName = this.getUri().getSchemeSpecificPart();
-      final ModuleResolver resolver = ctx.getInterpreterState().getResolver();
       final Module module = resolver.resolveModule(moduleName);
       final String internalName = module.getSpec().getInternalName();
       if (this.metadataFlag) {
@@ -301,7 +304,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       } else {
         type = module.getSpec().getType();
       }
-      ctx = ctx.getInterpreterState().getResolver().extendGenContext(ctx, module.getDependencies());
+      ctx = resolver.extendGenContext(ctx, module.getDependencies());
       if (!ctx.isPresent(internalName, true)) {
           ctx = ctx.extend(internalName, new Variable(internalName), type);
       }

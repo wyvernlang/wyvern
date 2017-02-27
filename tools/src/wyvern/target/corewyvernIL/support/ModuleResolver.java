@@ -140,7 +140,7 @@ public class ModuleResolver {
 	 * @param qualifiedName
 	 * @return
 	 */
-	private File resolve(String qualifiedName, boolean isType) {
+	public File resolve(String qualifiedName, boolean isType) {
 		String names[] = qualifiedName.split("\\.");
 		if (names.length == 0)
 			throw new RuntimeException();
