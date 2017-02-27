@@ -356,11 +356,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
                 Instantiation decl = (Instantiation)d;
                 uri = decl.getUri();
             }
-            if (uri == null) {
+            if (uri == null || !uri.getScheme().equals("wyv")) {
                 platformIndependent = Sequence.append(platformIndependent, d);
             } else {
-                System.out.println("Looking up URI path " + uri.getPath());
-                File f = ModuleResolver.getLocal().resolve(uri.getPath(), false);
+                System.out.println("Looking up URI path " + uri.getSchemeSpecificPart());
+                File f = ModuleResolver.getLocal().resolve(uri.getSchemeSpecificPart(), false);
                 if (isPlatformPath(ModuleResolver.getLocal().getPlatform(), f.getAbsolutePath()))
                     platformDependent = Sequence.append(platformDependent, d);
                 else
