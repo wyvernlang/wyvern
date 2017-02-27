@@ -224,7 +224,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 
 	/**
-	 * @see wraoLetWithIterator
+	 * @see wrapLetWithIterator
 	 *
 	 * @param impInstSeq the sequence of import and instantiate
 	 * @param normalSeq the rest sequence
