@@ -26,6 +26,10 @@ public class Bind extends Expression {
 		this.inExpr = inExpr;
 	}
 
+    public List<VarBinding> getBindings() {
+        return bindings;
+    }
+
 	public List<String> getVarNames() {
 		List<String> varNames = new ArrayList<String>();
 		for (VarBinding vb : bindings) {

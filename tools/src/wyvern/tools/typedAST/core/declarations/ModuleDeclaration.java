@@ -252,9 +252,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param ctx the context
 	 * @return the whole expression
 	 */
-	private IExpr wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
+    private IExpr wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
+        return wrapLetCtxWithIterator(ai, normalSeq, ctx, dependencies).first;
+    }
+
+	private Pair<IExpr, GenContext> wrapLetCtxWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
 		if(!ai.hasNext()) {
-			return innerTranslate(normalSeq, ctx);
+			return new Pair(innerTranslate(normalSeq, ctx), ctx);
 		}
 
 		TypedAST ast = ai.next();
@@ -269,7 +273,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			final Let letBinding = new Let(bindingAndCtx.first, e);
 			
 			//ValueType t = letBinding.typeCheck(ctx); // sanity check - catch errors early
-			return letBinding;
+			return new Pair(letBinding, bindingAndCtx.second);
 		} else {
 			// must be instantiate
 
@@ -297,7 +301,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			GenContext newContext = ctx.extend(inst.getName(), instValue, type);
 
 			IExpr e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
-			return new Let(inst.getName(), type, instValue, e);
+			return new Pair(new Let(inst.getName(), type, instValue, e), newContext);
 		}
 	}
 
@@ -358,6 +362,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             }
             if (uri == null || !uri.getScheme().equals("wyv")) {
                 platformIndependent = Sequence.append(platformIndependent, d);
+                System.out.println("THINGY " + uri.toString());
             } else {
                 System.out.println("Looking up URI path " + uri.getSchemeSpecificPart());
                 File f = ModuleResolver.getLocal().resolve(uri.getSchemeSpecificPart(), false);
@@ -368,7 +373,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             }
         }
 
-        return new Pair<>((DeclSequence)platformDependent, (DeclSequence)platformIndependent);
+        return new Pair<>((DeclSequence)platformIndependent, (DeclSequence)platformDependent);
     }
 
 	/**
@@ -419,7 +424,23 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
 	    /* importing modules and instantiations are translated into let sentence */
+		// Note: must wrap methodContext with platformDependent types first, or we will be unable to access platform-dependent imports
+		Iterator<TypedAST> it = platformDependentSeq.iterator();
+        ModuleResolver resolver = ModuleResolver.getLocal();
+		// while (it.hasNext()) {
+		// 	TypedAST dependency = it.next();
+		// 	if (dependency instanceof ImportDeclaration) {
+          
+        //     } else if (dependency instanceof Instantiation) {
+          
+        //     } else {
+        //         throw new RuntimeException("Unknown platform dependent object: " + dependency.toString());
+        //     }
+		// }
 		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(impInstSeq, normalSeq, methodContext, dependencies);
+        //GenContext ctx2 = wrapLetCtxWithIterator(platformDependentSeq.iterator(), normalSeq, methodContext, dependencies).second;
+        System.out.println("methodContext: " + methodContext.toString());
+        //System.out.println("ctx2: " + ctx2.toString());
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(methodContext, dependencies);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
 
@@ -427,6 +448,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			if (returnType.isResource(tempContext))
 				ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE_MODULE, this, this.getName());
 		}
+        if (platformDependentSeq.iterator().hasNext()) {
+            // We have platform-dependent dependencies, return a corewyvernIL ModuleDeclaration
+            List<ImportDeclaration> moduleDependencies = new LinkedList<>();
+            return new wyvern.target.corewyvernIL.decl.ModuleDeclaration(name, formalArgs, returnType, body, moduleDependencies, getLocation());
+        }
 		if(isResource() == false && formalArgs.isEmpty()) {
 			/* non resource module translated into value */
 			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
