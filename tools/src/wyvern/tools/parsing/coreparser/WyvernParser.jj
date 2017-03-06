@@ -574,7 +574,7 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Token id = null; Token id2 = null; AST exp = null; Type arrowResult = null; }
+{ Token id = null; Token id2 = null; AST exp = null; Type arrowResult = null; List generics = null; }
 {
   id = <IDENTIFIER> (<DOT> id2 = <IDENTIFIER> {
 	if (exp == null) {
@@ -583,13 +583,19 @@ Type Type() :
 		exp = build.invocation(exp, id.image, null, loc(id));
 	}
   	id = id2;
- })* (<TARROW> arrowResult = Type() )? {
+ })*
+ ( generics = Generics() )? 
+ (<TARROW> arrowResult = Type() )? {
 
     Type t;
     if (exp == null) {
         t = build.nominalType(id.image, loc(id));
     } else {
         t = build.qualifiedType(exp, id2.image);
+    }
+    
+    if (generics != null) {
+        t = build.parameterizedType(t, generics);
     }
 
     if (arrowResult == null) {

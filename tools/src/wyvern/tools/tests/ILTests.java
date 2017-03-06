@@ -1200,6 +1200,31 @@ public class ILTests {
     }
 
     @Test
+    public void testTypeParameterization() throws ParseException {
+
+        String source = ""
+                      + "type Box\n"
+                      + "    type T\n"
+                      + "    val contents: this.T\n\n"
+
+                      + "type IntBoxDecl\n"
+                      + "    type T=Int\n"
+                      + "    val contents: this.T\n\n"
+                      
+                      + "type IntBox = Box[Int]\n"
+                      
+                      + "val intBox:IntBox = new\n"
+                      + "    type T=Int\n"
+                      + "    val contents: this.T = 5\n\n"
+                      
+                      + "val b:Box = intBox \n"
+                      + "intBox.contents \n"
+                      + "";
+
+        TestUtil.doTest(source, null, new IntegerLiteral(5));
+    }
+
+    @Test
     public void testExplicitTwoParams() throws ParseException {
 
         String source = ""

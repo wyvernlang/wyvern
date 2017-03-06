@@ -332,8 +332,10 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		}
 		
 		for(TypedAST seq_ast : getDeclIterator()) {
+			ValueType type = new StructuralType(newName, declts);
+			GenContext incrCtx = newCtx.extend(newName, new Variable(newName), type);
 			Declaration d = (Declaration) seq_ast;
-			declts.add(d.genILType(newCtx));
+			declts.add(d.genILType(incrCtx));
 		}
 		
 		ValueType type = new StructuralType(newName, declts);

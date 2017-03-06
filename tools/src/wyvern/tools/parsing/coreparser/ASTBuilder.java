@@ -42,6 +42,7 @@ public interface ASTBuilder<AST,Type> {
 	
 	public Type nominalType(String name, FileLocation loc);
 	public Type arrowType(Type argument, Type result);
+	public Type parameterizedType(Type base, List<String> arguments);
 	
 	public Type qualifiedType(AST base, String name);
 	

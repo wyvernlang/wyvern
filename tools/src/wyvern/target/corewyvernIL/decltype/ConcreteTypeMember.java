@@ -109,7 +109,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
 	}
 
 	@Override
-	public DeclType adapt(View v) {
+	public ConcreteTypeMember adapt(View v) {
 		return new ConcreteTypeMember(getName(), this.getRawResultType().adapt(v), metadata);
 	}
 	
@@ -120,7 +120,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
 		return new ConcreteTypeMember(getName(), this.getRawResultType(), metadata.interpret(ctx));
 	}
 	@Override
-	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
+	public ConcreteTypeMember doAvoid(String varName, TypeContext ctx, int count) {
 		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
 		if (t.equals(this.getRawResultType())) {
 			return this;

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -41,6 +42,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.TypeExtension;
 import wyvern.tools.types.UnresolvedType;
 
 public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
@@ -134,6 +136,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
 	public Type arrowType(Type argument, Type result) {
 		return new Arrow(argument, result);
+	}
+
+	@Override
+	public Type parameterizedType(Type base, List<String> arguments) {
+		return new TypeExtension(base, arguments.stream().map(s -> nominalType(s,base.getLocation())).collect(Collectors.toList()));
 	}
 
 	@Override

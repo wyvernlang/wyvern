@@ -17,6 +17,8 @@ public class TypeApplication extends ValueType {
 		this.baseType = baseType;
 		this.typeArgument = typeArgument;
 		this.typeMember = typeMember;
+		throw new RuntimeException("use RefinementType");
+		// TODO: just remove this class?
 	}
 
 	public ValueType getBaseType ()
