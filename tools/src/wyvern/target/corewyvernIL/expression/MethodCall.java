@@ -184,6 +184,9 @@ public class MethodCall extends Expression {
 				ctx = newCtx;
 				ValueType resultType = defDeclType.getResultType(v);
 				resultType = resultType.adapt(v);
+				for (int i = args.size()-1; i >= 0; --i) {
+					resultType = resultType.avoid(formalArgs.get(i).getName(), ctx);
+				}
 				setExprType(resultType);
 				return defDeclType;
 			}

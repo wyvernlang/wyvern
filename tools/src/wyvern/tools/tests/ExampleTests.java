@@ -51,6 +51,11 @@ public class ExampleTests {
 	}
 	
 	@Test
+	public void testBox() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "introductory.box", Util.intType(), new IntegerLiteral(7));
+	}
+	
+	@Test
 	public void testCrossPlatformHello() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "xplatform.hello-via-writer", Util.unitType(), Util.unitValue());
 	}
