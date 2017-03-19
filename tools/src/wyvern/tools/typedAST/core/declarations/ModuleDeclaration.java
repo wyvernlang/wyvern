@@ -423,24 +423,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		for(FormalArg arg : formalArgs) {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
-	    /* importing modules and instantiations are translated into let sentence */
+    /* importing modules and instantiations are translated into let sentence */
 		// Note: must wrap methodContext with platformDependent types first, or we will be unable to access platform-dependent imports
-		Iterator<TypedAST> it = platformDependentSeq.iterator();
-        ModuleResolver resolver = ModuleResolver.getLocal();
-		// while (it.hasNext()) {
-		// 	TypedAST dependency = it.next();
-		// 	if (dependency instanceof ImportDeclaration) {
-          
-        //     } else if (dependency instanceof Instantiation) {
-          
-        //     } else {
-        //         throw new RuntimeException("Unknown platform dependent object: " + dependency.toString());
-        //     }
-		// }
-		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(impInstSeq, normalSeq, methodContext, dependencies);
-        //GenContext ctx2 = wrapLetCtxWithIterator(platformDependentSeq.iterator(), normalSeq, methodContext, dependencies).second;
-        System.out.println("methodContext: " + methodContext.toString());
-        //System.out.println("ctx2: " + ctx2.toString());
+    GenContext ctxWithPlatDeps = wrapLetCtxWithIterator(platformDependentSeq.iterator(), new Sequence(), methodContext, dependencies).second;
+		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(impInstSeq, normalSeq, ctxWithPlatDeps, dependencies);
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(methodContext, dependencies);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
 

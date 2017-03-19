@@ -68,7 +68,8 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     public ASTNode visit(PSVState state, New newExpr) {
         ArrayList<Declaration> newDecls = new ArrayList<>();
         for (Declaration decl : newExpr.getDecls()) {
-            newDecls.add((Declaration)decl.acceptVisitor(this, state));
+            ASTNode result = decl.acceptVisitor(this, state);
+            newDecls.add((Declaration)result);
         }
         New result = new New(newDecls, newExpr.getSelfName(), newExpr.getExprType(), newExpr.getLocation());
         result.copyMetadata(newExpr);
@@ -76,7 +77,8 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     }
 
     public ASTNode visit(PSVState state, Case c) {
-        Case result = (Case)c.getBody().acceptVisitor(this, state);
+        Expression resultBody = (Expression)c.getBody().acceptVisitor(this, state);
+        Case result = new Case(c.getVarName(), c.getPattern(), resultBody);
         result.copyMetadata(c);
         return result;
     }
@@ -109,7 +111,8 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
 
     public ASTNode visit(PSVState state, FieldGet fieldGet) {
-        FieldGet result = (FieldGet)fieldGet.getObjectExpr().acceptVisitor(this, state);
+        IExpr resultExpr = (IExpr)fieldGet.getObjectExpr().acceptVisitor(this, state);
+        FieldGet result = new FieldGet(resultExpr, fieldGet.getName(), fieldGet.getLocation());
         result.copyMetadata(fieldGet);
         return result;
     }
@@ -119,7 +122,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         IExpr toReplace = (IExpr)let.getToReplace().acceptVisitor(this, state);
         IExpr inExpr = (IExpr)let.getInExpr().acceptVisitor(this, state);
 
-        Let result = new Let(let.getVarName(), let.getExprType(), toReplace, inExpr);
+        Let result = new Let(let.getVarName(), let.getVarType(), toReplace, inExpr);
         result.copyMetadata(let);
         return result;
     }
@@ -141,26 +144,30 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
 
     public ASTNode visit(PSVState state, Cast cast) {
-        Cast result = (Cast)cast.getToCastExpr().acceptVisitor(this, state);
+        IExpr resultExpr = (IExpr)cast.getToCastExpr().acceptVisitor(this, state);
+        Cast result = new Cast(resultExpr, cast.getExprType());
         result.copyMetadata(cast);
         return result;
     }
 
 
     public ASTNode visit(PSVState state, VarDeclaration varDecl) {
-        VarDeclaration result = (VarDeclaration)varDecl.getDefinition().acceptVisitor(this, state);
+        ASTNode resultDefinition = (ASTNode)varDecl.getDefinition().acceptVisitor(this, state);
+        VarDeclaration result = new VarDeclaration(varDecl.getName(), varDecl.getType(), (IExpr)resultDefinition, varDecl.getLocation());
         result.copyMetadata(varDecl);
         return result;
     }
 
     public ASTNode visit(PSVState state, DefDeclaration defDecl) {
-        ASTNode result = (ASTNode)defDecl.getBody().acceptVisitor(this, state);
+        ASTNode resultBody = (ASTNode)defDecl.getBody().acceptVisitor(this, state);
+        DefDeclaration result = new DefDeclaration(defDecl.getName(), defDecl.getFormalArgs(), defDecl.getType(), (IExpr)resultBody, defDecl.getLocation());
         result.copyMetadata(defDecl);
         return result;
     }
 
     public ASTNode visit(PSVState state, ValDeclaration valDecl) {
-        ValDeclaration result = (ValDeclaration)valDecl.getDefinition().acceptVisitor(this, state);
+        ASTNode resultDefinition = (ASTNode)valDecl.getDefinition().acceptVisitor(this, state);
+        ValDeclaration result = new ValDeclaration(valDecl.getName(), valDecl.getType(), (IExpr)resultDefinition, valDecl.getLocation());
         result.copyMetadata(valDecl);
         return result;
     }

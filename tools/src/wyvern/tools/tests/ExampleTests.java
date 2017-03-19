@@ -60,12 +60,12 @@ public class ExampleTests {
 		TestUtil.doTestScriptModularly(PATH, "xplatform.hello-explicit-writer", Util.unitType(), Util.unitValue());
 	}
 	
-	// @Test
-	// public void testPythonCompilerOnScript() {
-	// 	String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };
-	// 	PythonCompiler.wyvernHome.set("..");
-	// 	PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
-	// 	PythonCompiler.main(args);
-	// }
+	@Test
+	public void testPythonCompilerOnScript() {
+		String[] args = new String[] { TestUtil.EXAMPLES_PATH + "pong/pong.wyv" };
+		PythonCompiler.wyvernHome.set("..");
+		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
+		PythonCompiler.main(args);
+	}
 	
 }
