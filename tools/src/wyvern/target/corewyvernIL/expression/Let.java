@@ -23,6 +23,8 @@ public class Let extends Expression {
 	public Let(VarBinding binding, IExpr inExpr) {
 		super();
 		this.binding = binding;
+    if (this.getVarType() == null)
+        throw new RuntimeException("Let created with null variable type");
 		if (inExpr == null) throw new RuntimeException();
 		this.inExpr = inExpr;
 	}

@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
@@ -250,6 +251,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		return new DefDeclaration(defDecl.getName(), defDecl.getFormalArgs(), defDecl.getType(),
 				bodyTransformed, defDecl.getLocation());
 	}
+
+    @Override
+    public ModuleDeclaration visit(TypeContext ctx, ModuleDeclaration moduleDecl) {
+        return (ModuleDeclaration)((DefDeclaration)moduleDecl).acceptVisitor(this, ctx);
+    }
 
 	@Override
 	public ValDeclaration visit(TypeContext ctx, ValDeclaration valDecl) {

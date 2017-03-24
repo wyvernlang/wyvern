@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.binding.Binding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
@@ -246,6 +247,12 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     @Override
     public Void visit(Boolean inTailPosition, FFI ffi) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Boolean inTailPosition, ModuleDeclaration moduleDecl) {
+        ((DefDeclaration)moduleDecl).acceptVisitor(this, inTailPosition);
         return null;
     }
 
