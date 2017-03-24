@@ -1170,7 +1170,7 @@ public class ILTests {
             + "        7 \n\n"
 
             + "type BooleanFn\n"
-            + "    def iff(thenFn: Body, elseFn: thenFn.ThisType) : thenFn.T \n\n"
+            + "    def iff(thnFn: Body, elsFn: thnFn.ThisType) : thnFn.T \n\n"
 
             + "val trueCase: BooleanFn = new \n"
             + "    def iff(thenFn: Body, elseFn: thenFn.ThisType): thenFn.T \n"

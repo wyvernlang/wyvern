@@ -9,8 +9,11 @@ import java.util.HashMap;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.support.ViewExtension;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -43,13 +46,31 @@ public class DefDeclType extends DeclTypeWithResult {
 		DefDeclType ddt = (DefDeclType) dt;
 		if (args.size() != ddt.args.size() || !ddt.getName().equals(getName()))
 			return false;
+		View adaptationView = null;
 		for (int i = 0; i < args.size(); ++i) {
-			if (! (ddt.args.get(i).getType().isSubtypeOf(args.get(i).getType(), ctx))) {
+			// x:A * B -> C <: y:A' * B' -> C'
+			// x in scope when analyzing B, B', C, and C'
+			// not y, because y's assumptions might be stronger than x's
+			// so replace y with x in B' and C'
+			// here y "from" is dt, x "to" is this
+			FormalArg myArg = args.get(i);
+			FormalArg theirArg = ddt.args.get(i);
+			ValueType theirType = theirArg.getType();
+			if (adaptationView == null) {
+				adaptationView = new ReceiverView(new Variable(theirArg.getName()), new Variable(myArg.getName()));
+			} else {
+				theirType = theirType.adapt(adaptationView);
+				adaptationView = new ViewExtension(new Variable(theirArg.getName()), new Variable(myArg.getName()), adaptationView);
+			}
+			if (! (theirType.isSubtypeOf(myArg.getType(), ctx))) {
 				return false;
 			}
+			ctx = ctx.extend(myArg.getName(), myArg.getType());
 		}
 		ValueType rawResultType = this.getRawResultType();
 		ValueType otherRawResultType = ddt.getRawResultType();
+		if (adaptationView != null)
+			otherRawResultType = otherRawResultType.adapt(adaptationView);
 		return rawResultType.isSubtypeOf(otherRawResultType, ctx);
 	}
 	@Override
