@@ -257,6 +257,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
                 ValueType type = this.genericStructuralType(s);
                 args.add(new FormalArg(genName, type));
 
+    			methodContext = methodContext.extend(genName, new Variable(genName), type);
+    			thisContext = thisContext.extend(genName, new Variable(genName), type);
                 methodContext = new TypeGenContext(s, genName, methodContext);
                 thisContext = new TypeGenContext(s, genName, thisContext); // TODO +s
             }

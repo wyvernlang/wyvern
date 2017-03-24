@@ -77,7 +77,11 @@ public class NominalType extends ValueType {
 	public ValueType getCanonicalType(TypeContext ctx) {
 		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
-			return ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx)).getCanonicalType(ctx);
+			final ValueType resultType = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
+			if (this.equals(resultType))
+				return this;
+			else
+				return resultType.getCanonicalType(ctx);
 		} else {
 			return this;
 		}
@@ -152,19 +156,27 @@ public class NominalType extends ValueType {
 	@Override
 	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
 		if (count > MAX_RECURSION_DEPTH)
-			ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+			// best effort failed
+			// TODO: make this more principled
+			return this;
+			//ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
 		if (path.getFreeVariables().contains(varName)) {
 			DeclType dt = this.getSourceDeclType(ctx);
 			if (dt instanceof ConcreteTypeMember) {
 				final ValueType type = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 				if (type.equals(this)) {
 					// avoid infinite loops, just in case
-					ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+					// TODO: make this more principled
+					return this;
+					//ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
 				}
 				return type.doAvoid(varName, ctx, count+1);
 			} else {
-				ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
-				throw new RuntimeException(); // cannot get here
+				// was best effort anyway
+				// TODO: be more principled
+				return this;
+				//ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+				//throw new RuntimeException(); // cannot get here
 			}
 		} else {
 			return this;

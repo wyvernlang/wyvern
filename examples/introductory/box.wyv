@@ -15,23 +15,20 @@ def makeBox[X](contents:X):Box[X]
 def id[X](in:X):X
     in
     
-// TODO: neither body for this function below works
-//def copyBox[X](in:Box[X]):Box[X]
-//    new
-//        type T = X
-//        val contents:X = in.contents
-//    makeBox[X](in.contents)
+def copyBox[X](in:Box[X]):Box[X]
+    new
+        type T = X
+        val contents:X = in.contents
+    //makeBox[X](in.contents)
 
 val x:Box[Int] = makeBoxInt(5)
 
-// similarly to below, broken
-// val y:Box[Int] = makeBox[Int](4)
+val yy:Box[Int] = makeBox[Int](4)
 val y = makeBox[Int](4)
 
 x.contents
-
-//TODO: fix me
-//y.contents // broken! diff vs. above
+y.contents // construction test
+yy.contents // construction test
 
 
 def identity[K](value: K): K
@@ -43,10 +40,6 @@ identity[Int](xx)
 identity[Int](15)
 
 val z = identity[Int](15)
-//TODO: fix me
-val zz:Int = identity[Int](15)  // broken! diff vs. above
+val zz:Int = identity[Int](15) // variant that's explicitly labeled
 
-// also a problem, but only if it is the last expression!
 z
-
-7

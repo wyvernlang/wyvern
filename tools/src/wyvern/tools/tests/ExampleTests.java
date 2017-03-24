@@ -52,7 +52,7 @@ public class ExampleTests {
 	
 	@Test
 	public void testBox() throws ParseException {
-		TestUtil.doTestScriptModularly(PATH, "introductory.box", Util.intType(), new IntegerLiteral(7));
+		TestUtil.doTestScriptModularly(PATH, "introductory.box", Util.intType(), new IntegerLiteral(15));
 	}
 	
 	@Test
