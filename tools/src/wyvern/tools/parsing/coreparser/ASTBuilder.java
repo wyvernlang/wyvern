@@ -17,7 +17,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 	public AST delegateDecl(Type type, AST exp, FileLocation loc);
 	
-	public AST defDeclType(String name, Type type, List args, FileLocation loc);
+	public AST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc);
 	public AST valDeclType(String name, Type type, FileLocation loc);
 	public AST varDeclType(String name, Type type, FileLocation loc);
 	public AST typeAbbrevDecl(String alias, Type reference, FileLocation loc);

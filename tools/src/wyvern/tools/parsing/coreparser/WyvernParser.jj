@@ -382,10 +382,10 @@ AST DeclType() :
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; }
+{ Type resultType; Token name; List args; List<String> gentypes=null; }
 {
-  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) args = Formals() <COLON> resultType = Type() <NEWLINE> {
-	return build.defDeclType(name.image, resultType, args, loc(name));
+  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() <NEWLINE> {
+	return build.defDeclType(name.image, resultType, gentypes, args, loc(name));
   }
 }
 
