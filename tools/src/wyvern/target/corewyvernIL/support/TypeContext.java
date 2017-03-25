@@ -8,7 +8,7 @@ public abstract class TypeContext {
 		return new VarBindingContext(var, type, this);
 	}
 	
-	public boolean isAssumedSubtype(NominalType t1, NominalType t2) {
+	public boolean isAssumedSubtype(NominalType t1, ValueType t2) {
 		if (getNext() == null)
 			return false;
 		else

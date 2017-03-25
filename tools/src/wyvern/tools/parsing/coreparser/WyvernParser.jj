@@ -298,7 +298,7 @@ AST Declaration(boolean inModule) :
 AST DefDeclaration() :
 { Type resultType; Token name; AST body; List args; List<String> gentypes = null; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = Generics()] args = Formals() <COLON> resultType = Type() body=DefBody() {
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() body=DefBody() {
 	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
   }
 }
@@ -574,7 +574,7 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Token id = null; Token id2 = null; AST exp = null; Type arrowResult = null; List generics = null; Type t; }
+{ Token id = null; Token id2 = null; AST exp = null; Type arrowResult = null; List<Type> generics = null; Type t; }
 {
   id = <IDENTIFIER> (<DOT> id2 = <IDENTIFIER> {
 	if (exp == null) {
@@ -708,7 +708,7 @@ AST Literal() :
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags) :
-{ AST rhs; Token t; List<String> gentypes = null;}
+{ AST rhs; Token t; List<Type> gentypes = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
@@ -777,6 +777,28 @@ List Generics() :
 }
 
 List GenericList() :
+{ LinkedList<Type> genList = new LinkedList<Type>(); Type t1, t2; }
+{
+
+  t1 = Type()
+  ( <COMMA> t2 = Type() {
+    genList.addLast(t2);
+  }
+  )* {
+    genList.addFirst(t1);
+    return genList;
+  }
+}
+
+List GenericsDecl() :
+{ List gens = null; }
+{
+  <LBRACK> gens = GenericListDecl() <RBRACK> {
+    return gens;
+  }
+}
+
+List GenericListDecl() :
 { LinkedList<String> genList = new LinkedList<String>(); Token t1, t2; }
 {
 

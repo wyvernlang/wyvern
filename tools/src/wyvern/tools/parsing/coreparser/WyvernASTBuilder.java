@@ -139,8 +139,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public Type parameterizedType(Type base, List<String> arguments) {
-		return new TypeExtension(base, arguments.stream().map(s -> nominalType(s,base.getLocation())).collect(Collectors.toList()));
+	public Type parameterizedType(Type base, List<Type> arguments) {
+		return new TypeExtension(base, arguments);
 	}
 
 	@Override
@@ -177,7 +177,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 	@Override
 	public TypedAST application(TypedAST function, TypedAST arguments,
-			FileLocation loc, List<String> generics) {
+			FileLocation loc, List<Type> generics) {
 		return new Application(function, arguments, loc != null ? loc : arguments.getLocation(), generics);
 	}
 

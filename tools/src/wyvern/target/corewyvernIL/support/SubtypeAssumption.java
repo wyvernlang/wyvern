@@ -6,16 +6,16 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class SubtypeAssumption extends TypeContext {
 	private TypeContext next;
 	private NominalType t1;
-	private NominalType t2;
+	private ValueType t2;
 	
-	public SubtypeAssumption(NominalType t1, NominalType t2, TypeContext next) {
+	public SubtypeAssumption(NominalType t1, ValueType t2, TypeContext next) {
 		this.next = next;
 		this.t1 = t1;
 		this.t2 = t2;
 	}
 
 	@Override
-	public boolean isAssumedSubtype(NominalType at1, NominalType at2) {
+	public boolean isAssumedSubtype(NominalType at1, ValueType at2) {
 		if (at1.equals(t1) && at2.equals(t2))
 			return true;
 		else

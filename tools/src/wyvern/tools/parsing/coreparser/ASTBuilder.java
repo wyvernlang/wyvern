@@ -29,7 +29,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST integerLit(int value, FileLocation loc);
 	public AST booleanLit(boolean value, FileLocation loc);
 	public AST invocation(AST receiver, String name, AST argument, FileLocation loc);
-	public AST application(AST function, AST arguments, FileLocation loc, List<String> generics);
+	public AST application(AST function, AST arguments, FileLocation loc, List<Type> generics);
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc, String selfName);
@@ -42,7 +42,7 @@ public interface ASTBuilder<AST,Type> {
 	
 	public Type nominalType(String name, FileLocation loc);
 	public Type arrowType(Type argument, Type result);
-	public Type parameterizedType(Type base, List<String> arguments);
+	public Type parameterizedType(Type base, List<Type> arguments);
 	
 	public Type qualifiedType(AST base, String name);
 	

@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.type;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -211,6 +212,20 @@ public class StructuralType extends ValueType {
 			return new StructuralType(selfName, newDeclTypes, resourceFlag);
 		}
 	}
+	
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(new Object[] { selfName, resourceFlag, declTypes, });
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof StructuralType))
+			return false;
+		StructuralType other = (StructuralType)obj;
+		return resourceFlag == other.resourceFlag && selfName.equals(other.selfName) && declTypes.equals(other.declTypes); 
+	}
+	
 
 	/*@Override
 	public String toString() {

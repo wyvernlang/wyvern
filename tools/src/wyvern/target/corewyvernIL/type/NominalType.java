@@ -109,15 +109,15 @@ public class NominalType extends ValueType {
 	public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
 		if (super.isSubtypeOf(t, ctx))
 			return true;
-		if (t instanceof NominalType && ctx.isAssumedSubtype(this, (NominalType)t))
+		if (ctx.isAssumedSubtype(this, t))
 			return true;
 		DeclType dt = getSourceDeclType(ctx);
 		if (dt instanceof ConcreteTypeMember) {
 			ValueType vt = ((ConcreteTypeMember)dt).getResultType(View.from(path, ctx));
 			ValueType ct = t.getCanonicalType(ctx);
 			// if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
-			if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
-				ctx = new SubtypeAssumption(this, (NominalType)t, ctx);
+			//if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
+			ctx = new SubtypeAssumption(this, t, ctx);
 			return vt.isSubtypeOf(ct, ctx);
 		} else if (dt instanceof TaggedTypeMember) {
 			Type typeDefn = ((TaggedTypeMember)dt).getTypeDefinition(View.from(path, ctx));

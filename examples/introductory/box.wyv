@@ -1,45 +1,19 @@
 type Box
     type T
     val contents: this.T
+    def copy():Box[this.T]
     
-def makeBoxInt(contents:Int):Box[Int]
-    new
-        type T = Int
-        val contents:Int = contents
-
 def makeBox[X](contents:X):Box[X]
     new
         type T = X
         val contents:X = contents
+        def copy():Box[this.T] = makeBox[X](this.contents)
 
-def id[X](in:X):X
-    in
-    
 def copyBox[X](in:Box[X]):Box[X]
-    new
-        type T = X
-        val contents:X = in.contents
-    //makeBox[X](in.contents)
+    makeBox[X](in.contents)
 
-val x:Box[Int] = makeBoxInt(5)
+val y = makeBox[Int](15)
+val z : Box[Int] = copyBox[Int](y)
+val v : Box[z.T] = z.copy()
 
-val yy:Box[Int] = makeBox[Int](4)
-val y = makeBox[Int](4)
-
-x.contents
-y.contents // construction test
-yy.contents // construction test
-
-
-def identity[K](value: K): K
-    value
-
-val xx = 15
-
-identity[Int](xx)
-identity[Int](15)
-
-val z = identity[Int](15)
-val zz:Int = identity[Int](15) // variant that's explicitly labeled
-
-z
+v.contents

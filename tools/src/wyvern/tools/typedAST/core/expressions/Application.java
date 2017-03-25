@@ -48,7 +48,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 public class Application extends CachingTypedAST implements CoreAST {
     private ExpressionAST function;
     private ExpressionAST argument;
-    private List<String> generics;
+    private List<Type> generics;
     private FileLocation location;
 
     public Application(TypedAST function, TypedAST argument, FileLocation location) {
@@ -61,14 +61,14 @@ public class Application extends CachingTypedAST implements CoreAST {
       * @param function the function that is called
       * @param argument the argument passed at the call site (may be a tuple, unit, or singleton
       * @param location the location of the call site in the source file
-      * @param generics the vector of type parameters passed at the call site
+      * @param generics2 the vector of type parameters passed at the call site
       */
     public Application(TypedAST function, TypedAST argument,
-            FileLocation location, List<String> generics) {
+            FileLocation location, List<Type> generics2) {
         this.function = (ExpressionAST) function;
         this.argument = (ExpressionAST) argument;
         this.location = location;
-        this.generics = (generics != null) ? generics : new LinkedList<String>();
+        this.generics = (generics2 != null) ? generics2 : new LinkedList<Type>();
     }
 
     @Override
@@ -134,10 +134,6 @@ public class Application extends CachingTypedAST implements CoreAST {
 
     public FileLocation getLocation() {
         return this.location;
-    }
-
-    private ValueType getILTypeForGeneric(GenContext ctx, String genericName) {
-        return ctx.lookupType(genericName, this.getLocation());
     }
 
     @Override
@@ -218,7 +214,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 
     private void addGenericToArgList(
           String formalName,
-          String generic,
+          Type generic,
           List<IExpr> args,
           GenContext ctx
     ) {
@@ -226,7 +222,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         String genericName = formalName
             .substring(DefDeclaration.GENERIC_PREFIX.length());
 
-        ValueType vt = getILTypeForGeneric(ctx, generic);
+        ValueType vt = generic.getILType(ctx);
         args.add(
             new wyvern.target.corewyvernIL.expression.New(
                 new TypeDeclaration(genericName, vt, this.location)
@@ -273,7 +269,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             // then we can simply add each of the actual generics to the argument's list
             for (int i = 0; i < count; i++) {
                 String formalName = formals.get(i).getName();
-                String generic = this.generics.get(i);
+                Type generic = this.generics.get(i);
                 addGenericToArgList(formalName, generic, args, ctx);    
             }
         } else {
@@ -378,7 +374,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     ) {
         for (int i = 0; i < this.generics.size(); i++) {
             String formalName = formals.get(i).getName();
-            String generic = this.generics.get(i);
+            Type generic = this.generics.get(i);
             addGenericToArgList(formalName, generic, args, ctx);    
         }
     }

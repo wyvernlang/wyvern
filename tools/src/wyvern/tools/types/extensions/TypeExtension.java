@@ -30,8 +30,7 @@ public class TypeExtension extends AbstractTypeImpl implements Type {
 	@Override
 	public ValueType getILType(GenContext ctx) {
 		final ValueType baseType = base.getILType(ctx);
-		//List<ValueType> params = parameters.stream().map(p -> p.getILType(ctx)).collect(Collectors.toList());
-		List<ConcreteTypeMember> decls = new LinkedList<ConcreteTypeMember>();
+		/*List<ConcreteTypeMember> decls = new LinkedList<ConcreteTypeMember>();
 		StructuralType st = baseType.getStructuralType(ctx);
 		int index = 0;
 		int declCount = st.getDeclTypes().size();
@@ -45,7 +44,9 @@ public class TypeExtension extends AbstractTypeImpl implements Type {
 			AbstractTypeMember m = (AbstractTypeMember) st.getDeclTypes().get(index);
 			decls.add(new ConcreteTypeMember(m.getName(), vt));
 		}
-		return new RefinementType(baseType, decls);
+		return new RefinementType(baseType, decls);*/
+		List<ValueType> params = parameters.stream().map(p -> p.getILType(ctx)).collect(Collectors.toList());
+		return new RefinementType(params,baseType);
 	}
 
 }
