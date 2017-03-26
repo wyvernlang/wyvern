@@ -42,5 +42,10 @@ public class ReceiverView extends View {
 			return v;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "ReceiverView(" + from + " => " + to + ')';
+	}
 
 }

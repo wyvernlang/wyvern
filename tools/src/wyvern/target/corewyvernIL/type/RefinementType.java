@@ -58,7 +58,7 @@ public class RefinementType extends ValueType {
 	public ValueType adapt(View v) {
 		ValueType newBase = base.adapt(v);
 		if (declTypes == null)
-			return new RefinementType(typeParams, newBase);
+			return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase);
 		List<ConcreteTypeMember> newDTs = new LinkedList<ConcreteTypeMember>();
 		for (ConcreteTypeMember dt : declTypes) {
 			newDTs.add(dt.adapt(v));
