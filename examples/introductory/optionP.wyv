@@ -27,4 +27,12 @@ def None[T]():Option[T] = new
     def orElse(x:Unit -> Option[T]):Option[T] = x()
     val isDefined:Boolean = false
 
-15
+val y:Option[Int] = None[Int]()
+val x:Option[Int] = Some[Int](15)
+// BUG: fixme
+//val w = x.map[Int](x => x+1)
+x.isDefined
+// BUG: fixme
+//val z = y.orElse(() => w)
+// TODO: change below to use z
+x.getOrElse(() => 3)
