@@ -6,6 +6,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
@@ -114,12 +116,19 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
     @Override
     @Deprecated
     public ValueType generateILType() {
-        return new StructuralType("this", Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.generateILType(), Arrays.asList(new FormalArg("arg1", argument.generateILType())))));
+        return new StructuralType("@lambda-type", Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.generateILType(), Arrays.asList(new FormalArg("arg1", argument.generateILType())))));
     }
 
+    static final ValueType nominalUnit = new NominalType("system", "Unit"); 
+    
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		return new StructuralType("this", Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), Arrays.asList(new FormalArg("arg1", argument.getILType(ctx))))));
+		final ValueType argType = argument.getILType(ctx);
+		if (Util.unitType().equals(argType) || nominalUnit.equals(argType)) {
+			// zero argument function
+			return new StructuralType("@lambda-type", Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), new LinkedList<FormalArg>())));
+		}
+		return new StructuralType("@lambda-type", Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), Arrays.asList(new FormalArg("arg1", argType)))));
 		//return this.result.getILType(ctx);
 	}
 }

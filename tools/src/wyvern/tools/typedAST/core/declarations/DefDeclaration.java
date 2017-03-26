@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -284,10 +286,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
-		List<Expression> args = new LinkedList<Expression>();
+		/*List<Expression> args = new LinkedList<Expression>();
 		for(NameBinding arg : argNames) {
 			args.add(new Variable(arg.getName()));
-		}
+		}*/
+		List<Expression> args = getArgILTypes().stream().map(a -> new Variable(a.getName())).collect(Collectors.toList());
 		if (tlc.getReceiverName() == null)
 			throw new RuntimeException("must set receiver name before addModuleDecl on a def");
 		Expression body = new MethodCall(new Variable(tlc.getReceiverName()), name, args, this);

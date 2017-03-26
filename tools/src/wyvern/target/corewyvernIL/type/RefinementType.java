@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
@@ -70,7 +71,11 @@ public class RefinementType extends ValueType {
 		List<ConcreteTypeMember> newDeclTypes = new LinkedList<ConcreteTypeMember>();
 		boolean changed = false;
 		ValueType newBase = base.doAvoid(varName, ctx, depth);
-		for (ConcreteTypeMember dt : getDeclTypes(ctx)) {
+		if (declTypes == null) {
+			List<ValueType> newTPs = typeParams.stream().map(p -> p.doAvoid(varName, ctx, depth)).collect(Collectors.toList());
+			return new RefinementType(newTPs, base);
+		}
+		for (ConcreteTypeMember dt : declTypes) {
 			ConcreteTypeMember newDT = dt.doAvoid(varName, ctx, depth+1);
 			newDeclTypes.add(newDT);
 			if (newDT != dt) {
@@ -176,9 +181,16 @@ public class RefinementType extends ValueType {
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		base.doPrettyPrint(dest, indent);
 		dest.append("[");
-		for (ConcreteTypeMember ctm: declTypes) {
-			ctm.getRawResultType().doPrettyPrint(dest, indent);
-			dest.append(", ");
+		if (declTypes != null) {
+			for (ConcreteTypeMember ctm: declTypes) {
+				ctm.getRawResultType().doPrettyPrint(dest, indent);
+				dest.append(", ");
+			}
+		} else {
+			for (ValueType vt: typeParams) {
+				vt.doPrettyPrint(dest, indent);
+				dest.append(", ");
+			}			
 		}
 		dest.append(']');
 	}
