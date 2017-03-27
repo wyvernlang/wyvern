@@ -181,7 +181,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         } else if (argument instanceof UnitVal) {
             // the method takes no arguments
         } else {
-        	// adding the last formal
+            // adding the last formal
             if (formals.size() != 1 + args.size()) {
                 ToolError.reportError(
                     ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
@@ -192,7 +192,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             }
             
             // TODO: propagate type downward from the last formal
-            args.add(argument.generateIL(ctx, formals.get(formals.size()-1).getType(), null));
+            args.add(argument.generateIL(ctx, formals.get(formals.size() - 1).getType(), null));
         }
 
         // generate the call
