@@ -10,6 +10,8 @@ import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.ASTNode;
+import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
@@ -233,6 +235,7 @@ public class TestUtil {
 	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
 	    final Module module = state.getResolver().resolveModule(qualifiedName);
 	    IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
+      program = (IExpr)PlatformSpecializationVisitor.specializeAST((ASTNode)program, "java", Globals.getGenContext(state));
 	    TestUtil.doChecks(program, expectedType, expectedValue);
 	}
 	

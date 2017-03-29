@@ -64,6 +64,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     this.asName = image;
   }
 
+    @Override
     public StringBuilder prettyPrint() {
         StringBuilder sb = new StringBuilder();
         String uriString = "null";
@@ -76,11 +77,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         String requireString = String.valueOf(requireFlag);
         String metadataString = String.valueOf(metadataFlag);
         sb.append("ImportDeclaration(uri=" + uriString +
-                  ", binder=" + binderString +
-                  ", location=" + locationString +
-                  ", requireFlag=" + requireString +
-                  ", metadataFlag=" + metadataString +
-                  ", asName=" + asName +
+                  // ", binder=" + binderString +
+                  // ", location=" + locationString +
+                  // ", requireFlag=" + requireString +
+                  // ", metadataFlag=" + metadataString +
+                  // ", asName=" + asName +
                   ")");
         return sb;
     }
@@ -336,5 +337,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
   public String getAsName() {
     return asName;
+  }
+  
+  @Override
+  public String toString() {
+	  return prettyPrint().toString();
   }
 }

@@ -5,11 +5,16 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
@@ -17,29 +22,50 @@ import wyvern.tools.util.Pair;
 
 
 public class ModuleDeclaration extends DefDeclaration {
-    private List<ImportDeclaration> dependencies; // The list of platform-dependent modules we depend on
+    private List<Pair<ImportDeclaration, ValueType>> dependencies; // The list of platform-dependent modules we depend on
 
     public ModuleDeclaration(String moduleName, List<FormalArg> formalArgs, ValueType type, IExpr body,
-                             List<ImportDeclaration> dependencies, FileLocation loc) {
+                             List<Pair<ImportDeclaration, ValueType>> dependencies, FileLocation loc) {
         super(moduleName, formalArgs, type, body, loc);
         this.dependencies = dependencies;
     }
 
-    public Declaration specialize(String platform, GenContext ctx) {
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
+    public List<Pair<ImportDeclaration, ValueType>> getDependencies() {
+        return dependencies;
+    }
+
+    public Pair<Declaration, List<TypedModuleSpec>> specialize(String platform, GenContext ctx) {
         ModuleResolver interpResolver = ModuleResolver.getLocal();
         ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
+        resolver.setInterpreterState(InterpreterState.getLocalThreadInterpreter());
+
+        List<TypedModuleSpec> recursiveDependencies = new ArrayList<>();
 
         IExpr body = getBody();
-        for (ImportDeclaration decl : dependencies) {
-            List<TypedModuleSpec> recursiveDependencies = new ArrayList<>();
-            Pair<VarBinding, GenContext> pair = decl.genBinding(resolver, ctx, recursiveDependencies);
+        for (Pair<ImportDeclaration, ValueType> decl : dependencies) {
+            Pair<VarBinding, GenContext> pair = decl.first.genBinding(resolver, ctx, recursiveDependencies);
             body = new Let(pair.first, body);
-            body = resolver.wrap(body, recursiveDependencies);
         }
 
         if (getFormalArgs().isEmpty())
-            return new ValDeclaration(getName(), getType(), body, getLocation());
+            return new Pair(new ValDeclaration(getName(), getType(), body, getLocation()), recursiveDependencies);
         else
-            return new DefDeclaration(getName(), getFormalArgs(), getType(), body, getLocation());
+            return new Pair(new DefDeclaration(getName(), getFormalArgs(), getType(), body, getLocation()), recursiveDependencies);
+    }
+
+    @Override
+    public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
+        ModuleResolver resolver = InterpreterState.getLocalThreadInterpreter().getResolver();
+        for (Pair<ImportDeclaration, ValueType> pair: dependencies) {
+            Module module = resolver.resolveModule(pair.first.getUri().getSchemeSpecificPart());
+            String internalName = module.getSpec().getInternalName();
+            thisCtx = thisCtx.extend(internalName, pair.second);
+        }
+        return super.typeCheck(ctx, thisCtx);
     }
 }

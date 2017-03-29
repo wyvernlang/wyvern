@@ -1,8 +1,8 @@
 package wyvern.target.corewyvernIL.astvisitor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
 
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.Case;
@@ -17,7 +17,6 @@ import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
-import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -38,31 +37,50 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.util.Pair;
 
 class PSVState {
     public String platform;
     public GenContext ctx;
+    public HashSet<TypedModuleSpec> dependencies;
+
     public PSVState(String platform, GenContext ctx) {
         this.platform = platform;
         this.ctx = ctx;
+        this.dependencies = new HashSet<>();
     }
 }
 
 public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode> {
 
     public static ASTNode specializeAST(ASTNode ast, String platform, GenContext ctx) {
-        return ast.acceptVisitor(new PlatformSpecializationVisitor(), new PSVState(platform, ctx));
+        PSVState state = new PSVState(platform, ctx);
+        ASTNode result = ast.acceptVisitor(new PlatformSpecializationVisitor(), state);
+
+        ModuleResolver interpResolver = ModuleResolver.getLocal();
+        ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
+        resolver.setInterpreterState(InterpreterState.getLocalThreadInterpreter());
+
+
+        List<TypedModuleSpec> dependenciesList = new ArrayList<>(state.dependencies);
+        return (ASTNode)resolver.wrap((IExpr)result, dependenciesList);
     }
 
     public ASTNode visit(PSVState state, ModuleDeclaration moduleDecl) {
-        return moduleDecl.specialize(state.platform, state.ctx);
+        Pair<Declaration, List<TypedModuleSpec>> pair = moduleDecl.specialize(state.platform, state.ctx);
+        for (TypedModuleSpec spec : pair.second) {
+            state.dependencies.add(spec);
+        }
+        return pair.first;
     }
 
     public ASTNode visit(PSVState state, New newExpr) {
