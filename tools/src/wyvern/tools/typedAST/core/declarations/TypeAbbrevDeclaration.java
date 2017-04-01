@@ -81,7 +81,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return alias;
 	}
 
@@ -133,6 +132,12 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(
 			GenContext ctx, GenContext thisContext) {
 		// TODO Auto-generated method stub
+        if (reference == null) {
+            System.out.print("reference is null with alias=");
+            System.out.print(alias);
+            System.out.print(", location = ");
+            System.out.println(getLocation().toString());
+        }
 		return new TypeDeclaration(alias, reference.getILType(ctx), getLocation());
 	}
 
