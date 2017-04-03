@@ -1353,4 +1353,15 @@ public class ILTests {
             + "x.length()\n";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(2));
     }
+
+    @Test
+    public void testListGet() throws ParseException {
+        String src
+            = "import wyvern.collections.list\n"
+            + "val x : list.List = list.make()\n"
+            + "x.append(1)\n"
+            + "x.append(2)\n"
+            + "x.get(0).getOrElse(() => -1)\n";
+        TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(1));
+    }
 }

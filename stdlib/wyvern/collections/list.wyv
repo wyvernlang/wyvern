@@ -28,12 +28,12 @@ def make():List
 				() => option.None())
 		def length():Int
 			this.next.isDefined.ifTrue(
-				() => this.next.getOrElse(() => 0).length() + 1,
+				() => 1 + this.next.getOrElse(() => 0).length(),
 				() => 0)
 		def get(n:Int):Option
 			this.next.isDefined.ifTrue(
 				() => (n == 0).ifTrue(
-				   () => option.Some(e),
+				   () => option.Some(this.element),
 				   () => this.next.flatMap(opt => opt.get(n-1))),
 				() => option.None())
 	val sentinel : Cell = makeCell(0, option.None())
