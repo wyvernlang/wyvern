@@ -32,12 +32,26 @@ public class Util {
 		return new StructuralType("arrow", arrowDecls, true);
 	}
 	public static ValueType listType() {
-		/* jLinkedList<DeclType> listDecls = new LinkedList<DeclType>();
-		listDecls.add(new ValDeclType("length", new IntegerType()));
-		listDecls.add(new DefDeclType("getVal", theEmptyType, new LinkedList<FormalArg>()));
-		listDecls.add(new DefDeclType("getVal", new NominalType("system", "List"), new LinkedList<FormalArg>()));
-		return new StructuralType("list", listDecls); */
-		return new NominalType("Lists", "List");
+      // LinkedList<DeclType> listDecls = new LinkedList<DeclType>();
+      // listDecls.add(new ValDeclType("length", new IntegerType()));
+      // listDecls.add(new DefDeclType("getVal", theEmptyType, new LinkedList<FormalArg>()));
+      // listDecls.add(new DefDeclType("getVal", new NominalType("system", "List"), new LinkedList<FormalArg>()));
+      // return new StructuralType("list", listDecls);
+      // return new NominalType("Lists", "List");
+
+      // LinkedList<DeclType> listDecls = new LinkedList<>();
+      // listDecls.add(new DefDeclType("length", theIntType, new LinkedList<FormalArg>()));
+
+      // LinkedList<FormalArg> getArgs = new LinkedList<>();
+      // getArgs.add(new FormalArg("n", theIntType));
+      // listDecls.add(new DefDeclType("get", theDynType, getArgs));
+
+      // LinkedList<FormalArg> appendArgs = new LinkedList<>();
+      // appendArgs.add(new FormalArg("value", theDynType));
+      // listDecls.add(new DefDeclType("append", theUnitType, appendArgs));
+      // return new StructuralType("list", listDecls);
+
+      return new NominalType("list", "List");
 	}
 	public static ObjectValue unitValue() {
 		return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, null, EvalContext.empty());

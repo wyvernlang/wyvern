@@ -137,4 +137,12 @@ public class AST {
         }
         return result.toString();
     }
+
+    // TODO: test fn, don't forget to remove
+    public LinkedList<String> foobar() {
+        LinkedList<String> ll = new LinkedList<>();
+        ll.add("Hello");
+        ll.add("there");
+        return ll;
+    }
 }

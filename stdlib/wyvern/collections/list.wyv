@@ -1,6 +1,7 @@
 module list
 
 import wyvern.option
+import wyvern.util.matching.regex
 
 type Option = option.Option
 
@@ -9,6 +10,14 @@ resource type List
 	def find(pred:Dyn -> Boolean):Option
 	def length():Int
 	def get(n:Int):Option
+	// metadata new
+	// 	def parseTSL(input : String, ctx : system.Context) : option.Option
+	// 		// WIP: This only works when the list elements don't have ',' in them
+	// 		def parseElem(input : String, result : List) : List
+  //         termRegex = regex.apply("\\w*[^,]+")
+  //         commaRegex = regex.apply(",\\w*")
+  //         termRegex.findPrefixMatchOf(input).flatMap( match =>
+
 
 def make():List
 	resource type Cell

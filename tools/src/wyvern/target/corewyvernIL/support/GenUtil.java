@@ -131,7 +131,7 @@ public class GenUtil {
 			return Util.dynType();
 		}
 
-		if (javaClass.getName().equals("java.util.List")) {
+		if (javaClass.getName().equals("java.util.List") || javaClass.getName().equals("java.util.LinkedList") || javaClass.getName().equals("java.util.ArrayList")) {
 			return Util.listType();
 		}
 
