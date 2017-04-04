@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -71,7 +72,7 @@ public class ModuleResolver {
         this.searchPath = searchPath;
     }
 	
-	void setInterpreterState(InterpreterState s) {
+	public void setInterpreterState(InterpreterState s) {
 		state = s;
 	}
 	
@@ -195,7 +196,11 @@ public class ModuleResolver {
 			if (decl instanceof ValDeclaration) {
 				program = ((ValDeclaration)decl).getDefinition();
 				//program = wrap(program, dependencies);
-			} else if (decl instanceof DefDeclaration) {
+			} else if (decl instanceof ModuleDeclaration) {
+          ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
+          ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(), oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
+          program = new New(moduleDecl);
+      } else if (decl instanceof DefDeclaration) {
 				DefDeclaration oldDefDecl = (DefDeclaration) decl;
 				// rename according to "apply"
 				DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(), oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
