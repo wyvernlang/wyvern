@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -19,6 +21,7 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.expressions.Fn;
 
 public class StructuralType extends ValueType {
 	private String selfName;
@@ -62,15 +65,29 @@ public class StructuralType extends ValueType {
 	}
 
 	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		String newIndent = indent + "    ";
-		if (isResource(GenContext.empty()))
-			dest.append("resource ");
-		dest.append("type { ").append(selfName).append(" =>\n");
-		for (DeclType dt : getDeclTypes()) {
-			dt.doPrettyPrint(dest, newIndent);
-		}
-		dest.append(indent).append("  }");
+	public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
+	    if (selfName.equals(Fn.LAMBDA_STRUCTUAL_DECL)) {
+	        DefDeclType ddt = (DefDeclType)getDeclTypes().get(0);
+	        boolean first = true;
+	        for (FormalArg arg: ddt.getFormalArgs()) {
+	            if (first)
+	                first = false;
+	            else
+	                dest.append(" * ");
+	            arg.getType().doPrettyPrint(dest, indent, ctx);
+	        }
+	        dest.append(" -> ");
+	        ddt.getRawResultType().doPrettyPrint(dest, indent, ctx);
+	    } else {
+    		String newIndent = indent + "    ";
+    		if (isResource(GenContext.empty()))
+    			dest.append("resource ");
+    		dest.append("type { ").append(selfName).append(" =>\n");
+    		for (DeclType dt : getDeclTypes()) {
+    			dt.doPrettyPrint(dest, newIndent);
+    		}
+    		dest.append(indent).append("  }");
+	    }
 	}
 
 	public String getSelfName() {
@@ -131,7 +148,8 @@ public class StructuralType extends ValueType {
 		return true;
 	}
 
-	// if there is exactly one decl type of name and class given, return it, otherwise null
+	/** if there is exactly one decl type of name and class given, return it, otherwise null
+	 */
 	DeclType findMatchingDecl(String name, Predicate<? super DeclType> filter, TypeContext ctx) {
 		List<DeclType> ds = findDecls(name, ctx);
 		ds.removeIf(filter);

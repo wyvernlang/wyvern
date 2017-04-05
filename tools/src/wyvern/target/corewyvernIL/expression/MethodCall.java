@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 
 public class MethodCall extends Expression {
 
@@ -140,11 +142,13 @@ public class MethodCall extends Expression {
 
 		// Go through all declarations, typechecking against the actual types passed in...
 		List<ValueType> actualArgTypes = getArgTypes(ctx);
-
+		List<ValueType> formalArgTypes = null;
+		
 		// ...use this context to do that.
 		TypeContext newCtx = null;
 		for (DeclType declType : declarationTypes) {
-
+		    formalArgTypes = new LinkedList<ValueType>();
+		    
 			// Ignore non-methods.
 			newCtx = ctx;
 			if (!(declType instanceof DefDeclType)) continue;
@@ -162,6 +166,7 @@ public class MethodCall extends Expression {
 				// Get info about the formal arguments.
 				FormalArg formalArg = formalArgs.get(i);
 				ValueType formalArgType = formalArg.getType().adapt(v);
+				formalArgTypes.add(formalArgType);
 				String formalArgName = formalArg.getName();
 				ValueType actualArgType = actualArgTypes.get(i);
 
@@ -194,15 +199,29 @@ public class MethodCall extends Expression {
 
 		// Couldn't find an appropriate method declaration. Build up a nice error message.
 		StringBuilder errMsg = new StringBuilder();
-		errMsg.append(methodName);
-		errMsg.append("(");
+		//errMsg.append(methodName);
+		//errMsg.append("(");
 		for (int i = 0; i <= args.size() - 2; ++i) {
-			errMsg.append(actualArgTypes.get(i).toString());
-			errMsg.append(", ");
+		    // add the argument only if it's not a generic
+		    if (!((DefDeclType)declarationTypes.get(0)).getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX)) {
+    			errMsg.append(actualArgTypes.get(i).desugar(ctx));
+    			errMsg.append(", ");
+		    }
 		}
 		if (args.size() > 0)
-			errMsg.append(actualArgTypes.get(args.size() - 1).toString());
-		errMsg.append(")");
+			errMsg.append(actualArgTypes.get(args.size() - 1).desugar(ctx));
+		errMsg.append("; expected types ");
+		DefDeclType ddt =(DefDeclType)declarationTypes.get(0); 
+        for (int i = 0; i <= formalArgTypes.size() - 2; ++i) {
+            // add the argument only if it's not a generic
+            if (!ddt.getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX)) {
+                errMsg.append(formalArgTypes.get(i).desugar(ctx));
+                errMsg.append(", ");
+            }
+        }
+        if (formalArgTypes.size() > 0)
+            errMsg.append(formalArgTypes.get(args.size() - 1).desugar(ctx));
+		//errMsg.append(")");
 		ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
 		return null;
 	}

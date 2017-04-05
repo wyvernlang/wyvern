@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
+
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
@@ -60,4 +62,10 @@ public class TypeApplication extends ValueType {
 	public ValueType doAvoid(String varName, TypeContext ctx, int count) {
 		throw new RuntimeException("not implemented");
 	}
+
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
+        // TODO Auto-generated method stub
+        
+    }
 }

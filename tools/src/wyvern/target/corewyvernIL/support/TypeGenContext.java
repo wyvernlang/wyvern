@@ -6,6 +6,14 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public class TypeGenContext extends GenContext {
 
+    @Override
+    public String desugarType(Path var, String member) {
+        if (var.equals(objName) && member.equals(typeName)) {
+            return typeName;
+        }
+        return super.desugarType(var, member);
+    }
+
     String typeName;
     Path objName;
 

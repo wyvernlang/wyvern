@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
@@ -29,8 +30,11 @@ public class NominalType extends ValueType {
 		this.typeMember = typeMember;
 	}
 
-	public NominalType(Path path, String typeMember) {
-		super();
+    public NominalType(Path path, String typeMember) {
+        this(path, typeMember, null);
+    }
+	public NominalType(Path path, String typeMember, FileLocation location) {
+		super(location);
         if(path.equals(null)) {
             throw new IllegalStateException("Path cannot be null.");
         }
@@ -71,7 +75,8 @@ public class NominalType extends ValueType {
 	}
 
 	private DeclType getSourceDeclType(TypeContext ctx) {
-		return path.typeCheck(ctx).getStructuralType(ctx).findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
+		final StructuralType structuralType = path.typeCheck(ctx).getStructuralType(ctx);
+        return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
 		//return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
 	}
 	
@@ -90,9 +95,19 @@ public class NominalType extends ValueType {
 	}
 
 	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		path.doPrettyPrint(dest, indent);
-		dest.append('.').append(typeMember);
+	public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
+	    String desugared = null;
+	    if (ctx != null) {
+	        if (path instanceof Variable) {
+	            desugared = ctx.desugarType(path, typeMember);
+	        }
+	    }
+	    if (desugared == null) {
+    		path.doPrettyPrint(dest, indent);
+    		dest.append('.').append(typeMember);
+	    } else {
+	        dest.append(desugared);
+	    }
 	}
 
 	@Override
@@ -140,7 +155,16 @@ public class NominalType extends ValueType {
 
 	@Override
 	public ValueType adapt(View v) {
-		return new NominalType(path.adapt(v), typeMember);
+	    try {
+    		final Path newPath = path.adapt(v);
+            return new NominalType(newPath, typeMember);
+	    } catch (RuntimeException e) {
+	        if (v.getContext() != null) {
+	            return getCanonicalType(v.getContext());
+	        } else {
+	            throw e;
+	        }
+	    }
 	}
 	
 	@Override
@@ -149,11 +173,16 @@ public class NominalType extends ValueType {
 		return t.getMetadataValue();
 	}
 
-	@Override
-	public void checkWellFormed(TypeContext ctx) {
-		// we are well-formed as long as we can get this without an error
-		this.getSourceDeclType(ctx);
-	}
+    @Override
+    public void checkWellFormed(TypeContext ctx) {
+        // we are well-formed as long as we can get this without an error, and it doesn't return null but instead a well-formed type member
+        final DeclType sourceDeclType = this.getSourceDeclType(ctx);
+        if (sourceDeclType == null) {
+            ToolError.reportError(ErrorMessage.NO_SUCH_TYPE_MEMBER, this, typeMember);
+        }
+        // would like to check this but can't, to avoid infinite recursion; other code should check it is well-formed
+        //sourceDeclType.checkWellFormed(ctx);
+    }
 
 	@Override
 	public ValueType doAvoid(String varName, TypeContext ctx, int count) {

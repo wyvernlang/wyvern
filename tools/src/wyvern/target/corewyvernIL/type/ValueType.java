@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,8 +10,13 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 
 public abstract class ValueType extends Type implements IASTNode {
+    public ValueType() {}
+    public ValueType(HasLocation hasLoc) { super(hasLoc); }
+    public ValueType(FileLocation loc) { super(loc); }
 	/**
 	 * Returns the equivalent structural type.  If the structural type
 	 * is unknown (e.g. because this is a nominal type and the
@@ -23,6 +29,28 @@ public abstract class ValueType extends Type implements IASTNode {
 		return getStructuralType(ctx, StructuralType.getEmptyType());
 	}
 
+    public final String desugar(TypeContext ctx) {
+        try {
+            Appendable dest = new StringBuilder(); 
+            doPrettyPrint(dest, "", ctx);
+            return dest.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "ERROR_PRINTING";
+        }
+    }
+    
+	/**
+	 * If ctx is non-null, then we try to desugar the type.
+	 * Otherwise this is the same as regular pretty-printing. 
+	 */
+    public abstract void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException;
+    
+    public final void doPrettyPrint(Appendable dest, String indent) throws IOException
+    {
+        doPrettyPrint(dest, indent, null);
+    }
+    
 	@Override
 	public NominalType getParentType(View v) {
 		return null;

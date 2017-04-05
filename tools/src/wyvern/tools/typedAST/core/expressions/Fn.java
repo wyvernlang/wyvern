@@ -40,6 +40,7 @@ import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
+    public static final String LAMBDA_STRUCTUAL_DECL = "@lambda-structual-decl";
     private List<NameBinding> bindings;
     private ExpressionAST body;
     private FileLocation location = FileLocation.UNKNOWN;
@@ -178,7 +179,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         // set up containsResources() properly by typechecking applyDef
         applyDef.typeCheck(ctx, ctx);
         ValueType newType = new StructuralType(
-            "@lambda-structual-decl",
+            LAMBDA_STRUCTUAL_DECL,
             declTypes,
             applyDef.containsResource(ctx)
         );

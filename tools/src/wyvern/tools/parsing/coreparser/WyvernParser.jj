@@ -594,7 +594,7 @@ Type Type() :
     }
     
     if (generics != null) {
-        Object o = build.parameterizedType(t, generics);
+        Object o = build.parameterizedType(t, generics, loc(id));
         t = (Type) o;
     }
 

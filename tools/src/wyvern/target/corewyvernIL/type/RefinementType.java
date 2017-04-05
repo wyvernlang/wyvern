@@ -13,15 +13,19 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.types.Type;
 
 public class RefinementType extends ValueType {
-	public RefinementType(ValueType base, List<ConcreteTypeMember> declTypes) {
+	public RefinementType(ValueType base, List<ConcreteTypeMember> declTypes, HasLocation hasLoc) {
 		this.base = base;
 		this.declTypes = declTypes;
 	}
 	
-	public RefinementType(List<ValueType> typeParams, ValueType base) {
+	public RefinementType(List<ValueType> typeParams, ValueType base, HasLocation hasLoc) {
+	    super(hasLoc);
 		this.base = base;
 		this.typeParams = typeParams;
 	}
@@ -33,7 +37,14 @@ public class RefinementType extends ValueType {
 	private List<ConcreteTypeMember> getDeclTypes(TypeContext ctx) {
 		if (declTypes == null) {
 			declTypes = new LinkedList<ConcreteTypeMember>();
-			StructuralType st = base.getStructuralType(ctx);
+			base.checkWellFormed(ctx);
+			StructuralType st = base.getStructuralType(ctx, null);
+			if (st == null) {
+			    // for debugging
+	            base.checkWellFormed(ctx);
+			    
+                ToolError.reportError(ErrorMessage.CANNOT_APPLY_TYPE_PARAMETERS, this.getLocation(), base.toString());
+			}
 			int index = 0;
 			int declCount = st.getDeclTypes().size();
 			for (ValueType vt : typeParams) {
@@ -42,6 +53,9 @@ public class RefinementType extends ValueType {
 					index++;
 				}
 				// add a corresponding ConcreteTypeMember
+				if (index >= declCount) {
+	                ToolError.reportError(ErrorMessage.NO_TYPE_MEMBER, this.getLocation());
+				}
 				AbstractTypeMember m = (AbstractTypeMember) st.getDeclTypes().get(index);
 				declTypes.add(new ConcreteTypeMember(m.getName(), vt));
 			}
@@ -58,12 +72,12 @@ public class RefinementType extends ValueType {
 	public ValueType adapt(View v) {
 		ValueType newBase = base.adapt(v);
 		if (declTypes == null)
-			return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase);
+			return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase, this);
 		List<ConcreteTypeMember> newDTs = new LinkedList<ConcreteTypeMember>();
 		for (ConcreteTypeMember dt : declTypes) {
 			newDTs.add(dt.adapt(v));
 		}
-		return new RefinementType(newBase, newDTs);
+		return new RefinementType(newBase, newDTs, this);
 	}
 
 	@Override
@@ -73,7 +87,7 @@ public class RefinementType extends ValueType {
 		ValueType newBase = base.doAvoid(varName, ctx, depth);
 		if (declTypes == null) {
 			List<ValueType> newTPs = typeParams.stream().map(p -> p.doAvoid(varName, ctx, depth)).collect(Collectors.toList());
-			return new RefinementType(newTPs, base);
+			return new RefinementType(newTPs, base, this);
 		}
 		for (ConcreteTypeMember dt : declTypes) {
 			ConcreteTypeMember newDT = dt.doAvoid(varName, ctx, depth+1);
@@ -85,7 +99,7 @@ public class RefinementType extends ValueType {
 		if (!changed && base == newBase) {
 			return this;
 		} else {
-			return new RefinementType(newBase, newDeclTypes);
+			return new RefinementType(newBase, newDeclTypes, this);
 		}
 	}
 
@@ -178,18 +192,21 @@ public class RefinementType extends ValueType {
 	}
 
 	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		base.doPrettyPrint(dest, indent);
+	public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
+		base.doPrettyPrint(dest, indent, ctx);
 		dest.append("[");
+		int count = 0;
 		if (declTypes != null) {
 			for (ConcreteTypeMember ctm: declTypes) {
-				ctm.getRawResultType().doPrettyPrint(dest, indent);
-				dest.append(", ");
+				ctm.getRawResultType().doPrettyPrint(dest, indent, ctx);
+				if (++count < declTypes.size())
+				    dest.append(", ");
 			}
 		} else {
 			for (ValueType vt: typeParams) {
-				vt.doPrettyPrint(dest, indent);
-				dest.append(", ");
+				vt.doPrettyPrint(dest, indent, ctx);
+                if (++count < typeParams.size())
+                    dest.append(", ");
 			}			
 		}
 		dest.append(']');

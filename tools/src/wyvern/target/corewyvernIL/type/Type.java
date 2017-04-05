@@ -4,8 +4,13 @@ import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 
 public abstract class Type extends ASTNode implements IASTNode {
+    public Type() {}
+    public Type(HasLocation hasLoc) { super(hasLoc); }
+    public Type(FileLocation loc) { super(loc); }
 	public abstract ValueType getValueType(); 
 	public abstract NominalType getParentType(View view);
 	

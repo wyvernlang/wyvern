@@ -9,8 +9,10 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class ReceiverView extends View {
 	private Variable from;
 	private Path to;
+	private TypeContext ctx;
 
 	public ReceiverView(IExpr e, TypeContext ctx) {
+        this.ctx = ctx;
 		if (e instanceof Variable) {
 			to = (Variable) e;
 		} else {
@@ -48,4 +50,8 @@ public class ReceiverView extends View {
 		return "ReceiverView(" + from + " => " + to + ')';
 	}
 
+	@Override
+    public TypeContext getContext() {
+        return ctx;
+    }
 }

@@ -18,4 +18,7 @@ public abstract class View {
 	public static View from(IExpr e, TypeContext ctx) {
 		return new ReceiverView(e, ctx);
 	}
+    public TypeContext getContext() {
+        return null;
+    }
 }

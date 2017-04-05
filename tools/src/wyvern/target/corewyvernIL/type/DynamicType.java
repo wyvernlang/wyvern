@@ -27,7 +27,7 @@ public class DynamicType extends ValueType {
 	}
 
 	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+	public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
 		dest.append("Dyn");
 	}
 	

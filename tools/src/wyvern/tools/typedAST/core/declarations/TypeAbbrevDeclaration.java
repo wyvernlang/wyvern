@@ -64,8 +64,7 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public FileLocation getLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		return location == null ? reference.getLocation() : location;
 	}
 
 	@Override
@@ -143,6 +142,7 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 		if (reference == null)
 			reportError(ErrorMessage.NO_ABSTRACT_TYPES_IN_OBJECTS, this);
 		ValueType referenceILType = reference.getILType(ctx);
+		referenceILType.checkWellFormed(ctx);
 		return new TypeDeclaration(getName(), referenceILType, getLocation());
 	}
 	

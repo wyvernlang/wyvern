@@ -139,8 +139,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public Type parameterizedType(Type base, List<Type> arguments) {
-		return new TypeExtension(base, arguments);
+	public Type parameterizedType(Type base, List<Type> arguments, FileLocation loc) {
+		return new TypeExtension(base, arguments, loc);
 	}
 
 	@Override

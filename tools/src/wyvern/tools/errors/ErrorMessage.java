@@ -14,7 +14,7 @@ public enum ErrorMessage {
 	VARIABLE_NOT_DECLARED("No variable named %ARG is in scope", 1),
 	NO_SUCH_METHOD("There is no visible method named %ARG", 1),
 	NO_SUCH_FIELD("There is no visible field named %ARG", 1),
-	NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept the actual argument types: '%ARG'", 1),
+	NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
 	NOT_A_METHOD("%ARG is not a method", 1),
 	TYPE_NOT_DECLARED("Type %ARG has no declaration in the context", 1),
 	OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),
@@ -24,6 +24,7 @@ public enum ErrorMessage {
 	ASSIGNMENT_SUBTYPING("The assigned value is not a subtype of the left-hand side of this assignment", 0),
 	DUPLICATE_MEMBER("%ARG has more than one member named %ARG", 2),
 	EXPECTED_RECORD_TYPE("Expected a type with members", 0),
+    NO_SUCH_TYPE_MEMBER("No such type member: %ARG", 1),
 	CANNOT_INFER_ARG_TYPE("Cannot infer the argument type as there is no expected type for the function expression", 0),
 	NOT_ASSIGNABLE("The left-hand side of the assignment is not an var or field", 0),
 	MUST_BE_ASSIGNED_TO_RESOURCE_TYPE("This new statement captures a resource and must be assigned to a resource type", 0),
@@ -96,6 +97,8 @@ public enum ErrorMessage {
 	NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),
 	METHODS_MUST_BE_INVOKED("Cannot access a method as if it were a field; use ()",0),
 	TSL_ERROR("Error in type-specific language: %ARG",1),
+	CANNOT_APPLY_TYPE_PARAMETERS("Cannot apply type parameters: type %ARG is abstract",1),
+	NO_TYPE_MEMBER("Cannot find enough type members to apply type parameters",0),
 	;
 
 	private ErrorMessage(String message, int numArgs) {

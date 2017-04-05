@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.Type;
 
@@ -17,7 +18,8 @@ public class TypeExtension extends AbstractTypeImpl implements Type {
 	private Type base;
 	private List<Type> parameters;
 	
-	public TypeExtension(Type base, List<Type> parameters) {
+	public TypeExtension(Type base, List<Type> parameters, FileLocation loc) {
+	    super(loc);
 		this.base = base;
 		this.parameters = parameters;
 	}
@@ -46,7 +48,7 @@ public class TypeExtension extends AbstractTypeImpl implements Type {
 		}
 		return new RefinementType(baseType, decls);*/
 		List<ValueType> params = parameters.stream().map(p -> p.getILType(ctx)).collect(Collectors.toList());
-		return new RefinementType(params,baseType);
+		return new RefinementType(params,baseType, this);
 	}
 
 }

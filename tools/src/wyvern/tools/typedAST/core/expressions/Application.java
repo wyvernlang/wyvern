@@ -174,7 +174,7 @@ public class Application extends CachingTypedAST implements CoreAST {
         List<IExpr> args = new LinkedList<IExpr>();
 
         // Add generic arguments to the argslist
-        generateGenericArgs(args, formals, ctx, ddt, dependencies);
+        generateGenericArgs(ddt.getName(), args, formals, ctx, ddt, dependencies);
 
         if (argument instanceof TupleObject) {
             generateILForTuples(formals, args, ctx, dependencies);
@@ -255,6 +255,7 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
     private void generateGenericArgs(
+        String methodName,
         List<IExpr> args,
         List<FormalArg> formals,
         GenContext ctx,
@@ -276,11 +277,12 @@ public class Application extends CachingTypedAST implements CoreAST {
         } else {
             // this case executes when count > this.generics.size()
             // In this case, we can do type inference to determine what types have been elided
-            inferGenericArgs(args, formals, ctx, ddt, deps);
+            inferGenericArgs(methodName, args, formals, ctx, ddt, deps);
         }
     }
 
     private void inferGenericArgs(
+            String methodName,
             List<IExpr> args,
             List<FormalArg> formals,
             GenContext ctx,
@@ -300,7 +302,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 
             if (!inferenceMap.containsKey(i)) {
                 // then we can't infer the type
-                ToolError.reportError(ErrorMessage.MISSING_GENERICS_AT_CALL_SITE, this);
+                ToolError.reportError(ErrorMessage.MISSING_GENERICS_AT_CALL_SITE, this, methodName);
             }
 
             List<Integer> positions = inferenceMap.get(i);

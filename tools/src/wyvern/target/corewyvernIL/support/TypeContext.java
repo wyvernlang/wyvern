@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -29,6 +30,13 @@ public abstract class TypeContext {
 	
 	public static TypeContext empty() {
 		return theEmpty;
+	}
+	
+	public String desugarType(Path var, String member) {
+        if (getNext() == null)
+            return null;
+        else
+            return getNext().desugarType(var, member);
 	}
 	
 	private static TypeContext theEmpty = new EmptyTypeContext(); 
