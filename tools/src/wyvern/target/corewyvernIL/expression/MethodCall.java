@@ -166,7 +166,11 @@ public class MethodCall extends Expression {
 				// Get info about the formal arguments.
 				FormalArg formalArg = formalArgs.get(i);
 				ValueType formalArgType = formalArg.getType().adapt(v);
-				formalArgTypes.add(formalArgType);
+				TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
+                if (!(objectExpr instanceof Variable))
+                    // adaptation for the receiver won't have worked, so try avoiding "this"
+                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), thisCtx);
+                formalArgTypes.add(formalArgType);
 				String formalArgName = formalArg.getName();
 				ValueType actualArgType = actualArgTypes.get(i);
 
@@ -189,6 +193,9 @@ public class MethodCall extends Expression {
 				ctx = newCtx;
 				ValueType resultType = defDeclType.getResultType(v);
 				resultType = resultType.adapt(v);
+				if (!(objectExpr instanceof Variable))
+				    // adaptation for the receiver won't have worked, so try avoiding "this"
+				    resultType = resultType.avoid(receiverType.getSelfName(), newCtx);
 				for (int i = args.size()-1; i >= 0; --i) {
 					resultType = resultType.avoid(formalArgs.get(i).getName(), ctx);
 				}

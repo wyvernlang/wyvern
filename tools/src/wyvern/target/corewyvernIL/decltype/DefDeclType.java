@@ -148,7 +148,7 @@ public class DefDeclType extends DeclTypeWithResult {
 	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
 		boolean changed = false;
 		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
-		if (t.equals(this.getRawResultType())) {
+		if (!(t.equals(this.getRawResultType()))) {
 			changed = true;
 		}
 		List<FormalArg> newArgs = new LinkedList<FormalArg>();
