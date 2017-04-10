@@ -264,9 +264,9 @@ public class TestUtil {
         IExpr program = ast.generateIL(genCtx, null, dependencies);
         program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
 
-        // Typecheck
-        TypeContext ctx = Globals.getStandardTypeContext();
-        program.typeCheck(ctx);
+        // // Typecheck
+        // TypeContext ctx = Globals.getStandardTypeContext();
+        // program.typeCheck(ctx);
 
         // Evaluate
         return program.interpret(Globals.getStandardEvalContext());

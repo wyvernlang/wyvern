@@ -60,10 +60,15 @@ public class JavaValue extends AbstractValue implements Invokable {
           return Util.unitValue();
       } else if(result instanceof List) {
           //return new JavaValue(JavaWrapper.wrapObject(result), new NominalType("system", "List"));
-          Value v = null;
+          ObjectValue v = null;
           try {
-              v = TestUtil.evaluate("import wyvern.collections.list\n" +
-                                    "list.make()\n");
+              v = (ObjectValue)TestUtil.evaluate("import wyvern.collections.list\n" +
+                                                 "list.make()\n");
+              for (Object elem : (List)result) {
+                  List<Value> args = new LinkedList<>();
+                  args.add(javaToWyvern(elem));
+                  v.invoke("append", args);
+              }
           } catch (ParseException e) {
               e.printStackTrace();
           }
