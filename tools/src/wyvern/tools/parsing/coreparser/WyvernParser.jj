@@ -312,10 +312,11 @@ AST ValDeclaration() :
 }
 
 AST TypeAbbrevDeclaration() :
-{ Token t = null; Type reference = null; Token alias = null; }
+{ Token t = null; Type reference = null; Token alias = null; AST metadata = null; }
 {
    t = <TYPE> alias = <IDENTIFIER>
-    ( <EQUALS> reference = Type())? <NEWLINE> {
+    ( <EQUALS> reference = Type())? <NEWLINE>
+    [ <INDENT> <METADATA> metadata = ExpressionLine(false) <DEDENT> ] {
      return build.typeAbbrevDecl(alias.image, reference, loc(t));
    }
 }
