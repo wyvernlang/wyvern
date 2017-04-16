@@ -1364,4 +1364,13 @@ public class ILTests {
             + "x.get(0).getOrElse(() => -1)\n";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(1));
     }
+
+    @Test
+    public void testListTSL() throws ParseException {
+        String src
+            = "import metadata wyvern.collections.list\n"
+            + "val l : list.List = {1, 2, 3, 4}\n"
+            + "l.get(1).getOrElse(() => -1)\n";
+        TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(2));
+    }
 }

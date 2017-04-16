@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Literal;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
@@ -26,6 +27,7 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -33,14 +35,24 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 public class AST {
 	public static AST utils = new AST();
+
+    private int identNum = 0;
 	
-	public ValueType intType() {
-		return Util.intType();
-	}
+    public ValueType intType() {
+        return Util.intType();
+    }
 
     public ValueType dynType() {
         return Util.dynType();
-	}
+    }
+
+    public ValueType unitType() {
+        return Util.unitType();
+    }
+
+    public ValueType nominalType(String pathVariable, String typeMember) {
+        return new NominalType(pathVariable, typeMember);
+    }
 
 	public Expression intLiteral(int i) {
 		return new IntegerLiteral(i);
@@ -53,6 +65,10 @@ public class AST {
 	public Expression variable(String s) {
 		return new Variable(s);
 	}
+
+    public Expression noArgCall(ObjectValue receiver, String methodName) {
+        return new MethodCall(getExpr(receiver), methodName, Arrays.asList(), null);
+    }
 	
 	public Expression oneArgCall(ObjectValue receiver, String methodName, ObjectValue argument) {
 		return new MethodCall(getExpr(receiver), methodName, Arrays.asList(getExpr(argument)), null);
@@ -94,20 +110,33 @@ public class AST {
 			throw new RuntimeException("unexpected!");
 		}
 	}
+
+    private ValueType getType(ObjectValue wyvernType) {
+        final JavaValue fieldValue = (JavaValue) wyvernType.getField("typ");
+        return (ValueType) fieldValue.getWrappedValue();
+    }
 	
 	public DefDeclaration OneArgDefn(String name, ObjectValue resultType, ObjectValue body) {
-		final JavaValue fieldValue = (JavaValue) resultType.getField("typ");
-		ValueType realType= (ValueType) fieldValue.getWrappedValue();
+		ValueType realType = getType(resultType);
 		Expression realBody = getExpr(body);
 		return new DefDeclaration(name, new LinkedList<FormalArg>(), realType, realBody, null);
 	}
 
+    public IExpr let(String ident, ObjectValue identType, ObjectValue bindingValue, ObjectValue inExpr) {
+        return new Let(ident, getType(identType), getExpr(bindingValue), getExpr(inExpr));
+    }
+
     public IExpr parseExpression(String input, JavaValue context) throws ParseException {
-        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input + "\n", "TSL Parse");
-        GenContext cxt = (GenContext)context.getFObject().getWrappedValue();
-        // Extend parseTSL with a second argument (abstract type representing context)
-        // TODO: Handle InterpreterState/GenContext
-        return ast.generateIL(cxt, null, null);
+        try {
+            ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
+            GenContext cxt = (GenContext)context.getFObject().getWrappedValue();
+            // Extend parseTSL with a second argument (abstract type representing context)
+            // TODO: Handle InterpreterState/GenContext
+            return ast.generateIL(cxt, null, null);
+        } catch (ParseException e) {
+            System.err.println("Error when running parseExpression on input \"" + input + "\"");
+            throw e;
+        }
     }
 
     private String commonPrefix(String s1, String s2) {
@@ -149,5 +178,9 @@ public class AST {
             result.append("\n");
         }
         return result.toString();
+    }
+
+    public String genIdent() {
+        return "ASTIDENT$" + Integer.toString(++identNum);
     }
 }

@@ -317,7 +317,7 @@ AST TypeAbbrevDeclaration() :
    t = <TYPE> alias = <IDENTIFIER>
     ( <EQUALS> reference = Type())? <NEWLINE>
     [ <INDENT> <METADATA> metadata = ExpressionLine(false) <DEDENT> ] {
-     return build.typeAbbrevDecl(alias.image, reference, loc(t));
+     return build.typeAbbrevDecl(alias.image, reference, metadata, loc(t));
    }
 }
 

@@ -3,15 +3,38 @@ module list
 import wyvern.internal.list
 import wyvern.option
 import wyvern.util.matching.regex
+import wyvern.ast
+import metadata wyvern.IfTSL
 
 type List = list.List
-  // metadata new
-  //   def parseTSL(input : String, ctx : system.Context) : option.Option
-  //     // WIP: This only works when the list elements don't have ',' in them
-  //     def parseElem(input : String, result : List) : List
-  //         termRegex = regex.apply("\\w*[^,]+")
-  //         commaRegex = regex.apply(",\\w*")
-  //         termRegex.findPrefixMatchOf(input).flatMap( match =>
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option
+      // WIP: This only works when the list elements don't have ',' in them
+      def parseElem(input : String, listIdent : String) : option.Option
+          val termRegex = regex.apply("\\w*[^,]+")
+          val commaRegex = regex.apply(",\\w*")
+          val matchOpt : option.Option = termRegex.findPrefixMatchOf(input)
+          IfTSL.doif(matchOpt.isDefined, ~)
+            then
+              val regexMatch = matchOpt.getOrElse(() => 0)
+              val expr : ast.AST = ast.parseExpression(regexMatch.matched(), ctx)
+              val rest : String = regexMatch.after()
+              val commaMatchOpt : option.Option = commaRegex.findPrefixMatchOf(rest)
+              val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", expr)
+              IfTSL.doif(commaMatchOpt.isDefined, ~)
+                then
+                  val commaMatch = commaMatchOpt.getOrElse(() => 0)
+                  parseElem(commaMatch.after(), listIdent).map(restAST =>
+                    ast.let(ast.genIdent(), ast.types.unit(), appendAST, restAST))
+                else
+                  option.Some(ast.let(ast.genIdent(), ast.types.unit(), appendAST, ast.variable(listIdent)))
+            else
+              // Ill-formed list string, raise error somehow?
+              option.None()
+      val listIdent : String = ast.genIdent()
+      parseElem(ast.stripLeadingWhitespace(input), listIdent).map(appends =>
+        ast.let(listIdent, ast.types.nominal("list", "List"), ast.noArgCall(ast.variable("list"), "make"), appends))
 
 
 def make():List = list.make()
+

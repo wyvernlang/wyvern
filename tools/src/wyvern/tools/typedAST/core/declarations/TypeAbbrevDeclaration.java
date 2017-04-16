@@ -129,7 +129,12 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
             return new AbstractTypeMember(this.alias);
         }
 		ValueType referenceILType = reference.getILType(ctx);
-		return new ConcreteTypeMember(getName(), referenceILType);
+
+	    IExpr metadataExp = null;
+	    if (metadata != null)
+	        metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
+	    
+		return new ConcreteTypeMember(getName(), referenceILType, metadataExp);
 	}
 
 	@Override

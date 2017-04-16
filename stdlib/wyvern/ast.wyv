@@ -36,6 +36,9 @@ def variable(s:String):AST = new
 def call(receiver:AST, methodName:String, argument:AST):AST = new
 	val ast:Unit = utils.oneArgCall(receiver,methodName, argument)
 
+def noArgCall(receiver:AST, methodName:String):AST = new
+	val ast:Unit = utils.noArgCall(receiver,methodName)
+
 def parseExpression(input : String, ctx : system.Context) : AST
   val ctxDyn:Dyn = ctx
   new
@@ -48,4 +51,15 @@ val types = new
   def dyn():Type = new
     val typ:Unit = utils.dynType()
 
+  def unit():Type = new
+    val typ:Unit = utils.unitType()
+
+  def nominal(pathVariable : String, typeMember : String):Type = new
+    val typ:Unit = utils.nominalType(pathVariable, typeMember)
+
 def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
+
+def genIdent() : String = utils.genIdent()
+
+def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = new
+  val ast:Unit = utils.let(ident, bindingType, bindingValue, inExpr)
