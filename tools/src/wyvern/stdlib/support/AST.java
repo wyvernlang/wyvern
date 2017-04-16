@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
@@ -55,6 +57,17 @@ public class AST {
 	public Expression oneArgCall(ObjectValue receiver, String methodName, ObjectValue argument) {
 		return new MethodCall(getExpr(receiver), methodName, Arrays.asList(getExpr(argument)), null);
 	}
+
+    public Expression object(List<ObjectValue> decls) {
+        List<NamedDeclaration> javaDecls = new LinkedList<>();
+        FileLocation loc = null;
+        for (ObjectValue decl : decls) {
+            JavaValue fieldValue = (JavaValue) decl.getField("decl");
+            javaDecls.add((NamedDeclaration)fieldValue.getWrappedValue());
+            loc = decl.getLocation();
+        }
+        return new New(javaDecls, loc);
+    }
 	
 	public Expression oneDeclObject(ObjectValue decl) {
 		final JavaValue fieldValue = (JavaValue) decl.getField("decl");
@@ -136,13 +149,5 @@ public class AST {
             result.append("\n");
         }
         return result.toString();
-    }
-
-    // TODO: test fn, don't forget to remove
-    public LinkedList<String> foobar() {
-        LinkedList<String> ll = new LinkedList<>();
-        ll.add("Hello");
-        ll.add("there");
-        return ll;
     }
 }

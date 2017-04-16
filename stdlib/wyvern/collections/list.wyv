@@ -1,60 +1,17 @@
 module list
 
+import wyvern.internal.list
 import wyvern.option
 import wyvern.util.matching.regex
 
-type Option = option.Option
-
-resource type List
-	def append(e:Dyn):Unit
-	def find(pred:Dyn -> Boolean):Option
-	def length():Int
-	def get(n:Int):Option
-	// metadata new
-	// 	def parseTSL(input : String, ctx : system.Context) : option.Option
-	// 		// WIP: This only works when the list elements don't have ',' in them
-	// 		def parseElem(input : String, result : List) : List
+type List = list.List
+  // metadata new
+  //   def parseTSL(input : String, ctx : system.Context) : option.Option
+  //     // WIP: This only works when the list elements don't have ',' in them
+  //     def parseElem(input : String, result : List) : List
   //         termRegex = regex.apply("\\w*[^,]+")
   //         commaRegex = regex.apply(",\\w*")
   //         termRegex.findPrefixMatchOf(input).flatMap( match =>
 
 
-def make():List
-	resource type Cell
-		var element:Dyn
-		var next:Option
-		def find(pred:Dyn -> Boolean):Option
-		def length():Int
-		def get(n:Int):Option
-	def makeCell(e:Dyn, n:Option):Cell = new
-		var element:Dyn = e
-		var next:Option = n
-		def find(pred:Dyn -> Boolean):Option
-			this.next.isDefined.ifTrue(
-				() => pred(this.element).ifTrue(
-					() => option.Some(this.element),
-					() => this.next.flatMap((c:Cell) => c.find(pred))),
-				() => option.None())
-		def length():Int
-			this.next.isDefined.ifTrue(
-				() => 1 + this.next.getOrElse(() => 0).length(),
-				() => 0)
-		def get(n:Int):Option
-			this.next.isDefined.ifTrue(
-				() => (n == 0).ifTrue(
-				   () => option.Some(this.element),
-				   () => this.next.flatMap(opt => opt.get(n-1))),
-				() => option.None())
-	val sentinel : Cell = makeCell(0, option.None())
-	new
-		var first:Cell = sentinel
-		var last:Cell = sentinel
-		def append(e:Dyn):Unit
-			this.last.element = e
-			val cell = makeCell(0, option.None())
-			this.last.next = option.Some(cell)
-			this.last = cell
-		def find(pred:Dyn -> Boolean):Option
-			this.first.find(pred)
-		def length():Int = this.first.length()
-		def get(n:Int):Option = this.first.get(n)
+def make():List = list.make()

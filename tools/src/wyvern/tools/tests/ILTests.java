@@ -1364,12 +1364,4 @@ public class ILTests {
             + "x.get(0).getOrElse(() => -1)\n";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(1));
     }
-
-    @Test
-    public void testJavaListToWyv() throws ParseException {
-        String src
-            = "import wyvern.ast\n"
-            + "ast.foobar().get(0)";
-        TestUtil.doTest(src, Util.stringType(), new StringLiteral("Hello"));
-    }
 }

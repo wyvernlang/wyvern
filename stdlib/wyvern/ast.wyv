@@ -1,7 +1,7 @@
 module ast
 
+import wyvern.internal.list
 import java:wyvern.stdlib.support.AST.utils
-import wyvern.collections.list
 
 type AST
 	val ast:Unit
@@ -11,6 +11,9 @@ type Decl
 
 type Type
 	val typ:Unit
+
+def objectOfList(decls : list.List) : AST = new
+	val ast:Unit = utils.object(decls)
 
 def object(d:Decl):AST = new
 	val ast:Unit = utils.oneDeclObject(d)
@@ -46,7 +49,3 @@ val types = new
     val typ:Unit = utils.dynType()
 
 def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
-
-// TODO: test function, remove
-def foobar() : list.List
-  utils.foobar()
