@@ -1,0 +1,56 @@
+module ast
+
+import wyvern.internal.list
+import java:wyvern.stdlib.support.AST.utils
+
+type AST
+	val ast:Unit
+
+type Decl
+	val decl:Unit
+
+type Type
+	val typ:Unit
+
+def object(decls : list.List) : AST = new
+	val ast:Unit = utils.object(decls)
+
+def defn(name:String,resultType:Type,body:AST):Decl = new
+	val decl:Unit = utils.OneArgDefn(name, resultType, body)
+
+def int(i:Int):AST = new
+	val ast:Unit = utils.intLiteral(i)
+
+def string(s:String):AST = new
+	val ast:Unit = utils.stringLiteral(s)
+
+def variable(s:String):AST = new
+	val ast:Unit = utils.variable(s)
+
+def call(receiver:AST, methodName:String, arguments:list.List):AST = new
+	val ast:Unit = utils.methodCall(receiver,methodName, arguments)
+
+def parseExpression(input : String, ctx : system.Context) : AST
+  val ctxDyn:Dyn = ctx
+  new
+    val ast:Unit = utils.parseExpression(input, ctxDyn)
+
+val types = new
+  def int():Type = new
+    val typ:Unit = utils.intType()
+
+  def dyn():Type = new
+    val typ:Unit = utils.dynType()
+
+  def unit():Type = new
+    val typ:Unit = utils.unitType()
+
+  def nominal(pathVariable : String, typeMember : String):Type = new
+    val typ:Unit = utils.nominalType(pathVariable, typeMember)
+
+def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
+
+def genIdent() : String = utils.genIdent()
+
+def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = new
+  val ast:Unit = utils.let(ident, bindingType, bindingValue, inExpr)

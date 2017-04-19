@@ -1,9 +1,9 @@
 module list
 
+import wyvern.internal.ast
 import wyvern.internal.list
 import wyvern.option
 import wyvern.util.matching.regex
-import wyvern.ast
 import metadata wyvern.IfTSL
 
 type List = list.List
@@ -20,7 +20,9 @@ type List = list.List
               val expr : ast.AST = ast.parseExpression(regexMatch.matched(), ctx)
               val rest : String = regexMatch.after()
               val commaMatchOpt : option.Option = commaRegex.findPrefixMatchOf(rest)
-              val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", expr)
+              val appendArgs : list.List = list.make()
+              appendArgs.append(expr)
+              val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", appendArgs)
               IfTSL.doif(commaMatchOpt.isDefined, ~)
                 then
                   val commaMatch = commaMatchOpt.getOrElse(() => 0)
@@ -33,7 +35,7 @@ type List = list.List
               option.None()
       val listIdent : String = ast.genIdent()
       parseElem(ast.stripLeadingWhitespace(input), listIdent).map(appends =>
-        ast.let(listIdent, ast.types.nominal("list", "List"), ast.noArgCall(ast.variable("list"), "make"), appends))
+        ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appends))
 
 
 def make():List = list.make()

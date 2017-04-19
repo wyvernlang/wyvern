@@ -66,13 +66,13 @@ public class AST {
 		return new Variable(s);
 	}
 
-    public Expression noArgCall(ObjectValue receiver, String methodName) {
-        return new MethodCall(getExpr(receiver), methodName, Arrays.asList(), null);
+    public Expression methodCall(ObjectValue receiver, String methodName, List<ObjectValue> arguments) {
+        List<Expression> translArgs = new LinkedList<>();
+        for (ObjectValue arg : arguments) {
+            translArgs.add(getExpr(arg));
+        }
+        return new MethodCall(getExpr(receiver), methodName, translArgs, null);
     }
-	
-	public Expression oneArgCall(ObjectValue receiver, String methodName, ObjectValue argument) {
-		return new MethodCall(getExpr(receiver), methodName, Arrays.asList(getExpr(argument)), null);
-	}
 
     public Expression object(List<ObjectValue> decls) {
         List<NamedDeclaration> javaDecls = new LinkedList<>();

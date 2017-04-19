@@ -3,6 +3,7 @@ module identity
 import wyvern.ast
 import wyvern.Int
 import wyvern.option
+import metadata wyvern.collections.list
 
 type AST = ast.AST
 
@@ -11,4 +12,9 @@ type IntExpr
   metadata new
     def parseTSL(input : String, ctx : system.Context) : option.Option
       val inputAST : AST = ast.parseExpression(ast.stripLeadingWhitespace(input), ctx)
-      option.Some(ast.object(ast.defn("eval", ast.types.int(), inputAST)))
+      val evalDefn = ast.defn("eval", ast.types.int(), inputAST)
+      val l = list.make()
+      l.append(evalDefn)
+      option.Some(ast.object(l))
+      // TODO: Using list TSL here triggers error because metadata is not interpreted or something
+      // option.Some(ast.object({evalDefn}))

@@ -1,65 +1,36 @@
 module ast
 
-import wyvern.internal.list
-import java:wyvern.stdlib.support.AST.utils
+import wyvern.collections.list
+import wyvern.internal.ast
 
-type AST
-	val ast:Unit
+type AST = ast.AST
 
-type Decl
-	val decl:Unit
+type Decl = ast.Decl
 
-type Type
-	val typ:Unit
+type Type = ast.Type
 
-def objectOfList(decls : list.List) : AST = new
-	val ast:Unit = utils.object(decls)
+// Expressions
+def object(decls : list.List) : AST = ast.object(decls)
 
-def object(d:Decl):AST = new
-	val ast:Unit = utils.oneDeclObject(d)
+def int(i:Int):AST = ast.int(i)
 
-def twoDeclObject(d1:Decl, d2:Decl):AST = new
-  val ast:Unit = utils.twoDeclObject(d1, d2)
+def string(s:String):AST = ast.string(s)
 
-def defn(name:String,resultType:Type,body:AST):Decl = new
-	val decl:Unit = utils.OneArgDefn(name, resultType, body)
+def variable(s:String):AST = ast.variable(s)
 
-def int(i:Int):AST = new
-	val ast:Unit = utils.intLiteral(i)
+def call(receiver:AST, methodName:String, arguments:list.List):AST = ast.call(receiver, methodName, arguments)
 
-def string(s:String):AST = new
-	val ast:Unit = utils.stringLiteral(s)
+def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = ast.let(ident, bindingType, bindingValue, inExpr)
 
-def variable(s:String):AST = new
-	val ast:Unit = utils.variable(s)
+def parseExpression(input : String, ctx : system.Context) : AST = ast.parseExpression(input, ctx)
 
-def call(receiver:AST, methodName:String, argument:AST):AST = new
-	val ast:Unit = utils.oneArgCall(receiver,methodName, argument)
+// Declarations
+def defn(name:String,resultType:Type,body:AST):Decl = ast.defn(name, resultType, body)
 
-def noArgCall(receiver:AST, methodName:String):AST = new
-	val ast:Unit = utils.noArgCall(receiver,methodName)
+// Types
+val types = ast.types
 
-def parseExpression(input : String, ctx : system.Context) : AST
-  val ctxDyn:Dyn = ctx
-  new
-    val ast:Unit = utils.parseExpression(input, ctxDyn)
+// Utility Functions
+def stripLeadingWhitespace(input : String) : String = ast.stripLeadingWhitespace(input)
 
-val types = new
-  def int():Type = new
-    val typ:Unit = utils.intType()
-
-  def dyn():Type = new
-    val typ:Unit = utils.dynType()
-
-  def unit():Type = new
-    val typ:Unit = utils.unitType()
-
-  def nominal(pathVariable : String, typeMember : String):Type = new
-    val typ:Unit = utils.nominalType(pathVariable, typeMember)
-
-def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
-
-def genIdent() : String = utils.genIdent()
-
-def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = new
-  val ast:Unit = utils.let(ident, bindingType, bindingValue, inExpr)
+def genIdent() : String = ast.genIdent()

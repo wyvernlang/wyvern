@@ -6,6 +6,7 @@ import wyvern.ast
 import wyvern.Int
 import wyvern.option
 import debug
+import metadata wyvern.collections.list
 
 // local bindings to make things easier
 val tokens = lexer.tokens

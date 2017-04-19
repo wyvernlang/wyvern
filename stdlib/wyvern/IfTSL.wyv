@@ -1,8 +1,9 @@
 module IfTSL
 
-import wyvern.ast
+import wyvern.internal.ast
 import wyvern.option
 import wyvern.util.matching.regex
+import wyvern.internal.list              // We use wyvern.internal.list because wyvern.collections.list depends on IfTSL
 
 def thenMatch(input : String) : regex.Match
   val thenRegex = regex("^then\n")
@@ -41,7 +42,10 @@ resource type IfExpr
       val falseAST : AST = toUnitOrAST(em.after(), ctx)
       val trueDefn = ast.defn("evalTrue", ast.types.dyn(), trueAST)
       val falseDefn = ast.defn("evalFalse", ast.types.dyn(), falseAST)
-      option.Some(ast.twoDeclObject(trueDefn, falseDefn))
+      val declList : list.List = list.make()
+      declList.append(trueDefn)
+      declList.append(falseDefn)
+      option.Some(ast.object(declList))
 
 resource type IfExprR
   def evalTrue() : Dyn
@@ -56,7 +60,10 @@ resource type IfExprR
       val falseAST : AST = toUnitOrAST(em.after(), ctx)
       val trueDefn = ast.defn("evalTrue", ast.types.dyn(), trueAST)
       val falseDefn = ast.defn("evalFalse", ast.types.dyn(), falseAST)
-      option.Some(ast.twoDeclObject(trueDefn, falseDefn))
+      val declList : list.List = list.make()
+      declList.append(trueDefn)
+      declList.append(falseDefn)
+      option.Some(ast.object(declList))
 
 def doif(condition : Boolean, body : IfExpr) : Dyn
   condition.ifTrue(() => body.evalTrue(), () => body.evalFalse())
