@@ -1373,4 +1373,9 @@ public class ILTests {
             + "l.get(1).getOrElse(() => -1)\n";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(2));
     }
+
+    @Test
+    public void testMetadataInterpretation() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.importWithMetadata", null, null);
+	}
 }
