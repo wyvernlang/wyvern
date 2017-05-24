@@ -1,4 +1,4 @@
-module pygame
+module def pygame(python:Python)
 
 import python:pygame
 import python:helper

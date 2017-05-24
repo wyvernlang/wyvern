@@ -1,4 +1,4 @@
-import pygame
+require pygame
 require wyvern.String
 
 import metadata wyvern.IfTSL
@@ -27,7 +27,6 @@ def run(gameLoop : GameLoop) : Unit
       0
     else
       run(gameLoop)
-  // Indentation needed because of parser bug
 
 val width = 640
 val height = 480
@@ -105,7 +104,6 @@ def makePaddle(paddleX : Int) : NonInteractivePaddle = new
     IfTSL.doifR(this.y < 0, ~)
       then
         this.y = 0
-    // Indentation workaround for parser bug
 
   def setPaddleSpeed(speed : Int) : Unit
     this.speed = speed
