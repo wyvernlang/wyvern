@@ -129,12 +129,15 @@ public class AST {
         final JavaValue fieldValue = (JavaValue) wyvernType.getField("typ");
         return (ValueType) fieldValue.getWrappedValue();
     }
-	
-	public DefDeclaration OneArgDefn(String name, ObjectValue resultType, ObjectValue body) {
-		ValueType realType = getType(resultType);
-		Expression realBody = getExpr(body);
-		return new DefDeclaration(name, new LinkedList<FormalArg>(), realType, realBody, null);
-	}
+
+    public DefDeclaration defDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType, ObjectValue body) {
+        List<FormalArg> formalArgs = new LinkedList<>();
+        for (ObjectValue arg: formalArgObjs) {
+            final JavaValue fieldValue = (JavaValue) arg.getField("formalArg");
+            formalArgs.add((FormalArg)fieldValue.getWrappedValue());
+        }
+        return new DefDeclaration(name, formalArgs, getType(returnType), getExpr(body), null);
+    }
 
     public IExpr let(String ident, ObjectValue identType, ObjectValue bindingValue, ObjectValue inExpr) {
         return new Let(ident, getType(identType), getExpr(bindingValue), getExpr(inExpr));
@@ -184,6 +187,10 @@ public class AST {
 
     public Case makeCase(String varName, ObjectValue pattern, ObjectValue body) {
         return new Case(varName, (NominalType)getType(pattern), getExpr(body));
+    }
+
+    public FormalArg formalArg(String name, ObjectValue type) {
+        return new FormalArg(name, getType(type));
     }
 
     public IExpr parseExpression(String input, JavaValue context) throws ParseException {

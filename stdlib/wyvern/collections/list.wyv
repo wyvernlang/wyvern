@@ -34,8 +34,12 @@ type List = list.List
               // Ill-formed list string, raise error somehow?
               option.None()
       val listIdent : String = ast.genIdent()
-      parseElem(ast.stripLeadingWhitespace(input), listIdent).map(appends =>
-        ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appends))
+      IfTSL.doif(input == "", ~)
+        then
+          option.Some(ast.call(ast.variable("list"), "make", list.make()))
+        else
+          parseElem(ast.stripLeadingWhitespace(input), listIdent).map(appends =>
+            ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appends))
 
 
 def make():List = list.make()

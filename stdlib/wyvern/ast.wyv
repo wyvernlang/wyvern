@@ -13,6 +13,8 @@ type VarBinding = ast.VarBinding
 
 type Case = ast.Case
 
+type FormalArg = ast.FormalArg
+
 // Expressions
 def object(decls : list.List) : AST = ast.object(decls)
 
@@ -45,7 +47,7 @@ def matchExpr(matchExpr : AST, elseExpr : AST, cases : list.List) : AST = ast.ma
 def parseExpression(input : String, ctx : system.Context) : AST = ast.parseExpression(input, ctx)
 
 // Declarations
-def defn(name:String,resultType:Type,body:AST):Decl = ast.defn(name, resultType, body)
+def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST) : Decl = ast.defDeclaration(name, formalArgs, returnType, body)
 
 // Types
 val types = ast.types
@@ -55,6 +57,8 @@ val types = ast.types
 def varBinding(varName : String, varType : Type, toReplace : AST) : VarBinding = ast.varBinding(varName, varType, toReplace)
 
 def makeCase(varName : String, pattern : Type, body : AST) : Case = ast.makeCase(varName, pattern, body)
+
+def formalArg(name : String, argType : Type) : FormalArg = ast.formalArg(name, argType)
 
 // Utility Functions
 def stripLeadingWhitespace(input : String) : String = ast.stripLeadingWhitespace(input)

@@ -4,7 +4,7 @@ import wyvern.ast
 import wyvern.Int
 import wyvern.option
 import tsls.parser
-import wyvern.collections.list
+import metadata wyvern.collections.list
 
 type AST = ast.AST
 
@@ -20,7 +20,7 @@ type PostfixExpr
 			// to match the signature above
             def f(r : AST) : AST
                 val l = list.make()
-                l.append(ast.defn("eval", ast.types.int(), r))
+                l.append(ast.defDeclaration("eval", {}, ast.types.int(), r))
                 ast.object(l)
             parseResult.map((r) =>
                 f(r)

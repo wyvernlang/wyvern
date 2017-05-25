@@ -18,11 +18,17 @@ type VarBinding
 type Case
   val caseValue:Unit
 
+type FormalArg
+  val formalArg:Unit
+
 def varBinding(varName : String, varType : Type, toReplace : AST) : VarBinding = new
   val binding:Unit = utils.varBinding(varName, varType, toReplace)
 
 def makeCase(varName : String, pattern : Type, body : AST) : Case = new
   val caseValue:Unit = utils.makeCase(varName, pattern, body)
+
+def formalArg(name : String, argType : Type) : FormalArg = new
+  val formalArg:Unit = utils.formalArg(name, argType)
 
 def bind(bindings : list.List, inExpr : AST) : AST = new
   val ast:Unit = utils.bind(bindings, inExpr)
@@ -30,8 +36,8 @@ def bind(bindings : list.List, inExpr : AST) : AST = new
 def object(decls : list.List) : AST = new
 	val ast:Unit = utils.object(decls)
 
-def defn(name:String,resultType:Type,body:AST):Decl = new
-	val decl:Unit = utils.OneArgDefn(name, resultType, body)
+def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST):Decl = new
+	val decl:Unit = utils.defDeclaration(name, formalArgs, returnType, body)
 
 def int(i:Int):AST = new
 	val ast:Unit = utils.intLiteral(i)
