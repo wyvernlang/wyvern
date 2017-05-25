@@ -9,6 +9,8 @@ type Decl = ast.Decl
 
 type Type = ast.Type
 
+type DeclType = ast.DeclType
+
 type VarBinding = ast.VarBinding
 
 type Case = ast.Case
@@ -61,6 +63,18 @@ def varDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = a
 
 // Types
 val types = ast.types
+
+// DeclTypes
+
+def abstractTypeMember(name : String, isResource : Boolean) : DeclType = ast.abstractTypeMember(name, isResource)
+
+def concreteTypeMember(name : String, sourceType : Type) : DeclType = ast.concreteTypeMember(name, sourceType)
+
+def defDeclType(methodName : String, returnType : Type, formalArgs : list.List) : DeclType = ast.defDeclType(methodName, returnType, formalArgs)
+
+def valDeclType(field : String, valType : Type) : DeclType = ast.valDeclType(field, valType)
+
+def varDeclType(field : String, varType : Type) : DeclType = ast.varDeclType(field, varType)
 
 // Other
 

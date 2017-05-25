@@ -24,7 +24,7 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.*;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -49,6 +49,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -97,6 +98,14 @@ public class AST {
             return (ValueType) fieldValue.getWrappedValue();
         }
         return new StructuralType(selfName, declTypes);
+    }
+
+    public ValueType refinementType(List<ObjectValue> typeParamObjs, ObjectValue base) {
+        List<ValueType> typeParams = new LinkedList<>();
+        for (ObjectValue obj: typeParamObjs) {
+            typeParams.add(getType(obj));
+        }
+        return new RefinementType(typeParams, getType(base), null);
     }
 
 	public Expression intLiteral(int i) {
@@ -151,13 +160,17 @@ public class AST {
         return (ValueType) fieldValue.getWrappedValue();
     }
 
-    public DefDeclaration defDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType, ObjectValue body) {
+    private List<FormalArg> getFormalArgs(List<ObjectValue> objs) {
         List<FormalArg> formalArgs = new LinkedList<>();
-        for (ObjectValue arg: formalArgObjs) {
+        for (ObjectValue arg: objs) {
             final JavaValue fieldValue = (JavaValue) arg.getField("formalArg");
             formalArgs.add((FormalArg)fieldValue.getWrappedValue());
         }
-        return new DefDeclaration(name, formalArgs, getType(returnType), getExpr(body), null);
+        return formalArgs;
+    }
+
+    public DefDeclaration defDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType, ObjectValue body) {
+        return new DefDeclaration(name, getFormalArgs(formalArgObjs), getType(returnType), getExpr(body), null);
     }
 
     public DelegateDeclaration delegateDeclaration(ObjectValue valueType, String fieldName) {
@@ -165,18 +178,13 @@ public class AST {
     }
 
     public ModuleDeclaration moduleDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType, ObjectValue body, List<String> dependencyURIs) throws URISyntaxException {
-        List<FormalArg> formalArgs = new LinkedList<>();
-        for (ObjectValue arg: formalArgObjs) {
-            final JavaValue fieldValue = (JavaValue) arg.getField("formalArg");
-            formalArgs.add((FormalArg)fieldValue.getWrappedValue());
-        }
         List<Pair<ImportDeclaration, ValueType>> dependencies = new LinkedList<>();
         for (String dependency: dependencyURIs) {
             ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false);
             Pair<VarBinding, GenContext> bindingCtx = imp.genBinding(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
             dependencies.add(new Pair(imp, bindingCtx.first.getType()));
         }
-        return new ModuleDeclaration(name, formalArgs, getType(returnType), getExpr(body), dependencies, null);
+        return new ModuleDeclaration(name, getFormalArgs(formalArgObjs), getType(returnType), getExpr(body), dependencies, null);
     }
 
     public TypeDeclaration typeDeclaration(String typeName, ObjectValue sourceType) {
@@ -243,6 +251,26 @@ public class AST {
 
     public FormalArg formalArg(String name, ObjectValue type) {
         return new FormalArg(name, getType(type));
+    }
+
+    public DeclType abstractTypeMember(String name, boolean isResource) {
+        return new AbstractTypeMember(name, isResource);
+    }
+
+    public DeclType concreteTypeMember(String name, ObjectValue sourceType) {
+        return new ConcreteTypeMember(name, getType(sourceType));
+    }
+
+    public DeclType defDeclType(String methodName, ObjectValue returnType, List<ObjectValue> formalArgs) {
+        return new DefDeclType(methodName, getType(returnType), getFormalArgs(formalArgs));
+    }
+
+    public DeclType valDeclType(String field, ObjectValue type) {
+        return new ValDeclType(field, getType(type));
+    }
+
+    public DeclType varDeclType(String field, ObjectValue type) {
+        return new VarDeclType(field, getType(type));
     }
 
     public IExpr parseExpression(String input, JavaValue context) throws ParseException {

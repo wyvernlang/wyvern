@@ -90,6 +90,21 @@ def fieldSet(exprType : Type, object : AST, fieldName : String, exprToAssign : A
 def matchExpr(matchExpr : AST, elseExpr : AST, cases : list.List) : AST = new
   val ast:Unit = utils.matchExpr(matchExpr, elseExpr, cases)
 
+def abstractTypeMember(name : String, isResource : Boolean) : DeclType = new
+  val declType:Unit = utils.abstractTypeMember(name, isResource)
+
+def concreteTypeMember(name : String, sourceType : Type) : DeclType = new
+  val declType:Unit = utils.concreteTypeMember(name, sourceType)
+
+def defDeclType(methodName : String, returnType : Type, formalArgs : list.List) : DeclType = new
+  val declType:Unit = utils.defDeclType(methodName, returnType, formalArgs)
+
+def valDeclType(field : String, valType : Type) : DeclType = new
+  val declType:Unit = utils.valDeclType(field, valType)
+
+def varDeclType(field : String, varType : Type) : DeclType = new
+  val declType:Unit = utils.varDeclType(field, varType)
+
 def parseExpression(input : String, ctx : system.Context) : AST
   val ctxDyn:Dyn = ctx
   new
@@ -124,6 +139,9 @@ val types = new
 
   def structural(selfName : String, declTypes : list.List):Type = new
     val typ:Unit = utils.structuralType(selfName, declTypes)
+
+  def refinement(typeParams : list.List, base : Type):Type = new
+    val typ:Unit = utils.refinementType(typeParams, base)
 
 def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
 
