@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -48,6 +49,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -63,7 +65,7 @@ public class AST {
 	public static AST utils = new AST();
 
     private int identNum = 0;
-	
+
     public ValueType intType() {
         return Util.intType();
     }
@@ -76,8 +78,25 @@ public class AST {
         return Util.unitType();
     }
 
+    public ValueType booleanType() {
+        return Util.booleanType();
+    }
+
+    public ValueType stringType() {
+        return Util.stringType();
+    }
+
     public ValueType nominalType(String pathVariable, String typeMember) {
         return new NominalType(pathVariable, typeMember);
+    }
+
+    public ValueType structuralType(String selfName, List<ObjectValue> declTypeObjs) {
+        List<DeclType> declTypes = new LinkedList<>();
+        for (ObjectValue declType: declTypeObjs) {
+            JavaValue fieldValue = (JavaValue) declType.getField("declType");
+            return (ValueType) fieldValue.getWrappedValue();
+        }
+        return new StructuralType(selfName, declTypes);
     }
 
 	public Expression intLiteral(int i) {

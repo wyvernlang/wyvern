@@ -12,6 +12,9 @@ type Decl
 type Type
 	val typ:Unit
 
+type DeclType
+  val declType:Unit
+
 type VarBinding
   val binding:Unit
 
@@ -110,8 +113,17 @@ val types = new
   def unit():Type = new
     val typ:Unit = utils.unitType()
 
+  def boolean():Type = new
+    val typ:Unit = utils.booleanType()
+
+  def string():Type = new
+    val typ:Unit = utils.stringType()
+
   def nominal(pathVariable : String, typeMember : String):Type = new
     val typ:Unit = utils.nominalType(pathVariable, typeMember)
+
+  def structural(selfName : String, declTypes : list.List):Type = new
+    val typ:Unit = utils.structuralType(selfName, declTypes)
 
 def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
 
