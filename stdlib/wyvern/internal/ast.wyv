@@ -12,6 +12,21 @@ type Decl
 type Type
 	val typ:Unit
 
+type VarBinding
+  val binding:Unit
+
+type Case
+  val caseValue:Unit
+
+def varBinding(varName : String, varType : Type, toReplace : AST) : VarBinding = new
+  val binding:Unit = utils.varBinding(varName, varType, toReplace)
+
+def makeCase(varName : String, pattern : Type, body : AST) : Case = new
+  val caseValue:Unit = utils.makeCase(varName, pattern, body)
+
+def bind(bindings : list.List, inExpr : AST) : AST = new
+  val ast:Unit = utils.bind(bindings, inExpr)
+
 def object(decls : list.List) : AST = new
 	val ast:Unit = utils.object(decls)
 
@@ -21,6 +36,9 @@ def defn(name:String,resultType:Type,body:AST):Decl = new
 def int(i:Int):AST = new
 	val ast:Unit = utils.intLiteral(i)
 
+def boolean(b:Boolean):AST = new
+  val ast:Unit = utils.booleanLiteral(b)
+
 def string(s:String):AST = new
 	val ast:Unit = utils.stringLiteral(s)
 
@@ -29,6 +47,24 @@ def variable(s:String):AST = new
 
 def call(receiver:AST, methodName:String, arguments:list.List):AST = new
 	val ast:Unit = utils.methodCall(receiver,methodName, arguments)
+
+def cast(toCastExpr : AST, exprType : Type) : AST = new
+  val ast:Unit = utils.cast(toCastExpr, exprType)
+
+def ffi(importName : String, importType : Type) : AST = new
+  val ast:Unit = utils.ffi(importName, importType)
+
+def ffiImport(ffiType : Type, path : String, importType : Type) : AST = new
+  val ast:Unit = utils.ffiImport(ffiType, path, importType)
+
+def fieldGet(objectExpr : AST, fieldName : String) : AST = new
+  val ast:Unit = utils.fieldGet(objectExpr, fieldName)
+
+def fieldSet(exprType : Type, object : AST, fieldName : String, exprToAssign : AST) : AST = new
+  val ast:Unit = utils.fieldSet(exprType, object, fieldName, exprToAssign)
+
+def matchExpr(matchExpr : AST, elseExpr : AST, cases : list.List) : AST = new
+  val ast:Unit = utils.matchExpr(matchExpr, elseExpr, cases)
 
 def parseExpression(input : String, ctx : system.Context) : AST
   val ctxDyn:Dyn = ctx

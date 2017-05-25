@@ -10,15 +10,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import wyvern.tools.tests.TestUtil;
+import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
+import wyvern.target.corewyvernIL.expression.Bind;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
+import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.FFI;
+import wyvern.target.corewyvernIL.expression.FFIImport;
+import wyvern.target.corewyvernIL.expression.FieldGet;
+import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Literal;
+import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
@@ -61,7 +71,11 @@ public class AST {
 	public Value stringLiteral(String s) {
 		return new StringLiteral(s);
 	}
-	
+
+    public Value booleanLiteral(boolean b) {
+        return new BooleanLiteral(b);
+    }
+
 	public Expression variable(String s) {
 		return new Variable(s);
 	}
@@ -126,6 +140,52 @@ public class AST {
         return new Let(ident, getType(identType), getExpr(bindingValue), getExpr(inExpr));
     }
 
+    public VarBinding varBinding(String varName, ObjectValue bindingType, ObjectValue toReplace) {
+        return new VarBinding(varName, getType(bindingType), getExpr(toReplace));
+    }
+
+    public IExpr bind(List<ObjectValue> bindingObjects, ObjectValue inExpr) {
+        List<VarBinding> bindings = new LinkedList<>();
+        for (ObjectValue bndObj: bindingObjects) {
+            JavaValue fieldValue = (JavaValue)bndObj.getField("binding");
+            bindings.add((VarBinding)fieldValue.getWrappedValue());
+        }
+        return new Bind(bindings, getExpr(inExpr));
+    }
+
+    public IExpr cast(ObjectValue toCastExpr, ObjectValue exprType) {
+        return new Cast(getExpr(toCastExpr), getType(exprType));
+    }
+
+    public IExpr ffi(String importName, ObjectValue type) {
+        return new FFI(importName, getType(type), null);
+    }
+
+    public IExpr ffiImport(ObjectValue ffiType, String path, ObjectValue importType) {
+        return new FFIImport(getType(ffiType), path, getType(importType));
+    }
+
+    public IExpr fieldGet(ObjectValue objectExpr, String fieldName) {
+        return new FieldGet(getExpr(objectExpr), fieldName, null);
+    }
+
+    public IExpr fieldSet(ObjectValue exprType, ObjectValue objectExpr, String fieldName, ObjectValue exprToAssign) {
+        return new FieldSet(getType(exprType), getExpr(objectExpr), fieldName, getExpr(exprToAssign));
+    }
+
+    public IExpr matchExpr(ObjectValue matchObj, ObjectValue elseObj, List<ObjectValue> caseObjs) {
+        List<Case> cases = new LinkedList<>();
+        for (ObjectValue obj: caseObjs) {
+            JavaValue fieldValue = (JavaValue)obj.getField("caseValue");
+            cases.add((Case)fieldValue.getWrappedValue());
+        }
+        return new Match(getExpr(matchObj), getExpr(elseObj), cases);
+    }
+
+    public Case makeCase(String varName, ObjectValue pattern, ObjectValue body) {
+        return new Case(varName, (NominalType)getType(pattern), getExpr(body));
+    }
+
     public IExpr parseExpression(String input, JavaValue context) throws ParseException {
         try {
             ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
@@ -183,4 +243,5 @@ public class AST {
     public String genIdent() {
         return "ASTIDENT$" + Integer.toString(++identNum);
     }
+
 }
