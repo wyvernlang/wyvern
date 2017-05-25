@@ -2,6 +2,7 @@ package wyvern.stdlib.support;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -50,8 +51,12 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.parsing.coreparser.ParseUtils;
+import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
 
 public class AST {
@@ -232,6 +237,20 @@ public class AST {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");
             throw e;
         }
+    }
+
+    public List<IExpr> parseExpressionList(String input, JavaValue context) throws ParseException {
+        List<IExpr> result = new LinkedList<>();
+        Reader r = new StringReader(input);
+        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser("parseExpressionList Parse", r);
+        List<TypedAST> exprASTs = wp.ExpressionList();
+        GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
+
+        for (TypedAST ast: exprASTs) {
+            result.add(((ExpressionAST)ast).generateIL(ctx, null, new LinkedList<TypedModuleSpec>()));
+        }
+
+        return result;
     }
 
     private String commonPrefix(String s1, String s2) {

@@ -92,6 +92,14 @@ def parseExpression(input : String, ctx : system.Context) : AST
   new
     val ast:Unit = utils.parseExpression(input, ctxDyn)
 
+def parseExpressionList(input : String, ctx : system.Context) : list.List
+  val ctxDyn:Dyn = ctx
+  def javaASTToWyvAST(jAST : Dyn):Dyn = new
+    val ast:Unit = jAST
+  val l = utils.parseExpressionList(input, ctxDyn)
+  l.map(ast => javaASTToWyvAST(ast))
+  l
+
 val types = new
   def int():Type = new
     val typ:Unit = utils.intType()

@@ -9,38 +9,20 @@ import metadata wyvern.IfTSL
 type List = list.List
   metadata new
     def parseTSL(input : String, ctx : system.Context) : option.Option
-      // WIP: This only works when the list elements don't have ',' in them
-      def parseElem(input : String, listIdent : String) : option.Option
-          val termRegex = regex.apply("\\w*[^,]+")
-          val commaRegex = regex.apply(",\\w*")
-          val matchOpt : option.Option = termRegex.findPrefixMatchOf(input)
-          IfTSL.doif(matchOpt.isDefined, ~)
-            then
-              val regexMatch = matchOpt.getOrElse(() => 0)
-              val expr : ast.AST = ast.parseExpression(regexMatch.matched(), ctx)
-              val rest : String = regexMatch.after()
-              val commaMatchOpt : option.Option = commaRegex.findPrefixMatchOf(rest)
-              val appendArgs : list.List = list.make()
-              appendArgs.append(expr)
-              val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", appendArgs)
-              IfTSL.doif(commaMatchOpt.isDefined, ~)
-                then
-                  val commaMatch = commaMatchOpt.getOrElse(() => 0)
-                  parseElem(commaMatch.after(), listIdent).map(restAST =>
-                    ast.let(ast.genIdent(), ast.types.unit(), appendAST, restAST))
-                else
-                  option.Some(ast.let(ast.genIdent(), ast.types.unit(), appendAST, ast.variable(listIdent)))
-            else
-              // Ill-formed list string, raise error somehow?
-              option.None()
-      val listIdent : String = ast.genIdent()
-      IfTSL.doif(input == "", ~)
-        then
-          option.Some(ast.call(ast.variable("list"), "make", list.make()))
-        else
-          parseElem(ast.stripLeadingWhitespace(input), listIdent).map(appends =>
-            ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appends))
-
+      val exprList : list.List = ast.parseExpressionList(input, ctx)
+      val n = exprList.length()
+      val listIdent = ast.genIdent()
+      def build(i : Int, listAST : ast.AST) : ast.AST
+        IfTSL.doif(i > 0, ~)
+          then
+            val appendArgs : list.List = list.make()
+            appendArgs.append(exprList.get(i - 1).getOrElse(() => 0))
+            val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", appendArgs)
+            build(i - 1, ast.let(ast.genIdent(), ast.types.unit(), appendAST, listAST))
+          else
+            listAST
+      val appendsAST = build(n, ast.variable(listIdent))
+      option.Some(ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appendsAST))
 
 def make():List = list.make()
 

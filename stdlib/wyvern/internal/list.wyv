@@ -10,6 +10,7 @@ resource type List
 	def find(pred:Dyn -> Boolean):Option
 	def length():Int
 	def get(n:Int):Option
+	def map(f:Dyn -> Dyn):Unit
 
 def make():List
 	resource type Cell
@@ -18,6 +19,7 @@ def make():List
 		def find(pred:Dyn -> Boolean):Option
 		def length():Int
 		def get(n:Int):Option
+		def map(f:Dyn -> Dyn):Unit
 	def makeCell(e:Dyn, n:Option):Cell = new
 		var element:Dyn = e
 		var next:Option = n
@@ -27,6 +29,13 @@ def make():List
 					() => option.Some(this.element),
 					() => this.next.flatMap((c:Cell) => c.find(pred))),
 				() => option.None())
+		def map(f:Dyn -> Dyn):Unit
+			def mapDefined():Unit
+				this.element = f(this.element)
+				this.next.getOrElse(() => 0).map(f)
+			this.next.isDefined.ifTrue(
+				() => mapDefined(),
+				() => 0)
 		def length():Int
 			this.next.isDefined.ifTrue(
 				() => 1 + this.next.getOrElse(() => 0).length(),
@@ -50,3 +59,4 @@ def make():List
 			this.first.find(pred)
 		def length():Int = this.first.length()
 		def get(n:Int):Option = this.first.get(n)
+		def map(f:Dyn -> Dyn):Unit = this.first.map(f)

@@ -18,10 +18,6 @@ type PostfixExpr
 			
 			// wrap the AST in an object with an eval() method
 			// to match the signature above
-            def f(r : AST) : AST
-                val l = list.make()
-                l.append(ast.defDeclaration("eval", {}, ast.types.int(), r))
-                ast.object(l)
             parseResult.map((r) =>
-                f(r)
+                ast.object({ast.defDeclaration("eval", {}, ast.types.int(), r)})
             )

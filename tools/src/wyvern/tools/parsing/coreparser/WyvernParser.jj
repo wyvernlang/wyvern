@@ -750,6 +750,19 @@ AST ArgumentList(ExpFlags flags, FileLocation loc) :
   	}
  }
   	
+List<AST> ExpressionList():
+{ AST exp; LinkedList<AST> expList = new LinkedList<AST>(); ExpFlags flags = new ExpFlags(); Token t; }
+{
+    (exp = Expression(flags) {
+        expList.add(exp);
+    }
+        ( t=<COMMA> exp = Expression(flags) {
+            expList.add(exp);
+        }
+            )*)? {
+        return expList;
+  	}
+ }
   	
 AST Instantiation() :
 { URI uri; Token name; AST arg;}
