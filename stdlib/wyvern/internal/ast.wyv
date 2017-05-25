@@ -39,6 +39,21 @@ def object(decls : list.List) : AST = new
 def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST):Decl = new
 	val decl:Unit = utils.defDeclaration(name, formalArgs, returnType, body)
 
+def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = new
+  val decl:Unit = utils.delegateDeclaration(delegateType, fieldName)
+
+def moduleDeclaration(name : String, formalArgs : list.List, moduleType : Type, body : AST, dependencies : list.List) : Decl = new
+  val decl:Unit = utils.moduleDeclaration(name, formalArgs, moduleType, body, dependencies)
+
+def typeDeclaration(typeName : String, sourceType : Type) : Decl = new
+  val decl:Unit = utils.typeDeclaration(typeName, sourceType)
+
+def valDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = new
+  val decl:Unit = utils.valDeclaration(fieldName, fieldType, value)
+
+def varDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = new
+  val decl:Unit = utils.varDeclaration(fieldName, fieldType, value)
+
 def int(i:Int):AST = new
 	val ast:Unit = utils.intLiteral(i)
 

@@ -3,18 +3,26 @@ package wyvern.stdlib.support;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import wyvern.stdlib.Globals;
 import wyvern.tools.tests.TestUtil;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -35,13 +43,16 @@ import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.util.Pair;
 
 public class AST {
 	public static AST utils = new AST();
@@ -98,21 +109,7 @@ public class AST {
         }
         return new New(javaDecls, loc);
     }
-	
-	public Expression oneDeclObject(ObjectValue decl) {
-		final JavaValue fieldValue = (JavaValue) decl.getField("decl");
-		NamedDeclaration realDecl = (NamedDeclaration) fieldValue.getWrappedValue();
-		return new New(realDecl);
-	}
 
-    public Expression twoDeclObject(ObjectValue decl1, ObjectValue decl2) {
-        final JavaValue fieldValue1 = (JavaValue) decl1.getField("decl");
-        NamedDeclaration realDecl1 = (NamedDeclaration) fieldValue1.getWrappedValue();
-        final JavaValue fieldValue2 = (JavaValue) decl2.getField("decl");
-        NamedDeclaration realDecl2 = (NamedDeclaration) fieldValue2.getWrappedValue();
-        return new New(realDecl1, realDecl2);
-    }
-	
 	private Expression getExpr(ObjectValue wyvernAST) {
 		final Value ast = wyvernAST.getField("ast");
 		if (ast instanceof JavaValue) {
@@ -137,6 +134,37 @@ public class AST {
             formalArgs.add((FormalArg)fieldValue.getWrappedValue());
         }
         return new DefDeclaration(name, formalArgs, getType(returnType), getExpr(body), null);
+    }
+
+    public DelegateDeclaration delegateDeclaration(ObjectValue valueType, String fieldName) {
+        return new DelegateDeclaration(getType(valueType), fieldName, null);
+    }
+
+    public ModuleDeclaration moduleDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType, ObjectValue body, List<String> dependencyURIs) throws URISyntaxException {
+        List<FormalArg> formalArgs = new LinkedList<>();
+        for (ObjectValue arg: formalArgObjs) {
+            final JavaValue fieldValue = (JavaValue) arg.getField("formalArg");
+            formalArgs.add((FormalArg)fieldValue.getWrappedValue());
+        }
+        List<Pair<ImportDeclaration, ValueType>> dependencies = new LinkedList<>();
+        for (String dependency: dependencyURIs) {
+            ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false);
+            Pair<VarBinding, GenContext> bindingCtx = imp.genBinding(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
+            dependencies.add(new Pair(imp, bindingCtx.first.getType()));
+        }
+        return new ModuleDeclaration(name, formalArgs, getType(returnType), getExpr(body), dependencies, null);
+    }
+
+    public TypeDeclaration typeDeclaration(String typeName, ObjectValue sourceType) {
+        return new TypeDeclaration(typeName, getType(sourceType), null);
+    }
+
+    public ValDeclaration valDeclaration(String fieldName, ObjectValue fieldType, ObjectValue value) {
+        return new ValDeclaration(fieldName, getType(fieldType), getExpr(value), null);
+    }
+
+    public VarDeclaration varDeclaration(String fieldName, ObjectValue fieldType, ObjectValue value) {
+        return new VarDeclaration(fieldName, getType(fieldType), getExpr(value), null);
     }
 
     public IExpr let(String ident, ObjectValue identType, ObjectValue bindingValue, ObjectValue inExpr) {

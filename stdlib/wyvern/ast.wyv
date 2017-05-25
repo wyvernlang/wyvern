@@ -49,6 +49,16 @@ def parseExpression(input : String, ctx : system.Context) : AST = ast.parseExpre
 // Declarations
 def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST) : Decl = ast.defDeclaration(name, formalArgs, returnType, body)
 
+def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = ast.delegateDeclaration(delegateType, fieldName)
+
+def moduleDeclaration(name : String, formalArgs : list.List, moduleType : Type, body : AST, dependencies : list.List) : Decl = ast.moduleDeclaration(name, formalArgs, moduleType, body, dependencies)
+
+def typeDeclaration(typeName : String, sourceType : Type) : Decl = ast.typeDeclaration(typeName, sourceType)
+
+def valDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = ast.valDeclaration(fieldName, fieldType, value)
+
+def varDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = ast.valDeclaration(fieldName, fieldType, value)
+
 // Types
 val types = ast.types
 
