@@ -59,7 +59,6 @@ public class JavaValue extends AbstractValue implements Invokable {
       } else if(result == null) {
           return Util.unitValue();
       } else if(result instanceof List) {
-          //return new JavaValue(JavaWrapper.wrapObject(result), new NominalType("system", "List"));
           ObjectValue v = null;
           try {
               v = (ObjectValue)TestUtil.evaluate("import wyvern.collections.list\n" +
@@ -114,21 +113,6 @@ public class JavaValue extends AbstractValue implements Invokable {
               return javaList;
           }
           return arg;
-          // List<Value> emptyList = new LinkedList<>();
-          // // Extremely hacky. Won't work if a different list implementation is used, for example.
-          // if (arg.getType() instanceof NominalType) {
-          // 	if (((NominalType) arg.getType()).getTypeMember().equals("List")) {
-          //       System.out.println("List translation!");
-          // 		ObjectValue wyvernArgList = (ObjectValue) arg;
-          // 		List<Value> argList = new ArrayList<>();
-          // 		while (((IntegerLiteral) (wyvernArgList.getField("length"))).getValue() != 0) {
-          // 			argList.add(((ObjectValue) arg).invoke("getVal", emptyList));
-          // 			wyvernArgList = (ObjectValue) wyvernArgList.invoke("getNext", emptyList);
-          // 		}
-          // 		return argList;
-          // 	}
-          // }
-          // return arg;
       } else if (arg instanceof BooleanLiteral){
           return new Boolean(((BooleanLiteral)arg).getValue());
       } else if (arg instanceof JavaValue) {
