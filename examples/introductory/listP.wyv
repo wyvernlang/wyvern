@@ -1,0 +1,39 @@
+module list
+
+import introductory.OptionPm
+
+val option = OptionPm
+
+type Option = option.Option
+
+resource type List
+    type E
+    def append(e:this.E):Unit
+    def find(pred:this.E -> Boolean):Option[this.E]
+
+def make[E]():List
+    resource type Cell
+        var element:E
+        var next:Option[Cell]
+        def find(pred:E -> Boolean):Option[E]
+    def makeCell(e:E, n:Option):Cell = new
+        var element:E = e
+        var next:Option[Cell] = n
+        def find(pred:E -> Boolean):Option[E]
+            this.next.isDefined.ifTrue(
+                () => pred(this.element).ifTrue(
+                    () => option.Some[E](this.element),
+                    () => this.next.flatMap[E]((c:Cell) => c.find(pred))),
+                () => option.None[E]())
+    val sentinel : Cell = makeCell(0, option.None[E]())
+    new
+        type E = E
+        var first:Cell = sentinel
+        var last:Cell = sentinel
+        def append(e:E):Unit
+            this.last.element = e
+            val cell = makeCell(0, option.None[E]())
+            this.last.next = option.Some(cell)
+            this.last = cell
+        def find(pred:E -> Boolean):Option[E]
+            this.first.find(pred)

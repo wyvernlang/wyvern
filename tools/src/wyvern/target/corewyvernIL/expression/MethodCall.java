@@ -227,7 +227,7 @@ public class MethodCall extends Expression {
             }
         }
         if (formalArgTypes.size() > 0)
-            errMsg.append(formalArgTypes.get(args.size() - 1).desugar(ctx));
+            errMsg.append(formalArgTypes.get(formalArgTypes.size() - 1).desugar(ctx));
 		//errMsg.append(")");
 		ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
 		return null;
