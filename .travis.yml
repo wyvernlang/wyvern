@@ -7,3 +7,4 @@ notifications:
   email:
     recipients:
       - jonathan.aldrich@cs.cmu.edu
+group: deprecated-2017Q1        # try to work around TravisCI update that breaks ant junit task
