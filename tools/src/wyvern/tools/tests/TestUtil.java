@@ -233,7 +233,7 @@ public class TestUtil {
     
 	public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
 	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
-	    final Module module = state.getResolver().resolveModule(qualifiedName);
+	    final Module module = state.getResolver().resolveModule(qualifiedName, true);
 	    IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
       program = (IExpr)PlatformSpecializationVisitor.specializeAST((ASTNode)program, "java", Globals.getGenContext(state));
 	    TestUtil.doChecks(program, expectedType, expectedValue);
@@ -251,6 +251,26 @@ public class TestUtil {
 	    if (expectedValue != null)
 	    	Assert.assertEquals(expectedValue, v);
 	}
+
+    public static Value evaluate(String input) throws ParseException {
+        // Parse to AST
+        ExpressionAST ast = (ExpressionAST) getNewAST(input, "eval input");
+
+        // Generate IL
+        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                                                                       new File(BASE_PATH),
+                                                                       new File(LIB_PATH)));
+        final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+        IExpr program = ast.generateIL(genCtx, null, dependencies);
+        program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
+
+        // // Typecheck
+        // TypeContext ctx = Globals.getStandardTypeContext();
+        // program.typeCheck(ctx);
+
+        // Evaluate
+        return program.interpret(Globals.getStandardEvalContext());
+    }
 	
     public static void doTestModule(String input, String fieldName, ValueType expectedType, Value expectedValue) throws ParseException {
         TypedAST ast = TestUtil.getNewAST(input, "test input");

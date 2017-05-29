@@ -675,9 +675,15 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
       String argsWithoutThis = "";
       OIRMethodDeclaration decl = oirMethod.getDeclaration();
       boolean firstArg = true;
+
+      HashSet<String> oldFreeVarSet = state.freeVarSet;
+      state.freeVarSet = new HashSet<String>(state.freeVarSet);
+
       for (OIRFormalArg formalArg : decl.getArgs()) {
           argsWithoutThis += ", " + formalArg.getName();
           args += ", " + formalArg.getName();
+
+          state.freeVarSet.remove(formalArg.getName());
       }
       String name = decl.getName();
       String trampolineDecl = "";
@@ -712,6 +718,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
       state.expectingReturn = oldExpectingReturn;
       indent = oldIndent;
       state.currentMethod = oldMethod;
+      state.freeVarSet = oldFreeVarSet;
 
       if (state.expectingReturn)
           return def + prefix + body + "\n"

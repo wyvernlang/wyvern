@@ -1,5 +1,6 @@
 module parser
 
+import metadata wyvern.collections.list
 import wyvern.util.matching.regex
 import tsls.lexer
 import wyvern.ast
@@ -54,8 +55,8 @@ def parseWithTwoExprs(scanner:lexer.Scanner, exp1:AST, exp2:AST,
 	val t = scanner.nextToken()
 	(t.kind() == tokens.OPERATOR).ifTrue(
 		() => moreOnStack.ifTrue(
-			() => option.Some(ast.call(exp1,t.print(),exp2)),
-		    () => parseWithOneExpr(scanner, ast.call(exp1,t.print(),exp2))
+			() => option.Some(ast.call(exp1,t.print(),{exp2})),
+		    () => parseWithOneExpr(scanner, ast.call(exp1,t.print(),{exp2}))
 		),
 		() => (t.kind() == tokens.NUMBER).ifTrue(
 			() => compose(ast.int(Int.from(t.print()))),

@@ -1,35 +1,28 @@
 module list
 
+import wyvern.internal.ast
+import wyvern.internal.list
 import wyvern.option
+import wyvern.util.matching.regex
+import metadata wyvern.IfTSL
 
-type Option = option.Option
+type List = list.List
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option
+      val exprList : list.List = ast.parseExpressionList(input, ctx)
+      val n = exprList.length()
+      val listIdent = ast.genIdent()
+      def build(i : Int, listAST : ast.AST) : ast.AST
+        IfTSL.doif(i > 0, ~)
+          then
+            val appendArgs : list.List = list.make()
+            appendArgs.append(exprList.get(i - 1).getOrElse(() => 0))
+            val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", appendArgs)
+            build(i - 1, ast.let(ast.genIdent(), ast.types.unit(), appendAST, listAST))
+          else
+            listAST
+      val appendsAST = build(n, ast.variable(listIdent))
+      option.Some(ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appendsAST))
 
-resource type List
-	def append(e:Dyn):Unit
-	def find(pred:Dyn -> Boolean):Option
+def make():List = list.make()
 
-def make():List
-	resource type Cell
-		var element:Dyn
-		var next:Option
-		def find(pred:Dyn -> Boolean):Option
-	def makeCell(e:Dyn, n:Option):Cell = new
-		var element:Dyn = e
-		var next:Option = n
-		def find(pred:Dyn -> Boolean):Option
-			this.next.isDefined.ifTrue(
-				() => pred(this.element).ifTrue(
-					() => option.Some(this.element),
-					() => this.next.flatMap((c:Cell) => c.find(pred))),
-				() => option.None())
-	val sentinel : Cell = makeCell(0, option.None())
-	new
-		var first:Cell = sentinel
-		var last:Cell = sentinel
-		def append(e:Dyn):Unit
-			this.last.element = e
-			val cell = makeCell(0, option.None())
-			this.last.next = option.Some(cell)
-			this.last = cell
-		def find(pred:Dyn -> Boolean):Option
-			this.first.find(pred)

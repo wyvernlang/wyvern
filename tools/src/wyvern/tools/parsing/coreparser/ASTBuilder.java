@@ -21,6 +21,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST valDeclType(String name, Type type, FileLocation loc);
 	public AST varDeclType(String name, Type type, FileLocation loc);
 	public AST typeAbbrevDecl(String alias, Type reference, FileLocation loc);
+	public AST typeAbbrevDecl(String alias, Type reference, AST metadata, FileLocation loc);
 	
 	public Object formalArg(String name, Type type);
 	public AST fn(List args, AST body, FileLocation loc);

@@ -1,0 +1,5 @@
+module importWithoutMetadata
+
+import wyvern.collections.list
+
+val x : Int = 7

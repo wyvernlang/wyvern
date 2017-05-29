@@ -11,6 +11,8 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.interop.*;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.TestUtil;
 
 public class JavaValue extends AbstractValue implements Invokable {
 	// FObject is part of a non-Wyvern-specific Java interop library
@@ -50,26 +52,38 @@ public class JavaValue extends AbstractValue implements Invokable {
 	 * null turns into unit.
 	 */
 	private Value javaToWyvern(Object result) {
-		if (result instanceof Integer) {
-			return new IntegerLiteral((Integer)result);
-        } else if(result instanceof String) {
-            return new StringLiteral((String) result);
-        } else if(result == null) {
-            return Util.unitValue();
-        } else if(result instanceof List) {
-			return new JavaValue(JavaWrapper.wrapObject(result), new NominalType("system", "List"));
-		} else if(result instanceof Boolean) {
-			return new BooleanLiteral((Boolean) result);
-		} else if(result instanceof StructuralType) {
-			return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
-		} else if(result instanceof Value) {
-			// Needed for returning arbitrary values from reflection's invoke.
-			return (Value) result;
-		} else {
-			// return it as a unit; try to do better than this later
-			return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
-			//throw new RuntimeException("some Java->Wyvern cases not implemented");
-		}
+      if (result instanceof Integer) {
+          return new IntegerLiteral((Integer)result);
+      } else if(result instanceof String) {
+          return new StringLiteral((String) result);
+      } else if(result == null) {
+          return Util.unitValue();
+      } else if(result instanceof List) {
+          ObjectValue v = null;
+          try {
+              v = (ObjectValue)TestUtil.evaluate("import wyvern.collections.list\n" +
+                                                 "list.make()\n");
+              for (Object elem : (List)result) {
+                  List<Value> args = new LinkedList<>();
+                  args.add(javaToWyvern(elem));
+                  v.invoke("append", args);
+              }
+          } catch (ParseException e) {
+              e.printStackTrace();
+          }
+          return v;
+      } else if(result instanceof Boolean) {
+          return new BooleanLiteral((Boolean) result);
+      } else if(result instanceof StructuralType) {
+          return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
+      } else if(result instanceof Value) {
+          // Needed for returning arbitrary values from reflection's invoke.
+          return (Value) result;
+      } else {
+          // return it as a unit; try to do better than this later
+          return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
+          //throw new RuntimeException("some Java->Wyvern cases not implemented");
+      }
 	}
 
 	/**
@@ -77,35 +91,35 @@ public class JavaValue extends AbstractValue implements Invokable {
 	 * @param hintClass 
 	 */
 	private Object wyvernToJava(Value arg, Class hintClass) {
-		if (arg instanceof IntegerLiteral) {
-			if (hintClass != null && hintClass == BigInteger.class) {
-				return ((IntegerLiteral)arg).getFullValue();
-			}
-			return new Integer(((IntegerLiteral)arg).getValue());
-        } else if (arg instanceof StringLiteral) {
-            return new String(((StringLiteral) arg).getValue());
-		} else if (arg instanceof ObjectValue) {
-			List<Value> emptyList = new LinkedList<>();
-			// Extremely hacky. Won't work if a different list implementation is used, for example.
-			if (arg.getType() instanceof NominalType) {
-				if (((NominalType) arg.getType()).getTypeMember().equals("List")) {
-					ObjectValue wyvernArgList = (ObjectValue) arg;
-					List<Value> argList = new ArrayList<>();
-					while (((IntegerLiteral) (wyvernArgList.getField("length"))).getValue() != 0) {
-						argList.add(((ObjectValue) arg).invoke("getVal", emptyList));
-						wyvernArgList = (ObjectValue) wyvernArgList.invoke("getNext", emptyList);
-					}
-					return argList;
-				}
-			}
-			return arg;
-		} else if (arg instanceof BooleanLiteral){
-			return new Boolean(((BooleanLiteral)arg).getValue());
-		} else if (arg instanceof JavaValue) {
-        return arg;
-    } else {
-			throw new RuntimeException("some Wyvern->Java cases not implemented");
-		}
+      if (arg instanceof IntegerLiteral) {
+          if (hintClass != null && hintClass == BigInteger.class) {
+              return ((IntegerLiteral)arg).getFullValue();
+          }
+          return new Integer(((IntegerLiteral)arg).getValue());
+      } else if (arg instanceof StringLiteral) {
+          return new String(((StringLiteral) arg).getValue());
+      } else if (arg instanceof ObjectValue) {
+          // Check if arg looks like a list type
+          ObjectValue wyvList = (ObjectValue) arg;
+          if (wyvList.findDecl("get") != null && wyvList.findDecl("length") != null) {
+              List<Value> javaList = new LinkedList<>();
+              int listLen = ((IntegerLiteral) (wyvList.invoke("length", new LinkedList<>()))).getValue();
+              for (int i = 0; i < listLen; i++) {
+                  LinkedList<Value> args = new LinkedList<>();
+                  args.add(new IntegerLiteral(i));
+                  Value v = ((ObjectValue)(wyvList.invoke("get", args))).getField("value");
+                  javaList.add(v);
+              }
+              return javaList;
+          }
+          return arg;
+      } else if (arg instanceof BooleanLiteral){
+          return new Boolean(((BooleanLiteral)arg).getValue());
+      } else if (arg instanceof JavaValue) {
+          return arg;
+      } else {
+          throw new RuntimeException("some Wyvern->Java cases not implemented");
+      }
 	}
 
 	@Override

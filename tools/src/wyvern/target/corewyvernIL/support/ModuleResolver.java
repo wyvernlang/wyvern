@@ -84,10 +84,14 @@ public class ModuleResolver {
 	 * @return
 	 */
 	public LoadedType resolveType(String qualifiedName) {
+		return resolveType(qualifiedName, false);
+	}
+	
+	public LoadedType resolveType(String qualifiedName, boolean toplevel) {
 		Module typeDefiningModule;
 		if (!moduleCache.containsKey(qualifiedName)) {
 			File f = resolve(qualifiedName, true);
-			typeDefiningModule = load(qualifiedName,f);
+			typeDefiningModule = load(qualifiedName, f, toplevel);
 			moduleCache.put(qualifiedName, typeDefiningModule);
 		} else {
 			typeDefiningModule = moduleCache.get(qualifiedName);
@@ -127,9 +131,13 @@ public class ModuleResolver {
 	 * @throws ParseException 
 	 */
 	public Module resolveModule(String qualifiedName) {
+		return resolveModule(qualifiedName, false);
+	}
+	
+	public Module resolveModule(String qualifiedName, boolean toplevel) {
 		if (!moduleCache.containsKey(qualifiedName)) {
 			File f = resolve(qualifiedName, false);
-			moduleCache.put(qualifiedName, load(qualifiedName, f));
+			moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
 		}
 		return moduleCache.get(qualifiedName);
 	}
@@ -178,7 +186,7 @@ public class ModuleResolver {
 	 * @param state 
 	 * @return
 	 */
-	public Module load(String qualifiedName, File file) {
+	public Module load(String qualifiedName, File file, boolean toplevel) {
         TypedAST ast = null;
 		try {
 			ast = TestUtil.getNewAST(file);
@@ -218,12 +226,12 @@ public class ModuleResolver {
         
 		TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
         
-        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx);
+        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel);
 	}
 
 	private Module createAdaptedModule(File file, String qualifiedName,
 			final List<TypedModuleSpec> dependencies, IExpr program,
-			TypeContext ctx) {
+			TypeContext ctx, boolean toplevel) {
 		
         ValueType moduleType = program.typeCheck(ctx);
 		// if this is a platform module, adapt any arguments to take the system.Platform object
@@ -257,6 +265,12 @@ public class ModuleResolver {
 				}
 			}
 		}
+
+    if (!moduleType.isResource(ctx) && !toplevel) {
+        Value v = wrap(program, dependencies).interpret(Globals.getStandardEvalContext());
+        moduleType = v.getType();
+		}
+
 		TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
 		return new Module(spec, program, dependencies);
 	}
