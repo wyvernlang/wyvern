@@ -1,0 +1,6 @@
+module def cellClientFunctor(cell : modules.TCellAsModule)
+
+def addOne():Unit
+    cell.set(cell.get()+1)
+    
+def getValue():Int = cell.get()

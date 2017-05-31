@@ -56,6 +56,36 @@ public class ExampleTests {
 		TestUtil.doTestScriptModularly(PATH, "introductory.box", Util.intType(), new IntegerLiteral(15));
 	}
 	
+    @Test
+    public void testFunctions() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.functions", Util.intType(), new IntegerLiteral(6));
+    }
+    
+    @Test
+    public void testObjects() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.objects", Util.intType(), new IntegerLiteral(7));
+    }
+    
+    @Test
+    public void testCell() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.cell", Util.intType(), new IntegerLiteral(3));
+    }
+    
+    @Test
+    public void testCellClient() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "modules.cellClient", Util.intType(), new IntegerLiteral(7));
+    }
+    
+    @Test
+    public void testCellModuleClient() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "modules.cellModuleClient", Util.intType(), new IntegerLiteral(2));
+    }
+    
+    @Test
+    public void testCellClientMain() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "modules.cellClientMain", Util.intType(), new IntegerLiteral(1));
+    }
+    
 	@Test
 	public void testOptionParameterized() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "introductory.optionP", Util.intType(), new IntegerLiteral(15));

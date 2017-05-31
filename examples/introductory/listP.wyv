@@ -1,3 +1,5 @@
+// NOTE: this example triggers a typechecking bug as of 5/31
+
 module list
 
 import introductory.OptionPm

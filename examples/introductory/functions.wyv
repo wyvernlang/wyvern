@@ -1,0 +1,23 @@
+require stdout
+
+val addOne = (x:Int) => x + 1
+val two = addOne(1)
+	
+type IntToIntFn
+    def apply(x:Int):Int
+
+val anotherAddOne:IntToIntFn = addOne
+    
+val add = (x:Int,y:Int) => x + y
+	
+val getSeven = () => 7
+
+val annotatedAddOne : Int -> Int = x => x + 1
+    
+val invokeIt = (f:Int -> Int, x:Int) => f(x)
+val six = invokeIt(x => x+1, 5)
+
+stdout.print("Should print 6: ")
+stdout.printInt(six)
+
+six
