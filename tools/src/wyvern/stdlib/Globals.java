@@ -122,6 +122,7 @@ public class Globals {
 		genCtx = new TypeGenContext("Int", "system", genCtx);
 		genCtx = new TypeGenContext("Unit", "system", genCtx);
 		genCtx = new TypeGenContext("String", "system", genCtx);
+        genCtx = new TypeGenContext("Character", "system", genCtx);
 		genCtx = new TypeGenContext("Boolean", "system", genCtx);
 		genCtx = new TypeGenContext("Dyn", "system", genCtx);
 		genCtx = new TypeGenContext("Java", "system", genCtx);
@@ -159,8 +160,19 @@ public class Globals {
 
         List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
         stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
+        stringDeclTypes.add(new DefDeclType("length", Util.intType(), new LinkedList<FormalArg>()));
         ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
         declTypes.add(new ConcreteTypeMember("String", stringType));
+
+        List<DeclType> charDeclTypes = new LinkedList<DeclType>();
+        charDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        charDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        charDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        ValueType charType = new StructuralType("charSelf", charDeclTypes);
+        declTypes.add(new ConcreteTypeMember("Character", charType));
 
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
         ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType());
@@ -200,6 +212,7 @@ public class Globals {
 		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));

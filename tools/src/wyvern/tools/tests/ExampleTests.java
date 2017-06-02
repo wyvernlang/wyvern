@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
@@ -64,6 +65,11 @@ public class ExampleTests {
     @Test
     public void testObjects() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.objects", Util.intType(), new IntegerLiteral(7));
+    }
+    
+    @Test
+    public void testStrings() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.strings", Util.booleanType(), new BooleanLiteral(true));
     }
     
     @Test
