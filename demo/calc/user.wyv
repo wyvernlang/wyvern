@@ -1,4 +1,0 @@
-import wyv:type.wyv
-
-val calc:CalculatorType.Calculator = { 2 + 3*2 - 4 }
-calc.eval()
