@@ -164,6 +164,7 @@ public class Globals {
         stringDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
         stringDeclTypes.add(new DefDeclType("length", Util.intType(), new LinkedList<FormalArg>()));
+        stringDeclTypes.add(new DefDeclType("substring", Util.stringType(), Arrays.asList(new FormalArg[]{new FormalArg("start", Util.intType()),new FormalArg("end", Util.intType())})));
         ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
         declTypes.add(new ConcreteTypeMember("String", stringType));
 

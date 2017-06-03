@@ -12,4 +12,7 @@ truth = truth && y > v
 truth = truth && v < y
 truth = truth && y == y
 
+val ver:String = "Wyvern".substring(2,5)
+truth = truth && ver == "ver"
+
 truth
