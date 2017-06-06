@@ -17,4 +17,7 @@ public class Stdio {
 	public void printInt(BigInteger n) {
 		java.lang.System.out.print(n);
 	}
+    public void printBoolean(boolean b) {
+        java.lang.System.out.print(b);
+    }
 }
