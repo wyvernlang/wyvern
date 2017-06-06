@@ -37,7 +37,7 @@ public enum ErrorMessage {
 	METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object",1),
 	WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG, but found %ARG",2),
 	SYNTAX_FOR_NO_ARG_LAMBDA("Use \"() => <expression>\" rather than \"x => <expression>\" for a zero-argument function expression",0),
-	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression", 1),
+	CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression.  If this is the last line in the program, try ending the program with a value of built-in type, e.g. the integer 0.", 1),
   DELEGATE_MUST_BE_VARIABLE("Expected variable in delegate declaration, got %ARG", 1),
 
 	// Syntax errors
