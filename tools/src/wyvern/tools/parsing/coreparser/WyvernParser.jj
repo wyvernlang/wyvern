@@ -109,6 +109,8 @@ TOKEN : /* Keywords */
 | < RESOURCE : "resource" >
 | < INSTANTIATE : "instantiate" >
 | < AS : "as" >
+| < EFFECT : "effect" >
+| < WITH : "with" > 
 }
 
 TOKEN : /* Logical Formatting */

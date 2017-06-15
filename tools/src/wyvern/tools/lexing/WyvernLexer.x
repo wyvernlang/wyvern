@@ -285,6 +285,8 @@ import wyvern.tools.errors.ToolError;
  	terminal Token thenKwd_t   ::= /then/ in (keywds);
  	terminal Token elseKwd_t   ::= /else/ in (keywds);
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
+ 	terminal Token effectKwd_t	::= /effect/ in (keywds) {: RESULT = token(EFFECT,lexeme); :};
+ 	terminal Token withKwd_t	::= /with/ in (keywds) {: RESULT = token(WITH,lexeme); :};
  	
  	terminal Token resourceKwd_t    ::= /resource/ in (keywds) {: RESULT = token(RESOURCE,lexeme); :};
  	terminal Token asKwd_t ::= /as/ in (keywds) {: RESULT = token(AS,lexeme); :};
@@ -412,7 +414,10 @@ import wyvern.tools.errors.ToolError;
 	       | importKwd_t:t {: RESULT = t; :}
 	       | instantiateKwd_t:t {: RESULT = t; :}
 	       | asKwd_t:t {: RESULT = t; :}
-	       | resourceKwd_t:t {: RESULT = t; :};
+	       | resourceKwd_t:t {: RESULT = t; :}
+	       | effectKwd_t:t {: RESULT = t; :}
+	       | withKwd_t:t {: RESULT = t; :}
+	       ;
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
