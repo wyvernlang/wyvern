@@ -331,6 +331,14 @@ AST VarDeclaration() :
   }
 }
 
+/*AST EffectDeclaration() :
+{ Token name; URI uri; }
+{
+  <EFFECT> name = <IDENTIFIER> <EQUALS> uri = Uri() {
+ 	return build.effectDecl(name.image, body, loc(name));
+  }
+}*/
+  
 AST DelegateDeclaration() :
 { Type type; Token t; AST exp; }
 {

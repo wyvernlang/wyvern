@@ -124,5 +124,10 @@ public class ExampleTests {
     @Test
     public void testPalindromeChecker() throws ParseException {
 	TestUtil.doTestScriptModularly(PATH, "rosetta/check-palindrome", Util.unitType(), Util.unitValue());
-    }	
+    }
+
+    /*@Test
+    public void testEffectNetwork1() throws ParseException {
+	TestUtil.doTestScriptModularly(PATH, "effects/network1", Util.unitType(), Util.unitValue());
+	}*/
 }
