@@ -168,7 +168,7 @@ TOKEN : /* Literals */
 }
 
 /** Root production. */
-AST CompilationUnit() :
+AST CompilationUnit() : 
 { AST exp; Token id; AST moduleArgs=null; boolean isResource = false; }
 {
   LOOKAHEAD(2)
@@ -286,6 +286,8 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
+  exp = EffectDeclaration() { return exp; }
+|
    LOOKAHEAD(4) exp =   TypeDeclaration()  { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
@@ -331,13 +333,18 @@ AST VarDeclaration() :
   }
 }
 
-/*AST EffectDeclaration() :
-{ Token name; URI uri; }
+AST EffectDeclaration() :
+{ Type type = null; Token name; AST body;} // URI uri for body?
 {
-  <EFFECT> name = <IDENTIFIER> <EQUALS> uri = Uri() {
- 	return build.effectDecl(name.image, body, loc(name));
-  }
-}*/
+   <EFFECT> name = <IDENTIFIER> <EQUALS> body = ExpressionLine(false) {
+    return build.effectDecl(name.image, type, body, loc(name)); // need to ensure that body is just obj.op though
+   }
+}
+
+/* for reference:
+public TypedAST effectDecl(String name, Type type, TypedAST exp, FileLocation loc) {
+	return new EffectDeclaration(name, type, exp, loc);
+} */
   
 AST DelegateDeclaration() :
 { Type type; Token t; AST exp; }
@@ -387,6 +394,8 @@ AST DeclType() :
 |
   exp = VarDeclType()  { return exp; }
 |
+  exp = EffectDeclType() { return exp; } 
+|
   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
@@ -415,6 +424,20 @@ AST VarDeclType() :
   return build.varDeclType(name.image, type, loc(name));
   }
 }
+
+AST EffectDeclType() :
+{ Type type = null; Token name; }
+{
+  <EFFECT> name = <IDENTIFIER> <NEWLINE> {
+  return build.effectDeclType(name.image, type, loc(name));
+  }
+}
+
+/* for reference:
+	public TypedAST effectDeclType(String name, Type type, FileLocation loc) {
+		return new EffectDeclaration(name, type, null, loc);
+	}
+*/
 
 List Formals_Lambda() :
 { List args = new LinkedList(); Object singleParameter;}

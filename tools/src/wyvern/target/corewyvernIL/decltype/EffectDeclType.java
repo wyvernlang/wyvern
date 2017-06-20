@@ -22,10 +22,10 @@ public class EffectDeclType extends DeclTypeWithResult implements IASTNode{
 
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
-		if (!(dt instanceof ValDeclType)) {
+		if (!(dt instanceof EffectDeclType)) {
 			return false;
 		}
-		ValDeclType vdt = (ValDeclType) dt;
+		EffectDeclType vdt = (EffectDeclType) dt;
 		return vdt.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(vdt.getRawResultType(), ctx);
 	}
 	
@@ -46,7 +46,7 @@ public class EffectDeclType extends DeclTypeWithResult implements IASTNode{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ValDeclType other = (ValDeclType) obj;
+		EffectDeclType other = (EffectDeclType) obj;
 		if (getName() == null) {
 			if (other.getName() != null)
 				return false;
@@ -62,14 +62,14 @@ public class EffectDeclType extends DeclTypeWithResult implements IASTNode{
 
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("val ").append(getName()).append(" : ");
+		dest.append(indent).append("effect ").append(getName()).append(" : "); // kind of like "effect : null"
 		getRawResultType().doPrettyPrint(dest, indent);
 		dest.append('\n');
 	}
 
 	@Override
 	public DeclType adapt(View v) {
-		return new ValDeclType(getName(), this.getRawResultType().adapt(v));
+		return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class EffectDeclType extends DeclTypeWithResult implements IASTNode{
 		if (t.equals(this.getRawResultType())) {
 			return this;
 		} else {
-			return new ValDeclType(this.getName(),t);
+			return new EffectDeclType(this.getName(),t);
 		}
 	}
 	
