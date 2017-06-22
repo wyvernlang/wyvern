@@ -1,4 +1,4 @@
-module def network1(stdout : Stdout) : NetworkType
+module def network1(stdout : Stdout) : NetworkType1
 
 effect send = {}
 effect receive = {}
