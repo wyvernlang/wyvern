@@ -1,0 +1,11 @@
+module def network1(stdout : Stdout) : NetworkType
+
+effect send = {}
+effect receive = {}
+
+def sendData(data : String) : Unit with send
+    stdout.print("data sent: ")
+    stdout.print(data)
+    stdout.print("\n")
+def receiveData() : Unit with receive
+    stdout.print("data received\n")

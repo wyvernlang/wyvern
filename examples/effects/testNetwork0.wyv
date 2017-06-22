@@ -1,0 +1,6 @@
+require stdout
+import effects.network0
+
+val n0 = network0(stdout)
+n0.sendData("Network0 without effects")	// print "data sent: Network0 without effects"
+n0.receiveData()		// print "data received"

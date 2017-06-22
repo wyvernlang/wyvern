@@ -127,7 +127,12 @@ public class ExampleTests {
     }
 
     @Test
+    public void testEffectNetwork0() throws ParseException {
+	TestUtil.doTestScriptModularly(PATH, "effects/testNetwork0", Util.unitType(), Util.unitValue());
+    } // near the top of the Standard Output, for some reason
+
+    @Test
     public void testEffectNetwork1() throws ParseException {
-	TestUtil.doTestScriptModularly(PATH, "effects/network1", Util.unitType(), Util.unitValue());
+	TestUtil.doTestScriptModularly(PATH, "effects/testNetwork1", Util.unitType(), Util.unitValue());
     }
 }

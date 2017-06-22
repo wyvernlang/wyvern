@@ -1,0 +1,6 @@
+require stdout
+import effects.network1
+
+val n1 = network1(stdout)
+n1.sendData("Network1 with effects")	// print "data sent: Network1 with effects"
+n1.receiveData()		// print "data received"

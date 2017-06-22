@@ -300,9 +300,9 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; }
+{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; Token effect; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() body=DefBody() {
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() [<WITH> effect = <IDENTIFIER>] body=DefBody() {
 	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
   }
 }
@@ -341,11 +341,6 @@ AST EffectDeclaration() :
    }
 }
 
-/* for reference:
-public TypedAST effectDecl(String name, Type type, TypedAST exp, FileLocation loc) {
-	return new EffectDeclaration(name, type, exp, loc);
-} */
-  
 AST DelegateDeclaration() :
 { Type type; Token t; AST exp; }
 {
@@ -402,9 +397,9 @@ AST DeclType() :
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; List<String> gentypes=null; }
+{ Type resultType; Token name; List args; List<String> gentypes=null; Token effect; }
 {
-  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() <NEWLINE> {
+  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() [<WITH> effect = <IDENTIFIER>] <NEWLINE> {
 	return build.defDeclType(name.image, resultType, gentypes, args, loc(name));
   }
 }
@@ -432,12 +427,6 @@ AST EffectDeclType() :
   return build.effectDeclType(name.image, type, loc(name));
   }
 }
-
-/* for reference:
-	public TypedAST effectDeclType(String name, Type type, FileLocation loc) {
-		return new EffectDeclaration(name, type, null, loc);
-	}
-*/
 
 List Formals_Lambda() :
 { List args = new LinkedList(); Object singleParameter;}

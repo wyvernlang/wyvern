@@ -1,0 +1,5 @@
+resource type NetworkType		
+  effect send
+  effect receive = {}	// really a placeholder
+  def sendData(data : String) with send
+  def receiveData() with receive
