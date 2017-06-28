@@ -172,7 +172,7 @@ AST CompilationUnit() :
 { AST exp; Token id; AST moduleArgs=null; boolean isResource = false; }
 {
   LOOKAHEAD(2)
-  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody() {
+  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> OptType() <NEWLINE> exp = ModuleBody(moduleArgs) {
 	if (moduleArgs == null) {
 	   return build.moduleDecl(id.image, exp, loc(id), true);
 	} else {
@@ -180,8 +180,8 @@ AST CompilationUnit() :
 	}
   }
 |
-  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody() {
-	return build.moduleDecl(id.image, exp, loc(id), isResource);
+  <MODULE> id = <IDENTIFIER> OptType() <NEWLINE> exp = ModuleBody(null) {
+	return build.moduleDecl(id.image, exp, loc(id), isResource); // pure modules --> optional EffectDeclaration(id)?
   }
 |
   exp = TopLevelCode()  { return exp; }
@@ -216,18 +216,18 @@ Type OptType() :
   /* nothing */ { return null; }
 }
 
-AST ModuleBody() :
+AST ModuleBody(AST moduleArgs) :
 { AST ast; AST decl; }
 {
-  ast = DeclSequence(true)  { return ast; }
+  ast = DeclSequence(true, moduleArgs)  { return ast; }
 |
-  decl = ImportDecl() ast = ModuleBody() { return build.sequence(decl,ast,true); }
+  decl = ImportDecl() ast = ModuleBody(decl) { return build.sequence(decl,ast,true); }
 }
 
 AST TopLevelCode() :
 { AST ast; AST decl; }
 {
-  ast = DeclSequence(false)  { return ast; }
+  ast = DeclSequence(false, null)  { return ast; }
 |
   decl = RequireDecl() ast = TopLevelCode() { return build.sequence(decl,ast,false); }
 |
@@ -269,15 +269,15 @@ String Segment() :
 	( <DOT> t1 = <IDENTIFIER> { s = s + '.' + t1.image; } )* { return s; }
 }
 
-AST DeclSequence(boolean inModule) :
+AST DeclSequence(boolean inModule, AST moduleArgs) :
 { AST decl1; AST decl2; }
 {
-  decl1 = Declaration(inModule)
-  ( decl2 = Declaration(inModule) { decl1 = build.sequence(decl1, decl2, inModule); } )*
+  decl1 = Declaration(inModule, moduleArgs)
+  ( decl2 = Declaration(inModule, moduleArgs) { decl1 = build.sequence(decl1, decl2, inModule); } )*
     { return decl1; }
 }
 
-AST Declaration(boolean inModule) :
+AST Declaration(boolean inModule, AST moduleArgs) :
 { AST exp; }
 {
   exp = DefDeclaration()  { return exp; }
@@ -286,7 +286,7 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
-  exp = EffectDeclaration() { return exp; }
+  exp = EffectDeclaration(moduleArgs) { return exp; }
 |
    LOOKAHEAD(4) exp =   TypeDeclaration()  { return exp; }
 |
@@ -333,13 +333,21 @@ AST VarDeclaration() :
   }
 }
 
-AST EffectDeclaration() :
+AST EffectDeclaration(AST moduleArgs) :
 { Type type = null; Token name; AST body;} // URI uri for body?
 {
-   <EFFECT> name = <IDENTIFIER> <EQUALS> body = ExpressionLine(false) {
-    return build.effectDecl(name.image, type, body, loc(name)); // need to ensure that body is just obj.op though
+   <EFFECT> name = <IDENTIFIER> <EQUALS> body = ExpressionLine(false) { // should check effect against moduleArgs here to ensure that body is just obj.op
+    return build.effectDecl(name.image, type, body, loc(name));
    }
 }
+
+/*AST Effect() : 
+{ Token effect; Token effect2; }
+{ effect = <IDENTIFIER> (effect2 = <DOT> <IDENTIFIER>) {
+	 effect += effect2;
+	 return build.var(effect.image, loc(id));
+   }
+ }*/
 
 AST DelegateDeclaration() :
 { Type type; Token t; AST exp; }
@@ -490,7 +498,7 @@ Object Formal() :
 AST DefBody() :
 { AST exp; }
 {
-  <NEWLINE> <INDENT> exp = DeclSequence(false) <DEDENT> { return exp; }
+  <NEWLINE> <INDENT> exp = DeclSequence(false, null) <DEDENT> { return exp; }
 |
   <EQUALS> exp = ExpressionLine(false) { return exp; }
 }
@@ -516,7 +524,7 @@ AST ExpressionLine(boolean makeValDecl) :
 {
   exp = Expression(flags) t=<NEWLINE>
   [
-    t2=<INDENT> decls = DeclSequence(true) <DEDENT>
+    t2=<INDENT> decls = DeclSequence(true, null) <DEDENT>
   |
     t2=DSLLines() 
   ]

@@ -28,6 +28,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
+import wyvern.tools.types.extensions.Effect;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 
@@ -55,6 +56,10 @@ public class EffectDeclaration extends Declaration implements CoreAST {
 	}
 
 	public EffectDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
+//		if (type==null) {
+//			type = new Effect();
+//		}
+		
 		if (type instanceof UnresolvedType) {
 			UnresolvedType t = (UnresolvedType) type;
 

@@ -1,6 +1,6 @@
 module def network1(stdout : Stdout) : NetworkType1
-
-
+effect send = {} // empty effects
+effect receive = {}
 def sendData(data : String) : Unit with send
     stdout.print("data sent: ")
     stdout.print(data)
