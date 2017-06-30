@@ -311,7 +311,6 @@ import java.net.URI;
  	terminal elseKwd_t   ::= /else/ in (keywds);
  	terminal objtype_t   ::= /objtype/ in (keywds);
  	terminal effectKwd_t	::= /effect/ in (keywds);
- 	terminal withKwd_t	::= /with/ in (keywds);
 
 	terminal taggedKwd_t  ::= /tagged/  in (keywds);
     terminal matchKwd_t   ::= /match/   in (keywds);

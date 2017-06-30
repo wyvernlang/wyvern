@@ -282,12 +282,20 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		return oirMember;
 	}
 
+//	public OIRAST visit(EmitOIRState state, EffectDeclaration effectDecl) {
+//		ValueType _type = effectDecl.getType();
+//		OIRType type = (OIRType) _type.acceptVisitor(this, state);
+//		OIRFieldDeclaration  oirMember = new OIRFieldDeclaration(effectDecl.getName(), null, true);
+//		oirMember.copyMetadata(effectDecl);
+//		return oirMember;
+//	}
+	
 	public OIRAST visit(EmitOIRState state, EffectDeclaration effectDecl) {
-		ValueType _type = effectDecl.getType();
-		OIRType type = (OIRType) _type.acceptVisitor(this, state);
-		OIRFieldDeclaration  oirMember = new OIRFieldDeclaration(effectDecl.getName(), null, true);
-		oirMember.copyMetadata(effectDecl);
-		return oirMember;
+		// The tag field
+		OIRFieldDeclaration fieldDecl = new OIRFieldDeclaration(effectDecl.getName() + "tag",
+				OIRIntegerType.getIntegerType());
+		fieldDecl.copyMetadata(effectDecl);
+		return fieldDecl;
 	}
 	
 	public OIRAST visit(EmitOIRState state, IntegerLiteral integerLiteral) {
@@ -338,12 +346,21 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		return methodDecls;
 	}
 	
+//	public OIRAST visit(EmitOIRState state, EffectDeclType effectDeclType) {
+//		ValueType type = effectDeclType.getRawResultType();
+//		OIRInterface oirtype = (OIRInterface) type.acceptVisitor(this, state);
+//		OIRMethodDeclaration methodDecl = new OIRMethodDeclaration(oirtype, "set" + effectDeclType.getName(), null);
+//		OIRMethodDeclarationGroup methodDecls = new OIRMethodDeclarationGroup();
+//		methodDecls.addMethodDeclaration(methodDecl);
+//		methodDecls.copyMetadata(effectDeclType);
+//		return methodDecls;
+//	}
+	
 	public OIRAST visit(EmitOIRState state, EffectDeclType effectDeclType) {
-		ValueType type = effectDeclType.getRawResultType();
-		OIRInterface oirtype = (OIRInterface) type.acceptVisitor(this, state);
-		OIRMethodDeclaration methodDecl = new OIRMethodDeclaration(oirtype, "set" + effectDeclType.getName(), null);
+		OIRType oirtype = (OIRType) effectDeclType.acceptVisitor(this, state);
+		OIRMethodDeclaration methDecl = new OIRMethodDeclaration(oirtype, "get" + effectDeclType.getName(), null);
 		OIRMethodDeclarationGroup methodDecls = new OIRMethodDeclarationGroup();
-		methodDecls.addMethodDeclaration(methodDecl);
+		methodDecls.addMethodDeclaration(methDecl);
 		methodDecls.copyMetadata(effectDeclType);
 		return methodDecls;
 	}

@@ -1,49 +1,36 @@
+/* Copied from wyvern.tools.src.wyvern.target.corewyvernIL.decl.TypeDeclaration */
+
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
-import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
-public class EffectDeclaration extends DeclarationWithRHS {
+public class EffectDeclaration extends NamedDeclaration {
 
-	/*@Override
-	public String toString() {
-		return "ValDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
-	}*/
+	private IExpr metadata;
+	private Type sourceType;
 
-	public EffectDeclaration(String fieldName, ValueType type, IExpr iExpr, FileLocation loc) {
-		super(fieldName, iExpr, loc);
-		this.type = type;
+	public EffectDeclaration(String typeName, Type sourceType, FileLocation loc) {
+		this(typeName, sourceType, null, loc);
 	}
-
-	private ValueType type;
-
-	@Override
-	public boolean containsResource(TypeContext ctx) {
-		return type.isResource(ctx);
+	public EffectDeclaration(String typeName, Type sourceType, IExpr metadata, FileLocation loc) {
+		super(typeName, loc);
+		this.sourceType = sourceType;
+		this.metadata = metadata;
 	}
-
-	@Override
-	public ValueType getType() {
-		return type;
-	}
-
-	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("effect ").append(getName()).append(':');
-		type.doPrettyPrint(dest, indent);
-		dest.append(" = ");
-		getDefinition().doPrettyPrint(dest, indent);
-		dest.append('\n');
+	
+	public Type getSourceType() {
+		return sourceType;
 	}
 
 	@Override
@@ -53,18 +40,35 @@ public class EffectDeclaration extends DeclarationWithRHS {
 	}
 
 	@Override
-	public DeclType getDeclType() {
-		return new EffectDeclType(getName(), type);
+	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
+		if (metadata != null)
+			metadata.typeCheck(thisCtx);
+		return getDeclType();
 	}
 
 	@Override
-	public Declaration interpret(EvalContext ctx) {
-		Expression newValue = (Expression) getDefinition().interpret(ctx);
-		return new EffectDeclaration(getName(), type, newValue, getLocation());
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("type ").append(getName()).append(" = ");
+		sourceType.doPrettyPrint(dest, indent);
+		dest.append('\n');
 	}
 
+	/*@Override
+	public String toString() {
+		return "type declaration " + super.getName() + " = " + sourceType.toString();
+	}*/
+
+	@Override
 	public Set<String> getFreeVariables() {
-		return getDefinition().getFreeVariables();
+		return new HashSet<>();
+	}
+	
+	/** LIMITATION: only works if sourceType is a ValueType.
+	 * in the future maybe we'll extract the ValueType from the source type somehow.
+	 */
+	@Override
+	public DeclType getDeclType() {
+		return new ConcreteTypeMember(getName(), (ValueType) sourceType, this.metadata);
 	}
 
 }

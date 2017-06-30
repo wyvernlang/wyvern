@@ -140,7 +140,6 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     }
     
     public Void visit(Boolean inTailPosition, EffectDeclaration effectDecl) {
-        effectDecl.getDefinition().acceptVisitor(this, false);
         return null;
     }
 

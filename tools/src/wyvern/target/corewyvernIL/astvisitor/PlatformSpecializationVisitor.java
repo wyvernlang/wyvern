@@ -193,10 +193,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     }
     
     public ASTNode visit(PSVState state, EffectDeclaration effectDecl) {
-        ASTNode resultDefinition = (ASTNode)effectDecl.getDefinition().acceptVisitor(this, state);
-        EffectDeclaration result = new EffectDeclaration(effectDecl.getName(), effectDecl.getType(), (IExpr)resultDefinition, effectDecl.getLocation());
-        result.copyMetadata(effectDecl);
-        return result;
+        return effectDecl;
     }
 
 

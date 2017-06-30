@@ -1,17 +1,30 @@
+/* Copied from wyvern.target.corewyvernIL.decltype.AbstractTypeMember */
+// Type member declarations, more like types than values
+// DefDeclType in structural type (ex. int -> {head} (int ))
+// representations?: path + effect name (might be a set of these pairs)
+
 package wyvern.target.corewyvernIL.decltype;
+
+import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
 
-import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.corewyvernIL.type.ValueType;
 
-public class EffectDeclType extends DeclTypeWithResult implements IASTNode{
 
-	public EffectDeclType(String field, ValueType type) {
-		super(field, type);
+public class EffectDeclType extends DeclType implements IASTNode {
+	boolean isResource;
+	// TODO: add metadata
+	
+	public EffectDeclType(String name) {
+		this(name, false);
+	}
+
+	public EffectDeclType(String name, boolean isResource) {
+		super(name);
+		this.isResource = isResource;
 	}
 
 	@Override
@@ -21,69 +34,36 @@ public class EffectDeclType extends DeclTypeWithResult implements IASTNode{
 	}
 
 	@Override
-	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
-		if (!(dt instanceof EffectDeclType)) {
-			return false;
-		}
-		EffectDeclType vdt = (EffectDeclType) dt;
-		return vdt.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(vdt.getRawResultType(), ctx);
-	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-		result = prime * result + ((getRawResultType() == null) ? 0 : getRawResultType().hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		EffectDeclType other = (EffectDeclType) obj;
-		if (getName() == null) {
-			if (other.getName() != null)
-				return false;
-		} else if (!getName().equals(other.getName()))
-			return false;
-		if (getRawResultType() == null) {
-			if (other.getRawResultType() != null)
-				return false;
-		} else if (!getRawResultType().equals(other.getRawResultType()))
-			return false;
-		return true;
+	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) { // may need to be changed
+        return this.getName().equals(dt.getName());
 	}
 
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("effect ").append(getName()).append(" : "); // kind of like "effect : null"
-		getRawResultType().doPrettyPrint(dest, indent);
-		dest.append('\n');
+		dest.append(indent).append("effect ").append(getName()).append('\n');
 	}
 
 	@Override
 	public DeclType adapt(View v) {
-		return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
+        return this;
+	}
+
+	@Override
+	public void checkWellFormed(TypeContext ctx) { 
+		// always well-formed! // may need further work
 	}
 
 	@Override
 	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
-		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
-		if (t.equals(this.getRawResultType())) {
-			return this;
-		} else {
-			return new EffectDeclType(this.getName(),t);
-		}
+		return this;
 	}
 	
+	public boolean isResource() {
+		return isResource;
+	}
+
 	@Override
 	public boolean isTypeDecl() {
-		return false;
+		return true;
 	}
 }
