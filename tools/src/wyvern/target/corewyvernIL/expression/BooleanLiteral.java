@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -76,9 +77,17 @@ public class BooleanLiteral extends Literal implements Invokable {
 		switch (methodName) {
 			case "ifTrue":
 				if (this.value) {
-					return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
+					return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+						@Override public Value interpret(EvalContext ignored) {
+							return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
+						}
+					};
 				}
-				return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
+				return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+					@Override public Value interpret(EvalContext ignored) {
+						return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
+					}
+				};
       case "&&":
         return new BooleanLiteral(this.value && ((BooleanLiteral) args.get(0)).value);
       case "||":

@@ -68,6 +68,11 @@ public class ExampleTests {
     }
     
     @Test
+    public void testTailCalls() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.tailcalls", Util.intType(), new IntegerLiteral(10000));
+    }
+    
+    @Test
     public void testStrings() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.strings", Util.booleanType(), new BooleanLiteral(true));
     }

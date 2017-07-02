@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -67,6 +68,7 @@ public class Interpreter {
 			Expression program = ast.generateIL(genCtx, null);*/
 			TypeContext ctx = Globals.getStandardTypeContext();
 			program.typeCheck(ctx);
+			TailCallVisitor.annotate(program);
 			Value v = program.interpret(Globals.getStandardEvalContext());
 		/*} catch (ParseException e) {
 			System.err.println("Parse error: " + e.getMessage());*/

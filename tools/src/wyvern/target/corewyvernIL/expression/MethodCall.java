@@ -11,6 +11,8 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.metadata.IsTailCall;
+import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -18,6 +20,7 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.support.ViewExtension;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.oir.OIRAST;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
@@ -104,9 +107,33 @@ public class MethodCall extends Expression {
 			IExpr e = args.get(i);
 			argValues.add(e.interpret(ctx));
 		}
-		return receiver.invoke(methodName, argValues);
+		if (isTailCall()) {
+			return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+
+				@Override
+				public Value interpret(EvalContext ignored) {
+					return receiver.invoke(methodName, argValues);
+				}
+				
+			};
+		}
+		return trampoline( receiver.invoke(methodName, argValues) );
 	}
 
+	private static Value trampoline(Value v) {
+		while (v instanceof SuspendedTailCall) {
+			v = v.interpret(null);
+		}
+		return v;
+	}
+	
+    public boolean isTailCall() {
+        for (Metadata m : getMetadata()) {
+            if (m instanceof IsTailCall) return true;
+        }
+        return false;
+    }
+	
 	@Override
 	public Set<String> getFreeVariables() {
 		Set<String> freeVars = objectExpr.getFreeVariables();

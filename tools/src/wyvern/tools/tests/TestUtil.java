@@ -6,12 +6,14 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.LinkedList;
+
 import org.junit.Assert;
 
 import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
@@ -243,6 +245,8 @@ public class TestUtil {
 	    // resolveModule already typechecked, but we'll do it again to verify the type
 		TypeContext ctx = Globals.getStandardTypeContext();
 	    ValueType t = program.typeCheck(ctx);
+		TailCallVisitor.annotate(program);
+	    
 	    if (expectedType != null)
 	    	Assert.assertTrue(t.isSubtypeOf(expectedType, ctx));
 	    
