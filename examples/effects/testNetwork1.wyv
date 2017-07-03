@@ -2,15 +2,11 @@ require stdout
 import effects.network1
 
 resource type NetworkType1
-//  effect send
-//  effect receive
-  def sendData(data : String) : {ast.add()} Unit
+  effect send
+  effect receive
+  def sendData(data : String) : {} Unit
   def receiveData() : {receive} Unit
 
 val n1 : NetworkType1 = network1(stdout)
 n1.sendData("Network1 with effects")	// print "data sent: Network1 with effects"
 n1.receiveData()		// print "data received"
-
-// val x = new
-//   effect E = something
-// (modules, types, objects for effect declarations)

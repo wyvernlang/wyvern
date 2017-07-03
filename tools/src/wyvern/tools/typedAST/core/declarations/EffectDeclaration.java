@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -37,8 +38,10 @@ import wyvern.tools.util.Reference;
 public class EffectDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	ArrayList<String> effectsList;
 	public EffectDeclaration(String name, String effects) {
-		if (effects=="") { 
-			effectsList = new ArrayList(); // empty list of effects
+//		if (effects==null) { // only possible in effectDeclType (enforced by WyvernParser.jj)
+//			effectsList = new ArrayList(); // may need a flag to indicate that items will be added to it in module def
+		if (effects=="") { // explicitly specified to be empty list of effects 
+			effectsList = new ArrayList();
 		//} else if (Character.isWhitespace(effects.charAt(0))) { // <DSLLINE>?
 		} else if (Pattern.compile("[^a-zA-Z,.]").matcher(effects).find()) { // found any non-effect-related chars --> actual DSL block
 			  throw new RuntimeException("Probably parsing effects--should not be a DSL block here"); // need to change error type later
@@ -46,10 +49,15 @@ public class EffectDeclaration extends AbstractTypeDeclaration implements CoreAS
 			effectsList = new ArrayList<String>(Arrays.asList(name.split(", *")));
 		}
 		
-		for (String s:effectsList) {
-			System.out.print(s+"|");
-		}
+//		for (String s:effectsList) {
+//			System.out.print(s+"|");
+//		}
 	}
+	
+	public void genTopLevel (TopLevelContext tlc) { // java.lang.RuntimeException: genTopLevel not implemented for class wyvern.tools.typedAST.core.declarations.EffectDeclaration
+		
+	}
+	
 	@Override
 	public Type getType() {
 		// TODO Auto-generated method stub

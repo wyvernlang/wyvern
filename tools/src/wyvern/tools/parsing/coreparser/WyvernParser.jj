@@ -334,9 +334,9 @@ AST VarDeclaration() :
 }
 
 AST EffectDeclaration(AST moduleArgs) : // in module def, must be defined
-{ Type type = null; Token name; Token effects;} //AST body;}
+{ Type type = null; Token name; Token effects; AST decls; } //AST body;}
 {
-   <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> { // should check effect against moduleArgs here to ensure that body is just obj.op
+   <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> <NEWLINE> decls = DeclSequence(false, null) { // should check effect against moduleArgs here to ensure that body is just obj.op
     return build.effectDecl(name.image, loc(name), effects.image); // body has to be changed to effects transformed as AST
    }
 }
@@ -429,9 +429,12 @@ AST VarDeclType() :
 }
 
 AST EffectDeclType() :
-{ Type type = null; Token name; Token effects = null;}
+{ Token name; Token effects = null;}
 {
   <EFFECT> name = <IDENTIFIER> [<EQUAL> effects = <DSL_LITERAL>] <NEWLINE> {
+  if (effects==null) {
+    return build.effectDeclType(name.image, loc(name), ""); // temporary work-around
+  }
   return build.effectDeclType(name.image, loc(name), effects.image);
   }
 }

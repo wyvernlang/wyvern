@@ -1,7 +1,7 @@
 module def network1(stdout : Stdout) : NetworkType1
-//effect send = {} // empty effects
-//effect receive = {}
-def sendData(data : String) : {ast.add()} Unit
+effect send = {}
+effect receive = {}
+def sendData(data : String) : {} Unit
     stdout.print("data sent: ")
     stdout.print(data)
     stdout.print("\n")
