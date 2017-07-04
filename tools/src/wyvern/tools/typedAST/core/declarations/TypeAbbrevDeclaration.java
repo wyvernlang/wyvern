@@ -30,6 +30,14 @@ import wyvern.tools.util.EvaluationEnvironment;
 
 // TODO: this represents an abstract type when the reference is null.
 // would be better to have a separate class for representing an abstract type
+
+/** Represents a type abbreviation of the form:
+ * 
+ * type T = T1
+ * 
+ * @author aldrich
+ *
+ */
 public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
 	private String alias;

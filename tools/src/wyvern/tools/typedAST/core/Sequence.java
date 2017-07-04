@@ -337,8 +337,13 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	 * @return the IL expression of a module
 	 */
 	public IExpr generateModuleIL(GenContext ctx, boolean isModule) {
+		// group blocks of mutually-recursive declarations
 		Sequence seqWithBlocks = combine();
+		
+		// generate a top-level context to help with translation
 		TopLevelContext tlc = new TopLevelContext(ctx);
+		
+		// do the actual translation
 		seqWithBlocks.genTopLevel(tlc);
 		IExpr result = isModule? tlc.getModuleExpression() : tlc.getExpression();
 		return result;

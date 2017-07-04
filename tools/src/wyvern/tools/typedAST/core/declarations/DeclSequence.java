@@ -314,6 +314,9 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		return normalSeq;
 	}
 	
+	/**
+	 * Top-level translation of a mutually-recursive block of declarations.
+	 */
 	@Override
 	public void genTopLevel(TopLevelContext tlc) {
 		String newName = GenContext.generateName();
@@ -323,6 +326,7 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		List<wyvern.target.corewyvernIL.decltype.DeclType> declts =
 				new LinkedList<wyvern.target.corewyvernIL.decltype.DeclType>();
 		
+		// build up a context that has all the elements in this recursive block
 		GenContext newCtx = tlc.getContext();
 		
 		for(TypedAST seq_ast : getDeclIterator()) {
@@ -340,7 +344,8 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 		
 		ValueType type = new StructuralType(newName, declts);
 		GenContext genCtx = newCtx.extend(newName, new Variable(newName), type);
-		
+
+		// Do the translation using this updated context 
 		tlc.updateContext(genCtx);
 		tlc.setReceiverName(newName);
 		for(TypedAST seq_ast : getDeclIterator()) {

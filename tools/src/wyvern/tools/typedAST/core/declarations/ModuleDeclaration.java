@@ -224,6 +224,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 */
 	private IExpr innerTranslate(Sequence normalSeq, GenContext ctx) {
 		/* Sequence.innerTranslate */
+		// The real work is done by the sequence itself.
 		return normalSeq.generateModuleIL(ctx, true);
 	}
 
@@ -256,11 +257,23 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         return wrapLetCtxWithIterator(ai, normalSeq, ctx, dependencies).first;
     }
 
+	/**
+	 * translate import/instantiate sequence into a let sequence and wrap the rest part inside the sequence. </br>
+	 * import A as copyA => let copyA = A in {rest} </br>
+	 * instantiate B(...) as copyB => let copyB = B(...) in {rest} </br>
+	 *
+	 * @param ai the declaration iterator
+	 * @param normalSeq the rest part of the module (not instantiate/import/require)
+	 * @param ctx the context
+	 * @return the whole expression
+	 */
 	private Pair<IExpr, GenContext> wrapLetCtxWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
 		if(!ai.hasNext()) {
+			// we are done with imports/instantiates, so translate the main body of the module
 			return new Pair(innerTranslate(normalSeq, ctx), ctx);
 		}
 
+		// otherwise, wrap with the outermost import/instantiate and proceed with a recursive call
 		TypedAST ast = ai.next();
 		if (ast instanceof ImportDeclaration) {
 
@@ -300,7 +313,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			final ValueType type = instValue.typeCheck(ctx);
 			GenContext newContext = ctx.extend(inst.getName(), instValue, type);
 
+			// translate the inner part of the sequence
 			IExpr e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
+			
+			// then wrap it with the declaration we just identified
 			return new Pair(new Let(inst.getName(), type, instValue, e), newContext);
 		}
 	}
@@ -382,6 +398,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @see filterNormal
 	 * @see wrapLet
 	 * For non-resource module: translate into a value
+	 * 
+	 * Called by ModuleResolver.load() to generate IL code for a module
 	 */
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {

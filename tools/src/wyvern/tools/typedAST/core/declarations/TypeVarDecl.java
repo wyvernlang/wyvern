@@ -35,6 +35,14 @@ import wyvern.tools.util.AbstractTreeWritable;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 
+/** Represents a declaration of a structural type.
+ * 
+ * A thin wrapper for a TypeDeclaration (but note that I think TypeDeclaration is *only*
+ * used as part of this class)
+ * 
+ * @author aldrich
+ *
+ */
 public class TypeVarDecl extends Declaration {
 	private final String name;
 	private final EnvironmentExtender body;

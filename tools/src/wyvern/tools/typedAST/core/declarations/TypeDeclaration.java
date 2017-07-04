@@ -29,6 +29,12 @@ import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 
 
+/** Represents the contents of a structural type.  Not used at the top level to my knowledge;
+ * used only within TypeVarDecl.
+ * 
+ * @author aldrich
+ *
+ */
 public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	private String name;
 	protected DeclSequence decls;
