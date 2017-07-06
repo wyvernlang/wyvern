@@ -1,0 +1,20 @@
+require stdout
+
+type ObjNetworkType0
+  def sendData(data : String) : Unit
+  def receiveData() : Unit
+
+val objNetwork0:ObjNetworkType0 = new
+  def sendData(data : String) : Unit = stdout.print(data)
+  def receiveData() : Unit = stdout.print("data received\n")
+
+/*val objNetwork0:ObjNetworkType0 = new
+  def sendData(data : String) : Unit // no equal if multi-line
+      stdout.print("data sent: ")
+      stdout.print(data)
+      stdout.print("\n")
+  def receiveData() : Unit =
+      stdout.print("data received\n")*/
+
+objNetwork0.sendData("objNetwork0")
+objNetwork0.receiveData()
