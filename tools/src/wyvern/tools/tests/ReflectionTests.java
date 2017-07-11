@@ -102,7 +102,7 @@ public class ReflectionTests {
                               "objectTypeOf.wyv"};
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
         GenContext genCtx = Globals.getStandardGenContext();
-        genCtx = new TypeGenContext("Boolean", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Boolean", "system", genCtx);
 
         for (String filename : fileList) {
             String source = TestUtil.readFile(PATH + filename);

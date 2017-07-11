@@ -28,7 +28,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
@@ -119,15 +119,15 @@ public class Globals {
 			return state.getGenContext();
 		}
 		GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), Globals.getSystemType());
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
-		genCtx = new TypeGenContext("String", "system", genCtx);
-        genCtx = new TypeGenContext("Character", "system", genCtx);
-		genCtx = new TypeGenContext("Boolean", "system", genCtx);
-		genCtx = new TypeGenContext("Dyn", "system", genCtx);
-		genCtx = new TypeGenContext("Java", "system", genCtx);
-		genCtx = new TypeGenContext("Python", "system", genCtx);
-		genCtx = new TypeGenContext("Platform", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Character", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Boolean", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Dyn", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}

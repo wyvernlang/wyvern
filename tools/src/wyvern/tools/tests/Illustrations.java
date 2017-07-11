@@ -17,7 +17,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -54,8 +54,8 @@ public class Illustrations {
 							"logger.wyv", "wavyUnderlineV3Fig5.wyv",
 							"example5.wyv", "example5driver.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
@@ -85,8 +85,8 @@ public class Illustrations {
 							"logger.wyv", "wavyUnderlineV1.wyv",
 							"example5Fig3.wyv", "example5driver.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		
@@ -122,8 +122,8 @@ public class Illustrations {
 		
 		String[] fileList = {"lists.wyv", "UserInfo.wyt", "userInfo.wyv", "wavyUnderlineV2.wyv", "example4driver.wyv", };
 		GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), new NominalType("", "system"));
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+		genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
 		
 		List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 		

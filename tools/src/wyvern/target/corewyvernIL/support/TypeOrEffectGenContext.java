@@ -4,7 +4,8 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 
-public class TypeGenContext extends GenContext {
+/** Used to look up the paths associated with a type abbreviation or an effect abbreviation */
+public class TypeOrEffectGenContext extends GenContext {
 
     @Override
     public String desugarType(Path var, String member) {
@@ -17,13 +18,13 @@ public class TypeGenContext extends GenContext {
     String typeName;
     Path objName;
 
-    public TypeGenContext(String typeName, Path objName, GenContext genContext) {
+    public TypeOrEffectGenContext(String typeName, Path objName, GenContext genContext) {
         super(genContext);
         this.typeName = typeName;
         this.objName = objName;
     }
 
-    public TypeGenContext(String typeName, String newName, GenContext genContext) {
+    public TypeOrEffectGenContext(String typeName, String newName, GenContext genContext) {
         super(genContext);
         this.typeName = typeName;
         this.objName = new Variable(newName);

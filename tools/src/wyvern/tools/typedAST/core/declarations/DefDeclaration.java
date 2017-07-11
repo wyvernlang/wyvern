@@ -18,7 +18,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -219,7 +219,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
                 String genName = GENERIC_PREFIX + s;
                 args.add(new FormalArg(genName, type));
 
-                ctx = new TypeGenContext(s, genName, ctx);
+                ctx = new TypeOrEffectGenContext(s, genName, ctx);
                 ctx = ctx.extend(genName, new Variable(genName), type);
             }
         }
@@ -261,8 +261,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     			methodContext = methodContext.extend(genName, new Variable(genName), type);
     			thisContext = thisContext.extend(genName, new Variable(genName), type);
-                methodContext = new TypeGenContext(s, genName, methodContext);
-                thisContext = new TypeGenContext(s, genName, thisContext); // TODO +s
+                methodContext = new TypeOrEffectGenContext(s, genName, methodContext);
+                thisContext = new TypeOrEffectGenContext(s, genName, thisContext); // TODO +s
             }
 		}
 
