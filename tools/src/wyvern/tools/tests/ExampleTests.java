@@ -107,20 +107,20 @@ public class ExampleTests {
 	TestUtil.doTestScriptModularly(PATH, "effects/testNetwork0", Util.unitType(), Util.unitValue());
     } // near the top of the Standard Output, for some reason
 
-    /*@Test
+    @Test
       public void testEffectNetwork1() throws ParseException {
 	TestUtil.doTestScriptModularly(PATH, "effects/testNetwork1", Util.unitType(), Util.unitValue());
-	}*/
+	}
     
     @Test
     public void testEffectObjNetwork0() throws ParseException {
 	TestUtil.doTestScriptModularly(PATH, "effects/objNetwork0", Util.unitType(), Util.unitValue());
     }
 
-    @Test
+    /*@Test
     public void testEffectObjNetwork1() throws ParseException {
 	TestUtil.doTestScriptModularly(PATH, "effects/objNetwork1", Util.unitType(), Util.unitValue());
-	}
+	}*/
     
     @Test
     @Category(CurrentlyBroken.class)
