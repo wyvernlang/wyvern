@@ -26,7 +26,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -190,7 +190,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
           int lastDot = qualifiedName.lastIndexOf('.');
           String className = qualifiedName.substring(lastDot+1);
           String packageName = qualifiedName.substring(0, lastDot);
-          ctx = new TypeGenContext(
+          ctx = new TypeOrEffectGenContext(
                   className,
                   new Variable(GenUtil.javaTypesObjectName + packageName),
                   ctx

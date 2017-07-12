@@ -25,7 +25,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.TypeGenContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -430,7 +430,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			final String internalName = lt.getModule().getSpec().getInternalName();
 			methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getModule().getSpec().getType());
 			// include the type abbreviation
-			methodContext = new TypeGenContext(lt.getTypeName(), internalName, methodContext);
+			methodContext = new TypeOrEffectGenContext(lt.getTypeName(), internalName, methodContext);
 			if (dependencies != null)
 				dependencies.add(lt.getModule().getSpec());
 		}
