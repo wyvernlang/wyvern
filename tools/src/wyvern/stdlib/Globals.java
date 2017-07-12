@@ -76,6 +76,7 @@ public class Globals {
 		return javaWhiteList.contains(packageName);
 	}
 
+	@Deprecated
 	public static Environment getStandardEnv() {
 		Environment env = Environment.getEmptyEnvironment();
 		env = env.extend(new ImportResolverBinding("java",JavaResolver.getInstance()));
@@ -93,6 +94,7 @@ public class Globals {
 		return env;
 	}
 
+	@Deprecated
 	public static EvaluationEnvironment getStandardEvalEnv() {
 		EvaluationEnvironment env = EvaluationEnvironment.EMPTY;
 		env = env.extend(new ValueBinding("null", UnitVal.getInstance(FileLocation.UNKNOWN))); // How to represent  shock/horror  null!?
