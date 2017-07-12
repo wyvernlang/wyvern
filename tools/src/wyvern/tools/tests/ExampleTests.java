@@ -125,5 +125,9 @@ public class ExampleTests {
 		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
 		PythonCompiler.main(args);
 	}
-	
+
+    @Test
+    public void testPalindromeChecker() throws ParseException {
+	TestUtil.doTestScriptModularly(PATH, "rosetta/check-palindrome", Util.unitType(), Util.unitValue());
+    }	
 }
