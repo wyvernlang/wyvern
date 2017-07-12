@@ -85,7 +85,7 @@ public abstract class GenContext extends TypeContext {
 	public GenContext rec(String newName, TypedAST ast) {
 		if(ast instanceof TypeVarDecl) {
 			String typeName = ((TypeVarDecl) ast).getName();
-			return new TypeGenContext(typeName, newName, this); 
+			return new TypeOrEffectGenContext(typeName, newName, this); 
 		} else if(ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
 			//assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
 			wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
@@ -95,7 +95,7 @@ public abstract class GenContext extends TypeContext {
 		else {
 			assert (ast instanceof TypeAbbrevDeclaration);
 			TypeAbbrevDeclaration typeAbbrevDecl = (TypeAbbrevDeclaration) ast;
-			return new TypeGenContext(typeAbbrevDecl.getName(), newName, this); 
+			return new TypeOrEffectGenContext(typeAbbrevDecl.getName(), newName, this); 
 		}
 		
 		
