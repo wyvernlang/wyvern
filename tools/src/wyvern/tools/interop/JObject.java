@@ -26,10 +26,12 @@ public class JObject implements FObject {
 		Method bestMethod = null;
 		for (int i = 0; i < methods.length; ++i) {
 			Method m = methods[i];
-			if (m.getName().equals(methodName) && isApplicable(m, parameterTypes)) {
-				if (bestMethod == null || isMorePrecise(m, bestMethod))
-					bestMethod = m;
-				candidates.add(m);
+			if (m.getName().equals(methodName)) {
+				if (isApplicable(m, parameterTypes)) {
+					if (bestMethod == null || isMorePrecise(m, bestMethod))
+						bestMethod = m;
+					candidates.add(m);
+				}
 			}
 		}
 		if (bestMethod != null) {

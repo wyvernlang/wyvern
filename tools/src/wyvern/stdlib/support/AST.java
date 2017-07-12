@@ -273,25 +273,25 @@ public class AST {
         return new VarDeclType(field, getType(type));
     }
 
-    public IExpr parseExpression(String input, JavaValue context) throws ParseException {
+    public IExpr parseExpression(String input, GenContext ctx) throws ParseException {
         try {
             ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
-            GenContext cxt = (GenContext)context.getFObject().getWrappedValue();
+            //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
             // Extend parseTSL with a second argument (abstract type representing context)
             // TODO: Handle InterpreterState/GenContext
-            return ast.generateIL(cxt, null, null);
+            return ast.generateIL(ctx, null, null);
         } catch (ParseException e) {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");
             throw e;
         }
     }
 
-    public List<IExpr> parseExpressionList(String input, JavaValue context) throws ParseException {
+    public List<IExpr> parseExpressionList(String input, GenContext ctx) throws ParseException {
         List<IExpr> result = new LinkedList<>();
         Reader r = new StringReader(input);
         WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser("parseExpressionList Parse", r);
         List<TypedAST> exprASTs = wp.ExpressionList();
-        GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
+        //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
 
         for (TypedAST ast: exprASTs) {
             result.add(((ExpressionAST)ast).generateIL(ctx, null, new LinkedList<TypedModuleSpec>()));
