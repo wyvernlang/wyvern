@@ -1,4 +1,4 @@
-module cell : TCell
+module cell : modules.TCell
 // TODO: get the above type annotation to typecheck properly
 
 resource type Cell

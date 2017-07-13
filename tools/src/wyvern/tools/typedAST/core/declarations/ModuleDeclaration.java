@@ -59,16 +59,18 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private ClassType subTypeType;
 	private FileLocation location;
 	private ClassType selfType;
+	private Type ascribedType;
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private boolean resourceFlag;
 
-	public ModuleDeclaration(String name, EnvironmentExtender inner, FileLocation location, boolean isResource) {
+	public ModuleDeclaration(String name, EnvironmentExtender inner, Type type, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
 		this.resourceFlag = isResource;
+		ascribedType = type;
 		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), null, name);
 		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), null, name);
 		if (isResource) {
@@ -190,7 +192,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), getLocation(), isResource());
+		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), ascribedType, getLocation(), isResource());
 		newDecl.selfType = selfType;
 		newDecl.subTypeType = subTypeType;
 		newDecl.importEnv = importEnv;
@@ -338,19 +340,27 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		for(Declaration d : reqSeq.getDeclIterator()) {
 			ImportDeclaration req = (ImportDeclaration) d;
 			String name = req.getUri().getSchemeSpecificPart();
-			wyvern.target.corewyvernIL.type.ValueType type = null;
-			if (ctx.isPresent(name, false)) {
-				type = ctx.lookupType(name, req.getLocation());
-			} else {
-				LoadedType lt = ctx.getInterpreterState().getResolver().resolveType(name);
-				type = new NominalType(lt.getModule().getSpec().getInternalName(), lt.getTypeName());
-				//bindings.add(binding);
-				loadedTypes.add(lt);
-			}
+			wyvern.target.corewyvernIL.type.ValueType type = getType(ctx,
+					loadedTypes, req.getLocation(), name);
 			final String asName = req.getAsName();
 			types.add(new FormalArg(asName == null ? name : asName, type));
 		}
 		return types;
+	}
+
+
+	private wyvern.target.corewyvernIL.type.ValueType getType(GenContext ctx,
+			List<LoadedType> loadedTypes, FileLocation location, String name) {
+		wyvern.target.corewyvernIL.type.ValueType type = null;
+		if (ctx.isPresent(name, false)) {
+			type = ctx.lookupType(name, location);
+		} else {
+			LoadedType lt = ctx.getInterpreterState().getResolver().resolveType(name);
+			type = new NominalType(lt.getModule().getSpec().getInternalName(), lt.getTypeName());
+			//bindings.add(binding);
+			loadedTypes.add(lt);
+		}
+		return type;
 	}
 
 
@@ -424,6 +434,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		List<FormalArg> formalArgs;
 		List<LoadedType> loadedTypes = new LinkedList<LoadedType>();
 		formalArgs = getTypes(reqSeq, ctx, loadedTypes); // translate requiring modules to method parameters
+		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.toString());
 		for (LoadedType lt : loadedTypes) {
 			// include the declaration itself
 			final String qualifiedName = lt.getModule().getSpec().getQualifiedName();
@@ -445,11 +456,15 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(impInstSeq, normalSeq, ctxWithPlatDeps, dependencies);
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(ctxWithPlatDeps, dependencies);
 		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
+    	//GenContext ctxWithModule = ctxWithPlatDeps.extend(name, new Variable(name), returnType);
+		if (ascribedValueType != null)
+			returnType = ascribedValueType;
 
+		/* commenting this out, it looks bogus!
 		if (isResource() == false) {
 			if (returnType.isResource(tempContext))
 				ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE_MODULE, this, this.getName());
-		}
+		}*/
         if (platformDependentSeq.iterator().hasNext()) {
             // We have platform-dependent dependencies, return a corewyvernIL ModuleDeclaration
             List<Pair<ImportDeclaration, ValueType>> moduleDependencies = new LinkedList<>();

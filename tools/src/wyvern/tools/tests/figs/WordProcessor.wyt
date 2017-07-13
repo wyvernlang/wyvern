@@ -1,0 +1,2 @@
+resource type WordProcessor
+    val x : system.Int
