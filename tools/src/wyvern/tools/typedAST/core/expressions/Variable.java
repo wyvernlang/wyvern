@@ -46,7 +46,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 
     @Override
     public String toString() {
-    	return binding.getName();
+        return binding.getName();
     }
     
     @Override
