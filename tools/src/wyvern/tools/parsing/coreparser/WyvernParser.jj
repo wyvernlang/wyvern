@@ -284,6 +284,8 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
+  exp = EffectDeclaration() { return exp; }
+|
    LOOKAHEAD(4) exp =   TypeDeclaration()  { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
@@ -327,6 +329,14 @@ AST VarDeclaration() :
   <VAR> name=<IDENTIFIER> <COLON> type = Type() <EQUALS> body = ExpressionLine(false) {
 	return build.varDecl(name.image, type, body, loc(name));
   }
+}
+
+AST EffectDeclaration() : // in module def, must be defined
+{ Type type = null; Token name; Token effects; AST decls; } //AST body;}
+{
+   <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> <NEWLINE> decls = DeclSequence(false) {
+    return build.effectDecl(name.image, loc(name), effects.image); 
+   }
 }
 
 AST DelegateDeclaration() :
@@ -403,6 +413,17 @@ AST VarDeclType() :
 {
   <VAR> name=<IDENTIFIER> <COLON> type = Type() <NEWLINE> {
   return build.varDeclType(name.image, type, loc(name));
+  }
+}
+
+AST EffectDeclType() :
+{ Token name; Token effects = null;}
+{
+  <EFFECT> name = <IDENTIFIER> [<EQUALS> effects = <DSL_LITERAL>] <NEWLINE> {
+  if (effects==null) {
+    return build.effectDeclType(name.image, loc(name), ""); // temporary work-around
+  }
+  return build.effectDeclType(name.image, loc(name), effects.image);
   }
 }
 
