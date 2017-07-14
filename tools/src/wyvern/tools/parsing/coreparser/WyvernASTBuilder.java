@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
+import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -85,6 +86,16 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		return new DefDeclaration(name, type, generics, args, body, isClassDef, loc);
 	}
 	
+/*	@Override
+	public TypedAST effectDecl(String name, TypedAST exp, FileLocation loc) {
+		return new EffectDeclaration(name, exp, loc);
+	}*/
+	
+	@Override
+	public TypedAST effectDecl(String name, FileLocation loc, String effects) {
+		return new EffectDeclaration(name, effects, loc);
+	}
+	
 	@Override
 	public TypedAST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc) {
 		return new DefDeclaration(name, type, generics, args, null, false, loc);
@@ -98,6 +109,16 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	@Override
 	public TypedAST varDeclType(String name, Type type, FileLocation loc) {
 		return new VarDeclaration(name, type, null, loc);
+	}
+	
+	/*@Override
+	public TypedAST effectDeclType(String name, FileLocation loc) { // this might need to account for effects = AST in place of type
+		return new EffectDeclaration(name, null, loc);
+	}*/
+	
+	@Override
+	public TypedAST effectDeclType(String name, FileLocation loc, String effects) { // this might need to account for effects = AST in place of type
+		return new EffectDeclaration(name, effects, loc);
 	}
 	
 	@Override

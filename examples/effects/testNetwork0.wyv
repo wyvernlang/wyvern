@@ -1,0 +1,10 @@
+require stdout
+import effects.network0
+
+resource type NetworkType0
+  def sendData(data : String) : Unit
+  def receiveData() : Unit
+
+val n0 : NetworkType0 = network0(stdout)
+n0.sendData("Network0 without effects")	// print "data sent: Network0 without effects"
+n0.receiveData()		// print "data received"

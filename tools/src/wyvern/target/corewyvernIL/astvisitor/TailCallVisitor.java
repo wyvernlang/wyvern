@@ -12,12 +12,14 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -136,6 +138,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
         valDecl.getDefinition().acceptVisitor(this, false);
         return null;
     }
+    
+    public Void visit(Boolean inTailPosition, EffectDeclaration effectDecl) {
+        return null;
+    }
 
 
     public Void visit(Boolean inTailPosition,
@@ -170,6 +176,12 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     public Void visit(Boolean inTailPosition,
                          ValDeclType valDeclType) {
         return null;
+    }
+    
+    
+    public Void visit(Boolean inTailPosition,
+            EffectDeclType effectDeclType) {
+    	return null;
     }
 
 

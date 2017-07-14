@@ -13,12 +13,14 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -261,6 +263,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	public ValDeclaration visit(TypeContext ctx, ValDeclaration valDecl) {
 		return valDecl;
 	}
+	
+	@Override
+	public EffectDeclaration visit(TypeContext ctx, EffectDeclaration effectDecl) {
+		return effectDecl;
+	}
 
 	@Override
 	public IntegerLiteral visit(TypeContext ctx, IntegerLiteral integerLiteral) {
@@ -290,6 +297,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	@Override
 	public ValDeclType visit(TypeContext ctx, ValDeclType valDeclType) {
 		return valDeclType;
+	}
+	
+	@Override
+	public EffectDeclType visit(TypeContext ctx, EffectDeclType effectDeclType) {
+		return effectDeclType;
 	}
 
 	@Override

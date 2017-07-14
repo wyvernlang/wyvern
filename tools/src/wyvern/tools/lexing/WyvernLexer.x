@@ -259,8 +259,8 @@ import wyvern.tools.errors.ToolError;
 
 	terminal Token comment_t  ::= /\/\/([^\r\n])*/ {: RESULT = token(SINGLE_LINE_COMMENT,lexeme); :};
 	terminal Token multi_comment_t  ::= /\/\*([^*]|\*[^/])*\*\// {: RESULT = token(MULTI_LINE_COMMENT,lexeme); :};
-	
-	
+
+	//terminal Token effect_t ::= /[a-zA-Z\.\,]*/ {: RESULT = token(EFFECTS, lexeme); :};
 	
  	terminal Token identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = token(IDENTIFIER,lexeme);
@@ -285,6 +285,7 @@ import wyvern.tools.errors.ToolError;
  	terminal Token thenKwd_t   ::= /then/ in (keywds);
  	terminal Token elseKwd_t   ::= /else/ in (keywds);
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
+ 	terminal Token effectKwd_t	::= /effect/ in (keywds) {: RESULT = token(EFFECT,lexeme); :};
  	
  	terminal Token resourceKwd_t    ::= /resource/ in (keywds) {: RESULT = token(RESOURCE,lexeme); :};
  	terminal Token asKwd_t ::= /as/ in (keywds) {: RESULT = token(AS,lexeme); :};
@@ -332,7 +333,6 @@ import wyvern.tools.errors.ToolError;
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
  	terminal Token cCurly_t ::= /\}/ {: RESULT = token(RBRACE,lexeme); :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
- 	
     
  	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); :};
  	
@@ -363,10 +363,16 @@ import wyvern.tools.errors.ToolError;
 %cf{
     non terminal innerdsl;
     non terminal inlinelit;
+    //non terminal effects;
+    //non terminal effectsLine;
 	non terminal List<Token> program;
 	non terminal List<Token> lines;
 	non terminal List<Token> logicalLine;
 	non terminal List<Token> dslLine;
+	/*non terminal List<Token> effectsLine;
+	non terminal List<Token> effectsList;
+	non terminal List<Token> optEffects;
+	non terminal List<Token> effects;*/
 	non terminal List<Token> anyLineElement;
 	non terminal List<Token> nonWSLineElement;
 	non terminal List lineElementSequence;
@@ -393,6 +399,15 @@ import wyvern.tools.errors.ToolError;
 	parens ::= openParen_t:t1 optParenContents:list closeParen_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :}
 	         | oSquareBracket_t:t1 optParenContents:list cSquareBracket_t:t2  {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
 	
+		                
+	/*effectsLine ::= effect_t:e {: RESULT = makeList(e); :};
+	effectsList ::=  effectsLine:el  {: RESULT = el; :} 
+							| effectsLine:el comma_t effectsList:e {: RESULT = el; el.addAll(e); :};
+	optEffects ::= effects:e {: RESULT = e; :} | {: RESULT = emptyList(); :};
+	effects ::= oCurly_t:t1 optEffects:list cCurly_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
+	*/
+	//disambiguate de:(inlinelit, effects){: return effects; :};
+	
 	keyw ::= classKwd_t:t {: RESULT = t; :}
 	       | typeKwd_t:t {: RESULT = t; :}
 	       | valKwd_t:t {: RESULT = t; :}
@@ -412,7 +427,9 @@ import wyvern.tools.errors.ToolError;
 	       | importKwd_t:t {: RESULT = t; :}
 	       | instantiateKwd_t:t {: RESULT = t; :}
 	       | asKwd_t:t {: RESULT = t; :}
-	       | resourceKwd_t:t {: RESULT = t; :};
+	       | resourceKwd_t:t {: RESULT = t; :}
+	       | effectKwd_t:t {: RESULT = t; :}
+	       ;
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
@@ -456,12 +473,17 @@ import wyvern.tools.errors.ToolError;
 	                   | literal:t {: RESULT = makeList(t); :}
 	                   | keyw:t {: RESULT = makeList(t); :}
 	                   | parens:l {: RESULT = l; :};
+	               //    | effects:e {: RESULT = e; :};
 
     dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = makeList(t); RESULT.add(line); :};
 	
     inlinelit ::= oCurly_t innerdsl:idsl cCurly_t {: RESULT = idsl; :};
     innerdsl ::= notCurly_t:str {: RESULT = str; :} | notCurly_t:str oCurly_t innerdsl:idsl cCurly_t innerdsl:stre {: RESULT = str + "{" + idsl + "}" + stre; :} | {: RESULT = ""; :};
-    
+	
+	/*effectsLine ::= oCurly_t effects:e cCurly_t {: RESULT = e; :};
+	effects ::= effect_t:str {: RESULT = str; :} | {: RESULT = ""; :}; // last part might not be necessary due to regex
+	disambiguate de:(inlinelit, effects){: return effects; :};*/
+	
 	lineElementSequence ::= indent_t:n {: RESULT = makeList(n); :}
 	                      | nonWSLineElement:n {:
 	                            // handles lines that start without any indent

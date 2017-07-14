@@ -109,6 +109,7 @@ TOKEN : /* Keywords */
 | < RESOURCE : "resource" >
 | < INSTANTIATE : "instantiate" >
 | < AS : "as" >
+| < EFFECT : "effect" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -298,9 +299,9 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; }
+{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; Token effect; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() body=DefBody() {
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effect = <DSL_LITERAL>] resultType = Type() body=DefBody() {
 	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
   }
 }
@@ -387,15 +388,17 @@ AST DeclType() :
 |
   exp = VarDeclType()  { return exp; }
 |
+  exp = EffectDeclType() { return exp; } 
+|
   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; List<String> gentypes=null; }
+{ Type resultType; Token name; List args; List<String> gentypes=null; Token effect; }
 {
-  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() <NEWLINE> {
+  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effect = <DSL_LITERAL>] resultType = Type() <NEWLINE> {
 	return build.defDeclType(name.image, resultType, gentypes, args, loc(name));
   }
 }
