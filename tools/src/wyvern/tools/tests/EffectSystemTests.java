@@ -32,7 +32,8 @@ import wyvern.tools.tests.suites.RegressionTests;
  * effect "declared_effect" = {"its_specified_effects"}
  * def method_name() : {"method_annotation_of_effects"} return_type 
  * 
- * In examples/effects directory, "*.wyt" files have no significance. Each 
+ * In examples/effects directory, "*.wyt" files have no significance, because
+ * there are some subtype issues that need to be fixed in the future.  Each 
  * network module has its own file in addition to its own type defined in the 
  * test file, despite some network test cases sharing the same type (which 
  * could be sorted out in the future).

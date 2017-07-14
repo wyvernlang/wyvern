@@ -1,4 +1,4 @@
-module def network07(stdout : Stdout) : NetworkType07
+module def network07(stdout : Stdout) //: NetworkType07
 effect send = {}
 effect receive = {}
 def sendData(data : String) : {} Unit

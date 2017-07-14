@@ -1,4 +1,4 @@
-module def network0(stdout : Stdout) : NetworkType0
+module def network00(stdout : Stdout) //: NetworkType00
 
 def sendData(data : String) : Unit
   stdout.print("data sent: ")
