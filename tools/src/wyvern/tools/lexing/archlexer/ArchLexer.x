@@ -126,7 +126,7 @@ import wyvern.tools.parsing.coreparser.Token;
                        | operator:t {: RESULT = LexerUtils.makeList(t); :}
                        | keyword:t {: RESULT = LexerUtils.makeList(t); :};
 
-	operator ::= colon_t:t {: RESULT = t; :}
+    operator ::= colon_t:t {: RESULT = t; :}
                | dot_t:t {: RESULT = t; :};
 
     keyword ::= componentKwd_t:t {: RESULT = t; :}
