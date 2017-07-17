@@ -1,69 +1,102 @@
-/* Copied from wyvern.target.corewyvernIL.decltype.AbstractTypeMember */
-// Type member declarations, more like types than values
-// DefDeclType in structural type (ex. int -> {head} (int ))
-// representations?: path + effect name (might be a set of these pairs)
-
 package wyvern.target.corewyvernIL.decltype;
 
 import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 
 
 public class EffectDeclType extends DeclType implements IASTNode {
-	boolean isResource;
-	// TODO: add metadata
+	HashSet<String> effectSet;
+	FileLocation loc;
 	
-	public EffectDeclType(String name) {
-		this(name, false);
-	}
-
-	public EffectDeclType(String name, boolean isResource) {
+	public EffectDeclType(String name, HashSet<String> effectSet, FileLocation loc) {
 		super(name);
-		this.isResource = isResource;
+		this.effectSet = effectSet;
+		this.loc = loc;
 	}
 
 	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-			S state) {
-		return emitILVisitor.visit(state, this);
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+		return visitor.visit(state, this);
 	}
 
 	@Override
-	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) { // may need to be changed
-        return this.getName().equals(dt.getName());
+	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+		if (!(dt instanceof EffectDeclType)) {
+			return false;
+		}
+		EffectDeclType edt = (EffectDeclType) dt;
+		if (edt.getEffectSet().containsAll(getEffectSet())) // "this" is a subtype of edt if edt's effect set contains "this" effect set and potentially more
+			return true;
+		return false;
+	}
+
+	public HashSet<String> getEffectSet() {
+		return effectSet;
 	}
 
 	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("effect ").append(getName()).append('\n');
+	public void checkWellFormed(TypeContext ctx) {
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EffectDeclType other = (EffectDeclType) obj;
+		if (getName() == null) {
+			if (other.getName() != null)
+				return false;
+		} else if (!getName().equals(other.getName()))
+			return false;
+		if (getEffectSet() == null) {
+			if (other.getEffectSet() != null)
+				return false;
+		} else if (!getEffectSet().equals(other.getEffectSet()))
+			return false;
+		return true;
+	}
+
+//	@Override
+//	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+//		dest.append(indent).append("val ").append(getName()).append(" : ");
+//		getRawResultType().doPrettyPrint(dest, indent);
+//		dest.append('\n');
+//	}
 
 	@Override
 	public DeclType adapt(View v) {
-        return this;
-	}
-
-	@Override
-	public void checkWellFormed(TypeContext ctx) { 
-		// always well-formed! // may need further work
+//		return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
+		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 
 	@Override
 	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
-		return this;
-	}
-	
-	public boolean isResource() {
-		return isResource;
+//		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
+//		if (t.equals(this.getRawResultType())) {
+//			return this;
+//		} else {
+//			
+//		}
+		return new EffectDeclType(this.getName(),effectSet, getLocation());
 	}
 
 	@Override
 	public boolean isTypeDecl() {
-		return true;
+		return false;
 	}
+	
 }

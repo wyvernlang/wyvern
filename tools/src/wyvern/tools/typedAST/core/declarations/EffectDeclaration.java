@@ -3,7 +3,7 @@ package wyvern.tools.typedAST.core.declarations;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import java.util.regex.Pattern;
 
@@ -21,21 +21,29 @@ import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
 	String name;
-	ArrayList<String> effectsList;
+	HashSet<String> effectSet;
 	FileLocation loc;
+	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation) { // decltype declarations
 		this.name = name;
 		loc = fileLocation;
 		
-		if (effects==null) { // no declared effect for identifier "name"
-			effectsList = null;
-		} else if (effects=="") { // explicitly specified to be empty list of effects; null effects is only possible in effectDeclType (enforced by WyvernParser.jj)
-			effectsList = new ArrayList<String>(); // may need a flag instead to indicate that items will be added to it in module def for null effects
-	//} else if (Character.isWhitespace(effects.charAt(0))) { // <DSLLINE>?
+		if (effects==null) { // no declared effect set for identifier "name", only possible in effectDeclType (enforced by WyvernParser.jj)
+			effectSet = null;
+		} else if (effects=="") { // explicitly specified to be empty list of effects
+			effectSet = new HashSet<String>();
 		} else if (Pattern.compile("[^a-zA-Z,.]").matcher(effects).find()) { // found any non-effect-related chars --> actual DSL block
-			throw new RuntimeException("Invalid effects--is this a DSL block instead?"); // need to change error type later
+			throw new RuntimeException("Invalid effects--is this a DSL block instead?"); // need to change to tool error later
 		} else {
-			effectsList = new ArrayList<String>(Arrays.asList(name.split(", *")));
+			effectSet = new HashSet<String>(Arrays.asList(name.split(", *")));
+		}
+	}
+	
+	public EffectDeclaration(String name, String effects, FileLocation loc, boolean isDeclType) {
+		this(name, effects, loc);
+		
+		if (effectSet==null && !isDeclType) { // not in the type signature but nothing defined for effect set 
+			new RuntimeException("Unspecified effect set outside of type signature.");
 		}
 	}
 	
@@ -43,6 +51,43 @@ public class EffectDeclaration extends Declaration {
 		
 	}
 	
+	@Override
+	public FileLocation getLocation() {
+		return loc;
+	}
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	public HashSet<String> getEffectSet() {
+		return effectSet;
+	}
+	
+	@Override
+	public DeclType genILType(GenContext ctx) {
+		return new EffectDeclType(getName(), getEffectSet(), getLocation());
+	}
+	
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), loc);
+//		throw new RuntimeException("generateDecl not implemented");
+	}
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("topLevelGen not implemented");
+//		return null;
+	}
+	
+	@Override
+	public void addModuleDecl(TopLevelContext tlc) {
+//		throw new RuntimeException("addModuleDecl");
+	}
+	
+	
+	/**** Secondary or obsolete (due to use of Environment) methods. ***/
 	@Override
 	public Environment extendType(Environment env, Environment against) {
 		// TODO Auto-generated method stub
@@ -57,7 +102,6 @@ public class EffectDeclaration extends Declaration {
 	}
 	@Override
 	public Type getType() { // effects have no parsed "type" like variables/values do
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
@@ -72,22 +116,9 @@ public class EffectDeclaration extends Declaration {
 		throw new RuntimeException("getChildren not implemented");
 //		return null;
 	}
+
 	@Override
-	public FileLocation getLocation() {
-		// TODO Auto-generated method stub
-		return loc;
-	}
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return name;
-	}
-	@Override
-	/* Would this be the method for making sure an effect is in scope? */
-	protected Type doTypecheck(Environment env) { // if effects have no types then not applicable?
-//		if ((effectsList != null) && !effectsList.isEmpty()) {
-//			env.lookup(getName());
-//		}
+	protected Type doTypecheck(Environment env) { 
 		throw new RuntimeException("doTypecheck not implemented");
 //		return null;
 	}
@@ -108,28 +139,5 @@ public class EffectDeclaration extends Declaration {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("evalDecl not implemented");
 	}
-	@Override
-	public DeclType genILType(GenContext ctx) {
-		return new EffectDeclType(getName());
-	}
-	
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("generateDecl not implemented");
-//		return null;
-	}
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("topLevelGen not implemented");
-//		return null;
-	}
-	
-	@Override
-	public void addModuleDecl(TopLevelContext tlc) {
-//		throw new RuntimeException("addModuleDecl");
-	}
-	
 	
 }

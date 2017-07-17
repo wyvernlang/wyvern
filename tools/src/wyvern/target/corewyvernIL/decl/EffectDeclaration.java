@@ -1,5 +1,3 @@
-/* Copied from wyvern.tools.src.wyvern.target.corewyvernIL.decl.TypeDeclaration */
-
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
@@ -9,6 +7,7 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
@@ -16,59 +15,37 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public class EffectDeclaration extends NamedDeclaration {
-
-	private IExpr metadata;
-	private Type sourceType;
-
-	public EffectDeclaration(String typeName, Type sourceType, FileLocation loc) {
-		this(typeName, sourceType, null, loc);
-	}
-	public EffectDeclaration(String typeName, Type sourceType, IExpr metadata, FileLocation loc) {
-		super(typeName, loc);
-		this.sourceType = sourceType;
-		this.metadata = metadata;
+	HashSet<String> effectSet;
+	
+	public EffectDeclaration(String name, HashSet<String> effectSet, FileLocation loc) {
+		super(name, loc);
+		this.effectSet = effectSet;
 	}
 	
-	public Type getSourceType() {
-		return sourceType;
-	}
-
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
 			S state) {
 		return emitILVisitor.visit(state, this);
 	}
 
+	public HashSet<String> getEffectSet() {
+		return effectSet;
+	}
+	
+	@Override
+	public DeclType getDeclType() {
+		return new EffectDeclType(getName(), getEffectSet(), getLocation());
+	}
+
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		if (metadata != null)
-			metadata.typeCheck(thisCtx);
-		return getDeclType();
+		// TODO Auto-generated method stub
+		return null;
 	}
-
-	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("type ").append(getName()).append(" = ");
-		sourceType.doPrettyPrint(dest, indent);
-		dest.append('\n');
-	}
-
-	/*@Override
-	public String toString() {
-		return "type declaration " + super.getName() + " = " + sourceType.toString();
-	}*/
 
 	@Override
 	public Set<String> getFreeVariables() {
-		return new HashSet<>();
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	/** LIMITATION: only works if sourceType is a ValueType.
-	 * in the future maybe we'll extract the ValueType from the source type somehow.
-	 */
-	@Override
-	public DeclType getDeclType() {
-		return new ConcreteTypeMember(getName(), (ValueType) sourceType, this.metadata);
-	}
-
 }

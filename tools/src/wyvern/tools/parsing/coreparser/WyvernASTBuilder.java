@@ -86,14 +86,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		return new DefDeclaration(name, type, generics, args, body, isClassDef, loc);
 	}
 	
-/*	@Override
-	public TypedAST effectDecl(String name, TypedAST exp, FileLocation loc) {
-		return new EffectDeclaration(name, exp, loc);
-	}*/
-	
 	@Override
 	public TypedAST effectDecl(String name, FileLocation loc, String effects) {
-		return new EffectDeclaration(name, effects, loc);
+		return new EffectDeclaration(name, effects, loc, false); // not decltype
 	}
 	
 	@Override
@@ -110,11 +105,6 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	public TypedAST varDeclType(String name, Type type, FileLocation loc) {
 		return new VarDeclaration(name, type, null, loc);
 	}
-	
-	/*@Override
-	public TypedAST effectDeclType(String name, FileLocation loc) { // this might need to account for effects = AST in place of type
-		return new EffectDeclaration(name, null, loc);
-	}*/
 	
 	@Override
 	public TypedAST effectDeclType(String name, FileLocation loc, String effects) { // this might need to account for effects = AST in place of type
