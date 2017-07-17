@@ -54,11 +54,12 @@ import wyvern.tools.errors.ToolError;
 				currentIndent = indents.peek();
 				dedentCount--;
 			}
-			if (newIndent.equals(currentIndent))
+			if (newIndent.equals(currentIndent)) {
 				return dedentCount;
-			else
+			} else {
 				ToolError.reportError(ErrorMessage.INCONSISTENT_INDENT, loc(tokenLoc));
-                throw new CopperParserException("Illegal dedent at line "+tokenLoc.beginLine+": does not match any previous indent level");
+				throw new RuntimeException(); // unreachable because reportError will throw, but the compiler dosn't know that, so we throw an exception to get it to stop complaining
+	        }
 		} else if (newIndent.length() > currentIndent.length()) {
 			// indent
 			if (newIndent.startsWith(currentIndent)) {
