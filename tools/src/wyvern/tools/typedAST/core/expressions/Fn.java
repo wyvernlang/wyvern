@@ -156,7 +156,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         ctx = extendCtxWithParams(ctx, intermediateArgs);
 
         // Generate the IL for the body, and get its return type.
-        ValueType expectedBodyType = (expectedType == null)?null : this.getExpectedResult(ctx, expectedType);
+        ValueType expectedBodyType = (expectedType == null) ?
+        					null : this.getExpectedResult(ctx, expectedType);
         IExpr il = this.body.generateIL(ctx, expectedBodyType, dependencies);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
