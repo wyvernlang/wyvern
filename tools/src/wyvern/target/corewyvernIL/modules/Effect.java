@@ -2,23 +2,29 @@ package wyvern.target.corewyvernIL.modules;
 
 import java.util.HashSet;
 
+import wyvern.target.corewyvernIL.support.TypeContext;
+
 /* Adapted from wyvern.target.corewyvernIL.modules.modules */
 
 public class Effect {
-	private HashSet<String> effects;
-	private String effectName;
+	private HashSet<String> effectSet;
+	private String name;
 	
 	public Effect(String effectName, HashSet<String> effects) {
-		this.effects = effects;
-		this.effectName = effectName;
+		this.effectSet = effects;
+		this.name = effectName;
 	}
 	
 	public HashSet<String> getEffectSet() {
-		return effects;
+		return effectSet;
 	}
 	
 	public String getEffectName() {
-		return effectName;
+		return name;
+	}
+	
+	public void effectCheck(TypeContext ctx, TypeContext thisCtx) {
+		
 	}
 }
 
