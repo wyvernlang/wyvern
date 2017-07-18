@@ -52,8 +52,22 @@
             <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
         </copper>
     </target>
-	
-    <target name="build" depends="clean,copper-generate">
+
+    <target name="arch-lexer">
+        <copper outputfile="src/wyvern/tools/lexing/archlexer/ArchLexer.java" packagename="wyvern.tools.lexing.archlexer">
+            <inputs file="src/wyvern/tools/lexing/archlexer/ArchLexer.x" />
+        </copper>
+    </target>
+
+    <target name="arch-parser" depends="arch-lexer">
+        <javacc
+            target="src/wyvern/tools/parsing/coreparser/ArchParser.jj"
+            outputdirectory="src/wyvern/tools/parsing/coreparser/"
+            javacchome="lib/"
+        />
+    </target>
+
+    <target name="build" depends="clean,copper-generate,arch-parser">
         <mkdir dir="${build.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
             <compilerarg value="-Xlint:deprecation"/>
