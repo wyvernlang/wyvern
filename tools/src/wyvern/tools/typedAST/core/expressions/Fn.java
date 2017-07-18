@@ -212,7 +212,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
                 ToolError.reportError(
                     ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                     this,
-                    Integer.toString(expectedSize)
+                    Integer.toString(expectedSize),
+                    Integer.toString(bindings.size())
                 );
             }
         }
