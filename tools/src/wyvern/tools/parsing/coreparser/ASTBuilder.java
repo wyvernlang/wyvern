@@ -42,7 +42,7 @@ public interface ASTBuilder<AST,Type> {
 	public Object tagInfo(Type type, List<Type> comprises);
 	
 	public Type nominalType(String name, FileLocation loc);
-	public Type arrowType(Type argument, Type result);
+	public Type arrowType(List<Type> arguments, Type result);
 	public Type parameterizedType(Type base, List<Type> arguments, FileLocation loc);
 	
 	public Type qualifiedType(AST base, String name);

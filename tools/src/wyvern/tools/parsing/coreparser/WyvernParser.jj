@@ -575,15 +575,26 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Type arrowResult = null; Type t; }
+{ Type arrowResult = null; Type t; Type t2; List<Type> tList=null; }
 {
  t = NonArrowType()
+ (<MULT> t2 = NonArrowType() {
+   if (tList == null) {
+       tList = new LinkedList<Type>();
+       tList.add(t);
+   }
+   tList.add(t2);
+ })*
  (<TARROW> arrowResult = Type() )? {
 
     if (arrowResult == null) {
         return t;
     } else {
-        return build.arrowType(t, arrowResult);
+        if (tList == null) {
+            tList = new LinkedList<Type>();
+            tList.add(t);
+        }
+        return build.arrowType(tList, arrowResult);
     }
  }
 }
