@@ -575,19 +575,35 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Token id = null; Token id2 = null; AST exp = null; Type arrowResult = null; List<Type> generics = null; Type t; }
+{ Type arrowResult = null; Type t; }
 {
-  id = <IDENTIFIER> (<DOT> id2 = <IDENTIFIER> {
-	if (exp == null) {
-	  	exp = build.var(id.image, loc(id));
-	} else {
-		exp = build.invocation(exp, id.image, null, loc(id));
-	}
-  	id = id2;
- })*
- ( generics = Generics() )? 
+ t = NonArrowType()
  (<TARROW> arrowResult = Type() )? {
 
+    if (arrowResult == null) {
+        return t;
+    } else {
+        return build.arrowType(t, arrowResult);
+    }
+ }
+}
+
+Type NonArrowType() :
+{ Token id = null; Token id2 = null; AST exp = null; List<Type> generics = null; Type t; }
+{
+  <LPAREN> t=Type() <RPAREN> {
+      return t;
+  }
+|
+  id = <IDENTIFIER> (<DOT> id2 = <IDENTIFIER> {
+    if (exp == null) {
+        exp = build.var(id.image, loc(id));
+    } else {
+        exp = build.invocation(exp, id.image, null, loc(id));
+    }
+    id = id2;
+ })*
+ ( generics = Generics() )? {
     if (exp == null) {
         t = build.nominalType(id.image, loc(id));
     } else {
@@ -598,12 +614,7 @@ Type Type() :
         Object o = build.parameterizedType(t, generics, loc(id));
         t = (Type) o;
     }
-
-    if (arrowResult == null) {
-        return t;
-    } else {
-        return build.arrowType(t, arrowResult);
-    }
+    return t;
  }
 }
 
