@@ -15,13 +15,11 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -191,12 +189,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         result.copyMetadata(valDecl);
         return result;
     }
-    
-    public ASTNode visit(PSVState state, EffectDeclaration effectDecl) {
-        return effectDecl;
-    }
-
-
+   
     public ASTNode visit(PSVState state,
                          IntegerLiteral integerLiteral) {
         return integerLiteral;
@@ -231,11 +224,6 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         return valDeclType;
     }
     
-    public ASTNode visit(PSVState state,
-            EffectDeclType effectDeclType) {
-    	return effectDeclType;
-    }
-
 
     public ASTNode visit(PSVState state,
                          DefDeclType defDeclType) {
