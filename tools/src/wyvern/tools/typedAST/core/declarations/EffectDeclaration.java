@@ -7,13 +7,17 @@ import java.util.HashSet;
 
 import java.util.regex.Pattern;
 
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -77,12 +81,14 @@ public class EffectDeclaration extends Declaration {
 	
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		return new EffectDeclType(getName(), getEffectSet(), getLocation());
+//		return new EffectDeclType(getName(), getEffectSet(), getLocation());
+		return new ValDeclType(name, Util.unitType());
 	}
 	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(new Effect(getPath(), getName(), getEffectSet(), getLocation()));
+		return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, Util.unitType(), Util.unitValue(), loc); // stub
+//		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(new Effect(getPath(), getName(), getEffectSet(), getLocation()));
 //		throw new RuntimeException("generateDecl not implemented");
 	}
 	@Override
