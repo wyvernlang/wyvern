@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.expression;
 
 import java.util.HashSet;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -21,12 +22,14 @@ public class Effect {
 	}
 	
 	public void effectCheck(TypeContext ctx, TypeContext thisCtx) { // can probably just remove thisCtx
-		ValueType vt = ctx.lookupTypeOf(path.getName());
-		if (vt == null){
-			throw new RuntimeException("Path not found.");
-		} else {
-			if (!(vt.findDecl(name, ctx).equals(new EffectDeclType(getName(), getEffectSet(), getLocation())))) {
-				throw new RuntimeException("Effect name not found in path.");
+		for (Effect e : effectSet) {
+			ValueType vt = ctx.lookupTypeOf(e.getName());
+			if (vt == null){
+				throw new RuntimeException("Path not found.");
+			} else {
+				if (!(vt.findDecl(e.getName(), ctx).equals(e.getDeclType()))) {
+					throw new RuntimeException("Effect name not found in path.");
+				}
 			}
 		}
 	}
@@ -45,6 +48,10 @@ public class Effect {
 	
 	public FileLocation getLocation() {
 		return loc;
+	}
+	
+	public DeclType getDeclType() {
+		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 	
 }

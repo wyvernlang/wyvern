@@ -23,6 +23,13 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		this.loc = loc;
 	}
 
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+//		dest.append("NOT_IMPLEMENTED(")
+//			.append(this.getClass().getName())
+//			.append(')');
+		//throw new RuntimeException("not implemented");
+	}
+	
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
 		return null; //visitor.visit(state, this);
