@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.expression.Effect;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
@@ -20,28 +22,33 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
+	Variable path;
 	String name;
-	HashSet<String> effectSet;
+	HashSet<Effect> effectSet;
 	FileLocation loc;
 	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation) { // decltype declarations
 		this.name = name;
 		loc = fileLocation;
+		path = new Variable(name); // not sure
 		
-		if (effects==null) { // no declared effect set for identifier "name", only possible in effectDeclType (enforced by WyvernParser.jj)
+		if (effects==null) { // no definition for identifier "name" -> only possible in effectDeclType (enforced by WyvernParser.jj)
 			effectSet = null;
-		} else if (effects=="") { // explicitly specified to be empty list of effects
-			effectSet = new HashSet<String>();
-		} else if (Pattern.compile("[^a-zA-Z,.]").matcher(effects).find()) { // found any non-effect-related chars --> actual DSL block
+		} else if (effects=="") { // explicitly defined to be empty list of effects
+			effectSet = new HashSet<Effect>();
+		} else if (Pattern.compile("[^a-zA-Z,.]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
 			throw new RuntimeException("Invalid effects--is this a DSL block instead?"); // need to change to tool error later
 		} else {
-			effectSet = new HashSet<String>(Arrays.asList(name.split(", *")));
+			effectSet = new HashSet<Effect>();
+			for (String s : name.split(", *")) {
+				String[] pathAndID = s.split("\\.");
+				effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], null, loc));
+			}
 		}
 	}
 	
 	public EffectDeclaration(String name, String effects, FileLocation loc, boolean isDeclType) {
 		this(name, effects, loc);
-		
 		if (effectSet==null && !isDeclType) { // not in the type signature but nothing defined for effect set 
 			new RuntimeException("Unspecified effect set outside of type signature.");
 		}
@@ -60,8 +67,12 @@ public class EffectDeclaration extends Declaration {
 		return name;
 	}
 	
-	public HashSet<String> getEffectSet() {
+	public HashSet<Effect> getEffectSet() {
 		return effectSet;
+	}
+	
+	public Variable getPath() {
+		return path;
 	}
 	
 	@Override
@@ -71,7 +82,7 @@ public class EffectDeclaration extends Declaration {
 	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), loc);
+		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(new Effect(getPath(), getName(), getEffectSet(), getLocation()));
 //		throw new RuntimeException("generateDecl not implemented");
 	}
 	@Override

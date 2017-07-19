@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -13,10 +14,10 @@ import wyvern.tools.errors.FileLocation;
 
 
 public class EffectDeclType extends DeclType implements IASTNode {
-	HashSet<String> effectSet;
+	HashSet<Effect> effectSet;
 	FileLocation loc;
 	
-	public EffectDeclType(String name, HashSet<String> effectSet, FileLocation loc) {
+	public EffectDeclType(String name, HashSet<Effect> effectSet, FileLocation loc) {
 		super(name);
 		this.effectSet = effectSet;
 		this.loc = loc;
@@ -24,7 +25,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
-		return visitor.visit(state, this);
+		return null; //visitor.visit(state, this);
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		return false;
 	}
 
-	public HashSet<String> getEffectSet() {
+	public HashSet<Effect> getEffectSet() {
 		return effectSet;
 	}
 
@@ -65,8 +66,11 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		if (getEffectSet() == null) {
 			if (other.getEffectSet() != null)
 				return false;
-		} else if (!getEffectSet().equals(other.getEffectSet()))
+		} else if (!getEffectSet().equals(other.getEffectSet()) ||
+				!getLocation().equals(other.getLocation())) { //||
+//				!getPath().equals(other.getPath())) {
 			return false;
+		}
 		return true;
 	}
 
@@ -91,7 +95,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 //		} else {
 //			
 //		}
-		return new EffectDeclType(this.getName(),effectSet, getLocation());
+		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 
 	@Override

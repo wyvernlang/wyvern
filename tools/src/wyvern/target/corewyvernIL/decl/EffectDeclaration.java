@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
@@ -18,42 +19,32 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class EffectDeclaration extends NamedDeclaration {
-	HashSet<String> effectSet;
+	Effect e;
 	
-	public EffectDeclaration(String name, HashSet<String> effectSet, FileLocation loc) {
-		super(name, loc);
-		this.effectSet = effectSet;
+	public EffectDeclaration(Effect e) {
+		super(e.getName(), e.getLocation()); // not sure if necessary...
+		this.e = e;
 	}
 	
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
 			S state) {
-		return emitILVisitor.visit(state, this);
+		return null; //emitILVisitor.visit(state, this);
 	}
-
-	public HashSet<String> getEffectSet() {
-		return effectSet;
-	}
+//
+//	public HashSet<String> getEffectSet() {
+//		return effectSet;
+//	}
 	
 	@Override
 	public DeclType getDeclType() {
-		return new EffectDeclType(getName(), getEffectSet(), getLocation());
+		return new EffectDeclType(getName(), e.getEffectSet(), getLocation());
 	}
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // actually effectCheck
-		Iterator<String> iter = effectSet.iterator();
-		while (iter.hasNext()) {
-			String[] pathAndID = iter.next().split("\\."); // assume all effects to have format "path_name.id_name" for now
-			// create Path obj from pathAndID[0]?
-			// should be an effect obj with its own effectchecking method
-		}
-		return new EffectDeclType(getName(), getEffectSet(), getLocation());
-		
-//		ValueType defType = definition.typeCheck(thisCtx); 
-//		if (!defType.isSubtypeOf(getType(), thisCtx))
-//			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
-//		return getDeclType();
+		e.effectCheck(ctx, thisCtx); // throw exception if problem	// could just not pass in thisCtx?
+		return getDeclType();
 	}
 
 	@Override
