@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
+import wyvern.tools.tests.EffectSystemTests;
 import wyvern.tools.tests.ExampleTests;
 import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.Figures;
@@ -44,6 +45,7 @@ import wyvern.tools.tests.StdlibTests;
         DemoTests.class,
         StdlibTests.class,      // tests the standard library with the new IL
         ExampleTests.class,      // tests the examples 
+        EffectSystemTests.class,
         ModuleSystemTests.class,        // tests the new IL
     }
 )

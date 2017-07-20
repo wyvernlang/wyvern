@@ -109,6 +109,7 @@ TOKEN : /* Keywords */
 | < RESOURCE : "resource" >
 | < INSTANTIATE : "instantiate" >
 | < AS : "as" >
+| < EFFECT : "effect" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -284,6 +285,8 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
+  exp = EffectDeclaration() { return exp; }
+|
    LOOKAHEAD(4) exp =   TypeDeclaration()  { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
@@ -296,9 +299,9 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; }
+{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; Token effect; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() body=DefBody() {
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effect = <DSL_LITERAL>] resultType = Type() body=DefBody() {
 	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
   }
 }
@@ -327,6 +330,14 @@ AST VarDeclaration() :
   <VAR> name=<IDENTIFIER> <COLON> type = Type() <EQUALS> body = ExpressionLine(false) {
 	return build.varDecl(name.image, type, body, loc(name));
   }
+}
+
+AST EffectDeclaration() : // in module def, must be defined
+{ Type type = null; Token name; Token effects; AST decls; } //AST body;}
+{
+   <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> <NEWLINE> {
+    return build.effectDecl(name.image, effects.image, loc(name)); 
+   }
 }
 
 AST DelegateDeclaration() :
@@ -377,15 +388,17 @@ AST DeclType() :
 |
   exp = VarDeclType()  { return exp; }
 |
+  exp = EffectDeclType() { return exp; } 
+|
   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; List<String> gentypes=null; }
+{ Type resultType; Token name; List args; List<String> gentypes=null; Token effect; }
 {
-  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> resultType = Type() <NEWLINE> {
+  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effect = <DSL_LITERAL>] resultType = Type() <NEWLINE> {
 	return build.defDeclType(name.image, resultType, gentypes, args, loc(name));
   }
 }
@@ -403,6 +416,17 @@ AST VarDeclType() :
 {
   <VAR> name=<IDENTIFIER> <COLON> type = Type() <NEWLINE> {
   return build.varDeclType(name.image, type, loc(name));
+  }
+}
+
+AST EffectDeclType() :
+{ Token name; Token effects = null;}
+{
+  <EFFECT> name = <IDENTIFIER> [<EQUALS> effects = <DSL_LITERAL>] <NEWLINE> {
+  if (effects==null) {
+    return build.effectDeclType(name.image, null, loc(name));
+  }
+  return build.effectDeclType(name.image, effects.image, loc(name));
   }
 }
 

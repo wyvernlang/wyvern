@@ -205,10 +205,10 @@ public class ModuleResolver {
 				program = ((ValDeclaration)decl).getDefinition();
 				//program = wrap(program, dependencies);
 			} else if (decl instanceof ModuleDeclaration) {
-          ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
-          ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(), oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
-          program = new New(moduleDecl);
-      } else if (decl instanceof DefDeclaration) {
+				ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
+				ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(), oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
+				program = new New(moduleDecl);
+			} else if (decl instanceof DefDeclaration) {
 				DefDeclaration oldDefDecl = (DefDeclaration) decl;
 				// rename according to "apply"
 				DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(), oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
