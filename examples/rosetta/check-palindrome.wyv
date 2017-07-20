@@ -9,7 +9,7 @@ def checkPalindrome(s:String):Boolean
         else
             (s.charAt(0) == s.charAt(s.length()-1)) && checkPalindrome(s.substring(1, s.length()-1)) // [start_ind, end_ind)
 
-def printResult(s:String):Unit
+def printResult(s:String): Unit
     iff (checkPalindrome(s), ~)
         then
             stdout.print("\"")

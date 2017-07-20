@@ -101,7 +101,12 @@ public class ExampleTests {
 	public void testOptionParameterized() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "introductory.optionP", Util.intType(), new IntegerLiteral(15));
 	}
-	
+
+    @Test
+    public void testPalindromeChecker() throws ParseException {
+	TestUtil.doTestScriptModularly(PATH, "rosetta/check-palindrome", Util.unitType(), Util.unitValue());
+    }
+    
     @Test
     @Category(CurrentlyBroken.class)
     public void testListParameterized() throws ParseException {
@@ -125,9 +130,4 @@ public class ExampleTests {
 		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
 		PythonCompiler.main(args);
 	}
-
-    @Test
-    public void testPalindromeChecker() throws ParseException {
-	TestUtil.doTestScriptModularly(PATH, "rosetta/check-palindrome", Util.unitType(), Util.unitValue());
-    }	
 }

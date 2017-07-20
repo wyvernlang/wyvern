@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
+import java.util.HashSet;
+
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -49,6 +51,10 @@ public class TypeOrEffectGenContext extends GenContext {
     @Override
     public ValueType lookupTypeOf(String varName) {
         return getNext().lookupTypeOf(varName);
+    }
+    
+    public HashSet<String> lookupEffectSetOf(String varName) { // HashSet<Effect>??
+        return ((TypeOrEffectGenContext) getNext()).lookupEffectSetOf(varName);
     }
 
     @Override

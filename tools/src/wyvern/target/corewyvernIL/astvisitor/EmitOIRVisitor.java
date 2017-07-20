@@ -279,7 +279,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		oirMember.copyMetadata(valDecl);
 		return oirMember;
 	}
-
+	
 	public OIRAST visit(EmitOIRState state, IntegerLiteral integerLiteral) {
 		OIRInteger oirInt = new OIRInteger(integerLiteral.getValue());
 		oirInt.copyMetadata(integerLiteral);
