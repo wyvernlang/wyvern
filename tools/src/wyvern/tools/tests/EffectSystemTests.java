@@ -27,9 +27,9 @@ import wyvern.tools.tests.suites.RegressionTests;
  * level are enclosed in try/catch statements and have the printout format:
  * "test_method_name(): exception_message"
  * 
- * Comments related to effects: "declaration, specification, method annotation"
+ * Comments related to effects: "declaration, definition, method annotation"
  * Appearance in Wyvern:
- * effect "declared_effect" = {"its_specified_effects"}
+ * effect "declared_effect" = {"its_defined_effects"}
  * def method_name() : {"method_annotation_of_effects"} return_type 
  * 
  * In examples/effects directory, "*.wyt" files have no significance, because
@@ -55,17 +55,17 @@ public class EffectSystemTests {
 //    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
 //    }
 //
-//    @Test
-//     public void testEffectNetwork01() throws ParseException {
+    @Test
+     public void testEffectNetwork01() throws ParseException {
 //    	/* Declared in type + module def;
-//    	 * Specified in module def;
+//    	 * Defined in module def;
 //    	 * Method annotations in both. */ 
 //    	try {
-//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
+    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
 //    	} catch (Exception e) {
 //    		System.out.println("testEffectNetwork01(): "+e.getMessage());
 //    	}
-//	}
+	}
 //    
 //    @Test
 //    public void testEffectNetwork02() throws ParseException {
@@ -75,8 +75,8 @@ public class EffectSystemTests {
 //  
 //    @Test
 //    public void testEffectNetwork03() throws ParseException {
-//    	/* In addition to declarations (not specified) & method annotations in type, additional declaration &
-//    	 * specification in module def. */
+//    	/* In addition to declarations (not defined) & method annotations in type, additional declaration &
+//    	 * definition in module def. */
 //    	try {
 //    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.unitType(), Util.unitValue());
 //    	} catch (Exception e) {
@@ -116,8 +116,8 @@ public class EffectSystemTests {
 //    
 //    @Test
 //    public void testEffectNetwork07() throws ParseException {
-//    	/* Declarations + 1 specified in type;
-//    	 * Declarations + specifications in module def;
+//    	/* Declarations + 1 defined in type;
+//    	 * Declarations + definitions in module def;
 //    	 * Method annotations in both.
 //    	 */
 //    	try {
@@ -136,6 +136,12 @@ public class EffectSystemTests {
 //    		System.out.println("testEffectNetwork08(): "+e.getMessage());
 //    	}
 //	}
+//    
+//    @Test
+//    public void testEffectNetwork09() throws ParseException {
+//    	/* No module declarations despite declarations in type + module def. */
+//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork09", Util.unitType(), Util.unitValue());
+//    }
     
 //    @Test
 //    public void testEffectObjNetwork00() throws ParseException {
@@ -143,13 +149,13 @@ public class EffectSystemTests {
 //    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
 //	}
 
-    @Test
-    public void testEffectObjNetwork01() throws ParseException {
-    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
+//    @Test
+//    public void testEffectObjNetwork01() throws ParseException {
+//    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
 //    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+//    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
 //    	} catch (Exception e) {
 //    		System.out.println("testEffectObjNetwork01(): "+e.getMessage());
 //    	}
-	}
+//	}
 }

@@ -205,14 +205,17 @@ public class ModuleResolver {
 				program = ((ValDeclaration)decl).getDefinition();
 				//program = wrap(program, dependencies);
 			} else if (decl instanceof ModuleDeclaration) {
-          ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
-          ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(), oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
-          program = new New(moduleDecl);
-      } else if (decl instanceof DefDeclaration) {
+				ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
+				ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(), oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
+				program = new New(moduleDecl);
+			} else if (decl instanceof DefDeclaration) {
 				DefDeclaration oldDefDecl = (DefDeclaration) decl;
 				// rename according to "apply"
 				DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(), oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
 				// wrap in an object
+//				String s = "";
+//				for (FormalArg f : defDecl.getFormalArgs()) {s+=(f.getName()+"+"+f.getType()+", ");}
+//				throw new RuntimeException(defDecl.getBody().toString());
 				program = new New(defDecl);
 				//program = wrap(program, dependencies);
 			} else if (decl instanceof TypeDeclaration) {

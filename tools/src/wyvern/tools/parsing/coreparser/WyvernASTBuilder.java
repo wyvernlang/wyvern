@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.javatuples.Unit;
+
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -88,8 +91,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	
 	@Override
 	public TypedAST effectDecl(String name, FileLocation loc, String effects) {
-		return new EffectDeclaration(name, effects, loc, false); // not decltype
-//		return new ValDeclaration(name, unitValue(loc).getType(), unitValue(loc), loc);
+//		return new EffectDeclaration(name, effects, loc, false); // not decltype
+		return new ValDeclaration(name, unitValue(loc).getType(), unitValue(loc), loc);
 	}
 	
 	@Override
@@ -109,8 +112,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	
 	@Override
 	public TypedAST effectDeclType(String name, FileLocation loc, String effects) { // this might need to account for effects = AST in place of type
-		return new EffectDeclaration(name, effects, loc);
-//		return new ValDeclaration(name, unitValue(loc).getType(), null, loc);
+//		return new EffectDeclaration(name, effects, loc);
+		return new ValDeclaration(name,  unitValue(loc), loc);
+//		return unitValue(loc); // Do not use -- ClassCastException: can't be cast to wyvern.tools.typedAST.abs.Declaration
 	}
 	
 	@Override
