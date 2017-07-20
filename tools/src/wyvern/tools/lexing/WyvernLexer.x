@@ -125,8 +125,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token comment_t  ::= /\/\/([^\r\n])*/ {: RESULT = token(SINGLE_LINE_COMMENT,lexeme); :};
 	terminal Token multi_comment_t  ::= /\/\*([^*]|\*[^/])*\*\// {: RESULT = token(MULTI_LINE_COMMENT,lexeme); :};
 
-	//terminal Token effect_t ::= /[a-zA-Z\.\,]*/ {: RESULT = token(EFFECTS, lexeme); :};
-	
  	terminal Token identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = token(IDENTIFIER,lexeme);
  	:};
@@ -228,16 +226,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 %cf{
     non terminal innerdsl;
     non terminal inlinelit;
-    //non terminal effects;
-    //non terminal effectsLine;
 	non terminal List<Token> program;
 	non terminal List<Token> lines;
 	non terminal List<Token> logicalLine;
 	non terminal List<Token> dslLine;
-	/*non terminal List<Token> effectsLine;
-	non terminal List<Token> effectsList;
-	non terminal List<Token> optEffects;
-	non terminal List<Token> effects;*/
 	non terminal List<Token> anyLineElement;
 	non terminal List<Token> nonWSLineElement;
 	non terminal List lineElementSequence;
@@ -271,16 +263,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	               RESULT.addAll(list);
 	               RESULT.add(t2);
 	           :};
-	
-		                
-	/*effectsLine ::= effect_t:e {: RESULT = makeList(e); :};
-	effectsList ::=  effectsLine:el  {: RESULT = el; :} 
-							| effectsLine:el comma_t effectsList:e {: RESULT = el; el.addAll(e); :};
-	optEffects ::= effects:e {: RESULT = e; :} | {: RESULT = emptyList(); :};
-	effects ::= oCurly_t:t1 optEffects:list cCurly_t:t2 {: RESULT = makeList(t1); RESULT.addAll(list); RESULT.add(t2); :};
-	*/
-	//disambiguate de:(inlinelit, effects){: return effects; :};
-	
+		
 	keyw ::= classKwd_t:t {: RESULT = t; :}
 	       | typeKwd_t:t {: RESULT = t; :}
 	       | valKwd_t:t {: RESULT = t; :}
@@ -346,7 +329,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	                   | literal:t {: RESULT = LexerUtils.makeList(t); :}
 	                   | keyw:t {: RESULT = LexerUtils.makeList(t); :}
 	                   | parens:l {: RESULT = l; :};
-	               //    | effects:e {: RESULT = e; :};
 
     dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = LexerUtils.makeList(t); RESULT.add(line); :};
 	

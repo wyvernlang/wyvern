@@ -20,8 +20,6 @@ public class Util {
 	private static ValueType theStringType = new NominalType("system","String");
 	private static ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
 	private static ValueType theDynType = new DynamicType();
-	private static ValueType theEffectType = new StructuralType("effect", new LinkedList<DeclType>());
-	// pretend it's a type for now with no effects in the list
 
 	public static ValueType booleanType() { return theBooleanType; }
 	public static ValueType emptyType() { return theEmptyType; }
@@ -30,7 +28,6 @@ public class Util {
 	public static ValueType stringType() { return theStringType; }
 	public static ValueType unitType() { return theUnitType; }
 	public static ValueType dynType() { return theDynType; }
-	public static ValueType effectType() { return theEffectType; } // 6/27/17
 	public static ValueType unitToDynType() {
 		LinkedList<DeclType> arrowDecls = new LinkedList<>();
 		arrowDecls.add(new DefDeclType("apply", new DynamicType(), new LinkedList<FormalArg>()));

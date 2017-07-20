@@ -52,10 +52,6 @@ public class TypeOrEffectGenContext extends GenContext {
     public ValueType lookupTypeOf(String varName) {
         return getNext().lookupTypeOf(varName);
     }
-    
-    public HashSet<String> lookupEffectSetOf(String varName) { // HashSet<Effect>??
-        return ((TypeOrEffectGenContext) getNext()).lookupEffectSetOf(varName);
-    }
 
     @Override
     public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
