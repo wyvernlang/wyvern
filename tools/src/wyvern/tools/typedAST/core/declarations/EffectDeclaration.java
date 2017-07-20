@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -58,8 +59,9 @@ public class EffectDeclaration extends Declaration {
 		}
 	}
 	
-	public void genTopLevel(TopLevelContext tlc) {
-		
+	@Override
+	public void genTopLevel(TopLevelContext tlc) { // type abbrev, (see ValDeclaration for Let), this.E, Type/EffectGenContext for 
+		tlc.addLet(getName(), Util.unitType(), Util.unitValue(), false);
 	}
 	
 	@Override
@@ -100,7 +102,12 @@ public class EffectDeclaration extends Declaration {
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
-//		throw new RuntimeException("addModuleDecl");
+		wyvern.target.corewyvernIL.decl.Declaration decl =
+				new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(),
+						Util.unitType(),
+						new wyvern.target.corewyvernIL.expression.Variable(getName()), getLocation());
+			DeclType dt = genILType(tlc.getContext());
+			tlc.addModuleDecl(decl,dt);
 	}
 	
 	
@@ -119,7 +126,8 @@ public class EffectDeclaration extends Declaration {
 	}
 	@Override
 	public Type getType() { // effects have no parsed "type" like variables/values do
-		return null;
+		throw new RuntimeException("extendName not implemented");
+//		return null;
 	}
 	@Override
 	public Map<String, TypedAST> getChildren() {
