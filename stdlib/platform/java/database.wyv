@@ -1,0 +1,37 @@
+module def database(java : Java)
+
+import java:wyvern.stdlib.support.Database.database
+
+//import java:wyvern.stdlib.platform.sql
+
+type Connection
+    def close(): Unit
+    //def prepareStatement(): PreparedStatement
+
+def connect(connectionStr:String, user:String, password:String):Connection
+    // Can probably rewrite library function
+    database.connect(connectionStr, user, password)
+
+def disconnect(con:Connection):Unit // Connection type not recognized 06/25
+    con.close()
+
+type PreparedStatement
+    def execute():Unit
+
+/*
+def createTable(con:Connection, tableName:String, tableContents:String):Unit // should this return Table?
+    database.createTable(con, tableName, tableContents)
+
+
+def select(con:Connection, arg:String, table:String):Unit
+    database.select(con, arg, table)
+
+def insert(con:Connection, format:String, values:String, table:String):Unit
+    database.insert(con, format, values, table)
+
+def delete(con:Connection, arg:String, table:String):Unit
+    database.delete(con, arg, table)
+
+def dropTable(con:Connection, col:String, table:String):Unit
+    database.dropTable(col, table)
+*/
