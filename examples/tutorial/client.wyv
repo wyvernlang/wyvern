@@ -8,7 +8,7 @@ val s1 = io.makeSocket("localhost", 1254)
 
 // Get an input file handle from the socket and read input
 val s1in = s1.getInputStream()
-stdout.print("Got past getInputStream")
+stdout.print("Got past getInputStream\n")
 
-//val dis = io.makeDataInputStream(s1in)
-//stdout.print("Got past makeDataInputStream")
+val dis = io.makeDataInputStream(s1in)
+stdout.print("Got past makeDataInputStream\n")
