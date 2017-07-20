@@ -1,7 +1,5 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.util.HashSet;
-
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
