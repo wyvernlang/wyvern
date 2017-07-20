@@ -8,7 +8,7 @@ import wyvern.tools.errors.FileLocation;
 public interface ASTBuilder<AST,Type> {
 	public AST sequence(AST t1, AST t2, boolean inModule);
 	
-	public AST moduleDecl(String name, AST ast, FileLocation loc, boolean isResource);
+	public AST moduleDecl(String name, AST ast, Type type, FileLocation loc, boolean isResource);
 	public AST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata);
 	/** if type is null, it will be inferred*/
 	public AST valDecl(String name, Type type, AST exp, FileLocation loc);
@@ -42,7 +42,7 @@ public interface ASTBuilder<AST,Type> {
 	public Object tagInfo(Type type, List<Type> comprises);
 	
 	public Type nominalType(String name, FileLocation loc);
-	public Type arrowType(Type argument, Type result);
+	public Type arrowType(List<Type> arguments, Type result);
 	public Type parameterizedType(Type base, List<Type> arguments, FileLocation loc);
 	
 	public Type qualifiedType(AST base, String name);

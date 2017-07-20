@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -124,12 +125,19 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
     
 	@Override
 	public ValueType getILType(GenContext ctx) {
-		final ValueType argType = argument.getILType(ctx);
-		if (Util.unitType().equals(argType) || nominalUnit.equals(argType)) {
-			// zero argument function
-			return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), new LinkedList<FormalArg>())));
+		List<FormalArg> formals = new LinkedList<FormalArg>();
+		if (argument instanceof Tuple) {
+		    Tuple tuple = (Tuple) argument;
+		    for (int i = 0; i < tuple.getTypeArray().length; ++i) {
+                formals.add(new FormalArg("arg" + i, tuple.getTypeArray()[i].getILType(ctx)));
+		    }
+		} else {
+	        final ValueType argType = argument.getILType(ctx);
+	        if (!Util.unitType().equals(argType) && !nominalUnit.equals(argType)) {
+	            // it's a real argument, add it to the list
+	            formals.add(new FormalArg("arg1", argType));
+	        }
 		}
-		return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), Arrays.asList(new FormalArg("arg1", argType)))));
-		//return this.result.getILType(ctx);
+		return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)));
 	}
 }

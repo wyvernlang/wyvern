@@ -1,4 +1,4 @@
-module def wordProcessor(io : figs.FileIO) : WordProcessor
+module def wordProcessor(io : figs.FileIO) : figs.WordProcessor
 
 import figs.logger
 

@@ -26,18 +26,15 @@ public class Tuple extends AbstractTypeImpl implements OperatableType, TypeResol
 	public Tuple(Type[] types) {
 		this.types = types;
 	}
-
+	
+    public Tuple(List<Type> types) {
+        this.types = types.toArray(new Type[types.size()]);
+    }
+	
 	public Tuple(Type first, Type last) {
 		types = new Type[] {first, last};
 	}
 	
-	public Tuple(List<NameBinding> bindings) {
-		this.types = new Type[bindings.size()];
-		for (int i = 0; i < bindings.size(); i++) {
-			this.types[i] = bindings.get(i).getType();
-		}
-	}
-
 	public Type[] getTypeArray() {
 		return types;
 	}

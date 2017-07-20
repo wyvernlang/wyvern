@@ -1,4 +1,4 @@
-module def userInfo() : UserInfo
+module def userInfo() : illustrations.UserInfo
 
 import illustrations.lists
 

@@ -16,7 +16,9 @@ public class ParseUtils {
 	 */
 	public static WyvernParser<TypedAST,Type> makeParser(String filename, Reader source)
 			throws ParseException {
-		WyvernParser<TypedAST,Type> wp = new WyvernParser<TypedAST,Type>(new WyvernTokenManager<WyvernLexer>(source, filename, WyvernLexer.class));
+		WyvernParser<TypedAST,Type> wp = new WyvernParser<TypedAST,Type>(
+				new WyvernTokenManager<WyvernLexer, WyvernParserConstants>(source, filename, WyvernLexer.class,
+                                                                           WyvernParserConstants.class));
 		wp.setBuilder(new WyvernASTBuilder());
 		return wp;
 	}
