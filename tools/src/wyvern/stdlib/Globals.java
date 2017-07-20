@@ -15,11 +15,13 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
@@ -30,6 +32,7 @@ import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.support.VarGenContext;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -130,6 +133,7 @@ public class Globals {
 		genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
 		genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
 		genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
+		genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
 		return genCtx;
 	}
@@ -194,6 +198,7 @@ public class Globals {
         //declTypes.add(new ConcreteTypeMember("Python", pythonType));
         declTypes.add(new TaggedTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
+        declTypes.add(new ValDeclType("unit", Util.unitType()));
         ValueType systemType = new StructuralType("system", declTypes);
         return systemType;
 	}
@@ -222,6 +227,7 @@ public class Globals {
 		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
 		decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
+        decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
 		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
 		return systemVal;
 	}

@@ -155,8 +155,10 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         // Extend the generalContext to include the parameters passed into the function.
         ctx = extendCtxWithParams(ctx, intermediateArgs);
 
-        // Generate the IL for the body, and get it's return type.
-        IExpr il = this.body.generateIL(ctx, null, dependencies);
+        // Generate the IL for the body, and get its return type.
+        ValueType expectedBodyType = (expectedType == null)
+                                     ? null : this.getExpectedResult(ctx, expectedType);
+        IExpr il = this.body.generateIL(ctx, expectedBodyType, dependencies);
         ValueType bodyReturnType = il.typeCheck(ctx);
 
         // Create a new list of function declaration,
@@ -210,7 +212,8 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
                 ToolError.reportError(
                     ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                     this,
-                    Integer.toString(expectedSize)
+                    Integer.toString(expectedSize),
+                    Integer.toString(bindings.size())
                 );
             }
         }
@@ -253,6 +256,21 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         DefDeclType applyDef = (DefDeclType) applyDecl;
 
         return applyDef.getFormalArgs();
+    }
+
+    private static ValueType getExpectedResult(GenContext ctx, ValueType declType) {
+        StructuralType declStructuralType = declType.getStructuralType(ctx);
+
+        DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
+
+        if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
+            //TODO: will replace with ToolError in the future
+            throw new RuntimeException("the declType is not a lambda type(it has no apply method)");
+        }
+
+        DefDeclType applyDef = (DefDeclType) applyDecl;
+
+        return applyDef.getRawResultType();
     }
 
     private static GenContext extendCtxWithParams(GenContext ctx, List<FormalArg> formalArgs) {
