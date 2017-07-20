@@ -1,4 +1,4 @@
-module def cellAsModule():modules.TCellAsModule
+module def cellAsModule():TCellAsModule
 
 var value : Int = 0
 def set(newValue:Int):Unit

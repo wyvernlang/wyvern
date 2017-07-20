@@ -1,4 +1,4 @@
-module def fileIO(java : Java) : illustrations.FileIO
+module def fileIO(java : Java) : FileIO
 
 import java:wyvern.tools.tests.Illustrations.nativeFileIO
 
