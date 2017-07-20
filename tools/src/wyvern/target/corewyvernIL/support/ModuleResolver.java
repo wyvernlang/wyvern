@@ -213,9 +213,6 @@ public class ModuleResolver {
 				// rename according to "apply"
 				DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(), oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
 				// wrap in an object
-//				String s = "";
-//				for (FormalArg f : defDecl.getFormalArgs()) {s+=(f.getName()+"+"+f.getType()+", ");}
-//				throw new RuntimeException(defDecl.getBody().toString());
 				program = new New(defDecl);
 				//program = wrap(program, dependencies);
 			} else if (decl instanceof TypeDeclaration) {

@@ -63,9 +63,6 @@ public class New extends Expression {
 		if (hasDelegate) {
 			delegateDeclaration = (DelegateDeclaration)delegate_option.get();
 		}
-//		String s = "";
-//		for (Declaration d : decls) {s += d.getName()+"+";}
-//		throw new RuntimeException(s);
 	}
 
 	public List<Declaration> getDecls() {
