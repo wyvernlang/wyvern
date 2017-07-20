@@ -13,11 +13,6 @@ public class QualifiedType extends AbstractTypeImpl {
 	private ExpressionAST base;
 	private String name;
 	
-	@Override
-	public String toString() {
-		return base.toString() + "." + name;
-	}
-	
 	public String getName() { return name; }
 	public TypedAST getBase() { return base; }
 	@Override

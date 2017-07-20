@@ -96,11 +96,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		} else if (args.size() == 1) {
 			argType = args.get(0).getType();
 		} else {
-	        Type types[] = new Type[args.size()];
-	        for (int i = 0; i < args.size(); i++) {
-	            types[i] = args.get(i).getType();
-	        }
-			argType = new Tuple(types);
+			argType = new Tuple(args);
 		}
 		return new Arrow(argType, returnType);
 	}

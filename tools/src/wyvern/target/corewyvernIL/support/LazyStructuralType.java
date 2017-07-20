@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,11 +37,6 @@ public class LazyStructuralType extends StructuralType {
 		// if we fail, we just leave out that method
 		nextMethod: for (Method m : javaClass.getMethods()) {
 			
-		    // Exclude static methods; they are part of the class, not the object
-		    // If we want to support calling static methods, in Wyvern we should call them on the class, not on one of its instances 
-		    if (Modifier.isStatic(m.getModifiers()))
-		        continue;
-		    
 			ValueType retType = GenUtil.javaClassToWyvernType(m.getReturnType(), ctx);
 			if (retType == null)
 				continue;

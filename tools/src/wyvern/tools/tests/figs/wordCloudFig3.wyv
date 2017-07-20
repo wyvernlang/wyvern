@@ -1,4 +1,4 @@
-module def wordCloudFig3(log : figs.Logger) : figs.WordCloud
+module def wordCloudFig3(log : figs.Logger) : WordCloud
 
 import figs.listFactory
 
