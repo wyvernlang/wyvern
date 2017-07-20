@@ -336,7 +336,7 @@ AST EffectDeclaration() : // in module def, must be defined
 { Type type = null; Token name; Token effects; AST decls; } //AST body;}
 {
    <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> <NEWLINE> {
-    return build.effectDecl(name.image, loc(name), effects.image); 
+    return build.effectDecl(name.image, effects.image, loc(name)); 
    }
 }
 
@@ -424,9 +424,9 @@ AST EffectDeclType() :
 {
   <EFFECT> name = <IDENTIFIER> [<EQUALS> effects = <DSL_LITERAL>] <NEWLINE> {
   if (effects==null) {
-    return build.effectDeclType(name.image, loc(name), null); // temporary work-around
+    return build.effectDeclType(name.image, null, loc(name));
   }
-  return build.effectDeclType(name.image, loc(name), effects.image);
+  return build.effectDeclType(name.image, effects.image, loc(name));
   }
 }
 
