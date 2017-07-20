@@ -24,5 +24,5 @@ stdout.print("WROTE TO UTF\n")
 
 // Close the connection but not the server socket
 dos.close()
-// Call to "s1in.close()" causes an error
+// Call to "s1out.close()" causes an error
 s1.close()
