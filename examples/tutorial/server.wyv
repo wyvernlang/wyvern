@@ -19,7 +19,7 @@ stdout.print("got past s1.getOutputStream\n")
 val dos = io.makeDataOutputStream(s1out)
 stdout.print("got past io.makeDataOutputStream\n")
 
-dos.writeUTF("This is a server, asshole")
+dos.writeUTF("This is a server message\n")
 stdout.print("WROTE TO UTF\n")
 
 // Close the connection but not the server socket

@@ -12,3 +12,13 @@ stdout.print("Got past getInputStream\n")
 
 val dis = io.makeDataInputStream(s1in)
 stdout.print("Got past makeDataInputStream\n")
+
+// Read in from server
+val str = dis.readUTF()
+stdout.print("Got a string from the server :o, here's what it said:\n")
+stdout.print(str)
+
+// When done, close the connection and exit
+dis.close()
+// Call to "s1in.close()" causes an error
+s1.close()
