@@ -49,113 +49,113 @@ public class EffectSystemTests {
         WyvernResolver.getInstance().addPath(PATH);
     }
     
-    @Test
-    public void testEffectNetwork00() throws ParseException {
-    	/* Type & module def with no annotations. */
-    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
-    }
+//    @Test
+//    public void testEffectNetwork00() throws ParseException {
+//    	/* Type & module def with no annotations. */
+//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
+//    }
 
     @Test
      public void testEffectNetwork01() throws ParseException {
     	/* Declared in type + module def;
     	 * Defined in module def;
     	 * Method annotations in both. */ 
-    	try {
+//    	try {
     		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork01(): "+e.getMessage());
-    	}
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork01(): "+e.getMessage());
+//    	}
 	}
     
-    @Test
-    public void testEffectNetwork02() throws ParseException {
-    	/* No declarations. Method annotations in type & module def. */
-    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.unitType(), Util.unitValue());
-	}
-  
-    @Test
-    public void testEffectNetwork03() throws ParseException {
-    	/* In addition to declarations (not defined) & method annotations in type, additional declaration &
-    	 * definition in module def. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork03(): "+e.getMessage());
-    	}
-	}
-    
-    @Test
-    public void testEffectNetwork04() throws ParseException { // parse error
-    	/* "gibberish" where "{}" should be in type's method header annotation. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork04(): "+e.getMessage());
-    	}
-	}
-    
-    @Test
-    public void testEffectNetwork05() throws ParseException { // parse error
-    	/* "gibberish" where "{}" should be in module def's method header annotation. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork05(): "+e.getMessage());
-    	}
-	}
-    
-    @Test
-    public void testEffectNetwork06() throws ParseException { // parse error
-    	/* Bogus declaration ("effect send = stdout") in module def. */ 
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork06(): "+e.getMessage());
-    	}
-	}
-    
-    @Test
-    public void testEffectNetwork07() throws ParseException {
-    	/* Declarations + 1 defined in type;
-    	 * Declarations + definitions in module def;
-    	 * Method annotations in both.
-    	 */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork07(): "+e.getMessage());
-    	}
-	}
-    
-    @Test
-    public void testEffectNetwork08() throws ParseException { // UNRESOLVED type error
-    	/* Like network07, but "effect receive = {{}}" */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork08(): "+e.getMessage());
-    	}
-	}
-    
-    @Test
-    public void testEffectNetwork09() throws ParseException {
-    	/* No module declarations despite declarations in type + module def. */
-    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork09", Util.unitType(), Util.unitValue());
-    }
-    
-    @Test
-    public void testEffectObjNetwork00() throws ParseException {
-    	/* Object notation with no effect annotations. */
-    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
-	}
-
-    @Test
-    public void testEffectObjNetwork01() throws ParseException {
-    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectObjNetwork01(): "+e.getMessage());
-    	}
-	}
+//    @Test
+//    public void testEffectNetwork02() throws ParseException {
+//    	/* No declarations. Method annotations in type & module def. */
+//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.unitType(), Util.unitValue());
+//	}
+//  
+//    @Test
+//    public void testEffectNetwork03() throws ParseException {
+//    	/* In addition to declarations (not defined) & method annotations in type, additional declaration &
+//    	 * definition in module def. */
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork03(): "+e.getMessage());
+//    	}
+//	}
+//    
+//    @Test
+//    public void testEffectNetwork04() throws ParseException { // parse error
+//    	/* "gibberish" where "{}" should be in type's method header annotation. */
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork04(): "+e.getMessage());
+//    	}
+//	}
+//    
+//    @Test
+//    public void testEffectNetwork05() throws ParseException { // parse error
+//    	/* "gibberish" where "{}" should be in module def's method header annotation. */
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork05(): "+e.getMessage());
+//    	}
+//	}
+//    
+//    @Test
+//    public void testEffectNetwork06() throws ParseException { // parse error
+//    	/* Bogus declaration ("effect send = stdout") in module def. */ 
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork06(): "+e.getMessage());
+//    	}
+//	}
+//    
+//    @Test
+//    public void testEffectNetwork07() throws ParseException {
+//    	/* Declarations + 1 defined in type;
+//    	 * Declarations + definitions in module def;
+//    	 * Method annotations in both.
+//    	 */
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork07(): "+e.getMessage());
+//    	}
+//	}
+//    
+//    @Test
+//    public void testEffectNetwork08() throws ParseException { // UNRESOLVED type error
+//    	/* Like network07, but "effect receive = {{}}" */
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectNetwork08(): "+e.getMessage());
+//    	}
+//	}
+//    
+//    @Test
+//    public void testEffectNetwork09() throws ParseException {
+//    	/* No module declarations despite declarations in type + module def. */
+//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork09", Util.unitType(), Util.unitValue());
+//    }
+//    
+//    @Test
+//    public void testEffectObjNetwork00() throws ParseException {
+//    	/* Object notation with no effect annotations. */
+//    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
+//	}
+//
+//    @Test
+//    public void testEffectObjNetwork01() throws ParseException {
+//    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
+//    	try {
+//    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+//    	} catch (Exception e) {
+//    		System.out.println("testEffectObjNetwork01(): "+e.getMessage());
+//    	}
+//	}
 }

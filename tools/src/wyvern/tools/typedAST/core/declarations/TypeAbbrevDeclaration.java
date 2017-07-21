@@ -166,12 +166,12 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 		ValueType referenceILType = reference.getILType(ctx);
 		referenceILType.checkWellFormed(ctx);
 
-    IExpr metadataExp = null;
-    if (metadata != null)
-        metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
+		IExpr metadataExp = null;
+		if (metadata != null)
+			metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
 
-		return new TypeDeclaration(getName(), referenceILType, metadataExp, getLocation());
-	}
+			return new TypeDeclaration(getName(), referenceILType, metadataExp, getLocation());
+		}
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {

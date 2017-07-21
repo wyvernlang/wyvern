@@ -22,13 +22,6 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		this.effectSet = effectSet;
 		this.loc = loc;
 	}
-
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-//		dest.append("NOT_IMPLEMENTED(")
-//			.append(this.getClass().getName())
-//			.append(')');
-		//throw new RuntimeException("not implemented");
-	}
 	
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
@@ -36,14 +29,44 @@ public class EffectDeclType extends DeclType implements IASTNode {
 	}
 
 	@Override
-	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) { 
 		if (!(dt instanceof EffectDeclType)) {
 			return false;
 		}
 		EffectDeclType edt = (EffectDeclType) dt;
-		if (edt.getEffectSet().containsAll(getEffectSet())) // "this" is a subtype of edt if edt's effect set contains "this" effect set and potentially more
-			return true;
-		return false;
+		
+		/* edt == effect declared (and possibly defined in the type),
+		 * this == effect declared and defined in the module def.
+		 * If effect undefined in the type, anything defined in the module
+		 * def works; if defined in the type, then the effect in the module
+		 * def can only be defined using a subset of the definition in the type.
+		 */
+		if (edt.getEffectSet()!=null) { 
+			if (!edt.getEffectSet().containsAll(getEffectSet())) 
+				return false; // effect E = S ("this") <: effect E = S' (edt)	if S <= S' (both are concrete)	
+		}
+		return true; // if edt.getEffectSet()==null (i.e. undefined in the type), anything is a subtype
+		// i.e. effect E = {} (concrete "this") <: effect E (abstract dt which is undefined)
+		
+//			if (getEffectSet()!=null) {
+//				return false;
+//			} else {
+//				return true; // need to shorten logic
+//			}
+//		}
+//		if (getEffectSet()==null) // equal 
+//			throw new RuntimeException();
+//		throw new RuntimeException("nope");
+//		if (edt.getEffectSet()==null) {
+//			return true;
+//		} else {
+//			if (edt.getEffectSet().containsAll(getEffectSet())) { // allow module def to define more effects in the set?
+//				return true;
+//			}
+//		}
+////		if (getEffectSet().containsAll(edt.getEffectSet())) 
+////			return true; // different from: effect E = S <: effect E = S'	if S <= S' (both are concrete)
+//		return false;
 	}
 
 	public HashSet<Effect> getEffectSet() {
@@ -81,12 +104,13 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		return true;
 	}
 
-//	@Override
-//	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-//		dest.append(indent).append("val ").append(getName()).append(" : ");
-//		getRawResultType().doPrettyPrint(dest, indent);
-//		dest.append('\n');
-//	}
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("effect ").append(getName()).append(" = ");
+		if (effectSet!=null) 
+			dest.append(effectSet.toString());
+		dest.append('\n');
+	}
 
 	@Override
 	public DeclType adapt(View v) {

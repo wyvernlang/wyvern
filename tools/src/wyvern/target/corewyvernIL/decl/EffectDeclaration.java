@@ -50,6 +50,7 @@ public class EffectDeclaration extends NamedDeclaration {
 	@Override
 	public Set<String> getFreeVariables() {
 		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<String>(); // this should either be an empty HashSet, or the entire effectSet...
+//		throw new RuntimeException("getFreeVars");
 	}
 }
