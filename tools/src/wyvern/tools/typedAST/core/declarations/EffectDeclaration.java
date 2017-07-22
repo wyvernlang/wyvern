@@ -27,10 +27,10 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
-	Variable path;
-	String name;
-	HashSet<Effect> effectSet;
-	FileLocation loc;
+	private Variable path;
+	private String name;
+	private HashSet<Effect> effectSet;
+	private FileLocation loc;
 	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation) { // decltype declarations
 		this.name = name;

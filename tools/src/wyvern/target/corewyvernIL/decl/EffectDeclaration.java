@@ -19,7 +19,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class EffectDeclaration extends NamedDeclaration {
-	Effect e;
+	private Effect e;
 	
 	public EffectDeclaration(Effect e) {
 		super(e.getName(), e.getLocation()); // not sure if necessary...

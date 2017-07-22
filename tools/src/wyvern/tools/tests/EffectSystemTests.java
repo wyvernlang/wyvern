@@ -7,6 +7,7 @@ import org.junit.experimental.categories.Category;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 //import wyvern.target.corewyvernIL.support.Util;
@@ -23,26 +24,16 @@ import wyvern.tools.tests.suites.RegressionTests;
  * "data sent: Network%d%d with(out) effects
  * data received"
  * 
- * Test cases that fail due to unimplemented features beyond the parsing 
- * level are commented as so and have the printout format:
- * "test_method_name(): exception_message"
- * 
  * Comments related to effects: "declaration, definition, method annotation"
  * Appearance in Wyvern:
  * effect "declared_effect" = {"its_defined_effects"}
  * def method_name() : {"method_annotation_of_effects"} return_type 
  * 
- * In examples/effects directory, "*.wyt" files have no significance, because
- * there are some subtype issues that need to be fixed in the future.  Each 
- * network module has its own file in addition to its own type defined in the 
- * test file, despite some network test cases sharing the same type (which 
- * could be sorted out in the future).
- * 
  * @author vzhao
  */
 @Category(RegressionTests.class)
 public class EffectSystemTests {
-    private static final String PATH = TestUtil.EXAMPLES_PATH;
+    private static final String PATH = TestUtil.BASE_PATH;
     
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
@@ -60,11 +51,7 @@ public class EffectSystemTests {
     	/* Declared in type + module def;
     	 * Defined in module def;
     	 * Method annotations in both. */ 
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork01(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
 	}
     
     @Test
@@ -77,41 +64,28 @@ public class EffectSystemTests {
     public void testEffectNetwork03() throws ParseException {
     	/* In addition to declarations (not defined) & method annotations in type, additional declaration &
     	 * definition in module def. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork03(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.unitType(), Util.unitValue());
 	}
     
     @Test
-    public void testEffectNetwork04() throws ParseException { // parse error
+    @Category(CurrentlyBroken.class) // Parse error
+    public void testEffectNetwork04() throws ParseException {
     	/* "gibberish" where "{}" should be in type's method header annotation. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork04(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.unitType(), Util.unitValue());
 	}
     
     @Test
-    public void testEffectNetwork05() throws ParseException { // parse error
+    @Category(CurrentlyBroken.class) // Parse error
+    public void testEffectNetwork05() throws ParseException {
     	/* "gibberish" where "{}" should be in module def's method header annotation. */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork05(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.unitType(), Util.unitValue());
 	}
     
     @Test
-    public void testEffectNetwork06() throws ParseException { // parse error
+    @Category(CurrentlyBroken.class) // Parse error
+    public void testEffectNetwork06() throws ParseException {
     	/* Bogus declaration ("effect send = stdout") in module def. */ 
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork06(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.unitType(), Util.unitValue());
 	}
     
     @Test
@@ -120,21 +94,14 @@ public class EffectSystemTests {
     	 * Declarations + definitions in module def;
     	 * Method annotations in both.
     	 */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork07(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.unitType(), Util.unitValue());
 	}
     
     @Test
-    public void testEffectNetwork08() throws ParseException { // UNRESOLVED type error
+    @Category(CurrentlyBroken.class) // Invalid effect (actually DSL block instead)
+    public void testEffectNetwork08() throws ParseException {
     	/* Like network07, but "effect receive = {{}}" */
-    	try {
-    		TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectNetwork08(): "+e.getMessage());
-    	}
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.unitType(), Util.unitValue());
 	}
     
     @Test

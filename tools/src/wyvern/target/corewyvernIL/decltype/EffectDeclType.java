@@ -14,8 +14,8 @@ import wyvern.tools.errors.FileLocation;
 
 
 public class EffectDeclType extends DeclType implements IASTNode {
-	HashSet<Effect> effectSet;
-	FileLocation loc;
+	private HashSet<Effect> effectSet;
+	private FileLocation loc;
 	
 	public EffectDeclType(String name, HashSet<Effect> effectSet, FileLocation loc) {
 		super(name);

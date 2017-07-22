@@ -1,10 +1,7 @@
-module def network01(stdout : Stdout)// : effects.NetworkType01
-
-effect send = {}
-effect receive = {}
+module def network02(stdout : Stdout) : effects.NetworkType02
 def sendData(data : String) : {} Unit
     stdout.print("data sent: ")
     stdout.print(data)
     stdout.print("\n")
-def receiveData() : {receive} Unit
+def receiveData() : {} Unit
     stdout.print("data received\n")
