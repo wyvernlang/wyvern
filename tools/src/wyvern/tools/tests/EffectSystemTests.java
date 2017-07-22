@@ -111,6 +111,13 @@ public class EffectSystemTests {
     }
     
     @Test
+    @Category(CurrentlyBroken.class) // Actually returns parse error (taken care of by the parser)
+    public void testEffectNetwork0A() throws ParseException {
+    	/* Effect undefined in module def. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0A", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
     public void testEffectObjNetwork00() throws ParseException {
     	/* Object notation with no effect annotations. */
     	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());

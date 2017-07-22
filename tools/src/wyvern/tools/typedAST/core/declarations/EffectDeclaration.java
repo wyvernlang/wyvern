@@ -19,7 +19,9 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -42,7 +44,7 @@ public class EffectDeclaration extends Declaration {
 		} else if (effects=="") { // explicitly defined to be empty list of effects
 			effectSet = new HashSet<Effect>();
 		} else if (Pattern.compile("[^a-zA-Z,.]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-			throw new RuntimeException("Invalid effects--is this a DSL block instead?"); // need to change to tool error later
+			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, this, name+" = {"+effects+"}");
 		} else {
 			effectSet = new HashSet<Effect>();
 			for (String s : name.split(", *")) {
@@ -54,8 +56,10 @@ public class EffectDeclaration extends Declaration {
 	
 	public EffectDeclaration(String name, String effects, FileLocation loc, boolean isDeclType) {
 		this(name, effects, loc);
+		
+		/* Dead code (but potentially more desirable): Effects undefined in module def are currently being taken care of by the parser */
 		if (effectSet==null && !isDeclType) { // not in the type signature but nothing defined for effect set 
-			new RuntimeException("Unspecified effect set outside of type signature.");
+			ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
 		}
 	}
 	

@@ -1,4 +1,4 @@
-module def network03(stdout : Stdout)// : effects.NetworkType03
+module def network03(stdout : Stdout) : effects.NetworkType01
 effect send = {}
 effect receive = {}
 effect process = {}
@@ -8,7 +8,6 @@ def sendData(data : String) : {} Unit
     stdout.print("\n")
 def receiveData() : {receive} Unit
     stdout.print("data received\n")
-/*def processData() : {process} Int
-    receiveData()
-    stdout.print("data processed")
-    3*/
+//def processData() : {process} Unit
+//    receiveData()
+//    stdout.print("data processed")

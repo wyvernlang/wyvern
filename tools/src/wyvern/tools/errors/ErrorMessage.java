@@ -99,6 +99,10 @@ public enum ErrorMessage {
 	TSL_ERROR("Error in type-specific language: %ARG",1),
 	CANNOT_APPLY_TYPE_PARAMETERS("Cannot apply type parameters: type %ARG is abstract",1),
 	NO_TYPE_MEMBER("Cannot find enough type members to apply type parameters",0),
+	
+	// effect error
+	MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: %ARG", 1),
+	UNDEFINED_EFFECT("Effect undefined outside of type signature: %ARG", 1),
 	;
 
 	private ErrorMessage(String message, int numArgs) {
