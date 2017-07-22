@@ -22,5 +22,5 @@ val objNetwork01:ObjNetworkType01 = new
   def receiveData() : Unit
       stdout.print("data received\n")
 
-objNetwork01.sendData("objNetwork01")
+objNetwork01.sendData("objNetwork01 with effects")
 objNetwork01.receiveData()

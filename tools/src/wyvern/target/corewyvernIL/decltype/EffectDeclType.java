@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.Effect;
@@ -14,10 +15,10 @@ import wyvern.tools.errors.FileLocation;
 
 
 public class EffectDeclType extends DeclType implements IASTNode {
-	HashSet<Effect> effectSet;
-	FileLocation loc;
+	private Set<Effect> effectSet;
+	private FileLocation loc;
 	
-	public EffectDeclType(String name, HashSet<Effect> effectSet, FileLocation loc) {
+	public EffectDeclType(String name, Set<Effect> effectSet, FileLocation loc) {
 		super(name);
 		this.effectSet = effectSet;
 		this.loc = loc;
@@ -69,7 +70,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 //		return false;
 	}
 
-	public HashSet<Effect> getEffectSet() {
+	public Set<Effect> getEffectSet() {
 		return effectSet;
 	}
 

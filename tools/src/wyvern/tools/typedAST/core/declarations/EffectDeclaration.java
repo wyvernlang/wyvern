@@ -5,6 +5,7 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashSet;
 
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -34,10 +36,10 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
-	Variable path;
-	String name;
-	HashSet<Effect> effectSet;
-	FileLocation loc;
+	private Variable path;
+	private String name;
+	private Set<Effect> effectSet;
+	private FileLocation loc;
 	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation) { // decltype declarations
 		this.name = name;
@@ -49,30 +51,27 @@ public class EffectDeclaration extends Declaration {
 		} else if (effects=="") { // explicitly defined to be empty list of effects
 			effectSet = new HashSet<Effect>();
 		} else if (Pattern.compile("[^a-zA-Z,.]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-			throw new RuntimeException("Invalid effects--is this a DSL block instead?"); // need to change to tool error later
+			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, this, name+" = {"+effects+"}");
 		} else {
 			effectSet = new HashSet<Effect>();
 			for (String s : name.split(", *")) {
 				String[] pathAndID = s.split("\\.");
-				effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], null, loc));
+				effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
 			}
 		}
 	}
 	
 	public EffectDeclaration(String name, String effects, FileLocation loc, boolean isDeclType) {
 		this(name, effects, loc);
-		if (effectSet==null) {
-			if (!isDeclType) { // not in the type signature but nothing defined for effect set 
-				new RuntimeException("Undefined effect set outside of type signature.");
-			} 
-//			else {
-//				effectSet = (HashSet<Effect>) effectSet; // or maybe just make it empty? But that would coincide w/ empty module def effects
-//			}
+		
+		/* Dead code (but potentially more desirable): Effects undefined in module def are currently being taken care of by the parser */
+		if (effectSet==null && !isDeclType) { // not in the type signature but nothing defined for effect set 
+			ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
 		}
 	}
 	
 	public Effect getEffect() {
-		return new Effect(getPath(), getName(), getEffectSet(), getLocation());
+		return new Effect(getPath(), getName(), getLocation());
 	}
 	
 	@Override
@@ -104,7 +103,7 @@ public class EffectDeclaration extends Declaration {
 		return name;
 	}
 	
-	public HashSet<Effect> getEffectSet() {
+	public Set<Effect> getEffectSet() {
 		return effectSet;
 	}
 	
@@ -121,7 +120,7 @@ public class EffectDeclaration extends Declaration {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 //		return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, Util.unitType(), Util.unitValue(), loc); // stub
-		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getEffect());
+		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
 //		throw new RuntimeException("generateDecl not implemented");
 	}
 	@Override
@@ -130,7 +129,7 @@ public class EffectDeclaration extends Declaration {
 			e.getPath().typeCheck(ctx).checkWellFormed(ctx);
 //			((TypeOrEffectGenContext) ctx).getContainerForTypeAbbrev(e.getPath().typeCheck(ctx));
 		}
-		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getEffect());
+		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
 		// ex. fio.read --> fio = Path/Variable which should theoretically be the obj name that corresponds to a type
 		// that .checkWellFormed(ctx) can be called on
 	}

@@ -1,10 +1,6 @@
 require stdout
 import effects.network02
 
-resource type NetworkType02
-  def sendData(data : String) : {} Unit
-  def receiveData() : {receive} Unit
-
-val n02 : NetworkType02 = network02(stdout)
+val n02 = network02(stdout)
 n02.sendData("Network02 with effects")	// print "data sent: Network02 with effects"
 n02.receiveData()		// print "data received"
