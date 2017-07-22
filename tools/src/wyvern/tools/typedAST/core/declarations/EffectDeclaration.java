@@ -83,8 +83,8 @@ public class EffectDeclaration extends Declaration {
 		return effectSet;
 	}
 	
-	public Path getPath() {
-		return path;
+	public Variable getPath() {
+		return (Variable) path;
 	}
 	
 	@Override

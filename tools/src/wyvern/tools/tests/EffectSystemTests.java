@@ -126,10 +126,6 @@ public class EffectSystemTests {
     @Test
     public void testEffectObjNetwork01() throws ParseException {
     	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
-    	try {
     		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
-    	} catch (Exception e) {
-    		System.out.println("testEffectObjNetwork01(): "+e.getMessage());
-    	}
 	}
 }

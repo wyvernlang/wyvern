@@ -33,8 +33,8 @@ public class Effect {
 //		}
 //	}
 
-	public Path getPath() {
-		return path;
+	public Variable getPath() {
+		return (Variable) path;
 	}
 	
 	public String getName() {

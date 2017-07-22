@@ -44,7 +44,7 @@ public class EffectDeclaration extends NamedDeclaration {
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // technically "effectCheck"
 		for (Effect e : effectSet) {
-			ValueType vt = ctx.lookupTypeOf(e.getName());
+			ValueType vt = ctx.lookupTypeOf(e.getPath().getName());
 			if (vt == null){
 				throw new RuntimeException("Path not found.");
 			} else {
