@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.Effect;
@@ -14,20 +15,13 @@ import wyvern.tools.errors.FileLocation;
 
 
 public class EffectDeclType extends DeclType implements IASTNode {
-	private HashSet<Effect> effectSet;
+	private Set<Effect> effectSet;
 	private FileLocation loc;
 	
-	public EffectDeclType(String name, HashSet<Effect> effectSet, FileLocation loc) {
+	public EffectDeclType(String name, Set<Effect> effectSet, FileLocation loc) {
 		super(name);
 		this.effectSet = effectSet;
 		this.loc = loc;
-	}
-
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-//		dest.append("NOT_IMPLEMENTED(")
-//			.append(this.getClass().getName())
-//			.append(')');
-		//throw new RuntimeException("not implemented");
 	}
 	
 	@Override
@@ -46,7 +40,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		return false;
 	}
 
-	public HashSet<Effect> getEffectSet() {
+	public Set<Effect> getEffectSet() {
 		return effectSet;
 	}
 
@@ -81,12 +75,13 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		return true;
 	}
 
-//	@Override
-//	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-//		dest.append(indent).append("val ").append(getName()).append(" : ");
-//		getRawResultType().doPrettyPrint(dest, indent);
-//		dest.append('\n');
-//	}
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("effect ").append(getName()).append(" = ");
+		if (effectSet != null)
+			dest.append(effectSet.toString());
+		dest.append('\n');
+	}
 
 	@Override
 	public DeclType adapt(View v) {

@@ -19,11 +19,11 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class EffectDeclaration extends NamedDeclaration {
-	private Effect e;
+	private Set<Effect> effectSet;
 	
-	public EffectDeclaration(Effect e) {
-		super(e.getName(), e.getLocation()); // not sure if necessary...
-		this.e = e;
+	public EffectDeclaration(String name, Set<Effect> effectSet, FileLocation loc) {
+		super(name, loc);
+		this.effectSet = effectSet;
 	}
 	
 	@Override
@@ -31,19 +31,28 @@ public class EffectDeclaration extends NamedDeclaration {
 			S state) {
 		return null; //emitILVisitor.visit(state, this);
 	}
-//
-//	public HashSet<String> getEffectSet() {
-//		return effectSet;
-//	}
+
+	public Set<Effect> getEffectSet() {
+		return effectSet;
+	}
 	
 	@Override
 	public DeclType getDeclType() {
-		return new EffectDeclType(getName(), e.getEffectSet(), getLocation());
+		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 
 	@Override
-	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // actually effectCheck
-		e.effectCheck(ctx, thisCtx); // throw exception if problem	// could just not pass in thisCtx?
+	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // technically "effectCheck"
+		for (Effect e : effectSet) {
+			ValueType vt = ctx.lookupTypeOf(e.getName());
+			if (vt == null){
+				throw new RuntimeException("Path not found.");
+			} else {
+				if (!(vt.findDecl(e.getName(), ctx).equals(getDeclType()))) {
+					throw new RuntimeException("Effect name not found in path.");
+				}
+			}
+		}
 		return getDeclType();
 	}
 

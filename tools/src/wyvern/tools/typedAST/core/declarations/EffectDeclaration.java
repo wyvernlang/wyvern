@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.core.declarations;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashSet;
 
 import java.util.regex.Pattern;
@@ -13,6 +14,7 @@ import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Effect;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -29,9 +31,9 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
-	private Variable path;
+	private Path path;
 	private String name;
-	private HashSet<Effect> effectSet;
+	private Set<Effect> effectSet;
 	private FileLocation loc;
 	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation) { // decltype declarations
@@ -49,7 +51,7 @@ public class EffectDeclaration extends Declaration {
 			effectSet = new HashSet<Effect>();
 			for (String s : name.split(", *")) {
 				String[] pathAndID = s.split("\\.");
-				effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], null, loc));
+				effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
 			}
 		}
 	}
@@ -77,11 +79,11 @@ public class EffectDeclaration extends Declaration {
 		return name;
 	}
 	
-	public HashSet<Effect> getEffectSet() {
+	public Set<Effect> getEffectSet() {
 		return effectSet;
 	}
 	
-	public Variable getPath() {
+	public Path getPath() {
 		return path;
 	}
 	
