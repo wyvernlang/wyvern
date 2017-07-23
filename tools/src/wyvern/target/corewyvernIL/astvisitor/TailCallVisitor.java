@@ -171,7 +171,7 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
                          ValDeclType valDeclType) {
         return null;
     }
-
+    
 
     public Void visit(Boolean inTailPosition,
                          DefDeclType defDeclType) {

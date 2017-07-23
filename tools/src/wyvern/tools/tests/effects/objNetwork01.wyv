@@ -1,0 +1,26 @@
+require stdout
+
+type ObjNetworkType01
+  effect send
+  effect receive
+  def sendData(data : String) : Unit
+  def receiveData() : Unit
+
+/*val objNetwork01:ObjNetworkType01 = new
+  effect send = {}
+  effect receive = {}
+  def sendData(data : String) : {} Unit = stdout.print(data)
+  def receiveData() : {receive} Unit = stdout.print("data received\n") */
+
+val objNetwork01:ObjNetworkType01 = new
+  effect send = {}
+  effect receive = {}
+  def sendData(data : String) : Unit
+      stdout.print("data sent: ")
+      stdout.print(data)
+      stdout.print("\n")
+  def receiveData() : Unit
+      stdout.print("data received\n")
+
+objNetwork01.sendData("objNetwork01 with effects")
+objNetwork01.receiveData()

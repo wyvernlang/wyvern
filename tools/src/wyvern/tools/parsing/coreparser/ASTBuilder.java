@@ -16,12 +16,14 @@ public interface ASTBuilder<AST,Type> {
 	public AST defDecl(String name, Type type, List<String> generics, List args, AST body, boolean isClassDef, FileLocation loc);
 	public AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 	public AST delegateDecl(Type type, AST exp, FileLocation loc);
+	public AST effectDecl(String name, String effects, FileLocation loc);
 	
 	public AST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc);
 	public AST valDeclType(String name, Type type, FileLocation loc);
 	public AST varDeclType(String name, Type type, FileLocation loc);
 	public AST typeAbbrevDecl(String alias, Type reference, FileLocation loc);
 	public AST typeAbbrevDecl(String alias, Type reference, AST metadata, FileLocation loc);
+	public AST effectDeclType(String name, String effects, FileLocation loc);
 	
 	public Object formalArg(String name, Type type);
 	public AST fn(List args, AST body, FileLocation loc);

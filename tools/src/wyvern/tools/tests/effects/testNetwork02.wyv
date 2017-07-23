@@ -1,0 +1,6 @@
+require stdout
+import effects.network02
+
+val n02 = network02(stdout)
+n02.sendData("Network02 with effects")	// print "data sent: Network02 with effects"
+n02.receiveData()		// print "data received"
