@@ -44,7 +44,7 @@ public class EffectDeclaration extends NamedDeclaration {
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // technically "effectCheck"
 		for (Effect e : effectSet) {
-			ValueType vt = ctx.lookupTypeOf(e.getName());
+			ValueType vt = ctx.lookupTypeOf(e.getPath().getName());
 			if (vt == null){
 				throw new RuntimeException("Path not found.");
 			} else {
@@ -56,6 +56,15 @@ public class EffectDeclaration extends NamedDeclaration {
 		return getDeclType();
 	}
 
+	@Override
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("effect ").append(getName()).append(" = ");
+		if (effectSet != null)
+			dest.append(effectSet.toString());
+		dest.append('\n');
+	}
+	
+	
 	@Override
 	public Set<String> getFreeVariables() {
 		// TODO Auto-generated method stub

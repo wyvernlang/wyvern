@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.declarations;
 
 import static wyvern.tools.errors.ToolError.reportError;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -36,7 +38,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
-	private Variable path;
+	private Path path;
 	private String name;
 	private Set<Effect> effectSet;
 	private FileLocation loc;
@@ -74,6 +76,13 @@ public class EffectDeclaration extends Declaration {
 		return new Effect(getPath(), getName(), getLocation());
 	}
 	
+	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+		dest.append(indent).append("effect ").append(getName()).append(" = ");
+		if (effectSet != null)
+			dest.append(effectSet.toString());
+		dest.append('\n');
+	}
+	
 	@Override
 	public void genTopLevel(TopLevelContext tlc) { // type abbrev, (see ValDeclaration for Let), this.E, Type/EffectGenContext for 
 //		tlc.addLet(getName(), Util.unitType(), Util.unitValue(), false); // topLevelGen == generateILType is just to get set of effects (not an actual ValueType)
@@ -108,7 +117,7 @@ public class EffectDeclaration extends Declaration {
 	}
 	
 	public Variable getPath() {
-		return path;
+		return (Variable) path;
 	}
 	
 	@Override

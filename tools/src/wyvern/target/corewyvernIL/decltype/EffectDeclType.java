@@ -108,7 +108,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("effect ").append(getName()).append(" = ");
-		if (effectSet!=null) 
+		if (effectSet != null)
 			dest.append(effectSet.toString());
 		dest.append('\n');
 	}
