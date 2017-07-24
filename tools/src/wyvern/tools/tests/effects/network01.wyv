@@ -1,5 +1,5 @@
 module def network01(stdout : Stdout) : effects.NetworkType01
-val n : Int = 3
+//val n : Int = 3
 effect send = {}
 effect receive = {}
 def sendData(data : String) : {} Unit

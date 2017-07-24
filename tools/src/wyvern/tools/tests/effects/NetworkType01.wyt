@@ -1,5 +1,5 @@
 resource type NetworkType01
-  val n : Int
+//  val n : Int
   effect send
   effect receive
   def sendData(data : String) : {} Unit

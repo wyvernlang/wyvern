@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -493,4 +494,10 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
     public OIRAST visit(EmitOIRState state, ModuleDeclaration modDecl) {
         throw new RuntimeException("ModuleDeclarations should be specialized before emitting Python!");
     }
+
+	@Override
+	public OIRAST visit(EmitOIRState state, EffectDeclaration effectDeclaration) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("EmitOIRVisitor: hopefully not necessary?");
+	}
 }

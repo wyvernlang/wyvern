@@ -8,6 +8,6 @@ def sendData(data : String) : {} Unit
     stdout.print("\n")
 def receiveData() : {receive} Unit
     stdout.print("data received\n")
-//def processData() : {process} Unit
-//    receiveData()
-//    stdout.print("data processed")
+def processData() : {process} Unit
+    receiveData()
+    stdout.print("data processed")

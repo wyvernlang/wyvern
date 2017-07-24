@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -356,5 +357,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
   public FFI visit(TypeContext ctx, FFI ffi) {
     return ffi;
 	}
+
+@Override
+public ASTNode visit(TypeContext state, EffectDeclaration effectDeclaration) {
+	// TODO Auto-generated method stub
+	return effectDeclaration;
+}
 
 }
