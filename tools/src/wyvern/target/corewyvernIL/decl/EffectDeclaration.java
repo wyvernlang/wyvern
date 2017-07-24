@@ -29,7 +29,8 @@ public class EffectDeclaration extends NamedDeclaration {
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
 			S state) {
-		return null; //emitILVisitor.visit(state, this);
+		throw new RuntimeException("acceptV");
+//		return null; //emitILVisitor.visit(state, this);
 	}
 
 	public Set<Effect> getEffectSet() {
