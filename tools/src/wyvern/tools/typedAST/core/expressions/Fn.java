@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -243,7 +244,11 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         return result;
     }
 
+    /** Returns the expected types of the formals, or null if the expected type is dyn. */
     private static List<FormalArg> getExpectedFormls(GenContext ctx, ValueType declType) {
+        if (declType.getCanonicalType(ctx) instanceof DynamicType) {
+            return null;
+        }
         StructuralType declStructuralType = declType.getStructuralType(ctx);
 
         DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
@@ -258,7 +263,11 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         return applyDef.getFormalArgs();
     }
 
+    /** Returns the expected type of the result, or null if the expected type is dyn. */
     private static ValueType getExpectedResult(GenContext ctx, ValueType declType) {
+        if (declType.getCanonicalType(ctx) instanceof DynamicType) {
+            return null;
+        }
         StructuralType declStructuralType = declType.getStructuralType(ctx);
 
         DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);

@@ -119,7 +119,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			if (!(metadata instanceof Invokable)) {
 				ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
 			}
-			ValueType metaType = metadata.getType();			
+			ValueType metaType = metadata.getType();
 			final DeclType parseTSLDecl = metaType.getStructuralType(ctx).findDecl("parseTSL", ctx);
 			if (parseTSLDecl == null) {
 				ToolError.reportError(ErrorMessage.METADATA_MUST_INCLUDE_PARSETSL, this, expectedType.toString());				

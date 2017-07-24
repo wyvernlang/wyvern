@@ -56,7 +56,7 @@ public class FFIImport extends Expression {
   public Value interpret(EvalContext ctx) {
     if (this.ffiType.equals(new NominalType("system", "java"))) {
       try {
-        FObject obj = wyvern.tools.interop.Default.importer().find(path);
+        FObject obj = wyvern.tools.interop.Default.importer().find(path, this);
         return new JavaValue(obj, this.getExprType());
       } catch (ReflectiveOperationException e1) {
         throw new RuntimeException(e1);

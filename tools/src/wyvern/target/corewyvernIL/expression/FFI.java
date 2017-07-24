@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.util.Pair;
@@ -51,10 +52,10 @@ public class FFI extends AbstractValue {
         return this.importName;
     }
 
-    public static Pair<VarBinding, GenContext> importURI(URI uri, GenContext ctx) {
+    public static Pair<VarBinding, GenContext> importURI(URI uri, GenContext ctx, HasLocation errorLocation) {
         final String scheme = uri.getScheme();
         if (scheme.equals("java")) {
-            return doJavaImport(uri, ctx);
+            return doJavaImport(uri, ctx, errorLocation);
         } else if (scheme.equals("python")) {
             return doPythonImport(uri, ctx);
         } else {
@@ -64,7 +65,7 @@ public class FFI extends AbstractValue {
         }
     }
 
-	public static Pair<VarBinding, GenContext> doJavaImport(URI uri, GenContext ctx) {
+	public static Pair<VarBinding, GenContext> doJavaImport(URI uri, GenContext ctx, HasLocation errorLocation) {
 		String importName = uri.getSchemeSpecificPart();
 	    if (importName.contains(".")) {
 	        importName = importName.substring(importName.lastIndexOf(".")+1);
@@ -72,7 +73,7 @@ public class FFI extends AbstractValue {
         String importPath = uri.getRawSchemeSpecificPart();
         FObject obj = null;
         try {
-            obj = wyvern.tools.interop.Default.importer().find(importPath);
+            obj = wyvern.tools.interop.Default.importer().find(importPath, errorLocation);
         } catch (ReflectiveOperationException e1) {
             throw new RuntimeException(e1);
         }

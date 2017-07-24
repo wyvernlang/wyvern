@@ -1,5 +1,7 @@
 package wyvern.tools.interop;
 
+import wyvern.tools.errors.HasLocation;
+
 /**
  * A generic interface for importing foreign (Java) objects into another language
  */
@@ -16,5 +18,5 @@ public interface Importer {
 	 * 
 	 * @throws ReflectiveOperationException 
 	 */
-	FObject find(String qualifiedName) throws ReflectiveOperationException;
+	FObject find(String qualifiedName, HasLocation errorLocation) throws ReflectiveOperationException;
 }

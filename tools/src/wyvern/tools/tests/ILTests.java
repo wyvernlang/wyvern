@@ -590,7 +590,7 @@ public class ILTests {
 
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {
-		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest");
+		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest", null);
 		List<Object> args = new LinkedList<Object>();
 		args.add(1);
 		Object result = obj.invokeMethod("addOne", args);
@@ -599,7 +599,7 @@ public class ILTests {
 	
 	@Test
 	public void testJavaImportLibrary2() throws ReflectiveOperationException {
-		FObject obj = wyvern.tools.interop.Default.importer().find("java.lang.System.out");
+		FObject obj = wyvern.tools.interop.Default.importer().find("java.lang.System.out", null);
 		List<Object> args = new LinkedList<Object>();
 		args.add("Hello, world!");
 		Object result = obj.invokeMethod("println", args);
