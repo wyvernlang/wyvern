@@ -40,11 +40,11 @@ public class EffectSystemTests {
         WyvernResolver.getInstance().addPath(PATH);
     }
     
-//    @Test
-//    public void testEffectNetwork00() throws ParseException {
-//    	/* Type & module def with no annotations. */
-//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
-//    }
+    @Test
+    public void testEffectNetwork00() throws ParseException {
+    	/* Type & module def with no annotations. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
+    }
 
     @Test
      public void testEffectNetwork01() throws ParseException {
@@ -117,15 +117,29 @@ public class EffectSystemTests {
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0A", Util.unitType(), Util.unitValue());
     }
     
-//    @Test
-//    public void testEffectObjNetwork00() throws ParseException {
-//    	/* Object notation with no effect annotations. */
-//    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
-//	}
+    @Test
+    @Category(CurrentlyBroken.class) // **Passes but shouldn't**
+    public void testEffectNetwork0B() throws ParseException {
+    	/* Nonexistent effect in module annotation in type (not in module def, but error should be reported before module def is evaluated). */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0B", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    @Category(CurrentlyBroken.class) // **Passes but shouldn't**
+    public void testEffectNetwork0C() throws ParseException {
+    	/* Int included as effect in module annotation of type (not in module def, but error should be reported before module def is evaluated). */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0C", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testEffectObjNetwork00() throws ParseException {
+    	/* Object notation with no effect annotations. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
+	}
 
-//    @Test
-//    public void testEffectObjNetwork01() throws ParseException {
-//    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
-//    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
-//	}
+    @Test
+    public void testEffectObjNetwork01() throws ParseException {
+    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
+    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+	}
 }
