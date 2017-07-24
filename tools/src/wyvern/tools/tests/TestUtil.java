@@ -43,10 +43,12 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.tools.types.Type;
 
 public class TestUtil {
-	public static final String BASE_PATH = "src/wyvern/tools/tests/";
+	public static final String WYVERN_HOME = System.getenv("WYVERN_HOME");
+	public static final String BASE_PATH = WYVERN_HOME == null
+										   ? "src/wyvern/tools/tests/" : WYVERN_HOME + "/tools/src/wyvern/tools/tests/";
 	public static final String STDLIB_PATH = BASE_PATH + "stdlib/";
-	public static final String LIB_PATH = "../stdlib/";
-	public static final String EXAMPLES_PATH = "../examples/";
+	public static final String LIB_PATH = WYVERN_HOME == null ? "../stdlib/" : WYVERN_HOME + "/stdlib/";
+	public static final String EXAMPLES_PATH = WYVERN_HOME == null ? "../examples/" : WYVERN_HOME + "/examples/";
 	private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
 	
 	/** Sets up the standard library and platform paths in the Wyvern resolver

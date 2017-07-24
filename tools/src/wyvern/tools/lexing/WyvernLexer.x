@@ -124,9 +124,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 	terminal Token comment_t  ::= /\/\/([^\r\n])*/ {: RESULT = token(SINGLE_LINE_COMMENT,lexeme); :};
 	terminal Token multi_comment_t  ::= /\/\*([^*]|\*[^/])*\*\// {: RESULT = token(MULTI_LINE_COMMENT,lexeme); :};
-	
-	
-	
+
  	terminal Token identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ in (), < (keywds), > () {:
  		RESULT = token(IDENTIFIER,lexeme);
  	:};
@@ -150,6 +148,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token thenKwd_t   ::= /then/ in (keywds);
  	terminal Token elseKwd_t   ::= /else/ in (keywds);
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
+ 	terminal Token effectKwd_t	::= /effect/ in (keywds) {: RESULT = token(EFFECT,lexeme); :};
  	
  	terminal Token resourceKwd_t    ::= /resource/ in (keywds) {: RESULT = token(RESOURCE,lexeme); :};
  	terminal Token asKwd_t ::= /as/ in (keywds) {: RESULT = token(AS,lexeme); :};
@@ -197,7 +196,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
  	terminal Token cCurly_t ::= /\}/ {: RESULT = token(RBRACE,lexeme); :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
- 	
     
  	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); :};
  	
@@ -265,7 +263,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	               RESULT.addAll(list);
 	               RESULT.add(t2);
 	           :};
-	
+		
 	keyw ::= classKwd_t:t {: RESULT = t; :}
 	       | typeKwd_t:t {: RESULT = t; :}
 	       | valKwd_t:t {: RESULT = t; :}
@@ -285,7 +283,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | importKwd_t:t {: RESULT = t; :}
 	       | instantiateKwd_t:t {: RESULT = t; :}
 	       | asKwd_t:t {: RESULT = t; :}
-	       | resourceKwd_t:t {: RESULT = t; :};
+	       | resourceKwd_t:t {: RESULT = t; :}
+	       | effectKwd_t:t {: RESULT = t; :}
+	       ;
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}

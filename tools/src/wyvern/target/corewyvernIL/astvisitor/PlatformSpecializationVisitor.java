@@ -189,8 +189,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         result.copyMetadata(valDecl);
         return result;
     }
-
-
+   
     public ASTNode visit(PSVState state,
                          IntegerLiteral integerLiteral) {
         return integerLiteral;
@@ -224,7 +223,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
                          ValDeclType valDeclType) {
         return valDeclType;
     }
-
+    
 
     public ASTNode visit(PSVState state,
                          DefDeclType defDeclType) {

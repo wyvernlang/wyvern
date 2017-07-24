@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.javatuples.Unit;
+
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -19,6 +22,7 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
+import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -87,6 +91,12 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 	
 	@Override
+	public TypedAST effectDecl(String name, String effects, FileLocation loc) {
+		return new EffectDeclaration(name, effects, loc, false); // not decltype
+//		return new ValDeclaration(name, unitValue(loc).getType(), unitValue(loc), loc);
+	}
+	
+	@Override
 	public TypedAST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc) {
 		return new DefDeclaration(name, type, generics, args, null, false, loc);
 	}
@@ -99,6 +109,13 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	@Override
 	public TypedAST varDeclType(String name, Type type, FileLocation loc) {
 		return new VarDeclaration(name, type, null, loc);
+	}
+	
+	@Override
+	public TypedAST effectDeclType(String name, String effects, FileLocation loc) { // this might need to account for effects = AST in place of type
+		return new EffectDeclaration(name, effects, loc);
+//		return new ValDeclaration(name,  unitValue(loc), loc);
+//		return unitValue(loc); // Do not use -- ClassCastException: can't be cast to wyvern.tools.typedAST.abs.Declaration
 	}
 	
 	@Override
