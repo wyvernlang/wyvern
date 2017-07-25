@@ -1,0 +1,15 @@
+require stdout
+import effects.network01 // w/ type ascription
+import effects.network0D // w/o
+import effects.dataProcessor
+
+val n01 = network01(stdout)
+val n0D = network0D(stdout)
+
+val dpD = dataProcessor(n0D, stdout) // should work
+dpD.processData() // print "data received" then "data processed"
+
+val dp1 = dataProcessor(n01, stdout) // should not work
+dp1.processData() // shouldn't get to this point
+
+// may need a NetworkType0E that incorporates 
