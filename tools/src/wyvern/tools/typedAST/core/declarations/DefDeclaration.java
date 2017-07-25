@@ -56,12 +56,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
     private List<String> generics;
+    private EffectDeclaration effects;
 
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
+    /* Seems to be the only constructor called by WyvernASTBuilder (therefore the only one dealing w/ effects for now). */
 	public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
-						  TypedAST body, boolean isClassDef, FileLocation location) {
+						  TypedAST body, boolean isClassDef, FileLocation location, String effects) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, returnType);
 		this.name = name;
@@ -69,13 +71,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
+		this.effects = new EffectDeclaration(name+"_method", effects, location, false);
 
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
 	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
-        this(name, returnType, null, argNames, body, isClassDef, location);
+        this(name, returnType, null, argNames, body, isClassDef, location, null);
 	}
 
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,

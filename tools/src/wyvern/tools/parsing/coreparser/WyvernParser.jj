@@ -299,11 +299,14 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; Token effect; }
+{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; Token effects = null; }
 {
-  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effect = <DSL_LITERAL>] resultType = Type() body=DefBody() {
-	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name));
-  }
+  <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effects = <DSL_LITERAL>] resultType = Type() body=DefBody() {
+	if (effects==null) {
+    	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name), null);
+  	}
+  		return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name), effects.image);
+  	}
 }
 
 AST ValDeclaration() :
@@ -333,7 +336,7 @@ AST VarDeclaration() :
 }
 
 AST EffectDeclaration() : // in module def, must be defined
-{ Type type = null; Token name; Token effects; AST decls; } //AST body;}
+{ Token name; Token effects; }
 {
    <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> <NEWLINE> {
     return build.effectDecl(name.image, effects.image, loc(name)); 
@@ -396,11 +399,14 @@ AST DeclType() :
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; List<String> gentypes=null; Token effect; }
+{ Type resultType; Token name; List args; List<String> gentypes=null; Token effects; }
 {
-  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effect = <DSL_LITERAL>] resultType = Type() <NEWLINE> {
-	return build.defDeclType(name.image, resultType, gentypes, args, loc(name));
-  }
+  <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effects = <DSL_LITERAL>] resultType = Type() <NEWLINE> {
+	if (effects==null) {
+    	return build.defDeclType(name.image, resultType, gentypes, args, loc(name), null);
+  	}
+  		return build.defDeclType(name.image, resultType, gentypes, args, loc(name), effects.image);
+  	}
 }
 
 AST ValDeclType() :
@@ -426,7 +432,7 @@ AST EffectDeclType() :
   if (effects==null) {
     return build.effectDeclType(name.image, null, loc(name));
   }
-  return build.effectDeclType(name.image, effects.image, loc(name));
+  	return build.effectDeclType(name.image, effects.image, loc(name));
   }
 }
 

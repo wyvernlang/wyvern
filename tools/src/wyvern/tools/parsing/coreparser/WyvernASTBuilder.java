@@ -86,8 +86,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 	@Override
 	public TypedAST defDecl(String name, Type type, List<String> generics, List args,
-			TypedAST body, boolean isClassDef, FileLocation loc) {
-		return new DefDeclaration(name, type, generics, args, body, isClassDef, loc);
+			TypedAST body, boolean isClassDef, FileLocation loc, String effects) {
+		return new DefDeclaration(name, type, generics, args, body, isClassDef, loc, effects);
 	}
 	
 	@Override
@@ -97,8 +97,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 	
 	@Override
-	public TypedAST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc) {
-		return new DefDeclaration(name, type, generics, args, null, false, loc);
+	public TypedAST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc, String effects) {
+		return new DefDeclaration(name, type, generics, args, null, false, loc, effects);
 	}
 	
 	@Override
