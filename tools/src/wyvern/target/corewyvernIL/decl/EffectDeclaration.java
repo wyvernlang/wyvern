@@ -44,13 +44,18 @@ public class EffectDeclaration extends NamedDeclaration {
 
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // technically "effectCheck"
-		for (Effect e : effectSet) {
-			ValueType vt = ctx.lookupTypeOf(e.getPath().getName());
+		for (Effect e : effectSet) { // ex. "fio.read"
+			String ePathName = e.getPath().getName(); // "fio"
+			ValueType vt = ctx.lookupTypeOf(ePathName);
 			if (vt == null){
-				throw new RuntimeException("Path not found.");
+//				throw new RuntimeException("Path not found.");
+				ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName);
 			} else {
-				if (!(vt.findDecl(e.getName(), ctx).equals(getDeclType()))) {
-					throw new RuntimeException("Effect name not found in path.");
+				String eName = e.getName(); // "read"
+				if ((vt.findDecl(eName, ctx)==null) ||						
+						!(vt.findDecl(eName, ctx).equals(getDeclType()))) {
+//					throw new RuntimeException("Effect name not found in path.");
+					ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, eName, ePathName);
 				}
 			}
 		}

@@ -56,9 +56,14 @@ public class EffectDeclaration extends Declaration {
 			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, this, name+" = {"+effects+"}");
 		} else {
 			effectSet = new HashSet<Effect>();
-			for (String s : name.split(", *")) {
-				String[] pathAndID = s.split("\\.");
-				effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
+			for (String e : effects.split(", *")) {
+				// need something to account for references to effects in the same module def (ie. no period)
+				if (e.contains(".")) {
+					String[] pathAndID = e.split("\\.");
+					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
+				} else {
+					effectSet.add(new Effect(new Variable("this"), e, loc)); // need to rethink
+				}
 			}
 		}
 	}
