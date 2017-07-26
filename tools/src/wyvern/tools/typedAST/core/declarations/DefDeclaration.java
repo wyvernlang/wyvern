@@ -71,8 +71,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effects = new EffectDeclaration(name+"_method", effects, location, false);
-
+		this.effects = new EffectDeclaration(name+"_method", effects, location, true);
+		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 

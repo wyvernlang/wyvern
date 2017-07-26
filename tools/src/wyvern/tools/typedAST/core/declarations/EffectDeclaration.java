@@ -43,12 +43,11 @@ public class EffectDeclaration extends Declaration {
 	private Set<Effect> effectSet;
 	private FileLocation loc;
 	
-	public EffectDeclaration(String name, String effects, FileLocation fileLocation) { // decltype declarations
-		this.name = name;
-		loc = fileLocation;
-		path = new Variable(name); // not sure
-		
-		if (effects==null) { // no definition for identifier "name" -> only possible in effectDeclType (enforced by WyvernParser.jj)
+	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean optional) { // decltype declarations
+	
+		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
+			if (!optional) // i.e. undefined in module def; if it's part of a method annotation in the type but not module def, should be caught later
+				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
 			effectSet = null;
 		} else if (effects=="") { // explicitly defined to be empty list of effects
 			effectSet = new HashSet<Effect>();
@@ -66,15 +65,10 @@ public class EffectDeclaration extends Declaration {
 				}
 			}
 		}
-	}
-	
-	public EffectDeclaration(String name, String effects, FileLocation loc, boolean isDeclType) {
-		this(name, effects, loc);
 		
-		/* Dead code (but potentially more desirable): Effects undefined in module def are currently being taken care of by the parser */
-		if (effectSet==null && !isDeclType) { // not in the type signature but nothing defined for effect set 
-			ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
-		}
+		this.name = name;
+		loc = fileLocation;
+		path = new Variable(name);
 	}
 	
 	public Effect getEffect() {

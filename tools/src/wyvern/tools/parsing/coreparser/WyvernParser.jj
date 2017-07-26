@@ -304,9 +304,9 @@ AST DefDeclaration() :
   <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effects = <DSL_LITERAL>] resultType = Type() body=DefBody() {
 	if (effects==null) {
     	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name), null);
-  	}
-  		return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name), effects.image);
-  	}
+  	} 
+  	return build.defDecl(name.image, resultType, gentypes, args, body, false, loc(name), effects.image);
+  }
 }
 
 AST ValDeclaration() :
@@ -399,14 +399,14 @@ AST DeclType() :
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; List<String> gentypes=null; Token effects; }
+{ Type resultType; Token name; List args; List<String> gentypes=null; Token effects = null; }
 {
   <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effects = <DSL_LITERAL>] resultType = Type() <NEWLINE> {
 	if (effects==null) {
     	return build.defDeclType(name.image, resultType, gentypes, args, loc(name), null);
-  	}
-  		return build.defDeclType(name.image, resultType, gentypes, args, loc(name), effects.image);
-  	}
+  	} 
+  	return build.defDeclType(name.image, resultType, gentypes, args, loc(name), effects.image);
+  }
 }
 
 AST ValDeclType() :
@@ -429,9 +429,9 @@ AST EffectDeclType() :
 { Token name; Token effects = null;}
 {
   <EFFECT> name = <IDENTIFIER> [<EQUALS> effects = <DSL_LITERAL>] <NEWLINE> {
-  if (effects==null) {
-    return build.effectDeclType(name.image, null, loc(name));
-  }
+  	if (effects==null) {
+    	return build.effectDeclType(name.image, null, loc(name));
+  	}
   	return build.effectDeclType(name.image, effects.image, loc(name));
   }
 }
