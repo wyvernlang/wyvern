@@ -40,12 +40,12 @@ public class EffectSystemTests {
         WyvernResolver.getInstance().addPath(PATH);
     }
     
-//    @Test
-//    public void testEffectNetwork00() throws ParseException {
-//    	/* Type & module def with no annotations. */
-//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
-//    }
-//
+    @Test
+    public void testEffectNetwork00() throws ParseException {
+    	/* Type & module def with no annotations. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
+    }
+
     @Test
      public void testEffectNetwork01() throws ParseException {
     	/* Declared in type + module def;
@@ -111,7 +111,7 @@ public class EffectSystemTests {
     }
     
     @Test
-    @Category(CurrentlyBroken.class) // Actually returns parse error (taken care of by the parser)
+    @Category(CurrentlyBroken.class) // Parse error (undefined effects in module def are taken care of by the parser)
     public void testEffectNetwork0A() throws ParseException {
     	/* Effect undefined in module def. */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0A", Util.unitType(), Util.unitValue());
@@ -154,22 +154,22 @@ public class EffectSystemTests {
 //    	/* Same as network01 but without type ascription (for testing DataProcessor). */
 //    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.unitType(), Util.unitValue());
 //    }
-//    
-//    @Test
-//    @Category(CurrentlyBroken.class) // **Work-in-progress, need to figure out the logic **
-//    public void testDataProcessor() throws ParseException {
-//    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor", Util.unitType(), Util.unitValue());
-//    }
     
-//    @Test
-//    public void testEffectObjNetwork00() throws ParseException {
-//    	/* Object notation with no effect annotations. */
-//    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
-//	}
-//
-//    @Test
-//    public void testEffectObjNetwork01() throws ParseException {
-//    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
-//    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
-//	}
+    @Test
+    //@Category(CurrentlyBroken.class) // **Work-in-progress, need to figure out the logic **
+    public void testDataProcessor() throws ParseException {
+    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testEffectObjNetwork00() throws ParseException {
+    	/* Object notation with no effect annotations. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
+	}
+
+    @Test
+    public void testEffectObjNetwork01() throws ParseException {
+    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
+    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+	}
 }

@@ -52,8 +52,9 @@ public class EffectDeclaration extends NamedDeclaration {
 				ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName);
 			} else {
 				String eName = e.getName(); // "read"
-				if ((vt.findDecl(eName, ctx)==null) ||						
-						!(vt.findDecl(eName, ctx).equals(getDeclType()))) {
+				DeclType eDT = vt.findDecl(eName, ctx);
+				DeclType actualEDT = e.getDeclType(getEffectSet());
+				if ((eDT==null) ||	(!eDT.equals(actualEDT))) {
 //					throw new RuntimeException("Effect name not found in path.");
 					ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, eName, ePathName);
 				}

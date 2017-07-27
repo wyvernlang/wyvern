@@ -1,14 +1,17 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.util.HashSet;
+import java.util.Set;
 
+import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
-public class Effect {
+public class Effect extends Expression{
 	private Path path;
 	private String name;
 	private FileLocation loc;
@@ -45,12 +48,31 @@ public class Effect {
 		return loc;
 	}
 	
-//	/* Necessary?
-//	 * [INCOMPLETE]
-//	 * Look up the set of effects that this represents in the context, 
-//	 * use them as part of the EffectDeclType returned.
-//	 */
-//	public DeclType getDeclType(TypeContext ctx) {
-//		return new EffectDeclType(getName(), new HashSet<Effect>(), getLocation());
-//	}
+	public DeclType getDeclType(Set<Effect> effects) {
+		return new EffectDeclType(getName(), effects, getLocation());
+	}
+
+	@Override
+	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ValueType typeCheck(TypeContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Value interpret(EvalContext ctx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<String> getFreeVariables() {
+		// TODO Auto-generated method stub
+		return new HashSet<String>();
+	}
 }

@@ -68,7 +68,9 @@ public class EffectDeclaration extends Declaration {
 		
 		this.name = name;
 		loc = fileLocation;
-		path = new Variable(name);
+		
+		// send = name, path = "effect" (the module def doesn't seem to be represented in the context?)
+		path = new Variable("effect"); // since it's a keyword that shouldn't be used for variable/type names...
 	}
 	
 	public Effect getEffect() {
@@ -88,7 +90,9 @@ public class EffectDeclaration extends Declaration {
 //		tlc.addLet(getName(), getPath().typeCheck(tlc.getContext()), getPath(), false); // probably shouldn't be getPath().typeCheck()
 		// or at least, where to extend the context?? In the constructor (for each e in the set)??
 		GenContext ctx = tlc.getContext();
-		ctx = ctx.extend(getName(), getPath(), getPath().getExprType()); // so getExprType or typeCheck? Or cast ctx to TypeOrEffect...
+//		path = ctx.getContainerForTypeAbbrev(this.getName());// it's a bit odd to place it here...
+		ctx = ctx.extend(getName(), new Variable("what"), getPath().getExprType()); 
+				//(Variable) ctx.getContainerForTypeAbbrev(getName()), getPath().getExprType()); // so getExprType or typeCheck? Or cast ctx to TypeOrEffect... Or make Effect a ValueType subclass
 		tlc.updateContext(ctx); // would be a good sign if addLet does this somewhere
 		
 //		@Override // Sequence
@@ -129,7 +133,6 @@ public class EffectDeclaration extends Declaration {
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 //		return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, Util.unitType(), Util.unitValue(), loc); // stub
 		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
-//		throw new RuntimeException("generateDecl not implemented");
 	}
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
