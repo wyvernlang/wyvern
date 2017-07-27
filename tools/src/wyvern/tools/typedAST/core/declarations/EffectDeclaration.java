@@ -38,7 +38,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
-	private Path path;
 	private String name;
 	private Set<Effect> effectSet;
 	private FileLocation loc;
@@ -68,13 +67,10 @@ public class EffectDeclaration extends Declaration {
 		
 		this.name = name;
 		loc = fileLocation;
-		
-		// send = name, path = "effect" (the module def doesn't seem to be represented in the context?)
-		path = new Variable("effect"); // since it's a keyword that shouldn't be used for variable/type names...
 	}
 	
 	public Effect getEffect() {
-		return new Effect(getPath(), getName(), getLocation());
+		return new Effect(new Variable("effect"), getName(), getLocation()); // not sure about the use of new Variable("effect") here instead of some path field
 	}
 	
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
@@ -84,27 +80,27 @@ public class EffectDeclaration extends Declaration {
 		dest.append('\n');
 	}
 	
-	@Override
-	public void genTopLevel(TopLevelContext tlc) { // type abbrev, (see ValDeclaration for Let), this.E, Type/EffectGenContext for 
-//		tlc.addLet(getName(), Util.unitType(), Util.unitValue(), false); // topLevelGen == generateILType is just to get set of effects (not an actual ValueType)
-//		tlc.addLet(getName(), getPath().typeCheck(tlc.getContext()), getPath(), false); // probably shouldn't be getPath().typeCheck()
-		// or at least, where to extend the context?? In the constructor (for each e in the set)??
-		GenContext ctx = tlc.getContext();
-//		path = ctx.getContainerForTypeAbbrev(this.getName());// it's a bit odd to place it here...
-		ctx = ctx.extend(getName(), new Variable("what"), getPath().getExprType()); 
-				//(Variable) ctx.getContainerForTypeAbbrev(getName()), getPath().getExprType()); // so getExprType or typeCheck? Or cast ctx to TypeOrEffect... Or make Effect a ValueType subclass
-		tlc.updateContext(ctx); // would be a good sign if addLet does this somewhere
-		
-//		@Override // Sequence
-//		public void genTopLevel(TopLevelContext tlc) {
-//			for (TypedAST ast : exps) {
-//				ast.genTopLevel(tlc);
-//				if (ast instanceof Declaration) {
-//					((Declaration)ast).addModuleDecl(tlc);
-//				}
-//			}
-//		}
-	}
+//	@Override
+//	public void genTopLevel(TopLevelContext tlc) { // type abbrev, (see ValDeclaration for Let), this.E, Type/EffectGenContext for 
+////		tlc.addLet(getName(), Util.unitType(), Util.unitValue(), false); // topLevelGen == generateILType is just to get set of effects (not an actual ValueType)
+////		tlc.addLet(getName(), getPath().typeCheck(tlc.getContext()), getPath(), false); // probably shouldn't be getPath().typeCheck()
+//		// or at least, where to extend the context?? In the constructor (for each e in the set)??
+//		GenContext ctx = tlc.getContext();
+////		path = ctx.getContainerForTypeAbbrev(this.getName());// it's a bit odd to place it here...
+//		ctx = ctx.extend(getName(), new Variable("what"), getPath().getExprType()); 
+//				//(Variable) ctx.getContainerForTypeAbbrev(getName()), getPath().getExprType()); // so getExprType or typeCheck? Or cast ctx to TypeOrEffect... Or make Effect a ValueType subclass
+//		tlc.updateContext(ctx); // would be a good sign if addLet does this somewhere
+//		
+////		@Override // Sequence
+////		public void genTopLevel(TopLevelContext tlc) {
+////			for (TypedAST ast : exps) {
+////				ast.genTopLevel(tlc);
+////				if (ast instanceof Declaration) {
+////					((Declaration)ast).addModuleDecl(tlc);
+////				}
+////			}
+////		}
+//	}
 	
 	@Override
 	public FileLocation getLocation() {
@@ -117,10 +113,6 @@ public class EffectDeclaration extends Declaration {
 	
 	public Set<Effect> getEffectSet() {
 		return effectSet;
-	}
-	
-	public Variable getPath() {
-		return (Variable) path;
 	}
 	
 	@Override
@@ -145,7 +137,7 @@ public class EffectDeclaration extends Declaration {
 		// that .checkWellFormed(ctx) can be called on
 	}
 	
-//	@Override
+//	@Override // from TypeAbbrevDeclaration I think
 //	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
 //			GenContext ctx, List<TypedModuleSpec> dependencies) {
 //		if (reference == null)

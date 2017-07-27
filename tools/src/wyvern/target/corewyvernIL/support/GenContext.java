@@ -10,6 +10,8 @@ import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
@@ -83,8 +85,8 @@ public abstract class GenContext extends TypeContext {
 	 * @return a new functional environment which extends the mapping
 	 */
 	public GenContext rec(String newName, TypedAST ast) {
-		if(ast instanceof TypeVarDecl) {
-			String typeName = ((TypeVarDecl) ast).getName();
+		if(ast instanceof TypeVarDecl || ast instanceof EffectDeclaration) {
+			String typeName = ((Declaration) ast).getName();
 			return new TypeOrEffectGenContext(typeName, newName, this); 
 		} else if(ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
 			//assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);

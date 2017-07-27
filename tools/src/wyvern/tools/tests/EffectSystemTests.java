@@ -119,14 +119,14 @@ public class EffectSystemTests {
     
     @Test
     @Category(CurrentlyBroken.class) // **Work-in-progress: passes but shouldn't**
-    public void testEffectNetwork0B() throws ParseException {
-    	/* Nonexistent effect in module annotation in type (not in module def, but error should be reported before module def is evaluated). */
+    public void testEffectNetwork0B() throws ParseException { // dependent on incorporating EffectDeclaration into DefDeclaration
+    	/* Nonexistent effect in method annotation in type (not in module def, but error should be reported before module def is evaluated). */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0B", Util.unitType(), Util.unitValue());
     }
     
     @Test
     @Category(CurrentlyBroken.class) // **Work-in-progress: passes but shouldn't**
-    public void testEffectNetwork0C() throws ParseException {
+    public void testEffectNetwork0C() throws ParseException { // dependent on incorporating EffectDeclaration into DefDeclaration
     	/* Int included as effect in module annotation of type (not in module def, but error should be reported before module def is evaluated). */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0C", Util.unitType(), Util.unitValue());
     }
