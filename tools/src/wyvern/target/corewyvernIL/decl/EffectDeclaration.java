@@ -43,7 +43,12 @@ public class EffectDeclaration extends NamedDeclaration {
 	}
 
 	@Override
-	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) { // technically "effectCheck"
+	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
+		effectsCheck(ctx, thisCtx);
+		return getDeclType();
+	}
+		
+	public void effectsCheck(TypeContext ctx, TypeContext thisCtx) { // technically doesn't even need thisCtx	
 		for (Effect e : effectSet) { // ex. "fio.read"
 			String ePathName = e.getPath().getName(); // "fio"
 			ValueType vt = ctx.lookupTypeOf(ePathName);
@@ -60,7 +65,6 @@ public class EffectDeclaration extends NamedDeclaration {
 				}
 			}
 		}
-		return getDeclType();
 	}
 
 	@Override
