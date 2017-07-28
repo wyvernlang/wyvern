@@ -1,3 +1,6 @@
+/**
+ * @author vzhao
+ */
 package wyvern.target.corewyvernIL.expression;
 
 import java.util.HashSet;
@@ -21,26 +24,12 @@ public class Effect {
 		name = n;
 		loc = l;
 	}
-	
-	/* moved to IL EffectDeclaration */
-//	public void effectCheck(TypeContext ctx, TypeContext thisCtx) { 
-//		for (Effect e : effectSet) {
-//			ValueType vt = ctx.lookupTypeOf(e.getName());
-//			if (vt == null){
-//				throw new RuntimeException("Path not found.");
-//			} else {
-//				if (!(vt.findDecl(e.getName(), ctx).equals(e.getDeclType()))) {
-//					throw new RuntimeException("Effect name not found in path.");
-//				}
-//			}
-//		}
-//	}
 
 	public Variable getPath() {
 		return (Variable) path;
 	}
 	
-	public void setPath(Path p) { // for effects defined in the same signature
+	public void setPath(Path p) { // for effects defined in the same signature (whose paths are null until typechecked)
 		path = p;
 	}
 	

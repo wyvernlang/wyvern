@@ -1,3 +1,10 @@
+/**
+ * Typed AST of an effect; translates the definition of the effect 
+ * from a String into a set of effects.
+ * 
+ * @author vzhao
+ */
+
 package wyvern.tools.typedAST.core.declarations;
 
 import static wyvern.tools.errors.ToolError.reportError;
@@ -42,12 +49,11 @@ public class EffectDeclaration extends Declaration {
 	private Set<Effect> effectSet;
 	private FileLocation loc;
 	
-	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean optional) { // decltype declarations
-	
+	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean optional) {
 		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
-			if (!optional) // i.e. undefined in module def; if it's part of a method annotation in the type but not module def, should be caught later
+			if (!optional) // i.e. undefined in module def; (if it's part of a method annotation in the type but not module def, should be caught later)
 				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
-			effectSet = null;
+			effectSet = null; // no effect annotation in the method header
 		} else if (effects=="") { // explicitly defined to be empty list of effects
 			effectSet = new HashSet<Effect>();
 		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
@@ -55,12 +61,11 @@ public class EffectDeclaration extends Declaration {
 		} else {
 			effectSet = new HashSet<Effect>();
 			for (String e : effects.split(", *")) {
-				// need something to account for references to effects in the same module def (ie. no period)
-				if (e.contains(".")) {
+				if (e.contains(".")) { // effect from another object
 					String[] pathAndID = e.split("\\.");
 					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
-				} else {
-					effectSet.add(new Effect(null, e, loc)); // need to rethink
+				} else { // effect defined in the same type or module def
+					effectSet.add(new Effect(null, e, loc));
 				}
 			}
 		}
@@ -70,7 +75,7 @@ public class EffectDeclaration extends Declaration {
 	}
 	
 	public Effect getEffect() {
-		return new Effect(new Variable("effect"), getName(), getLocation()); // not sure about the use of new Variable("effect") here instead of some path field
+		return new Effect(null, getName(), getLocation()); 
 	}
 	
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
@@ -80,32 +85,11 @@ public class EffectDeclaration extends Declaration {
 		dest.append('\n');
 	}
 	
-//	@Override
-//	public void genTopLevel(TopLevelContext tlc) { // type abbrev, (see ValDeclaration for Let), this.E, Type/EffectGenContext for 
-////		tlc.addLet(getName(), Util.unitType(), Util.unitValue(), false); // topLevelGen == generateILType is just to get set of effects (not an actual ValueType)
-////		tlc.addLet(getName(), getPath().typeCheck(tlc.getContext()), getPath(), false); // probably shouldn't be getPath().typeCheck()
-//		// or at least, where to extend the context?? In the constructor (for each e in the set)??
-//		GenContext ctx = tlc.getContext();
-////		path = ctx.getContainerForTypeAbbrev(this.getName());// it's a bit odd to place it here...
-//		ctx = ctx.extend(getName(), new Variable("what"), getPath().getExprType()); 
-//				//(Variable) ctx.getContainerForTypeAbbrev(getName()), getPath().getExprType()); // so getExprType or typeCheck? Or cast ctx to TypeOrEffect... Or make Effect a ValueType subclass
-//		tlc.updateContext(ctx); // would be a good sign if addLet does this somewhere
-//		
-////		@Override // Sequence
-////		public void genTopLevel(TopLevelContext tlc) {
-////			for (TypedAST ast : exps) {
-////				ast.genTopLevel(tlc);
-////				if (ast instanceof Declaration) {
-////					((Declaration)ast).addModuleDecl(tlc);
-////				}
-////			}
-////		}
-//	}
-	
 	@Override
 	public FileLocation getLocation() {
 		return loc;
 	}
+	
 	@Override
 	public String getName() {
 		return name;
@@ -118,43 +102,17 @@ public class EffectDeclaration extends Declaration {
 	@Override
 	public DeclType genILType(GenContext ctx) {
 		return new EffectDeclType(getName(), getEffectSet(), getLocation());
-//		return new ValDeclType(name, Util.unitType());
 	}
 	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-//		return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, Util.unitType(), Util.unitValue(), loc); // stub
 		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
-	}
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		for (Effect e : getEffectSet()) {
-//			if (e.getPath() == null) { // significance?
-//				throw new RuntimeException("Effect-checking for effects defined in the same signature is unimplemented.");
-//			}
-			if (e.getPath() != null)
-				e.getPath().typeCheck(ctx).checkWellFormed(ctx);
-//			((TypeOrEffectGenContext) ctx).getContainerForTypeAbbrev(e.getPath().typeCheck(ctx));
-		}
-		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
-		// ex. fio.read --> fio = Path/Variable which should theoretically be the obj name that corresponds to a type
-		// that .checkWellFormed(ctx) can be called on
 	}
 	
-//	@Override // from TypeAbbrevDeclaration I think
-//	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
-//			GenContext ctx, List<TypedModuleSpec> dependencies) {
-//		if (reference == null)
-//			reportError(ErrorMessage.NO_ABSTRACT_TYPES_IN_OBJECTS, this);
-//		ValueType referenceILType = reference.getILType(ctx); // check each effect in the set for their type
-//		referenceILType.checkWellFormed(ctx); // just call it on each effect?
-//
-//		IExpr metadataExp = null; // ignore
-//		if (metadata != null)
-//			metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
-//
-//			return new TypeDeclaration(getName(), referenceILType, metadataExp, getLocation());
-//		}
+	@Override
+	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
+		return generateDecl(ctx, ctx); // like in DefDeclaration
+	}
 	
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {

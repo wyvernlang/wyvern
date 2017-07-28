@@ -1,3 +1,9 @@
+/**
+ * IL representation of a defined effect.
+ * Its set of effects are checked for validity.
+ * 
+ * @author vzhao
+ */
 package wyvern.target.corewyvernIL.decl;
 
 import java.io.IOException;
@@ -34,7 +40,6 @@ public class EffectDeclaration extends NamedDeclaration {
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
 			S state) {
-//		return null; 
 		return emitILVisitor.visit(state, this);
 	}
 
@@ -53,20 +58,16 @@ public class EffectDeclaration extends NamedDeclaration {
 		return getDeclType();
 	}
 		
-	public void effectsCheck(TypeContext ctx, TypeContext thisCtx) { // technically doesn't even need thisCtx	
+	/** Iterate through all effects in the set and check that they all exist in the context. **/ 
+	public void effectsCheck(TypeContext ctx, TypeContext thisCtx) { // technically doesn't need thisCtx	
 		if (effectSet != null) {
 			String ePathName;
 			for (Effect e : effectSet) { // ex. "fio.read"
-				if (e.getPath() == null) { // generating code where the effect is in the same signature VarGenContexts
-					String eName = e.getName();
-					ValueType eVT = ((GenContext) ctx).lookupType(e.getName(), getLocation());
-					Path ePath = ((NominalType) eVT).getPath();
-					e.setPath(ePath); // avoid having to repeat everything when typecheck() is called again, but this time with VarBindingContext
-					ePathName = ((Variable) ePath).getName(); // there must be something better...
-				} else {
-					ePathName = e.getPath().getName(); // "fio"
+				if (e.getPath() == null) { // an effect that (if valid) was defined in the same type or module def
+					addPath(e, ctx, thisCtx);
 				}
 				
+				ePathName = e.getPath().getName(); // "fio"
 				ValueType vt = ctx.lookupTypeOf(ePathName);
 				if (vt == null){
 					ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName);
@@ -79,6 +80,13 @@ public class EffectDeclaration extends NamedDeclaration {
 				}
 			}
 		}
+	}
+	
+	/** Add path to an effect if it doesn't already have one (i.e. if it's defined in the same type or module def). **/
+	public void addPath(Effect e, TypeContext ctx, TypeContext thisCtx) { // also doesn't need thisCtx
+		ValueType eVT = ((GenContext) ctx).lookupType(e.getName(), getLocation());
+		Path ePath = ((NominalType) eVT).getPath(); // not the best way, but it seems to work
+		e.setPath(ePath); // path is casted into Variable at some point
 	}
 
 	@Override
