@@ -40,6 +40,10 @@ public class Effect {
 		return (Variable) path;
 	}
 	
+	public void setPath(Path p) { // for effects defined in the same signature
+		path = p;
+	}
+	
 	public String getName() {
 		return name;
 	}

@@ -71,7 +71,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effects = new EffectDeclaration(name+"_method", effects, location, true);
+		this.effects = null; //effects==null? null : new EffectDeclaration(name+"_method", effects, location, true);
 		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
@@ -281,8 +281,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		}
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
+		
+		wyvern.target.corewyvernIL.decl.Declaration effectIL = effects==null ? null : effects.generateDecl(ctx, thisContext);
+		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation());
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectIL);
 	}
 
 

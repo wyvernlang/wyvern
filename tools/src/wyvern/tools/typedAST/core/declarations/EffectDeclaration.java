@@ -129,10 +129,11 @@ public class EffectDeclaration extends Declaration {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		for (Effect e : getEffectSet()) {
-			if (e.getPath() == null) {
-				throw new RuntimeException("Effect-checking for effects defined in the same signature is unimplemented.");
-			}
-			e.getPath().typeCheck(ctx).checkWellFormed(ctx);
+//			if (e.getPath() == null) { // significance?
+//				throw new RuntimeException("Effect-checking for effects defined in the same signature is unimplemented.");
+//			}
+			if (e.getPath() != null)
+				e.getPath().typeCheck(ctx).checkWellFormed(ctx);
 //			((TypeOrEffectGenContext) ctx).getContainerForTypeAbbrev(e.getPath().typeCheck(ctx));
 		}
 		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());

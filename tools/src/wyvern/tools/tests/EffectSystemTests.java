@@ -167,6 +167,20 @@ public class EffectSystemTests {
     	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor2", Util.unitType(), Util.unitValue());
     }
     
+    @Test
+    @Category(CurrentlyBroken.class) 
+    public void testDataProcessor3() throws ParseException {
+    	/* Like dataProcessor2, but has "effect process = {net.receive, gibberish}" instead. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor3", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    @Category(CurrentlyBroken.class) 
+    public void testDataProcessor4() throws ParseException {
+    	/* Like dataProcessor2, but has "effect process = {net.gibberish, process}" instead (i.e. recursive). */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor4", Util.unitType(), Util.unitValue());
+    }
+    
     // another test in which a third module takes in a data processor which takes in a network, so that the there's multiple (external) layers of effect abstraction?
     
 //    @Test

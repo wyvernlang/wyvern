@@ -11,7 +11,12 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -49,22 +54,28 @@ public class EffectDeclaration extends NamedDeclaration {
 	}
 		
 	public void effectsCheck(TypeContext ctx, TypeContext thisCtx) { // technically doesn't even need thisCtx	
-		for (Effect e : effectSet) { // ex. "fio.read"
-			if (e.getPath() == null) {
-				throw new RuntimeException("Effect-checking for effects defined in the same signature is unimplemented.");
-			}
-			String ePathName = e.getPath().getName(); // "fio"
-			ValueType vt = ctx.lookupTypeOf(ePathName);
-			if (vt == null){
-//				throw new RuntimeException("Path not found.");
-				ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName);
-			} else {
-				String eName = e.getName(); // "read"
-				DeclType eDT = vt.findDecl(eName, ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
-//				DeclType actualEDT = e.getDeclType(getEffectSet()); // not necessary??
-				if (eDT==null) {//||	(!eDT.equals(actualEDT))) {
-//					throw new RuntimeException("Effect name not found in path.");
-					ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, eName, ePathName);
+		if (effectSet != null) {
+			String ePathName;
+			for (Effect e : effectSet) { // ex. "fio.read"
+				if (e.getPath() == null) { // generating code where the effect is in the same signature VarGenContexts
+					String eName = e.getName();
+					ValueType eVT = ((GenContext) ctx).lookupType(e.getName(), getLocation());
+					Path ePath = ((NominalType) eVT).getPath();
+					e.setPath(ePath); // avoid having to repeat everything when typecheck() is called again, but this time with VarBindingContext
+					ePathName = ((Variable) ePath).getName(); // there must be something better...
+				} else {
+					ePathName = e.getPath().getName(); // "fio"
+				}
+				
+				ValueType vt = ctx.lookupTypeOf(ePathName);
+				if (vt == null){
+					ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName);
+				} else {
+					String eName = e.getName(); // "read"
+					DeclType eDT = vt.findDecl(eName, ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
+					if (eDT==null) {
+						ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, eName, ePathName);
+					}
 				}
 			}
 		}

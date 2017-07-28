@@ -21,14 +21,21 @@ public class DefDeclaration extends NamedDeclaration {
 	private ValueType type;
 	private IExpr body;
 	private boolean hasResource = false;
+	private EffectDeclaration effects;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, IExpr iExpr, FileLocation loc) {
+		this(methodName, formalArgs, type, iExpr, loc, null);
+	}
+	
+	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
+			ValueType type, IExpr iExpr, FileLocation loc, Declaration effects) {
 		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = iExpr;
+		this.effects = (EffectDeclaration) effects;
 	}
 
 	@Override
@@ -104,6 +111,9 @@ public class DefDeclaration extends NamedDeclaration {
 			bodyType.isSubtypeOf(resultType, methodCtx);
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");;
 			
+		}
+		if (effects != null) {
+			effects.effectsCheck(ctx, thisCtx);
 		}
 		return new DefDeclType(getName(), type, formalArgs);
 	}
