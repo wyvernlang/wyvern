@@ -11,7 +11,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
-public class Effect extends Expression{
+public class Effect {
 	private Path path;
 	private String name;
 	private FileLocation loc;
@@ -50,29 +50,5 @@ public class Effect extends Expression{
 	
 	public DeclType getDeclType(Set<Effect> effects) {
 		return new EffectDeclType(getName(), effects, getLocation());
-	}
-
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ValueType typeCheck(TypeContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Value interpret(EvalContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<String> getFreeVariables() {
-		// TODO Auto-generated method stub
-		return new HashSet<String>();
 	}
 }

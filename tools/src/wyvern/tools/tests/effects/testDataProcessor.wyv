@@ -1,13 +1,8 @@
 require stdout
-import effects.network01 // w/ type ascription
-//import effects.network0D // w/o
+import effects.network01
 import effects.dataProcessor
 
 val n01 = network01(stdout)
-//val n0D = network0D(stdout)
 
 val dp1 = dataProcessor(n01, stdout) // should work
-dp1.processData() // print "data received" then "data processed"
-
-//val dp1 = dataProcessor(n01, stdout) // should not work
-//dp1.processData() // shouldn't get to this point
+dp1.processData() // print "Data processor w/ effect abstraction: ", "data received", then "data processed"
