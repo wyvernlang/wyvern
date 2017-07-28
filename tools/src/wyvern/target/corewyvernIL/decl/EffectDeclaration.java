@@ -50,6 +50,9 @@ public class EffectDeclaration extends NamedDeclaration {
 		
 	public void effectsCheck(TypeContext ctx, TypeContext thisCtx) { // technically doesn't even need thisCtx	
 		for (Effect e : effectSet) { // ex. "fio.read"
+			if (e.getPath() == null) {
+				throw new RuntimeException("Effect-checking for effects defined in the same signature is unimplemented.");
+			}
 			String ePathName = e.getPath().getName(); // "fio"
 			ValueType vt = ctx.lookupTypeOf(ePathName);
 			if (vt == null){

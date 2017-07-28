@@ -60,7 +60,7 @@ public class EffectDeclaration extends Declaration {
 					String[] pathAndID = e.split("\\.");
 					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
 				} else {
-					effectSet.add(new Effect(new Variable("this"), e, loc)); // need to rethink
+					effectSet.add(new Effect(null, e, loc)); // need to rethink
 				}
 			}
 		}
@@ -129,6 +129,9 @@ public class EffectDeclaration extends Declaration {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		for (Effect e : getEffectSet()) {
+			if (e.getPath() == null) {
+				throw new RuntimeException("Effect-checking for effects defined in the same signature is unimplemented.");
+			}
 			e.getPath().typeCheck(ctx).checkWellFormed(ctx);
 //			((TypeOrEffectGenContext) ctx).getContainerForTypeAbbrev(e.getPath().typeCheck(ctx));
 		}
