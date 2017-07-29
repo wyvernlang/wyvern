@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -21,7 +22,7 @@ public class DefDeclaration extends NamedDeclaration {
 	private ValueType type;
 	private IExpr body;
 	private boolean hasResource = false;
-	private EffectDeclaration effects;
+	private Set<Effect> effects;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, IExpr iExpr, FileLocation loc) {
@@ -29,13 +30,13 @@ public class DefDeclaration extends NamedDeclaration {
 	}
 	
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
-			ValueType type, IExpr iExpr, FileLocation loc, Declaration effects) {
+			ValueType type, IExpr iExpr, FileLocation loc, Set<Effect> effects) {
 		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = iExpr;
-		this.effects = (EffectDeclaration) effects;
+		this.effects = effects;
 	}
 
 	@Override
@@ -112,9 +113,10 @@ public class DefDeclaration extends NamedDeclaration {
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");;
 			
 		}
-		if (effects != null) {
-			effects.effectsCheck(ctx, thisCtx);
-		}
+//		if (effects != null) {
+//			EffectDeclaration methodEffects = new EffectDeclaration(getName(), effects, getLocation()); // translate earlier?
+//			methodEffects.effectsCheck(ctx, thisCtx);
+//		}
 		return new DefDeclType(getName(), type, formalArgs);
 	}
 

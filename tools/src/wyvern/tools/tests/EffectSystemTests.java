@@ -183,6 +183,8 @@ public class EffectSystemTests {
     
     // another test in which a third module takes in a data processor which takes in a network, so that the there's multiple (external) layers of effect abstraction?
     
+	 // Need test case where the object's effect is same as another defined in the sig (and are valid?)
+    
 //    @Test
 //    public void testEffectObjNetwork00() throws ParseException {
 //    	/* Object notation with no effect annotations. */

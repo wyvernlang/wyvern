@@ -58,7 +58,9 @@ public class EffectDeclaration extends NamedDeclaration {
 		return getDeclType();
 	}
 		
-	/** Iterate through all effects in the set and check that they all exist in the context. **/ 
+	/** Iterate through all effects in the set and check that they all exist in the context. 
+	 * Errors reported are: VARIABLE_NOT_DECLARED for objects not found, and 
+	 * EFFECT_NOT_FOUND for effects not from the signature or another object **/ 
 	public void effectsCheck(TypeContext ctx, TypeContext thisCtx) { // technically doesn't need thisCtx	
 		if (effectSet != null) {
 			String ePathName;
@@ -68,15 +70,17 @@ public class EffectDeclaration extends NamedDeclaration {
 				}
 				
 				ePathName = e.getPath().getName(); // "fio"
-				ValueType vt = ctx.lookupTypeOf(ePathName);
-				if (vt == null){
-					ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName);
-				} else {
-					String eName = e.getName(); // "read"
-					DeclType eDT = vt.findDecl(eName, ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
-					if (eDT==null) {
-						ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, eName, ePathName);
-					}
+				ValueType vt = null;
+				try {
+					vt = ctx.lookupTypeOf(ePathName); 
+				} catch (RuntimeException ex) { // also for a recursive effect declaration (ex. effect process = {process}), variable name would be "var_##"
+					ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, this, ePathName); 
+				}
+				
+				String eName = e.getName(); // "read"
+				DeclType eDT = vt.findDecl(eName, ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
+				if (eDT==null) {
+					ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, eName, ePathName);
 				}
 			}
 		}
@@ -84,9 +88,15 @@ public class EffectDeclaration extends NamedDeclaration {
 	
 	/** Add path to an effect if it doesn't already have one (i.e. if it's defined in the same type or module def). **/
 	public void addPath(Effect e, TypeContext ctx, TypeContext thisCtx) { // also doesn't need thisCtx
-		ValueType eVT = ((GenContext) ctx).lookupType(e.getName(), getLocation());
-		Path ePath = ((NominalType) eVT).getPath(); // not the best way, but it seems to work
-		e.setPath(ePath); // path is casted into Variable at some point
+		try {
+			// Without try/catch, GenContext.lookupType() reports an error that isn't specific to this problem
+			ValueType eVT = ((GenContext) ctx).lookupType(e.getName(), getLocation());
+
+			Path ePath = ((NominalType) eVT).getPath(); // not the best way, but it seems to work
+			e.setPath(ePath); // path is casted into Variable at some point
+		} catch (RuntimeException ex) { // for effects that should've been defined in the same module def or type
+			ToolError.reportError(ErrorMessage.EFFECT_NOT_FOUND, this, e.getName(), "this"); 
+		}
 	}
 
 	@Override

@@ -2,10 +2,13 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.FormalArg;
@@ -13,6 +16,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Effect;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -56,7 +60,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
     private List<String> generics;
-    private EffectDeclaration effects;
+//    private EffectDeclaration effects;
+    private Set<Effect> effects;
 
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
@@ -71,7 +76,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effects = null; //effects==null? null : new EffectDeclaration(name+"_method", effects, location, true);
+		this.effects = parseEffects(effects); 
+		//effects==null? null : new EffectDeclaration(name+"_method", effects, location, true);
 		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
@@ -122,6 +128,30 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public Type getType() {
 		return type;
+	}
+	
+	public Set<Effect> parseEffects(String effects) { // refactor later (in Effect.java?)
+		Set<Effect> effectSet = null; 
+		
+		if (effects==null) {
+			effectSet=null; // fix
+		} else if (effects=="") { // explicitly defined to be empty list of effects
+			effectSet = new HashSet<Effect>();
+		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
+			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, this, name+" = {"+effects+"}");
+		} else {
+			effectSet = new HashSet<Effect>();
+			for (String e : effects.split(", *")) {
+				if (e.contains(".")) { // effect from another object
+					String[] pathAndID = e.split("\\.");
+					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], location));
+				} else { // effect defined in the same type or module def
+					effectSet.add(new Effect(null, e, location));
+				}
+			}
+		}
+		
+		return effectSet;
 	}
 
 	@Override
@@ -282,10 +312,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
 		
-		wyvern.target.corewyvernIL.decl.Declaration effectIL = effects==null ? null : effects.generateDecl(ctx, thisContext);
+//		wyvern.target.corewyvernIL.decl.Declaration effectIL = effects==null ? null : effects.generateDecl(ctx, thisContext);
 		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectIL);
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effects);
 	}
 
 
