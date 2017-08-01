@@ -53,13 +53,13 @@ public class EffectDeclaration extends Declaration {
 	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean declType) {
 		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
-			if (!declType) // i.e. undefined in module def
-				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
+			if (!declType) // i.e. undefined in module def -- the parser doesn't allow this so this is actually dead code I believe
+				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, fileLocation, name);
 //			effectSet = null; // no effect annotation in the method header
 		} else if (effects=="") { // explicitly defined to be empty list of effects
 			effectSet = new HashSet<Effect>();
 		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, this, name+" = {"+effects+"}");
+			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, fileLocation, name, effects);
 		} else {
 			effectSet = new HashSet<Effect>();
 			for (String e : effects.split(", *")) {
