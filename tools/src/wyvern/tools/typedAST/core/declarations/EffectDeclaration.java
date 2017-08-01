@@ -31,8 +31,10 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -49,11 +51,11 @@ public class EffectDeclaration extends Declaration {
 	private Set<Effect> effectSet;
 	private FileLocation loc;
 	
-	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean optional) {
+	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean declType) {
 		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
-			if (!optional) // i.e. undefined in module def; (if it's part of a method annotation in the type but not module def, should be caught later)
+			if (!declType) // i.e. undefined in module def
 				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, this, name);
-			effectSet = null; // no effect annotation in the method header
+//			effectSet = null; // no effect annotation in the method header
 		} else if (effects=="") { // explicitly defined to be empty list of effects
 			effectSet = new HashSet<Effect>();
 		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
@@ -106,7 +108,23 @@ public class EffectDeclaration extends Declaration {
 	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+		for (Effect e : effectSet) {
+			if (e.getPath() == null) { 
+				// an effect that (if valid) was defined in the same type or module def 
+				// (and therefore did not come with a path)
+				addPath(e, ctx);
+			}
+		}
 		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
+	}
+	
+	/** Add path to an effect if it doesn't already have one (i.e. if it's defined in the same type or module def). **/
+	public void addPath(Effect e, GenContext ctx) {
+		Path ePath = ctx.getContainerForTypeAbbrev(e.getName());
+		if (ePath==null) { // effect not found
+			ToolError.reportError(ErrorMessage.EFFECT_IN_SIG_NOT_FOUND, this, e.getName());
+		}
+		e.setPath(ePath);
 	}
 	
 	@Override

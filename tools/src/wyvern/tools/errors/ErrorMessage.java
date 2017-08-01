@@ -103,7 +103,8 @@ public enum ErrorMessage {
 	// effect error
 	MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: %ARG", 1),
 	UNDEFINED_EFFECT("Effect undefined outside of type signature: %ARG", 1),
-	EFFECT_NOT_FOUND("Effect %ARG not found for object %ARG", 2),
+	EFFECT_IN_SIG_NOT_FOUND("Effect %ARG not found in the signature", 1),
+	EFFECT_OF_VAR_NOT_FOUND("Effect %ARG not found for variable %ARG", 2),
 	;
 
 	private ErrorMessage(String message, int numArgs) {

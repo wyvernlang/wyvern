@@ -185,15 +185,15 @@ public class EffectSystemTests {
     
 	 // Need test case where the object's effect is same as another defined in the sig (and are valid?)
     
-//    @Test
-//    public void testEffectObjNetwork00() throws ParseException {
-//    	/* Object notation with no effect annotations. */
-//    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
-//	}
-//
-//    @Test
-//    public void testEffectObjNetwork01() throws ParseException {
-//    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
-//    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
-//	}
+    @Test
+    public void testEffectObjNetwork00() throws ParseException {
+    	/* Object notation with no effect annotations. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
+	}
+
+    @Test
+    public void testEffectObjNetwork01() throws ParseException {
+    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
+    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+	}
 }
