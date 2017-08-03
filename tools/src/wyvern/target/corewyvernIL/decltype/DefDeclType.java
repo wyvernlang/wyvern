@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
 
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -21,10 +23,16 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class DefDeclType extends DeclTypeWithResult {
 
 	private List<FormalArg> args;
+	private Set<Effect> effectSet;
 	
 	public DefDeclType(String method, ValueType returnType, List<FormalArg> args) {
+		this(method, returnType, args, null);
+	}
+
+	public DefDeclType(String method, ValueType returnType, List<FormalArg> args, Set<Effect> effects) {
 		super(method, returnType);
 		this.args = args;
+		this.effectSet = effects;
 	}
 
 	public List<FormalArg> getFormalArgs ()
@@ -133,7 +141,16 @@ public class DefDeclType extends DeclTypeWithResult {
 		for (FormalArg a : args) {
 			newArgs.add(new FormalArg(a.getName(), a.getType().adapt(v)));
 		}
-		return new DefDeclType(this.getName(), this.getRawResultType().adapt(v), newArgs);
+		if (effectSet != null) {
+			for (Effect e : effectSet) {
+				/* e.addPath(ctx) wouldn't work here, but there seems to be no
+				 * logical place to add paths before here (and there are effects
+				 * that have missing paths here) */
+				if (e.getPath()!=null) {	
+					e.adapt(v); }
+			}
+		}
+		return new DefDeclType(this.getName(), this.getRawResultType().adapt(v), newArgs, getEffectSet()); // need to adapt effects too
 	}
 	
 	@Override
@@ -162,12 +179,16 @@ public class DefDeclType extends DeclTypeWithResult {
 		if (!changed)
 			return this;
 		else
-			return new DefDeclType(this.getName(), t, newArgs);
+			return new DefDeclType(this.getName(), t, newArgs, getEffectSet());
 	}
 	
 	@Override
 	public boolean isTypeDecl() {
 		return false;
+	}
+	
+	public Set<Effect> getEffectSet() {
+		return effectSet;
 	}
 
     /**

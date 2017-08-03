@@ -72,7 +72,7 @@ public class Illustrations {
 		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
+		ValueType t = program.typeCheck(ctx, null);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
@@ -103,7 +103,7 @@ public class Illustrations {
 		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
+		ValueType t = program.typeCheck(ctx, null);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);
@@ -140,7 +140,7 @@ public class Illustrations {
 		Expression program = new FieldGet(mainProgram, "x", null); 
 		
     	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx);
+		ValueType t = program.typeCheck(ctx, null);
 		Value v = program.interpret(EvalContext.empty());
     	IntegerLiteral five = new IntegerLiteral(5);
 		Assert.assertEquals(five, v);

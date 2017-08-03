@@ -2,19 +2,18 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -65,7 +64,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
-    /* Seems to be the only constructor called by WyvernASTBuilder. */
 	public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location, String effects) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
@@ -76,7 +74,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.isClass = isClassDef;
 		this.location = location;
 		this.effectSet = Effect.parseEffects(name, effects, location); 
-		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
@@ -94,6 +91,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
         this.generics = new LinkedList<String>();
+//        this.effectSet = null;
 	}
 
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
@@ -142,7 +140,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-	    DefDeclaration dd = new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass);
+	    DefDeclaration dd = new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass); // may need to add effectSet?
         dd.location = this.location;
         return dd;
 	}
@@ -221,9 +219,37 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public DeclType genILType(GenContext ctx) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
 
+		/* TODO: for checking that an effect exists in the method annotation 
+		 * of a type signature; need modifying because paths do not show up in ctx
+		 */
+//		// place after serializeArguments() to include effects defined by args?
+//        if (effectSet != null) {
+//        	for (Effect e : effectSet) {
+//        		e.effectsCheck(ctx);
+//        	}
+//        }
+//		if (ctx.lookupTypeOf("this") != null)
+		if (effectSet != null) {
+			ValueType vt = null;
+			try {
+				vt = ctx.lookupTypeOf("this");
+			} catch (RuntimeException ex) {
+				// don't check effect annotations of methods this time
+			}
+			
+			if (vt != null) {
+				for (Effect e : effectSet) {
+					DeclType dt = vt.findDecl(e.getName(), ctx); // not sure about what to do w/ obj ones yet...
+					if ((dt == null) || !(dt instanceof EffectDeclType)) {
+						ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), e.toString());
+					}
+				}
+			}
+		}
+        
         ctx = this.serializeArguments(args, ctx);
-
-		DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args);
+        
+		DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args, getEffectSet());
 		return ret;
 	}
 
@@ -247,6 +273,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			args.add(fa);
 			ctx = ctx.extend(bName, new Variable(bName), type);
 		}
+        if (getName().equals("sendData")) {
+        	System.out.println("sendData");
+        }
         return ctx;
     }
 
@@ -290,8 +319,18 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
 		
+		if (effectSet != null) {
+			for (Effect e : effectSet) {
+				try { // might be obj instantiation, in which case leave to effect-check and add path later in IL (DefDeclaration.typecheck())
+					ValueType vt = thisContext.lookupTypeOf("this");
+				} catch (RuntimeException ex) { // if not, see if it has path already in context
+					e.addPath(thisContext); // will throw exception if unsuccessful
+				}
+			}
+		}
+		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectSet);
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), getEffectSet());
 	}
 
 
@@ -314,7 +353,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		if (argILTypes == null)
 			throw new NullPointerException("need to call topLevelGen/generateDecl before addModuleDecl");
 		wyvern.target.corewyvernIL.decl.DefDeclaration decl =
-			new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body, getLocation());
+			new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body, getLocation(), getEffectSet());
 		
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
@@ -347,7 +386,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		// Make and return the declaration.
 		wyvern.tools.typedAST.core.declarations.DefDeclaration getterDecl;
 		getterDecl = new wyvern.tools.typedAST.core.declarations.DefDeclaration(getterName, varType, new LinkedList<>(),
-																				getterBody, false, null);
+																				getterBody, false, null); // may need to add effectSet?
 		return getterDecl;
 		
 	}
@@ -378,7 +417,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		
 		// Make and return the declaration.
 		DefDeclaration setterDecl;
-		setterDecl = new DefDeclaration(setterName, unitType, setterArgs, setterBody, false, null);
+		setterDecl = new DefDeclaration(setterName, unitType, setterArgs, setterBody, false, null); // may need to add effectSet?
 		return setterDecl;
 		
 	}
@@ -408,6 +447,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         sb.append(type.toString());
         sb.append(" = ");
         sb.append(body.prettyPrint());
+		if (effectSet != null) {
+			sb.append(" with "); // just for distinction
+			sb.append(effectSet.toString().replace("[", "{").replace("]", "}")); 
+		}
         return sb;
     }
 }

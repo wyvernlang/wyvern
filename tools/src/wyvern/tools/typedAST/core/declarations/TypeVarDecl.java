@@ -263,8 +263,9 @@ public class TypeVarDecl extends Declaration {
 
 	private StructuralType computeInternalILType(GenContext ctx) {
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
-		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+		StructuralType localCopy = new StructuralType(getSelfName(), td.genDeclTypeSeq(ctx), this.resourceFlag); // VZ
+		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), localCopy); // null to localCopy
+		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag); // remove localCopy afterwards??
 	}
 	
 	@Override

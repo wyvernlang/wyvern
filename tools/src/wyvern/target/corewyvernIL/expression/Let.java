@@ -7,6 +7,7 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -46,15 +47,15 @@ public class Let extends Expression {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
-		ValueType t = getToReplace().typeCheck(ctx);
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+		ValueType t = getToReplace().typeCheck(ctx, effectAccumulator);
 		if (!t.isSubtypeOf(binding.getType(), ctx)) {
 			ValueType q = binding.getType();
 			t.isSubtypeOf(q, ctx);
 			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
 		}
 		final TypeContext extendedCtx = ctx.extend(getVarName(), binding.getType());
-		final ValueType exprType = inExpr.typeCheck(extendedCtx);
+		final ValueType exprType = inExpr.typeCheck(extendedCtx, effectAccumulator);
 		final ValueType cleanExprType = exprType.avoid(binding.getVarName(), extendedCtx);
 		//cleanExprType.checkWellFormed(ctx);
 		this.setExprType(cleanExprType);

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
@@ -54,7 +55,7 @@ public class Variable extends Expression implements Path {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext env) {
+	public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
 		return env.lookupTypeOf(name);
 	}
 

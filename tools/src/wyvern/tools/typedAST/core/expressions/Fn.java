@@ -159,7 +159,7 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         ValueType expectedBodyType = (expectedType == null)
                                      ? null : this.getExpectedResult(ctx, expectedType);
         IExpr il = this.body.generateIL(ctx, expectedBodyType, dependencies);
-        ValueType bodyReturnType = il.typeCheck(ctx);
+        ValueType bodyReturnType = il.typeCheck(ctx, null);
 
         // Create a new list of function declaration,
         // which is a singleton, containing only Util.APPLY_NAME

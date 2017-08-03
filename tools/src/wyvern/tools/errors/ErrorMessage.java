@@ -100,11 +100,13 @@ public enum ErrorMessage {
 	CANNOT_APPLY_TYPE_PARAMETERS("Cannot apply type parameters: type %ARG is abstract",1),
 	NO_TYPE_MEMBER("Cannot find enough type members to apply type parameters",0),
 	
-	// effect error
+	// effects errors
 	MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: \"effect %ARG = {%ARG}\"", 2),
-	UNDEFINED_EFFECT("Effect undefined outside of type signature: \"%ARG\"", 1),
-	EFFECT_IN_SIG_NOT_FOUND("Effect \"%ARG\" not found in the signature", 1),
+//	UNDEFINED_EFFECT("Effect undefined outside of type signature: \"%ARG\"", 1),
+	EFFECT_NOT_IN_SCOPE("Effect \"%ARG\" not found in scope", 1),
 	EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
+	RECURSIVE_EFFECT("Effect \"%ARG\" is being defined recursively", 1),
+	UNKNOWN_EFFECT("Effects of method call \"%ARG\" are unknown", 1),
 	;
 
 	private ErrorMessage(String message, int numArgs) {

@@ -48,7 +48,7 @@ public class TransformTests {
 	 */
 	private static void typecheck(IExpr program, ValueType expectedType) {
 		TypeContext ctx = Globals.getStandardTypeContext();
-		ValueType actualType = program.typeCheck(ctx);
+		ValueType actualType = program.typeCheck(ctx, null);
 		if (expectedType != null)
 			Assert.assertEquals(expectedType, actualType);
 	}

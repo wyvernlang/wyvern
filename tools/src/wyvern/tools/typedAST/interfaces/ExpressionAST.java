@@ -26,7 +26,7 @@ public interface ExpressionAST extends TypedAST {
 	@Override
 	public default void genTopLevel(TopLevelContext topLevelContext) {
 		final IExpr exp = generateIL(topLevelContext.getContext(), null, topLevelContext.getDependencies());
-		ValueType type = exp.typeCheck(topLevelContext.getContext());
+		ValueType type = exp.typeCheck(topLevelContext.getContext(), null);
 		topLevelContext.addExpression(exp, type);
 		Expression e;
 	}

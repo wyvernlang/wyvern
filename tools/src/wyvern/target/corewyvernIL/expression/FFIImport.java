@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -48,7 +49,7 @@ public class FFIImport extends Expression {
   }
 
   @Override
-  public ValueType typeCheck(TypeContext ctx) {
+  public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
     return this.getExprType();
   }
 

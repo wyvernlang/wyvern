@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DeclTypeWithResult;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -43,8 +44,8 @@ public class FieldGet extends Expression implements Path {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
-		ValueType vt = objectExpr.typeCheck(ctx);
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+		ValueType vt = objectExpr.typeCheck(ctx, effectAccumulator);
 		if (Util.isDynamicType(vt)) return Util.dynType();
 		DeclType dt = vt.findDecl(fieldName, ctx);
 		if (dt == null)
