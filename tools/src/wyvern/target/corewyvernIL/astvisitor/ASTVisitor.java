@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
@@ -71,4 +72,8 @@ public abstract class ASTVisitor<S, T> {
   public abstract T visit(S state, FFIImport ffiImport);
   public abstract T visit(S state, FFI ffi);
 public  abstract T visit(S state, EffectDeclaration effectDeclaration) ;
+public T visit(S state, EffectDeclType effectDeclType) {
+	// TODO Auto-generated method stub
+	return null;
+}
 }

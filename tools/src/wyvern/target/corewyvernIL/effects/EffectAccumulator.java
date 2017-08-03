@@ -1,26 +1,25 @@
+/** Accumulates effects into a set.
+ * 
+ * @author vzhao
+ */
+
 package wyvern.target.corewyvernIL.effects;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/* TODO: Use in corewyvernIL.decl.DefDeclaration.typecheck() to
- * collect effects of all method calls in a method.
- */
 public class EffectAccumulator {
 	private Set<Effect> effectSet;
 	
-	public EffectAccumulator(Set<Effect> effects) {
-		effectSet = effects;
-	}
+	public EffectAccumulator() {
+		this.effectSet = new HashSet<Effect>();
+	}	
 	
-	public void initializeSet() {
-		if (effectSet==null) {
-			effectSet = new HashSet<Effect>();
-		}
+	public void addEffect(Effect e) {
+		effectSet.add(e);
 	}
 	
 	public void addEffects(Set<Effect> effects) {
-		initializeSet();
 		effectSet.addAll(effects);
 	}
 	
@@ -30,14 +29,6 @@ public class EffectAccumulator {
 	
 	@Override
 	public String toString() {
-		return ((effectSet==null) ? "null" : effectSet.toString());
+		return effectSet==null ? "null" : effectSet.toString().replace("[", "{").replace("]", "}");
 	}
-	
-//	@Override
-//	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-//		dest.append(indent).append("effect ").append(getName()).append(" = ");
-//		if (effectSet != null)
-//			dest.append(effectSet.toString());
-//		dest.append('\n');
-//	}
 }

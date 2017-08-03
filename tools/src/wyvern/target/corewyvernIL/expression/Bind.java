@@ -9,6 +9,7 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EmptyTypeContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -51,16 +52,16 @@ public class Bind extends Expression {
     }
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
 		TypeContext bodyCtx = EmptyTypeContext.empty();
 		for (VarBinding vb : bindings) {
-			ValueType t = vb.getExpression().typeCheck(ctx);
+			ValueType t = vb.getExpression().typeCheck(ctx, effectAccumulator);
 			if (!t.isSubtypeOf(vb.getType(), ctx)) {
 				reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), vb.getType().toString());
 			}
 			bodyCtx = bodyCtx.extend(vb.getVarName(), vb.getType());
 		}
-		this.setExprType(inExpr.typeCheck(bodyCtx));
+		this.setExprType(inExpr.typeCheck(bodyCtx, effectAccumulator));
 		return getExprType();
 	}
 

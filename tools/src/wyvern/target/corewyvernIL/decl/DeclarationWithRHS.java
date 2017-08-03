@@ -25,7 +25,7 @@ public abstract class DeclarationWithRHS extends NamedDeclaration {
 	
 	@Override
 	public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		ValueType defType = definition.typeCheck(thisCtx); 
+		ValueType defType = definition.typeCheck(thisCtx, null); 
 		if (!defType.isSubtypeOf(getType(), thisCtx))
 			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
 		return getDeclType();

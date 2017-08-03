@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -133,7 +134,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
 		return this.getExprType();
 	}
 

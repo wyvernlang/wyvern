@@ -4,21 +4,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
-//import wyvern.target.corewyvernIL.support.Util;
-//import wyvern.tools.parsing.coreparser.ParseException;
-//import wyvern.tools.tests.suites.RegressionTests;
-
 /**
  * Test suite for the effect system (adapted from ExampleTests.java).
- * Test cases numbered with "x0" (ex. 10) do not have effect annotations; 
- * those numbered with "xn" (ex. 12) are versions of "x0" test cases 
- * annotated with effects. 
  * 
  * Successful test cases have the following printout format:
  * "data sent: Network%d%d with(out) effects
@@ -26,8 +20,9 @@ import wyvern.tools.tests.suites.RegressionTests;
  * 
  * Test cases that should be broken are in the category of 
  * @Category(CurrentlyBroken.class); test cases that should
- * be broken but pass for now due to the unimplemented checking
- * of effects in methods, and are commented as "work-in-progress".
+ * be broken but pass for now due to unimplemented features
+ * are commented as "work-in-progress". 
+ * (as of 8/18/17: Network0B, Network0C, Network0F).
  * 
  * Comments related to effects: "declaration, definition, method annotation"
  * Appearance in Wyvern:
@@ -61,7 +56,6 @@ public class EffectSystemTests {
     
     @Test
     @Category(CurrentlyBroken.class) 
-    // **Work-in-progress: passes despite "undefined" effect used for method**
     public void testEffectNetwork02() throws ParseException {
     	/* No declarations. Undefined method annotations in module def
     	 * that does not correspond to the method annotations in type. */
@@ -126,16 +120,20 @@ public class EffectSystemTests {
     }
     
     @Test
-    @Category(CurrentlyBroken.class) // **Work-in-progress: passes but shouldn't**
-    public void testEffectNetwork0B() throws ParseException { // dependent on incorporating EffectDeclaration into DefDeclaration
-    	/* Nonexistent effect in method annotation in type (not in module def, but error should be reported before module def is evaluated). */
+    @Category(CurrentlyBroken.class)
+    /* Work-in-progress: method annotations are not verified in type signature */
+    public void testEffectNetwork0B() throws ParseException {
+    	/* Nonexistent effect in method annotation in type (not in module def, 
+    	 * but error should be reported before module def is evaluated). */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0B", Util.unitType(), Util.unitValue());
     }
     
     @Test
-    @Category(CurrentlyBroken.class) // **Work-in-progress: passes but shouldn't**
-    public void testEffectNetwork0C() throws ParseException { // dependent on incorporating EffectDeclaration into DefDeclaration
-    	/* Int included as effect in module annotation of type (not in module def, but error should be reported before module def is evaluated). */
+    @Category(CurrentlyBroken.class)
+    /* Work-in-progress: method annotations are not verified in type signature */
+    public void testEffectNetwork0C() throws ParseException { 
+    	/* Int included as effect in module annotation of type (not in module def, 
+    	 * but error should be reported before module def is evaluated). */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0C", Util.unitType(), Util.unitValue());
     }
     
@@ -157,15 +155,25 @@ public class EffectSystemTests {
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0E", Util.unitType(), Util.unitValue());
 	}
     
-//    @Test
-//    public void testEffectNetwork11() throws ParseException {
-//    	/* Same as network01 but without type ascription (for testing DataProcessor). */
-//    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.unitType(), Util.unitValue());
-//    }
+	  @Test
+	  @Category(CurrentlyBroken.class)
+	  /* Work-in-progress: effect annotations are not verified in type signature */
+	  public void testEffectNetwork0F() throws ParseException {
+	  	/* Same as network01 but with incorrect effect definition (effect receive = {undefined})
+	  	 * and method annotation (def sendData(data : String) : {error} Unit) in type signature only. */
+	  	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.unitType(), Util.unitValue());
+	  }
+	  
+    @Test
+    public void testEffectNetwork11() throws ParseException {
+    	/* Same as network01 but with all effects defined in type and module def (for testing DataProcessor). */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.unitType(), Util.unitValue());
+    }
     
     @Test
     public void testDataProcessor() throws ParseException {
-    	/* Involve real effect abstraction ("effect process = {net.receive}"). */
+    	/* Involve real effect abstraction ("effect process = {net.receive}"). 
+    	 * Uses network11 because effects in its type are defined, to make sure that effect-checking for methods do work. */
     	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor", Util.unitType(), Util.unitValue());
     }
     
@@ -205,7 +213,20 @@ public class EffectSystemTests {
 
     @Test
     public void testEffectObjNetwork01() throws ParseException {
-    	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
+    	/* Except for the "new" notation, should otherwise use the same parser code as modules. */
     	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
 	}
+    
+    @Test
+    public void testDummy() throws ParseException {
+    	/* Does not use any outside objects/types or functions */
+    	TestUtil.doTestScriptModularly(PATH, "effects.dummyTest", Util.stringType(), new StringLiteral("dummyDef.m3()"));
+    }
+    
+    @Test
+    public void testDummyTaker() throws ParseException {
+    	/* Does not use any outside objects/types or functions other than dummyDef, which itself doesn't use any
+    	 * outside objects/types or functions. 	 */
+    	TestUtil.doTestScriptModularly(PATH, "effects.dummyTakerTest", Util.stringType(), new StringLiteral("dummyTakerDef.m5()"));
+    }
 }

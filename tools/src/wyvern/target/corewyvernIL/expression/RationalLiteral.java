@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -35,7 +36,7 @@ public class RationalLiteral extends Literal {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext env) {
+	public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
 		// TODO Auto-generated method stub
 		return null;
 	}

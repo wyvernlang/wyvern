@@ -98,7 +98,7 @@ public class ModuleResolver {
 		}
 		Expression typeDefiningObject = typeDefiningModule.getExpression();
 		TypeContext ctx = Globals.getStandardTypeContext();
-		final String typeName = typeDefiningObject.typeCheck(ctx).getStructuralType(ctx).getDeclTypes().get(0).getName();
+		final String typeName = typeDefiningObject.typeCheck(ctx, null).getStructuralType(ctx).getDeclTypes().get(0).getName();
 		//final String typeName = ((New)typeDefiningObject).getDecls().get(0).getName();
 		//final String generatedVariableName = GenerationEnvironment.generateVariableName();
 		return new LoadedType(typeName, typeDefiningModule);
@@ -233,7 +233,7 @@ public class ModuleResolver {
 			final List<TypedModuleSpec> dependencies, IExpr program,
 			TypeContext ctx, boolean toplevel) {
 		
-        ValueType moduleType = program.typeCheck(ctx);
+        ValueType moduleType = program.typeCheck(ctx, null);
 		// if this is a platform module, adapt any arguments to take the system.Platform object
 		if (file.toPath().toAbsolutePath().startsWith(platformPath)) {
 			// if the type is in functor form
@@ -261,7 +261,7 @@ public class ModuleResolver {
 					IExpr call = f.call(program, "apply", args);
 					IExpr fn = f.function("apply", argNames, argTypes, appType.getRawResultType(), call);
 					program = fn;
-			        moduleType = program.typeCheck(ctx);
+			        moduleType = program.typeCheck(ctx, null);
 				}
 			}
 		}
