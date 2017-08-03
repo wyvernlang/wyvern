@@ -60,8 +60,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
     private List<String> generics;
-//    private EffectDeclaration effects;
-    private Set<Effect> effects;
+    private Set<Effect> effectSet;
 
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
@@ -76,8 +75,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effects = parseEffects(effects); 
-		//effects==null? null : new EffectDeclaration(name+"_method", effects, location, true);
+		this.effectSet = parseEffects(effects); 
 		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
@@ -128,6 +126,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public Type getType() {
 		return type;
+	}
+	
+	public Set<Effect> getEffectSet() {
+		return effectSet; 
 	}
 	
 	public Set<Effect> parseEffects(String effects) { // refactor later (in Effect.java?)
@@ -315,7 +317,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 //		wyvern.target.corewyvernIL.decl.Declaration effectIL = effects==null ? null : effects.generateDecl(ctx, thisContext);
 		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effects);
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectSet);
 	}
 
 

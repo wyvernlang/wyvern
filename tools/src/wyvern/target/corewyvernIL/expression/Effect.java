@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
@@ -43,5 +44,29 @@ public class Effect {
 	
 	public DeclType getDeclType(Set<Effect> effects) {
 		return new EffectDeclType(getName(), effects, getLocation());
+	}
+	
+	@Override
+	public String toString() {
+		return (path==null? "" : getPath().getName() + ".") + getName(); 
+	}
+	
+	public Path adapt(View v) {
+		if (getName()=="send") 
+			System.out.println("send");
+		return getPath().adapt(v);
+	}	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj==null) return false;
+		if (this == obj) return true;
+	
+		if (!(obj instanceof Effect)) return false;	
+		
+		Effect eObj = (Effect) obj;
+		if (eObj.getName().equals(getName()) &&
+				eObj.getPath().equals(getPath())) return true;
+		return false;
 	}
 }
