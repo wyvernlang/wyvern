@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.expression.Effect;
+import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;

@@ -15,7 +15,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
-import wyvern.target.corewyvernIL.expression.Effect;
+import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
