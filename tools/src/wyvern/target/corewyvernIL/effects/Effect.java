@@ -54,8 +54,6 @@ public class Effect {
 	}
 	
 	public Path adapt(View v) {
-		if (getName()=="send") 
-			System.out.println("send");
 		return getPath().adapt(v);
 	}	
 	

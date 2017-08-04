@@ -13,7 +13,7 @@ import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
-
+/* TODO: adapt(), doAvoid() */
 public class EffectDeclType extends DeclType implements IASTNode {
 	private Set<Effect> effectSet;
 	private FileLocation loc;
@@ -48,26 +48,6 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		}
 		return true; // if edt.getEffectSet()==null (i.e. undefined in the type), anything is a subtype
 		// i.e. effect E = {} (concrete "this") <: effect E (abstract dt which is undefined)
-		
-//			if (getEffectSet()!=null) {
-//				return false;
-//			} else {
-//				return true; // need to shorten logic
-//			}
-//		}
-//		if (getEffectSet()==null) // equal 
-//			throw new RuntimeException();
-//		throw new RuntimeException("nope");
-//		if (edt.getEffectSet()==null) {
-//			return true;
-//		} else {
-//			if (edt.getEffectSet().containsAll(getEffectSet())) { // allow module def to define more effects in the set?
-//				return true;
-//			}
-//		}
-////		if (getEffectSet().containsAll(edt.getEffectSet())) 
-////			return true; // different from: effect E = S <: effect E = S'	if S <= S' (both are concrete)
-//		return false;
 	}
 
 	public Set<Effect> getEffectSet() {
@@ -115,18 +95,16 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
 	@Override
 	public DeclType adapt(View v) {
+		// TODO: the returned EffectDeclType should have, as its effect set, the set
+		// of results from calling adapt(v) on each Effect in this.EffectSet
+		
 //		return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
 		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 
 	@Override
 	public DeclType doAvoid(String varName, TypeContext ctx, int count) {
-//		ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
-//		if (t.equals(this.getRawResultType())) {
-//			return this;
-//		} else {
-//			
-//		}
+		// TODO: similar to NominalType.doAvoid()
 		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 
