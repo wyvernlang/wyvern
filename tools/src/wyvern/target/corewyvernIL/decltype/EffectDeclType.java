@@ -57,7 +57,6 @@ public class EffectDeclType extends DeclType implements IASTNode {
 	@Override
 	public void checkWellFormed(TypeContext ctx) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -111,6 +110,5 @@ public class EffectDeclType extends DeclType implements IASTNode {
 	@Override
 	public boolean isTypeDecl() {
 		return false;
-	}
-	
+	}	
 }
