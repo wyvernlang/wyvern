@@ -92,8 +92,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	
 	@Override
 	public TypedAST effectDecl(String name, String effects, FileLocation loc) {
-		return new EffectDeclaration(name, effects, loc, false); // not optional
-//		return new ValDeclaration(name, unitValue(loc).getType(), unitValue(loc), loc);
+		return new EffectDeclaration(name, effects, loc);
 	}
 	
 	@Override
@@ -113,7 +112,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	
 	@Override
 	public TypedAST effectDeclType(String name, String effects, FileLocation loc) { 
-		return new EffectDeclaration(name, effects, loc, true);
+		return new EffectDeclaration(name, effects, loc);
 	}
 	
 	@Override

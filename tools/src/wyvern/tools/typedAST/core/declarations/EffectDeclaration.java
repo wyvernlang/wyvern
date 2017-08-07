@@ -51,28 +51,9 @@ public class EffectDeclaration extends Declaration {
 	private Set<Effect> effectSet;
 	private FileLocation loc;
 	
-	public EffectDeclaration(String name, String effects, FileLocation fileLocation, boolean declType) {
-		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
-			if (!declType) // i.e. undefined in module def -- the parser doesn't allow this so this is actually dead code I believe
-				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, fileLocation, name);
-//			effectSet = null; // no effect annotation in the method header
-		} else if (effects=="") { // explicitly defined to be empty list of effects
-			effectSet = new HashSet<Effect>();
-		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, fileLocation, name, effects);
-		} else {
-			effectSet = new HashSet<Effect>();
-			for (String e : effects.split(", *")) {
-				if (e.contains(".")) { // effect from another object
-					String[] pathAndID = e.split("\\.");
-					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], loc));
-				} else { // effect defined in the same type or module def
-					effectSet.add(new Effect(null, e, loc));
-				}
-			}
-		}
-		
+	public EffectDeclaration(String name, String effects, FileLocation fileLocation) {	
 		this.name = name;
+		effectSet = Effect.parseEffects(name, effects, fileLocation);
 		loc = fileLocation;
 	}
 	

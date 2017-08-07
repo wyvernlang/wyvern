@@ -25,30 +25,30 @@ public class Effect {
 	private String name;
 	private FileLocation loc;
 	
-//	public static Set<Effect> parseEffects(String name, String effects, FileLocation fileLocation, boolean declType) {
-//		Set<Effect> effectSet = null; 
-//		
-//		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
+	public static Set<Effect> parseEffects(String name, String effects, FileLocation fileLocation) {
+		Set<Effect> effectSet = null; 
+		
+		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
 //			if (!declType) // i.e. undefined in module def -- the parser doesn't allow this so this is actually dead code I believe
 //				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, fileLocation, name);
-//		} else if (effects=="") { // empty list of effects
-//			effectSet = new HashSet<Effect>();
-//		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-//			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, fileLocation, name+" = {"+effects+"}");
-//		} else {
-//			effectSet = new HashSet<Effect>();
-//			for (String e : effects.split(", *")) {
-//				if (e.contains(".")) { // effect from another object
-//					String[] pathAndID = e.split("\\.");
-//					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], fileLocation));
-//				} else { // effect defined in the same type or module def
-//					effectSet.add(new Effect(null, e, fileLocation));
-//				}
-//			}
-//		}
-//		
-//		return effectSet;
-//	}
+		} else if (effects=="") { // empty list of effects
+			effectSet = new HashSet<Effect>();
+		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
+			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, fileLocation, name, effects);
+		} else {
+			effectSet = new HashSet<Effect>();
+			for (String e : effects.split(", *")) {
+				if (e.contains(".")) { // effect from another object
+					String[] pathAndID = e.split("\\.");
+					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], fileLocation));
+				} else { // effect defined in the same type or module def
+					effectSet.add(new Effect(null, e, fileLocation));
+				}
+			}
+		}
+		
+		return effectSet;
+	}
 	
 	public Effect(Variable p, String n, FileLocation l) {
 		path = p;
