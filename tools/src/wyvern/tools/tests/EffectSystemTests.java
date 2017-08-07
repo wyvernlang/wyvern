@@ -24,6 +24,11 @@ import wyvern.tools.tests.suites.RegressionTests;
  * "data sent: Network%d%d with(out) effects
  * data received"
  * 
+ * Test cases that should be broken are in the category of 
+ * @Category(CurrentlyBroken.class); two test cases should
+ * be broken but pass for now due to the unimplemented checking
+ * of effects in methods, and are commented as "work-in-progress".
+ * 
  * Comments related to effects: "declaration, definition, method annotation"
  * Appearance in Wyvern:
  * effect "declared_effect" = {"its_defined_effects"}
@@ -170,20 +175,24 @@ public class EffectSystemTests {
     @Test
     @Category(CurrentlyBroken.class) 
     public void testDataProcessor3() throws ParseException {
-    	/* Like dataProcessor2, but has "effect process = {net.receive, gibberish}" instead. */
+    	/* Shorter version of dataProcessor2, with "effect process = {net.receive, gibberish}". */
     	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor3", Util.unitType(), Util.unitValue());
     }
     
     @Test
     @Category(CurrentlyBroken.class) 
     public void testDataProcessor4() throws ParseException {
-    	/* Like dataProcessor2, but has "effect process = {net.gibberish, process}" instead (i.e. recursive). */
+    	/* Shorter version of dataProcessor2, with "effect process = {net.gibberish, process}" (i.e. recursive). */
     	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor4", Util.unitType(), Util.unitValue());
     }
     
-    // another test in which a third module takes in a data processor which takes in a network, so that the there's multiple (external) layers of effect abstraction?
+    @Test
+    public void testDataProcessor5() throws ParseException {
+    	/* Like dataProcessor2, but has "effect receive = {}" in addition to the use of net.receive (i.e. same name, dif paths). */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor5", Util.unitType(), Util.unitValue());
+    }
     
-	 // Need test case where the object's effect is same as another defined in the sig (and are valid?)
+    // another test in which a third module takes in a data processor which takes in a network, so that the there's multiple (external) layers of effect abstraction?
     
     @Test
     public void testEffectObjNetwork00() throws ParseException {
@@ -194,6 +203,6 @@ public class EffectSystemTests {
     @Test
     public void testEffectObjNetwork01() throws ParseException {
     	/* Except for the "new" notation, should otherwise use the same a parser code as modules. */
-    		TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+    	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
 	}
 }

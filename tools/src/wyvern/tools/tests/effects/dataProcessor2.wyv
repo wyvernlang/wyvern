@@ -10,4 +10,4 @@ def processData() : {process, genN} Unit
     net.receiveData()
     stdout.print("data processed\n")
     net.sendData("from dataProcessor2...") // send==net.send=={}
-    stdout.print("dataProcessor2 done!")
+    stdout.print("dataProcessor2 done!\n")
