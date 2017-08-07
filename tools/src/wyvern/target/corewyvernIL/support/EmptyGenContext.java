@@ -2,7 +2,6 @@ package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ToolError;
 
 public class EmptyGenContext extends GenContext {
 	private InterpreterState state;

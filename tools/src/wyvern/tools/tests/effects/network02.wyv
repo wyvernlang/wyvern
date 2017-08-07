@@ -3,5 +3,5 @@ def sendData(data : String) : {} Unit
     stdout.print("data sent: ")
     stdout.print(data)
     stdout.print("\n")
-def receiveData() : {what} Unit
+def receiveData() : {undefined} Unit
     stdout.print("data received\n")

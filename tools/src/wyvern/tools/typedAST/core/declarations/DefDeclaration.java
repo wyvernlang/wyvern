@@ -65,7 +65,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
-    /* Seems to be the only constructor called by WyvernASTBuilder (therefore the only one dealing w/ effects for now). */
+    /* Seems to be the only constructor called by WyvernASTBuilder. */
 	public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location, String effects) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
@@ -75,7 +75,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effectSet = parseEffects(effects); 
+		this.effectSet = Effect.parseEffects(name, effects, location); 
 		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
@@ -130,30 +130,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	
 	public Set<Effect> getEffectSet() {
 		return effectSet; 
-	}
-	
-	public Set<Effect> parseEffects(String effects) { // refactor later (in Effect.java?)
-		Set<Effect> effectSet = null; 
-		
-		if (effects==null) {
-			effectSet=null; // fix
-		} else if (effects=="") { // explicitly defined to be empty list of effects
-			effectSet = new HashSet<Effect>();
-		} else if (Pattern.compile("[^a-zA-Z,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, this, name+" = {"+effects+"}");
-		} else {
-			effectSet = new HashSet<Effect>();
-			for (String e : effects.split(", *")) {
-				if (e.contains(".")) { // effect from another object
-					String[] pathAndID = e.split("\\.");
-					effectSet.add(new Effect(new Variable(pathAndID[0]), pathAndID[1], location));
-				} else { // effect defined in the same type or module def
-					effectSet.add(new Effect(null, e, location));
-				}
-			}
-		}
-		
-		return effectSet;
 	}
 
 	@Override
@@ -313,8 +289,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		}
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
-		
-//		wyvern.target.corewyvernIL.decl.Declaration effectIL = effects==null ? null : effects.generateDecl(ctx, thisContext);
 		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
 				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectSet);

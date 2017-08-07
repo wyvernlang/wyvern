@@ -25,7 +25,7 @@ import wyvern.tools.tests.suites.RegressionTests;
  * data received"
  * 
  * Test cases that should be broken are in the category of 
- * @Category(CurrentlyBroken.class); two test cases should
+ * @Category(CurrentlyBroken.class); test cases that should
  * be broken but pass for now due to the unimplemented checking
  * of effects in methods, and are commented as "work-in-progress".
  * 
@@ -60,8 +60,11 @@ public class EffectSystemTests {
 	}
     
     @Test
+    @Category(CurrentlyBroken.class) 
+    // **Work-in-progress: passes despite "undefined" effect used for method**
     public void testEffectNetwork02() throws ParseException {
-    	/* No declarations. Method annotations in type & module def. */
+    	/* No declarations. Undefined method annotations in module def
+    	 * that does not correspond to the method annotations in type. */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.unitType(), Util.unitValue());
 	}
   
