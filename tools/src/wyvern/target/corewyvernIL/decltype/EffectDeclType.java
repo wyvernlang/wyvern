@@ -3,14 +3,12 @@ package wyvern.target.corewyvernIL.decltype;
 import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 /* TODO: adapt(), doAvoid() */

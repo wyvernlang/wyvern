@@ -1,6 +1,5 @@
 package wyvern.target.corewyvernIL.effects;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
