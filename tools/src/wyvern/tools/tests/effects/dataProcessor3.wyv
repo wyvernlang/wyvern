@@ -5,4 +5,4 @@ def processData() : {process} Unit
     stdout.print("dataProcessor3 w/ multiple layers of effect abstraction: \n")
     net.receiveData()
     stdout.print("data processed\n")
-    stdout.print("dataProcessor3 w/ multiple layers of effect abstraction!")
+    stdout.print("dataProcessor3 w/ multiple layers of effect abstraction!\n")
