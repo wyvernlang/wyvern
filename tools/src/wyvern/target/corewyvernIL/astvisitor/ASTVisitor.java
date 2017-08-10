@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -69,4 +70,5 @@ public abstract class ASTVisitor<S, T> {
   public abstract T visit(S state, DataType dataType);
   public abstract T visit(S state, FFIImport ffiImport);
   public abstract T visit(S state, FFI ffi);
+public  abstract T visit(S state, EffectDeclaration effectDeclaration) ;
 }

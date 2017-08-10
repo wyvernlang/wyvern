@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.binding.Binding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -255,5 +256,11 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
         ((DefDeclaration)moduleDecl).acceptVisitor(this, inTailPosition);
         return null;
     }
+
+	@Override
+	public Void visit(Boolean state, EffectDeclaration effectDeclaration) {
+//		effectDeclaration.acceptVisitor(this, false); // causes StackOverflow (inf loop, probably)
+		return null;
+	}
 
 }

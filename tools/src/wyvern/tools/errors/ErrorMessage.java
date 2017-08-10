@@ -11,7 +11,7 @@ public enum ErrorMessage {
 	TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
 	CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
 	TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
-	VARIABLE_NOT_DECLARED("No variable named %ARG is in scope", 1),
+	VARIABLE_NOT_DECLARED("No variable named \"%ARG\" is in scope", 1),
 	NO_SUCH_METHOD("There is no visible method named %ARG", 1),
 	NO_SUCH_FIELD("There is no visible field named %ARG", 1),
 	NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
@@ -102,8 +102,10 @@ public enum ErrorMessage {
 	NO_TYPE_MEMBER("Cannot find enough type members to apply type parameters",0),
 	
 	// effect error
-	MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: %ARG", 1),
-	UNDEFINED_EFFECT("Effect undefined outside of type signature: %ARG", 1),
+	MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: \"effect %ARG = {%ARG}\"", 2),
+	UNDEFINED_EFFECT("Effect undefined outside of type signature: \"%ARG\"", 1),
+	EFFECT_IN_SIG_NOT_FOUND("Effect \"%ARG\" not found in the signature", 1),
+	EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
 	;
 
 	private ErrorMessage(String message, int numArgs) {
@@ -116,7 +118,7 @@ public enum ErrorMessage {
 
         String str = errorMessage;
         for (String arg : args) {
-            str = str.replaceFirst("%ARG", Matcher.quoteReplacement(arg) );
+            str = str.replaceFirst("%ARG", Matcher.quoteReplacement(arg));
         }
         return str;
     }

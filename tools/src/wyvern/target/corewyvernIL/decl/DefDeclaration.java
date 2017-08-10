@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -21,14 +22,21 @@ public class DefDeclaration extends NamedDeclaration {
 	private ValueType type;
 	private IExpr body;
 	private boolean hasResource = false;
+	private Set<Effect> effectSet;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, IExpr iExpr, FileLocation loc) {
+		this(methodName, formalArgs, type, iExpr, loc, null);
+	}
+	
+	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
+			ValueType type, IExpr iExpr, FileLocation loc, Set<Effect> effects) {
 		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = iExpr;
+		this.effectSet = effects;
 	}
 
 	@Override

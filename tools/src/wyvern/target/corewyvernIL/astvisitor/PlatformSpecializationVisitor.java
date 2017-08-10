@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -307,4 +308,9 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     public ASTNode visit(PSVState state, FFI ffi) {
         return ffi;
     }
+
+	@Override
+	public ASTNode visit(PSVState state, EffectDeclaration effectDeclaration) { // unsure
+		return effectDeclaration;
+	}
 }

@@ -2,16 +2,20 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -56,12 +60,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
     private List<String> generics;
+    private Set<Effect> effectSet;
 
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
+    /* Seems to be the only constructor called by WyvernASTBuilder. */
 	public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
-						  TypedAST body, boolean isClassDef, FileLocation location) {
+						  TypedAST body, boolean isClassDef, FileLocation location, String effects) {
 		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
 		this.type = getMethodType(argNames, returnType);
 		this.name = name;
@@ -69,13 +75,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-
+		this.effectSet = Effect.parseEffects(name, effects, location); 
+		
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
 	public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
 						  TypedAST body, boolean isClassDef, FileLocation location) {
-        this(name, returnType, null, argNames, body, isClassDef, location);
+        this(name, returnType, null, argNames, body, isClassDef, location, null);
 	}
 
 	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
@@ -119,6 +126,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public Type getType() {
 		return type;
+	}
+	
+	public Set<Effect> getEffectSet() {
+		return effectSet; 
 	}
 
 	@Override
@@ -278,8 +289,9 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		}
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
+		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation());
+				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectSet);
 	}
 
 
