@@ -29,6 +29,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) { 
+		// TODO: instead of the code below, implement semantics comparison
 		if (!(dt instanceof EffectDeclType)) {
 			return false;
 		}

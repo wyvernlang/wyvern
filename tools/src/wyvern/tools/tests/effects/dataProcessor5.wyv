@@ -10,5 +10,5 @@ def processData() : {process, genN, receive} Unit
     val n : Int = genNum()
     net.receiveData()
     stdout.print("data processed\n")
-    net.sendData("from dataProcessor5...\n") // send==net.send=={}
+    net.sendData("from dataProcessor5...") // send==net.send=={}
     stdout.print("dataProcessor5 done!\n")

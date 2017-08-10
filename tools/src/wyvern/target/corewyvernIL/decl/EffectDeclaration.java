@@ -64,6 +64,10 @@ public class EffectDeclaration extends NamedDeclaration {
 	
 	@Override
 	public Set<String> getFreeVariables() {
-		return new HashSet<String>();
+		Set<String> freeVars = new HashSet<String>();
+		for (Effect e : effectSet) {
+			freeVars.add(e.getPath().getName()); // e.getPath() should never be null because of addPath() being called earlier
+		}
+		return freeVars;
 	}
 }
