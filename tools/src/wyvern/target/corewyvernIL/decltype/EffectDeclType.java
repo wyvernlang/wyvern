@@ -58,7 +58,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 			} // effect E = S ("this") <: effect E = S' (edt)	if S <= S' (both are concrete)
 		}
 		
-		/* if edt.getEffectSet()==null (i.e. undefined in the type, or no method anntations), 
+		/* if edt.getEffectSet()==null (i.e. undefined in the type, or no method annotations), 
 		 * anything (defined in the module def, or the effects of the method calls) is a subtype
 		 */
 		// i.e. effect E = {} (concrete "this") <: effect E (abstract dt which is undefined)

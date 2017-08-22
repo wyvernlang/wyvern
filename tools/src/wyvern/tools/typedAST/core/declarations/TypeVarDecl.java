@@ -263,9 +263,15 @@ public class TypeVarDecl extends Declaration {
 
 	private StructuralType computeInternalILType(GenContext ctx) {
 		TypeDeclaration td = (TypeDeclaration) this.body;
-		StructuralType localCopy = new StructuralType(getSelfName(), td.genDeclTypeSeq(ctx), this.resourceFlag); // VZ
-		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), localCopy); // null to localCopy
-		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag); // remove localCopy afterwards??
+		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
+		
+		// temporarily check effect annotations of a method w/ effects declared in the type signature:
+		StructuralType localCopy = new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag); // duplicate type signature
+		GenContext ctxWithCopy = localCtx.extend(getSelfName(), new Variable(getSelfName()), localCopy);
+		td.genDeclTypeSeq(ctxWithCopy); // will throw error if a method has invalid effect annotations, no need for result
+		
+		// if everything is fine, use original localCtx
+		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
 	}
 	
 	@Override

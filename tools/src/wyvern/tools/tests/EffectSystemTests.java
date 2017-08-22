@@ -22,7 +22,6 @@ import wyvern.tools.tests.suites.RegressionTests;
  * @Category(CurrentlyBroken.class); test cases that should
  * be broken but pass for now due to unimplemented features
  * are commented as "work-in-progress". 
- * (as of 8/18/17: Network0B, Network0C, Network0F).
  * 
  * Comments related to effects: "declaration, definition, method annotation"
  * Appearance in Wyvern:
@@ -57,8 +56,8 @@ public class EffectSystemTests {
     @Test
     @Category(CurrentlyBroken.class) 
     public void testEffectNetwork02() throws ParseException {
-    	/* No declarations. Undefined method annotations in module def (regardless of whether it matches
-    	 * the type signature). */
+    	/* No declarations. Undefined method annotations in module def (doesn't match the valid type signature,
+    	 * to isolate testing for just method-checking in module def). */
     	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.unitType(), Util.unitValue());
 	}
   
@@ -121,7 +120,6 @@ public class EffectSystemTests {
     
     @Test
     @Category(CurrentlyBroken.class)
-    /* Work-in-progress: method annotations are not verified in type signature */
     public void testEffectNetwork0B() throws ParseException {
     	/* Nonexistent effect in method annotation in type (not in module def, 
     	 * but error should be reported before module def is evaluated). */
@@ -130,7 +128,6 @@ public class EffectSystemTests {
     
     @Test
     @Category(CurrentlyBroken.class)
-    /* Work-in-progress: method annotations are not verified in type signature */
     public void testEffectNetwork0C() throws ParseException { 
     	/* Int included as effect in module annotation of type (not in module def, 
     	 * but error should be reported before module def is evaluated). */
@@ -157,10 +154,10 @@ public class EffectSystemTests {
     
 	  @Test
 	  @Category(CurrentlyBroken.class)
-	  /* Work-in-progress: effect annotations are not verified in type signature */
 	  public void testEffectNetwork0F() throws ParseException {
-	  	/* Same as network01 but with incorrect effect definition (effect receive = {undefined})
-	  	 * and method annotation (def sendData(data : String) : {error} Unit) in type signature only. */
+	  	/* Same as network01 but with incorrect effect definition (effect receive = {undefined}, should report error here)
+	  	 * and method annotation (def sendData(data : String) : {error} Unit) -- both in type signature *only*, to isolate
+	  	 * testing in type signature. */
 	  	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.unitType(), Util.unitValue());
 	  }
 	  

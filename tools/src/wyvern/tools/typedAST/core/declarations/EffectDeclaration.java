@@ -17,7 +17,10 @@ import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -64,14 +67,25 @@ public class EffectDeclaration extends Declaration {
 	
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		/* TODO: for effect-checking in effect definitions in type signature;
-		 * need modifying to accommodate cases where an effect is defined
-		 * based on a previous effect declared in the same type signature
-		 */
-//        if (effectSet != null) {
-//        	effectSet.stream().forEach(e -> e.addPath(ctx));
-//        	effectSet.stream().forEach(e -> e.effectsCheck(ctx));
-//        }
+		if (effectSet != null) {
+			ValueType vt = null;
+			try {
+				vt = ctx.lookupTypeOf("this");
+			} catch (RuntimeException ex) {
+				// don't check effect annotations of methods this time
+				// (bad programming practice, but ctx.lookupTypeOf() throws exception instead of returning a value)
+			}
+			
+			if (vt != null) {
+				for (Effect e : effectSet) {
+					DeclType dt = vt.findDecl(e.getName(), ctx); // not sure about what to do w/ obj ones yet...
+					if ((dt == null) || !(dt instanceof EffectDeclType)) {
+						ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), e.toString());
+					}
+				}
+			}
+		}
+		
 		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 	

@@ -219,22 +219,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public DeclType genILType(GenContext ctx) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
 
-		/* TODO: for checking that an effect exists in the method annotation 
-		 * of a type signature; need modifying because paths do not show up in ctx
-		 */
-//		// place after serializeArguments() to include effects defined by args?
-//        if (effectSet != null) {
-//        	for (Effect e : effectSet) {
-//        		e.effectsCheck(ctx);
-//        	}
-//        }
-//		if (ctx.lookupTypeOf("this") != null)
 		if (effectSet != null) {
 			ValueType vt = null;
 			try {
 				vt = ctx.lookupTypeOf("this");
 			} catch (RuntimeException ex) {
 				// don't check effect annotations of methods this time
+				// (bad programming practice, but ctx.lookupTypeOf() throws exception instead of returning a value)
 			}
 			
 			if (vt != null) {
@@ -273,9 +264,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 			args.add(fa);
 			ctx = ctx.extend(bName, new Variable(bName), type);
 		}
-        if (getName().equals("sendData")) {
-        	System.out.println("sendData");
-        }
         return ctx;
     }
 

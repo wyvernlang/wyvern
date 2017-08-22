@@ -131,6 +131,10 @@ public class DefDeclType extends DeclTypeWithResult {
 		}
 		String newIndent = indent+"    ";
 		dest.append(") : ");
+		if (effectSet != null) { 
+			dest.append(effectSet.toString().replace("[", "{").replace("]", "}"));	
+			dest.append(" ");
+		}
 		getRawResultType().doPrettyPrint(dest, newIndent);
 		dest.append('\n');
 	}
