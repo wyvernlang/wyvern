@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -59,7 +60,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	private List<FormalArg> argILTypes = new LinkedList<FormalArg>();// store to preserve IL arguments types and return types
 	private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
     private List<String> generics;
-    private Set<Effect> effectSet;
+    private EffectSet effectSet;
 
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
@@ -73,7 +74,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effectSet = Effect.parseEffects(name, effects, location); 
+		this.effectSet = EffectSet.parseEffects(name, effects, location); 
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
@@ -126,7 +127,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return type;
 	}
 	
-	public Set<Effect> getEffectSet() {
+	public EffectSet getEffectSet() {
 		return effectSet; 
 	}
 
@@ -219,24 +220,8 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public DeclType genILType(GenContext ctx) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
 
-		if (effectSet != null) {
-			ValueType vt = null;
-			try {
-				vt = ctx.lookupTypeOf("this");
-			} catch (RuntimeException ex) {
-				// don't check effect annotations of methods this time
-				// (bad programming practice, but ctx.lookupTypeOf() throws exception instead of returning a value)
-			}
-			
-			if (vt != null) {
-				for (Effect e : effectSet) {
-					DeclType dt = vt.findDecl(e.getName(), ctx); // not sure about what to do w/ obj ones yet...
-					if ((dt == null) || !(dt instanceof EffectDeclType)) {
-						ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), e.toString());
-					}
-				}
-			}
-		}
+		// for checking that the effects in effectSet are in scope (such as previously declared in the same type signature)
+		if (effectSet != null) {	effectSet.verifyInType(ctx, getName());	}
         
         ctx = this.serializeArguments(args, ctx);
         
@@ -307,15 +292,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.returnILType = this.getResultILType(thisContext);
 		this.argILTypes = args;
 		
-		if (effectSet != null) {
-			for (Effect e : effectSet) {
-				try { // might be obj instantiation, in which case leave to effect-check and add path later in IL (DefDeclaration.typecheck())
-					ValueType vt = thisContext.lookupTypeOf("this");
-				} catch (RuntimeException ex) { // if not, see if it has path already in context
-					e.addPath(thisContext); // will throw exception if unsuccessful
-				}
-			}
-		}
+		if (effectSet != null) { effectSet.addPaths(thisContext);}
 		
 		return new wyvern.target.corewyvernIL.decl.DefDeclaration(
 				        getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), getEffectSet());
@@ -437,7 +414,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         sb.append(body.prettyPrint());
 		if (effectSet != null) {
 			sb.append(" with "); // just for distinction
-			sb.append(effectSet.toString().replace("[", "{").replace("]", "}")); 
+			sb.append(effectSet.toString()); 
 		}
         return sb;
     }

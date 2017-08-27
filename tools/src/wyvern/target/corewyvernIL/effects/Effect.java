@@ -24,42 +24,6 @@ public class Effect {
 	private String name;
 	private FileLocation loc;
 
-	/** Parse string into set of effects. */
-	public static Set<Effect> parseEffects(String name, String effects, FileLocation fileLocation) {
-		Set<Effect> effectSet = null; 
-		
-		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
-//			if (!declType) // i.e. undefined in module def -- the parser doesn't allow this so this is actually dead code I believe
-//				ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, fileLocation, name);
-		} else if (effects=="") { // empty list of effects
-			effectSet = new HashSet<Effect>();
-		} else if (Pattern.compile("[^a-zA-Z0-9,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
-			ToolError.reportError(ErrorMessage.MISTAKEN_DSL, fileLocation, name, effects);
-		} else {
-			effectSet = new HashSet<Effect>();
-			for (String e : effects.split(", *")) {
-				Effect newE = parseEffect(e, name, fileLocation);
-				effectSet.add(newE);
-			}
-		}
-		return effectSet;
-	}
-	
-	/** Parse string into single Effect object. */
-	private static Effect parseEffect(String e, String name, FileLocation fileLocation) {
-		e = e.trim(); // remove leading/trailing spaces
-		
-		if (e.contains(".")) { // effect from another object
-			String[] pathAndID = e.split("\\.");
-			return new Effect(new Variable(pathAndID[0]), pathAndID[1], fileLocation);
-		} else { // effect defined in the same type or module def
-			if (name.equals(e)) { // recursive definition (ex. "effect process = {send, process}")
-				ToolError.reportError(ErrorMessage.RECURSIVE_EFFECT, fileLocation, e);
-			}
-			return new Effect(null, e, fileLocation);
-		}
-	}
-	
 	public Effect(Variable p, String n, FileLocation l) {
 		this.path = p;
 		this.name = n;
@@ -75,14 +39,15 @@ public class Effect {
 		path = p;
 	}
 	
-	/** Add path to an effect if it doesn't already have one (i.e. if it's defined in the same type or module def). **/
+	/** Add path to the effect if it doesn't already have one (i.e. if it's defined in the same type or module def). **/
 	public void addPath(GenContext ctx) {
+		/* ignore if path not found in context (i.e. null) -- this sometimes occurs in a valid setting, 
+		 * such as sometimes for obj definitions in typedAST.DefDeclaration.generateDecl(), which 
+		 * is made up for later in the compiling process; otherwise the effect is invalid and will be
+		 * caught by effectCheck() later. */
 		if (getPath()==null) {
 			Path ePath = ctx.getContainerForTypeAbbrev(getName());
-			if (ePath==null) { // effect not found
-				ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), getName());
-			}
-			setPath(ePath);
+			setPath(ePath); // may be null
 		}
 	}
 	
@@ -94,9 +59,9 @@ public class Effect {
 		return loc;
 	}
 	
-	public DeclType getDeclType(Set<Effect> effects) {
-		return new EffectDeclType(getName(), effects, getLocation());
-	}
+//	public DeclType getDeclType(EffectSet effectSet) {
+//		return new EffectDeclType(getName(), effectSet, getLocation());
+//	}
 	
 	@Override
 	public String toString() {
@@ -120,8 +85,17 @@ public class Effect {
 		return false;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 67;
+		int result = 1;
+		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+		result = prime * result + ((getPath() == null) ? 0 : getPath().hashCode());
+		return result;
+	}
+	
 	/** Check that an effect exists in the context, returning its corresponding effect set at the end. */
-	public Set<Effect> effectsCheck(TypeContext ctx) {	
+	public EffectSet effectCheck(TypeContext ctx) {	
 		ValueType vt = null;
 		
 		// Without try/catch, this could result in a runtime exception due to EmptyGenContext 
@@ -130,19 +104,19 @@ public class Effect {
 			// if path is null (due to failure of addPath() before) or typeCheck() fails
 			vt = getPath().typeCheck(ctx, null); 
 		} catch (RuntimeException ex) { 
-			ToolError.reportError(ErrorMessage.VARIABLE_NOT_DECLARED, getLocation(), getPath().getName());
-			
-			/* may be useful for checking effects that don't have paths (such as in DefDeclaration.genILType) */
-//			if (getPath()==null) {
-//				ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), getName());
-//			}
-		}
-		
-		DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
-		if ((eDT==null) || (!(eDT instanceof EffectDeclType))){
-			ToolError.reportError(ErrorMessage.EFFECT_OF_VAR_NOT_FOUND, getLocation(), getName(), getPath().getName());
+			ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
 		}
 
-		return ((EffectDeclType) eDT).getEffectSet();
+		return findEffectDeclType(ctx, vt).getEffectSet();
+	}
+	
+	/** Find this effect's (effect)DeclType in ValueType vt; report error if not found, else return effectDeclType. */
+	public EffectDeclType findEffectDeclType(TypeContext ctx, ValueType vt) {
+		DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
+		if ((eDT==null) || (!(eDT instanceof EffectDeclType))){
+			ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
+		}
+		
+		return (EffectDeclType) eDT;
 	}
 }

@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -227,17 +228,17 @@ public class MethodCall extends Expression {
 				
 				// accumulate effects from method calls
 				if (effectAccumulator != null) {
-					Set<Effect> methodCallE = defDeclType.getEffectSet();
+					EffectSet methodCallE = defDeclType.getEffectSet();
 					
 					// for ambiguous effects: need primitive operations and etc. to have effects implemented or specifically ignored
 //					if (methodCallE==null) {
 //						ToolError.reportError(ErrorMessage.UNKNOWN_EFFECT, getLocation(), getMethodName());
 //					}
-					if (methodCallE != null) {
-						for (Effect e : methodCallE) {
-							if (e.getPath() == null) {e.setPath((Variable) objectExpr); }
+					if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
+						for (Effect e : methodCallE.getEffects()) {
+							if (e.getPath() == null) {e.setPath((Variable) objectExpr); } // TODO: should not set path to objectExpr
 						}
-						effectAccumulator.addEffects(methodCallE);
+						effectAccumulator.addEffects(methodCallE.getEffects());
 					}
 				}
 				

@@ -14,6 +14,7 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
@@ -29,7 +30,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
 	private String name;
-	private Set<Effect> effectSet;
+	private EffectSet effectSet;
 	private FileLocation loc;
 	
 	public EffectDeclaration(String name, String effects, FileLocation fileLocation) {	
@@ -38,7 +39,7 @@ public class EffectDeclaration extends Declaration {
 		
 		/* Parses the String effects into a set. If it was not defined: 
 		 * effectSet==null if in type signature, else error is reported */
-		this.effectSet = Effect.parseEffects(name, effects, fileLocation);
+		this.effectSet = EffectSet.parseEffects(name, effects, fileLocation);
 	}
 	
 	public Effect getEffect() {
@@ -47,7 +48,7 @@ public class EffectDeclaration extends Declaration {
 	
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("effect ").append(getName()).append(" = ");
-		if (effectSet != null) { effectSet.toString().replace("[", "{").replace("]", "}"); }
+		if (effectSet != null) {dest.append(effectSet.toString());}
 		dest.append('\n');
 	}
 	
@@ -61,37 +62,20 @@ public class EffectDeclaration extends Declaration {
 		return name;
 	}
 	
-	public Set<Effect> getEffectSet() {
+	public EffectSet getEffectSet() {
 		return effectSet;
 	}
 	
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		if (effectSet != null) {
-			ValueType vt = null;
-			try {
-				vt = ctx.lookupTypeOf("this");
-			} catch (RuntimeException ex) {
-				// don't check effect annotations of methods this time
-				// (bad programming practice, but ctx.lookupTypeOf() throws exception instead of returning a value)
-			}
-			
-			if (vt != null) {
-				for (Effect e : effectSet) {
-					DeclType dt = vt.findDecl(e.getName(), ctx); // not sure about what to do w/ obj ones yet...
-					if ((dt == null) || !(dt instanceof EffectDeclType)) {
-						ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), e.toString());
-					}
-				}
-			}
-		}
-		
+		// for checking that the effects in effectSet are in scope (such as previously declared in the same type signature)
+		if (effectSet != null) {	effectSet.verifyInType(ctx, getName());	}
 		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		if (effectSet != null) {effectSet.stream().forEach(e -> e.addPath(ctx)); }
+		if (effectSet != null) { effectSet.addPaths(ctx); }
 		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
 	}
 	
@@ -103,7 +87,7 @@ public class EffectDeclaration extends Declaration {
 	@Override
 	public void addModuleDecl(TopLevelContext tlc) {
 		wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext(), null);
-		DeclType dt = genILType(tlc.getContext()); // doesn't actually uses the context
+		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
 	}
 	

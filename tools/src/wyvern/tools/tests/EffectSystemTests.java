@@ -161,6 +161,12 @@ public class EffectSystemTests {
 	  	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.unitType(), Util.unitValue());
 	  }
 	  
+//	  @Test
+//	    public void testEffectNetwork10() throws ParseException { /* Work-in-progress */
+//	    	/* For testing effects defined by a pure module. */
+//	    	TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.unitType(), Util.unitValue());
+//	    }
+	  
     @Test
     public void testEffectNetwork11() throws ParseException {
     	/* Same as network01 but with all effects defined in type and module def (for testing DataProcessor). */
@@ -200,6 +206,20 @@ public class EffectSystemTests {
     	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor5", Util.unitType(), Util.unitValue());
     }
     
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testDataProcessor6() throws ParseException {
+    	/* Similar to dataProcessor2, but method processData() has "net.receive" from one of its method calls that it did not annotate. */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor6", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testDataProcessor7() throws ParseException {
+    	/* Similar to dataProcessor6, but method processData() over-compensates with annotation "net.send" in addition
+    	 * to its method call effects (and does not know that "net.send" is empty). */
+    	TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor7", Util.unitType(), Util.unitValue());
+    }
+
     // another test in which a third module takes in a data processor which takes in a network, so that the there's multiple (external) layers of effect abstraction?
     
     @Test
@@ -214,16 +234,16 @@ public class EffectSystemTests {
     	TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
 	}
     
-    @Test
-    public void testDummy() throws ParseException {
-    	/* Does not use any outside objects/types or functions */
-    	TestUtil.doTestScriptModularly(PATH, "effects.dummyTest", Util.stringType(), new StringLiteral("dummyDef.m3()"));
-    }
-    
-    @Test
-    public void testDummyTaker() throws ParseException {
-    	/* Does not use any outside objects/types or functions other than dummyDef, which itself doesn't use any
-    	 * outside objects/types or functions. 	 */
-    	TestUtil.doTestScriptModularly(PATH, "effects.dummyTakerTest", Util.stringType(), new StringLiteral("dummyTakerDef.m5()"));
-    }
+   @Test
+   public void testDummy() throws ParseException {
+   	/* Does not use any outside objects/types or functions */
+   	TestUtil.doTestScriptModularly(PATH, "effects.dummyTest", Util.stringType(), new StringLiteral("dummyDef.m3()"));
+   }
+   
+   @Test
+   public void testDummyTaker() throws ParseException {
+   	/* Does not use any outside objects/types or functions other than dummyDef, which itself doesn't use any
+   	 * outside objects/types or functions. 	 */
+   	TestUtil.doTestScriptModularly(PATH, "effects.dummyTakerTest", Util.stringType(), new StringLiteral("dummyTakerDef.m5()"));
+   }
 }

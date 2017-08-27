@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -24,7 +25,7 @@ public class DefDeclaration extends NamedDeclaration {
 	private ValueType type;
 	private IExpr body;
 	private boolean hasResource = false;
-	private Set<Effect> effectSet;
+	private EffectSet effectSet;
 
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
 			ValueType type, IExpr iExpr, FileLocation loc) {
@@ -32,13 +33,13 @@ public class DefDeclaration extends NamedDeclaration {
 	}
 	
 	public DefDeclaration(String methodName, List<FormalArg> formalArgs,
-			ValueType type, IExpr iExpr, FileLocation loc, Set<Effect> effects) {
+			ValueType type, IExpr iExpr, FileLocation loc, EffectSet effectSet) {
 		super(methodName, loc);
 		this.formalArgs = formalArgs;
 		if (type == null) throw new RuntimeException();
 		this.type = type;
 		this.body = iExpr;
-		this.effectSet = effects;
+		this.effectSet = effectSet;
 	}
 
 	@Override
@@ -63,10 +64,7 @@ public class DefDeclaration extends NamedDeclaration {
 		}
 		String newIndent = indent+"    ";
 		dest.append(") : ");
-		if (effectSet != null) { 
-			dest.append(effectSet.toString().replace("[", "{").replace("]", "}"));	
-			dest.append(" ");
-		}
+		if (effectSet != null) {dest.append(effectSet.toString());}
 		type.doPrettyPrint(dest, newIndent);
 		dest.append('\n').append(newIndent);
 		body.doPrettyPrint(dest,newIndent);
@@ -90,7 +88,7 @@ public class DefDeclaration extends NamedDeclaration {
 		return body;
 	}
 	
-	public Set<Effect> getEffectSet() {
+	public EffectSet getEffectSet() {
 		return effectSet;
 	}
 
@@ -121,39 +119,7 @@ public class DefDeclaration extends NamedDeclaration {
 		
 		ValueType bodyType = body.typeCheck(methodCtx, effectAccumulator);
 		
-		if (effectSet != null) { 
-			// check that all effects in annotation exist (assume that those from method calls are valid)
-			ValueType vt = null;
-			try { // if we're currently in an object
-				vt = methodCtx.lookupTypeOf("this");
-			} catch (RuntimeException ex) { // might be a module def instead
-				for (Effect e : effectSet) {
-					e.effectsCheck(methodCtx); // report error if effect is just not found in scope
-				}
-			}
-			
-			// finish effect-checking for effect in instantiated obj; set its path as "this" if successful
-			if (vt != null) { 
-				for (Effect e : effectSet) {
-					DeclType dt = vt.findDecl(e.getName(), methodCtx);
-					if ((dt==null) || (!(dt instanceof EffectDeclType))) {
-						ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), e.toString());
-					}
-					e.setPath(new Variable("this"));
-				}
-			}
-			
-			Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
-			
-			// compare method call effects with annotated ones
-			EffectDeclType actualEffects = new EffectDeclType(getName()+"-actualEffects", actualEffectSet, getLocation());
-			EffectDeclType annotatedEffects = new EffectDeclType(getName()+"-annotatedEffects", effectSet, getLocation());
-			if (!actualEffects.isSubtypeOf(annotatedEffects, methodCtx)) { // changed from ctx
-				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), 
-						"set of effects from the method calls "+actualEffectSet.toString().replace("[", "{").replace("]", "}"),
-						"set of effects specified by "+getName()+effectSet.toString().replace("[", "{").replace("]", "}"));
-			}
-		}	
+		if (effectSet != null){ effectsCheck(methodCtx, effectAccumulator); }	
 		
 		if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
 			// for debugging
@@ -163,6 +129,38 @@ public class DefDeclaration extends NamedDeclaration {
 			
 		}
 		return new DefDeclType(getName(), type, formalArgs, effectSet);
+	}
+	
+	/** check that all effects in annotation exist (assume that those from method calls are valid). */
+	private void effectsCheck(TypeContext methodCtx, EffectAccumulator effectAccumulator) {
+		// TODO: make uniform, regardless of whether we're in an obj definition or module def
+		if (effectSet.getEffects() != null) {
+				ValueType vt = null;
+				try { // if we're currently in an object
+					vt = methodCtx.lookupTypeOf("this");
+				} catch (RuntimeException ex) { // might be a module def instead
+					effectSet.effectsCheck(methodCtx);
+				}
+				
+				// finish effect-checking for effect in instantiated obj; set its path as "this" if successful
+				if (vt != null) { 
+					for (Effect e : effectSet.getEffects()) {
+						e.findEffectDeclType(methodCtx, vt);
+//						e.setPath(new Variable("this"));
+					}
+				}
+				
+				Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
+				
+				// compare method call effects with annotated ones
+				EffectDeclType actualEffects = new EffectDeclType(getName()+"-actualEffects", new EffectSet(actualEffectSet), getLocation());
+				EffectDeclType annotatedEffects = new EffectDeclType(getName()+"-annotatedEffects", effectSet, getLocation());
+				if (!actualEffects.isSubtypeOf(annotatedEffects, methodCtx)) { // changed from ctx
+					ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), 
+							"set of effects from the method calls "+actualEffectSet.toString(),
+							"set of effects specified by "+getName()+effectSet.toString());
+				}
+		}
 	}
 
 	@Override
