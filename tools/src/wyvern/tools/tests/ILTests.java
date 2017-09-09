@@ -29,6 +29,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.Interpreter;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
@@ -681,6 +682,16 @@ public class ILTests {
     @Test
     public void testTSL2() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testTSL3() throws ParseException {
+        TestUtil.doTestScriptModularly("tsls.trivialClient", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testTSL4() throws ParseException {
+        TestUtil.doTestScriptModularlyFailing("tsls.failingClient", ErrorMessage.TSL_ERROR);
     }
 
     @Test

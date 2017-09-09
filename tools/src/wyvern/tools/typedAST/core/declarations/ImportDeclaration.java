@@ -17,7 +17,9 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -312,7 +314,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       importExp = new Variable(internalName);
       dependencies.add(module.getSpec());
       dependencies.addAll(module.getDependencies());
-      ctx = ctx.extend(importName, new Variable(internalName), type);
+      if (module.getSpec().getDefinedTypeName() != null) {
+          ctx = new TypeOrEffectGenContext(importName, (Variable) importExp, ctx);
+      } else {
+          ctx = ctx.extend(importName, new Variable(internalName), type);
+      }
     } else {
         ToolError.reportError(ErrorMessage.SCHEME_NOT_RECOGNIZED, this, scheme);
     }
