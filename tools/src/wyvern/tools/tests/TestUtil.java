@@ -235,6 +235,16 @@ public class TestUtil {
         doTestScriptModularly(BASE_PATH, qualifiedName, expectedType, expectedValue);
 	}
     
+    // TODO: make other script tests call this function
+    public static void doTestScriptModularlyFailing(String qualifiedName, ErrorMessage expectedMessage) throws ParseException {
+        try {
+            doTestScriptModularly(BASE_PATH, qualifiedName, null, null);
+        } catch (ToolError e) {
+            ErrorMessage actualMessage = e.getTypecheckingErrorMessage();
+            Assert.assertEquals(expectedMessage, actualMessage);
+        }
+    }
+    
 	public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
 	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
 	    final Module module = state.getResolver().resolveModule(qualifiedName, true);
