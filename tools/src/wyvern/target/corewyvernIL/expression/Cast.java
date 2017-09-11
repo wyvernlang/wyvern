@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -24,8 +25,8 @@ public class Cast extends Expression{
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
-		toCastExpr.typeCheck(ctx);
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+		toCastExpr.typeCheck(ctx, effectAccumulator);
 		return getExprType().getCanonicalType(ctx);
 	}
 
@@ -38,7 +39,7 @@ public class Cast extends Expression{
 	@Override
 	public Value interpret(EvalContext ctx) {
 		Value value = getToCastExpr().interpret(ctx);
-		ValueType actualType = value.typeCheck(ctx);
+		ValueType actualType = value.typeCheck(ctx, null);
 		ValueType goalType = getExprType();
 		if (!actualType.isSubtypeOf(goalType, ctx))
 			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString());

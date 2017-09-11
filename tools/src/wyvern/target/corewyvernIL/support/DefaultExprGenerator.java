@@ -30,7 +30,7 @@ public class DefaultExprGenerator implements CallableExprGenerator {
 	@Override
 	public DefDeclType getDeclType(TypeContext ctx) {
 		IExpr e = genExpr();
-		ValueType vt = e.typeCheck(ctx);
+		ValueType vt = e.typeCheck(ctx, null);
 		return (DefDeclType) vt.findDecl(Util.APPLY_NAME, ctx);
 		// return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(expr, ctx));
 	}

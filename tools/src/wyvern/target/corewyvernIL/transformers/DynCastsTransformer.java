@@ -52,7 +52,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	 * @param ctx: context in which typechecking happens.
 	 */
 	private boolean hasDynamicType(IExpr expr, TypeContext ctx) {
-		return Util.isDynamicType(expr.typeCheck(ctx));
+		return Util.isDynamicType(expr.typeCheck(ctx, null));
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		    for (int i = 0; i < actualArgs.size(); i++) {
 		        IExpr arg = actualArgs.get(i);
 		        arg = (IExpr) arg.acceptVisitor(this, ctx);
-		        ValueType argType = arg.typeCheck(ctx);
+		        ValueType argType = arg.typeCheck(ctx, null);
 		        fargs.add(new FormalArg("_arg" + i, argType));    
 		    }
 		    
@@ -120,7 +120,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		else {
 
 	        // Get formal arguments of the method being invoked.
-	        DefDeclType formalMethCall = methCall.typeMethodDeclaration(ctx);
+	        DefDeclType formalMethCall = methCall.typeMethodDeclaration(ctx, null);
 	        List<FormalArg> formalArgs = formalMethCall.getFormalArgs();
 	        
 	        // Transform the actual arguments supplied to the method call.
@@ -151,7 +151,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 	@Override
 	public FieldGet visit(TypeContext ctx, FieldGet fieldGet) {
 	    IExpr receiver = fieldGet.getObjectExpr();
-	    ValueType receiverType = receiver.typeCheck(ctx);
+	    ValueType receiverType = receiver.typeCheck(ctx, null);
 
         // If accessing field of object with Dyn type, cast it to something with that field.
 	    if (Util.isDynamicType(receiverType)) {
@@ -197,7 +197,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		// Transform expression being assigned. Wrap in a cast if necessary.
 		IExpr toAssign = (IExpr) fieldSet.getExprToAssign().acceptVisitor(this, ctx);
 		if (hasDynamicType(toAssign, ctx)) {
-			ValueType fieldType = fieldSet.getObjectExpr().typeCheck(ctx);
+			ValueType fieldType = fieldSet.getObjectExpr().typeCheck(ctx, null);
 			toAssign = castFromDyn(toAssign, fieldType);
 		}
 		
@@ -206,7 +206,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		System.out.println();
 		IExpr receiver = (IExpr) fieldSet.getObjectExpr().acceptVisitor(this, ctx);
 		if (hasDynamicType(receiver, ctx)) {
-		    VarDeclType varDecl = new VarDeclType(fieldSet.getFieldName(), toAssign.typeCheck(ctx));
+		    VarDeclType varDecl = new VarDeclType(fieldSet.getFieldName(), toAssign.typeCheck(ctx, null));
 		    LinkedList<DeclType> newDecls = new LinkedList<>();
 		    newDecls.add(varDecl);
 		    ValueType objCastType = new StructuralType("this", newDecls);

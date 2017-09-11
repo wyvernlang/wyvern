@@ -100,7 +100,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 
 		// Add the object to the context.
 		TypeContext ctx = state.getContext();
-		ctx = ctx.extend(newExpr.getSelfName(), newExpr.typeCheck(state.getContext()));
+		ctx = ctx.extend(newExpr.getSelfName(), newExpr.typeCheck(state.getContext(), null));
 		
 		// Process each declaration.
 		for (Declaration decl : newExpr.getDecls()) {
@@ -164,7 +164,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		OIRExpression oirbody = (OIRExpression) body.acceptVisitor(this, state);
 		
 		// Return the OIRMethodCall.
-		OIRMethodCall oirMethodCall = new OIRMethodCall(oirbody, body.typeCheck(state.getContext()), methodCall.getMethodName(),
+		OIRMethodCall oirMethodCall = new OIRMethodCall(oirbody, body.typeCheck(state.getContext(), null), methodCall.getMethodName(),
 				args);
 		oirMethodCall.copyMetadata(methodCall);
 		return oirMethodCall;

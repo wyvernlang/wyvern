@@ -3,8 +3,8 @@ require stdout
 type ObjNetworkType01
   effect send
   effect receive
-  def sendData(data : String) : Unit
-  def receiveData() : Unit
+  def sendData(data : String) : {} Unit
+  def receiveData() : {receive} Unit
 
 /*val objNetwork01:ObjNetworkType01 = new
   effect send = {}
@@ -15,11 +15,11 @@ type ObjNetworkType01
 val objNetwork01:ObjNetworkType01 = new
   effect send = {}
   effect receive = {}
-  def sendData(data : String) : Unit
+  def sendData(data : String) : {} Unit
       stdout.print("data sent: ")
       stdout.print(data)
       stdout.print("\n")
-  def receiveData() : Unit
+  def receiveData() : {receive} Unit
       stdout.print("data received\n")
 
 objNetwork01.sendData("objNetwork01 with effects")

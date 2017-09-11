@@ -18,7 +18,7 @@ public class ReceiverView extends View {
 		} else {
 			to = null;
 		}
-		ValueType vt = e.typeCheck(ctx);
+		ValueType vt = e.typeCheck(ctx, null);
 		StructuralType st = vt.getStructuralType(ctx);
 		if (st != null) {
 			from = new Variable(st.getSelfName());

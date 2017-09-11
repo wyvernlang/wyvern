@@ -115,7 +115,7 @@ public class ReflectionTests {
         // after genExp the modules are transferred into an object. We need to evaluate one field of the main object
 
         TypeContext ctx = Globals.getStandardTypeContext();
-        mainProgram.typeCheck(ctx);
+        mainProgram.typeCheck(ctx, null);
         mainProgram.interpret(Globals.getStandardEvalContext());
     }
 

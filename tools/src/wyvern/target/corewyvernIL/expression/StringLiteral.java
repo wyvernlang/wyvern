@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -57,7 +58,7 @@ public class StringLiteral extends Literal implements Invokable {
     }
 
 	@Override
-	public ValueType typeCheck(TypeContext env) {
+	public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
         return Util.stringType();
 	}
 

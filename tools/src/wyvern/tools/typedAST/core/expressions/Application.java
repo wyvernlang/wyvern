@@ -320,7 +320,7 @@ public class Application extends CachingTypedAST implements CoreAST {
             if (this.argument instanceof TupleObject) {
                 ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
                 IExpr inferArg = rawArgs[actualPos].generateIL(ctx, null, deps);
-                this.addInferredType(args, formals, ctx, inferArg.typeCheck(ctx), i);
+                this.addInferredType(args, formals, ctx, inferArg.typeCheck(ctx, null), i);
             } else if (this.argument instanceof UnitVal) {
                 // The arg is a unit value. We must be inferring from the result type
                 throw new UnsupportedOperationException(
@@ -336,7 +336,7 @@ public class Application extends CachingTypedAST implements CoreAST {
 
                 // Now we know that the argument is the inferrable type.
                 final IExpr argIL = this.argument.generateIL(ctx, null, deps);
-                ValueType inferredType = argIL.typeCheck(ctx);
+                ValueType inferredType = argIL.typeCheck(ctx, null);
                 this.addInferredType(args, formals, ctx, inferredType, i);
             }
         }

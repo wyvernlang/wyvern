@@ -247,7 +247,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
 				vt = type.getILType(ctx);
 			} else {
 				// convert the declaration and typecheck it
-				vt = definition.generateIL(ctx, null, null).typeCheck(ctx);
+				vt = definition.generateIL(ctx, null, null).typeCheck(ctx, null);
 			}
 		}
 		return vt;

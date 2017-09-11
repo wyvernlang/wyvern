@@ -57,7 +57,7 @@ public class ILTests {
 		NominalType Int = new NominalType("system", "Int");
 		IntegerLiteral five = new IntegerLiteral(5);
 		Expression letExpr = new Let(new VarBinding("x", Int, five), new Variable("x"));
-		ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext());
+		ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext(), null);
 		Assert.assertEquals(Int, t);
 		Value v = letExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(five, v);
@@ -67,7 +67,7 @@ public class ILTests {
 	public void testLetOutside() {
 		IntegerLiteral six = new IntegerLiteral(6);
 		Expression letExpr = new Let(new VarBinding("x", Util.intType(), new IntegerLiteral(5)), new Variable("y"));
-		ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext().extend("y", Util.intType()));
+		ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext().extend("y", Util.intType()), null);
 		Assert.assertEquals(Util.intType(), t);
 		Value v = letExpr.interpret(EvalContext.empty().extend("y", six));
 		Assert.assertEquals(six, v);
@@ -80,7 +80,7 @@ public class ILTests {
 		Expression bindExpr = new Bind(
 				new ArrayList<VarBinding>(Arrays.asList(new VarBinding("x", Int, five))),
 				new Variable("x"));
-		ValueType t = bindExpr.typeCheck(Globals.getStandardTypeContext());
+		ValueType t = bindExpr.typeCheck(Globals.getStandardTypeContext(), null);
 		Assert.assertEquals(Int, t);
 		Value v = bindExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(five, v);
@@ -94,7 +94,7 @@ public class ILTests {
 				new VarBinding("y", Int, new IntegerLiteral(2)),
 				new VarBinding("z", Int, new IntegerLiteral(3)))),
 				new Variable("y"));
-		ValueType t = bindExpr.typeCheck(TypeContext.empty());
+		ValueType t = bindExpr.typeCheck(TypeContext.empty(), null);
 		Assert.assertEquals(Int, t);
 		Value v = bindExpr.interpret(EvalContext.empty());
 		Assert.assertEquals(new IntegerLiteral(2), v);
@@ -107,7 +107,7 @@ public class ILTests {
 				new ArrayList<VarBinding>(Arrays.asList(new VarBinding("x", Int, new IntegerLiteral(5)))),
 				new Variable("y"));
 		try {
-			bindExpr.typeCheck(Globals.getStandardTypeContext().extend("y", Int));
+			bindExpr.typeCheck(Globals.getStandardTypeContext().extend("y", Int), null);
 			Assert.fail("Typechecking should have failed.");
 		} catch (RuntimeException e) {
 		}
@@ -143,7 +143,7 @@ public class ILTests {
         ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
         IExpr program = ast.generateIL(Globals.getStandardGenContext(), null, null);
         TypeContext ctx = Globals.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx);
+        ValueType t = program.typeCheck(ctx, null);
         Assert.assertEquals(Util.intType(), t);
         Value v = program.interpret(EvalContext.empty());
         IntegerLiteral five = new IntegerLiteral(5);
@@ -346,7 +346,7 @@ public class ILTests {
 			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
 			IExpr program = ((Sequence) ast).generateIL(genCtx, null, null);
 			TypeContext ctx = TypeContext.empty();
-			ValueType t = program.typeCheck(ctx);
+			ValueType t = program.typeCheck(ctx, null);
 			Assert.fail("typechecking should have failed");
 		} catch (ToolError e) {
 			Assert.assertEquals(2, e.getLine());
@@ -903,7 +903,7 @@ public class ILTests {
 			
 			// not quite right, but works for now
 			// TODO: replace this with a standard prelude
-			program.typeCheck(TypeContext.empty().extend("system", Util.unitType()));
+			program.typeCheck(TypeContext.empty().extend("system", Util.unitType()), null);
 			Assert.fail("A type error should have been reported.");
 		} catch (ToolError toolError) {
 			System.err.println(toolError);

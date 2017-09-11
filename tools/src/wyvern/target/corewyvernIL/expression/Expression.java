@@ -12,8 +12,8 @@ import wyvern.tools.errors.FileLocation;
 public abstract class Expression extends ASTNode implements IASTNode,IExpr {
 
 	private ValueType exprType;
-	@Override
-	public abstract ValueType typeCheck(TypeContext ctx);
+//	@Override
+//	public abstract ValueType typeCheck(TypeContext ctx);
 	public abstract Value interpret(EvalContext ctx);
 	public abstract Set<String> getFreeVariables();
 
