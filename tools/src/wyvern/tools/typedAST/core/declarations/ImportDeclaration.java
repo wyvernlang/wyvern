@@ -17,7 +17,9 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -214,12 +216,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     final String scheme = this.getUri().getScheme();
     if (ctx.isPresent(scheme, true)) {
       // TODO: hack; replace this by getting FFI metadata from the type of the scheme
-      return FFI.importURI(this.getUri(), ctx);
+      return FFI.importURI(this.getUri(), ctx, this);
     } else if (scheme.equals("java")) {
       // we are not using Java like a capability in this branch, so check the whitelist!
       if (!Globals.checkSafeJavaImport(this.getUri().getSchemeSpecificPart()))
           ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, this.getUri().getSchemeSpecificPart());
-      return FFI.doJavaImport(getUri(), ctx);
+      return FFI.doJavaImport(getUri(), ctx, this);
     } else if (this.getUri().getScheme().equals("python")) {
       String moduleName = this.getUri().getRawSchemeSpecificPart();
       importExp = new FFIImport(new NominalType("system", "python"),
@@ -312,7 +314,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
       importExp = new Variable(internalName);
       dependencies.add(module.getSpec());
       dependencies.addAll(module.getDependencies());
-      ctx = ctx.extend(importName, new Variable(internalName), type);
+      if (module.getSpec().getDefinedTypeName() != null) {
+          ctx = new TypeOrEffectGenContext(importName, (Variable) importExp, ctx);
+      } else {
+          ctx = ctx.extend(importName, new Variable(internalName), type);
+      }
     } else {
         ToolError.reportError(ErrorMessage.SCHEME_NOT_RECOGNIZED, this, scheme);
     }

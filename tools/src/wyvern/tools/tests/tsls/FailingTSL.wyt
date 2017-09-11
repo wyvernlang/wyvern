@@ -1,0 +1,7 @@
+import wyvern.option
+
+type FailingTSL
+  def eval() : Int
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option
+      option.None()

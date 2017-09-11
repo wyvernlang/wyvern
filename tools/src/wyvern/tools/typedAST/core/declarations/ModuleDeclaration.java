@@ -20,7 +20,7 @@ import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.modules.LoadedType;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
@@ -334,7 +334,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param loadedTypes
 	 * @return
 	 */
-	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx, List<LoadedType> loadedTypes) {
+	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx, List<Module> loadedTypes) {
 		/* generate the formal arguments by requiring sequence */
 		List<FormalArg> types = new LinkedList<FormalArg>();
 		for(Declaration d : reqSeq.getDeclIterator()) {
@@ -350,13 +350,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 
 	private wyvern.target.corewyvernIL.type.ValueType getType(GenContext ctx,
-			List<LoadedType> loadedTypes, FileLocation location, String name) {
+			List<Module> loadedTypes, FileLocation location, String name) {
 		wyvern.target.corewyvernIL.type.ValueType type = null;
 		if (ctx.isPresent(name, false)) {
 			type = ctx.lookupType(name, location);
 		} else {
-			LoadedType lt = ctx.getInterpreterState().getResolver().resolveType(name);
-			type = new NominalType(lt.getModule().getSpec().getInternalName(), lt.getTypeName());
+			Module lt = ctx.getInterpreterState().getResolver().resolveType(name);
+			type = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName());
 			//bindings.add(binding);
 			loadedTypes.add(lt);
 		}
@@ -432,18 +432,17 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		}
 
 		List<FormalArg> formalArgs;
-		List<LoadedType> loadedTypes = new LinkedList<LoadedType>();
+		List<Module> loadedTypes = new LinkedList<Module>();
 		formalArgs = getTypes(reqSeq, ctx, loadedTypes); // translate requiring modules to method parameters
 		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.toString());
-		for (LoadedType lt : loadedTypes) {
+		for (Module lt : loadedTypes) {
 			// include the declaration itself
-			final String qualifiedName = lt.getModule().getSpec().getQualifiedName();
-			final String internalName = lt.getModule().getSpec().getInternalName();
-			methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getModule().getSpec().getType());
+			final String internalName = lt.getSpec().getInternalName();
+			methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getSpec().getType());
 			// include the type abbreviation
-			methodContext = new TypeOrEffectGenContext(lt.getTypeName(), internalName, methodContext);
+			methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalName, methodContext);
 			if (dependencies != null)
-				dependencies.add(lt.getModule().getSpec());
+				dependencies.add(lt.getSpec());
 		}
 
 		/* adding parameters to environments */

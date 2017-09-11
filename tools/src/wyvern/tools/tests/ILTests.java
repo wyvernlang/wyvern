@@ -29,6 +29,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.Interpreter;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
@@ -590,7 +591,7 @@ public class ILTests {
 
 	@Test
 	public void testJavaImportLibrary1() throws ReflectiveOperationException {
-		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest");
+		FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest", null);
 		List<Object> args = new LinkedList<Object>();
 		args.add(1);
 		Object result = obj.invokeMethod("addOne", args);
@@ -599,7 +600,7 @@ public class ILTests {
 	
 	@Test
 	public void testJavaImportLibrary2() throws ReflectiveOperationException {
-		FObject obj = wyvern.tools.interop.Default.importer().find("java.lang.System.out");
+		FObject obj = wyvern.tools.interop.Default.importer().find("java.lang.System.out", null);
 		List<Object> args = new LinkedList<Object>();
 		args.add("Hello, world!");
 		Object result = obj.invokeMethod("println", args);
@@ -681,6 +682,16 @@ public class ILTests {
     @Test
     public void testTSL2() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testTSL3() throws ParseException {
+        TestUtil.doTestScriptModularly("tsls.trivialClient", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testTSL4() throws ParseException {
+        TestUtil.doTestScriptModularlyFailing("tsls.failingClient", ErrorMessage.TSL_ERROR);
     }
 
     @Test

@@ -25,7 +25,6 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.modules.LoadedType;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -83,11 +82,11 @@ public class ModuleResolver {
 	 * @param qualifiedName
 	 * @return
 	 */
-	public LoadedType resolveType(String qualifiedName) {
+	public Module resolveType(String qualifiedName) {
 		return resolveType(qualifiedName, false);
 	}
 	
-	public LoadedType resolveType(String qualifiedName, boolean toplevel) {
+	private Module resolveType(String qualifiedName, boolean toplevel) {
 		Module typeDefiningModule;
 		if (!moduleCache.containsKey(qualifiedName)) {
 			File f = resolve(qualifiedName, true);
@@ -96,12 +95,14 @@ public class ModuleResolver {
 		} else {
 			typeDefiningModule = moduleCache.get(qualifiedName);
 		}
-		Expression typeDefiningObject = typeDefiningModule.getExpression();
+		/*Expression typeDefiningObject = typeDefiningModule.getExpression();
 		TypeContext ctx = Globals.getStandardTypeContext();
-		final String typeName = typeDefiningObject.typeCheck(ctx, null).getStructuralType(ctx).getDeclTypes().get(0).getName();
+		final String typeName = typeDefiningObject.typeCheck(ctx, null).getStructuralType(ctx).getDeclTypes().get(0).getName();*/
+		//final String typeName = typeDefiningModule.getSpec().getDefinedTypeName();
 		//final String typeName = ((New)typeDefiningObject).getDecls().get(0).getName();
 		//final String generatedVariableName = GenerationEnvironment.generateVariableName();
-		return new LoadedType(typeName, typeDefiningModule);
+		//return new LoadedType(typeName, typeDefiningModule);
+		return typeDefiningModule;
 		/*return new ContextBinding(generatedVariableName, typeDefiningObject, typeName) {
 
 			@Override
@@ -142,30 +143,43 @@ public class ModuleResolver {
 		return moduleCache.get(qualifiedName);
 	}
 	
-	/**
-	 * Turns dots into directory slashes.
-	 * Adds a .wyv at the end, and the root to the beginning
-	 * 
-	 * @param qualifiedName
-	 * @return
-	 */
-	public File resolve(String qualifiedName, boolean isType) {
-		String names[] = qualifiedName.split("\\.");
-		if (names.length == 0)
-			throw new RuntimeException();
-		names[names.length - 1] += isType?".wyt":".wyv";
+    /**
+     * Turns dots into directory slashes.
+     * Adds a .wyv at the end, and the root to the beginning
+     * 
+     * @param qualifiedName
+     * @return
+     */
+    public File resolve(String qualifiedName, boolean isType) {
+        String names[] = qualifiedName.split("\\.");
+        if (names.length == 0)
+            throw new RuntimeException();
+        names[names.length - 1] += isType?".wyt":".wyv";
 
-    File f = null;
-    for (File searchDir : searchPath) {
-        f = findFile(names, searchDir.getAbsolutePath());
-        if (f.exists())
-            break;
+        File f = findFile2(names);
+        if (f == null || !f.exists()) {
+            if (!isType) {
+                // try to find a type, in case there was no module of the appropriate name
+                String lastName = names[names.length - 1]; 
+                names[names.length - 1] = lastName.substring(0, lastName.length()-4) + ".wyt";
+                f = findFile2(names);
+            }
+            if (f == null || !f.exists()) {
+                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, (FileLocation) null, isType?"type":"module", qualifiedName);
+            }
+        }
+        return f;
     }
-		if (f == null || !f.exists()) {
-			ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, (FileLocation) null, isType?"type":"module", qualifiedName);
-		}
-		return f;
-	}
+
+    private File findFile2(String[] names) {
+        File f = null;
+        for (File searchDir : searchPath) {
+            f = findFile(names, searchDir.getAbsolutePath());
+            if (f.exists())
+                break;
+        }
+        return f;
+    }
 
 	private File findFile(String[] names, String filename) {
 		for (int i = 0; i < names.length; ++i) {
@@ -187,6 +201,7 @@ public class ModuleResolver {
 	 * @return
 	 */
 	public Module load(String qualifiedName, File file, boolean toplevel) {
+	    boolean loadingType = file.getName().endsWith(".wyt");
         TypedAST ast = null;
 		try {
 			ast = TestUtil.getNewAST(file);
@@ -226,52 +241,56 @@ public class ModuleResolver {
         
 		TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
         
-        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel);
+        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel, loadingType);
 	}
 
 	private Module createAdaptedModule(File file, String qualifiedName,
 			final List<TypedModuleSpec> dependencies, IExpr program,
-			TypeContext ctx, boolean toplevel) {
+			TypeContext ctx, boolean toplevel, boolean loadingType) {
 		
         ValueType moduleType = program.typeCheck(ctx, null);
-		// if this is a platform module, adapt any arguments to take the system.Platform object
-		if (file.toPath().toAbsolutePath().startsWith(platformPath)) {
-			// if the type is in functor form
-			if (moduleType instanceof StructuralType
-				&& ((StructuralType)moduleType).getDeclTypes().size()==1
-				&& ((StructuralType)moduleType).getDeclTypes().get(0) instanceof DefDeclType
-				&& ((StructuralType)moduleType).getDeclTypes().get(0).getName().equals("apply")) {
-				DefDeclType appType = (DefDeclType)((StructuralType)moduleType).getDeclTypes().get(0);
-				// if the functor takes a system.X object for current platform type X
-				ILFactory f = ILFactory.instance();
-				ValueType platformType = f.nominalType("system", capitalize(platform));
-				ValueType genericPlatformType = f.nominalType("system", "Platform");
-				if (appType.getFormalArgs().stream().anyMatch(a -> a.getType().equals(platformType))) {
-					// adapt arguments to take the system.Platform object
-					List<IExpr> args = appType.getFormalArgs().stream().map(a -> {
-						IExpr result = f.variable(a.getName());
-						if (a.getType().equals(platformType))
-							result = f.cast(result, platformType);
-						return result;
-					}).collect(Collectors.toList());
-					List<ValueType> argTypes = appType.getFormalArgs().stream()
-							.map(a -> a.getType().equals(platformType)?genericPlatformType:a.getType())
-							.collect(Collectors.toList());
-					List<String> argNames = appType.getFormalArgs().stream().map(a -> a.getName()).collect(Collectors.toList());
-					IExpr call = f.call(program, "apply", args);
-					IExpr fn = f.function("apply", argNames, argTypes, appType.getRawResultType(), call);
-					program = fn;
-			        moduleType = program.typeCheck(ctx, null);
-				}
-			}
+        // if this is a platform module, adapt any arguments to take the system.Platform object
+        if (file.toPath().toAbsolutePath().startsWith(platformPath)) {
+            // if the type is in functor form
+            if (moduleType instanceof StructuralType
+                && ((StructuralType)moduleType).getDeclTypes().size()==1
+                && ((StructuralType)moduleType).getDeclTypes().get(0) instanceof DefDeclType
+                && ((StructuralType)moduleType).getDeclTypes().get(0).getName().equals("apply")) {
+                DefDeclType appType = (DefDeclType)((StructuralType)moduleType).getDeclTypes().get(0);
+            	// if the functor takes a system.X object for current platform type X
+            	ILFactory f = ILFactory.instance();
+            	ValueType platformType = f.nominalType("system", capitalize(platform));
+            	ValueType genericPlatformType = f.nominalType("system", "Platform");
+            	if (appType.getFormalArgs().stream().anyMatch(a -> a.getType().equals(platformType))) {
+            		// adapt arguments to take the system.Platform object
+            		List<IExpr> args = appType.getFormalArgs().stream().map(a -> {
+            			IExpr result = f.variable(a.getName());
+            			if (a.getType().equals(platformType))
+            				result = f.cast(result, platformType);
+            			return result;
+            		}).collect(Collectors.toList());
+            		List<ValueType> argTypes = appType.getFormalArgs().stream()
+            				.map(a -> a.getType().equals(platformType)?genericPlatformType:a.getType())
+            				.collect(Collectors.toList());
+            		List<String> argNames = appType.getFormalArgs().stream().map(a -> a.getName()).collect(Collectors.toList());
+            		IExpr call = f.call(program, "apply", args);
+            		IExpr fn = f.function("apply", argNames, argTypes, appType.getRawResultType(), call);
+            		program = fn;
+                    moduleType = program.typeCheck(ctx, null);
+            	}
+            }
 		}
 
-    if (!moduleType.isResource(ctx) && !toplevel) {
-        Value v = wrap(program, dependencies).interpret(Globals.getStandardEvalContext());
-        moduleType = v.getType();
-		}
+        if (!moduleType.isResource(ctx) && !toplevel) {
+            Value v = wrap(program, dependencies).interpret(Globals.getStandardEvalContext());
+            moduleType = v.getType();
+        }
 
-		TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType);
+        String typeName = null;
+        if (loadingType) {
+            typeName = moduleType.getStructuralType(ctx).getDeclTypes().get(0).getName();
+        }
+		TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
 		return new Module(spec, program, dependencies);
 	}
 

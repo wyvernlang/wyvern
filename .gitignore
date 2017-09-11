@@ -67,3 +67,5 @@ tools/src/wyvern/target/llvm/aclocal.m4
 tools/src/wyvern/target/llvm/configure
 tools/jacoco.exec
 tools/report
+examples/modules/.dropbox.attr
+stdlib/wyvern/internal/.dropbox.attr

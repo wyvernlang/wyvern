@@ -119,7 +119,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			if (!(metadata instanceof Invokable)) {
 				ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
 			}
-			ValueType metaType = metadata.getType();			
+			ValueType metaType = metadata.getType();
 			final DeclType parseTSLDecl = metaType.getStructuralType(ctx).findDecl("parseTSL", ctx);
 			if (parseTSLDecl == null) {
 				ToolError.reportError(ErrorMessage.METADATA_MUST_INCLUDE_PARSETSL, this, expectedType.toString());				
@@ -128,7 +128,7 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 			List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
 			args.add(new StringLiteral(dslText.get()));
       args.add(new JavaValue(JavaWrapper.wrapObject(ctx), new NominalType("system", "Context")));
-			wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable)metadata).invoke("parseTSL", args);
+			wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable)metadata).invoke("parseTSL", args).executeIfThunk();
 			// we get an option back, is it success?
 			ValDeclaration isDefined = (ValDeclaration)((ObjectValue)parsedAST).findDecl("isDefined");			
 			BooleanLiteral success = (BooleanLiteral)isDefined.getDefinition();

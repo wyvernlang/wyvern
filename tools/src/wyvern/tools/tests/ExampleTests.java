@@ -113,6 +113,11 @@ public class ExampleTests {
         TestUtil.doTestScriptModularly(PATH, "introductory.listP", Util.intType(), new IntegerLiteral(15));
     }
     
+    @Test
+    public void testJavaFFI() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.callFromJava", Util.unitType(), Util.unitValue());
+    }
+    
 	@Test
 	public void testCrossPlatformHello() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "xplatform.hello-via-writer", Util.unitType(), Util.unitValue());

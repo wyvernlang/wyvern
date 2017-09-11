@@ -128,7 +128,7 @@ public class MethodCall extends Expression {
 		return trampoline( receiver.invoke(methodName, argValues) );
 	}
 
-	private static Value trampoline(Value v) {
+	static Value trampoline(Value v) {
 		while (v instanceof SuspendedTailCall) {
 			v = v.interpret(null);
 		}
