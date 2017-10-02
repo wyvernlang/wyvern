@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -239,11 +240,16 @@ public class EffectSystemTests {
    	/* Does not use any outside objects/types or functions */
    	TestUtil.doTestScriptModularly(PATH, "effects.dummyTest", Util.stringType(), new StringLiteral("dummyDef.m3()"));
    }
-   
+
    @Test
    public void testDummyTaker() throws ParseException {
    	/* Does not use any outside objects/types or functions other than dummyDef, which itself doesn't use any
    	 * outside objects/types or functions. 	 */
    	TestUtil.doTestScriptModularly(PATH, "effects.dummyTakerTest", Util.stringType(), new StringLiteral("dummyTakerDef.m5()"));
    }
+
+	@Test
+	public void testFileIO1() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "effects.testFileIO1", Util.intType(), new IntegerLiteral(3));
+	}
 }
