@@ -18,12 +18,10 @@ import wyvern.tools.errors.FileLocation;
 /* TODO: adapt(), doAvoid() */
 public class EffectDeclType extends DeclType implements IASTNode {
 	private EffectSet effectSet;
-	private FileLocation loc;
-	
+
 	public EffectDeclType(String name, EffectSet effectSet, FileLocation loc) {
 		super(name);
 		this.effectSet = effectSet;
-		this.loc = loc;
 	}
 	
 	@Override

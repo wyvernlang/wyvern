@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -20,7 +18,7 @@ import wyvern.tools.errors.ToolError;
 
 public class EffectSet {
 	/** Parse string into set of effects. */
-	public static EffectSet parseEffects(String name, String effects, FileLocation fileLocation) {
+	public static EffectSet parseEffects(String name, String effects, boolean effectDecl, FileLocation fileLocation) {
 		EffectSet effectSet = null; 
 		
 		if (effects==null) { // undefined (allowed by parser implementation to occur in type and any method annotations)
@@ -33,7 +31,7 @@ public class EffectSet {
 		} else {
 			Set<Effect> temp = new HashSet<Effect>();
 			for (String e : effects.split(", *")) {
-				Effect newE = parseEffect(e, name, fileLocation);
+				Effect newE = parseEffect(e, name, effectDecl, fileLocation);
 				temp.add(newE);
 			}
 			effectSet = new EffectSet(temp);
@@ -43,14 +41,14 @@ public class EffectSet {
 	}
 	
 	/** Parse string into single Effect object. */
-	private static Effect parseEffect(String e, String name, FileLocation fileLocation) {
+	private static Effect parseEffect(String e, String name, boolean effectDecl, FileLocation fileLocation) {
 		e = e.trim(); // remove leading/trailing spaces
 		
 		if (e.contains(".")) { // effect from another object
 			String[] pathAndID = e.split("\\.");
 			return new Effect(new Variable(pathAndID[0]), pathAndID[1], fileLocation);
 		} else { // effect defined in the same type or module def
-			if (name.equals(e)) { // recursive definition (ex. "effect process = {send, process}")
+			if (effectDecl && name.equals(e)) { // recursive definition (ex. "effect process = {send, process}")
 				ToolError.reportError(ErrorMessage.RECURSIVE_EFFECT, fileLocation, e);
 			}
 			return new Effect(null, e, fileLocation);
