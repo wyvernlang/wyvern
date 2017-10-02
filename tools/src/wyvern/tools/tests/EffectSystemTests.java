@@ -252,4 +252,9 @@ public class EffectSystemTests {
 	public void testFileIO1() throws ParseException {
 		TestUtil.doTestScriptModularly(PATH, "effects.testFileIO1", Util.intType(), new IntegerLiteral(3));
 	}
+
+	@Test
+	public void testFileIO2() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
+	}
 }
