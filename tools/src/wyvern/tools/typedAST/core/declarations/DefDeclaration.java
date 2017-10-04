@@ -6,15 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
-import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -29,12 +26,12 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.evaluation.Closure;
-import wyvern.tools.typedAST.core.expressions.Assignment;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
+import wyvern.tools.typedAST.core.evaluation.Closure;
+import wyvern.tools.typedAST.core.expressions.Assignment;
+import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -74,7 +71,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		this.argNames = argNames;
 		this.isClass = isClassDef;
 		this.location = location;
-		this.effectSet = EffectSet.parseEffects(name, effects, location); 
+		this.effectSet = EffectSet.parseEffects(name, effects, false, location); 
         this.generics = (generics != null) ? generics : new LinkedList<String>();
 	}
 
@@ -232,7 +229,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     private GenContext serializeArguments(List<FormalArg> args, GenContext ctx) {
         if(isGeneric()) {
             for(String s : this.generics) {
-                ValueType type = this.genericStructuralType(s);
+                ValueType type = DefDeclaration.genericStructuralType(s);
                 String genName = GENERIC_PREFIX + s;
                 args.add(new FormalArg(genName, type));
 
@@ -273,7 +270,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
             for(String s : this.generics) {
                 String genName = GENERIC_PREFIX + s;
-                ValueType type = this.genericStructuralType(s);
+                ValueType type = DefDeclaration.genericStructuralType(s);
                 args.add(new FormalArg(genName, type));
 
     			methodContext = methodContext.extend(genName, new Variable(genName), type);

@@ -1,0 +1,2 @@
+require effects.fileIO1
+fileIO1.read()
