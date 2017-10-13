@@ -32,7 +32,6 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
@@ -111,16 +110,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
     @Override
     public void checkAssignment(Assignment ass, Environment env) {
-        Type recType = receiver.typecheck(env, Optional.empty());
-        if (!(recType instanceof ClassType)) { //TODO: Hack
-            throw new RuntimeException(
-                "Cannot assign to a field on a type without fields!"
-            );
-        }
-        ((ClassType) recType)
-            .getEnv()
-            .lookupBinding(operationName, AssignableNameBinding.class)
-            .get();
     }
 
     @Override

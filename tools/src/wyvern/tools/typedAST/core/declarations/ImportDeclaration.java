@@ -45,7 +45,6 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
@@ -105,18 +104,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
   @Override
   protected Type doTypecheck(Environment env) {
-    if(uri.getScheme().equals("wyv")) {
-      String schemeSpecificPart = uri.getSchemeSpecificPart();
-      NameBinding envModule = env.lookup(schemeSpecificPart);
-      if (envModule == null)
-        return binder.typecheck(env);
-      ClassType moduleType = (ClassType) envModule.getType();
-      if(!moduleType.isModule()) {
-        reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
-      } else if (!isRequire() && moduleType.isResource()) {
-        reportError(MODULE_TYPE_ERROR, this, schemeSpecificPart);
-      }
-    }
     return binder.typecheck(env);
   }
 

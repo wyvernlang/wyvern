@@ -13,7 +13,9 @@ import wyvern.tools.util.TreeWritable;
 public interface TypedAST extends TreeWritable, HasLocation {
 
 	/** should call typecheck() before getType() -- except maybe for declarations */
-	Type getType();
+	default Type getType() {
+	    throw new RuntimeException();
+	}
 	Type typecheck(Environment env, Optional<Type> expected);
 	
 	/** an interpreter.  Out of date - should generate IL code and interpret that instead. */

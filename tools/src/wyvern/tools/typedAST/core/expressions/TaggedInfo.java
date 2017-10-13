@@ -12,7 +12,6 @@ import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeInv;
 
 /**
@@ -285,27 +284,11 @@ public class TaggedInfo {
 
 	public static TaggedInfo lookupTagByType(Type t) {
 		if (t == null) { return null; }
-		if (t instanceof ClassType) return ((ClassType) t).getTaggedInfo();
 
 		// System.out.println("Looking for " + t + " inside:");
 		// System.out.println(globalTagStoreList);
 
 		for (TaggedInfo i : globalTagStoreList) {
-			if (t instanceof ClassType && i.tagType instanceof ClassType) {
-				ClassType ct = (ClassType) t;
-				ClassType cti = (ClassType) i.tagType;
-
-				// System.out.println(cti.getName());
-				// System.out.println(ct.getName());
-
-				// FIXME:
-
-				// For static tags:
-				if (ct.getName() != null && ct.getName().equals(i.getTagName())) return i;
-
-				// For dynamic tags:
-				if (ct.toString().equals(cti.toString())) return i;
-			}
 
 			if (i.tagType.equals(t)) return i;
 		}

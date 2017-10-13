@@ -22,8 +22,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ClassType;
-import wyvern.tools.types.extensions.TypeDeclUtils;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 
@@ -42,15 +40,9 @@ public class Obj extends AbstractValue implements InvokableValue, Assignable {
 		this.taggedInfo = taggedInfo;
 	}
 
-    private void updateTee() {
-        typeEquivEnv = TypeDeclUtils.getTypeEquivalentEnvironment(intEnv.get().toTypeEnv());
-    }
-
 	@Override
 	public Type getType() {
-		if (typeEquivEnv == null)
-        	updateTee();
-		return new ClassType(intEnv.map(EvaluationEnvironment::toTypeEnv), new Reference<>(typeEquivEnv), new LinkedList<String>(), taggedInfo, null);
+	    throw new RuntimeException();
 	}
 
 	@Override
