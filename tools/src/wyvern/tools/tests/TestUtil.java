@@ -29,7 +29,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
-import wyvern.tools.parsing.Wyvern;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.Token;
@@ -60,19 +59,6 @@ public class TestUtil {
 		WyvernResolver.getInstance().addPath(PLATFORM_PATH);
 	}
 
-	/**
-	 * Converts the given program into the AST representation.
-	 * 
-	 * @param program
-	 * @return
-	 * @throws IOException 
-	 * @throws CopperParserException 
-	 */
-	public static TypedAST getAST(String program) throws CopperParserException, IOException {
-		clearGlobalTagInfo();
-		return (TypedAST)new Wyvern().parse(new StringReader(program), "test input");
-	}
-	
 	/**
 	 * Converts the given program into the TypedAST representation, using the
 	 * new Wyvern parser.
