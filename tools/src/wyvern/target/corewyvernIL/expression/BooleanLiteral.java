@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -53,7 +54,7 @@ public class BooleanLiteral extends Literal implements Invokable {
 	}
 
     @Override
-    public ValueType typeCheck(TypeContext env) {
+    public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
         return Util.booleanType();
     }
 
@@ -81,11 +82,23 @@ public class BooleanLiteral extends Literal implements Invokable {
 						@Override public Value interpret(EvalContext ignored) {
 							return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
 						}
+
+						@Override
+						public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+							// TODO Auto-generated method stub
+							return null;
+						}
 					};
 				}
 				return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
 					@Override public Value interpret(EvalContext ignored) {
 						return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
+					}
+
+					@Override
+					public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+						// TODO Auto-generated method stub
+						return null;
 					}
 				};
       case "&&":

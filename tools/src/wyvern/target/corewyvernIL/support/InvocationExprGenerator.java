@@ -27,7 +27,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 		this.receiver = iExpr;
 		this.location = loc;
 	
-		ValueType receiverType = iExpr.typeCheck(ctx);
+		ValueType receiverType = iExpr.typeCheck(ctx, null);
 		
 		if (Util.isDynamicType(receiverType)) {
 			this.declType = null;
@@ -76,7 +76,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 			return null;
 		} else if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
 			Expression e = genExpr();
-			ValueType vt = e.typeCheck(ctx);
+			ValueType vt = e.typeCheck(ctx, null);
 			return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx);
 			// return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(receiver, ctx));
 		} else if (declType instanceof DefDeclType) {

@@ -314,7 +314,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 					new MethodCall(
 							new wyvern.target.corewyvernIL.expression.Variable(inst.getUri().getSchemeSpecificPart().toString()) /*path*/,
 							inst.getUri().getSchemeSpecificPart().toString(), args, this);
-			final ValueType type = instValue.typeCheck(ctx);
+			final ValueType type = instValue.typeCheck(ctx, null);
 			GenContext newContext = ctx.extend(inst.getName(), instValue, type);
 
 			// translate the inner part of the sequence
@@ -456,7 +456,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
     GenContext ctxWithPlatDeps = wrapLetCtxWithIterator(platformDependentSeq.iterator(), new Sequence(), methodContext, new LinkedList<>()).second;
 		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(impInstSeq, normalSeq, ctxWithPlatDeps, dependencies);
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(ctxWithPlatDeps, dependencies);
-		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext);
+		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext, null);
     	//GenContext ctxWithModule = ctxWithPlatDeps.extend(name, new Variable(name), returnType);
 		if (ascribedValueType != null)
 			returnType = ascribedValueType;

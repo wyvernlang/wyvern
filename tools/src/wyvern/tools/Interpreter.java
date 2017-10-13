@@ -67,7 +67,7 @@ public class Interpreter {
 			GenContext genCtx = Globals.getGenContext(state);
 			Expression program = ast.generateIL(genCtx, null);*/
 			TypeContext ctx = Globals.getStandardTypeContext();
-			program.typeCheck(ctx);
+			program.typeCheck(ctx, null);
 			TailCallVisitor.annotate(program);
 			Value v = program.interpret(Globals.getStandardEvalContext());
 		/*} catch (ParseException e) {

@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
@@ -199,6 +200,7 @@ public class Globals {
         declTypes.add(new TaggedTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));
+        declTypes.add(new EffectDeclType("ffiEffect", null, null));
         ValueType systemType = new StructuralType("system", declTypes);
         return systemType;
 	}

@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
 
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.Effect;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -21,10 +24,16 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class DefDeclType extends DeclTypeWithResult {
 
 	private List<FormalArg> args;
+	private EffectSet effectSet;
 	
 	public DefDeclType(String method, ValueType returnType, List<FormalArg> args) {
+		this(method, returnType, args, null);
+	}
+
+	public DefDeclType(String method, ValueType returnType, List<FormalArg> args, EffectSet effects) {
 		super(method, returnType);
 		this.args = args;
+		this.effectSet = effects;
 	}
 
 	public List<FormalArg> getFormalArgs ()
@@ -123,6 +132,7 @@ public class DefDeclType extends DeclTypeWithResult {
 		}
 		String newIndent = indent+"    ";
 		dest.append(") : ");
+		if (effectSet != null) { dest.append(effectSet.toString()); }
 		getRawResultType().doPrettyPrint(dest, newIndent);
 		dest.append('\n');
 	}
@@ -133,7 +143,19 @@ public class DefDeclType extends DeclTypeWithResult {
 		for (FormalArg a : args) {
 			newArgs.add(new FormalArg(a.getName(), a.getType().adapt(v)));
 		}
-		return new DefDeclType(this.getName(), this.getRawResultType().adapt(v), newArgs);
+		if ((effectSet != null) && (effectSet.getEffects() != null)) {
+			for (Effect e : effectSet.getEffects()) {
+				/* e.addPath(ctx) wouldn't work here, but there seems to be no
+				 * logical place to add paths before here (and there are effects
+				 * that have missing paths here) */
+//				if (e.getPath()==null) {
+//					System.out.println("null"); // use breakpoint here
+//				}
+				if (e.getPath()!=null) {	
+					e.adapt(v); } // TODO: find some way to have all paths ready before this is called
+			}
+		}
+		return new DefDeclType(this.getName(), this.getRawResultType().adapt(v), newArgs, getEffectSet()); // need to adapt effects too
 	}
 	
 	@Override
@@ -162,12 +184,16 @@ public class DefDeclType extends DeclTypeWithResult {
 		if (!changed)
 			return this;
 		else
-			return new DefDeclType(this.getName(), t, newArgs);
+			return new DefDeclType(this.getName(), t, newArgs, getEffectSet());
 	}
 	
 	@Override
 	public boolean isTypeDecl() {
 		return false;
+	}
+	
+	public EffectSet getEffectSet() {
+		return effectSet;
 	}
 
     /**

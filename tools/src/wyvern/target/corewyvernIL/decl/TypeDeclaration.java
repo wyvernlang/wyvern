@@ -40,7 +40,7 @@ public class TypeDeclaration extends NamedDeclaration {
 	@Override
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
 		if (metadata != null)
-			metadata.typeCheck(thisCtx);
+			metadata.typeCheck(thisCtx, null);
 		return getDeclType();
 	}
 

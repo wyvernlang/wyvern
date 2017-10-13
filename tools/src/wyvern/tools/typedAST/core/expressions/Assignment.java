@@ -144,7 +144,7 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         
         // Figure out expression being assigned and target it is being assigned to.
         IExpr exprToAssign = value.generateIL(ctx, expectedType, dependencies);
-        ValueType exprType = exprToAssign.typeCheck(ctx); 
+        ValueType exprType = exprToAssign.typeCheck(ctx, null); 
         IExpr exprFieldGet = generateFieldGet(ctx, dependencies);
         
         // Assigning to a top-level var.

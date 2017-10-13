@@ -9,6 +9,7 @@ import java.util.Optional;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
@@ -200,6 +201,12 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	public List<DeclType> genDeclTypeSeq(GenContext ctx){
 		List<DeclType> declts = new LinkedList<DeclType>();
 		for(Declaration d : decls.getDeclIterator()) {
+			 // temporary context for verifying existence of variables within the same type so far
+			if (d instanceof EffectDeclaration) { 
+				/* HACK: only do it for effect-checking purposes (otherwise results in NullPointerException
+				 * for tests like testTSL). */
+				ctx = ctx.extend(d.getName(), null, new StructuralType(d.getName(), declts));
+			}
 			declts.add(d.genILType(ctx));
 		}
 		

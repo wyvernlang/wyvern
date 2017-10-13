@@ -124,7 +124,7 @@ public class PythonCompiler {
       }
 
       TypeContext ctx = Globals.getStandardTypeContext();
-      program.typeCheck(ctx);
+      program.typeCheck(ctx, null);
 
       OIRAST oirast =
           program.acceptVisitor(new EmitOIRVisitor(),

@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -47,11 +48,11 @@ public class FieldSet extends Expression {
 		ValueType receiverType = null;
 		if (objectExpr instanceof FieldGet) {
 			IExpr receiver = ((FieldGet)objectExpr).getObjectExpr();
-			receiverType = receiver.typeCheck(ctx);
+			receiverType = receiver.typeCheck(ctx, null);
 		} else if (objectExpr instanceof Variable) {
 			receiverType = ctx.lookupTypeOf(((Variable)objectExpr).getName());
 		} else if (objectExpr instanceof Cast) {
-		    receiverType = objectExpr.typeCheck(ctx);
+		    receiverType = objectExpr.typeCheck(ctx, null);
 		} else {
 		    throw new RuntimeException("Target of FieldSet is unsupported. Type: " + objectExpr.getClass());
 	    }
@@ -59,17 +60,17 @@ public class FieldSet extends Expression {
 	}
 	
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
 
 	    // Setting the field of a dynamic object.
 		if (settingDynamicObject(ctx)) {
-		    exprToAssign.typeCheck(ctx);
+		    exprToAssign.typeCheck(ctx, effectAccumulator);
 		    return Util.unitType();
 		}
 		
 		// Figure out types of object and expression.
-		StructuralType varTypeStructural = objectExpr.typeCheck(ctx).getStructuralType(ctx);
-		ValueType varTypeExpr = exprToAssign.typeCheck(ctx);
+		StructuralType varTypeStructural = objectExpr.typeCheck(ctx, effectAccumulator).getStructuralType(ctx);
+		ValueType varTypeExpr = exprToAssign.typeCheck(ctx, effectAccumulator);
 
 		// Figure out the type of the field.
 		DeclType declTypeField = varTypeStructural.findDecl(fieldName, ctx);

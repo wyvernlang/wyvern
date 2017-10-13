@@ -1,56 +1,98 @@
+/** @author vzhao */
+
 package wyvern.target.corewyvernIL.decltype;
 
 import wyvern.target.corewyvernIL.IASTNode;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.FileLocation;
 
 /* TODO: adapt(), doAvoid() */
 public class EffectDeclType extends DeclType implements IASTNode {
-	private Set<Effect> effectSet;
-	private FileLocation loc;
-	
-	public EffectDeclType(String name, Set<Effect> effectSet, FileLocation loc) {
+	private EffectSet effectSet;
+
+	public EffectDeclType(String name, EffectSet effectSet, FileLocation loc) {
 		super(name);
 		this.effectSet = effectSet;
-		this.loc = loc;
 	}
 	
 	@Override
 	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
-		return null; //visitor.visit(state, this);
+		return visitor.visit(state, this); // could return null here, though implication is unknown
+	}
+	
+	public EffectSet getEffectSet() {
+		return effectSet;
 	}
 
+	/** Conduct semantics check, by decomposing the effect sets of the two
+	 * (effect)DeclTypes before comparing them.
+	 */
 	@Override
 	public boolean isSubtypeOf(DeclType dt, TypeContext ctx) { 
 		// TODO: instead of the code below, implement semantics comparison
-		if (!(dt instanceof EffectDeclType)) {
+ 		if (!(dt instanceof EffectDeclType)) {
 			return false;
 		}
 		EffectDeclType edt = (EffectDeclType) dt;
 		
-		/* edt == effect declared (and possibly defined in the type),
-		 * this == effect declared and defined in the module def.
-		 * If effect undefined in the type, anything defined in the module
-		 * def works; if defined in the type, then the effect in the module
-		 * def can only be defined using a subset of the definition in the type.
+		/* edt == type or method annotations, vs. 
+		 * this == module def or method calls:
+		 * if edt.getEffectSet()==null: this.getEffectSet() can be anything (null or not)
+		 * else: this.getEffectSet() can't be null (though can't happen in the first place), 
+		 * and edt.getEffectSet().containsAll(this.getEffectSet())
 		 */
-		if (edt.getEffectSet()!=null) { 
-			if (!edt.getEffectSet().containsAll(getEffectSet())) 
-				return false; // effect E = S ("this") <: effect E = S' (edt)	if S <= S' (both are concrete)	
+		
+		/* this.getEffectSet()==null only if edt.getEffectSet()==null
+		 * (the reverse isn't necessarily true) */
+		if ((edt.getEffectSet()!=null) && (edt.getEffectSet().getEffects()!=null)) { 
+			Set<Effect> thisEffects = recursiveEffectCheck(ctx, getEffectSet().getEffects());
+			Set<Effect> edtEffects =  recursiveEffectCheck(ctx, edt.getEffectSet().getEffects());
+			if (!edtEffects.containsAll(thisEffects)) {
+				return false; // "this" is not a subtype of dt, i.e. not all of its effects are covered by edt's effectSet
+			} // effect E = S ("this") <: effect E = S' (edt)	if S <= S' (both are concrete)
 		}
-		return true; // if edt.getEffectSet()==null (i.e. undefined in the type), anything is a subtype
+		
+		/* if edt.getEffectSet()==null (i.e. undefined in the type, or no method annotations), 
+		 * anything (defined in the module def, or the effects of the method calls) is a subtype */
 		// i.e. effect E = {} (concrete "this") <: effect E (abstract dt which is undefined)
+		return true; 
 	}
 
-	public Set<Effect> getEffectSet() {
-		return effectSet;
+	/** Decompose set of effects to lowest-level ones in scope (obeys any type ascription) **/
+	public Set<Effect> recursiveEffectCheck(TypeContext ctx, Set<Effect> effects) {
+		// TODO: need to adapt effects when they're being added to moreEffects
+		if (effects==null) { return null; }
+		
+		Set<Effect> allEffects =  new HashSet<Effect>(); // collects lower-level effects from effectSets of arg "effects"
+		Set<Effect> moreEffects = null; // get the effectSet belonging to an effect in arg "effects"
+		for (Effect e : effects) {
+			try {
+				/* effectCheck() returns the effectSet defined by EffectDeclType, or reports an error
+				 * if EffectDeclType for e is not found in the context */
+				moreEffects = e.effectCheck(ctx).getEffects(); 
+			} catch (RuntimeException ex) { // seems to have reached the lowest-level effect in scope
+				allEffects.add(e);
+			}
+			
+			if (moreEffects != null) {	
+				allEffects.addAll(moreEffects);	
+			} else { // e was the lowest-level in scope (hidden by type ascription)
+				allEffects.add(e);
+			}
+		}
+		
+		// if it is null, then everything in "effects" are of the lowest-level in scope
+		if (moreEffects != null) { allEffects = recursiveEffectCheck(ctx, allEffects);	}
+		return allEffects;
 	}
 
 	@Override
@@ -86,8 +128,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 	@Override
 	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
 		dest.append(indent).append("effect ").append(getName()).append(" = ");
-		if (effectSet != null)
-			dest.append(effectSet.toString());
+		if (effectSet != null) { dest.append(effectSet.toString()); }
 		dest.append('\n');
 	}
 

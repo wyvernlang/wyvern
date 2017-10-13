@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -24,7 +25,7 @@ public abstract class SuspendedTailCall extends Expression implements Value {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
 		throw new RuntimeException("should not try to typecheck a suspended tail call");
 	}
 

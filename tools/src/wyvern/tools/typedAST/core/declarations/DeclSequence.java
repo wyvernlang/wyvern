@@ -391,16 +391,28 @@ public class DeclSequence extends Sequence implements EnvironmentExtender {
 				delegateDecl = (wyvern.tools.typedAST.core.declarations.DelegateDeclaration)d;
 			}
 			else {
-				DeclType t = ((Declaration) d).genILType(ctxTemp);
+				Declaration dd = (Declaration) d;
+				
+				/* for checking whether effects used in an effect declaration or method header were declared
+				 * in the type signature prior to its use. */
+				if (dd instanceof EffectDeclaration) {
+					/* HACK: only do it for effect-checking purposes (otherwise results in NullPointerException
+					 * for tests like testTSL). */
+					ctxTemp = ctxTemp.extend(dd.getName(), null, new StructuralType(dd.getName(), declTypes));
+				}
+				
+				DeclType t = dd.genILType(ctxTemp);
 				declTypes.add(t);
 			}
 		}
+		
+		final GenContext finalCtxTemp = ctxTemp; // for declTypes.stream() later, which requires this to be final
 		
 		// Add delegate object's declaration which has not been overridden to the structural type.
 		if (delegateDecl != null) {
 			StructuralType delegateStructuralType = delegateDecl.getType().getILType(ctxTemp).getStructuralType(ctxTemp);
 			for (DeclType declType : delegateStructuralType.getDeclTypes()) {
-				if (!declTypes.stream().anyMatch(newDefDecl-> newDefDecl.isSubtypeOf(declType, ctxTemp))) {
+				if (!declTypes.stream().anyMatch(newDefDecl-> newDefDecl.isSubtypeOf(declType, finalCtxTemp))) {
 					declTypes.add(declType);
 				}
 			}

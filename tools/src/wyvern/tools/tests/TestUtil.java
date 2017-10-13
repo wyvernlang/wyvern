@@ -256,7 +256,7 @@ public class TestUtil {
 	public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
 	    // resolveModule already typechecked, but we'll do it again to verify the type
 		TypeContext ctx = Globals.getStandardTypeContext();
-	    ValueType t = program.typeCheck(ctx);
+	    ValueType t = program.typeCheck(ctx, null);
 		TailCallVisitor.annotate(program);
 	    
 	    if (expectedType != null)
@@ -302,7 +302,7 @@ public class TestUtil {
 		GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
 		try {
 			IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
-			program.typeCheck(Globals.getStandardTypeContext());
+			program.typeCheck(Globals.getStandardTypeContext(), null);
 			Assert.fail("Typechecking should have failed.");
 		} catch (ToolError e) {
 		}

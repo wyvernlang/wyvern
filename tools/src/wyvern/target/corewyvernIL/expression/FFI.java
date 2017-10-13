@@ -6,6 +6,7 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -34,7 +35,7 @@ public class FFI extends AbstractValue {
 	}
 
 	@Override
-	public ValueType typeCheck(TypeContext ctx) {
+	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
 		return type;
 	}
 
