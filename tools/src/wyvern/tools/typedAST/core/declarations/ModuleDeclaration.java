@@ -46,7 +46,9 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.NamedType;
 import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
@@ -59,13 +61,13 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private ClassType subTypeType;
 	private FileLocation location;
 	private ClassType selfType;
-	private Type ascribedType;
+	private NamedType ascribedType;
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private boolean resourceFlag;
 
-	public ModuleDeclaration(String name, EnvironmentExtender inner, Type type, FileLocation location, boolean isResource) {
+	public ModuleDeclaration(String name, EnvironmentExtender inner, NamedType type, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
@@ -434,7 +436,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		List<FormalArg> formalArgs;
 		List<Module> loadedTypes = new LinkedList<Module>();
 		formalArgs = getTypes(reqSeq, ctx, loadedTypes); // translate requiring modules to method parameters
-		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.toString());
+		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
 		for (Module lt : loadedTypes) {
 			// include the declaration itself
 			final String internalName = lt.getSpec().getInternalName();

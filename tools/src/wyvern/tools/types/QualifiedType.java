@@ -9,16 +9,19 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-public class QualifiedType extends AbstractTypeImpl {
+public class QualifiedType extends AbstractTypeImpl implements NamedType {
 	private ExpressionAST base;
 	private String name;
 	
 	@Override
 	public String toString() {
-		return base.toString() + "." + name;
+		return getFullName();
 	}
 	
+    @Override
 	public String getName() { return name; }
+    @Override
+    public String getFullName() { return base.toString() + "." + name; }
 	public TypedAST getBase() { return base; }
 	@Override
 	public FileLocation getLocation() {
