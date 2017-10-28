@@ -43,6 +43,7 @@ import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.NamedType;
 import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
@@ -66,7 +67,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     
 	@Override
 	public TypedAST moduleDecl(String name, TypedAST ast, Type type, FileLocation loc, boolean isResource) {
-		return  new ModuleDeclaration(name, (EnvironmentExtender)ast, type, loc, isResource);
+		return  new ModuleDeclaration(name, (EnvironmentExtender)ast, (NamedType) type, loc, isResource);
 	}
 
 	@Override

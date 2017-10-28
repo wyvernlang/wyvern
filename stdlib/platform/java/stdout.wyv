@@ -1,4 +1,4 @@
-module def stdout(java : Java)
+module def stdout(java : Java) /*: Stdout*/
 
 import java:wyvern.stdlib.support.Stdio.stdio
 

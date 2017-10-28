@@ -1,6 +1,6 @@
 require stdout
 
-type ObjNetworkType01
+resource type ObjNetworkType01
   effect send
   effect receive
   def sendData(data : String) : {} Unit

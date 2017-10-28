@@ -10,7 +10,7 @@ package wyvern.tools.typedAST.core.declarations;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
@@ -18,10 +18,7 @@ import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
@@ -39,7 +36,7 @@ public class EffectDeclaration extends Declaration {
 		
 		/* Parses the String effects into a set. If it was not defined: 
 		 * effectSet==null if in type signature, else error is reported */
-		this.effectSet = EffectSet.parseEffects(name, effects, fileLocation);
+		this.effectSet = EffectSet.parseEffects(name, effects, true, fileLocation);
 	}
 	
 	public Effect getEffect() {

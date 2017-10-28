@@ -27,7 +27,6 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.TypeInv;
 import wyvern.tools.util.EvaluationEnvironment;
 
@@ -127,12 +126,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 		*/
 
 
-		// System.out.println("Evaluating match over tag: " + matchingOverTag + " with matchingOver = " + matchingOver.getType());
-		if (matchingOver.getType() instanceof ClassType) {
-			ClassType ct = (ClassType) matchingOver.getType();
-			// System.out.println("hmm = " + this.matchingOver.typecheck(env, Optional.empty()));
-			// System.out.println("ct = " + ct.getName());
-		}
 
 		// System.out.println("matchingOverTag (latest) = " + matchingOverTag);
 		int cnt = 0;

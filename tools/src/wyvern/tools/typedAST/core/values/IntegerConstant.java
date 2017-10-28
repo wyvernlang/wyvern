@@ -17,7 +17,6 @@ import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Int;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class IntegerConstant extends AbstractValue implements InvokableValue, CoreAST {
@@ -31,11 +30,6 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 	public IntegerConstant(int i, FileLocation loc) {
 		value = i;
 		location = loc;
-	}
-
-	@Override
-	public Type getType() {
-		return new Int();
 	}
 
 	public int getValue() {

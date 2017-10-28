@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 import wyvern.stdlib.Globals;
@@ -28,12 +27,9 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.expressions.Instantiation;
@@ -46,8 +42,8 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
+import wyvern.tools.types.NamedType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
@@ -56,30 +52,19 @@ import wyvern.tools.util.Reference;
 public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;
 	private final EnvironmentExtender inner;
-	private ClassType subTypeType;
 	private FileLocation location;
-	private ClassType selfType;
-	private Type ascribedType;
+	private NamedType ascribedType;
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private boolean resourceFlag;
 
-	public ModuleDeclaration(String name, EnvironmentExtender inner, Type type, FileLocation location, boolean isResource) {
+	public ModuleDeclaration(String name, EnvironmentExtender inner, NamedType type, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
 		this.resourceFlag = isResource;
 		ascribedType = type;
-		selfType = new ClassType(dclEnv, new Reference<>(), new LinkedList<>(), null, name);
-		subTypeType = new ClassType(typeEnv, new Reference<>(), new LinkedList<>(), null, name);
-		if (isResource) {
-			selfType.setAsResource();
-			subTypeType.setAsResource();
-		} else {
-			selfType.setAsModule();
-			subTypeType.setAsModule();
-		}
 	}
 
 
@@ -121,10 +106,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	boolean extGuard = false;
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
-		if (!extGuard) {
-			dclEnv.set(inner.extend(dclEnv.get(), old.extend(dclEnv.get())));
-		}
-		return old.extend(new NameBindingImpl(name, selfType)).extend(new TypeBinding(name, subTypeType));
+	    throw new RuntimeException();
 	}
 
 	boolean typeGuard = false;
@@ -150,23 +132,12 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	boolean nameGuard = false;
 	@Override
 	public Environment extendName(Environment env, Environment against) {
-		if (!nameGuard) {
-			for (TypedAST ast : getInnerIterable()) {
-				if (ast instanceof ImportDeclaration) {
-					importEnv.set(((ImportDeclaration) ast).extendName(importEnv.get(), Globals.getStandardEnv()));
-				} else if (ast instanceof EnvironmentExtender) {
-					dclEnv.set(((EnvironmentExtender) ast).extendName(dclEnv.get(),
-							Globals.getStandardEnv().extend(importEnv.get()).extend(dclEnv.get())));
-				}
-			}
-			nameGuard = true;
-		}
-		return env.extend(new NameBindingImpl(name, selfType)).extend(new TypeBinding(name, subTypeType));
+        throw new RuntimeException();
 	}
 
 	@Override
 	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		return old.extend(new ValueBinding(name, selfType));
+        throw new RuntimeException();
 	}
 
 	@Override
@@ -193,8 +164,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), ascribedType, getLocation(), isResource());
-		newDecl.selfType = selfType;
-		newDecl.subTypeType = subTypeType;
 		newDecl.importEnv = importEnv;
 		newDecl.typeEnv = typeEnv;
 		newDecl.dclEnv = dclEnv;
@@ -434,7 +403,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		List<FormalArg> formalArgs;
 		List<Module> loadedTypes = new LinkedList<Module>();
 		formalArgs = getTypes(reqSeq, ctx, loadedTypes); // translate requiring modules to method parameters
-		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.toString());
+		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
 		for (Module lt : loadedTypes) {
 			// include the declaration itself
 			final String internalName = lt.getSpec().getInternalName();

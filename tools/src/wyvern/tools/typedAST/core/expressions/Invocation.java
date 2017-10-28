@@ -20,7 +20,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
@@ -32,7 +31,6 @@ import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.ClassType;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
@@ -111,16 +109,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
     @Override
     public void checkAssignment(Assignment ass, Environment env) {
-        Type recType = receiver.typecheck(env, Optional.empty());
-        if (!(recType instanceof ClassType)) { //TODO: Hack
-            throw new RuntimeException(
-                "Cannot assign to a field on a type without fields!"
-            );
-        }
-        ((ClassType) recType)
-            .getEnv()
-            .lookupBinding(operationName, AssignableNameBinding.class)
-            .get();
     }
 
     @Override
