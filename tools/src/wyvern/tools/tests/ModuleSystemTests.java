@@ -30,85 +30,12 @@ public class ModuleSystemTests {
 		WyvernResolver.getInstance().addPath(PATH);
     }
 
-    /*
-	@Test
-    @Deprecated
-	public void testResource() throws ParseException {
-		String program = TestUtil.readFile(PATH + "testModule.wyv");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		WyvernResolver.getInstance().setNewParser(true);
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEvalEnv());
-	}
-
-	@Test
-	public void testImport() throws ParseException {
-		String program = TestUtil.readFile(PATH + "import.wyv");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		WyvernResolver.getInstance().setNewParser(true);
-		typeCheckfailWith(ast, ErrorMessage.MODULE_TYPE_ERROR);
-	}
-
-	@Test
-    @Deprecated
-	public void testRequire() throws ParseException {
-		String program = TestUtil.readFile(PATH + "require.wyv");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		WyvernResolver.getInstance().setNewParser(true);
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEvalEnv());
-	}
-
-	@Test
-    @Deprecated
-	public void testRsType() throws ParseException {
-		String program = TestUtil.readFile(PATH + "rsType.wyv");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		WyvernResolver.getInstance().setNewParser(true);
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEvalEnv());
-	}
-
-	@Test
-    @Deprecated
-	public void testWyt() throws ParseException {
-		String program = TestUtil.readFile(PATH + "Log.wyt");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		WyvernResolver.getInstance().setNewParser(true);
-		ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		ast.evaluate(Globals.getStandardEvalEnv());
-	}
-	*/
-
 	@Test
 	public void testInst() throws ParseException {
 		String program = TestUtil.readFile(PATH + "inst.wyv");
 		TypedAST ast = TestUtil.getNewAST(program, "test input");
 	}
 
-	/**
-	 * Attempts to typecheck the given AST and catch the given ErrorMessage.
-	 * This error being thrown indicates the test passed.
-	 *
-	 * If the error isn't thrown, the test fails.
-	 *
-	 * @param ast
-	 * @param errorMessage
-	 *
-	private static void typeCheckfailWith(TypedAST ast, ErrorMessage errorMessage) {
-		try {
-			ast.typecheck(Globals.getStandardEnv(), Optional.empty());
-		} catch (ToolError toolError) {
-			// toolError.printStackTrace(); // FIXME:
-			System.out.println(errorMessage);
-			Assert.assertEquals(errorMessage, toolError.getTypecheckingErrorMessage());
-
-			return;
-		}
-
-		Assert.fail("Should have failed with error: " + errorMessage);
-	}
-	*/
 	@Test
 	public void testADT() throws ParseException {
 		TestUtil.doTestScriptModularly("modules.listClient",
@@ -146,10 +73,6 @@ public class ModuleSystemTests {
 	@Test
 	public void testTopLevelVarGet () throws ParseException {
 		GenContext genCtx = Globals.getStandardGenContext();
-		/*GenContext.empty().extend("system", new Variable("system"), null);
-		genCtx = new TypeGenContext("Int", "system", genCtx);
-		genCtx = new TypeGenContext("Unit", "system", genCtx);*/
-	
 		String source = "var v : Int = 5\n"
 					  + "v\n";
 		
