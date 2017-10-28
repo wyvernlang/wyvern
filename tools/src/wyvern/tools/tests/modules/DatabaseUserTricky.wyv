@@ -1,8 +1,0 @@
-require database
-
-database.contents = 0
-
-val db = database
-db.contents = 10
-
-database.contents
