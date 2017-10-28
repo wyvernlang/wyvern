@@ -1,0 +1,4 @@
+resource type TDatabase
+	def setContents(newValue: Int): Unit
+	def getContents(): Int
+

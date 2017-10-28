@@ -1,4 +1,0 @@
-module def databaseProxy(db : modules.Database)
-
-def increment():Unit
-	db.contents = db.contents + 1
