@@ -3,10 +3,12 @@
  */
 package wyvern.target.corewyvernIL.effects;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Path;
@@ -96,20 +98,32 @@ public class Effect {
 	
 	/** Check that an effect exists in the context, returning its corresponding effect set at the end. */
 	public EffectSet effectCheck(TypeContext ctx) {	
-		ValueType vt = null;
-		
-		// Without try/catch, this could result in a runtime exception due to EmptyGenContext 
-		// (which doesn't have FileLocation or HasLocation to call ToolError.reportError())
-		try {  
-			// if path is null (due to failure of addPath() before) or typeCheck() fails
-			vt = getPath().typeCheck(ctx, null); 
-		} catch (RuntimeException ex) { 
-			ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
-		}
-
-		return findEffectDeclType(ctx, vt).getEffectSet();
+		return findEffectDeclType(ctx).getEffectSet();
 	}
 	
+    /** Find this effect's (effect)DeclType; report error if not found, else return effectDeclType. */
+    public EffectDeclType findEffectDeclType(TypeContext ctx) {
+        ValueType vt = null;
+        
+        // Without try/catch, this could result in a runtime exception due to EmptyGenContext 
+        // (which doesn't have FileLocation or HasLocation to call ToolError.reportError())
+        try {  
+            // if path is null (due to failure of addPath() before) or typeCheck() fails
+            //if (getPath() == null)
+                
+            vt = getPath().typeCheck(ctx, null); 
+        } catch (RuntimeException ex) { 
+            ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
+        }
+
+        DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
+        if ((eDT==null) || (!(eDT instanceof EffectDeclType))){
+            ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
+        }
+        
+        return (EffectDeclType) eDT;
+    }
+
 	/** Find this effect's (effect)DeclType in ValueType vt; report error if not found, else return effectDeclType. */
 	public EffectDeclType findEffectDeclType(TypeContext ctx, ValueType vt) {
 		DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
@@ -119,4 +133,32 @@ public class Effect {
 		
 		return (EffectDeclType) eDT;
 	}
+
+    public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
+        if (path.getFreeVariables().contains(varName)) {
+            EffectDeclType dt = this.findEffectDeclType(ctx);
+            if (dt.getEffectSet() != null) {
+                if (dt.getEffectSet().getEffects().size() == 1
+                        && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
+                    // avoid infinite loops, just in case
+                    // TODO: make this more principled
+                    Set<Effect> s = new HashSet<Effect>();
+                    s.add(this);
+                    return s;
+                }
+                // different effects, so call recursively
+                Set<Effect> s = new HashSet<Effect>();
+                for (Effect e : dt.getEffectSet().getEffects()) {
+                    s.addAll(e.doAvoid(varName, ctx, count+1));
+                }
+                return s;
+            }
+        }
+        
+        // was best effort anyway
+        // TODO: be more principled
+        Set<Effect> s = new HashSet<Effect>();
+        s.add(this);
+        return s;
+    }
 }

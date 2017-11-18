@@ -410,8 +410,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getSpec().getType());
 			// include the type abbreviation
 			methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalName, methodContext);
-			if (dependencies != null)
+			if (dependencies != null) {
 				dependencies.add(lt.getSpec());
+                dependencies.addAll(lt.getDependencies());
+			}
 		}
 
 		/* adding parameters to environments */

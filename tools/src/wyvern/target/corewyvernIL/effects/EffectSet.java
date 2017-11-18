@@ -8,9 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -82,18 +85,8 @@ public class EffectSet {
 	 * (such as declared in the signature previously). */
 	public void verifyInType(GenContext ctx, String declName) {
 		if (getEffects() != null) {
-			ValueType vt = null;
-			try {
-				vt = ctx.lookupTypeOf(declName); // if null, don't check
-			} catch (Exception ex) {
-				// do nothing (ctx.lookupTypeOf(str) throws exception when str is not found)
-			}
-			
-			if (vt != null) {
-				// no need for acquiring the actual effectDeclTypes (report error if not found)
-				final ValueType finalVT = vt;
-				getEffects().stream().forEach(e -> e.findEffectDeclType(ctx, finalVT));
-			}
+		    // TODO: what's below should check out, except verifyInType is called a lot when the effects still are on a null variable
+		    //getEffects().stream().forEach(e -> e.findEffectDeclType(ctx));
 		}
 	}
 	
@@ -111,4 +104,14 @@ public class EffectSet {
 	public String toString() {
 		return effectSet==null? "" : effectSet.toString().replace("[", "{").replace("]", "} ");
 	}
+
+    public EffectSet doAvoid(String varName, TypeContext ctx, int count) {
+        if (effectSet.isEmpty())
+            return this;
+        Set<Effect> newSet = new HashSet<Effect>();
+        for (Effect e:effectSet) {
+            newSet.addAll(e.doAvoid(varName, ctx, count));
+        }
+        return new EffectSet(newSet);
+    }
 }

@@ -24,6 +24,8 @@ public class Module {
 		return (Expression) expr;
 	}
 	
+	/** Returns a transitive, but not necessarily carefully ordered,
+	 *  list of the dependencies of this module */
 	public List<TypedModuleSpec> getDependencies() {
 		return dependencies;
 	}
