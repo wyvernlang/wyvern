@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -14,24 +12,14 @@ import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InvocationExprGenerator;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
-import static wyvern.tools.errors.ErrorMessage.CANNOT_INVOKE;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
-import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.core.values.VarValue;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
-import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.OperatableType;
-import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
 
@@ -55,28 +43,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
         this.location = fileLocation;
     }
 
-    @Override
-    protected Type doTypecheck(Environment env, Optional<Type> expected) {
-
-        Type receiverType = receiver.typecheck(env, Optional.empty());
-
-        if (argument != null) {
-            argument.typecheck(env, Optional.empty());
-        }
-
-        if (receiverType instanceof OperatableType) {
-            return ((OperatableType)receiverType).checkOperator(this,env);
-        } else {
-            ToolError.reportError(
-                ErrorMessage.OPERATOR_DOES_NOT_APPLY,
-                this,
-                "Trying to call a function on non OperatableType!",
-                receiverType.toString()
-            );
-            return null;
-        }
-    }
-
     public TypedAST getArgument() {
         return argument;
     }
@@ -90,36 +56,7 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
     }
 
     @Override
-    @Deprecated
-    public Value evaluate(EvaluationEnvironment env) {
-
-        Value lhs = receiver.evaluate(env);
-        if (Globals.checkRuntimeTypes && !(lhs instanceof InvokableValue)) {
-            reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
-        }
-        InvokableValue receiverValue = (InvokableValue) lhs;
-        Value out = receiverValue.evaluateInvocation(this, env);
-
-        //TODO: bit of a hack
-        if (out instanceof VarValue) {
-            out = ((VarValue)out).getValue();
-        }
-        return out;
-    }
-
-    @Override
     public void checkAssignment(Assignment ass, Environment env) {
-    }
-
-    @Override
-    @Deprecated
-    public Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
-        Value lhs = receiver.evaluate(env);
-        if (!(lhs instanceof Assignable)) {
-            reportEvalError(CANNOT_INVOKE, lhs.toString(), this);
-        }
-
-        return ((Assignable)lhs).evaluateAssignment(ass, env);
     }
 
     @Override

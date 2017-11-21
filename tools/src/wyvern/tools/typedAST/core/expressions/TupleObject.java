@@ -39,49 +39,9 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 			this.location = objects[0].getLocation();*/
 	}
 	
-	public TupleObject(TypedAST first, TypedAST rest, FileLocation commaLine) {
-		if (rest instanceof TupleObject) {
-			objects = new ExpressionAST[((TupleObject) rest).objects.length + 1];
-			objects[0] = (ExpressionAST)first;
-			for (int i = 1; i < ((TupleObject) rest).objects.length + 1; i++) {
-				objects[i] = ((TupleObject) rest).objects[i-1];
-			}
-		} else {
-			this.objects = new ExpressionAST[] { (ExpressionAST)first, (ExpressionAST)rest };
-		}
-		this.location = commaLine;
-	}
-
 	public ExpressionAST getObject(int index) {
 		return (ExpressionAST) objects[index];
 	}
-
-	@Override
-    @Deprecated
-	public Value evaluate(EvaluationEnvironment env) {
-		Value[] evaluatedResults = new Value[objects.length];
-		for (int i = 0; i < objects.length; i++) {
-			evaluatedResults[i] = objects[i].evaluate(env);
-		}
-		return new TupleValue((Tuple)this.getType(), evaluatedResults);
-	}
-
-	@Override
-	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		Type[] newTypes = new Type[objects.length];
-		for (int i = 0; i < objects.length; i++) {
-			final int sti = i;
-			newTypes[i] = objects[i].typecheck(env, expected.map(exp -> {
-				if (exp instanceof Tuple) return ((Tuple)exp).getTypeArray()[sti];
-				if (exp instanceof Intersection)
-					return ((Intersection)exp).getTypes().stream().filter(tpe -> tpe instanceof Tuple).filter(tpe -> ((Tuple)tpe).getTypeArray().length == objects.length).findFirst().get();
-				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this, getType().toString(), exp.toString());
-				throw new RuntimeException();
-			}));
-		}
-		return new Tuple(newTypes);
-	}
-
 
 	@Override
 	public Map<String, TypedAST> getChildren() {

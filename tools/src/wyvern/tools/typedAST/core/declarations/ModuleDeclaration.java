@@ -32,7 +32,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.expressions.Instantiation;
 import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -71,81 +70,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	protected Type doTypecheck(Environment env) {
-		inner.typecheck(env, Optional.empty());
-
-		// TODO: Implement type checking for modules (resource vs import etc).
-		// System.out.println("DEBUG: Type checking a module declaration named " + this.name);
-		// System.out.println("DEBUG: Is it a resource module? " + this.resourceFlag);
-
-		return new Unit();
-	}
-
-	private Iterable<TypedAST> getInnerIterable() {
-		if (inner instanceof Sequence) {
-			return ((Sequence) inner).getIterator();
-		}
-		final Reference<Boolean> gotten = new Reference<>(false);
-		return () -> new Iterator<TypedAST>() {
-			@Override
-			public boolean hasNext() {
-				return !gotten.get();
-			}
-
-			@Override
-			public EnvironmentExtender next() {
-				gotten.set(true);
-				return inner;
-			}
-		};
-	}
-
-	boolean extGuard = false;
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-	    throw new RuntimeException();
-	}
-
-	boolean typeGuard = false;
-	@Override
-	public Environment extendType(Environment extend, Environment against) {
-		if (!typeGuard) {
-			for (TypedAST ast : getInnerIterable()) {
-				if (ast instanceof ImportDeclaration) {
-					importEnv.set(((ImportDeclaration) ast).extendType(importEnv.get(), Globals.getStandardEnv()));
-				} else if (ast instanceof EnvironmentExtender) {
-					Environment delta = ((EnvironmentExtender) ast).extendType(Environment.getEmptyEnvironment(), importEnv.get().extend(Globals.getStandardEnv()));
-					dclEnv.set(dclEnv.get().extend(delta));
-					delta.getBindings().stream()
-							.flatMap(bndg -> (bndg instanceof TypeBinding)? Stream.of((TypeBinding)bndg) : Stream.empty())
-							.forEach(bndg -> typeEnv.set(typeEnv.get().extend(bndg)));
-				}
-			}
-			typeGuard = true;
-		}
-		return extend;
-	}
-
-	boolean nameGuard = false;
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-        throw new RuntimeException();
-	}
-
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-        throw new RuntimeException();
-	}
-
-	@Override
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		ValueBinding selfBinding = declEnv.lookup(name).get();
-		EvaluationEnvironment objEnv = EvaluationEnvironment.EMPTY;
-		Value selfV = new Obj(inner.evalDecl(objEnv), null);
-		selfBinding.setValue(selfV);
 	}
 
 	@Override

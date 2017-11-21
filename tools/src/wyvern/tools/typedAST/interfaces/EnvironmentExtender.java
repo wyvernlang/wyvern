@@ -10,7 +10,9 @@ public interface EnvironmentExtender extends TypedAST {
 	 * @param against The environment to check against
 	 * @return The new environment with bound names
 	 */
-	public Environment extendType(Environment env, Environment against);
+	public default Environment extendType(Environment env, Environment against) {
+	    throw new RuntimeException("deprecated");
+	}
 
 
 	/**
@@ -19,7 +21,9 @@ public interface EnvironmentExtender extends TypedAST {
 	 * @param against The environment to typecheck with
 	 * @return The new environment with bound names
 	 */
-	public Environment extendName(Environment env, Environment against);
+	public default Environment extendName(Environment env, Environment against) {
+	    throw new RuntimeException("deprecated");
+	}
 
 
 	public Environment extend(Environment env, Environment against);

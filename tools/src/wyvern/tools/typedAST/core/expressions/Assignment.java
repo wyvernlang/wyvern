@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -15,20 +14,12 @@ import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
-import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
-import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.GetterAndSetterGeneration;
 
 public class Assignment extends CachingTypedAST implements CoreAST {
@@ -51,24 +42,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         this.location = fileLocation;
     }
 
-    @Override
-    protected Type doTypecheck(Environment env, Optional<Type> expected) {
-        if (nextExpr == null) {
-            if (!(target instanceof Assignable)) {
-                throw new RuntimeException("Invalid target");
-            }
-            ((Assignable)target).checkAssignment(this, env);
-            Type tT = target.typecheck(env, Optional.empty());
-            Type vT = value.typecheck(env, Optional.of(tT));
-            if (!vT.subtype(tT)) {
-                ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
-            }
-        } else {
-            nextExpr.typecheck(env, Optional.empty());
-        }
-        return new Unit();
-    }
-
     public TypedAST getTarget() {
         return target;
     }
@@ -79,20 +52,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
 
     public TypedAST getNext() {
         return nextExpr;
-    }
-
-    @Override
-    @Deprecated
-    public Value evaluate(EvaluationEnvironment env) {
-        if (!(target instanceof Assignable)) {
-            reportEvalError(VALUE_CANNOT_BE_APPLIED, target.toString(), this);
-        }
-        Value evaluated = ((Assignable) target).evaluateAssignment(this, env);
-        if (nextExpr == null) {
-            return evaluated;
-        } else {
-            return nextExpr.evaluate(env);
-        }
     }
 
     @Override

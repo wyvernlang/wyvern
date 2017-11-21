@@ -32,21 +32,6 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 	}
 
 	@Override
-	protected Type doTypecheck(Environment env, Optional<Type> expected) {
-		decl.typecheck(env, Optional.empty());
-		Environment newEnv = decl.extend(env,env);
-		Type bodyType = body.typecheck(newEnv, Optional.empty());
-		return bodyType;
-	}
-
-	@Override
-    @Deprecated
-	public Value evaluate(EvaluationEnvironment env) {
-		EvaluationEnvironment newEnv = decl.evalDecls(env);
-		return body.evaluate(newEnv);
-	}
-
-	@Override
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> childMap = new HashMap<>();
 		childMap.put("decl", decl);

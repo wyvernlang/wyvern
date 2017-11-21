@@ -39,20 +39,6 @@ public class TypeAsc extends AbstractExpressionAST implements ExpressionAST {
 	}
 
 	@Override
-	public Type typecheck(Environment env, Optional<Type> expected) {
-		should = TypeResolver.resolve(should, env);
-		if (!(exn.typecheck(env, Optional.empty()).subtype(should)))
-			throw new RuntimeException();
-		return should;
-	}
-
-	@Override
-    @Deprecated
-	public Value evaluate(EvaluationEnvironment env) {
-		return exn.evaluate(env);
-	}
-
-	@Override
 	public Map<String, TypedAST> getChildren() {
 		Map<String, TypedAST> output = new HashMap<>();
 		output.put("exn", exn);

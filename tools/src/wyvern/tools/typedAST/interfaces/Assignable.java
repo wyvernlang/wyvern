@@ -5,6 +5,12 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public interface Assignable extends ExpressionAST {
-	void checkAssignment(Assignment ass, Environment env);
-	Value evaluateAssignment(Assignment ass, EvaluationEnvironment env);
+    @Deprecated
+	default void checkAssignment(Assignment ass, Environment env) {
+        throw new RuntimeException("deprecated");
+    }
+	@Deprecated
+	default Value evaluateAssignment(Assignment ass, EvaluationEnvironment env) {
+	    throw new RuntimeException("deprecated");
+	}
 }

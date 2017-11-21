@@ -1,13 +1,9 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.UnresolvedType;
 
 public class Case {
 
@@ -51,23 +47,6 @@ public class Case {
     public Case(TypedAST ast) {
         this.ast = ast;
         this.caseType = CaseType.DEFAULT;
-    }
-
-    /**
-      * resolve converts this case expression to the corresponding tagged type and resolves that
-      *
-      * @param env the Environment in which to resolve the case.
-      * @param m the Match to resolve against.
-      */
-    public void resolve(Environment env, Match m) {
-        if (taggedType instanceof UnresolvedType) {
-            String name = ((UnresolvedType) taggedType).getName();
-            if (env.lookup(name) == null && env.lookupType(name) == null) {
-                ToolError.reportError(ErrorMessage.TYPE_NOT_DECLARED, m, name);
-            }
-
-            this.taggedType = ((UnresolvedType) taggedType).resolve(env);
-        }
     }
 
     /**

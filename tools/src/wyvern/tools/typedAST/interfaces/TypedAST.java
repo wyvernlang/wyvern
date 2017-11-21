@@ -20,7 +20,9 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	
 	/** an interpreter.  Out of date - should generate IL code and interpret that instead. */
 	@Deprecated
-	Value evaluate(EvaluationEnvironment env);
+	default Value evaluate(EvaluationEnvironment env) {
+	    throw new RuntimeException("deprecated");
+	}
 
 	/**
 	 * Gets the children of a composite node

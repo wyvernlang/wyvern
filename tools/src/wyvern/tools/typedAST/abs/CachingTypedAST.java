@@ -10,7 +10,11 @@ import wyvern.tools.types.Type;
 
 public abstract class CachingTypedAST extends AbstractExpressionAST implements ExpressionAST {
 	private Type type;
-	protected abstract Type doTypecheck(Environment env, Optional<Type> expected);
+	
+	@Deprecated
+	protected Type doTypecheck(Environment env, Optional<Type> expected) {
+	    throw new RuntimeException("deprecated");
+	}
 	
 	@Override
 	public final Type typecheck(Environment env, Optional<Type> expected) {

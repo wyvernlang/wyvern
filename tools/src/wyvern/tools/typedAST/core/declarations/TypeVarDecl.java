@@ -55,66 +55,6 @@ public class TypeVarDecl extends Declaration {
     private String activeSelfName;
     private IExpr metadataExp = null;
 
-	/**
-	 * Helper class to allow easy variation of bound types
-	 */
-	private abstract class EnvironmentExtInner extends AbstractTreeWritable implements EnvironmentExtender {
-
-		private final FileLocation loc;
-
-		public EnvironmentExtInner(FileLocation loc) {
-			this.loc = loc;
-		}
-
-		@Override
-		public Environment extendName(Environment env, Environment against) {
-			return env;
-		}
-
-		@Override
-		public Environment extend(Environment env, Environment against) {
-			return env;
-		}
-
-		@Override
-		public EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
-			return env;
-		}
-		@Override
-		public Type typecheck(Environment env, Optional<Type> expected) {
-			return getType();
-		}
-
-		@Override
-        @Deprecated
-		public Value evaluate(EvaluationEnvironment env) {
-			return UnitVal.getInstance(loc);
-		}
-
-		@Override
-		public Map<String, TypedAST> getChildren() {
-			return new HashMap<>();
-		}
-
-		@Override
-		public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-			return this;
-		}
-
-		@Override
-		public FileLocation getLocation() {
-			return loc;
-		}
-	}
-
-	public TypeVarDecl(String name, DeclSequence body, TypedAST metadata, FileLocation fileLocation) {
-		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
-		this.name = name;
-		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
-		this.body = new TypeDeclaration(name, body, this.metadataObj, fileLocation);
-		this.fileLocation = fileLocation;
-	}
-
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName ) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
@@ -126,101 +66,9 @@ public class TypeVarDecl extends Declaration {
         this.activeSelfName = selfName;
 	}
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation){
-		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
-		this.name = name;
-		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
-		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
-		this.fileLocation = fileLocation;
-	}
-	
-	private TypeVarDecl(String name, EnvironmentExtender body, Reference<Optional<TypedAST>> metadata, Reference<Value> metadataObj, FileLocation location) {
-		this.name = name;
-		this.body = body;
-		this.metadata = metadata;
-		this.metadataObj = metadataObj;
-		fileLocation = location;
-	}
-
-	public TypeVarDecl(String name, Type body, TypedAST metadata, FileLocation fileLocation) {
-		this.name = name;
-		this.body = new EnvironmentExtInner(fileLocation) {
-			@Override
-			public Environment extendType(Environment env, Environment against) {
-				Type type = TypeResolver.resolve(body, against);
-				return env.extend(new TypeBinding(name, type, metadataObj))
-						.extend(new LateNameBinding(name, () -> metadataObj.get().getType()));
-			}
-
-
-
-			@Override
-			public Type getType() {
-				return body;
-			}
-
-
-		};
-
-		this.fileLocation = fileLocation;
-		this.metadata = new Reference<>(Optional.ofNullable(metadata));
-		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
-	}
-
-	public TypeVarDecl(String name, EnvironmentExtender body, FileLocation fileLocation) {
-		this.body = body;
-		this.name = name;
-		this.fileLocation = fileLocation;
-		metadata = new Reference<Optional<TypedAST>>(Optional.empty());
-		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
-	}
-
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	protected Type doTypecheck(Environment env) {
-		evalMeta(env);
-		return body.typecheck(env, Optional.<Type>empty());
-	}
-
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-		return body.extend(old, against);
-	}
-
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		return body.evalDecl(old);
-	}
-
-	@Override
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		body.evalDecl(declEnv);
-	}
-
-	@Override
-	public Environment extendType(Environment env, Environment against) {
-		return body.extendType(env, against);
-	}
-
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-		return body.extendName(env, against);
-	}
-
-    @Deprecated
-	private void evalMeta(Environment evalEnv) {
-		MetadataInnerBinding extMetaEnv = evalEnv
-				.lookupBinding("metaEnv", MetadataInnerBinding.class).orElseGet(() -> MetadataInnerBinding.EMPTY);
-
-		Environment metaTcEnv = Globals.getStandardEnv().extend(extMetaEnv.getInnerEnv());
-		EvaluationEnvironment metaEnv = Globals.getStandardEvalEnv().extend(TypeDeclaration.attrEvalEnv).extend(extMetaEnv.getInnerEvalEnv());
-		metadata.get().map(obj->obj.typecheck(metaTcEnv, Optional.<Type>empty()));
-
-		metadataObj.set(metadata.get().map(obj -> obj.evaluate(metaEnv)).orElse(new Obj(EvaluationEnvironment.EMPTY, null)));
 	}
 
 	@Override
@@ -239,8 +87,9 @@ public class TypeVarDecl extends Declaration {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		metadata.set(Optional.ofNullable(newChildren.get("metadata")));
-		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);
+	    throw new RuntimeException("deprecated I think");
+		/*metadata.set(Optional.ofNullable(newChildren.get("metadata")));
+		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);*/
 	}
 
     @Override

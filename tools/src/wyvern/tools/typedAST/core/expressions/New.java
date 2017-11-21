@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -21,10 +20,7 @@ import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class New extends CachingTypedAST implements CoreAST {
 
@@ -92,25 +88,6 @@ public class New extends CachingTypedAST implements CoreAST {
 
     private String self() {
         return (this.selfName == null) ? "this" : this.selfName;
-    }
-
-    @Override
-    protected Type doTypecheck(Environment env, Optional<Type> expected) {
-        throw new RuntimeException();
-    }
-
-    private EvaluationEnvironment getGenericDecls(
-            EvaluationEnvironment env, 
-            EvaluationEnvironment mockEnv, 
-            LinkedList<Declaration> decls
-    ) {
-        return mockEnv;
-    }
-
-    @Deprecated
-    @Override
-    public Value evaluate(EvaluationEnvironment env) {
-        throw new RuntimeException();
     }
 
     @Override

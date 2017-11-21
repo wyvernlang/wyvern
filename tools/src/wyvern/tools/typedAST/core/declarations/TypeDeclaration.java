@@ -118,19 +118,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 		return decls1;
 	}
 
-    @Override
-	public Type doTypecheck(Environment env) {
-		Environment eenv = decls.extend(env, env);
-		
-		for (Declaration decl : decls.getDeclIterator()) {
-			decl.typecheckSelf(eenv);
-		}
-
-		if (isTagged()) typecheckTags(env);
-		
-		return this.typeBinding.getType();
-	}	
-	
 	@Override
 	protected Environment doExtend(Environment old, Environment against) {
 		Environment newEnv = old.extend(nameBinding).extend(typeBinding);

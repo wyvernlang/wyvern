@@ -4,10 +4,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
@@ -24,36 +21,21 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
-import static wyvern.tools.errors.ErrorMessage.TYPE_CANNOT_BE_APPLIED;
-import static wyvern.tools.errors.ErrorMessage.VALUE_CANNOT_BE_APPLIED;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import static wyvern.tools.errors.ToolError.reportError;
-import static wyvern.tools.errors.ToolError.reportEvalError;
 import wyvern.tools.typedAST.abs.CachingTypedAST;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.interfaces.ApplyableValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.ApplyableType;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Intersection;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class Application extends CachingTypedAST implements CoreAST {
     private ExpressionAST function;
     private ExpressionAST argument;
     private List<Type> generics;
     private FileLocation location;
-
-    public Application(TypedAST function, TypedAST argument, FileLocation location) {
-        this(function, argument, location, null);
-    }
 
     /**
       * Application represents a call cite for a function call.
@@ -71,30 +53,6 @@ public class Application extends CachingTypedAST implements CoreAST {
         this.generics = (generics2 != null) ? generics2 : new LinkedList<Type>();
     }
 
-    @Override
-    protected Type doTypecheck(Environment env, Optional<Type> expected) {
-        Type fnType = function.typecheck(env, Optional.empty());
-
-        Type argument = null;
-        if (fnType instanceof Arrow) {
-            argument = ((Arrow) fnType).getArgument();
-        } else if (fnType instanceof Intersection) {
-            List<Type> args = fnType.getChildren().values().stream()
-                    .filter(tpe -> tpe instanceof Arrow).map(tpe -> ((Arrow)tpe).getArgument())
-                    .collect(Collectors.toList());
-            argument = new Intersection(args);
-        }
-        if (this.argument != null) {
-            this.argument.typecheck(env, Optional.ofNullable(argument));
-        }
-
-        if (!(fnType instanceof ApplyableType)) {
-            reportError(TYPE_CANNOT_BE_APPLIED, this, fnType.toString());
-        }
-
-        return ((ApplyableType) fnType).checkApplication(this, env);
-    }
-
     public TypedAST getArgument() {
         return argument;
     }
@@ -104,32 +62,11 @@ public class Application extends CachingTypedAST implements CoreAST {
     }
 
     @Override
-    @Deprecated
-    public Value evaluate(EvaluationEnvironment env) {
-        TypedAST lhs = function.evaluate(env);
-        if (Globals.checkRuntimeTypes && !(lhs instanceof ApplyableValue)) {
-            reportEvalError(VALUE_CANNOT_BE_APPLIED, lhs.toString(), this);
-        }
-        ApplyableValue fnValue = (ApplyableValue) lhs;
-
-        return fnValue.evaluateApplication(this, env);
-    }
-
-    @Override
     public Map<String, TypedAST> getChildren() {
         Hashtable<String, TypedAST> children = new Hashtable<>();
         children.put("function", function);
         children.put("argument", argument);
         return children;
-    }
-
-    @Override
-    public ExpressionAST doClone(Map<String, TypedAST> nc) {
-        return new Application(
-            (ExpressionAST) nc.get("function"),
-            (ExpressionAST) nc.get("argument"),
-            location
-        );
     }
 
     public FileLocation getLocation() {
@@ -391,5 +328,11 @@ public class Application extends CachingTypedAST implements CoreAST {
         sb.append(argument.prettyPrint());
         sb.append(")");
         return sb;
+    }
+
+    @Override
+    protected ExpressionAST doClone(Map<String, TypedAST> nc) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

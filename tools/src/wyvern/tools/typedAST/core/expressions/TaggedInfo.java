@@ -48,67 +48,6 @@ public class TaggedInfo {
 	private List<TaggedInfo> comprisesTaggedInfos;
 
 
-	public static void resolveAll(Environment env, HasLocation hl) {
-		for (TaggedInfo ti : globalTagStoreList) {
-			ti.resolve(env, hl);
-		}
-	}
-
-	public void resolve(Environment env, HasLocation hl) {
-		if (this.tagType instanceof UnresolvedType) {
-			this.tagType = ((UnresolvedType) this.tagType).resolve(env);
-		}
-
-		if (this.tagType instanceof TypeInv) {
-			// System.out.println("FOUND TypeInv tagType!" + tagType + " which could be " + ((TypeInv) this.tagType).resolve(env));
-			// this.tagType = ((TypeInv) this.tagType).resolve(env);
-		}
-
-
-		if (this.caseOf != null && this.caseOf instanceof UnresolvedType) {
-			String name = ((UnresolvedType) this.caseOf).getName();
-			if (env.lookup(name) == null && env.lookupType(name) == null) {
-				ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, hl, name);
-			}
-
-			this.caseOf = ((UnresolvedType) this.caseOf).resolve(env);
-		}
-
-		if (this.caseOf != null && this.caseOf instanceof TypeInv &&
-				!(((TypeInv)caseOf).getInnerType() instanceof UnresolvedType)) {
-			// System.out.println("FOUND caseOf!" + caseOf);
-			((TypeInv) this.caseOf).resolve(env);
-			// System.out.println("MADE caseOf!" + caseOf);
-		}
-
-		if (caseOfTaggedInfo != null) caseOfTaggedInfo.resolve(env, hl);
-
-		List<Type> resolvedComprises = new ArrayList<Type>(comprises.size());
-		for (Type t : comprises) {
-			if (t instanceof UnresolvedType) {
-				Type tt = ((UnresolvedType) t).resolve(env);
-				resolvedComprises.add(tt);
-			} else {
-				// if (t instanceof ClassType)
-				//	System.out.println(((ClassType) t).getName());
-				resolvedComprises.add(t);
-			}
-			/*
-			if (t instanceof TypeInv) {
-				// System.out.println("FOUND comprises one!" + t);
-				Type tt = ((TypeInv) t).resolve(env);
-				resolvedComprises.add(tt);
-			}
-			*/
-		}
-		this.comprises = resolvedComprises;
-		if (comprisesTaggedInfos != null) {
-			for (TaggedInfo ti : comprisesTaggedInfos) {
-				ti.resolve(env, hl);
-			}
-		}
-	}
-
 
 	/**
 	 * Constructs an empty TaggedInfo.
