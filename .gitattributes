@@ -1,2 +1,32 @@
-tools/bin/ text eol=lf
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+
+# These kinds of files are text; they should be converted to native line endings on checkout
+*.java text
+*.wyv text
+*.wyt text
+*.yml text
+*.TXT text
+*.txt text
+*.md text
+*.el text
+*.classpath text
+*.project text
+*.xml text
+*.jj text
+*.MF text
+
+
+# These are binary files
+*.jar binary
+*.pdf binary
+*.png binary
+
+
+# Make sure the unix scripts stay with LF endings
 bin/* eol=lf
+
+
+# Not sure why this is important, but leaving it for now
+tools/bin/ text eol=lf
