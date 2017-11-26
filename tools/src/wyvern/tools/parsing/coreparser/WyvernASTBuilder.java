@@ -259,11 +259,6 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		return new Instantiation(uri, arg, name.image, loc);
 	}
 
-  @Override
-  public TypedAST typeAbbrevDecl(String alias, Type reference, FileLocation loc) {
-    return new TypeAbbrevDeclaration(alias, reference, null, loc);
-  }
-
 	@Override
 	public TypedAST typeAbbrevDecl(String alias, Type reference, TypedAST metadata, FileLocation loc) {
       return new TypeAbbrevDeclaration(alias, reference, metadata, loc);
