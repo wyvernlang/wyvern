@@ -12,6 +12,7 @@ import wyvern.tools.tests.EffectSystemTests;
 import wyvern.tools.tests.ExampleTests;
 import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.Figures;
+import wyvern.tools.tests.FreeVars;
 import wyvern.tools.tests.ILTests;
 import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.LexingTests;
@@ -19,6 +20,7 @@ import wyvern.tools.tests.ModuleSystemTests;
 import wyvern.tools.tests.OIRTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
+import wyvern.tools.tests.TransformTests;
 
 /**
  * This test suite includes all working tests (as of this writing) that
@@ -43,6 +45,8 @@ import wyvern.tools.tests.StdlibTests;
         Figures.class,
         Illustrations.class,        // tests the new IL
         DemoTests.class,
+        TransformTests.class,
+        FreeVars.class,
         StdlibTests.class,      // tests the standard library with the new IL
         ExampleTests.class,      // tests the examples 
         EffectSystemTests.class,

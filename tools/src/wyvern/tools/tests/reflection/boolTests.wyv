@@ -1,3 +1,5 @@
+require java
+
 import java:wyvern.tools.tests.ReflectionTests.tools
 
 val x : system.Boolean = true

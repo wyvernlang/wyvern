@@ -61,6 +61,12 @@ public class ReflectionTests {
         mainProgram.typeCheck(ctx);
         mainProgram.interpret(TestUtil.getStandardEvalContext()); */
     }
+    
+    @Test
+    public void testBase2() throws ParseException {
+        TestUtil.doTestScriptModularly("reflection.base", null, null);
+    }
+
 
     @Test
     @Category(CurrentlyBroken.class)
@@ -121,15 +127,12 @@ public class ReflectionTests {
 
     @Test
     public void testLists() throws ParseException {
-        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(PATH), null);
-        Expression program = state.getResolver().resolveModule("listClient").getExpression();
-        program.interpret(Globals.getStandardEvalContext());
+        TestUtil.doTestScriptModularly("reflection.listClient", null, null);
     }
 
     @Test
     public void testBools() throws ParseException {
-        InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(PATH), null);
-        Expression program = state.getResolver().resolveModule("boolTests").getExpression();
-        program.interpret(Globals.getStandardEvalContext());
+        TestUtil.doTestScriptModularly("reflection.boolTests", Util.intType(), new IntegerLiteral(0));
     }
+
 }

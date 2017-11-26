@@ -1,16 +1,19 @@
-module wyvern_reflect_base
+module def wyvern_reflect_base(java:Java)
 
-import modules.Lists
+import reflection.modules.Lists
 import java:wyvern.tools.tests.ReflectionTests.mirror
 
-type Any
+val lists = Lists(java)
+
+type Any = Unit
+type List = lists.List
 
 /**
 * Mirror to reflect an object at run time.
 */
 type Object
     def equals(object:Object) : Int
-    def invoke (m:String, args:Lists.List) : Object
+    def invoke (m:String, args:List) : Object
     // def set(f:Field, value:Object) : Unit
     // def get(f:Field) : Object
     def typeOf() : Type
@@ -30,7 +33,7 @@ type Type
 * Mirror to reflect the compile time attributes of a method.
 */
 type Method
-    def arguments() : Lists.List
+    def arguments() : List
     def equals(method:Method) : Unit // Boolean
     def name() : String
     def returnType() : Type
@@ -59,8 +62,8 @@ def createField(name:String, tp:Type) : Field = new
     def typeOf() : Type = tp
 
 // Must be called on the result of a java interop function which returns a structural type.
-def createMethod(arguments:Lists.List, name:String, returnType:Type) : Method = new
-    def arguments() : Lists.List = arguments
+def createMethod(arguments:lists.List, name:String, returnType:Type) : Method = new
+    def arguments() : lists.List = arguments
     def equals(method:Method) : Unit = mirror.equalMethods(this, method)
     def name() : String = name
     def returnType() : Type = returnType
@@ -69,26 +72,26 @@ def createMethod(arguments:Lists.List, name:String, returnType:Type) : Method = 
 def createType(typ:Any) : Type = new
     val structType = typ
     def equals(typ2:Type) : Int = mirror.equalTypes(this, typ2)
-    def fields() : Lists.List = let
-    val fieldNames = Lists.fromJavaList(mirror.getFieldNames(typ))
+    def fields() : lists.List = let
+    val fieldNames = lists.fromJavaList(mirror.getFieldNames(typ))
     in
-    Lists.map(name:String => createField(name, createType(mirror.getFieldType(typ, name))), fieldNames)
+    lists.map(name:String => createField(name, createType(mirror.getFieldType(typ, name))), fieldNames)
     def fieldByName(name:String) : Field = createField(name, createType(mirror.getFieldType(typ, name)))
     // TODO: fix this to allow getting arg types
     def methodByName(name:String) : Method = createMethod(
         name, mirror.getMethodArgNames(typ, name), createType(mirror.getMethodRetType(typ, name)))
     def methods() : List = let
     // TODO: here too
-    val methodNames = Lists.fromJavaList(mirror.getMethodNames(typ))
+    val methodNames = lists.fromJavaList(mirror.getMethodNames(typ))
     in
-    Lists.map(name:String => createMethod(
+    lists.map(name:String => createMethod(
         name, mirror.getMethodArgNames(typ, name), mirror.getMethodRetType(typ, name)), methodNames)
     def name() : String = mirror.typeName(typ)
 
 def reflect(object:Any) : Object = new
     val original : Any = object
     def equals(object2:Object) : Int = mirror.equals(object, object2)
-    def invoke(m:Method, args:Lists.List) : Object = reflect(mirror.invoke(object, m.name(), args))
+    def invoke(m:Method, args:lists.List) : Object = reflect(mirror.invoke(object, m.name(), args))
     def typeOf() : Type = createType(mirror.getObjectType(object))
         /* let
         val fields = mirror.getObjectFields(object)

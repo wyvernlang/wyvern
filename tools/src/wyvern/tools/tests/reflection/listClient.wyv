@@ -1,4 +1,4 @@
-resource module main
+require java
 
 import modules.Lists
 import java:wyvern.tools.tests.ReflectionTests.tools

@@ -1,6 +1,6 @@
-resource module main
+require java
 
-import modules.baseModule
+import reflection.modules.baseModule
 
 // filler line of code
 val x : Int = 5
