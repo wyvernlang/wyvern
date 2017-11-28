@@ -43,37 +43,12 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	private NameBinding nameBinding;
 	private TypeBinding typeBinding;
 	
-	private EvaluationEnvironment declEvalEnv;
-    protected Reference<Environment> declEnv = new Reference<>(Environment.getEmptyEnvironment());
-	protected Reference<Environment> attrEnv = new Reference<>(Environment.getEmptyEnvironment());
-	
-	public static EvaluationEnvironment attrEvalEnv = EvaluationEnvironment.EMPTY; // HACK
 	private Reference<Value> metaValue = new Reference<>();
 
 	// FIXME: I am not convinced typeGuard is required (alex).
 	private boolean typeGuard = false;
-	@Override
-	public Environment extendType(Environment env, Environment against) {
-		if (!typeGuard) {
-			env = env.extend(typeBinding);
-			declEnv.set(decls.extendType(declEnv.get(), against));
-			typeGuard = true;
-		}
-		return env.extend(typeBinding);
-	}
 
 	private boolean declGuard = false;
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-		if (!declGuard) {
-			declEnv.set(decls.extendName(declEnv.get(), against.extend(typeBinding).extend(declEnv.get())));
-			//declEnv.set(decls.extend(declEnv.get(), against.extend(typeBinding)));
-			declGuard = true;
-		}
-
-		return env.extend(nameBinding);
-	}
-	
 	public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
 		// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
 		this.name = name;
@@ -82,7 +57,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 		typeBinding = new TypeBinding(name, null, metadata);
 		Type objectType = new TypeType(this);
 
-		attrEnv.set(attrEnv.get().extend(new TypeDeclBinding("type", this)));
 
 
 		nameBinding = new LateNameBinding(nameBinding.getName(), () ->
@@ -96,50 +70,9 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 		this.metaValue = metadata;
 	}
 	
-    public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, FileLocation clsNameLine) {
-		this(name, decls, metadata, null, clsNameLine);
-	}
-
 	@Override
 	public Type getType() {
 		return this.typeBinding.getType();
-	}
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> childMap = new HashMap<>();
-		childMap.put("decls", decls);
-		return childMap;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		TypeDeclaration decls1 = new TypeDeclaration(nameBinding.getName(), (DeclSequence) newChildren.get("decls"), metaValue, getTaggedInfo(), location);
-		return decls1;
-	}
-
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-		Environment newEnv = old.extend(nameBinding).extend(typeBinding);
-		// newEnv = newEnv.extend(new NameBindingImpl("this", nameBinding.getType())); // Why is there "this" in a type (not class)?
-		
-		return newEnv;
-	}
-
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		EvaluationEnvironment newEnv = old.extend(new ValueBinding(nameBinding.getName(), nameBinding.getType()));
-		return newEnv;
-	}
-
-	@Override
-    @Deprecated
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		declEvalEnv = declEnv;
-		if (metaValue.get() == null)
-			metaValue.set(metadata.get().orElseGet(() -> new New(new DeclSequence(), FileLocation.UNKNOWN)).evaluate(evalEnv));
-		ValueBinding vb = (ValueBinding) declEnv.lookup(nameBinding.getName()).orElseThrow(() -> new RuntimeException("Internal Error - TypeDeclaration NameBinding broken"));
-		vb.setValue(metaValue.get());
 	}
 
 	public DeclSequence getDecls() {
@@ -156,15 +89,6 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 	@Override
 	public FileLocation getLocation() {
 		return location; 
-	}
-
-    public NameBinding lookupDecl(String name) {
-        return declEnv.get().lookup(name);
-    }
-
-
-	public Reference<Environment> getDeclEnv() {
-		return declEnv;
 	}
 
 	@Override

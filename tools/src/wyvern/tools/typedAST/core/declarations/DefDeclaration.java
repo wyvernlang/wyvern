@@ -80,18 +80,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         this(name, returnType, null, argNames, body, isClassDef, location, null);
 	}
 
-	public DefDeclaration(String name, Type fullType, List<NameBinding> argNames,
-						   TypedAST body, boolean isClassDef) {
-		if (argNames == null) { argNames = new LinkedList<NameBinding>(); }
-		this.type = fullType;
-		this.name = name;
-		this.body = (ExpressionAST) body;
-		this.argNames = argNames;
-		this.isClass = isClassDef;
-        this.generics = new LinkedList<String>();
-//        this.effectSet = null;
-	}
-
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
 		Type argType = null;
 		if (args.size() == 0) {
@@ -129,43 +117,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 	@Override
-	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> childMap = new HashMap<>();
-		if (body != null)
-			childMap.put("body", body);
-		return childMap;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-	    DefDeclaration dd = new DefDeclaration(name, type, argNames, newChildren.get("body"), isClass); // may need to add effectSet?
-        dd.location = this.location;
-        return dd;
-	}
-
-    @Override
-	protected Type doTypecheck(Environment env) {
-		Environment extEnv = env;
-		for (NameBinding bind : argNames) {
-			extEnv = extEnv.extend(bind);
-		}
-		if (body != null) {
-			Type bodyType = body.typecheck(extEnv, Optional.of(((Arrow)type).getResult())); // Can be null for def inside type!
-			type = TypeResolver.resolve(type, env);
-			Type retType = ((Arrow)type).getResult();
-			if (bodyType != null &&
-					!bodyType.subtype(retType))
-				ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, bodyType.toString(), ((Arrow)type).getResult().toString());
-		}
-		return type;
-	}
-
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-		return extendName(old, against);
-	}
-
-	@Override
 	public List<NameBinding> getArgBindings() {
 		return argNames;
 	}
@@ -173,19 +124,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	@Override
 	public TypedAST getBody() {
 		return body;
-	}
-
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		EvaluationEnvironment newEnv = old.extend(new ValueBinding(name, type));
-		return newEnv;
-	}
-
-	@Override
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		Closure closure = new Closure(this, evalEnv);
-		ValueBinding vb = (ValueBinding) declEnv.lookup(name).get();
-		vb.setValue(closure);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

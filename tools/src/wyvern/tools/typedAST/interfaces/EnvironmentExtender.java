@@ -26,7 +26,11 @@ public interface EnvironmentExtender extends TypedAST {
 	}
 
 
-	public Environment extend(Environment env, Environment against);
+	public default Environment extend(Environment env, Environment against) {
+        throw new RuntimeException("deprecated");
+	}
 
-	public EvaluationEnvironment evalDecl(EvaluationEnvironment env);
+	public default EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
+        throw new RuntimeException("deprecated");
+	}
 }
