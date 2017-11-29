@@ -8,6 +8,9 @@ Wyvern is a new general-purpose programming language designed to support adaptat
 * A simple but powerful capability-safe module system
 * Support for various aspects of software architecture within the running system
 
+The best starting point for understanding Wyvern is the Wyvern manifesto: 
+[Wyvern: A Language for Usable Design-Driven Assurance](https://github.com/wyvernlang/wyvern/wiki/Wyvern%3A-A-Language-for-Usable-Design-Driven-Assurance)
+
 For an introduction to key concepts of the Wyvern language, see https://github.com/wyvernlang/docs/raw/master/guide/wyvern-guide.pdf
 
 For information about how to build and run the Wyvern tools, and about the Wyvern tools architecture, see https://raw.githubusercontent.com/wyvernlang/docs/master/tooldoc/wyvern-tool-architecture.mdk
