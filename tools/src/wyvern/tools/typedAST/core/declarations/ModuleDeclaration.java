@@ -36,7 +36,6 @@ import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.values.Obj;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
@@ -50,7 +49,7 @@ import wyvern.tools.util.Reference;
 
 public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;
-	private final EnvironmentExtender inner;
+	private final TypedAST inner;
 	private FileLocation location;
 	private NamedType ascribedType;
 	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
@@ -58,7 +57,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private boolean resourceFlag;
 
-	public ModuleDeclaration(String name, EnvironmentExtender inner, NamedType type, FileLocation location, boolean isResource) {
+	public ModuleDeclaration(String name, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
@@ -87,7 +86,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 	@Override
 	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		ModuleDeclaration newDecl = new ModuleDeclaration(name, (EnvironmentExtender) newChildren.get("body"), ascribedType, getLocation(), isResource());
+		ModuleDeclaration newDecl = new ModuleDeclaration(name, newChildren.get("body"), ascribedType, getLocation(), isResource());
 		newDecl.importEnv = importEnv;
 		newDecl.typeEnv = typeEnv;
 		newDecl.dclEnv = dclEnv;

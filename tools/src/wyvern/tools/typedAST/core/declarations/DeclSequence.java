@@ -31,7 +31,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 
-public class DeclSequence extends Sequence implements EnvironmentExtender {
+public class DeclSequence extends Sequence {
 
 	public DeclSequence() {
 		this(Arrays.asList());
