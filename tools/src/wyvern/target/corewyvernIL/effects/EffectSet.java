@@ -83,7 +83,7 @@ public class EffectSet {
 	
 	/** for checking that a set of effects used in a type signature are based on effects found in the signature
 	 * (such as declared in the signature previously). */
-	public void verifyInType(GenContext ctx, String declName) {
+	public void verifyInType(GenContext ctx) {
 		if (getEffects() != null) {
 		    // TODO: what's below should check out, except verifyInType is called a lot when the effects still are on a null variable
 		    getEffects().stream().forEach(e -> e.findEffectDeclType(ctx));

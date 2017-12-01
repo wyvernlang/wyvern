@@ -65,14 +65,15 @@ public class EffectDeclaration extends Declaration {
 	
 	@Override
 	public DeclType genILType(GenContext ctx) {
-		// for checking that the effects in effectSet are in scope (such as previously declared in the same type signature)
-		if (effectSet != null) {	effectSet.verifyInType(ctx, getName());	}
 		return new EffectDeclType(getName(), getEffectSet(), getLocation());
 	}
 	
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		if (effectSet != null) { effectSet.addPaths(ctx); }
+		if (effectSet != null) {
+		    effectSet.addPaths(ctx);
+		    effectSet.verifyInType(ctx);
+		}
 		return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
 	}
 	
