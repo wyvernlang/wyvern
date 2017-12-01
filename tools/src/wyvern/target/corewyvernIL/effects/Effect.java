@@ -109,7 +109,15 @@ public class Effect {
         // (which doesn't have FileLocation or HasLocation to call ToolError.reportError())
         try {  
             // if path is null (due to failure of addPath() before) or typeCheck() fails
-            //if (getPath() == null)
+            if (getPath() == null) {
+                // try to do an addPath
+                if (ctx instanceof GenContext) {
+                    addPath((GenContext)ctx);
+                }
+                if (getPath() == null) {
+                    ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
+                }
+            }
                 
             vt = getPath().typeCheck(ctx, null); 
         } catch (RuntimeException ex) { 
