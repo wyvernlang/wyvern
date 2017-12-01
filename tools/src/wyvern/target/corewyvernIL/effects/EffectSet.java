@@ -86,7 +86,7 @@ public class EffectSet {
 	public void verifyInType(GenContext ctx, String declName) {
 		if (getEffects() != null) {
 		    // TODO: what's below should check out, except verifyInType is called a lot when the effects still are on a null variable
-		    //getEffects().stream().forEach(e -> e.findEffectDeclType(ctx));
+		    getEffects().stream().forEach(e -> e.findEffectDeclType(ctx));
 		}
 	}
 	
