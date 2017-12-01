@@ -155,9 +155,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public DeclType genILType(GenContext ctx) {
 		List<FormalArg> args = new LinkedList<FormalArg>();
 
-		// for checking that the effects in effectSet are in scope (such as previously declared in the same type signature)
-		if (effectSet != null) {	effectSet.verifyInType(ctx, getName());	}
-        
         ctx = this.serializeArguments(args, ctx);
         
 		DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args, getEffectSet());
