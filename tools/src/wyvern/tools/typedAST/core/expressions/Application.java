@@ -23,7 +23,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -31,7 +31,7 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
-public class Application extends CachingTypedAST implements CoreAST {
+public class Application extends AbstractExpressionAST implements CoreAST {
     private ExpressionAST function;
     private ExpressionAST argument;
     private List<Type> generics;
@@ -59,14 +59,6 @@ public class Application extends CachingTypedAST implements CoreAST {
 
     public TypedAST getFunction() {
         return function;
-    }
-
-    @Override
-    public Map<String, TypedAST> getChildren() {
-        Hashtable<String, TypedAST> children = new Hashtable<>();
-        children.put("function", function);
-        children.put("argument", argument);
-        return children;
     }
 
     public FileLocation getLocation() {
@@ -330,9 +322,4 @@ public class Application extends CachingTypedAST implements CoreAST {
         return sb;
     }
 
-    @Override
-    protected ExpressionAST doClone(Map<String, TypedAST> nc) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

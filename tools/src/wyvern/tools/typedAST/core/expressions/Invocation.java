@@ -13,7 +13,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InvocationExprGenerator;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -21,7 +21,7 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Environment;
 
-public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
+public class Invocation extends AbstractExpressionAST implements CoreAST, Assignable {
 
     private String operationName;
     private ExpressionAST receiver;
@@ -69,16 +69,6 @@ public class Invocation extends CachingTypedAST implements CoreAST, Assignable {
             children.put("argument", argument);
         }
         return children;
-    }
-
-    @Override
-    public ExpressionAST doClone(Map<String, TypedAST> nc) {
-        return new Invocation(
-            nc.get("receiver"),
-            operationName,
-            nc.get("argument"),
-            location
-        );
     }
 
     public FileLocation getLocation() {

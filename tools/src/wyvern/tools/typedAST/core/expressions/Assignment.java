@@ -4,6 +4,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -16,13 +17,15 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Environment;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.GetterAndSetterGeneration;
 
-public class Assignment extends CachingTypedAST implements CoreAST {
+public class Assignment extends AbstractExpressionAST implements CoreAST {
 
     private ExpressionAST target;
     private ExpressionAST value;
@@ -60,11 +63,6 @@ public class Assignment extends CachingTypedAST implements CoreAST {
         children.put("target", target);
         children.put("value", value);
         return children;
-    }
-
-    @Override
-    public ExpressionAST doClone(Map<String, TypedAST> nc) {
-        return new Assignment(nc.get("target"), nc.get("value"), location);
     }
 
     public FileLocation getLocation() {
@@ -138,4 +136,5 @@ public class Assignment extends CachingTypedAST implements CoreAST {
             return null;
         }
     }
+
 }

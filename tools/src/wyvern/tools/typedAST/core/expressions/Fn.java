@@ -23,14 +23,14 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
+public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
     public static final String LAMBDA_STRUCTUAL_DECL = "@lambda-structual-decl";
     private List<NameBinding> bindings;
     private ExpressionAST body;
@@ -64,11 +64,6 @@ public class Fn extends CachingTypedAST implements CoreAST, BoundCode {
         Hashtable<String, TypedAST> children = new Hashtable<>();
         children.put("body", body);
         return children;
-    }
-
-    @Override
-    public ExpressionAST doClone(Map<String, TypedAST> nc) {
-        return new Fn(bindings, nc.get("body"), this.location);
     }
 
     public FileLocation getLocation() {

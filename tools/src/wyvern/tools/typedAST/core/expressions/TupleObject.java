@@ -13,7 +13,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.TupleValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -25,7 +25,7 @@ import wyvern.tools.types.extensions.Intersection;
 import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.util.EvaluationEnvironment;
 
-public class TupleObject extends CachingTypedAST implements CoreAST {
+public class TupleObject extends AbstractExpressionAST implements CoreAST {
 	private ExpressionAST[] objects;
 	private static ExpressionAST[] typeObj = new ExpressionAST[0];
 	
@@ -51,15 +51,6 @@ public class TupleObject extends CachingTypedAST implements CoreAST {
 			childMap.put(i++ + "", object);
 		}
 		return childMap;
-	}
-
-    @Override
-	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
-    	ExpressionAST[] objs = new ExpressionAST[newChildren.size()];
-		for (String s : newChildren.keySet()) {
-			objs[Integer.parseInt(s)] = (ExpressionAST)newChildren.get(s);
-		}
-		return new TupleObject(objs, location);
 	}
 
 	public ExpressionAST[] getObjects() {

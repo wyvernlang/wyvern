@@ -15,7 +15,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.StaticTypeBinding;
 import wyvern.tools.typedAST.core.binding.evaluation.HackForArtifactTaggedInfoBinding;
@@ -35,7 +35,7 @@ import wyvern.tools.util.EvaluationEnvironment;
  *
  * @author Troy Shaw
  */
-public class Match extends CachingTypedAST implements CoreAST {
+public class Match extends AbstractExpressionAST implements CoreAST {
 
 	private TypedAST matchingOver;
 
@@ -112,12 +112,6 @@ public class Match extends CachingTypedAST implements CoreAST {
 	@Override
 	public FileLocation getLocation() {
 		return location;
-	}
-
-	@Override
-	protected ExpressionAST doClone(Map<String, TypedAST> nc) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

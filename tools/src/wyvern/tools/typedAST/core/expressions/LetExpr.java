@@ -11,7 +11,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -22,7 +22,7 @@ import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 
-public class LetExpr extends CachingTypedAST implements CoreAST {
+public class LetExpr extends AbstractExpressionAST implements CoreAST {
 	private DeclSequence decl;
 	private TypedAST body;
 	
@@ -37,11 +37,6 @@ public class LetExpr extends CachingTypedAST implements CoreAST {
 		childMap.put("decl", decl);
 		childMap.put("body", body);
 		return childMap;
-	}
-
-    @Override
-	public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
-		return new LetExpr((DeclSequence)newChildren.get("decl"), newChildren.get("body"));
 	}
 
 	/*

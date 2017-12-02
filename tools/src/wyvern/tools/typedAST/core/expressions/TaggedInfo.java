@@ -158,26 +158,6 @@ public class TaggedInfo {
 	}
 
 	/**
-	 * Returns true of false if a circular hierarchical relation is detected.
-	 *
-	 * @return
-	 */
-	public boolean isCircular() {
-		// FIXME: Should be using type bindings, not strings.
-
-		TaggedInfo info = lookupTagByType(caseOf);
-		String myName = tagName;
-
-		while (info != null) {
-			if (info.tagName.equals(myName)) return true;
-
-			info = lookupTagByType(info.caseOf);
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns a non-null list of what tags are comprised.
 	 * A size of 0 indicates this doesn't have any comprise tags.
 	 *
@@ -232,39 +212,6 @@ public class TaggedInfo {
 			if (i.tagType.equals(t)) return i;
 		}
 		return null;
-	}
-
-	public void associateWithObject(Obj obj) {
-		// FIXME: This is what makes dynamic tags work but needs lots of fixing and testing! :-(
-		// FIXME: Currently does not actually distinguish different instances properly or update caseof or comprises!
-
-		Type ot = obj.getType();
-
-		// System.out.println("Adding tag for type = " + ot);
-
-		TaggedInfo ti = new TaggedInfo(obj.toString(), ot);
-		globalTagStoreList.add(ti);
-
-	}
-
-	public static void dumpall(Environment env) {
-		System.out.println("DUMP OF TAGS:");
-		for (TaggedInfo ti : TaggedInfo.globalTagStoreList) {
-			System.out.println("Tag: " + ti);
-			System.out.println("Tag.td = " + ti.td);
-			if (ti.td!=null) {
-				System.out.println(ti.td.getType());
-			}
-		}
-		System.out.println("END OF DUMP.");
-	}
-
-	@Override
-	public String toString() {
-		return "TaggedInfo [tagName=" + tagName + ", tagType=" + tagType + ", caseOf=" + caseOf
-				+ ", caseOfTaggedInfo=" + caseOfTaggedInfo + ", comprises="
-				+ comprises + ", comprisesTaggedInfos=" + comprisesTaggedInfos
-				+ "]";
 	}
 
 }

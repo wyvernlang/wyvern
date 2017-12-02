@@ -11,7 +11,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.CachingTypedAST;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
@@ -22,7 +22,7 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
-public class New extends CachingTypedAST implements CoreAST {
+public class New extends AbstractExpressionAST implements CoreAST {
 
     private static int generic_num = 0;
     private static int uniqueCounter = 0;
@@ -110,14 +110,6 @@ public class New extends CachingTypedAST implements CoreAST {
         String name = "field " + uniqueCounter++;
         variables.put(name, value);
         return name;
-    }
-
-    @Override
-    public ExpressionAST doClone(Map<String, TypedAST> newChildren) {
-
-        New aNew = new New(new HashMap<>(), location);
-        aNew.setBody((DeclSequence) newChildren.get("seq"));
-        return aNew;
     }
 
     public Map<String, TypedAST> getArgs() {

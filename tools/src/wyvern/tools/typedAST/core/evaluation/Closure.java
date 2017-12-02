@@ -32,7 +32,7 @@ public class Closure extends AbstractValue implements ApplyableValue {
 
 	@Override
 	public Type getType() {
-		return function.getType();
+		return null;
 	}
 
 	@Override

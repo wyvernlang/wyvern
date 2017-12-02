@@ -7,7 +7,6 @@ import wyvern.tools.types.Type;
 
 public interface BoundCode {
 
-	Type getType();
 	List<NameBinding> getArgBindings();
 	TypedAST getBody();
 
