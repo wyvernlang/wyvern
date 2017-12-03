@@ -18,13 +18,11 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
 public class New extends AbstractExpressionAST implements CoreAST {
 
-    private static int generic_num = 0;
     private static int uniqueCounter = 0;
     private static Map<String, Expression> variables = new HashMap<>();
 
@@ -32,7 +30,6 @@ public class New extends AbstractExpressionAST implements CoreAST {
     private Map<String, TypedAST> args = new HashMap<String, TypedAST>();
     private boolean isGeneric = false;
     private DeclSequence seq;
-    private Type ct;
     private String selfName;
 
     /**
@@ -77,13 +74,6 @@ public class New extends AbstractExpressionAST implements CoreAST {
 
     public DeclSequence getDecls() {
         return seq;
-    }
-
-    /**
-     * Resets the count of generics.
-     */
-    public static void resetGenNum() {
-        generic_num = 0;
     }
 
     private String self() {

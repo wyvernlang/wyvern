@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -21,8 +20,6 @@ import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.GetterAndSetterGeneration;
 
 public class Assignment extends AbstractExpressionAST implements CoreAST {

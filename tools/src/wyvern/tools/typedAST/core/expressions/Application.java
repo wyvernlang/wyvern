@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
