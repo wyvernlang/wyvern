@@ -30,10 +30,10 @@ import wyvern.tools.types.TypeResolver;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	private Type result;
-	private Type argument;
+	private List<Type> arguments;
 	
-	public Arrow(Type argument, Type result) {
-		this.argument = argument;
+	public Arrow(List<Type> arguments, Type result) {
+		this.arguments = arguments;
 		this.result = result;
 	}
 
@@ -41,27 +41,13 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 		return result;
 	}
 	
-	public Type getArgument() {
-		return argument;
-	}
-	
-	@Override
-	public Type checkApplication(Application application, Environment env) {
-		Type actualType = application.getArgument().typecheck(env, Optional.of(argument));
-		argument = TypeResolver.resolve(argument, env);
-		
-		// System.out.println(argument); //FIXME:
-		
-		if (!actualType.subtype(argument))
-			reportError(ACTUAL_FORMAL_TYPE_MISMATCH, application,actualType.toString(),argument.toString());
-		return result;
+	public List<Type> getArguments() {
+		return arguments;
 	}
 	
 	@Override
 	public String toString() {
-		String argString = (argument == null)?null:argument.toString();
-		if (!argument.isSimple())
-			argString = "(" + argString + ")";
+		String argString = (arguments == null)?null:arguments.toString();
 		return argString + " -> " + result;
 	}
 	
@@ -70,74 +56,38 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
 		if (!(otherT instanceof Arrow))
 			return false;
 		Arrow otherAT = (Arrow) otherT; 
-		return argument.equals(otherAT.argument) && result.equals(otherAT.result);
+		return arguments.equals(otherAT.arguments) && result.equals(otherAT.result);
 	}
 	
 	@Override
 	public int hashCode() {
-		return 37*argument.hashCode()+result.hashCode();
+		return 37*arguments.hashCode()+result.hashCode();
 	}	
-
-	@Override
-	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		if (super.subtype(other, subtypes)) {
-			return true;
-		}
-		
-		if (other instanceof Arrow) {
-			Arrow oa = (Arrow) other;
-			
-			return 	oa.argument.subtype(this.argument, subtypes) &&
-					this.result.subtype(oa.result, subtypes);
-		} else {
-			return false;
-		}
-	}
-	@Override
-	public boolean isSimple() {
-		return false;
-	}
-	@Override
-	public Map<String, Type> getChildren() {
-		HashMap<String, Type> map = new HashMap<>();
-		map.put("result", result);
-		map.put("argument", argument);
-		return map;
-	}
-
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		return new Arrow(newChildren.get("argument"), newChildren.get("result"));
-	}
-
-	@Override
-	public Type cloneWithBinding(TypeBinding binding) {
-		return null;
-	}
-
-    @Override
-    @Deprecated
-    public ValueType generateILType() {
-        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.generateILType(), Arrays.asList(new FormalArg("arg1", argument.generateILType())))));
-    }
 
     static final ValueType nominalUnit = new NominalType("system", "Unit"); 
     
 	@Override
 	public ValueType getILType(GenContext ctx) {
 		List<FormalArg> formals = new LinkedList<FormalArg>();
-		if (argument instanceof Tuple) {
-		    Tuple tuple = (Tuple) argument;
-		    for (int i = 0; i < tuple.getTypeArray().length; ++i) {
-                formals.add(new FormalArg("arg" + i, tuple.getTypeArray()[i].getILType(ctx)));
-		    }
-		} else {
-	        final ValueType argType = argument.getILType(ctx);
-	        if (!Util.unitType().equals(argType) && !nominalUnit.equals(argType)) {
-	            // it's a real argument, add it to the list
-	            formals.add(new FormalArg("arg1", argType));
-	        }
-		}
+        for (int i = 0; i < arguments.size(); ++i) {
+            ValueType argType = arguments.get(i).getILType(ctx);
+            if (!Util.unitType().equals(argType) && !nominalUnit.equals(argType)) {
+                // it's a real argument, add it to the list
+                formals.add(new FormalArg("arg" + i, argType));
+            }
+        }
+        
 		return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)));
 	}
+
+    @Override
+    public Type checkApplication(Application application, Environment env) {
+        // TODO: eliminate me
+        throw new RuntimeException();
+    }
+
+    @Override
+    public ValueType generateILType() {
+        throw new RuntimeException();
+    }
 }

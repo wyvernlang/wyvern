@@ -1,11 +1,8 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.FormalArg;
@@ -22,14 +19,10 @@ import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.evaluation.Closure;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.BoundCode;
@@ -41,9 +34,6 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.TypeResolver;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Tuple;
-import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.GetterAndSetterGeneration;
 import wyvern.tools.util.TreeWritable;
 
@@ -81,19 +71,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	}
 
 	public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
-		Type argType = null;
-		if (args.size() == 0) {
-			argType = new Unit();
-		} else if (args.size() == 1) {
-			argType = args.get(0).getType();
-		} else {
-	        Type types[] = new Type[args.size()];
-	        for (int i = 0; i < args.size(); i++) {
-	            types[i] = args.get(i).getType();
-	        }
-			argType = new Tuple(types);
-		}
-		return new Arrow(argType, returnType);
+		List<Type> argTypes = new LinkedList<Type>();
+        for (int i = 0; i < args.size(); i++) {
+            argTypes.add(args.get(i).getType());
+        }
+		return new Arrow(argTypes, returnType);
 	}
 	
 

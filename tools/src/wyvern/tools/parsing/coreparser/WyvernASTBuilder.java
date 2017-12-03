@@ -47,7 +47,6 @@ import wyvern.tools.types.NamedType;
 import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
-import wyvern.tools.types.extensions.Tuple;
 import wyvern.tools.types.extensions.TypeExtension;
 import wyvern.tools.types.UnresolvedType;
 
@@ -151,10 +150,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	
     @Override
 	public Type arrowType(List<Type> arguments, Type result) {
-        if (arguments.size() == 1)
-            return new Arrow(arguments.get(0), result);
-        else
-            return new Arrow(new Tuple(arguments), result);
+        return new Arrow(arguments, result);
 	}
 
 	@Override
