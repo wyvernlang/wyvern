@@ -1,9 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
 
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -14,23 +11,16 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.evaluation.VarValueBinding;
 import wyvern.tools.typedAST.core.binding.typechecking.AssignableNameBinding;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
-import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.GetterAndSetterGeneration;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,25 +35,10 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		return isClass;
 	}
 
-	@Deprecated
-	public VarDeclaration(String varName, Type parsedType, TypedAST definition) {
-		this(varName, parsedType, definition, FileLocation.UNKNOWN);
-	}
 	public VarDeclaration(String varName, Type parsedType, TypedAST definition, FileLocation loc) {
 		this.definition=(ExpressionAST)definition;
 		binding = new AssignableNameBinding(varName, parsedType);
 		this.location = loc;
-	}
-
-	@Override
-	protected Type doTypecheck(Environment env) {
-		if (this.definition != null) {
-			Type varType = definitionType;
-			boolean defType = this.definition.typecheck(env, Optional.of(varType)).subtype(varType);
-			if (!defType)
-				ToolError.reportError(ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH, this);
-		}
-		return binding.getType();
 	}
 
 	public NameBinding getBinding() {
@@ -71,65 +46,17 @@ public class VarDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Type getType() {
-		return binding.getType();
-	}
-
-	@Override
 	public String getName() {
 		return binding.getName();
 	}
 	
+    @Override
+    public Type getType() {
+        return binding.getType();
+    }
+    
 	public TypedAST getDefinition() {
 		return definition;
-	}
-
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-		return old.extend(binding);
-	}
-
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		return old.extend(new VarValueBinding(binding.getName(), binding.getType(), null));
-		//Environment newEnv = old.extend(new ValueBinding(binding.getName(), defValue));
-	}
-
-	@Override
-    @Deprecated
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		VarValueBinding vb = declEnv.lookupValueBinding(binding.getName(), VarValueBinding.class).get();
-		if (definition == null) {
-            vb.assign(null);
-			return;
-		}
-		Value defValue = definition.evaluate(evalEnv);
-		vb.assign(defValue);
-	}
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Hashtable<String, TypedAST> children = new Hashtable<>();
-		children.put("definition", definition);
-		return children;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new VarDeclaration(getName(), getType(), nc.get("definition"), location);
-	}
-
-    @Override
-	public Environment extendType(Environment env, Environment against) {
-		return env;
-	}
-
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-		definitionType = TypeResolver.resolve(binding.getType(), against);
-		binding = new AssignableNameBinding(binding.getName(), definitionType);
-
-		return env.extend(binding);
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;

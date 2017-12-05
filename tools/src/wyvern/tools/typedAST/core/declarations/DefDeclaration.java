@@ -89,11 +89,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		return name;
 	}
 
-	@Override
-	public Type getType() {
-		return type;
-	}
-	
 	public EffectSet getEffectSet() {
 		return effectSet; 
 	}
@@ -114,24 +109,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 	public FileLocation getLocation() {
 		return location; 
 	}
-
-	@Override
-	public Environment extendType(Environment env, Environment against) {
-		return env;
-	}
-
-	Type resolvedType = null;
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-		for (int i = 0; i < argNames.size(); i++) {
-			NameBinding oldBinding = argNames.get(i);
-			argNames.set(i, new NameBindingImpl(oldBinding.getName(), TypeResolver.resolve(oldBinding.getType(), against)));
-		}
-		if (resolvedType == null)
-			resolvedType = TypeResolver.resolve(type, against);
-		return env.extend(new NameBindingImpl(name, resolvedType));
-	}
-
 
 	@Override
 	public DeclType genILType(GenContext ctx) {

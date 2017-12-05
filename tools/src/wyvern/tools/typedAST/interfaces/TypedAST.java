@@ -13,6 +13,7 @@ import wyvern.tools.util.TreeWritable;
 public interface TypedAST extends TreeWritable, HasLocation {
 
 	/** should call typecheck() before getType() -- except maybe for declarations */
+    @Deprecated
 	default Type getType() {
 	    throw new RuntimeException();
 	}

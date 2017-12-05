@@ -72,28 +72,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	}
 
 	@Override
-	public Type getType() {
-		return new Unit();
-	}
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> childMap = new HashMap<>();
-		if (inner != null)
-			childMap.put("body", inner);
-		return childMap;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		ModuleDeclaration newDecl = new ModuleDeclaration(name, newChildren.get("body"), ascribedType, getLocation(), isResource());
-		newDecl.importEnv = importEnv;
-		newDecl.typeEnv = typeEnv;
-		newDecl.dclEnv = dclEnv;
-		return newDecl;
-	}
-
-	@Override
 	public FileLocation getLocation() {
 		return location;
 	}
