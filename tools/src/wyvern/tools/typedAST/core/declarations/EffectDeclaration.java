@@ -9,7 +9,6 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
@@ -20,10 +19,6 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class EffectDeclaration extends Declaration {
 	private String name;
@@ -87,53 +82,5 @@ public class EffectDeclaration extends Declaration {
 		wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext(), null);
 		DeclType dt = genILType(tlc.getContext());
 		tlc.addModuleDecl(decl,dt);
-	}
-	
-	
-	/**** Secondary or obsolete (due to use of Environment) methods. ***/
-	@Override
-	public Environment extendType(Environment env, Environment against) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("extendType not implemented");
-	}
-	@Override
-	public Environment extendName(Environment env, Environment against) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("extendName not implemented");
-	}
-	@Override
-	public Type getType() { // effects have no parsed "type" like variables/values do
-		throw new RuntimeException("extendName not implemented");
-	}
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("getChildren not implemented");
-	}
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("getChildren not implemented");
-	}
-
-	@Override
-	protected Type doTypecheck(Environment env) { 
-		throw new RuntimeException("doTypecheck not implemented");
-	}
-	@Override
-	protected Environment doExtend(Environment old, Environment against) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("doExtend not implemented");
-	}
-	@Override
-	public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("extendWithValue not implemented");
-	}
-	@Override
-	public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("evalDecl not implemented");
-	}
-	
+	}	
 }

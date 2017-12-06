@@ -42,13 +42,6 @@ public class Instantiation extends Declaration implements CoreAST {
         return location;
     }
 
-    @Override
-    public Map<String, TypedAST> getChildren() {
-        Hashtable<String, TypedAST> children = new Hashtable<>();
-        children.put("arg", arg);
-        return children;
-    }
-
     public URI getUri() {
         return this.uri;
     }
@@ -63,12 +56,6 @@ public class Instantiation extends Declaration implements CoreAST {
 
     @Override
     public Type getType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
         // TODO Auto-generated method stub
         return null;
     }

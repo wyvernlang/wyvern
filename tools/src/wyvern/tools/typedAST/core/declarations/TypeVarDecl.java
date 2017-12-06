@@ -76,22 +76,6 @@ public class TypeVarDecl extends Declaration {
 		return null;
 	}
 
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		HashMap<String,TypedAST> out = new HashMap<>();
-		out.put("body", body);
-		if (metadata.get().isPresent())
-			out.put("metadata", metadata.get().get());
-		return out;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-	    throw new RuntimeException("deprecated I think");
-		/*metadata.set(Optional.ofNullable(newChildren.get("metadata")));
-		return new TypeVarDecl(name, (EnvironmentExtender)newChildren.get("body"), metadata, metadataObj, fileLocation);*/
-	}
-
     @Override
 	public FileLocation getLocation() {
 		return fileLocation;
