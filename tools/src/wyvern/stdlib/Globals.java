@@ -35,20 +35,8 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.compiler.ImportResolverBinding;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.values.BooleanConstant;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.typedAST.core.values.StringConstant;
-import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.extensions.ExternalFunction;
 import wyvern.tools.types.Environment;
-import wyvern.tools.types.extensions.Bool;
-import wyvern.tools.types.extensions.Unit;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Globals {

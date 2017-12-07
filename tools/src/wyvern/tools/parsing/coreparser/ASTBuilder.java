@@ -31,7 +31,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST integerLit(int value, FileLocation loc);
 	public AST booleanLit(boolean value, FileLocation loc);
 	public AST invocation(AST receiver, String name, AST argument, FileLocation loc);
-	public AST application(AST function, AST arguments, FileLocation loc, List<Type> generics);
+	public AST application(AST function, List<AST> arguments, FileLocation loc, List<Type> generics);
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc, String selfName);
@@ -51,6 +51,6 @@ public interface ASTBuilder<AST,Type> {
 	public void setNewBody(AST newExp, AST decls);
 	public void setDSLBody(AST dslExp, String text);
 
-	public AST instantiation(URI uri, AST arg, Token name, FileLocation loc);
+	public AST instantiation(URI uri, List<AST> args, Token name, FileLocation loc);
 
 }

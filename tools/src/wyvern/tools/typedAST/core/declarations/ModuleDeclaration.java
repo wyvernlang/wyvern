@@ -2,16 +2,11 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.File;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -30,31 +25,17 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
-import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.NamedType;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Pair;
-import wyvern.tools.util.Reference;
 
 public class ModuleDeclaration extends Declaration implements CoreAST {
 	private final String name;
 	private final TypedAST inner;
 	private FileLocation location;
 	private NamedType ascribedType;
-	private Reference<Environment> importEnv = new Reference<>(Environment.getEmptyEnvironment());
-	private Reference<Environment> dclEnv = new Reference<>(Environment.getEmptyEnvironment());
-	private Reference<Environment> typeEnv = new Reference<>(Environment.getEmptyEnvironment());
 	private boolean resourceFlag;
 
 	public ModuleDeclaration(String name, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
@@ -164,19 +145,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 			Instantiation inst = (Instantiation) ast;
 			// generate arguments
-			TypedAST argument = inst.getArgs();
+			List<TypedAST> arguments = inst.getArgs();
 			List<IExpr> args = new LinkedList<IExpr>();
-		    if (argument instanceof TupleObject) {
-		    	for (ExpressionAST arg : ((TupleObject) argument).getObjects()) {
-		    		args.add(arg.generateIL(ctx, null, dependencies));
-		    	}
-		    } else {
-		    	if(! (argument instanceof UnitVal)) {
-		    		/* single argument */
-			    	args.add(((ExpressionAST)argument).generateIL(ctx, null, null));
-		    	}
-		    	/* no argument */
-		    }
+	    	for (TypedAST arg : arguments) {
+	    		args.add(((ExpressionAST) arg).generateIL(ctx, null, dependencies));
+	    	}
 
 			MethodCall instValue =
 					new MethodCall(

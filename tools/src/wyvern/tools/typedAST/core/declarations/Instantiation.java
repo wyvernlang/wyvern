@@ -19,7 +19,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 public class Instantiation extends Declaration implements CoreAST {
 
     private URI uri;
-    private TypedAST arg;
+    private List<TypedAST> args;
     private FileLocation location;
     private String name;
 
@@ -30,9 +30,9 @@ public class Instantiation extends Declaration implements CoreAST {
       * @param arg the argument to the instantiation
       * @param loc the location in the source where the instantiation is to occur
       */
-    public Instantiation(URI uri, TypedAST arg, String image, FileLocation loc) {
+    public Instantiation(URI uri, List<TypedAST> args, String image, FileLocation loc) {
         this.uri = uri;
-        this.arg = arg;
+        this.args = args;
         this.location = loc;
         this.name = image;
     }
@@ -46,8 +46,8 @@ public class Instantiation extends Declaration implements CoreAST {
         return this.uri;
     }
 
-    public TypedAST getArgs() {
-        return this.arg;
+    public List<TypedAST> getArgs() {
+        return this.args;
     }
 
     public String getName() {

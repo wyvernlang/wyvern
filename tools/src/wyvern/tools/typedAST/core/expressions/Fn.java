@@ -1,9 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
@@ -57,13 +55,6 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
     @Override
     public TypedAST getBody() {
         return body;
-    }
-
-    @Override
-    public Map<String, TypedAST> getChildren() {
-        Hashtable<String, TypedAST> children = new Hashtable<>();
-        children.put("body", body);
-        return children;
     }
 
     public FileLocation getLocation() {

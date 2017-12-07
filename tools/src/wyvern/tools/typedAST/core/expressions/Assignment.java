@@ -1,9 +1,7 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -52,14 +50,6 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
 
     public TypedAST getNext() {
         return nextExpr;
-    }
-
-    @Override
-    public Map<String, TypedAST> getChildren() {
-        Hashtable<String, TypedAST> children = new Hashtable<>();
-        children.put("target", target);
-        children.put("value", value);
-        return children;
     }
 
     public FileLocation getLocation() {

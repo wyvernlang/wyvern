@@ -2,9 +2,7 @@ package wyvern.tools.typedAST.core.expressions;
 
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -17,7 +15,6 @@ import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
 
@@ -43,16 +40,6 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     @Override
     public Type getType() {
         return binding.getType();
-    }
-
-    @Override
-    public Map<String, TypedAST> getChildren() {
-        return new Hashtable<>();
-    }
-
-    @Override
-    public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-        return new Variable(binding, location);
     }
 
     public FileLocation getLocation() {

@@ -191,9 +191,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST application(TypedAST function, TypedAST arguments,
+	public TypedAST application(TypedAST function, List<TypedAST> arguments,
 			FileLocation loc, List<Type> generics) {
-		return new Application(function, arguments, loc != null ? loc : arguments.getLocation(), generics);
+		return new Application(function, arguments, loc != null ? loc : function.getLocation(), generics);
 	}
 
 	@Override
@@ -251,8 +251,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
 	@Override
-	public TypedAST instantiation(URI uri, TypedAST arg, Token name, FileLocation loc) {
-		return new Instantiation(uri, arg, name.image, loc);
+	public TypedAST instantiation(URI uri, List<TypedAST> args, Token name, FileLocation loc) {
+		return new Instantiation(uri, args, name.image, loc);
 	}
 
 	@Override

@@ -761,7 +761,7 @@ AST Literal() :
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags) :
-{ AST rhs; Token t; List<Type> gentypes = null;}
+{ List<AST> rhs; Token t; List<Type> gentypes = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
@@ -770,35 +770,25 @@ AST PrimarySuffix(AST lhs, ExpFlags flags) :
   }
 }
 
-AST Arguments(ExpFlags flags) :
-{ AST exp = null; Token t; }
+List<AST> Arguments(ExpFlags flags) :
+{ AST exp = null; List<AST> expList = null; Token t; }
 {
-  t = <LPAREN> [ exp = ArgumentList(flags, loc(t)) ] <RPAREN> {
-    if (exp == null) {
-        return build.unitValue(loc(t));
-    }
-    else {
-        return exp;
-    }
+  t = <LPAREN> [ expList = ArgumentList(flags, loc(t)) ] <RPAREN> {
+    return expList;
   }
 }
 
-AST ArgumentList(ExpFlags flags, FileLocation loc) :
-{ AST exp; AST exp2; LinkedList<AST> expList = null; Token t; }
+List<AST> ArgumentList(ExpFlags flags, FileLocation loc) :
+{ AST exp; AST exp2; LinkedList<AST> expList = new LinkedList<AST>(); Token t; }
 {
-  exp = Expression(flags)
+  exp = Expression(flags) {
+    expList.add(exp);
+  }
   ( t=<COMMA> exp2 = Expression(flags) {
-  		if (expList == null) {
-  			expList = new LinkedList<AST>();
-  			expList.add(exp);
-  		}
   		expList.addLast(exp2);
 	}
   )* {
-  		if (expList != null) {
-  			return build.tuple(expList, loc); 
-  		}
-  		return exp;
+  		return expList;
   	}
  }
   	
@@ -817,10 +807,10 @@ List<AST> ExpressionList():
  }
   	
 AST Instantiation() :
-{ URI uri; Token name; AST arg;}
+{ URI uri; Token name; List<AST> args;}
 {
-<INSTANTIATE> uri = Uri() arg = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
-{return build.instantiation(uri, arg, name, loc(name));}
+<INSTANTIATE> uri = Uri() args = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
+{return build.instantiation(uri, args, name, loc(name));}
 }
 
 Token OverrideOperator() :

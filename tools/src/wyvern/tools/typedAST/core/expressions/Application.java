@@ -24,7 +24,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -32,7 +31,7 @@ import wyvern.tools.types.Type;
 
 public class Application extends AbstractExpressionAST implements CoreAST {
     private ExpressionAST function;
-    private ExpressionAST argument;
+    private List<TypedAST> arguments;
     private List<Type> generics;
     private FileLocation location;
 
@@ -40,20 +39,20 @@ public class Application extends AbstractExpressionAST implements CoreAST {
       * Application represents a call cite for a function call.
       *
       * @param function the function that is called
-      * @param argument the argument passed at the call site (may be a tuple, unit, or singleton
+      * @param arguments the arguments passed at the call site
       * @param location the location of the call site in the source file
       * @param generics2 the vector of type parameters passed at the call site
       */
-    public Application(TypedAST function, TypedAST argument,
+    public Application(TypedAST function, List<TypedAST> arguments,
             FileLocation location, List<Type> generics2) {
         this.function = (ExpressionAST) function;
-        this.argument = (ExpressionAST) argument;
+        this.arguments = arguments == null ? new LinkedList<TypedAST>() : arguments;
         this.location = location;
         this.generics = (generics2 != null) ? generics2 : new LinkedList<Type>();
     }
 
-    public TypedAST getArgument() {
-        return argument;
+    public List<TypedAST> getArguments() {
+        return arguments;
     }
 
     public TypedAST getFunction() {
@@ -78,8 +77,8 @@ public class Application extends AbstractExpressionAST implements CoreAST {
 
             // Generate code for the arguments.
             List<IExpr> args = new LinkedList<>();
-            if (!(argument instanceof UnitVal)) {
-                args.add(argument.generateIL(ctx, null, dependencies));
+            for (TypedAST a : arguments) {
+                args.add(((ExpressionAST)a).generateIL(ctx, null, dependencies));
             }
     
             // Need to do this to find out what the method name is.
@@ -104,24 +103,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         // Add generic arguments to the argslist
         generateGenericArgs(ddt.getName(), args, formals, ctx, ddt, dependencies);
 
-        if (argument instanceof TupleObject) {
-            generateILForTuples(formals, args, ctx, dependencies);
-        } else if (argument instanceof UnitVal) {
-            // the method takes no arguments
-        } else {
-            // adding the last formal
-            if (formals.size() != 1 + args.size()) {
-                ToolError.reportError(
-                    ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
-                    this,
-                    "" + formals.size(),
-                    new Integer(1 + args.size()).toString()
-                );
-            }
-            
-            // TODO: propagate type downward from the last formal
-            args.add(argument.generateIL(ctx, formals.get(formals.size() - 1).getType(), null));
-        }
+        generateILForTuples(formals, args, ctx, dependencies);
 
         // generate the call
         return exprGen.genExprWithArgs(args, this);
@@ -166,17 +148,17 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             List<TypedModuleSpec> dependencies
     ) {
         
-        ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
-        if (formals.size() != rawArgs.length + args.size()) {
+        List<TypedAST> rawArgs = arguments;
+        if (formals.size() != rawArgs.size() + args.size()) {
             ToolError.reportError(
                 ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                 this,
                 "" + formals.size()
             );
         }
-        for (int i = 0; i < rawArgs.length; i++) {
+        for (int i = 0; i < rawArgs.size(); i++) {
             ValueType expectedArgType = formals.get(i + this.generics.size()).getType();
-            ExpressionAST ast = rawArgs[i];
+            ExpressionAST ast = (ExpressionAST) rawArgs.get(i);
             // TODO: propagate types downward from formals
             args.add(ast.generateIL(ctx, expectedArgType, dependencies));
         }
@@ -245,28 +227,8 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             // argument list the type should be
             int actualPos = formalPos - count;
 
-            if (this.argument instanceof TupleObject) {
-                ExpressionAST[] rawArgs = ((TupleObject) this.argument).getObjects();
-                IExpr inferArg = rawArgs[actualPos].generateIL(ctx, null, deps);
-                this.addInferredType(args, formals, ctx, inferArg.typeCheck(ctx, null), i);
-            } else if (this.argument instanceof UnitVal) {
-                // The arg is a unit value. We must be inferring from the result type
-                throw new UnsupportedOperationException(
-                    "Can't infer from the result type.");
-            } else {
-            
-                // Then the arg must be a single element
-                if (actualPos != 0) {
-                    // Inferring from a formal arg that doesn't exist
-                    throw new UnsupportedOperationException(
-                        "Can't infer from the result type.");
-                }
-
-                // Now we know that the argument is the inferrable type.
-                final IExpr argIL = this.argument.generateIL(ctx, null, deps);
-                ValueType inferredType = argIL.typeCheck(ctx, null);
-                this.addInferredType(args, formals, ctx, inferredType, i);
-            }
+            IExpr inferArg = ((ExpressionAST) arguments.get(actualPos)).generateIL(ctx, null, deps);
+            this.addInferredType(args, formals, ctx, inferArg.typeCheck(ctx, null), i);
         }
     }
 
@@ -316,7 +278,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         sb.append("Application(function=");
         sb.append(function.prettyPrint());
         sb.append(", argument=");
-        sb.append(argument.prettyPrint());
+        sb.append(arguments.toString());
         sb.append(")");
         return sb;
     }
