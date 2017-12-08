@@ -47,7 +47,7 @@ public class Illustrations {
 				new IntegerLiteral(5));
 	}
 	
-	@Test(expected=RuntimeException.class)
+	/*@Test(expected=RuntimeException.class)
 	public void testFigure5() throws ParseException {
 		
 		String[] fileList = {"FileIO.wyt", "fileIO.wyv", "Logger.wyt",
@@ -67,15 +67,6 @@ public class Illustrations {
 			genCtx = GenUtil.link(genCtx, decl);
 		}
 		
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x", null); 
-		
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx, null);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -98,16 +89,7 @@ public class Illustrations {
 			genCtx = GenUtil.link(genCtx, decl);
 		}
 		
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x", null); 
-		
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx, null);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
-	}
+	}*/
 	
 	@Test
 	public void testFigure2() throws ParseException {
@@ -117,7 +99,7 @@ public class Illustrations {
 				new IntegerLiteral(5));
 	}
 	
-	@Test(expected=RuntimeException.class)
+	/*@Test(expected=RuntimeException.class)
 	public void testFigure4() throws ParseException {
 		
 		String[] fileList = {"lists.wyv", "UserInfo.wyt", "userInfo.wyv", "wavyUnderlineV2.wyv", "example4driver.wyv", };
@@ -134,17 +116,7 @@ public class Illustrations {
 			decls.add(decl);
 			genCtx = GenUtil.link(genCtx, decl);
 		}
-		
-		Expression mainProgram = GenUtil.genExp(decls, genCtx);
-		// after genExp the modules are transferred into an object. We need to evaluate one field of the main object
-		Expression program = new FieldGet(mainProgram, "x", null); 
-		
-    	TypeContext ctx = TypeContext.empty();
-		ValueType t = program.typeCheck(ctx, null);
-		Value v = program.interpret(EvalContext.empty());
-    	IntegerLiteral five = new IntegerLiteral(5);
-		Assert.assertEquals(five, v);
-	}
+	}*/
 	
 	public static NativeFileIO nativeFileIO = new NativeFileIO();
 	public static class NativeFileIO {
