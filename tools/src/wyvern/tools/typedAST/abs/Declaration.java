@@ -1,19 +1,13 @@
 package wyvern.tools.typedAST.abs;
 
 import java.util.List;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.AbstractTreeWritable;
-import wyvern.tools.util.EvaluationEnvironment;
 
 // TODO: Consider adding a class "ListOfDeclarations" that only handles indents with decls and make
 // Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)
@@ -22,84 +16,7 @@ import wyvern.tools.util.EvaluationEnvironment;
 public abstract class Declaration extends AbstractTreeWritable implements EnvironmentExtender {
 	protected Declaration nextDecl = null;
 
-	/** 
-	 * Most declarations simply evaluate to unit without any computation
-	 */
-	@Override
-    @Deprecated
-	public final Value evaluate(EvaluationEnvironment env) {
-		// code smell - can we eliminate this function?
-		// throw new RuntimeException("cannot evaluate a decl to a value - use evalDecls to get an updated environment");
-		return UnitVal.getInstance(this.getLocation());
-	}
-	
-	public final Type typecheckSelf(Environment env) {
-		return doTypecheck(env);
-	}
-	
-	public final void typecheckAll(Environment env) {
-		Environment newEnv = env;
-		for (Declaration d = this; d != null; d = d.nextDecl) {
-			d.typecheck(newEnv, Optional.empty());
-			newEnv = d.doExtend(newEnv, newEnv);
-		}
-	}
-	
-	@Override @Deprecated
-	public final Type typecheck(Environment env, Optional<Type> expected) {
-		Environment tEnv = this.extendType(env, env);
-		Environment nEnv = extendName(tEnv, tEnv);
-		Environment newEnv = extend(nEnv, nEnv);
-		return typecheckSelf(newEnv);
-	}
-
 	public abstract String getName();
-	@Deprecated
-	protected Type doTypecheck(Environment env) {
-	    throw new RuntimeException("deprecated");
-	}
-
-	@Deprecated
-	public final Environment extend(Environment old, Environment against) {
-		Environment newEnv = doExtend(old, against);
-		if (nextDecl != null)
-			newEnv = nextDecl.extend(newEnv, newEnv);
-		return newEnv;
-	}
-	
-	@Deprecated
-	public final Environment extendWithSelf(Environment old) {
-		return doExtend(old, old);
-	}
-
-	@Deprecated protected Environment doExtend(Environment old, Environment against) {
-	    throw new RuntimeException("deprecated");
-	}
-	@Deprecated public EvaluationEnvironment extendWithValue(EvaluationEnvironment old) {
-        throw new RuntimeException("deprecated");
-	}
-	@Deprecated public void evalDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-        throw new RuntimeException("deprecated");
-	}
-	
-	
-	@Deprecated public final EvaluationEnvironment bindDecl(EvaluationEnvironment evalEnv, EvaluationEnvironment declEnv) {
-		evalDecl(evalEnv, declEnv);
-		return evalEnv;
-	}
-	
-	@Deprecated public final EvaluationEnvironment bindDecl(EvaluationEnvironment evalEnv) {
-		return bindDecl(evalEnv, evalEnv);
-	}
-	
-	@Deprecated public final EvaluationEnvironment evalDecl(EvaluationEnvironment env) {
-		return bindDecl(doExtendWithValue(env));
-	}
-
-	@Deprecated public final EvaluationEnvironment doExtendWithValue(EvaluationEnvironment old) {
-		return extendWithValue(old);
-	}
-
 	public Declaration getNextDecl() {
 		return nextDecl;
 	}

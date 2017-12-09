@@ -1,11 +1,8 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
@@ -16,23 +13,13 @@ import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.typedAST.core.values.Obj;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
-import wyvern.tools.util.AbstractTreeWritable;
-import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.Reference;
 
 /** Represents a declaration of a structural type.
@@ -48,7 +35,6 @@ public class TypeVarDecl extends Declaration {
 	private final EnvironmentExtender body;
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
-	private final Reference<Value> metadataObj;
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
@@ -58,8 +44,7 @@ public class TypeVarDecl extends Declaration {
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName ) {
 		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
 		this.name = name;
-		this.metadataObj = new Reference<>(new Obj(EvaluationEnvironment.EMPTY, null));
-		this.body = new TypeDeclaration(name, body, this.metadataObj, taggedInfo, fileLocation);
+		this.body = new TypeDeclaration(name, body, null, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 		this.taggedInfo = taggedInfo;
 		this.resourceFlag = isResource;

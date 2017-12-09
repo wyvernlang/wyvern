@@ -1,29 +1,11 @@
 package wyvern.tools.imports.extensions;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Optional;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-import wyvern.stdlib.Globals;
 import wyvern.tools.imports.ImportBinder;
 import wyvern.tools.imports.ImportResolver;
-import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.parsing.coreparser.ParseUtils;
-import wyvern.tools.typedAST.core.binding.compiler.MetadataInnerBinding;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.Reference;
 
 public class WyvernResolver implements ImportResolver {
 	private static WyvernResolver instance;

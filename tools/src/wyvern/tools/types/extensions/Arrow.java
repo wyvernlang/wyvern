@@ -1,15 +1,8 @@
 package wyvern.tools.types.extensions;
 
-import static wyvern.tools.errors.ErrorMessage.ACTUAL_FORMAL_TYPE_MISMATCH;
-import static wyvern.tools.errors.ToolError.reportError;
-
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
@@ -18,15 +11,10 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.expressions.Application;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
-import wyvern.tools.types.Environment;
-import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.TypeResolver;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
 	private Type result;
@@ -79,12 +67,6 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
         
 		return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)));
 	}
-
-    @Override
-    public Type checkApplication(Application application, Environment env) {
-        // TODO: eliminate me
-        throw new RuntimeException();
-    }
 
     @Override
     public ValueType generateILType() {

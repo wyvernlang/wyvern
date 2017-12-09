@@ -17,7 +17,6 @@ import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Environment;
 
 public class Invocation extends AbstractExpressionAST implements CoreAST, Assignable {
 
@@ -51,10 +50,6 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
 
     public String getOperationName() {
         return operationName;
-    }
-
-    @Override
-    public void checkAssignment(Assignment ass, Environment env) {
     }
 
     public FileLocation getLocation() {

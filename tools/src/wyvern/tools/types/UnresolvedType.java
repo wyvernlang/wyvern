@@ -23,23 +23,6 @@ public class UnresolvedType extends AbstractTypeImpl implements NamedType {
 		this.typeName = typeName;
 	}
 	
-	public Type resolve(Environment env) {
-		if (env.lookupType(typeName) == null) {
-			if (env.lookup(this.typeName) != null) {
-				// Perhaps its first class?
-				NameBinding n = env.lookup(this.typeName);
-				Type t = n.getType();
-				return t;
-			}
-			throw new RuntimeException("Cannot find "+typeName +" in environment "+env);
-		}
-		TypeBinding typeBinding = env.lookupType(typeName);
-		if (typeBinding.getMetadata().isPresent() && typeBinding.getMetadata().get().get() != null)
-			return typeBinding.getUse().cloneWithBinding(typeBinding);
-		else
-			return typeBinding.getUse();
-	}
-	
 	@Override
 	public String toString() {
 		return "UNRESOLVED: " + typeName;
@@ -65,11 +48,6 @@ public class UnresolvedType extends AbstractTypeImpl implements NamedType {
 	@Override
 	public Map<String, Type> getChildren() {
 		return new HashMap<>();
-	}
-
-	@Override
-	public Type cloneWithChildren(Map<String, Type> newChildren) {
-		throw new RuntimeException("Cannot specify a ref type");
 	}
 
 	@Override

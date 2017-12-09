@@ -23,11 +23,9 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.extensions.TSLBlock;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.EvaluationEnvironment;
 

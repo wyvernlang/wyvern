@@ -17,7 +17,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.types.AbstractTypeImpl;
-import wyvern.tools.types.Environment;
 import wyvern.tools.types.OperatableType;
 import wyvern.tools.types.SubtypeRelation;
 import wyvern.tools.types.Type;
@@ -30,20 +29,6 @@ public class Bool extends AbstractTypeImpl implements OperatableType {
 			"&&",
 			"||",
 	}));
-
-	@Override
-	public Type checkOperator(Invocation opExp, Environment env) {
-		Type type2 = opExp.getArgument().typecheck(env, Optional.empty());
-		String operatorName = opExp.getOperationName();
-		
-		if (!(legalOperators.contains(operatorName)))
-			reportError(OPERATOR_DOES_NOT_APPLY, opExp, operatorName, this.toString());
-		
-		if (!(type2 instanceof Bool))
-			reportError(OPERATOR_DOES_NOT_APPLY2, opExp, operatorName, this.toString(), type2.toString());
-		
-		return this;
-	}
 
 	@Override
 	public String toString() {

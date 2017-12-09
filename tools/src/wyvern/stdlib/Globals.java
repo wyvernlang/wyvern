@@ -36,7 +36,6 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.types.Environment;
 import wyvern.tools.util.EvaluationEnvironment;
 
 public class Globals {
@@ -58,11 +57,6 @@ public class Globals {
 	
 	public static boolean checkSafeJavaImport(String packageName) {
 		return javaWhiteList.contains(packageName);
-	}
-
-	@Deprecated
-	public static Environment getStandardEnv() {
-	    throw new RuntimeException();
 	}
 
 	@Deprecated
