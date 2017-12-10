@@ -1,10 +1,9 @@
-resource module main
+require java
 
-import wyvern_reflect_base
-import Lists
+import reflection.modules.base
 import java:wyvern.tools.tests.ReflectionTests.tools
 
-type Any
+val basic = base(java)
 
 type IntObj
 	val contents : Int
@@ -12,10 +11,11 @@ type IntObj
 
 type StringObj
     val contents : String
-
+/*
 type ZeroOrOne
     val contents : Int
     def eq(zo:ZeroOrOne) : Booleans.Bool
+*/
 
 def makeInt(contents:Int) : IntObj = new
     val contents = contents
@@ -27,25 +27,28 @@ val stringObj : StringObj = new
     val contents = "reflection in wyvern!"
 
 // Test objects with different types aren't equal
-val intMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(intObj)
-val intType : wyvern_reflect_base.Type = intMirror.typeOf()
-val stringMirror : wyvern_reflect_base.Object = wyvern_reflect_base.reflect(stringObj)
+val intMirror : basic.Object = basic.reflect(intObj)
+val intType : basic.Type = intMirror.typeOf()
+val stringMirror : basic.Object = basic.reflect(stringObj)
 val typeNotEqual : Int = intType.equals(stringMirror.typeOf())
-tools.assertIntEquals(typeNotEqual, 0)
+tools.assertIntEquals(0, typeNotEqual)
 
 val typeName : String = intType.name()
-tools.assertStringEquals("IntObj", typeName)
+tools.assertStringEquals("<anonymous structural type>", typeName)
 
+/*
 def makeZeroOrOne(x:Int) : ZeroOrOne = new
     val contents = x
     def eq(zo:ZeroOrOne)
-
-def findAddMeth(methods:Lists.List) : wyvern_reflect_base.Method =
+*/
+/*def findAddMeth(methods:Lists.List) : basic.Method =
     val name = methods.getVal().name()
+*/
 
 
-val l = Lists.cons(makeInt(5), Lists.nil(makeInt(0)))
+//val l = Lists.cons(makeInt(5), Lists.nil(makeInt(0)))
 val methods = intMirror.typeOf()
-val sum : Int = methods.getVal() intMirror.invoke("add", l.getVal())
+//val sum : Int = methods.getVal()
+//intMirror.invoke("add", l.getVal())
 // Can't use because sum is supposed to be a mirror
 // tools.assertIntEquals(sum, 52)

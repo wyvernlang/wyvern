@@ -7,13 +7,13 @@ import org.junit.Assert;
  */
 public class TestTools {
 
-    public int assertIntEquals(int x, int y) {
-        Assert.assertEquals(x, y);
+    public int assertIntEquals(int expected, int actual) {
+        Assert.assertEquals(expected, actual);
         return 0;
     }
 
-    public int assertStringEquals(String x, String y) {
-        Assert.assertEquals(x, y);
+    public int assertStringEquals(String expected, String actual) {
+        Assert.assertEquals(expected, actual);
         return 0;
     }
 

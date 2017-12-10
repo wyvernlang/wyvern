@@ -18,6 +18,7 @@ import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
 import wyvern.tools.tests.OIRTests;
+import wyvern.tools.tests.ReflectionTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
 import wyvern.tools.tests.TransformTests;
@@ -45,6 +46,7 @@ import wyvern.tools.tests.TransformTests;
         Figures.class,
         Illustrations.class,        // tests the new IL
         DemoTests.class,
+        ReflectionTests.class,
         TransformTests.class,
         FreeVars.class,
         StdlibTests.class,      // tests the standard library with the new IL

@@ -26,12 +26,12 @@ public class Mirror {
             return ((IntegerLiteral) v1).getValue() == ((IntegerLiteral) v2).getValue();
         }
         if (v1 instanceof ObjectValue && v2 instanceof ObjectValue) {
-            return (1 == equals((ObjectValue) v1, (ObjectValue) v2));
+            return (1 == equals2((ObjectValue) v1, (ObjectValue) v2));
         }
         return false;
     }
 
-    public int equals(ObjectValue o1, ObjectValue o2) {
+    public int equals2(ObjectValue o1, ObjectValue o2) {
         EvalContext evalCtx = o1.getEvalCtx();
         // o2 is an ObjectMirror
         Value obj = o2.getField("original");
@@ -73,20 +73,20 @@ public class Mirror {
         args.add(evalCtx);
         args.add(null);
 
-        JavaValue typeOrig1 = (JavaValue) (type1.getField("valType"));
-        JavaValue typeOrig2 = (JavaValue) (type1.getField("valType"));
-        try {
+        JavaValue typeOrig1 = (JavaValue) (type1.getField("structType"));
+        JavaValue typeOrig2 = (JavaValue) (type2.getField("structType"));
+        //try {
             StructuralType structType1 = (StructuralType)
-                    ((JObject) (typeOrig1.getFObject())).invokeMethod("getStructuralType", args);
+                    ((JObject) (typeOrig1.getFObject())).getWrappedValue();
             StructuralType structType2 = (StructuralType)
-                    ((JObject) (typeOrig2.getFObject())).invokeMethod("getStructuralType", args);
+                    ((JObject) (typeOrig2.getFObject())).getWrappedValue();
             if (structType1.equalsInContext(structType2, evalCtx)) {
                 return 1;
             }
             return 0;
-        } catch (ReflectiveOperationException e) {
+        /*} catch (ReflectiveOperationException e) {
             return 0;
-        }
+        }*/
     }
 
     public List<String> getFieldNames(JavaValue type) {
@@ -119,7 +119,8 @@ public class Mirror {
         if (type instanceof NominalType) {
             return ((NominalType) type).getTypeMember();
         }
-        throw new Exception("Error: Requested name of a structural type");
+        return "<anonymous structural type>";
+        //throw new Exception("Error: Requested name of a structural type");
         // return obj.getType().toString();
     }
 
