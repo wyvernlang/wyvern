@@ -36,7 +36,6 @@ public interface ASTBuilder<AST,Type> {
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc, String selfName);
 	public AST dsl(FileLocation loc);
-	public AST tuple(List<AST> members, FileLocation loc);
 	public AST match(AST exp, List cases, FileLocation loc);
 	
 	public Object caseArm(String name, Type type, AST exp, FileLocation loc);

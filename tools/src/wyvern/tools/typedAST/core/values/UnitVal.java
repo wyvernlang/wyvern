@@ -34,17 +34,6 @@ public class UnitVal extends AbstractValue implements Value, CoreAST {
 		return "()";
 	}
 
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Hashtable<String, TypedAST> children = new Hashtable<>();
-		return children;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new UnitVal(location);
-	}
-
     private FileLocation location;
 	public FileLocation getLocation() {
 		return this.location;

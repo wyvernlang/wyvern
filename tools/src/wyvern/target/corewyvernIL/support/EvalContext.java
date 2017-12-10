@@ -20,8 +20,6 @@ public abstract class EvalContext extends TypeContext {
 	
 	public abstract Value lookupValue(String varName);
 	
-	public abstract EvalContext combine(EvalContext ctx);
-	
 	public static EvalContext empty() {
 		return theEmpty;
 	}

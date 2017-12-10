@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.WyvernException;
 import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.util.TreeWritable;
 
@@ -36,6 +38,10 @@ public interface Type extends TreeWritable, HasLocation {
 	Type cloneWithBinding(TypeBinding binding);
 
 	@Deprecated
-	wyvern.target.corewyvernIL.type.ValueType generateILType();
+	default wyvern.target.corewyvernIL.type.ValueType generateILType() {
+        throw new WyvernException("Cannot generate IL form for unresolved type", FileLocation.UNKNOWN);
+    }
+
+
 	public ValueType getILType(GenContext ctx);
 }

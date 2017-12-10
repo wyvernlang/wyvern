@@ -16,7 +16,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
@@ -32,7 +31,7 @@ import wyvern.tools.util.Reference;
  */
 public class TypeVarDecl extends Declaration {
 	private final String name;
-	private final EnvironmentExtender body;
+	private final Declaration body;
 	private final FileLocation fileLocation;
 	private final Reference<Optional<TypedAST>> metadata;
 	private TaggedInfo taggedInfo = null;

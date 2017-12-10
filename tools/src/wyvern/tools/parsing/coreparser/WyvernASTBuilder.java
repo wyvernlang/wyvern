@@ -35,13 +35,11 @@ import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
-import wyvern.tools.typedAST.core.expressions.TupleObject;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
 import wyvern.tools.types.QualifiedType;
@@ -199,11 +197,6 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	@Override
 	public TypedAST unitValue(FileLocation loc) {
 		return UnitVal.getInstance(loc);
-	}
-
-	@Override
-	public TypedAST tuple(List<TypedAST> members, FileLocation loc) {
-		return new TupleObject(members, loc);
 	}
 
 	@Override

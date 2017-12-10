@@ -6,14 +6,14 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.util.AbstractTreeWritable;
 
 // TODO: Consider adding a class "ListOfDeclarations" that only handles indents with decls and make
 // Type and Class to be subtypes of that rather than this current Declaration which can be called DeclarationWithBody? (Alex)
 
 // TODO SMELL: probably should have Declarations not be in an "evaluate" part of the AST
-public abstract class Declaration extends AbstractTreeWritable implements EnvironmentExtender {
+public abstract class Declaration extends AbstractTreeWritable implements TypedAST {
 	protected Declaration nextDecl = null;
 
 	public abstract String getName();

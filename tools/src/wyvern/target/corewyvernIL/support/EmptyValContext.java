@@ -8,11 +8,6 @@ public class EmptyValContext extends EvalContext {
 	}
 
 	@Override
-	public EvalContext combine(EvalContext ctx) {
-		return ctx;
-	}
-
-	@Override
 	public String endToString() {
 		return "]";
 	}

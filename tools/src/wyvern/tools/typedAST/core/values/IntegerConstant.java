@@ -1,8 +1,6 @@
 package wyvern.tools.typedAST.core.values;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -11,22 +9,12 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
-import wyvern.tools.typedAST.core.expressions.Invocation;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class IntegerConstant extends AbstractValue implements InvokableValue, CoreAST {
 	private int value;
 	
-	@Deprecated
-	public IntegerConstant(int i) {
-		this(i, FileLocation.UNKNOWN);
-	}
-
 	public IntegerConstant(int i, FileLocation loc) {
 		value = i;
 		location = loc;
@@ -36,54 +24,9 @@ public class IntegerConstant extends AbstractValue implements InvokableValue, Co
 		return value;
 	}
 
-	@Override
-    @Deprecated
-	public Value evaluateInvocation(Invocation exp, EvaluationEnvironment env) {
-		IntegerConstant intArgValue = null;
-		String operator = exp.getOperationName();
-
-		Value argValue = exp.getArgument().evaluate(env);
-		if (argValue instanceof StringConstant) {		// int + "str"
-			if (operator.equals("+")) {
-				return new StringConstant(this.value + ((StringConstant) argValue).getValue());
-			} else {
-				throw new RuntimeException("forgot to typecheck!");
-			}
-		} else if (argValue instanceof IntegerConstant) {		//int op int
-			intArgValue = (IntegerConstant)argValue;
-			switch(operator) {
-				case "+": return new IntegerConstant(value + intArgValue.value);
-				case "-": return new IntegerConstant(value - intArgValue.value);
-				case "*": return new IntegerConstant(value * intArgValue.value);
-				case "/": try { return new IntegerConstant(value / intArgValue.value); } catch (ArithmeticException e) { throw new RuntimeException(exp.getLocation() + "", e); }
-				case ">": return new BooleanConstant(value > intArgValue.value);
-				case "<": return new BooleanConstant(value < intArgValue.value);
-				case ">=": return new BooleanConstant(value >= intArgValue.value);
-				case "<=": return new BooleanConstant(value <= intArgValue.value);
-				case "==": return new BooleanConstant(value == intArgValue.value);
-				case "!=": return new BooleanConstant(value != intArgValue.value);
-				default: throw new RuntimeException("forgot to typecheck!");
-			}
-		} else {
-//			shouldn't get here
-			throw new RuntimeException("forgot to typecheck!");
-		}
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
-	}
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Hashtable<String, TypedAST> children = new Hashtable<>();
-		return children;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> nc) {
-		return new IntegerConstant(value, location);
 	}
 
     @Override

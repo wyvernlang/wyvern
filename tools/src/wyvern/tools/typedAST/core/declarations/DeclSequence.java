@@ -24,7 +24,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
-import wyvern.tools.typedAST.interfaces.EnvironmentExtender;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Unit;
@@ -89,7 +88,7 @@ public class DeclSequence extends Sequence {
 
 			@Override
 			public Iterator<TypedAST> iterator() {
-				final Iterator<EnvironmentExtender> iter = first.iterator();
+				final Iterator<Declaration> iter = first.iterator();
 				return new Iterator<TypedAST>() {
 					@Override
 					public boolean hasNext() {
