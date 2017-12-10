@@ -36,7 +36,6 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class Globals {
 	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
@@ -57,11 +56,6 @@ public class Globals {
 	
 	public static boolean checkSafeJavaImport(String packageName) {
 		return javaWhiteList.contains(packageName);
-	}
-
-	@Deprecated
-	public static EvaluationEnvironment getStandardEvalEnv() {
-        throw new RuntimeException();
 	}
 
 	public static GenContext getStandardGenContext() {

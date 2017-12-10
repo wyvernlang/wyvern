@@ -3,9 +3,7 @@ package wyvern.tools.typedAST.core.binding;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class NameBindingImpl extends AbstractBinding implements NameBinding {
 	public NameBindingImpl(String name, Type type) {
@@ -17,13 +15,6 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 		return new Variable(this, FileLocation.UNKNOWN); // FIXME: !!! Cannot replicate its use from outside!
 	}
 
-	public Value getValue(EvaluationEnvironment env) {
-		// TODO: code smell, leaving in to make sure I don't need it.  Refactor to move down to ValueBinding and eliminate env parameter
-		throw new RuntimeException("deprecated - to be removed");
-		/*NameBinding bind = env.lookupValue(getName());
-		assert bind instanceof ValueBinding;
-		return ((ValueBinding)bind).getValue(env);*/
-	}
 	@Override
 	public String toString() {
 		return "{" + getName() + " : " + getType() + "}";

@@ -12,7 +12,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.errors.WyvernException;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 
 public class UnresolvedType extends AbstractTypeImpl implements NamedType {
 	private String typeName;
@@ -47,11 +46,6 @@ public class UnresolvedType extends AbstractTypeImpl implements NamedType {
 	@Override
 	public Map<String, Type> getChildren() {
 		return new HashMap<>();
-	}
-
-	@Override
-	public Optional<TypeBinding> getResolvedBinding() {
-		return Optional.empty();
 	}
 
     @Override

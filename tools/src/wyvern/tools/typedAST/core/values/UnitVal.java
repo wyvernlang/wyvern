@@ -1,8 +1,6 @@
 package wyvern.tools.typedAST.core.values;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -12,21 +10,14 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractValue;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
+
 
 public class UnitVal extends AbstractValue implements Value, CoreAST {
 	private UnitVal(FileLocation location) { this.location = location; }
 	// private static UnitVal instance = new UnitVal(); // FIXME: I have to move away from instance to provide line number! :(
 	public static UnitVal getInstance(FileLocation fileLocation) {
 		return new UnitVal(fileLocation); // instance; 
-	}
-	
-	@Override
-	public Type getType() {
-		return new Unit();
 	}
 	
 	@Override

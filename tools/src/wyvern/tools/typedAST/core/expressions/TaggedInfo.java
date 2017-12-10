@@ -3,14 +3,8 @@ package wyvern.tools.typedAST.core.expressions;
 import java.util.ArrayList;
 import java.util.List;
 
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.AbstractTypeDeclaration;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.TypeInv;
 
 /**
  * Class encapsulates information about what tags a type is a case of and what comprises it.
@@ -163,13 +157,6 @@ public class TaggedInfo {
 	 */
 	public List<Type> getComprisesTags() {
 		return comprises;
-	}
-
-	public void associateWithClassOrType(TypeBinding t) {
-		this.tagType = t.getType();
-
-		//globalTagStore.put(t, this);
-		globalTagStoreList.add(this);
 	}
 
 	public static void clearGlobalTaggedInfos() {

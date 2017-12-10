@@ -2,7 +2,6 @@ package wyvern.tools.parsing;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -22,12 +21,9 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
-import wyvern.tools.typedAST.core.values.UnitVal;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 /**
  * Created by Ben Chung on 3/11/14.
@@ -64,22 +60,6 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 
 	private Type getDefaultType() {
 		//TODO
-		return null;
-	}
-
-	@Override
-    @Deprecated
-	public Value evaluate(EvaluationEnvironment env) {
-		return null;
-	}
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		return null;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
 		return null;
 	}
 

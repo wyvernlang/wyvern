@@ -6,7 +6,6 @@ import java.util.Optional;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 import wyvern.tools.util.TreeWritable;
 
 public interface TypedAST extends TreeWritable, HasLocation {
@@ -17,22 +16,18 @@ public interface TypedAST extends TreeWritable, HasLocation {
 	    throw new RuntimeException();
 	}
     
-	/** an interpreter.  Out of date - should generate IL code and interpret that instead. */
-	@Deprecated
-	default Value evaluate(EvaluationEnvironment env) {
-	    throw new RuntimeException("deprecated");
-	}
-
 	/**
 	 * Gets the children of a composite node
 	 * @return The children of the node
 	 */
+    @Deprecated
 	default Map<String, TypedAST> getChildren() { return null; }
 	/**
 	 * Clones the current AST node with the given set of children
 	 * @param newChildren The children to create
 	 * @return The deep-copied AST node
 	 */
+    @Deprecated
 	default TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) { return null; }
 
 	public default void genTopLevel(TopLevelContext tlc) {

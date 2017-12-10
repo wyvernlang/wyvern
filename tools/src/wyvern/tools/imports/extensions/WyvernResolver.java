@@ -4,10 +4,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import wyvern.tools.imports.ImportBinder;
-import wyvern.tools.imports.ImportResolver;
 
-public class WyvernResolver implements ImportResolver {
+public class WyvernResolver {
 	private static WyvernResolver instance;
 	private LinkedList<String> paths = new LinkedList<String>();
 	private boolean useNewParser = false;
@@ -35,8 +33,4 @@ public class WyvernResolver implements ImportResolver {
 	private WyvernResolver() {}
 
 
-	@Override
-	public ImportBinder resolveImport(URI uri) {
-		throw new RuntimeException("not implemented anymore ");
-	}
 }

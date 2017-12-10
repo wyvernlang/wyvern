@@ -1,9 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -12,14 +9,10 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.RecordType;
 import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.TypeType;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class DelegateDeclaration extends Declaration implements CoreAST {
 	private TypedAST target;

@@ -1,16 +1,12 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Stack;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
 //import wyvern.targets.java.annotations.Val;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.New;
@@ -19,15 +15,9 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
-import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.Unit;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class DeclSequence extends Sequence {
 

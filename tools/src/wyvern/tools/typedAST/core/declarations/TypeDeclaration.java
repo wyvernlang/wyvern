@@ -1,10 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -12,21 +9,8 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBinding;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.binding.evaluation.ValueBinding;
-import wyvern.tools.typedAST.core.binding.objects.TypeDeclBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.LateNameBinding;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
-import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.typedAST.interfaces.Value;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.extensions.TypeType;
-import wyvern.tools.util.EvaluationEnvironment;
-import wyvern.tools.util.Reference;
 
 
 /** Represents the contents of a structural type.  Not used at the top level to my knowledge;
@@ -38,49 +22,25 @@ import wyvern.tools.util.Reference;
 public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
 	private String name;
 	protected DeclSequence decls;
-	private Reference<Optional<TypedAST>> metadata;
-	private NameBinding nameBinding;
-	private TypeBinding typeBinding;
 	
-	private Reference<Value> metaValue = new Reference<>();
-
 	// FIXME: I am not convinced typeGuard is required (alex).
 	private boolean typeGuard = false;
 
 	private boolean declGuard = false;
-	public TypeDeclaration(String name, DeclSequence decls, Reference<Value> metadata, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+	public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
 		// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
 		this.name = name;
 		this.decls = decls;
-		nameBinding = new NameBindingImpl(name, null);
-		typeBinding = new TypeBinding(name, null, metadata);
-		Type objectType = new TypeType(this);
 
 
 
-		nameBinding = new LateNameBinding(nameBinding.getName(), () ->
-				metadata.get().getType());
-		typeBinding = new TypeBinding(nameBinding.getName(), objectType, metadata);
-
-		setupTags(name, typeBinding, taggedInfo);
 		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 
 		this.location = clsNameLine;
-		this.metaValue = metadata;
 	}
 	
-	@Override
-	public Type getType() {
-		return this.typeBinding.getType();
-	}
-
 	public DeclSequence getDecls() {
 		return decls;
-	}
-
-	@Override
-	public String getName() {
-		return nameBinding.getName();
 	}
 
 	private FileLocation location = FileLocation.UNKNOWN;
@@ -122,5 +82,11 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 		
 		return declts;
 	}
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return name;
+    }
 	
 }

@@ -2,14 +2,12 @@ package wyvern.tools.types.extensions;
 
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.OperatableType;
-import wyvern.tools.types.RecordType;
 
-public class TypeType extends AbstractTypeImpl implements OperatableType, RecordType {
+public class TypeType extends AbstractTypeImpl implements OperatableType {
 	private TypeDeclaration decl;
 
 	public TypeType(TypeDeclaration decl) {
@@ -42,24 +40,5 @@ public class TypeType extends AbstractTypeImpl implements OperatableType, Record
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public TypeBinding getInnerType(String name) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TypeType getEquivType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TaggedInfo getTaggedInfo() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 
 }

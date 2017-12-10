@@ -13,7 +13,6 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.EvaluationEnvironment;
 
 public class Instantiation extends Declaration implements CoreAST {
 

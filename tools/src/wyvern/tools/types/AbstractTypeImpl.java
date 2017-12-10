@@ -6,11 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.core.binding.typechecking.TypeBinding;
 
 public abstract class AbstractTypeImpl implements Type {
 	private final FileLocation location;
-	private Optional<TypeBinding> resolved;
 	
 	protected AbstractTypeImpl(FileLocation location) {
 		this.location = location;
@@ -24,24 +22,6 @@ public abstract class AbstractTypeImpl implements Type {
 	public FileLocation getLocation() {
 		return location;
 	}
-
-	@Override
-	public void setResolvedBinding(TypeBinding resolvedBinding) {
-		resolved = Optional.of(resolvedBinding);
-	}
-
-	@Override
-	public Optional<TypeBinding> getResolvedBinding() {
-		return resolved;
-	}
-
-	@Override
-	public Type cloneWithBinding(TypeBinding binding) {
-		Type inner = this.cloneWithChildren(getChildren());
-		inner.setResolvedBinding(binding);
-		return inner;
-	}
-
 
 	@Override
 	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {

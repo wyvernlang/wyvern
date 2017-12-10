@@ -19,7 +19,6 @@ import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
-import wyvern.tools.util.Reference;
 
 /** Represents a declaration of a structural type.
  * 
@@ -33,7 +32,7 @@ public class TypeVarDecl extends Declaration {
 	private final String name;
 	private final Declaration body;
 	private final FileLocation fileLocation;
-	private final Reference<Optional<TypedAST>> metadata;
+	private final TypedAST metadata;
 	private TaggedInfo taggedInfo = null;
 	private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
@@ -41,9 +40,9 @@ public class TypeVarDecl extends Declaration {
     private IExpr metadataExp = null;
 
 	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName ) {
-		this.metadata = new Reference<Optional<TypedAST>>(Optional.ofNullable(metadata));
+		this.metadata = metadata;
 		this.name = name;
-		this.body = new TypeDeclaration(name, body, null, taggedInfo, fileLocation);
+		this.body = new TypeDeclaration(name, body, taggedInfo, fileLocation);
 		this.fileLocation = fileLocation;
 		this.taggedInfo = taggedInfo;
 		this.resourceFlag = isResource;
@@ -96,9 +95,9 @@ public class TypeVarDecl extends Declaration {
 	}
 	
 	private IExpr getMetadata(GenContext ctx) {
-		if (metadata.get().isPresent()) {
+		if (metadata != null) {
 			if (metadataExp == null)
-				metadataExp = ((ExpressionAST)metadata.get().get()).generateIL(ctx, null, null);
+				metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
 			return metadataExp;
 		} else {
 			return null;
