@@ -1,6 +1,6 @@
 require java
 
-import modules.Lists
+import modules.lists
 import java:wyvern.tools.tests.ReflectionTests.tools
 
 type IntObj
@@ -10,8 +10,8 @@ def makeInt(x : Int) : IntObj = new
     val contents = x
 
 // throws null pointer exception
-/* val nil = Lists.nil(0)
-val l1 = Lists.cons(5, Lists.cons(1, nil))
+/* val nil = lists.nil(0)
+val l1 = lists.cons(5, lists.cons(1, nil))
 tools.assertIntEquals(l1.getVal(), 5)
 tools.assertIntEquals(l1.getNext().getVal(), 1)
 tools.assertIntEquals(l1.getNext().getNext().getVal(), 0)
