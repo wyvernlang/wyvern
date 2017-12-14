@@ -42,13 +42,6 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
     }
 
 	@Override
-    @Deprecated
-	public ValueType generateILType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public ValueType getILType(GenContext ctx) {
 		return new NominalType(getPath(base, ctx), name, getLocation());
 	}

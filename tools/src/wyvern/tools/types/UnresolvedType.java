@@ -26,26 +26,9 @@ public class UnresolvedType extends AbstractTypeImpl implements NamedType {
 		return "UNRESOLVED: " + typeName;
 	}
 
-	@Override
-	public boolean subtype(Type other, HashSet<SubtypeRelation> subtypes) {
-		ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
-				HasLocation.UNKNOWN, this.toString(), other.toString());
-		return false; // Unreachable.
-	}
-	
-	@Override
-	public boolean subtype(Type other) {
-		return this.subtype(other, new HashSet<SubtypeRelation>());
-	}
-
     @Override
 	public boolean isSimple() {
 		return true;
-	}
-
-	@Override
-	public Map<String, Type> getChildren() {
-		return new HashMap<>();
 	}
 
     @Override

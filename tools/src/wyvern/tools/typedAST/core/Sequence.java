@@ -42,22 +42,6 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		return e;
 	}
 	
-	public static interface MapCallback {
-		public void map(TypedAST elem);
-	}
-	public static void tryMap(TypedAST potential, MapCallback callback) {
-		if (!(potential instanceof Sequence))
-			return;
-		Sequence seq = (Sequence)potential;
-		for (TypedAST elem : seq) {
-			if (elem instanceof Sequence) {
-				tryMap(elem, callback);
-				continue;
-			}
-			callback.map(elem);
-		}
-	}
-
 	public static Sequence append(Sequence s, TypedAST e) {
 		Iterator<TypedAST> innerIter = s.iterator();
 		if (s instanceof DeclSequence && e instanceof Declaration) {
@@ -110,36 +94,6 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	public Sequence() {
 		// TODO Auto-generated constructor stub
 	}
-	public void append(TypedAST exp) {
-		this.exps.add(check(exp));
-	}
-	
-	@Override
-	public Type getType() {
-		if (retType == null)
-			ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this);
-		return retType;
-	}
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> childMap = new HashMap<>();
-		int i = 0;
-		for (TypedAST ast : exps) {
-			childMap.put(i++ + "", ast);
-		}
-		return childMap;
-	}
-
-	@Override
-	public TypedAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		List<TypedAST> result = new ArrayList<>(newChildren.size());
-		for (int i = 0; i < newChildren.size(); i++) {
-			result.add(newChildren.get(i + ""));
-		}
-		return new Sequence(result);
-	}
-
 	private FileLocation location = FileLocation.UNKNOWN;
 	public FileLocation getLocation() {
 		return this.location;
@@ -152,14 +106,6 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	@Override
 	public Iterator<TypedAST> iterator() {
 		return exps.iterator();
-	}
-	
-	public static Sequence fromAST(Sequence s) {
-		return s;
-	}
-	
-	public static Sequence fromAST(TypedAST s) {
-		return new Sequence(s);
 	}
 	
 	// FIXME: Hack. Flattens decl sequence. NEED TO REFACTOR!
@@ -189,10 +135,6 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 			}
 
 		};
-	}
-
-	public Iterable<Declaration> getEnvExts() {
-		return getIterator();
 	}
 
 	public <T extends TypedAST> Iterable<T> getIterator() {
