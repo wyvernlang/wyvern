@@ -14,13 +14,8 @@ import wyvern.tools.util.AbstractTreeWritable;
 
 // TODO SMELL: probably should have Declarations not be in an "evaluate" part of the AST
 public abstract class Declaration extends AbstractTreeWritable implements TypedAST {
-	protected Declaration nextDecl = null;
 
 	public abstract String getName();
-	public Declaration getNextDecl() {
-		return nextDecl;
-	}
-
 	public boolean isClassMember() { return false; }
 
 	public abstract DeclType genILType(GenContext ctx);

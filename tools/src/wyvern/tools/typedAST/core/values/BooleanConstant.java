@@ -8,12 +8,12 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractValue;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.types.Type;
 
-public class BooleanConstant extends AbstractValue implements InvokableValue, CoreAST {
+public class BooleanConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
 	private boolean value;
 	
 	public BooleanConstant(boolean b) {

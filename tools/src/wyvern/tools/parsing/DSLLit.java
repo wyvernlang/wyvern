@@ -42,10 +42,6 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 
 	public Optional<String> getText() { return dslText; }
 
-	public DSLLit(Optional<String> dslText) {
-		this.dslText = (dslText);
-	}
-
 	public DSLLit(Optional<String> dslText, FileLocation loc) {
 		location = loc;
 		this.dslText = (dslText);

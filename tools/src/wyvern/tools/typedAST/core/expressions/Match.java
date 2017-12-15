@@ -71,29 +71,6 @@ public class Match extends AbstractExpressionAST implements CoreAST {
 		this.location = location;
 	}
 
-
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> children = new HashMap<>();
-
-		for (Case c : cases) {
-			//is there a proper convention for names in children?
-			children.put("match case: " + c.getTaggedTypeMatch(), c.getAST());
-		}
-
-		if (defaultCase != null) {
-			children.put("match default-case: " + defaultCase.getTaggedTypeMatch(), defaultCase.getAST());
-		}
-
-
-		return children;
-	}
-
-	@Override
-	public ExpressionAST cloneWithChildren(Map<String, TypedAST> newChildren) {
-		return new Match(matchingOver, cases, defaultCase, location);
-	}
-
 	@Override
 	public FileLocation getLocation() {
 		return location;

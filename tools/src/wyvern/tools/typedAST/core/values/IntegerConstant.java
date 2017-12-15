@@ -8,11 +8,11 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractValue;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 
-public class IntegerConstant extends AbstractValue implements InvokableValue, CoreAST {
+public class IntegerConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
 	private int value;
 	
 	public IntegerConstant(int i, FileLocation loc) {

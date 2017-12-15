@@ -8,12 +8,12 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.typedAST.abs.AbstractValue;
+import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.Value;
 
 
-public class UnitVal extends AbstractValue implements Value, CoreAST {
+public class UnitVal extends AbstractExpressionAST implements Value, CoreAST {
 	private UnitVal(FileLocation location) { this.location = location; }
 	// private static UnitVal instance = new UnitVal(); // FIXME: I have to move away from instance to provide line number! :(
 	public static UnitVal getInstance(FileLocation fileLocation) {

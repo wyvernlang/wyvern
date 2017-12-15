@@ -25,14 +25,6 @@ public class LetExpr extends AbstractExpressionAST implements CoreAST {
 		this.body = body;
 	}
 
-	@Override
-	public Map<String, TypedAST> getChildren() {
-		Map<String, TypedAST> childMap = new HashMap<>();
-		childMap.put("decl", decl);
-		childMap.put("body", body);
-		return childMap;
-	}
-
 	/*
 	// TODO: SMELL: maybe should have a list of decls here? but reuse between letexpr and class?
 	// depends on declToAdd adding the returned decl to itself
