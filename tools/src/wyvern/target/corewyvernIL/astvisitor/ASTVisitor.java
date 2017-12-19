@@ -28,6 +28,7 @@ import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.DataType;
@@ -75,5 +76,9 @@ public  abstract T visit(S state, EffectDeclaration effectDeclaration) ;
 public T visit(S state, EffectDeclType effectDeclType) {
 	// TODO Auto-generated method stub
 	return null;
+}
+public T visit(S state, SeqExpr seqExpr) {
+    // TODO Auto-generated method stub
+    return null;
 }
 }

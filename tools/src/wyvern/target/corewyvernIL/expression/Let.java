@@ -48,13 +48,13 @@ public class Let extends Expression {
 
 	@Override
 	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-		ValueType t = getToReplace().typeCheck(ctx, effectAccumulator);
+		/*ValueType t = getToReplace().typeCheck(ctx, effectAccumulator);
 		if (!t.isSubtypeOf(binding.getType(), ctx)) {
 			ValueType q = binding.getType();
 			t.isSubtypeOf(q, ctx);
 			reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), binding.getType().toString());
-		}
-		final TypeContext extendedCtx = ctx.extend(getVarName(), binding.getType());
+		}*/
+		final TypeContext extendedCtx = binding.typecheck(ctx, effectAccumulator);//ctx.extend(getVarName(), binding.getType());
 		final ValueType exprType = inExpr.typeCheck(extendedCtx, effectAccumulator);
 		final ValueType cleanExprType = exprType.avoid(binding.getVarName(), extendedCtx);
 		//cleanExprType.checkWellFormed(ctx);
@@ -81,8 +81,9 @@ public class Let extends Expression {
 
 	@Override
 	public Value interpret(EvalContext ctx) {
-		Value v = getToReplace().interpret(ctx);
-		return inExpr.interpret(ctx.extend(getVarName(), v));
+	    EvalContext extendedCtx = binding.interpret(ctx);
+		//Value v = getToReplace().interpret(ctx);
+		return inExpr.interpret(extendedCtx);//ctx.extend(getVarName(), v));
 	}
 
 	@Override
@@ -90,8 +91,9 @@ public class Let extends Expression {
 		// Get free variables in the sub-expressions.
 		Set<String> freeVars = inExpr.getFreeVariables();
 		// Remove the name that just became bound.
-		freeVars.remove(getVarName());
-		freeVars.addAll(getToReplace().getFreeVariables());
+		//freeVars.remove(getVarName());
+		//freeVars.addAll(getToReplace().getFreeVariables());
+		binding.modFreeVars(freeVars);
 		return freeVars;
 	}
 }
