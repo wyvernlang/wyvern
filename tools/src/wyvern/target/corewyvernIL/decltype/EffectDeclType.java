@@ -138,7 +138,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		// of results from calling adapt(v) on each Effect in this.EffectSet
 		
 //		return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
-		return new EffectDeclType(getName(), getEffectSet(), getLocation());
+		return new EffectDeclType(getName(), effectSet == null ? null : getEffectSet().adapt(v), getLocation());
 	}
 
 	@Override

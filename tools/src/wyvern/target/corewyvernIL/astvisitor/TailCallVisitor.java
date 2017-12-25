@@ -1,7 +1,10 @@
 package wyvern.target.corewyvernIL.astvisitor;
 
+import java.util.List;
+
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
@@ -13,6 +16,7 @@ import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
@@ -29,6 +33,7 @@ import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
@@ -37,6 +42,7 @@ import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 
 /** TailCallVisitor finds all MethodCall expressions in a
  *  corewyvernIL AST and attaches an IsTailCall metadata to them
@@ -253,5 +259,29 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 //		effectDeclaration.acceptVisitor(this, false); // causes StackOverflow (inf loop, probably)
 		return null;
 	}
+
+    @Override
+    public Void visit(Boolean state, EffectDeclType effectDeclType) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Void visit(Boolean inTailPosition, SeqExpr seqExpr) {
+        List<HasLocation> elements = seqExpr.getElements();
+        int count = elements.size();
+        if (elements.get(count-1) instanceof IExpr) {
+            ((IExpr)elements.get(count-1)).acceptVisitor(this, inTailPosition);
+            count--;
+        }
+        for (int i = 0; i < count; ++i) {
+            HasLocation hl = elements.get(i);
+            if (hl instanceof IExpr)
+                ((IExpr)hl).acceptVisitor(this, false);
+            else
+                ((VarBinding)hl).getExpression().acceptVisitor(this, false);
+        }
+        return null;
+    }
 
 }

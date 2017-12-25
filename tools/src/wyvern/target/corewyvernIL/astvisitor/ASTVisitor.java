@@ -38,47 +38,41 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class ASTVisitor<S, T> {
-	public abstract T visit(S state, New newExpr);
-	public abstract T visit(S state, Case c);
-	public abstract T visit(S state, MethodCall methodCall);
-	public abstract T visit(S state, Match match);
-	public abstract T visit(S state, FieldGet fieldGet);
-	public abstract T visit(S state, Let let);
-	public abstract T visit(S state, Bind bind);
-	public abstract T visit(S state, FieldSet fieldSet);
-	public abstract T visit(S state, Variable variable);
-	public abstract T visit(S state, Cast cast);
-	public abstract T visit(S state, VarDeclaration varDecl);
-	public abstract T visit(S state, DefDeclaration defDecl);
-	public abstract T visit(S state, ValDeclaration valDecl);
-  public abstract T visit(S state, ModuleDeclaration moduleDecl);
-	public abstract T visit(S state, IntegerLiteral integerLiteral);
-  public abstract T visit(S state, BooleanLiteral booleanLiteral);
-	public abstract T visit(S state, RationalLiteral rational);
-	public abstract T visit(S state, FormalArg formalArg);
-	public abstract T visit(S state, VarDeclType varDeclType);
-	public abstract T visit(S state, ValDeclType valDeclType);
-	//public abstract T visit(S state, DependentType dependentType);
-	public abstract T visit(S state, DefDeclType defDeclType);
-	public abstract T visit(S state, AbstractTypeMember abstractDeclType);
-	public abstract T visit(S state, NominalType nominalType);
-	public abstract T visit(S state, StructuralType structuralType);
-	public abstract T visit(S state, StringLiteral stringLiteral);
-	public abstract T visit(S state, DelegateDeclaration delegateDecl);
-	public abstract T visit(S state, ConcreteTypeMember concreteTypeMember);
-	public abstract T visit(S state, TypeDeclaration typeDecl);
-  public abstract T visit(S state, ValueType valueType);
-  public abstract T visit(S state, ExtensibleTagType extensibleTagType);
-  public abstract T visit(S state, DataType dataType);
-  public abstract T visit(S state, FFIImport ffiImport);
-  public abstract T visit(S state, FFI ffi);
-public  abstract T visit(S state, EffectDeclaration effectDeclaration) ;
-public T visit(S state, EffectDeclType effectDeclType) {
-	// TODO Auto-generated method stub
-	return null;
-}
-public T visit(S state, SeqExpr seqExpr) {
-    // TODO Auto-generated method stub
-    return null;
-}
+    public abstract T visit(S state, New newExpr);
+    public abstract T visit(S state, Case c);
+    public abstract T visit(S state, MethodCall methodCall);
+    public abstract T visit(S state, Match match);
+    public abstract T visit(S state, FieldGet fieldGet);
+    public abstract T visit(S state, Let let);
+    public abstract T visit(S state, Bind bind);
+    public abstract T visit(S state, FieldSet fieldSet);
+    public abstract T visit(S state, Variable variable);
+    public abstract T visit(S state, Cast cast);
+    public abstract T visit(S state, VarDeclaration varDecl);
+    public abstract T visit(S state, DefDeclaration defDecl);
+    public abstract T visit(S state, ValDeclaration valDecl);
+    public abstract T visit(S state, ModuleDeclaration moduleDecl);
+    public abstract T visit(S state, IntegerLiteral integerLiteral);
+    public abstract T visit(S state, BooleanLiteral booleanLiteral);
+    public abstract T visit(S state, RationalLiteral rational);
+    public abstract T visit(S state, FormalArg formalArg);
+    public abstract T visit(S state, VarDeclType varDeclType);
+    public abstract T visit(S state, ValDeclType valDeclType);
+    //public abstract T visit(S state, DependentType dependentType);
+    public abstract T visit(S state, DefDeclType defDeclType);
+    public abstract T visit(S state, AbstractTypeMember abstractDeclType);
+    public abstract T visit(S state, NominalType nominalType);
+    public abstract T visit(S state, StructuralType structuralType);
+    public abstract T visit(S state, StringLiteral stringLiteral);
+    public abstract T visit(S state, DelegateDeclaration delegateDecl);
+    public abstract T visit(S state, ConcreteTypeMember concreteTypeMember);
+    public abstract T visit(S state, TypeDeclaration typeDecl);
+    public abstract T visit(S state, ValueType valueType);
+    public abstract T visit(S state, ExtensibleTagType extensibleTagType);
+    public abstract T visit(S state, DataType dataType);
+    public abstract T visit(S state, FFIImport ffiImport);
+    public abstract T visit(S state, FFI ffi);
+    public abstract T visit(S state, EffectDeclaration effectDeclaration) ;
+    public abstract T visit(S state, EffectDeclType effectDeclType);
+    public abstract T visit(S state, SeqExpr seqExpr);
 }

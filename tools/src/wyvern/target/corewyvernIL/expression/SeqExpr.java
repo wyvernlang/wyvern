@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import static wyvern.tools.errors.ToolError.reportError;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,18 +24,25 @@ public class SeqExpr extends Expression {
 	private LinkedList<HasLocation> elements; // either a VarBinding or an Expression
 	
 	public SeqExpr() {
-	    setExprType(Util.unitType()); // default to Unit
+	    //setExprType(Util.unitType()); // default to Unit
 	    elements = new LinkedList<HasLocation>();
 	}
 	
-	public void addExpr(Expression expr) {
+	public void addExpr(IExpr expr) {
 	    elements.addLast(expr);
 	}
 
     public void addBinding(VarBinding binding) {
         elements.addLast(binding);
     }
+    public void addBinding(String varName, ValueType type, IExpr toReplace) {
+        addBinding(new VarBinding(varName, type, toReplace));
+    }
 
+    public List<HasLocation> getElements() {
+        return Collections.unmodifiableList(elements);
+    }
+    
 	@Override
 	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
 	    TypeContext extendedCtx = ctx;
@@ -43,14 +51,22 @@ public class SeqExpr extends Expression {
 	        if (elem instanceof VarBinding) {
 	            VarBinding binding = (VarBinding) elem;
 	            extendedCtx = binding.typecheck(extendedCtx, effectAccumulator);
-	            result = Util.unitType();
+	            //TODO: make this Unit
+	            result = binding.getType();//Util.unitType();
 	        } else if (elem instanceof Expression) {
 	            result = ((Expression)elem).typeCheck(extendedCtx, effectAccumulator); 
 	        } else {
 	            throw new RuntimeException("invariant broken");
 	        }
 	    }
-	    if (!result.isSubtypeOf(getExprType(), extendedCtx)) {
+        for (int i = elements.size()-1; i >= 0; --i) {
+            HasLocation elem = elements.get(i);
+            if (elem instanceof VarBinding)
+                result = result.avoid(((VarBinding)elem).getVarName(), extendedCtx);
+        }
+	    if (getExprType() == null) {
+	        setExprType(result);
+	    } else if (!result.isSubtypeOf(getExprType(), extendedCtx)) {
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString());
 	    }
 		return getExprType();
@@ -94,7 +110,8 @@ public class SeqExpr extends Expression {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
                 extendedCtx = binding.interpret(extendedCtx);
-                result = Util.unitValue();
+                // TODO: return unit
+                result = extendedCtx.lookupValue(binding.getVarName());//Util.unitValue();
             } else if (elem instanceof Expression) {
                 result = ((Expression)elem).interpret(extendedCtx);
             } else {
@@ -119,6 +136,7 @@ public class SeqExpr extends Expression {
             } else {
                 throw new RuntimeException("invariant broken");
             }
+            index--;
 	    }
 		return freeVars;
 	}

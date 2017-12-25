@@ -1,11 +1,13 @@
 package wyvern.target.corewyvernIL.astvisitor;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
@@ -18,6 +20,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
@@ -35,8 +38,10 @@ import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
@@ -74,6 +79,8 @@ import wyvern.target.oir.expressions.OIRNew;
 import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.util.Pair;
 
 public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 	private int classCount = 0;
@@ -500,4 +507,48 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("EmitOIRVisitor: hopefully not necessary?");
 	}
+
+    @Override
+    public OIRAST visit(EmitOIRState state, EffectDeclType effectDeclType) {
+        throw new RuntimeException("EmitOIRVisitor: hopefully not necessary?");
+    }
+
+    @Override
+    public OIRAST visit(EmitOIRState state, SeqExpr seqExpr) {
+        TypeContext ctx = state.getContext();
+        LinkedList<Pair<String, OIRExpression>> list = new LinkedList<Pair<String, OIRExpression>>(); 
+        for (HasLocation hl : seqExpr.getElements()) {
+            IExpr expr = null;
+            String varName = null;
+            ValueType varType = null;
+            if (hl instanceof IExpr) {
+                expr = (IExpr) hl;
+                varName = GenContext.generateName();
+                varType = expr.typeCheck(ctx, null);
+            }
+            else {
+                VarBinding vb = (VarBinding)hl;
+                expr = vb.getExpression();
+                varName = vb.getVarName();
+                varType = vb.getType();
+            }
+            ctx = ctx.extend(varName, varType);
+            OIRExpression newExpr = (OIRExpression) expr.acceptVisitor(this, new EmitOIRState(ctx, state.getEnvironment()));
+            state.getEnvironment().addName(varName, null);
+            
+            list.addLast(new Pair<String,OIRExpression>(varName, newExpr));
+        }
+        
+        OIRExpression current = list.getLast().second;
+
+        for (int i = list.size()-2; i >= 0; --i) {
+            String varName = list.get(i).first;
+            OIRExpression oirExpr = list.get(i).second;
+            OIRLet oirLet = new OIRLet(varName, oirExpr, current);
+            oirLet.copyMetadata(seqExpr);
+            current = oirLet;
+        }
+        
+        return current;
+    }
 }

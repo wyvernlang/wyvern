@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
@@ -34,6 +35,7 @@ import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -353,15 +355,24 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 		return ffiImport;
 	}
 
-  @Override
-  public FFI visit(TypeContext ctx, FFI ffi) {
-    return ffi;
+    @Override
+    public FFI visit(TypeContext ctx, FFI ffi) {
+        return ffi;
 	}
 
-@Override
-public ASTNode visit(TypeContext state, EffectDeclaration effectDeclaration) {
-	// TODO Auto-generated method stub
-	return effectDeclaration;
-}
+    @Override
+    public ASTNode visit(TypeContext state, EffectDeclaration effectDeclaration) {
+    	return effectDeclaration;
+    }
+    
+    @Override
+    public ASTNode visit(TypeContext state, EffectDeclType effectDeclType) {
+        return effectDeclType;
+    }
+    
+    @Override
+    public ASTNode visit(TypeContext state, SeqExpr seqExpr) {
+        throw new RuntimeException("not impl");
+    }
 
 }

@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.decl.VarDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
@@ -36,6 +37,7 @@ import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -47,6 +49,7 @@ import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.util.Pair;
 
 class PSVState {
@@ -313,4 +316,27 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 	public ASTNode visit(PSVState state, EffectDeclaration effectDeclaration) { // unsure
 		return effectDeclaration;
 	}
+
+    @Override
+    public ASTNode visit(PSVState state, SeqExpr seqExpr) {
+        SeqExpr newExpr = new SeqExpr();
+        for (HasLocation hl : seqExpr.getElements()) {
+            if (hl instanceof IExpr) {
+                newExpr.addExpr((IExpr) ((IExpr)hl).acceptVisitor(this, state));
+            }
+            else {
+                VarBinding vb = (VarBinding)hl;
+                IExpr expr = (IExpr) vb.getExpression().acceptVisitor(this, state);
+                newExpr.addBinding(new VarBinding(vb.getVarName(), vb.getType(), expr));
+            }
+        }
+        
+        newExpr.copyMetadata(seqExpr);
+        return newExpr;
+    }
+
+    @Override
+    public ASTNode visit(PSVState state, EffectDeclType effectDeclType) {
+        return effectDeclType;
+    }
 }

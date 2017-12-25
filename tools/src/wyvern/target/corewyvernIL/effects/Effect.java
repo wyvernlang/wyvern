@@ -26,7 +26,7 @@ public class Effect {
 	private String name;
 	private FileLocation loc;
 
-	public Effect(Variable p, String n, FileLocation l) {
+	public Effect(Path p, String n, FileLocation l) {
 		this.path = p;
 		this.name = n;
 		this.loc = l;
@@ -70,8 +70,8 @@ public class Effect {
 		return (path==null? "" : getPath().getName() + ".") + getName(); 
 	}
 	
-	public Path adapt(View v) {
-		return getPath().adapt(v);
+	public Effect adapt(View v) {
+		return new Effect(getPath().adapt(v), name, loc);
 	}	
 	
 	@Override

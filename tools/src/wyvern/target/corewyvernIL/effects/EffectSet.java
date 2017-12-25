@@ -114,4 +114,12 @@ public class EffectSet {
         }
         return new EffectSet(newSet);
     }
+
+    public EffectSet adapt(View v) {
+        Set<Effect> newSet = new HashSet<Effect>();
+        for (Effect e:effectSet) {
+            newSet.add(e.adapt(v));
+        }
+        return new EffectSet(newSet);
+    }
 }

@@ -4,16 +4,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+//import java.util.Stack;
 
-import wyvern.target.corewyvernIL.VarBinding;
+//import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.expression.Let;
+//import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -21,16 +22,19 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public class TopLevelContext {
 	
-	private Stack<VarBinding> pending = new Stack<VarBinding>();
+	//private Stack<VarBinding> pending = new Stack<VarBinding>();
 	private List<Declaration> moduleDecls = new LinkedList<Declaration>();
 	private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
 	private List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 	private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
 	private GenContext ctx;
 	private String receiverName;
+	private SeqExpr expr = new SeqExpr();
+	//private GenContext origCtx;
 
 	public TopLevelContext(GenContext ctx) {
 		this.ctx = ctx;
+		//origCtx = ctx;
 	}
 
 	public GenContext getContext() {
@@ -38,13 +42,15 @@ public class TopLevelContext {
 	}
 
 	public IExpr getExpression() {
-		VarBinding binding = pending.pop();
+		/*VarBinding binding = pending.pop();
 		IExpr exp = binding.getExpression();
 		while (!pending.isEmpty()) {
 			binding = pending.pop();
 			exp = new Let(binding, exp);
 		}
-		return exp;
+		return exp;*/
+	    //expr.typeCheck(origCtx, null);
+		return expr;
 	}
 
 	public IExpr getModuleExpression() {
@@ -87,7 +93,8 @@ public class TopLevelContext {
 	}
 	
 	public void addExpression(IExpr exp, ValueType type) {
-		pending.push(new VarBinding(GenContext.generateName(), type, exp));
+		//pending.push(new VarBinding(GenContext.generateName(), type, exp));
+		expr.addExpr(exp);
 	}
 	
 	/**
@@ -99,9 +106,10 @@ public class TopLevelContext {
 	 * @param isDeclBlock flags a let statement that represents a block of recursive declarations, or a var
 	 */
 	public void addLet(String name, ValueType type, IExpr iExpr, boolean isDeclBlock) {
-		pending.push(new VarBinding(name, type, iExpr));
+		//pending.push(new VarBinding(name, type, iExpr));
 		ctx = ctx.extend(name, new Variable(name), type);
 		avoidanceMap.put(name, isDeclBlock);
+		expr.addBinding(name, type, iExpr);
 	}
 
 	public void updateContext(GenContext newCtx) {
