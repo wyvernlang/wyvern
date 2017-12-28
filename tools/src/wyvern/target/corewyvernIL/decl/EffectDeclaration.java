@@ -46,7 +46,7 @@ public class EffectDeclaration extends NamedDeclaration {
 	 * Errors reported are: VARIABLE_NOT_DECLARED for objects not found and recursive
 	 * effect definitions, and EFFECT_NOT_FOUND for effects not from the signature or another object **/ 
 	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		if (effectSet != null) { effectSet.effectsCheck(ctx); }
+		if (effectSet != null) { effectSet.effectsCheck(thisCtx); }
 		return getDeclType();
 	}
 

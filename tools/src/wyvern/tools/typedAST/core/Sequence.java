@@ -306,24 +306,15 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 		boolean recBlock = false;
 		Sequence normalSeq = new Sequence();
 		Sequence recSequence = new DeclSequence(); // not sure definition is needed here (Valerie)
-		Sequence effectSequence; // = new DeclSequence(); // each will only have one EffectDeclaration
 		for (TypedAST ast : this.getIterator()) {
 			
-			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration || ast instanceof TypeAbbrevDeclaration) {
+			if(ast instanceof TypeVarDecl || ast instanceof DefDeclaration || ast instanceof TypeAbbrevDeclaration || ast instanceof EffectDeclaration) {
 				Declaration d = (Declaration) ast;
 				if(recBlock == false) { // no open recSequence
 					recBlock = true; 
 					recSequence = new DeclSequence(); // start one
 				}
 				recSequence = Sequence.append(recSequence, d); // add the declaration
-			} else if (ast instanceof EffectDeclaration) {
-				if(recBlock) { // during a recBlock
-					normalSeq = Sequence.append(normalSeq, recSequence); // add the recSequence
-				}
-				recBlock = false; // close it, no longer accepting Declarations to this one
-				
-				effectSequence = Sequence.append(new DeclSequence(), (Declaration) ast); // size of 1
-				normalSeq = Sequence.append(normalSeq, effectSequence); // add this effectSequence to normalSeq
 			} else {
 				if(recBlock == true) { // still collecting for the recSequence
 					normalSeq = Sequence.append(normalSeq, recSequence); // add it to the normalSeq 
