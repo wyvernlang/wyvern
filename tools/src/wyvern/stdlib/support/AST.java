@@ -279,7 +279,7 @@ public class AST {
             //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
             // Extend parseTSL with a second argument (abstract type representing context)
             // TODO: Handle InterpreterState/GenContext
-            return ast.generateIL(ctx, null, null);
+            return ast.generateIL(ctx, null, new LinkedList<TypedModuleSpec>());
         } catch (ParseException e) {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");
             throw e;

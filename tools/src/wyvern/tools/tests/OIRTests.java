@@ -610,8 +610,8 @@ public class OIRTests {
     @Test
     public void testOption() throws ParseException {
         String input =
-            "import wyvern.option\n" +
             "require stdout\n" +
+            "import wyvern.option\n" +
             "val orElse : option.UnitToDyn = new\n" +
             "  def apply() : Dyn = 5\n" +
             "val v1 : Int = option.Some(3).getOrElse(orElse)\n" +

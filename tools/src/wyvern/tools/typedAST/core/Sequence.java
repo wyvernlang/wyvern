@@ -302,7 +302,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
 	 * Combines the sequential type and method declarations into a block </br>
 	 * @return return the sequence after combination.
 	 */
-	private Sequence combine() {
+	Sequence combine() {
 		boolean recBlock = false;
 		Sequence normalSeq = new Sequence();
 		Sequence recSequence = new DeclSequence(); // not sure definition is needed here (Valerie)

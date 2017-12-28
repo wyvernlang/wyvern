@@ -335,22 +335,12 @@ public class ILTests {
 	
 	@Test()
 	public void testBogusType() throws ParseException {
-		try {
-			String input = "val obj = new\n"
-				     	 + "    def id(x:Foo) : Foo = x\n"
-						 + "val i : Int = 5\n\n"
-						 + "i\n"
-				     	 ;
-			TypedAST ast = TestUtil.getNewAST(input, "test input");
-			// bogus "system" entry, but makes the text work for now
-			GenContext genCtx = GenContext.empty().extend("system", new Variable("system"), null);
-			IExpr program = ((Sequence) ast).generateIL(genCtx, null, null);
-			TypeContext ctx = TypeContext.empty();
-			ValueType t = program.typeCheck(ctx, null);
-			Assert.fail("typechecking should have failed");
-		} catch (ToolError e) {
-			Assert.assertEquals(2, e.getLine());
-		}
+		String input = "val obj = new\n"
+			     	 + "    def id(x:Foo) : Foo = x\n"
+					 + "val i : Int = 5\n\n"
+					 + "i\n"
+			     	 ;
+		TestUtil.doTestTypeFailOnLine(input, 2);
 	}
 	
 	@Test
@@ -723,10 +713,11 @@ public class ILTests {
                      + "    metadata 3\n\n"
                      
                      ;
-        TypedAST ast = TestUtil.getNewAST(input, "test input");
+        /*TypedAST ast = TestUtil.getNewAST(input, "test input");
         GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
 		// IL generation doesn't work yet!
-		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
+		wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);*/
+        TestUtil.doTest(input, null, null);
 	}
 
 	@Test

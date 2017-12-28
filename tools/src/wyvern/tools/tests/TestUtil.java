@@ -294,4 +294,16 @@ public class TestUtil {
 		}
 	}
 
+    public static void doTestTypeFailOnLine(String input, int line) throws ParseException {
+        ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
+        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, null, null));
+        try {
+            IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
+            program.typeCheck(Globals.getStandardTypeContext(), null);
+            Assert.fail("Typechecking should have failed.");
+        } catch (ToolError e) {
+            Assert.assertEquals(line, e.getLine());
+        }
+    }
+
 }

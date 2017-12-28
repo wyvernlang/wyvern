@@ -14,6 +14,7 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.typedAST.core.Script;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -262,5 +263,10 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	public void setDSLBody(TypedAST dslExp, String text) {
 		((DSLLit)dslExp).setText(text);
 	}
+
+    @Override
+    public TypedAST script(List<TypedAST> imports, List<TypedAST> requires, TypedAST body) {
+        return new Script(imports, requires, body);
+    }
 
 }

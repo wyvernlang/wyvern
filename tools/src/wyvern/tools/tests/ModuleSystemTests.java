@@ -72,36 +72,19 @@ public class ModuleSystemTests {
     
 	@Test
 	public void testTopLevelVarGet () throws ParseException {
-		GenContext genCtx = Globals.getStandardGenContext();
 		String source = "var v : Int = 5\n"
 					  + "v\n";
 		
-		// Generate code to be evaluated.
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
-		IExpr program = ast.generateIL(genCtx, Util.intType(), null);
-		
-		// Evaluate.
-		wyvern.target.corewyvernIL.expression.Value result = program.interpret(Globals.getStandardEvalContext());
-		Assert.assertEquals(new IntegerLiteral(5), result);
-		
+		TestUtil.doTestInt(source, 5);
 	}
 	
 	@Test
 	public void testTopLevelVarSet () throws ParseException {
-		GenContext genCtx = Globals.getStandardGenContext();
 	
 		String source = "var v : Int = 5\n"
 					  + "v = 10\n"
 					  + "v\n";
-		
-		// Generate code to be evaluated.
-		ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(source, "test input");
-		IExpr program = ast.generateIL(genCtx, Util.intType(), null);
-		
-		// Evaluate.
-		wyvern.target.corewyvernIL.expression.Value result = program.interpret(Globals.getStandardEvalContext());
-		Assert.assertEquals(new IntegerLiteral(10), result);
-		
+        TestUtil.doTestInt(source, 10);
 	}
 	
 	@Test

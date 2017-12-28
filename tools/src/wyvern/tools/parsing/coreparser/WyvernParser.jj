@@ -168,6 +168,54 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
+{ LinkedList<AST> decls = new LinkedList<AST>(); AST exp; }
+{
+  /*ImportDecls(decls)*/ exp=ProgramBody(decls) { return exp; }
+}
+
+/** Root production. */
+void ImportDecls(LinkedList<AST> decls) :
+{ AST exp1; AST exp2; }
+{
+  exp1 = ImportDecl() { decls.addLast(exp1); }
+  ImportDecls(decls)
+|
+  /* nothing */ {}
+}
+
+AST ProgramBody(LinkedList<AST> imports) :
+{ AST exp; Token id; Type type; AST moduleArgs=null; boolean isResource = false; LinkedList<AST> requires = new LinkedList<AST>(); }
+{
+  LOOKAHEAD(2)
+  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> type=OptType() <NEWLINE> exp = ModuleBody() {
+	if (moduleArgs == null) {
+	   return build.moduleDecl(id.image, exp, type, loc(id), true);
+	} else {
+	   return build.moduleDecl(id.image, build.sequence(moduleArgs,exp,true), type, loc(id), true);
+	}
+  }
+|
+  <MODULE> id = <IDENTIFIER> type=OptType() <NEWLINE> exp = ModuleBody() {
+	return build.moduleDecl(id.image, exp, type, loc(id), isResource);
+  }
+|
+  exp = Script(imports, requires)  { return exp; }
+}
+
+AST Script(LinkedList<AST> imports, LinkedList<AST> requires) :
+{ AST ast; AST decl; }
+{
+  ImportDecls(imports) ast = DeclSequence(false)  { return build.script(imports, requires, ast); }
+|
+  decl = RequireDecl() {
+      requires.addLast(decl);
+  }
+  ast = Script(imports, requires) { return ast; }
+}
+
+// GET RID OF ME ONCE THE ABOVE WORKS; ALSO TopLevelCode
+/** Root production. */
+AST CompUnit() :
 { AST exp; Token id; Type type; AST moduleArgs=null; boolean isResource = false; }
 {
   LOOKAHEAD(2)
