@@ -168,9 +168,11 @@ TOKEN : /* Literals */
 
 /** Root production. */
 AST CompilationUnit() :
-{ LinkedList<AST> decls = new LinkedList<AST>(); AST exp; }
+{ LinkedList<AST> imports= new LinkedList<AST>(); AST exp; LinkedList<AST> requires = new LinkedList<AST>(); }
 {
-  /*ImportDecls(decls)*/ exp=ProgramBody(decls) { return exp; }
+  /*ImportDecls(imports)*/ exp=ModuleDecl(imports) { return exp; }
+|
+  exp = Script(imports, requires)  { return exp; }
 }
 
 /** Root production. */
@@ -183,39 +185,7 @@ void ImportDecls(LinkedList<AST> decls) :
   /* nothing */ {}
 }
 
-AST ProgramBody(LinkedList<AST> imports) :
-{ AST exp; Token id; Type type; AST moduleArgs=null; boolean isResource = false; LinkedList<AST> requires = new LinkedList<AST>(); }
-{
-  LOOKAHEAD(2)
-  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> type=OptType() <NEWLINE> exp = ModuleBody() {
-	if (moduleArgs == null) {
-	   return build.moduleDecl(id.image, exp, type, loc(id), true);
-	} else {
-	   return build.moduleDecl(id.image, build.sequence(moduleArgs,exp,true), type, loc(id), true);
-	}
-  }
-|
-  <MODULE> id = <IDENTIFIER> type=OptType() <NEWLINE> exp = ModuleBody() {
-	return build.moduleDecl(id.image, exp, type, loc(id), isResource);
-  }
-|
-  exp = Script(imports, requires)  { return exp; }
-}
-
-AST Script(LinkedList<AST> imports, LinkedList<AST> requires) :
-{ AST ast; AST decl; }
-{
-  ImportDecls(imports) ast = DeclSequence(false)  { return build.script(imports, requires, ast); }
-|
-  decl = RequireDecl() {
-      requires.addLast(decl);
-  }
-  ast = Script(imports, requires) { return ast; }
-}
-
-// GET RID OF ME ONCE THE ABOVE WORKS; ALSO TopLevelCode
-/** Root production. */
-AST CompUnit() :
+AST ModuleDecl(LinkedList<AST> imports) :
 { AST exp; Token id; Type type; AST moduleArgs=null; boolean isResource = false; }
 {
   LOOKAHEAD(2)
@@ -230,8 +200,17 @@ AST CompUnit() :
   <MODULE> id = <IDENTIFIER> type=OptType() <NEWLINE> exp = ModuleBody() {
 	return build.moduleDecl(id.image, exp, type, loc(id), isResource);
   }
+}
+
+AST Script(LinkedList<AST> imports, LinkedList<AST> requires) :
+{ AST ast; AST decl; }
+{
+  ImportDecls(imports) ast = DeclSequence(false)  { return build.script(requires, imports, ast); }
 |
-  exp = TopLevelCode()  { return exp; }
+  decl = RequireDecl() {
+      requires.addLast(decl);
+  }
+  ast = Script(imports, requires) { return ast; }
 }
 
 AST ModuleArgs() :

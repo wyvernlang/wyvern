@@ -8,7 +8,7 @@ import wyvern.tools.errors.FileLocation;
 public interface ASTBuilder<AST,Type> {
 	public AST sequence(AST t1, AST t2, boolean inModule);
 	
-	public AST script(List<AST> imports, List<AST> requires, AST body);
+	public AST script(List<AST> requires, List<AST> imports, AST body);
 	public AST moduleDecl(String name, AST ast, Type type, FileLocation loc, boolean isResource);
 	public AST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata);
 	/** if type is null, it will be inferred*/

@@ -265,8 +265,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
     @Override
-    public TypedAST script(List<TypedAST> imports, List<TypedAST> requires, TypedAST body) {
-        return new Script(imports, requires, body);
+    public TypedAST script(List<TypedAST> requires, List<TypedAST> imports, TypedAST body) {
+        return new Script(requires, imports, body);
     }
 
 }
