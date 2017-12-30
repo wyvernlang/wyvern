@@ -25,10 +25,13 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.Pair;
 
 public class ModuleDeclaration extends Declaration implements CoreAST {
@@ -37,13 +40,15 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	private FileLocation location;
 	private NamedType ascribedType;
 	private boolean resourceFlag;
+	private final List<NameBindingImpl> args;
 
-	public ModuleDeclaration(String name, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
+	public ModuleDeclaration(String name, List<NameBindingImpl> args, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
 		this.name = name;
 		this.inner = inner;
 		this.location = location;
 		this.resourceFlag = isResource;
 		ascribedType = type;
+		this.args = args;
 	}
 
 
@@ -177,16 +182,14 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	 * @param loadedTypes
 	 * @return
 	 */
-	private List<FormalArg> getTypes(Sequence reqSeq, GenContext ctx, List<Module> loadedTypes) {
+	private List<FormalArg> getTypes(GenContext ctx, List<Module> loadedTypes) {
 		/* generate the formal arguments by requiring sequence */
 		List<FormalArg> types = new LinkedList<FormalArg>();
-		for(Declaration d : reqSeq.getDeclIterator()) {
-			ImportDeclaration req = (ImportDeclaration) d;
-			String name = req.getUri().getSchemeSpecificPart();
+		for(NameBindingImpl a : args) {
+			String typeName = ((NamedType)a.getType()).getFullName();
 			wyvern.target.corewyvernIL.type.ValueType type = getType(ctx,
-					loadedTypes, req.getLocation(), name);
-			final String asName = req.getAsName();
-			types.add(new FormalArg(asName == null ? name : asName, type));
+					loadedTypes, null, typeName);
+			types.add(new FormalArg(a.getName(), type));
 		}
 		return types;
 	}
@@ -257,13 +260,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 	@Override
 	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
 		GenContext methodContext = ctx;
-		Sequence reqSeq = new DeclSequence();
 		Sequence impInstSeq = new DeclSequence();
         Sequence platformDependentSeq = new DeclSequence();
 		Sequence normalSeq = new Sequence();
 		if(inner instanceof Sequence || inner instanceof DeclSequence) {
 			/* classify declarations */
-			reqSeq = ((DeclSequence) inner).filterRequires();
             Pair<DeclSequence, DeclSequence> pair = separatePlatformDependencies(((DeclSequence) inner).filterImportInstantiates());
             impInstSeq = pair.first;
             platformDependentSeq = pair.second;
@@ -276,7 +277,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 		List<FormalArg> formalArgs;
 		List<Module> loadedTypes = new LinkedList<Module>();
-		formalArgs = getTypes(reqSeq, ctx, loadedTypes); // translate requiring modules to method parameters
+		formalArgs = getTypes(ctx, loadedTypes); // translate requiring modules to method parameters
 		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
 		for (Module lt : loadedTypes) {
 			// include the declaration itself

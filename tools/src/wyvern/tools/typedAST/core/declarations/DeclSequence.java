@@ -106,21 +106,6 @@ public class DeclSequence extends Sequence {
 		super(decl);
 	}
 
-    /**
-     * 
-     * @return the sequence of require 
-     */
-	public Sequence filterRequires() {
-		
-		Sequence reqSeq = new DeclSequence();
-		for (Declaration d : this.getDeclIterator()) {
-			if(d instanceof ImportDeclaration && ((ImportDeclaration) d).isRequire()) {
-				reqSeq = Sequence.append(reqSeq, d);
-			}
-		}
-		return reqSeq;
-	}
-
 	/**
 	 * 
 	 * @return the sequence of import/instantiate

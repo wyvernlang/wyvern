@@ -186,19 +186,15 @@ void ImportDecls(LinkedList<AST> decls) :
 }
 
 AST ModuleDecl(LinkedList<AST> imports) :
-{ AST exp; Token id; Type type; AST moduleArgs=null; boolean isResource = false; }
+{ AST exp; Token id; Type type = null; List moduleArgs = new LinkedList(); boolean isResource = false; }
 {
   LOOKAHEAD(2)
-  <MODULE> <DEF> id = <IDENTIFIER> <LPAREN> [ moduleArgs = ModuleArgs() ] <RPAREN> type=OptType() <NEWLINE> exp = ModuleBody() {
-	if (moduleArgs == null) {
-	   return build.moduleDecl(id.image, exp, type, loc(id), true);
-	} else {
-	   return build.moduleDecl(id.image, build.sequence(moduleArgs,exp,true), type, loc(id), true);
-	}
+  <MODULE> <DEF> id = <IDENTIFIER> moduleArgs = Formals() [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
+	   return build.moduleDecl(id.image, moduleArgs, exp, type, loc(id), true);
   }
 |
-  <MODULE> id = <IDENTIFIER> type=OptType() <NEWLINE> exp = ModuleBody() {
-	return build.moduleDecl(id.image, exp, type, loc(id), isResource);
+  <MODULE> id = <IDENTIFIER> [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
+	return build.moduleDecl(id.image, moduleArgs, exp, type, loc(id), isResource);
   }
 }
 
@@ -213,41 +209,15 @@ AST Script(LinkedList<AST> imports, LinkedList<AST> requires) :
   ast = Script(imports, requires) { return ast; }
 }
 
-AST ModuleArgs() :
-{ AST arg; AST args=null; }
-{
-  arg = ModuleArg() {
-      args = build.sequence(args,arg,true);
-  }
-  ( <COMMA> arg = ModuleArg() {
-      args = build.sequence(args,arg,true);
-    }
-  )*
-  { return args; }
-}
-
-AST ModuleArg() :
-{ Token name; URI uri; }
-{
-  name = <IDENTIFIER> <COLON> uri = Uri() {
-      return build.importDecl(uri, loc(name), name, true, false);
-  }
-}
-
-Type OptType() :
-{ Type t; }
-{
-  <COLON> t = Type()  { return t; }
-|
-  /* nothing */ { return null; }
-}
-
-AST ModuleBody() :
+AST ModuleBody(LinkedList<AST> imports) :
 { AST ast; AST decl; }
 {
   ast = DeclSequence(true)  { return ast; }
 |
-  decl = ImportDecl() ast = ModuleBody() { return build.sequence(decl,ast,true); }
+  decl = ImportDecl() {
+    imports.addLast(decl);
+  }
+  ast = ModuleBody(imports) { return build.sequence(decl,ast,true); }
 }
 
 AST TopLevelCode() :
