@@ -135,20 +135,7 @@ public class DefDeclaration extends NamedDeclaration {
 	private void effectsCheck(TypeContext methodCtx, EffectAccumulator effectAccumulator) {
 		// TODO: make uniform, regardless of whether we're in an obj definition or module def
 		if (effectSet.getEffects() != null) {
-				ValueType vt = null;
-				try { // if we're currently in an object
-					vt = methodCtx.lookupTypeOf("this");
-				} catch (RuntimeException ex) { // might be a module def instead
-					effectSet.effectsCheck(methodCtx);
-				}
-				
-				// finish effect-checking for effect in instantiated obj; set its path as "this" if successful
-				if (vt != null) { 
-					for (Effect e : effectSet.getEffects()) {
-						e.findEffectDeclType(methodCtx, vt);
-//						e.setPath(new Variable("this"));
-					}
-				}
+		        effectSet.effectsCheck(methodCtx);
 				
 				Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
 				

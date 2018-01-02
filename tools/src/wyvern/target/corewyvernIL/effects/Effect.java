@@ -27,17 +27,21 @@ public class Effect {
 	private FileLocation loc;
 
 	public Effect(Path p, String n, FileLocation l) {
+	    /*if (p != null && !(p instanceof Variable))
+	        throw new RuntimeException();*/
 		this.path = p;
 		this.name = n;
 		this.loc = l;
 	}
 
-	public Variable getPath() {
-		return (Variable) path;
+	public Path getPath() {
+		return path;
 	}
 	
 	/** For effects defined in the same signature (whose paths are null until typechecked) */
 	public void setPath(Path p) { 
+        if (!(p instanceof Variable))
+            throw new RuntimeException();
 		path = p;
 	}
 	
@@ -67,7 +71,7 @@ public class Effect {
 	
 	@Override
 	public String toString() {
-		return (path==null? "" : getPath().getName() + ".") + getName(); 
+		return (path==null? "" : getPath().toString() + ".") + getName(); 
 	}
 	
 	public Effect adapt(View v) {
@@ -131,16 +135,6 @@ public class Effect {
         
         return (EffectDeclType) eDT;
     }
-
-	/** Find this effect's (effect)DeclType in ValueType vt; report error if not found, else return effectDeclType. */
-	public EffectDeclType findEffectDeclType(TypeContext ctx, ValueType vt) {
-		DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
-		if ((eDT==null) || (!(eDT instanceof EffectDeclType))){
-			ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
-		}
-		
-		return (EffectDeclType) eDT;
-	}
 
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
         if (path.getFreeVariables().contains(varName)) {

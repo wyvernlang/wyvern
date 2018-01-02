@@ -75,15 +75,9 @@ public class EffectDeclType extends DeclType implements IASTNode {
 		Set<Effect> allEffects =  new HashSet<Effect>(); // collects lower-level effects from effectSets of arg "effects"
 		Set<Effect> moreEffects = null; // get the effectSet belonging to an effect in arg "effects"
 		for (Effect e : effects) {
-			try {
-				/* effectCheck() returns the effectSet defined by EffectDeclType, or reports an error
-				 * if EffectDeclType for e is not found in the context */
-				moreEffects = e.effectCheck(ctx).getEffects(); 
-			} catch (RuntimeException ex) { // seems to have reached the lowest-level effect in scope
-				allEffects.add(e);
-			}
-			
-			if (moreEffects != null) {	
+		    EffectSet s = e.effectCheck(ctx);
+		    if (s != null) {
+		        moreEffects = s.getEffects();
 				allEffects.addAll(moreEffects);	
 			} else { // e was the lowest-level in scope (hidden by type ascription)
 				allEffects.add(e);

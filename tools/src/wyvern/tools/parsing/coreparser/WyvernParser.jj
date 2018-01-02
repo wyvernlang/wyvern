@@ -190,11 +190,11 @@ AST ModuleDecl(LinkedList<AST> imports) :
 {
   LOOKAHEAD(2)
   <MODULE> <DEF> id = <IDENTIFIER> moduleArgs = Formals() [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	   return build.moduleDecl(id.image, moduleArgs, exp, type, loc(id), true);
+	   return build.moduleDecl(id.image, imports, moduleArgs, exp, type, loc(id), true);
   }
 |
   <MODULE> id = <IDENTIFIER> [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	return build.moduleDecl(id.image, moduleArgs, exp, type, loc(id), isResource);
+	return build.moduleDecl(id.image, imports, moduleArgs, exp, type, loc(id), isResource);
   }
 }
 

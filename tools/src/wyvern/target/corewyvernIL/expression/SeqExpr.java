@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -70,6 +71,16 @@ public class SeqExpr extends Expression {
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString());
 	    }
 		return getExprType();
+	}
+	
+	public GenContext extendContext(GenContext ctx) {
+        for (HasLocation elem : elements) {
+            if (elem instanceof VarBinding) {
+                VarBinding binding = (VarBinding) elem;
+                ctx = ctx.extend(binding.getVarName(), new Variable(binding.getVarName()), binding.getType());
+            }
+        }
+	    return ctx;
 	}
 	
 	// making this public

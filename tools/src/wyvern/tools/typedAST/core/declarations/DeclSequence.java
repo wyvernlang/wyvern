@@ -109,7 +109,7 @@ public class DeclSequence extends Sequence {
 	/**
 	 * 
 	 * @return the sequence of import/instantiate
-	 */
+	 *
 	public Sequence filterImportInstantiates() {
 		Sequence impInstSeq = new DeclSequence();
 		for (TypedAST d : this.getDeclIterator()) {
@@ -119,7 +119,7 @@ public class DeclSequence extends Sequence {
 			}
 		}
 		return impInstSeq;
-	}
+	}*/
 
 	/**
 	 * 
