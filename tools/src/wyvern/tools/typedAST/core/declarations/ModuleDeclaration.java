@@ -224,7 +224,14 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
     private boolean isPlatformPath(String platform, String path) {
         // Return true if file path ends with /platform/X/FILENAME (where X is a platform)
-        Pattern p = Pattern.compile("/platform/" + platform + "/[^/]*$");
+        //Pattern p = Pattern.compile("/platform/" + platform + "/[^/]*$");
+        
+        // Return true if file path includes platform/X (where X is a platform)
+        final String separatorPattern = Pattern.quote(File.separator);
+        //Pattern p = Pattern.compile("platform" + separatorPattern + platform);
+        //TODO: generalize me - just use the above.  But this involves fixing a bug.
+        //HACK: avoid certain problematic libraries being interpreted as platform dependent.  need to fix this later
+        Pattern p = Pattern.compile("platform" + separatorPattern + platform + separatorPattern + "[^" + separatorPattern + "]*$");
         return p.matcher(path).find();
     }
 
@@ -242,7 +249,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
                 platformIndependent.addLast(d);
             } else {
                 File f = ModuleResolver.getLocal().resolve(uri.getSchemeSpecificPart(), false);
-                if (isPlatformPath(ModuleResolver.getLocal().getPlatform(), f.getAbsolutePath()))
+                boolean isPlatPath = isPlatformPath(ModuleResolver.getLocal().getPlatform(), f.getAbsolutePath());
+                if (isPlatPath)
                     platformDependent.addLast(d);
                 else
                     platformIndependent.addLast(d);
@@ -306,8 +314,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 		// TODO: fix the old code that was used here
 		// GenContext ctxWithPlatDeps = wrapLetCtxWithIterator(platformDependentSeq.iterator(), new Sequence(), methodContext, new LinkedList<>()).second;
 		SeqExpr seqExpr = new SeqExpr();
-		GenContext extended = translateImports(platformIndependentImports, methodContext, seqExpr, dependencies); 
-		wyvern.target.corewyvernIL.expression.IExpr body = wrapLet(/*impInstSeq*/new Sequence(), normalSeq, /*ctxWithPlatDeps*/ extended, dependencies);
+        GenContext extended = translateImports(platformDependentImports, methodContext, seqExpr, dependencies); 
+        seqExpr = new SeqExpr(); // throw away the bindings for platform dependencies, they will be added back later
+		extended = translateImports(platformIndependentImports, extended, seqExpr, dependencies); 
+		wyvern.target.corewyvernIL.expression.IExpr body = innerTranslate(normalSeq, extended); 
 		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(/*ctxWithPlatDeps*/methodContext, dependencies);
 		seqExpr.addExpr(body);
         body = seqExpr;
