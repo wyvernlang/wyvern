@@ -96,90 +96,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
 
 	/**
-	 * @see wrapLetWithIterator
-	 *
-	 * @param impInstSeq the sequence of import and instantiate
-	 * @param normalSeq the rest sequence
-	 * @param ctx the context
-	 * @return new IL expression
-	 */
-	private IExpr wrapLet(Sequence impInstSeq, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
-		Iterator<TypedAST> ai = impInstSeq.iterator();
-		return wrapLetWithIterator(ai, normalSeq, ctx, dependencies);
-	}
-
-
-	/**
-	 * translate import/instantiate sequence into a let sequence and wrap the rest part inside the sequence. </br>
-	 * import A as copyA => let copyA = A in {rest} </br>
-	 * instantiate B(...) as copyB => let copyB = B(...) in {rest} </br>
-	 *
-	 * @param ai the declaration iterator
-	 * @param normalSeq the rest part of the module (not instantiate/import/require)
-	 * @param ctx the context
-	 * @return the whole expression
-	 */
-    private IExpr wrapLetWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
-        return wrapLetCtxWithIterator(ai, normalSeq, ctx, dependencies).first;
-    }
-
-	/**
-	 * translate import/instantiate sequence into a let sequence and wrap the rest part inside the sequence. </br>
-	 * import A as copyA => let copyA = A in {rest} </br>
-	 * instantiate B(...) as copyB => let copyB = B(...) in {rest} </br>
-	 *
-	 * @param ai the declaration iterator
-	 * @param normalSeq the rest part of the module (not instantiate/import/require)
-	 * @param ctx the context
-	 * @return the whole expression
-	 */
-	private Pair<IExpr, GenContext> wrapLetCtxWithIterator(Iterator<TypedAST> ai, Sequence normalSeq, GenContext ctx, List<TypedModuleSpec> dependencies) {
-		if(!ai.hasNext()) {
-			// we are done with imports/instantiates, so translate the main body of the module
-			return new Pair(innerTranslate(normalSeq, ctx), ctx);
-		}
-
-		// otherwise, wrap with the outermost import/instantiate and proceed with a recursive call
-		TypedAST ast = ai.next();
-		if (ast instanceof ImportDeclaration) {
-
-			// must be import
-			ImportDeclaration imp = (ImportDeclaration) ast;
-			
-			Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(ctx, dependencies);
-			
-			IExpr e = wrapLetWithIterator(ai, normalSeq, bindingAndCtx.second, dependencies);
-			final Let letBinding = new Let(bindingAndCtx.first, e);
-			
-			//ValueType t = letBinding.typeCheck(ctx); // sanity check - catch errors early
-			return new Pair(letBinding, bindingAndCtx.second);
-		} else {
-			// must be instantiate
-
-			Instantiation inst = (Instantiation) ast;
-			// generate arguments
-			List<TypedAST> arguments = inst.getArgs();
-			List<IExpr> args = new LinkedList<IExpr>();
-	    	for (TypedAST arg : arguments) {
-	    		args.add(((ExpressionAST) arg).generateIL(ctx, null, dependencies));
-	    	}
-
-			MethodCall instValue =
-					new MethodCall(
-							new wyvern.target.corewyvernIL.expression.Variable(inst.getUri().getSchemeSpecificPart().toString()) /*path*/,
-							inst.getUri().getSchemeSpecificPart().toString(), args, this);
-			final ValueType type = instValue.typeCheck(ctx, null);
-			GenContext newContext = ctx.extend(inst.getName(), instValue, type);
-
-			// translate the inner part of the sequence
-			IExpr e = wrapLetWithIterator(ai, normalSeq, newContext, dependencies);
-			
-			// then wrap it with the declaration we just identified
-			return new Pair(new Let(inst.getName(), type, instValue, e), newContext);
-		}
-	}
-
-	/**
 	 * Computes and returns the set of arguments this module requires.
 	 * 
 	 * loadedTypes is updated with all the types that had to be loaded in
@@ -309,10 +225,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
 		}
 		
-		/* importing modules and instantiations are translated into let sentence */
-		// TODO: must wrap methodContext with platformDependent types first, or we will be unable to access platform-dependent imports
-		// TODO: fix the old code that was used here
-		// GenContext ctxWithPlatDeps = wrapLetCtxWithIterator(platformDependentSeq.iterator(), new Sequence(), methodContext, new LinkedList<>()).second;
+		/* importing modules and instantiations are translated into a SeqExpr */
 		SeqExpr seqExpr = new SeqExpr();
         GenContext extended = translateImports(platformDependentImports, methodContext, seqExpr, dependencies); 
         seqExpr = new SeqExpr(); // throw away the bindings for platform dependencies, they will be added back later
