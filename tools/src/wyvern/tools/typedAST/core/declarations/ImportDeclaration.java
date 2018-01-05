@@ -187,11 +187,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 			
 			// instantiate the module
 			DefDeclType modDeclType = (DefDeclType) ((StructuralType)m.getSpec().getType()).findDecl(Util.APPLY_NAME, ctx);
-			List<FormalArg> modArgs = modDeclType.getFormalArgs();
-			if (modArgs.size() != 1) {
-				System.err.println("Expected modArgs.size() = 1, got " + modArgs.size());
+			if (modDeclType == null || modDeclType.getFormalArgs().size() != 1) {
+				//System.err.println("Expected modArgs.size() = 1, got " + modArgs.size());
 				ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
 			}
+            List<FormalArg> modArgs = modDeclType.getFormalArgs();
 			final ValueType argType = modArgs.get(0).getType();
 			List<Expression> args = new LinkedList<Expression>();
 			if (argType.equals(Globals.JAVA_IMPORT_TYPE)

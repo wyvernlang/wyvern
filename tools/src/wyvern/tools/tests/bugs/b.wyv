@@ -1,0 +1,2 @@
+module b
+val x : Int = 7

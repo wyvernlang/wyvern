@@ -675,6 +675,11 @@ public class ILTests {
     }
 
     @Test
+    public void testNonResourceImport() throws ParseException {
+        TestUtil.doTestScriptModularlyFailing("bugs.a", ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA);
+    }
+
+    @Test
     public void testTSL2() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
     }

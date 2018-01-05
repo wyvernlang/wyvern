@@ -89,7 +89,7 @@ public enum ErrorMessage {
 	PARSE_ERROR("Parse error: %ARG", 1),
 	READ_FILE_ERROR("Could not read file %ARG", 1),
 	MODULE_NOT_FOUND_ERROR("Could not find %ARG %ARG in either the current Wyvern path or the standard library", 2),
-	SCRIPT_REQUIRED_MODULE_ONLY_JAVA("A module required by a top-level script can only have java as its requirement", 0),
+	SCRIPT_REQUIRED_MODULE_ONLY_JAVA("A module required by a top-level script must have exactly one argument, a platform such as java", 0),
 	NOT_AN_FFI("Expected an FFI object as the schema in an import URI", 0),
 	SCHEME_NOT_RECOGNIZED("import scheme %ARG not recognized; did you forget to \"require java\"?", 1),
 	UNSAFE_JAVA_IMPORT("To import the java package %ARG, make sure you \"require java\" or add the package to the built-in whitelist (experts only)", 1),
