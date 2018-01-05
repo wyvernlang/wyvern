@@ -670,9 +670,8 @@ public class ILTests {
 	}
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testVal() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "tsls.testVal", Util.intType(), new IntegerLiteral(5));
+        TestUtil.doTestScriptModularly(PATH, "tsls.testVal", Util.unitType(), Util.unitValue());
     }
 
     @Test

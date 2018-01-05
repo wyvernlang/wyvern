@@ -7,4 +7,4 @@ val empty:IntList = new
 def cons(elem:Int,rest:IntList):IntList = new
     def sum():Int = elem + rest.sum()
     
-cons(3,cons(4,empty)).sum() // evalutes to 7
+cons(3,cons(4,empty)).sum() // evaluates to 7
