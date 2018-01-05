@@ -29,9 +29,7 @@ def None[T]():Option[T] = new
 
 val y:Option[Int] = None[Int]()
 val x:Option[Int] = Some[Int](14)
-// BUG: if we use z for the lambda variable here Wyvern gets confused.  Need to fix variable renaming!
 val w = x.map[Int](z => z+1)
 x.isDefined
-val z = y.orElse(() => x)
-// TODO: change below to use z and above to use w
-w.getOrElse(() => 3)
+val z = w.orElse(() => x)
+z.getOrElse(() => 3)
