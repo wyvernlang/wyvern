@@ -117,8 +117,8 @@ public class VarDeclaration extends Declaration implements CoreAST {
 		
 		// Create variables for the temp object to be used for the getter and setter.
 		wyvern.tools.typedAST.core.expressions.Variable tempObjForSetter, tempObjForGetter;
-		tempObjForGetter = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(tempObjName, null), null);
-		tempObjForSetter = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl(tempObjName, null), null);
+		tempObjForGetter = new wyvern.tools.typedAST.core.expressions.Variable(tempObjName, null);
+		tempObjForSetter = new wyvern.tools.typedAST.core.expressions.Variable(tempObjName, null);
 		
 		// Create getter and setter.
 		DefDeclaration getter, setter;

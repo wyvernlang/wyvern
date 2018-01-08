@@ -12,7 +12,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
-import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.types.Type;
@@ -20,26 +19,26 @@ import wyvern.tools.types.Type;
 
 public class Variable extends AbstractExpressionAST implements CoreAST, Assignable {
 
-    private NameBinding binding;
+    private String name;
     private FileLocation location = FileLocation.UNKNOWN;
 
-    public Variable(NameBinding binding, FileLocation location) {
-        this.binding = binding;
+    public Variable(String name, FileLocation location) {
+        this.name = name;
         this.location = location;
     }
 
     public String getName() {
-        return this.binding.getName();
+        return name;
     }
 
     @Override
     public String toString() {
-        return binding.getName();
+        return name;
     }
     
     @Override
     public Type getType() {
-        return binding.getType();
+        throw new RuntimeException();
     }
 
     public FileLocation getLocation() {
@@ -68,13 +67,13 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     public StringBuilder prettyPrint() {
         StringBuilder sb = new StringBuilder();
         sb.append("Variable(\"");
-        sb.append(binding.getName());
-        sb.append("\" : ");
+        sb.append(name);
+        /*sb.append("\" : ");
         if (binding.getType() != null) {
             sb.append(binding.getType().toString());
         } else {
             sb.append("null");
-        }
+        }*/
         sb.append(")");
         return sb;
     }

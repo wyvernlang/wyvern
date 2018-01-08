@@ -1,0 +1,20 @@
+module IfTSL2
+
+import wyvern.internal.ast
+import wyvern.option
+import wyvern.internal.list              // We use wyvern.internal.list because wyvern.collections.list depends on IfTSL
+
+type AST = ast.AST
+
+resource type FnExpr
+  def apply() : Dyn
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option
+      val fnAST : AST = ast.parseExpression(input, ctx)
+      val applyDefn = ast.defDeclaration("apply", list.make(), ast.types.dyn(), fnAST)
+      val declList : list.List = list.make()
+      declList.append(applyDefn)
+      option.Some(ast.object(declList))
+
+def doif(condition : Boolean, tt:FnExpr, ff:FnExpr) : Dyn
+  condition.ifTrue(() => tt.apply(), () => ff.apply())

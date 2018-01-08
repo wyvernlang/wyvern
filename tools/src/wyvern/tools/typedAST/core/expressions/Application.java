@@ -59,6 +59,10 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         return function;
     }
 
+    public List<Type> getGenerics() {
+        return generics;
+    }
+
     public FileLocation getLocation() {
         return this.location;
     }

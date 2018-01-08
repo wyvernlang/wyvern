@@ -12,7 +12,8 @@ public class NameBindingImpl extends AbstractBinding implements NameBinding {
 
 	public TypedAST getUse() {
 		// throw new RuntimeException("this method should not be needed!!!");
-		return new Variable(this, FileLocation.UNKNOWN); // FIXME: !!! Cannot replicate its use from outside!
+		//return new Variable(this, FileLocation.UNKNOWN); // FIXME: !!! Cannot replicate its use from outside!
+	    throw new RuntimeException();
 	}
 
 	@Override

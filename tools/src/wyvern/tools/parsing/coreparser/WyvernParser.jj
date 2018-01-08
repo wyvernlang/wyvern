@@ -709,9 +709,16 @@ AST UnaryExpression(ExpFlags flags) :
 }
 
 AST PrimaryExpression(ExpFlags flags) :
-{ AST exp; Token t; Token selfName = null; }
+{ AST exp; Token t; Token selfName = null;
+  LinkedList<String> names = new LinkedList<String>();
+  LinkedList<AST> args = new LinkedList<AST>(); }
 {
-  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )*  { return exp; }
+  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )* ( Extension(names, args) )*  {
+    if (names.size() + args.size() > 0) {
+      exp = build.addArguments(exp,names,args);
+    }
+    return exp;
+  }
 |
   t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW>] {
     String self = (selfName == null) ? null : selfName.image;
@@ -720,6 +727,22 @@ AST PrimaryExpression(ExpFlags flags) :
     // store a reference to the new expression so we can fill in the fields later!
     flags.setExp(exp, IndentedExpKind.NEW_KIND);
     return exp;
+  }
+}
+
+void Extension(LinkedList<String> names, LinkedList<AST> args) :
+{ AST exp; Token t; }
+{
+  t=<IDENTIFIER> {
+    names.addLast(t.image);
+  }
+|
+  t=<DSL_LITERAL> {
+    if (!names.isEmpty())
+    	names.addLast("ARG"); // track parameters past the first keyword
+    exp = build.dsl(loc(t));
+    build.setDSLBody(exp, t.image);
+    args.addLast(exp);
   }
 }
 

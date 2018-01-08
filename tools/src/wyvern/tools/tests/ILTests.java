@@ -680,6 +680,11 @@ public class ILTests {
     }
 
     @Test
+    public void testIf() throws ParseException {
+        TestUtil.doTestScriptModularly("tsls.cleanIf", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
     public void testTSL2() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
     }

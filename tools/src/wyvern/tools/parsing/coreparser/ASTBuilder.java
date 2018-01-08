@@ -33,6 +33,7 @@ public interface ASTBuilder<AST,Type> {
 	public AST booleanLit(boolean value, FileLocation loc);
 	public AST invocation(AST receiver, String name, AST argument, FileLocation loc);
 	public AST application(AST function, List<AST> arguments, FileLocation loc, List<Type> generics);
+    public AST addArguments(AST application, List<String> names, List<AST> arguments) throws ParseException;
 	public AST assignment(AST lhs, AST rhs, FileLocation loc);
 	public AST unitValue(FileLocation loc);
 	public AST newObj(FileLocation loc, String selfName);

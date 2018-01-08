@@ -12,7 +12,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -21,9 +20,6 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
 public class New extends AbstractExpressionAST implements CoreAST {
-
-    private static int uniqueCounter = 0;
-    private static Map<String, Expression> variables = new HashMap<>();
 
     private FileLocation location = FileLocation.UNKNOWN;
     private Map<String, TypedAST> args = new HashMap<String, TypedAST>();
@@ -131,11 +127,11 @@ public class New extends AbstractExpressionAST implements CoreAST {
                 wyvern.tools.typedAST.core.expressions.Variable receiver2;
 
                 receiver1 = new wyvern.tools.typedAST.core.expressions.Variable(
-                        new NameBindingImpl(this.self(), null),
+                        this.self(),
                         null
                 );
                 receiver2 = new wyvern.tools.typedAST.core.expressions.Variable(
-                        new NameBindingImpl(this.self(), null),
+                        this.self(),
                         null
                 );
                 

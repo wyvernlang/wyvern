@@ -263,7 +263,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 		String setterName = GetterAndSetterGeneration.varNameToSetter(varName);
 		Invocation fieldGet = new Invocation(receiver, varName, null, null);
 		wyvern.tools.typedAST.core.expressions.Variable valueToAssign;
-		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable(new NameBindingImpl("x", null), null);
+		valueToAssign = new wyvern.tools.typedAST.core.expressions.Variable("x", null);
 		Assignment setterBody = new Assignment(fieldGet, valueToAssign, null);
 		
 		// The setter takes one argument x : varType; its signature is varType -> Unit

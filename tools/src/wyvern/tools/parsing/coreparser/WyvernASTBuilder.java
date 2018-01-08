@@ -3,6 +3,7 @@ package wyvern.tools.parsing.coreparser;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -165,7 +166,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 	@Override
 	public TypedAST var(String name, FileLocation loc) {
-		return new Variable(new NameBindingImpl(name, null), loc);
+		return new Variable(name, loc);
 	}
 
 	@Override
@@ -195,6 +196,37 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 		return new Application(function, arguments, loc != null ? loc : function.getLocation(), generics);
 	}
 
+    @Override
+    public TypedAST addArguments(TypedAST application, List<String> names, List<TypedAST> arguments) throws ParseException {
+        if (!(application instanceof Application))
+            throw new ParseException("Juxtaposed an additional argument to something that was not an application"); 
+        Application app = (Application) application;
+        List<Type> generics = app.getGenerics();
+        List<TypedAST> args = new LinkedList<TypedAST>(app.getArguments());
+        TypedAST function = app.getFunction();
+        StringBuilder name = new StringBuilder();
+        args.addAll(arguments);
+        
+        // what to do about function?
+        if (function instanceof Variable) {
+            Variable var = (Variable)function;
+            name.append(var.getName());
+            names.forEach(name::append);
+            function = new Variable(name.toString(), var.getLocation());
+        } else if (function instanceof Invocation) {
+            Invocation inv = (Invocation) function;
+            if (inv.getArgument() != null)
+                throw new ParseException("Cannot juxtapose an additional argument to a binary operation"); 
+            name.append(inv.getOperationName());
+            names.forEach(name::append);
+            function = new Invocation(inv.getReceiver(), name.toString(), null, inv.getLocation());
+        } else {
+            throw new RuntimeException();
+        }
+        
+        return new Application(function, args, app.getLocation(), generics);
+    }
+	
 	@Override
 	public TypedAST unitValue(FileLocation loc) {
 		return UnitVal.getInstance(loc);
