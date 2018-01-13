@@ -34,6 +34,7 @@ import wyvern.tools.typedAST.core.binding.*;
 import wyvern.tools.typedAST.core.expressions.*;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.errors.*;
+import wyvern.tools.lexing.LexerUtils;
 
 import java.net.URI;
 import java.util.*;
@@ -57,24 +58,29 @@ public class WyvernParser<AST,Type> {
     public void setBuilder(ASTBuilder<AST,Type> builder) { build = builder; }
 
     private enum IndentedExpKind {
-        NEW_KIND, DSL_KIND,
+        NEW_KIND, DSL_KIND, INVOKE_KIND,
     }
 
-	private class ExpFlags {
-		public boolean isEmpty() { return exp == null; }
-		public void setExp(AST a, IndentedExpKind kind) throws ParseException {
-		  	// error to have two news in one expression
-		  	if (!isEmpty())
-		  		throw new ParseException("May not have two \"new\" or \"DSL literal\" expressions within the same line"); 
-			exp = a;
-			this.kind = kind;
-		} 
-		public AST getExp() { return exp; }
+    private class ExpFlags {
+        public boolean isEmpty() { return exp == null; }
+        public void setExp(AST a, IndentedExpKind kind) throws ParseException {
+        	final IndentedExpKind INVOKE_KIND = IndentedExpKind.INVOKE_KIND;
+        
+            // error to have two news in one expression
+            if (!isEmpty() && this.kind != INVOKE_KIND && kind != INVOKE_KIND)
+                throw new ParseException("May not have two \"new\" or \"DSL literal\" expressions within the same line");
+            if (kind == INVOKE_KIND && this.kind != null && this.kind != INVOKE_KIND)
+            	return; // don't override a new or DSL literal with an invocation
+            // otherwise update 
+            exp = a;
+            this.kind = kind;
+        } 
+        public AST getExp() { return exp; }
         public IndentedExpKind getExpKind() { return kind; }
-		
-	    private AST exp;
-	    private IndentedExpKind kind;
-	}    
+
+        private AST exp;
+        private IndentedExpKind kind;
+    }    
 }
 
 PARSER_END(WyvernParser)
@@ -511,6 +517,11 @@ Token DSLLines() :
     }
   )*
   { 
+    //if (content.trim().length() == 0) {
+    if (LexerUtils.isCommentsAndWhitespace(content)) {
+      // just comments and whitespace, return null; didn't really find a DSL
+      return null;
+    }
     t.image = content;
     return t;
   }
@@ -529,6 +540,13 @@ AST ExpressionLine(boolean makeValDecl) :
     if (!flags.isEmpty()) {
         if (flags.getExpKind() == IndentedExpKind.NEW_KIND) {
             build.setNewBody(flags.getExp(), decls);
+    	} else if (flags.getExpKind() == IndentedExpKind.INVOKE_KIND) {
+            if (t2 != null) {
+	            System.out.println("FOUND FUNCTION ARG DSL BLOCK: " + t2);
+                AST dsl = build.dsl(loc(t2));
+                build.setDSLBody(dsl, t2.image);
+			    build.addArgument(flags.getExp(),dsl);
+	        }
     	} else if (t2 == null) {
             ToolError.reportError(ErrorMessage.EXPECTED_DSL_BLOCK, (HasLocation)flags.getExp());
         } else {
@@ -717,6 +735,7 @@ AST PrimaryExpression(ExpFlags flags) :
     if (names.size() + args.size() > 0) {
       exp = build.addArguments(exp,names,args);
     }
+    flags.setExp(exp, IndentedExpKind.INVOKE_KIND);
     return exp;
   }
 |
@@ -829,7 +848,7 @@ List<AST> ExpressionList():
 AST Instantiation() :
 { URI uri; Token name; List<AST> args;}
 {
-<INSTANTIATE> uri = Uri() args = Arguments(null) <AS> name=<IDENTIFIER> <NEWLINE> 
+<INSTANTIATE> uri = Uri() args = Arguments(new ExpFlags()) <AS> name=<IDENTIFIER> <NEWLINE> 
 {return build.instantiation(uri, args, name, loc(name));}
 }
 

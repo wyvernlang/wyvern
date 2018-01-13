@@ -170,8 +170,29 @@ public class LexerUtils {
      */
     public static <T> boolean hasNonSpecialToken(List<Token> l, Class<T> tClass) {
         for (Token t : l)
-            if (!LexerUtils.<T>isSpecial(t, tClass))
+            if (!LexerUtils.<T>isSpecial(t, tClass)
+                    /*&& t.image.trim().length() > 0 /* takes out "DSLs" that are just whitespace*/)
                 return true;
         return false;
+    }
+    
+    public static boolean isCommentsAndWhitespace(String s) {
+        String simpler = s.trim();
+        if (simpler.startsWith("/*")) {
+            int loc = simpler.indexOf("*/");
+            if (loc != -1)
+                simpler = simpler.substring(loc+2);
+        }
+        if (simpler.startsWith("//")) {
+            int loc = simpler.indexOf("\n");
+            if (loc != -1)
+                simpler = simpler.substring(loc+1);
+        }
+        if (simpler.length() == 0)
+            return true;
+        else if (simpler.length() < s.length())
+            return isCommentsAndWhitespace(simpler);
+        else
+            return false;
     }
 }

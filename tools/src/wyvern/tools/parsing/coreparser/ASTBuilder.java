@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public interface ASTBuilder<AST,Type> {
 	public AST sequence(AST t1, AST t2, boolean inModule);
@@ -53,5 +54,7 @@ public interface ASTBuilder<AST,Type> {
 	public void setDSLBody(AST dslExp, String text);
 
 	public AST instantiation(URI uri, List<AST> args, Token name, FileLocation loc);
+
+    public void addArgument(AST application, AST argument) throws ParseException;
 
 }

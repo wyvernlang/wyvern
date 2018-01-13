@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -10,7 +11,10 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.*;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
@@ -44,6 +48,16 @@ public class JavaValue extends AbstractValue implements Invokable {
 			result = foreignObject.invokeMethod(methodName, javaArgs);
 			return javaToWyvern(result);
 		} catch (ReflectiveOperationException e) {
+		    if (e instanceof InvocationTargetException) {
+		        InvocationTargetException te = (InvocationTargetException) e;
+		        Throwable cause = e.getCause();
+		        if (cause instanceof RuntimeException)
+		            throw (RuntimeException) cause;
+                if (cause instanceof ParseException) {
+                    ParseException pe = (ParseException) cause;
+                    ToolError.reportError(ErrorMessage.PARSE_ERROR, (HasLocation)null, pe.getMessage());
+                }
+		    }
 			throw new RuntimeException(e);
 		}
 	}

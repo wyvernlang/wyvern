@@ -197,6 +197,14 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 	}
 
     @Override
+    public void addArgument(TypedAST application, TypedAST argument) throws ParseException {
+        if (!(application instanceof Application))
+            throw new ParseException("Added an additional TSL argument to something that was not an application"); 
+        Application app = (Application) application;
+        app.addArgument(argument);
+    }
+    
+    @Override
     public TypedAST addArguments(TypedAST application, List<String> names, List<TypedAST> arguments) throws ParseException {
         if (!(application instanceof Application))
             throw new ParseException("Juxtaposed an additional argument to something that was not an application"); 

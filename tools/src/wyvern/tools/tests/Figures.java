@@ -43,4 +43,9 @@ public class Figures {
 				new IntegerLiteral(5));
 	}
 	
+    @Test
+    public void testFigure4bit() throws ParseException {
+        TestUtil.doParseTypeModularly(TestUtil.BASE_PATH, "figs.ListFactory2");
+    }
+    
 }

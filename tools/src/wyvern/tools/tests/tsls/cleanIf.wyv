@@ -2,14 +2,15 @@ import metadata wyvern.IfTSL2
 
 // TODO: put this in the standard prelude, and allow it be called 'if'
 val iffelsARG = (cond:Boolean, tt:IfTSL2.FnExpr, ff:IfTSL2.FnExpr) => IfTSL2.doif(cond, tt, ff)
+val iff = (cond:Boolean, blocks:IfTSL2.Blocks) => IfTSL2.doifblk(cond, blocks)
 
 val x = -5
 val y : Int = iff (x>0) {x} els {-x}
-/*val z : Int = iff (x>0)
-    thn
+val z : Int = iff (x>0)
+    then
         x
-    els
-        -x*/
+    else
+        -x
 y
 
 // design question: should we just replace the whole ~ syntax with a scheme more like what's above?

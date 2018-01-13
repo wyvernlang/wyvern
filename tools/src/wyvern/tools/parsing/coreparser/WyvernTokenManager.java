@@ -41,7 +41,9 @@ public class WyvernTokenManager<Lexer extends SingleDFAEngine<List< Token >, Cop
 	
 	private void readTokenList() throws CopperParserException, IOException, InstantiationException,
 										IllegalAccessException, InvocationTargetException {
-		tokens = this.lexerCtor.newInstance().parse(input, filename).iterator();
+		List<Token> tokenList = this.lexerCtor.newInstance().parse(input, filename);
+		//System.out.println(tokenList);
+        tokens = tokenList.iterator();
 	}
 
 	@Override

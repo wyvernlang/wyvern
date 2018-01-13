@@ -21,8 +21,27 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	boolean DSLNext = false;						// is the next line a DSL?
 	boolean inDSL = false;							// are we in a DSL?
 	Stack<String> indents = new Stack<String>();	// the stack of indents
+	Token flagTok = null;							// a token that signals whether an indent is for a DSL
+	Token lastIndent = null;
 	
 	/********************** HELPER FUNCTIONS ************************/
+
+	/** equivalent (except for "if") to DSLNext */
+	boolean isDSLNext() {
+	    if (flagTok == null)
+	    	return true;
+		switch (flagTok.kind) {
+		  case TILDE:
+		  		return true;
+		  case TYPE:
+		  case DEF:
+		  case NEW:
+		  case MATCH:
+		  		return false;
+		  default:
+		  		throw new RuntimeException("broke invariant!");
+		}
+	}
 
 	/** Wraps the lexeme s in a Token, setting the begin line/column and kind appropriately
 	 *  The current lexical location is used.
@@ -130,16 +149,16 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	:};
 
     terminal Token classKwd_t ::= /class/ in (keywds) {: RESULT = token(CLASS,lexeme); :};
-	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(TYPE,lexeme); :};
+	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(TYPE,lexeme); flagTok = RESULT; :};
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
-	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); :};
+	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
 	terminal Token delegateKwd_t::= /delegate/ in (keywds) {: RESULT = token(DELEGATE,lexeme); :};
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
 	terminal Token metadataKwd_t 	::= /metadata/ in (keywds) {: RESULT = token(METADATA,lexeme); :};
-	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); :};
+	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); flagTok = RESULT; :};
  	terminal Token importKwd_t   ::= /import/ in (keywds) {: RESULT = token(IMPORT,lexeme); :};
  	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
  	terminal Token comprisesKwd_t   ::= /comprises/ in (keywds) {: RESULT = token(COMPRISES,lexeme); :};
@@ -155,7 +174,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token instantiateKwd_t ::= /instantiate/ in (keywds) {: RESULT = token(INSTANTIATE,lexeme); :};
 
 	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
-    terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); :};
+    terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); flagTok = RESULT; :};
     terminal Token defaultKwd_t ::= /default/ in (keywds);
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
@@ -163,13 +182,17 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token booleanLit_t ::= /true|false/ in (keywds) {: RESULT = token(BOOLEAN_LITERAL,lexeme); :};
  	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
 
-	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); :};
+	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); flagTok = RESULT; :};
 	terminal Token plus_t ::= /\+/ {: RESULT = token(PLUS,lexeme); :};
 	terminal Token dash_t ::= /-/ {: RESULT = token(DASH,lexeme); :};
 	terminal Token mult_t ::= /\*/ {: RESULT = token(MULT,lexeme); :};
 	terminal Token divide_t ::= /\// {: RESULT = token(DIVIDE,lexeme); :};
 	terminal Token remainder_t ::= /%/ {: RESULT = token(MOD,lexeme); :};
-	terminal Token equals_t ::= /=/ {: RESULT = token(EQUALS,lexeme); :};
+	terminal Token equals_t ::= /=/ {:
+		RESULT = token(EQUALS,lexeme);
+		if (flagTok != null && flagTok.kind == DEF) // EQUALS cancels a DEF for the purposes of whether we are looking for a DSL on the next line
+			flagTok = null;
+	:};
 	terminal Token equalsequals_t ::= /==/ {: RESULT = token(EQUALSEQUALS,lexeme); :};
 	terminal Token openParen_t ::= /\(/ {: RESULT = token(LPAREN,lexeme); :};
  	terminal Token closeParen_t ::= /\)/ {: RESULT = token(RPAREN,lexeme); :};
@@ -197,7 +220,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token cCurly_t ::= /\}/ {: RESULT = token(RBRACE,lexeme); :};
  	terminal notCurly_t ::= /[^\{\}]*/ {: RESULT = lexeme; :};
     
- 	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); :};
+ 	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); flagTok = null; :};
  	
  	// error if DSLNext but not indented further
  	// DSL if DSLNext and indented (unsets DSLNext, sets inDSL)
@@ -206,9 +229,15 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	disambiguate d1:(dsl_indent_t,indent_t)
 	{:
 		String currentIndent = indents.peek();
+		if (lastIndent != null && !(currentIndent.equals(lastIndent.image)))
+		    currentIndent = lastIndent.image;
 		if (lexeme.length() > currentIndent.length() && lexeme.startsWith(currentIndent)) {
 			// indented
-			if (DSLNext || inDSL) {
+			/*if (DSLNext != isDSLNext()) {
+				System.out.println("whoa");
+			    //throw new RuntimeException("unexpected difference");
+			}*/
+			if (/*DSLNext*/ isDSLNext() || inDSL) {
 				DSLNext = false;
 				inDSL = true;
 				return dsl_indent_t;
@@ -317,8 +346,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
                | booleanor_t:t {: RESULT = t; :}
 	           ;
 
-	anyLineElement ::= whitespace_t:n {: RESULT = LexerUtils.makeList(n); :}
-	                 | nonWSLineElement:n {: RESULT = n; :};
+	anyLineElement ::= whitespace_t:n {: RESULT = LexerUtils.makeList(n); /*System.out.println(n);*/ :}
+	                 | nonWSLineElement:n {: RESULT = n; /*System.out.println(n);*/ :};
 
 	// a non-whitespace line element 
 	nonWSLineElement ::= identifier_t:n {: RESULT = LexerUtils.makeList(n); :}
@@ -335,8 +364,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     inlinelit ::= oCurly_t innerdsl:idsl cCurly_t {: RESULT = idsl; :};
     innerdsl ::= notCurly_t:str {: RESULT = str; :} | notCurly_t:str oCurly_t innerdsl:idsl cCurly_t innerdsl:stre {: RESULT = str + "{" + idsl + "}" + stre; :} | {: RESULT = ""; :};
     
-	lineElementSequence ::= indent_t:n {: RESULT = LexerUtils.makeList(n); :}
+	lineElementSequence ::= indent_t:n {: RESULT = LexerUtils.makeList(n); flagTok = null; lastIndent = n; :}
 	                      | nonWSLineElement:n {:
+	                            //System.out.println(n);
+	                            lastIndent = null;
 	                            // handles lines that start without any indent
 	                            if (inDSL)
 	                                inDSL = false;

@@ -157,7 +157,8 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             ToolError.reportError(
                 ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
                 this,
-                "" + formals.size()
+                "" + formals.size(),
+                "" + (rawArgs.size() + args.size())
             );
         }
         for (int i = 0; i < rawArgs.size(); i++) {
@@ -285,6 +286,15 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         sb.append(arguments.toString());
         sb.append(")");
         return sb;
+    }
+
+    /** Side-effects the Application to add an argument;
+     * used when we parse an argument separately from the application itself.
+     */
+    public void addArgument(TypedAST argument) {
+        LinkedList<TypedAST> args = new LinkedList<TypedAST>(arguments);
+        args.addLast(argument);
+        arguments = args;
     }
 
 }

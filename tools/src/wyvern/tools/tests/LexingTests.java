@@ -2,6 +2,7 @@ package wyvern.tools.tests;
 
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DASH;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEDENT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEF;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DIVIDE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DSLLINE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.IDENTIFIER;
@@ -14,6 +15,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.PLUS;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.RPAREN;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.SINGLE_LINE_COMMENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TILDE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TYPE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.WHITESPACE;
 
 import java.io.IOException;
@@ -156,12 +158,12 @@ public class LexingTests {
 	@Test
 	public void testIndentBlock() throws IOException, CopperParserException {
 		String input =
-				"foo()\n" +
+				"def()\n" +
 				"  baz()\n" +
 				"  bam()\n" +
 				"bar()\n";
 		int[] expected = new int[] {
-				IDENTIFIER, LPAREN, RPAREN, WHITESPACE, NEWLINE,
+				DEF, LPAREN, RPAREN, WHITESPACE, NEWLINE,
 				INDENT, WHITESPACE, IDENTIFIER, LPAREN, RPAREN, WHITESPACE, NEWLINE,
 				WHITESPACE, IDENTIFIER, LPAREN, RPAREN, WHITESPACE, NEWLINE,
 				DEDENT, IDENTIFIER, LPAREN, RPAREN, WHITESPACE, NEWLINE,
@@ -186,12 +188,12 @@ public class LexingTests {
 	@Test
 	public void testIndentComment() throws IOException, CopperParserException {
 		String input =
-				"foo\n" +
+				"def\n" +
 				"  baz  /* \n" +
 				" */ bam\n" +
 				"  bag\n";
 		int[] expected = new int[] {
-				IDENTIFIER, WHITESPACE, NEWLINE,
+				DEF, WHITESPACE, NEWLINE,
 				INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, MULTI_LINE_COMMENT,
 				WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
 				WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE, DEDENT,
@@ -201,12 +203,12 @@ public class LexingTests {
 	@Test
 	public void testIndentParen() throws IOException, CopperParserException {
 		String input =
-				"foo\n" +
+				"def\n" +
 				"  baz  ( \n" +
 				" knarl) bam\n" +
 				"  bag\n";
 		int[] expected = new int[] {
-				IDENTIFIER, WHITESPACE, NEWLINE,
+				DEF, WHITESPACE, NEWLINE,
 				INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, LPAREN, WHITESPACE, WHITESPACE,
 				WHITESPACE, IDENTIFIER, RPAREN, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
 				WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE, DEDENT,
@@ -216,11 +218,11 @@ public class LexingTests {
 	@Test
 	public void testContinuationAndEOFDedent() throws IOException, CopperParserException {
 		String input =
-				"foo\\\n" +
+				"def\\\n" +
 				"  bar\n" +
 				"  bam\n";
 		int[] expected = new int[] {
-				IDENTIFIER, WHITESPACE,
+				DEF, WHITESPACE,
 				WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
 				INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE, DEDENT,
 			};
@@ -229,11 +231,11 @@ public class LexingTests {
 	@Test
 	public void testContinuationAndEOFDedent2() throws IOException, CopperParserException {
 		String input =
-				"foo\\\n" +
+				"def\\\n" +
 				"  bar\n" +
 				"  bam";
 		int[] expected = new int[] {
-				IDENTIFIER, WHITESPACE,
+				DEF, WHITESPACE,
 				WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
 				INDENT, WHITESPACE, IDENTIFIER, NEWLINE, DEDENT,
 			};
@@ -267,15 +269,15 @@ public class LexingTests {
 	@Test(expected = CopperParserException.class)
 	public void badIndent() throws IOException, CopperParserException {
 		String input =
-				"foo\n" +
-				" bar\n" +
+				"def\n" +
+				" type\n" +
 				"\t baz\n";
 		tryLex(input);
 	}
 	@Test(expected = ToolError.class)
 	public void badDedent() throws IOException, CopperParserException {
 		String input =
-				"foo\n" +
+				"def\n" +
 				"  bar\n" +
 				" baz\n";
 		tryLex(input);
@@ -283,13 +285,13 @@ public class LexingTests {
 	@Test
 	public void TwoDedents() throws IOException, CopperParserException {
 		String input =
-				"foo\n" +
-				" bar\n" +
+				"def\n" +
+				" type\n" +
 				"  bam\n" +
 				"baz\n";
 		int[] expected = new int[] {
-				IDENTIFIER, WHITESPACE, NEWLINE,
-				INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
+				DEF, WHITESPACE, NEWLINE,
+				INDENT, WHITESPACE, TYPE, WHITESPACE, NEWLINE,
 				INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
 				DEDENT, DEDENT, IDENTIFIER, WHITESPACE, NEWLINE,
 			};
