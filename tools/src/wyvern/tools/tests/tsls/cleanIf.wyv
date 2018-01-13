@@ -7,10 +7,9 @@ val iff = (cond:Boolean, blocks:IfTSL2.Blocks) => IfTSL2.doifblk(cond, blocks)
 val x = -5
 val y : Int = iff (x>0) {x} els {-x}
 val z : Int = iff (x>0)
-    then
         x
     else
         -x
-y
+z
 
 // design question: should we just replace the whole ~ syntax with a scheme more like what's above?

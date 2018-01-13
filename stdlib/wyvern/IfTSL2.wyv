@@ -7,11 +7,6 @@ import wyvern.internal.list              // We use wyvern.internal.list because 
 
 type AST = ast.AST
 
-def thenMatch(input : String) : regex.Match
-  val thenRegex = regex("^then\n")
-  val mOpt = thenRegex.findPrefixMatchOf(input)
-  mOpt.getOrElse(() => regex.makeMatch("", input))
-
 def elseMatch(input : String) : regex.Match
   val thenRegex = regex("^else\n")
   val mOpt = thenRegex.findPrefixMatchOf(input)
@@ -45,8 +40,7 @@ resource type Blocks
   metadata new
     def parseTSL(input : String, ctx : system.Context) : option.Option
       val trimmedInput = ast.stripLeadingWhitespace(input)
-      val tm = thenMatch(trimmedInput)
-      val trueMatch = indentedBlockMatch(tm.after())
+      val trueMatch = indentedBlockMatch(trimmedInput)
       val em = elseMatch(trueMatch.after())
       val trueAST : AST = toUnitOrAST(trueMatch.matched(), ctx)
       val falseAST : AST = toUnitOrAST(em.after(), ctx)
