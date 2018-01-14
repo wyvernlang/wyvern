@@ -18,8 +18,11 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -34,8 +37,13 @@ import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
+import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public class Globals {
 	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
@@ -43,6 +51,8 @@ public class Globals {
 	public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
 	public static final boolean checkRuntimeTypes = false;
 	private static final Set<String> javaWhiteList = new HashSet<String>();
+	private static final String PRELUDE_NAME = "prelude.wyv";
+	private static SeqExpr prelude = null;
 	
 	static {
 		// the whitelist that anyone can import without requiring java or becoming a resource module
@@ -52,6 +62,23 @@ public class Globals {
 		javaWhiteList.add("wyvern.stdlib.support.AST.utils");
 		javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
 		javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
+	}
+	
+	private static SeqExpr getPrelude(GenContext ctx) {
+	    if (prelude == null) {
+    	    String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
+    	    File file = new File(preludeLocation);
+    	    TypedAST ast = null;
+    	    try {
+                ast = TestUtil.getNewAST(file);
+            } catch (ParseException e) {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
+            }
+            final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+            IExpr program = ((ExpressionAST)ast).generateIL(ctx, null, dependencies);
+            prelude = (SeqExpr) program;
+	    }
+        return prelude;
 	}
 	
 	public static boolean checkSafeJavaImport(String packageName) {
@@ -78,7 +105,9 @@ public class Globals {
 		genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
 		genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
 		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
-		return genCtx;
+		SeqExpr sexpr = getPrelude(genCtx);
+		GenContext newCtx = sexpr.extendContext(genCtx);
+		return newCtx;
 	}
 
     private static ValueType getSystemType() {
@@ -151,12 +180,17 @@ public class Globals {
 		GenContext ctx = GenContext.empty();
 		ctx = ctx.extend("system", new Variable("system"), getSystemType());
 		ctx = GenUtil.ensureJavaTypesPresent(ctx);
-		return ctx;
+        SeqExpr sexpr = getPrelude(ctx);
+        GenContext newCtx = sexpr.extendContext(ctx);
+		return newCtx;
 	}
 
 	public static EvalContext getStandardEvalContext() {
 		EvalContext ctx = EvalContext.empty();
 		ctx = ctx.extend("system", Globals.getSystemValue());
+        SeqExpr sexpr = prelude;
+        assert sexpr != null; // invariant: we must have gotten a type context already 
+        ctx = sexpr.interpretCtx(ctx).second;
 		return ctx;
 	}
 

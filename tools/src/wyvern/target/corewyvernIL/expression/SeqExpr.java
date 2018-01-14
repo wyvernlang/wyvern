@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.util.Pair;
 
 public class SeqExpr extends Expression {
 	private LinkedList<HasLocation> elements; // either a VarBinding or an Expression
@@ -113,8 +114,7 @@ public class SeqExpr extends Expression {
 		return emitILVisitor.visit(state, this);
 	}
 
-	@Override
-	public Value interpret(EvalContext ctx) {
+	public Pair<Value, EvalContext> interpretCtx(EvalContext ctx) {
 	    EvalContext extendedCtx = ctx;
         Value result = Util.unitValue();
         for (HasLocation elem : elements) {
@@ -130,8 +130,13 @@ public class SeqExpr extends Expression {
             }
         }
         
-		return result;
+		return new Pair<Value, EvalContext>(result, extendedCtx);
 	}
+
+    @Override
+    public Value interpret(EvalContext ctx) {
+        return interpretCtx(ctx).first;
+    }
 
 	@Override
 	public Set<String> getFreeVariables() {
