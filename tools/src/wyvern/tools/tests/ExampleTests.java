@@ -1,5 +1,12 @@
 package wyvern.tools.tests;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -8,6 +15,7 @@ import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
@@ -137,14 +145,50 @@ public class ExampleTests {
 	}
 	
 	@Test
-	@Category(CurrentlyBroken.class)
-	public void testIOLibServer() throws ParseException {
-		TestUtil.doTestScriptModularly(PATH, "io-lib.server", Util.unitType(), Util.unitValue());
-	}
-	
-	@Test
-	@Category(CurrentlyBroken.class)
-	public void testIOLibClient() throws ParseException {
-		TestUtil.doTestScriptModularly(PATH, "io-lib.client", Util.unitType(), Util.unitValue());
+	public void testIOLibServerClient() throws ParseException {
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+		
+		Future<?> futureServer = executor.submit(() -> {
+			try {
+				TestUtil.doTestScriptModularly(PATH, "io-lib.server", Util.unitType(), Util.unitValue());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		
+		// We need to let the server start and get to waiting/blocking on a socket with accept before we start client.
+		// Thus I wait 3 seconds. The following code will also catch any ToolError that might have happened in the test.
+		
+		try {
+			futureServer.get(3, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// This one is OK.
+		} catch (TimeoutException e) {
+			// This one is a good sign as it is waiting on a socket.
+		} catch (ExecutionException e) {
+			if (e.getCause().getCause() instanceof ToolError) {
+				throw (ToolError) e.getCause().getCause();
+			} else {
+				throw new RuntimeException(e.getCause());
+			}
+		} finally {
+			executor.shutdownNow();
+		}
+
+		// Client can now run and it will complete and shutdown the server as a result if all goes well.
+		try {
+			TestUtil.doTestScriptModularly(PATH, "io-lib.client", Util.unitType(), Util.unitValue());
+		} finally {
+			// Just in case - we need to clean up.
+			executor.shutdown();
+			try {
+			    if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
+			        executor.shutdownNow();
+			    } 
+			} catch (InterruptedException e) {
+			} finally {
+				executor.shutdownNow();
+			}
+		}
 	}
 }
