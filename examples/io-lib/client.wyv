@@ -23,5 +23,5 @@ stdout.print(str)
 // When done, close the connection and exit
 dis.close()
 // Call to "s1in.close()" causes an error
-    // As in the server, this call is not needed but came from the cited example
+// As in the server, this call is not needed but came from the cited example
 s1.close()

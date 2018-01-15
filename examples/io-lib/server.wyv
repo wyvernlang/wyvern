@@ -28,5 +28,5 @@ stdout.print("Wrote to DataOutputStream\n")
 // Close the connection but not the server socket
 dos.close()
 // Call to "s1out.close()" causes an error.
-    // This call is not necessary, but was provided in the example cited.
+// This call is not necessary, but was provided in the example cited.
 s1.close()
