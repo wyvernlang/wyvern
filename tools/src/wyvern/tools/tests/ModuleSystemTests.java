@@ -49,7 +49,7 @@ public class ModuleSystemTests {
 	            Util.intType(),
 	            new IntegerLiteral(1));
 	}
-	
+
     @Test
     public void testTransitiveAuthorityBad() throws ParseException {
         TestUtil.doTestScriptModularlyFailing("modules.databaseClientBad",

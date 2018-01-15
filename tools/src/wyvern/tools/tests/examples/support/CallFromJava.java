@@ -1,4 +1,4 @@
-package wyvern.examples.support;
+package wyvern.tools.tests.examples.support;
 
 import java.util.LinkedList;
 import java.util.List;
