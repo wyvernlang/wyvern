@@ -135,4 +135,16 @@ public class ExampleTests {
 		PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
 		PythonCompiler.main(args);
 	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testIOLibServer() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "io-lib.server", Util.unitType(), Util.unitValue());
+	}
+	
+	@Test
+	@Category(CurrentlyBroken.class)
+	public void testIOLibClient() throws ParseException {
+		TestUtil.doTestScriptModularly(PATH, "io-lib.client", Util.unitType(), Util.unitValue());
+	}
 }
