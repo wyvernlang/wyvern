@@ -15,7 +15,7 @@ public class ToolError extends RuntimeException {
 
     protected ToolError(ErrorMessage message, FileLocation location, String... args) {
         super(message.getErrorMessage(args) + 
-                ((location != null) ? " on line number " + location.toString():""));
+                ((location != null) ? " at location " + location.toString() : ""));
         this.location = location;
         assert message.numberOfArguments() == args.length;
         this.errorMessage = message;
