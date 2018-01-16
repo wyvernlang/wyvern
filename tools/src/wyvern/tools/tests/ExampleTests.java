@@ -160,7 +160,7 @@ public class ExampleTests {
 		// Thus I wait 3 seconds. The following code will also catch any ToolError that might have happened in the test.
 		
 		try {
-			futureServer.get(3, TimeUnit.SECONDS);
+			futureServer.get(10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			// This one is OK.
 		} catch (TimeoutException e) {
