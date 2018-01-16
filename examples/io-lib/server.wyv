@@ -5,12 +5,12 @@
 
 require java
 require stdout
-import IO
-val io = IO(java)
+import io
+val ioobj = io(java)
 
 
 // Make a ServerSocket on port 1254
-val serverSocket = io.makeServerSocket(1254)
+val serverSocket = ioobj.makeServerSocket(1254)
 
 // Wait and accept a connection
 stdout.print("Waiting for a client connection...\n")
@@ -20,7 +20,7 @@ stdout.print("Accepted a connection.\n")
 // Get a communication stream associated with the socket
 val s1out = s1.getOutputStream()
 
-val dos = io.makeDataOutputStream(s1out)
+val dos = ioobj.makeDataOutputStream(s1out)
 
 dos.writeUTF("This is a server message\n")
 stdout.print("Wrote to DataOutputStream\n")
