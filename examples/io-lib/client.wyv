@@ -5,15 +5,15 @@
 
 require java
 require stdout
-import IO
-val io = IO(java)
+import io
+val ioobj = io(java)
 
 // Open a connection to a server at port 1254
-val s1 = io.makeSocket("localhost", 1254)
+val s1 = ioobj.makeSocket("localhost", 1254)
 
 // Get an input file handle from the socket and read input
 val s1in = s1.getInputStream()
-val dis = io.makeDataInputStream(s1in)
+val dis = ioobj.makeDataInputStream(s1in)
 
 // Read in from server
 val str = dis.readUTF()
@@ -23,5 +23,5 @@ stdout.print(str)
 // When done, close the connection and exit
 dis.close()
 // Call to "s1in.close()" causes an error
-    // As in the server, this call is not needed but came from the cited example
+// As in the server, this call is not needed but came from the cited example
 s1.close()
