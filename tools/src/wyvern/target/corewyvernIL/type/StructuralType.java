@@ -165,7 +165,7 @@ public class StructuralType extends ValueType {
 		for (DeclType mdt : getDeclTypes()) {
 			if (mdt.getName().equals(declName)) {
 				if (theDecl != null)
-					throw new RuntimeException("ambiguous findDecl!");
+					throw new RuntimeException("Ambiguous findDecl: " + declName);
 				theDecl = mdt;
 			}
 		}

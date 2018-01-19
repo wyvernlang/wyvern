@@ -55,14 +55,14 @@ public class Interpreter {
 			// sanity check: is the wyvernPath a valid directory?
 			if (!Files.isDirectory(Paths.get(wyvernPath))) {
 				System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
-				return;				
+				return;
 			}
 			final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, rootDir, new File(wyvernPath));
 			Module m = state.getResolver().load("unknown", filepath.toFile(), true);
 			IExpr program = m.getExpression();
 			program = state.getResolver().wrap(program, m.getDependencies());
-      program = (IExpr)PlatformSpecializationVisitor.specializeAST((ASTNode)program, "java", Globals.getGenContext(state));
-			
+			program = (IExpr)PlatformSpecializationVisitor.specializeAST((ASTNode)program, "java", Globals.getGenContext(state));
+
 			/*ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
 			GenContext genCtx = Globals.getGenContext(state);
 			Expression program = ast.generateIL(genCtx, null);*/
@@ -79,7 +79,7 @@ public class Interpreter {
 
 	// used to set WYVERN_HOME when called programatically
 	public static final ThreadLocal<String> wyvernHome = new ThreadLocal<String>();
-	  
+
 	// used to set WYVERN_ROOT when called programatically
 	public static final ThreadLocal<String> wyvernRoot = new ThreadLocal<String>();
 }

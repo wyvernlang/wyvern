@@ -1,151 +1,169 @@
 <?xml version="1.0"?>
 <project name="wyvern" default="copper-generate" basedir=".">
-    <property name="build.dir" value="build/" />
-    <property name="src.dir" value="src" />
-	
-	<path id="classpath.base">
-		<pathelement location="lib/junit-4.11.jar" />
-		<pathelement location="lib/asm-debug-all-5.0.1.jar" />
-		<pathelement location="lib/CopperCompiler.jar" />
-		<pathelement location="lib/CopperRuntime.jar" />
-		<pathelement location="lib/hamcrest-core-1.3.jar" />
-		<pathelement location="lib/javatuples-1.2.jar" />
-        <pathelement location="lib/checkstyle-7.1-all.jar" />
-        <pathelement location="lib/jacocoant.jar" />
-	</path>
-	
-    <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
-    <target name="copper-compose-compile">
-        <mkdir dir="copper-composer/bin"/>
-        <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
-            <classpath path="lib/CopperCompiler.jar:lib/ant.jar"/>
-        </javac>
-    </target>
-    <target name="lexer">
-        <copper outputfile="src/wyvern/tools/lexing/WyvernLexer.java" packagename="wyvern.tools.lexing">
-            <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
-        </copper>
-    </target>
-    <target name="javacc-parser" depends="lexer">
-    	<javacc
-    	    target="src/wyvern/tools/parsing/coreparser/WyvernParser.jj"
-    	    outputdirectory="src/wyvern/tools/parsing/coreparser/"
-    	    javacchome="lib/"
+  <property name="build.dir" value="build/" />
+  <property name="src.dir" value="src" />
+  
+  <path id="classpath.base">
+    <pathelement location="lib/junit-4.11.jar" />
+    <pathelement location="lib/asm-debug-all-5.0.1.jar" />
+    <pathelement location="lib/CopperCompiler.jar" />
+    <pathelement location="lib/CopperRuntime.jar" />
+    <pathelement location="lib/hamcrest-core-1.3.jar" />
+    <pathelement location="lib/javatuples-1.2.jar" />
+    <pathelement location="lib/checkstyle-7.1-all.jar" />
+    <pathelement location="lib/jacocoant.jar" />
+  </path>
+  
+  <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
+
+  <target name="copper-compose-compile">
+    <mkdir dir="copper-composer/bin"/>
+    <javac destdir="copper-composer/bin" srcdir="copper-composer/src">
+      <classpath path="lib/CopperCompiler.jar:lib/ant.jar"/>
+    </javac>
+  </target>
+
+  <target name="lexer">
+    <copper outputfile="src/wyvern/tools/lexing/WyvernLexer.java" packagename="wyvern.tools.lexing">
+      <inputs file="src/wyvern/tools/lexing/WyvernLexer.x"/>
+    </copper>
+  </target>
+
+  <target name="javacc-parser" depends="lexer">
+    <javacc
+    	target="src/wyvern/tools/parsing/coreparser/WyvernParser.jj"
+    	outputdirectory="src/wyvern/tools/parsing/coreparser/"
+    	javacchome="lib/"
     	/>
-    </target>
-    <target name="copper-generate" depends="lexer,javacc-parser">
-    </target>
-    <target name="copper-debug">
-        <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt" packagename="wyvern.tools.parsing">
-            <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
-        </copper>
-        <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java" dump="ON" dumpfile="copper-tests-output.txt">
-            <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
-        </copper>
-    </target>
+  </target>
 
-    <target name="arch-lexer">
-        <copper outputfile="src/wyvern/tools/lexing/archlexer/ArchLexer.java" packagename="wyvern.tools.lexing.archlexer">
-            <inputs file="src/wyvern/tools/lexing/archlexer/ArchLexer.x" />
-        </copper>
-    </target>
+  <target name="copper-generate" depends="lexer,javacc-parser">
+  </target>
 
-    <target name="arch-parser" depends="arch-lexer">
-        <javacc
-            target="src/wyvern/tools/parsing/coreparser/ArchParser.jj"
-            outputdirectory="src/wyvern/tools/parsing/coreparser/"
-            javacchome="lib/"
+  <target name="copper-debug">
+    <copper outputfile="src/wyvern/tools/parsing/Wyvern.java" dump="ON" dumpfile="copper-output.txt" packagename="wyvern.tools.parsing">
+      <inputs file="src/wyvern/tools/parsing/Wyvern.x"/>
+    </copper>
+    <copper outputfile="src/wyvern/tools/tests/utils/TestSuiteParser.java" dump="ON" dumpfile="copper-tests-output.txt">
+      <inputs file="src/wyvern/tools/tests/utils/Testsuite.x"/>
+    </copper>
+  </target>
+  
+  <target name="arch-lexer">
+    <copper outputfile="src/wyvern/tools/lexing/archlexer/ArchLexer.java" packagename="wyvern.tools.lexing.archlexer">
+      <inputs file="src/wyvern/tools/lexing/archlexer/ArchLexer.x" />
+    </copper>
+  </target>
+  
+  <target name="arch-parser" depends="arch-lexer">
+    <javacc
+        target="src/wyvern/tools/parsing/coreparser/ArchParser.jj"
+        outputdirectory="src/wyvern/tools/parsing/coreparser/"
+        javacchome="lib/"
         />
-    </target>
-
-    <target name="build" depends="clean,copper-generate,arch-parser">
-        <mkdir dir="${build.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
-            <compilerarg value="-Xlint:deprecation"/>
-            <compilerarg line="-Xmaxerrs 950" />
-            <classpath refid="classpath.base"/>
-        </javac>
-        <echo message="Build done" />	
-    </target>
-	
-	<target name="test" depends="build, lint">
-		<junit printsummary="on" haltonfailure="yes" fork="yes">
-			<classpath>
-				<path refid="classpath.base" />
-				<pathelement location="${build.dir}"/>
-			</classpath>
-            <formatter type="brief" usefile="false" />
-			<batchtest>
-				<fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
-			</batchtest>
-		</junit>
-    </target>
-	<target name="clean"
-			description="clean up">
-		<!-- Delete the ${build.dir} directory tree -->
-		<delete dir="${build.dir}"/>
-	</target>
-
-    <target name="lint">
-        <checkstyle config="checkstyle.xml" maxWarnings="0">
-            <!-- This is the fileset of all java files in our project.
-                 Uncommenting this line would be useful only have we've trimmed down the number of lint violations we have. Right now this takes 16 seconds just to dump the output of all the lint violations. Instead, we'll add files one at a time until we've got a lot covered.
-                <fileset dir="${src.dir}" includes="**/*.java"/>
-            -->
-            <fileset dir="${src.dir}"
-                includes="wyvern/tools/typedAST/core/expressions/New.java
-                wyvern/tools/typedAST/core/expressions/Variable.java
-                wyvern/tools/typedAST/core/expressions/Application.java
-                wyvern/tools/typedAST/core/expressions/Assignment.java
-                wyvern/tools/typedAST/core/expressions/Case.java
-                wyvern/tools/typedAST/core/expressions/Fn.java
-                wyvern/tools/typedAST/core/expressions/IfExpr.java
-                wyvern/tools/typedAST/core/expressions/Instantiation.java
-                wyvern/tools/typedAST/core/expressions/Invocation.java
-                wyvern/tools/util/TreeWritable.java
-                wyvern/tools/tests/suites/AntRegressionTestSuite.java
-                wyvern/target/corewyvernIL/support/CallableExprGenerator.java"
-            />
-        </checkstyle>
-    </target>
-
-    <taskdef 
-        resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
-        classpathref="classpath.base"
-    />
-
-    <target name="coverage">
-        <coverage>
-            <junit printsummary="on" haltonfailure="yes" fork="yes">
-                <classpath>
-                    <path refid="classpath.base" />
-                    <pathelement location="${build.dir}"/>
-                </classpath>
-                <formatter type="brief" usefile="false" />
-                <batchtest>
-                    <fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
-                </batchtest>
-            </junit>
-        </coverage>
-        <report>
-            <executiondata>
-                <file file="jacoco.exec"/>
-            </executiondata>
-
-            <structure name="Wyvern">
-                <classfiles>
-                    <fileset dir="${build.dir}"/>
-                </classfiles>
-                <sourcefiles encoding="UTF-8">
-                    <fileset dir="${src.dir}"/>
-                </sourcefiles>
-            </structure>
-            <html destdir="report"/>
-        </report>
-    </target>
-
-    <taskdef 
-        resource="org/jacoco/ant/antlib.xml"
-        classpathref="classpath.base"
-    />
+  </target>
+  
+  <target name="build" depends="clean,copper-generate,arch-parser">
+    <mkdir dir="${build.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
+      <compilerarg value="-Xlint:deprecation"/>
+      <compilerarg line="-Xmaxerrs 950" />
+      <classpath refid="classpath.base"/>
+    </javac>
+    <echo message="Build done" />	
+  </target>
+  
+  <target name="test" depends="build, lint">
+    <property environment="env"/>
+    <fail message="WYVERN_HOME environment variable is set but points at a folder that does not look like valid Wyvern folder.">
+      <condition>
+	<and>
+	  <isset property="env.WYVERN_HOME"/>
+	  <not>
+	    <available file="${env.WYVERN_HOME}/stdlib" type="dir"/>
+	  </not>
+	</and>
+      </condition>
+    </fail>
+    <echo message="Testing... ${env.WYVERN_HOME}"/>
+    <junit printsummary="on" haltonfailure="yes" fork="yes">
+      <classpath>
+	<path refid="classpath.base" />
+	<pathelement location="${build.dir}"/>
+      </classpath>
+      <formatter type="brief" usefile="false" />
+      <batchtest>
+	<fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
+      </batchtest>
+    </junit>
+  </target>
+  
+  <target name="clean"
+	  description="clean up">
+    <!-- Delete the ${build.dir} directory tree -->
+    <delete dir="${build.dir}"/>
+  </target>
+  
+  <target name="lint">
+    <checkstyle config="checkstyle.xml" maxWarnings="0">
+      <!-- This is the fileset of all java files in our project.
+           Uncommenting this line would be useful only have we've trimmed down the number of lint violations we have. Right now this takes 16 seconds just to dump the output of all the lint violations. Instead, we'll add files one at a time until we've got a lot covered.
+           <fileset dir="${src.dir}" includes="**/*.java"/>
+      -->
+      <fileset dir="${src.dir}"
+               includes="wyvern/tools/typedAST/core/expressions/New.java
+			 wyvern/tools/typedAST/core/expressions/Variable.java
+			 wyvern/tools/typedAST/core/expressions/Application.java
+			 wyvern/tools/typedAST/core/expressions/Assignment.java
+			 wyvern/tools/typedAST/core/expressions/Case.java
+			 wyvern/tools/typedAST/core/expressions/Fn.java
+			 wyvern/tools/typedAST/core/expressions/IfExpr.java
+			 wyvern/tools/typedAST/core/expressions/Instantiation.java
+			 wyvern/tools/typedAST/core/expressions/Invocation.java
+			 wyvern/tools/util/TreeWritable.java
+			 wyvern/tools/tests/suites/AntRegressionTestSuite.java
+			 wyvern/target/corewyvernIL/support/CallableExprGenerator.java"
+               />
+    </checkstyle>
+  </target>
+  
+  <taskdef 
+      resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+      classpathref="classpath.base"
+      />
+  
+  <target name="coverage">
+    <coverage>
+      <junit printsummary="on" haltonfailure="yes" fork="yes">
+        <classpath>
+          <path refid="classpath.base" />
+          <pathelement location="${build.dir}"/>
+        </classpath>
+        <formatter type="brief" usefile="false" />
+        <batchtest>
+          <fileset dir="${src.dir}" includes="**/AntRegressionTestSuite.java" />
+        </batchtest>
+      </junit>
+    </coverage>
+    <report>
+      <executiondata>
+        <file file="jacoco.exec"/>
+      </executiondata>
+      
+      <structure name="Wyvern">
+        <classfiles>
+          <fileset dir="${build.dir}"/>
+        </classfiles>
+        <sourcefiles encoding="UTF-8">
+          <fileset dir="${src.dir}"/>
+        </sourcefiles>
+      </structure>
+      <html destdir="report"/>
+    </report>
+  </target>
+  
+  <taskdef 
+      resource="org/jacoco/ant/antlib.xml"
+      classpathref="classpath.base"
+      />
 </project>

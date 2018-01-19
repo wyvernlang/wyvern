@@ -240,7 +240,7 @@ public class TestUtil {
 	    InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,new File(searchPath), new File(LIB_PATH));
 	    final Module module = state.getResolver().resolveModule(qualifiedName, true);
 	    IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
-      program = (IExpr)PlatformSpecializationVisitor.specializeAST((ASTNode)program, "java", Globals.getGenContext(state));
+	    program = (IExpr)PlatformSpecializationVisitor.specializeAST((ASTNode)program, "java", Globals.getGenContext(state));
 	    TestUtil.doChecks(program, expectedType, expectedValue);
 	}
 	
