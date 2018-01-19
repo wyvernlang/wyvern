@@ -16,7 +16,7 @@ For an introduction to key concepts of the Wyvern language, see https://github.c
 For information about how to build and run the Wyvern tools, and about the Wyvern tools architecture, see https://raw.githubusercontent.com/wyvernlang/docs/master/tooldoc/wyvern-tool-architecture.mdk
 
 
-Research papers on Wyvern and other material is available at the Wyvern web page, http://www.cs.cmu.edu/~aldrich/wyvern/
+Research papers on Wyvern and other material is available at the Wyvern web page, http://wyvernlang.github.io/
 
 Contributing
 ------------
