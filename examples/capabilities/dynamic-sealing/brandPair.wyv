@@ -1,0 +1,18 @@
+module brandPair
+
+import wyvern.Option
+
+val option = Option
+
+type Option = option.Option
+
+resource type BrandPair
+     type T
+     var name:String
+     var shared:Option
+
+def make[T](name:String):BrandPair[T]
+    new
+        type T = T
+        var name:String = name
+        var shared:Option = option.None()
