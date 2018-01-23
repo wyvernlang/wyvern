@@ -13,25 +13,29 @@ import wyvern.tools.typedAST.interfaces.InvokableValue;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 
 public class StringConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
-	private String value;
-	
-	public StringConstant(String s) { this.value = s; }
-	public StringConstant(String s, FileLocation loc) { this.value = s; location = loc; }
+    private String value;
 
-	public String getValue() {
-		return value;
-	}
-	
+    public StringConstant(String s) {
+        this.value = s;
+    }
+    public StringConstant(String s, FileLocation loc) {
+        this.value = s; location = loc;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
 
     private FileLocation location = FileLocation.UNKNOWN;
-	public FileLocation getLocation() {
-		return this.location;
-	}
+    public FileLocation getLocation() {
+        return this.location;
+    }
 
-	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		return new StringLiteral(value, location);
-	}
+    @Override
+    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+        return new StringLiteral(value, location);
+    }
 
     public StringBuilder prettyPrint() {
         StringBuilder sb = new StringBuilder();

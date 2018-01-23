@@ -13,33 +13,40 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 
 public class IntegerConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
-	private int value;
-	
-	public IntegerConstant(int i, FileLocation loc) {
-		value = i;
-		location = loc;
-	}
+    private int value;
 
-	public int getValue() {
-		return value;
-	}
+    public IntegerConstant(int i, FileLocation loc) {
+        value = i;
+        location = loc;
+    }
 
-	private FileLocation location = FileLocation.UNKNOWN;
-	public FileLocation getLocation() {
-		return this.location;
-	}
+    public int getValue() {
+        return value;
+    }
+
+    private FileLocation location = FileLocation.UNKNOWN;
+    public FileLocation getLocation() {
+        return this.location;
+    }
 
     @Override
-	public boolean equals(Object o) {
-		if (!(o instanceof IntegerConstant))
-			return false;
-		if (((IntegerConstant) o).getValue() != this.getValue())
-			return false;
-		return true;
-	}
+    public boolean equals(Object o) {
+        if (!(o instanceof IntegerConstant)) {
+            return false;
+        }
+        if (((IntegerConstant) o).getValue() != this.getValue()) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		return new IntegerLiteral(value, location);
-	}
+    @Override
+    public int hashCode() {
+        return value;
+    }
+
+    @Override
+    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+        return new IntegerLiteral(value, location);
+    }
 }
