@@ -114,6 +114,7 @@
                includes="wyvern/tools/typedAST/**/*.java
                wyvern/tools/types/**/*.java
                wyvern/tools/util/*.java
+               wyvern/tools/interop/*.java
                wyvern/tools/reflection/*.java
                wyvern/tools/tests/CoreParserTests.java
                wyvern/tools/tests/DemoTests.java
