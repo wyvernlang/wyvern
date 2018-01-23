@@ -2,7 +2,6 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -11,8 +10,6 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.expression.Let;
-import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -28,120 +25,117 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
-import wyvern.tools.types.Type;
-import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.Pair;
 
 public class ModuleDeclaration extends Declaration implements CoreAST {
-	private final String name;
-	private final TypedAST inner;
-	private FileLocation location;
-	private NamedType ascribedType;
-	private boolean resourceFlag;
-	private final List<NameBindingImpl> args;
-	private final List<ImportDeclaration> imports;
+    private final String name;
+    private final TypedAST inner;
+    private FileLocation location;
+    private NamedType ascribedType;
+    private boolean resourceFlag;
+    private final List<NameBindingImpl> args;
+    private final List<ImportDeclaration> imports;
 
-	public ModuleDeclaration(String name, List imports, List<NameBindingImpl> args, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
-		this.name = name;
-		this.inner = inner;
-		this.location = location;
-		this.resourceFlag = isResource;
-		ascribedType = type;
-		this.args = args;
-		this.imports = imports;
-	}
+    public ModuleDeclaration(String name, List imports, List<NameBindingImpl> args, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
+        this.name = name;
+        this.inner = inner;
+        this.location = location;
+        this.resourceFlag = isResource;
+        ascribedType = type;
+        this.args = args;
+        this.imports = imports;
+    }
 
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
     @Override
     public String toString() {
         return "module " + name;
     }
 
-	@Override
-	public FileLocation getLocation() {
-		return location;
-	}
+    @Override
+    public FileLocation getLocation() {
+        return location;
+    }
 
-	@Override
-	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public DeclType genILType(GenContext ctx) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		return null;
-	}
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+        return null;
+    }
 
-	/**
-	 * Generate the rest part of a module (not import/instantiate/require)
-	 *
-	 * @param normalSeq the declaration sequence
-	 * @param ctx the context
-	 * @return the IL expression
-	 */
-	private IExpr innerTranslate(Sequence normalSeq, GenContext ctx) {
-		/* Sequence.innerTranslate */
-		// The real work is done by the sequence itself.
-		return normalSeq.generateModuleIL(ctx, true);
-	}
-
-
-	/**
-	 * Computes and returns the set of arguments this module requires.
-	 * 
-	 * loadedTypes is updated with all the types that had to be loaded in
-	 * order to specify the required types.
-	 * 
-	 * @param reqSeq
-	 * @param ctx
-	 * @param loadedTypes
-	 * @return
-	 */
-	private List<FormalArg> getTypes(GenContext ctx, List<Module> loadedTypes) {
-		/* generate the formal arguments by requiring sequence */
-		List<FormalArg> types = new LinkedList<FormalArg>();
-		for(NameBindingImpl a : args) {
-			String typeName = ((NamedType)a.getType()).getFullName();
-			wyvern.target.corewyvernIL.type.ValueType type = getType(ctx,
-					loadedTypes, null, typeName);
-			types.add(new FormalArg(a.getName(), type));
-		}
-		return types;
-	}
+    /**
+     * Generate the rest part of a module (not import/instantiate/require)
+     *
+     * @param normalSeq the declaration sequence
+     * @param ctx the context
+     * @return the IL expression
+     */
+    private IExpr innerTranslate(Sequence normalSeq, GenContext ctx) {
+        /* Sequence.innerTranslate */
+        // The real work is done by the sequence itself.
+        return normalSeq.generateModuleIL(ctx, true);
+    }
 
 
-	private wyvern.target.corewyvernIL.type.ValueType getType(GenContext ctx,
-			List<Module> loadedTypes, FileLocation location, String name) {
-		wyvern.target.corewyvernIL.type.ValueType type = null;
-		if (ctx.isPresent(name, false)) {
-			type = ctx.lookupType(name, location);
-		} else {
-			Module lt = ctx.getInterpreterState().getResolver().resolveType(name);
-			type = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName());
-			//bindings.add(binding);
-			loadedTypes.add(lt);
-		}
-		return type;
-	}
+    /**
+     * Computes and returns the set of arguments this module requires.
+     *
+     * loadedTypes is updated with all the types that had to be loaded in
+     * order to specify the required types.
+     *
+     * @param reqSeq
+     * @param ctx
+     * @param loadedTypes
+     * @return
+     */
+    private List<FormalArg> getTypes(GenContext ctx, List<Module> loadedTypes) {
+        /* generate the formal arguments by requiring sequence */
+        List<FormalArg> types = new LinkedList<FormalArg>();
+        for (NameBindingImpl a : args) {
+            String typeName = ((NamedType) a.getType()).getFullName();
+            wyvern.target.corewyvernIL.type.ValueType type = getType(ctx,
+                    loadedTypes, null, typeName);
+            types.add(new FormalArg(a.getName(), type));
+        }
+        return types;
+    }
 
 
-	public boolean isResource() {
-		return this.resourceFlag;
-	}
+    private wyvern.target.corewyvernIL.type.ValueType getType(GenContext ctx,
+            List<Module> loadedTypes, FileLocation location, String name) {
+        wyvern.target.corewyvernIL.type.ValueType type = null;
+        if (ctx.isPresent(name, false)) {
+            type = ctx.lookupType(name, location);
+        } else {
+            Module lt = ctx.getInterpreterState().getResolver().resolveType(name);
+            type = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName());
+            //bindings.add(binding);
+            loadedTypes.add(lt);
+        }
+        return type;
+    }
+
+
+    public boolean isResource() {
+        return this.resourceFlag;
+    }
 
     private boolean isPlatformPath(String platform, String path) {
         // Return true if file path ends with /platform/X/FILENAME (where X is a platform)
         //Pattern p = Pattern.compile("/platform/" + platform + "/[^/]*$");
-        
+
         // Return true if file path includes platform/X (where X is a platform)
         final String separatorPattern = Pattern.quote(File.separator);
         //Pattern p = Pattern.compile("platform" + separatorPattern + platform);
@@ -166,10 +160,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             } else {
                 File f = ModuleResolver.getLocal().resolve(uri.getSchemeSpecificPart(), false);
                 boolean isPlatPath = isPlatformPath(ModuleResolver.getLocal().getPlatform(), f.getAbsolutePath());
-                if (isPlatPath)
+                if (isPlatPath) {
                     platformDependent.addLast(d);
-                else
+                } else {
                     platformIndependent.addLast(d);
+                }
             }
         }
     }
@@ -178,65 +173,67 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
     public GenContext translateImports(LinkedList<ImportDeclaration> imports, GenContext ctx, SeqExpr seq, List<TypedModuleSpec> dependencies) {
         GenContext current = ctx;
         for (ImportDeclaration imp : imports) {
-                Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(current, dependencies);
-                current = bindingAndCtx.second;
-                seq.addBinding(bindingAndCtx.first);
+            Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(current, dependencies);
+            current = bindingAndCtx.second;
+            seq.addBinding(bindingAndCtx.first);
         }
         return current;
     }
-    
-	/**
-	 * For resource module: translate into def method(list of require types) : </br>
-	 * resource type { let (sequences of instantiate/import) in rest}; </br>
-	 * @see filterRequires
-	 * @see filterImportInstantiates
-	 * @see filterNormal
-	 * @see wrapLet
-	 * For non-resource module: translate into a value
-	 * 
-	 * Called by ModuleResolver.load() to generate IL code for a module
-	 */
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		GenContext methodContext = ctx;
+
+    /**
+     * For resource module: translate into def method(list of require types) : </br>
+     * resource type { let (sequences of instantiate/import) in rest}; </br>
+     * @see filterRequires
+     * @see filterImportInstantiates
+     * @see filterNormal
+     * @see wrapLet
+     * For non-resource module: translate into a value
+     *
+     * Called by ModuleResolver.load() to generate IL code for a module
+     */
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
+        GenContext methodContext = ctx;
         LinkedList<ImportDeclaration> platformDependentImports = new LinkedList<ImportDeclaration>();
         LinkedList<ImportDeclaration> platformIndependentImports = new LinkedList<ImportDeclaration>();
         separatePlatformDependencies(platformDependentImports, platformIndependentImports);
-		Sequence normalSeq = (inner instanceof Sequence)? ((DeclSequence)inner).filterNormal() : new Sequence(inner);
+        Sequence normalSeq = (inner instanceof Sequence) ? ((DeclSequence) inner).filterNormal() : new Sequence(inner);
 
-		List<FormalArg> formalArgs;
-		List<Module> loadedTypes = new LinkedList<Module>();
-		formalArgs = getTypes(ctx, loadedTypes); // get the types of the module parameters
-		wyvern.target.corewyvernIL.type.ValueType ascribedValueType = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
-		for (Module lt : loadedTypes) {
-			// include the declaration itself
-			final String internalName = lt.getSpec().getInternalName();
-			methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getSpec().getType());
-			// include the type abbreviation
-			methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalName, methodContext);
-			if (dependencies != null) {
-				dependencies.add(lt.getSpec());
+        List<FormalArg> formalArgs;
+        List<Module> loadedTypes = new LinkedList<Module>();
+        formalArgs = getTypes(ctx, loadedTypes); // get the types of the module parameters
+        wyvern.target.corewyvernIL.type.ValueType ascribedValueType
+            = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
+        for (Module lt : loadedTypes) {
+            // include the declaration itself
+            final String internalName = lt.getSpec().getInternalName();
+            methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getSpec().getType());
+            // include the type abbreviation
+            methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalName, methodContext);
+            if (dependencies != null) {
+                dependencies.add(lt.getSpec());
                 dependencies.addAll(lt.getDependencies());
-			}
-		}
+            }
+        }
 
-		/* adding parameters to environments */
-		for(FormalArg arg : formalArgs) {
-			methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
-		}
-		
-		/* importing modules and instantiations are translated into a SeqExpr */
-		SeqExpr seqExpr = new SeqExpr();
-        GenContext extended = translateImports(platformDependentImports, methodContext, seqExpr, dependencies); 
+        /* adding parameters to environments */
+        for (FormalArg arg : formalArgs) {
+            methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
+        }
+
+        /* importing modules and instantiations are translated into a SeqExpr */
+        SeqExpr seqExpr = new SeqExpr();
+        GenContext extended = translateImports(platformDependentImports, methodContext, seqExpr, dependencies);
         seqExpr = new SeqExpr(); // throw away the bindings for platform dependencies, they will be added back later
-		extended = translateImports(platformIndependentImports, extended, seqExpr, dependencies); 
-		wyvern.target.corewyvernIL.expression.IExpr body = innerTranslate(normalSeq, extended); 
-		TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(/*ctxWithPlatDeps*/methodContext, dependencies);
-		seqExpr.addExpr(body);
+        extended = translateImports(platformIndependentImports, extended, seqExpr, dependencies);
+        wyvern.target.corewyvernIL.expression.IExpr body = innerTranslate(normalSeq, extended);
+        TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(/*ctxWithPlatDeps*/methodContext, dependencies);
+        seqExpr.addExpr(body);
         body = seqExpr;
-		wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext, null);
-		if (ascribedValueType != null)
-			returnType = ascribedValueType;
+        wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext, null);
+        if (ascribedValueType != null) {
+            returnType = ascribedValueType;
+        }
 
         if (platformDependentImports.size() > 0) {
             // We have platform-dependent dependencies, return a corewyvernIL ModuleDeclaration
@@ -247,11 +244,11 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             }
             return new wyvern.target.corewyvernIL.decl.ModuleDeclaration(name, formalArgs, returnType, body, moduleDependencies, getLocation());
         }
-		if(isResource() == false && formalArgs.isEmpty()) {
-			/* non resource module translated into value */
-			return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
-		}
-		/* resource module translated into method */
-		return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
-	}
+        if (!isResource() && formalArgs.isEmpty()) {
+            /* non resource module translated into value */
+            return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
+        }
+        /* resource module translated into method */
+        return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
+    }
 }

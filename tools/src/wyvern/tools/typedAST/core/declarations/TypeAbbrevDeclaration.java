@@ -25,87 +25,90 @@ import wyvern.tools.types.Type;
 // would be better to have a separate class for representing an abstract type
 
 /** Represents a type abbreviation of the form:
- * 
+ *
  * type T = T1
- * 
+ *
  * @author aldrich
  *
  */
 public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
 
-	private String alias;
-	private Type reference;
-	private FileLocation location;
-	private TypedAST metadata;
+    private String alias;
+    private Type reference;
+    private FileLocation location;
+    private TypedAST metadata;
 
-	public TypeAbbrevDeclaration(String alias, Type reference, TypedAST metadata, FileLocation loc) {
-		this.alias = alias;
-		this.reference = reference;
-		this.location = loc;
-		this.metadata = metadata;
-	}
-	
-	@Override
-	public FileLocation getLocation() {
-		return location == null ? reference.getLocation() : location;
-	}
+    public TypeAbbrevDeclaration(String alias, Type reference, TypedAST metadata, FileLocation loc) {
+        this.alias = alias;
+        this.reference = reference;
+        this.location = loc;
+        this.metadata = metadata;
+    }
 
-	@Override
-	public String getName() {
-		return alias;
-	}
+    @Override
+    public FileLocation getLocation() {
+        return location == null ? reference.getLocation() : location;
+    }
 
-	@Override
-	public DeclType genILType(GenContext ctx) {
+    @Override
+    public String getName() {
+        return alias;
+    }
+
+    @Override
+    public DeclType genILType(GenContext ctx) {
         if (this.reference == null) {
             return new AbstractTypeMember(this.alias);
         }
-		ValueType referenceILType = reference.getILType(ctx);
+        ValueType referenceILType = reference.getILType(ctx);
 
-	    IExpr metadataExp = null;
-	    if (metadata != null)
-	        metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
-	    
-		return new ConcreteTypeMember(getName(), referenceILType, metadataExp);
-	}
+        IExpr metadataExp = null;
+        if (metadata != null) {
+            metadataExp = ((ExpressionAST) metadata).generateIL(ctx, null, null);
+        }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(
-			GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
+        return new ConcreteTypeMember(getName(), referenceILType, metadataExp);
+    }
+
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(
+            GenContext ctx, GenContext thisContext) {
+        // TODO Auto-generated method stub
         if (reference == null) {
             System.out.print("reference is null with alias=");
             System.out.print(alias);
             System.out.print(", location = ");
             System.out.println(getLocation().toString());
         }
-		return new TypeDeclaration(alias, reference.getILType(ctx), getLocation());
-	}
+        return new TypeDeclaration(alias, reference.getILType(ctx), getLocation());
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
-			GenContext ctx, List<TypedModuleSpec> dependencies) {
-		if (reference == null)
-			reportError(ErrorMessage.NO_ABSTRACT_TYPES_IN_OBJECTS, this);
-		ValueType referenceILType = reference.getILType(ctx);
-		referenceILType.checkWellFormed(ctx);
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
+            GenContext ctx, List<TypedModuleSpec> dependencies) {
+        if (reference == null) {
+            reportError(ErrorMessage.NO_ABSTRACT_TYPES_IN_OBJECTS, this);
+        }
+        ValueType referenceILType = reference.getILType(ctx);
+        referenceILType.checkWellFormed(ctx);
 
-		IExpr metadataExp = null;
-		if (metadata != null)
-			metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
+        IExpr metadataExp = null;
+        if (metadata != null) {
+            metadataExp = ((ExpressionAST) metadata).generateIL(ctx, null, null);
+        }
 
-			return new TypeDeclaration(getName(), referenceILType, metadataExp, getLocation());
-		}
-	
-	@Override
-	public void addModuleDecl(TopLevelContext tlc) {
-		wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext(), null);
-		DeclType dt = genILType(tlc.getContext());
-		tlc.addModuleDecl(decl,dt);
-	}
+        return new TypeDeclaration(getName(), referenceILType, metadataExp, getLocation());
+    }
 
-	
+    @Override
+    public void addModuleDecl(TopLevelContext tlc) {
+        wyvern.target.corewyvernIL.decl.Declaration decl = topLevelGen(tlc.getContext(), null);
+        DeclType dt = genILType(tlc.getContext());
+        tlc.addModuleDecl(decl, dt);
+    }
 
 
-	
+
+
+
 }

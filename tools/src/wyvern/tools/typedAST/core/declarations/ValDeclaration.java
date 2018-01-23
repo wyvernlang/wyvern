@@ -20,125 +20,125 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 
 public class ValDeclaration extends Declaration implements CoreAST {
-	ExpressionAST definition;
-	Type definitionType;
-	NameBinding binding;
-	
-	Type declaredType;
-	String declaredTypeName;
-	
-	String variableName;
+    private ExpressionAST definition;
+    private Type definitionType;
+    private NameBinding binding;
 
-	private TaggedInfo ti;
+    private Type declaredType;
+    private String declaredTypeName;
 
-	public ValDeclaration(String name, TypedAST definition, FileLocation location) {
-		this.definition=(ExpressionAST) definition;
-		binding = new NameBindingImpl(name, null);
-		this.location = location;
-	}
+    private String variableName;
 
-	public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
-		if (type instanceof UnresolvedType) {
-			UnresolvedType t = (UnresolvedType) type;
+    private TaggedInfo ti;
 
-			// System.out.println("t = " + t);
-			
-			TaggedInfo tag = TaggedInfo.lookupTagByType(t); // FIXME:
-			
-			// System.out.println("tag = " + tag);
-			
-			// if (tag != null) {
-				//doing a tagged type
-				ti = tag;
-				
-				variableName = name;
-				
-				declaredType = type; // Record this.
-				
-				//type = null;
-			// }
-		}
+    public ValDeclaration(String name, TypedAST definition, FileLocation location) {
+        this.definition = (ExpressionAST) definition;
+        binding = new NameBindingImpl(name, null);
+        this.location = location;
+    }
 
-		this.definition=(ExpressionAST)definition;
-		binding = new NameBindingImpl(name, type);
-		this.location = location;
-	}
+    public ValDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
+        if (type instanceof UnresolvedType) {
+            UnresolvedType t = (UnresolvedType) type;
 
-	@Override
-	public Type getType() {
-		return binding.getType();
-	}
+            // System.out.println("t = " + t);
 
-	@Override
-	public String getName() {
-		return binding.getName();
-	}
-	
-	public ExpressionAST getDefinition() {
-		return definition;
-	}
+            TaggedInfo tag = TaggedInfo.lookupTagByType(t); // FIXME:
 
-	private FileLocation location = FileLocation.UNKNOWN;
-	public FileLocation getLocation() {
-		return this.location; //TODO
-	}
+            // System.out.println("tag = " + tag);
 
-	@Override
-	public void genTopLevel(TopLevelContext tlc) {
-		ValueType declType = getILValueType(tlc.getContext());
-		tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
-	}
+            // if (tag != null) {
+            //doing a tagged type
+            ti = tag;
 
-	@Override
-	public DeclType genILType(GenContext ctx) {
-		ValueType vt = getILValueType(ctx);
-		return new ValDeclType(getName(), vt);
-	}
+            variableName = name;
 
-	private ValueType getILValueType(GenContext ctx) {
-		ValueType vt;
-		if (declaredType != null) {
-			// convert the declared type if there is one
-			vt = declaredType.getILType(ctx);
-		} else {
+            declaredType = type; // Record this.
+
+            //type = null;
+            // }
+        }
+
+        this.definition = (ExpressionAST) definition;
+        binding = new NameBindingImpl(name, type);
+        this.location = location;
+    }
+
+    @Override
+    public Type getType() {
+        return binding.getType();
+    }
+
+    @Override
+    public String getName() {
+        return binding.getName();
+    }
+
+    public ExpressionAST getDefinition() {
+        return definition;
+    }
+
+    private FileLocation location = FileLocation.UNKNOWN;
+    public FileLocation getLocation() {
+        return this.location; //TODO
+    }
+
+    @Override
+    public void genTopLevel(TopLevelContext tlc) {
+        ValueType declType = getILValueType(tlc.getContext());
+        tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
+    }
+
+    @Override
+    public DeclType genILType(GenContext ctx) {
+        ValueType vt = getILValueType(ctx);
+        return new ValDeclType(getName(), vt);
+    }
+
+    private ValueType getILValueType(GenContext ctx) {
+        ValueType vt;
+        if (declaredType != null) {
+            // convert the declared type if there is one
+            vt = declaredType.getILType(ctx);
+        } else {
 
             final Type type = this.binding.getType();
             if (type != null) {
-			
-			// then there is no proper R-value
-			//if(definition == null) {
-				vt = type.getILType(ctx);
-			} else {
-				// convert the declaration and typecheck it
-				vt = definition.generateIL(ctx, null, null).typeCheck(ctx, null);
-			}
-		}
-		return vt;
-	}
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		
-		ValueType expectedType = getILValueType(thisContext);
-		/* uses ctx for generating the definition, as the selfName is not in scope */
-		return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType, null), location);
-	}
+                // then there is no proper R-value
+                //if(definition == null) {
+                vt = type.getILType(ctx);
+            } else {
+                // convert the declaration and typecheck it
+                vt = definition.generateIL(ctx, null, null).typeCheck(ctx, null);
+            }
+        }
+        return vt;
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 
-	@Override
-	public void addModuleDecl(TopLevelContext tlc) {
-		wyvern.target.corewyvernIL.decl.Declaration decl =
-			new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(),
-					getILValueType(tlc.getContext()),
-					new wyvern.target.corewyvernIL.expression.Variable(getName()), location);
-		DeclType dt = genILType(tlc.getContext());
-		tlc.addModuleDecl(decl,dt);
-	}
+        ValueType expectedType = getILValueType(thisContext);
+        /* uses ctx for generating the definition, as the selfName is not in scope */
+        return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType, null), location);
+    }
+
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void addModuleDecl(TopLevelContext tlc) {
+        wyvern.target.corewyvernIL.decl.Declaration decl =
+                new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(),
+                        getILValueType(tlc.getContext()),
+                        new wyvern.target.corewyvernIL.expression.Variable(getName()), location);
+        DeclType dt = genILType(tlc.getContext());
+        tlc.addModuleDecl(decl, dt);
+    }
 
     @Override
     public StringBuilder prettyPrint() {
@@ -146,15 +146,17 @@ public class ValDeclaration extends Declaration implements CoreAST {
         sb.append("val ");
         sb.append(variableName);
         sb.append(" : ");
-        if (declaredType != null)
+        if (declaredType != null) {
             sb.append(declaredType.toString());
-        else
+        } else {
             sb.append("null");
+        }
         sb.append(" = ");
-        if (definition != null)
+        if (definition != null) {
             sb.append(definition.prettyPrint());
-        else
+        } else {
             sb.append("null");
+        }
         return sb;
     }
 }
