@@ -17,7 +17,7 @@ public class Script extends AbstractExpressionAST implements CoreAST {
     private List<ImportDeclaration> imports;
     private List<ImportDeclaration> requires;
     private Sequence body;
-    
+
     public Script(List requires, List imports, TypedAST body) {
         this.imports = (List<ImportDeclaration>) imports;
         this.requires = (List<ImportDeclaration>) requires;
@@ -38,7 +38,7 @@ public class Script extends AbstractExpressionAST implements CoreAST {
         for (ImportDeclaration i: imports) {
             i.genTopLevel(tlc);
         }
-        Sequence combinedSeq = ((Sequence)body).combine();
+        Sequence combinedSeq = ((Sequence) body).combine();
         combinedSeq.genTopLevel(tlc, expectedType);
         dependencies.addAll(tlc.getDependencies());
         return tlc.getExpression();
