@@ -28,12 +28,12 @@ public class New extends AbstractExpressionAST implements CoreAST {
     private String selfName;
 
     /**
-      * Makes a New expression with the provided mapping, file location, and self name.
-      *
-      * @param args The mapping from arg name to Expression.
-      * @param fileLocation the location in the file where the New expression occurs 
-      * @param selfName the name of the object created by this expression, like 'this' in Java
-      */
+     * Makes a New expression with the provided mapping, file location, and self name.
+     *
+     * @param args The mapping from arg name to Expression.
+     * @param fileLocation the location in the file where the New expression occurs
+     * @param selfName the name of the object created by this expression, like 'this' in Java
+     */
     public New(Map<String, TypedAST> args, FileLocation fileLocation, String selfName) {
         this.args = args;
         this.location = fileLocation;
@@ -41,11 +41,11 @@ public class New extends AbstractExpressionAST implements CoreAST {
     }
 
     /**
-      * Makes a New expression with the provided mapping and file location.
-      *
-      * @param args The mapping from arg name to Expression.
-      * @param fileLocation the location in the file where the New expression occurs 
-      */
+     * Makes a New expression with the provided mapping and file location.
+     *
+     * @param args The mapping from arg name to Expression.
+     * @param fileLocation the location in the file where the New expression occurs
+     */
     public New(Map<String, TypedAST> args, FileLocation fileLocation) {
         this.args = args;
         this.location = fileLocation;
@@ -53,11 +53,11 @@ public class New extends AbstractExpressionAST implements CoreAST {
     }
 
     /**
-      * This constructor makes a New expression with the provided declaration sequence.
-      *
-      * @param seq the list of declaration internal to the object created by this expression
-      * @param fileLocation the location in the file where the New expression occurs 
-      */
+     * This constructor makes a New expression with the provided declaration sequence.
+     *
+     * @param seq the list of declaration internal to the object created by this expression
+     * @param fileLocation the location in the file where the New expression occurs
+     */
     public New(DeclSequence seq, FileLocation fileLocation) {
         this.seq = seq;
         this.location = fileLocation;
@@ -93,35 +93,35 @@ public class New extends AbstractExpressionAST implements CoreAST {
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies
-    ) {
+            ) {
 
         ValueType type = seq.inferStructuralType(ctx, this.self());
-        
+
         // Translate the declarations.
         GenContext thisContext = ctx.extend(
                 this.self(),
                 new wyvern.target.corewyvernIL.expression.Variable(this.self()),
                 type
-        );
-        List<wyvern.target.corewyvernIL.decl.Declaration> decls = 
-            new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+                );
+        List<wyvern.target.corewyvernIL.decl.Declaration> decls =
+                new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 
-        for (TypedAST d : seq) {            
+        for (TypedAST d : seq) {
             wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) d)
-                .generateDecl(ctx, thisContext);
+                    .generateDecl(ctx, thisContext);
             if (decl == null) {
                 throw new NullPointerException();
             }
             decls.add(decl);
-            
-            // A VarDeclaration also generates declarations for 
+
+            // A VarDeclaration also generates declarations for
             // the getter and setter to the var field.
             // TODO: is the best place for this to happen?
             if (d instanceof VarDeclaration) {
                 VarDeclaration varDecl = (VarDeclaration) d;
                 String varName = varDecl.getName();
                 Type varType = varDecl.getType();
-                
+
                 // Create references to "this" for the generated methods.
                 wyvern.tools.typedAST.core.expressions.Variable receiver1;
                 wyvern.tools.typedAST.core.expressions.Variable receiver2;
@@ -129,21 +129,21 @@ public class New extends AbstractExpressionAST implements CoreAST {
                 receiver1 = new wyvern.tools.typedAST.core.expressions.Variable(
                         this.self(),
                         null
-                );
+                        );
                 receiver2 = new wyvern.tools.typedAST.core.expressions.Variable(
                         this.self(),
                         null
-                );
-                
+                        );
+
                 // Generate getter and setter; add to the declarations.
                 wyvern.target.corewyvernIL.decl.Declaration getter;
                 wyvern.target.corewyvernIL.decl.Declaration setter;
                 getter = DefDeclaration.generateGetter(ctx, receiver1, varName, varType)
-                    .generateDecl(thisContext, thisContext);
+                        .generateDecl(thisContext, thisContext);
                 setter = DefDeclaration.generateSetter(ctx, receiver2, varName, varType)
-                    .generateDecl(thisContext, thisContext);
+                        .generateDecl(thisContext, thisContext);
                 decls.add(getter);
-                decls.add(setter);  
+                decls.add(setter);
             }
         }
         // if type is not specified, infer
@@ -152,9 +152,9 @@ public class New extends AbstractExpressionAST implements CoreAST {
                 this.self(),
                 type,
                 getLocation()
-        );
+                );
     }
-    
+
     public void setSelfName(String n) {
         this.selfName = n;
     }

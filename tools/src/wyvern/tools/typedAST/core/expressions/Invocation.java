@@ -26,13 +26,13 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
     private FileLocation location = FileLocation.UNKNOWN;
 
     /**
-      * Invocation of an operation on two operands.
-      *
-      * @param op1 the first operand
-      * @param op2 the second operand
-      * @param operatorName the operator invoked.
-      * @param fileLocation the location in the source where the operation occurs
-      */
+     * Invocation of an operation on two operands.
+     *
+     * @param op1 the first operand
+     * @param op2 the second operand
+     * @param operatorName the operator invoked.
+     * @param fileLocation the location in the source where the operation occurs
+     */
     public Invocation(TypedAST op1, String operatorName, TypedAST op2, FileLocation fileLocation) {
         this.receiver = (ExpressionAST) op1;
         this.argument = (ExpressionAST) op2;
@@ -63,18 +63,18 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
             List<TypedModuleSpec> dependencies) {
 
         CallableExprGenerator generator = getCallableExpr(ctx);
-        
+
         // Invoking property of a dynamic object; don't bother validating things.
         if (generator.getDeclType(ctx) == null) {
             return new FieldGet(
-                receiver.generateIL(ctx, null, null),
-                operationName,
-                location);
+                    receiver.generateIL(ctx, null, null),
+                    operationName,
+                    location);
         }
-        
+
         if (argument != null) {
             IExpr arg  = ((ExpressionAST) argument)
-                .generateIL(ctx, null, dependencies);
+                    .generateIL(ctx, null, dependencies);
 
             List<IExpr> args = new ArrayList<IExpr>();
             if (!(argument instanceof UnitVal)) { // TODO: This is hacky. Refactor me to avoid
@@ -90,11 +90,11 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
     @Override
     public CallableExprGenerator getCallableExpr(GenContext genCtx) {
         return new InvocationExprGenerator(
-            receiver.generateIL(genCtx, null, null),
-            operationName,
-            genCtx,
-            getLocation()
-        );
+                receiver.generateIL(genCtx, null, null),
+                operationName,
+                genCtx,
+                getLocation()
+                );
     }
 
     @Override
