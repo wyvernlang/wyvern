@@ -111,8 +111,7 @@
            <fileset dir="${src.dir}" includes="**/*.java"/>
       -->
       <fileset dir="${src.dir}"
-               includes="wyvern/tools/typedAST/core/**/*.java
-               wyvern/tools/typedAST/abs/*.java" />
+               includes="wyvern/tools/typedAST/**/*.java" />
 <!-- 			 wyvern/tools/util/TreeWritable.java
 			 wyvern/tools/tests/suites/AntRegressionTestSuite.java
 			 wyvern/target/corewyvernIL/support/CallableExprGenerator.java"
