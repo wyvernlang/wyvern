@@ -36,13 +36,13 @@ public class Application extends AbstractExpressionAST implements CoreAST {
     private FileLocation location;
 
     /**
-      * Application represents a call cite for a function call.
-      *
-      * @param function the function that is called
-      * @param arguments the arguments passed at the call site
-      * @param location the location of the call site in the source file
-      * @param generics2 the vector of type parameters passed at the call site
-      */
+     * Application represents a call cite for a function call.
+     *
+     * @param function the function that is called
+     * @param arguments the arguments passed at the call site
+     * @param location the location of the call site in the source file
+     * @param generics2 the vector of type parameters passed at the call site
+     */
     public Application(TypedAST function, List<TypedAST> arguments,
             FileLocation location, List<Type> generics2) {
         this.function = (ExpressionAST) function;
@@ -74,7 +74,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             List<TypedModuleSpec> dependencies) {
 
         CallableExprGenerator exprGen = function.getCallableExpr(ctx);
-        
+
         /* Method call on a dynamic object. We pretend there's an appropriate declaration,
          * and ignore the expression generator. */
         if (exprGen.getDeclType(ctx) == null) {
@@ -82,23 +82,23 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             // Generate code for the arguments.
             List<IExpr> args = new LinkedList<>();
             for (TypedAST a : arguments) {
-                args.add(((ExpressionAST)a).generateIL(ctx, null, dependencies));
+                args.add(((ExpressionAST) a).generateIL(ctx, null, dependencies));
             }
-    
+
             // Need to do this to find out what the method name is.
             if (!(function instanceof Invocation)) {
                 throw new RuntimeException("Getting field of dynamic object,"
-                                          + "which isn't an invocation.");
+                        + "which isn't an invocation.");
             }
             Invocation invocation = (Invocation) function;
 
             return new MethodCall(
-                invocation.getReceiver().generateIL(ctx, null, dependencies),
-                invocation.getOperationName(),
-                args,
-                this);
+                    invocation.getReceiver().generateIL(ctx, null, dependencies),
+                    invocation.getOperationName(),
+                    args,
+                    this);
         }
-        
+
         /* Otherwise look up declaration. Ensure arguments match the declaration. */
         DefDeclType ddt = exprGen.getDeclType(ctx);
         List<FormalArg> formals = ddt.getFormalArgs();
@@ -128,38 +128,38 @@ public class Application extends AbstractExpressionAST implements CoreAST {
     }
 
     private void addGenericToArgList(
-          String formalName,
-          Type generic,
-          List<IExpr> args,
-          GenContext ctx
-    ) {
-        
+            String formalName,
+            Type generic,
+            List<IExpr> args,
+            GenContext ctx
+            ) {
+
         String genericName = formalName
-            .substring(DefDeclaration.GENERIC_PREFIX.length());
+                .substring(DefDeclaration.GENERIC_PREFIX.length());
 
         ValueType vt = generic.getILType(ctx);
         args.add(
-            new wyvern.target.corewyvernIL.expression.New(
-                new TypeDeclaration(genericName, vt, this.location)
-            )
-        );
+                new wyvern.target.corewyvernIL.expression.New(
+                        new TypeDeclaration(genericName, vt, this.location)
+                        )
+                );
     }
 
     private void generateILForTuples(
             List<FormalArg> formals,
-            List<IExpr> args, 
+            List<IExpr> args,
             GenContext ctx,
             List<TypedModuleSpec> dependencies
-    ) {
-        
+            ) {
+
         List<TypedAST> rawArgs = arguments;
         if (formals.size() != rawArgs.size() + args.size()) {
             ToolError.reportError(
-                ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
-                this,
-                "" + formals.size(),
-                "" + (rawArgs.size() + args.size())
-            );
+                    ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
+                    this,
+                    "" + formals.size(),
+                    "" + (rawArgs.size() + args.size())
+                    );
         }
         for (int i = 0; i < rawArgs.size(); i++) {
             ValueType expectedArgType = formals.get(i + this.generics.size()).getType();
@@ -170,13 +170,13 @@ public class Application extends AbstractExpressionAST implements CoreAST {
     }
 
     private void generateGenericArgs(
-        String methodName,
-        List<IExpr> args,
-        List<FormalArg> formals,
-        GenContext ctx,
-        DefDeclType ddt,
-        List<TypedModuleSpec> deps
-    ) {
+            String methodName,
+            List<IExpr> args,
+            List<FormalArg> formals,
+            GenContext ctx,
+            DefDeclType ddt,
+            List<TypedModuleSpec> deps
+            ) {
         int count = countFormalGenerics(formals);
         if (count < this.generics.size()) {
             // then the number of actual generics is greater than the number of formal generics
@@ -187,7 +187,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             for (int i = 0; i < count; i++) {
                 String formalName = formals.get(i).getName();
                 Type generic = this.generics.get(i);
-                addGenericToArgList(formalName, generic, args, ctx);    
+                addGenericToArgList(formalName, generic, args, ctx);
             }
         } else {
             // this case executes when count > this.generics.size()
@@ -203,7 +203,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             GenContext ctx,
             DefDeclType ddt,
             List<TypedModuleSpec> deps
-    ) {
+            ) {
         // First, add any of the pre-existing generics to the argument list.
         addExistingGenerics(args, formals, ctx);
 
@@ -243,23 +243,23 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             GenContext ctx,
             ValueType inferredType,
             int formalIndex
-    ) {
+            ) {
         List<Declaration> members = new LinkedList<>();
         TypeDeclaration typeMember = new TypeDeclaration(
-            formals.get(formalIndex).getName()
+                formals.get(formalIndex).getName()
                 .substring(
-                    DefDeclaration.GENERIC_PREFIX.length()),
+                        DefDeclaration.GENERIC_PREFIX.length()),
                 inferredType,
                 null
-        );
+                );
         members.add(typeMember);
         List<DeclType> declTypes = new LinkedList<DeclType>();
         declTypes.add(
-            new ConcreteTypeMember(
-                formals.get(formalIndex).getName()
-                    .substring(DefDeclaration.GENERIC_PREFIX.length()),
-                inferredType)
-        );
+                new ConcreteTypeMember(
+                        formals.get(formalIndex).getName()
+                        .substring(DefDeclaration.GENERIC_PREFIX.length()),
+                        inferredType)
+                );
         ValueType actualArgType = new StructuralType("self", declTypes);
         Expression newExp = new New(members, "self", actualArgType, null);
         args.add(newExp);
@@ -269,11 +269,11 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             List<IExpr> args,
             List<FormalArg> formals,
             GenContext ctx
-    ) {
+            ) {
         for (int i = 0; i < this.generics.size(); i++) {
             String formalName = formals.get(i).getName();
             Type generic = this.generics.get(i);
-            addGenericToArgList(formalName, generic, args, ctx);    
+            addGenericToArgList(formalName, generic, args, ctx);
         }
     }
 
