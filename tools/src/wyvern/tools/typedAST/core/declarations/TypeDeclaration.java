@@ -15,78 +15,78 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 
 /** Represents the contents of a structural type.  Not used at the top level to my knowledge;
  * used only within TypeVarDecl.
- * 
+ *
  * @author aldrich
  *
  */
 public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
-	private String name;
-	protected DeclSequence decls;
-	
-	// FIXME: I am not convinced typeGuard is required (alex).
-	private boolean typeGuard = false;
+    private String name;
+    private DeclSequence decls;
 
-	private boolean declGuard = false;
-	public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-		// System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
-		this.name = name;
-		this.decls = decls;
+    // FIXME: I am not convinced typeGuard is required (alex).
+    private boolean typeGuard = false;
+
+    private boolean declGuard = false;
+    public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
+        // System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
+        this.name = name;
+        this.decls = decls;
 
 
 
-		// System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
+        // System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
 
-		this.location = clsNameLine;
-	}
-	
-	public DeclSequence getDecls() {
-		return decls;
-	}
+        this.location = clsNameLine;
+    }
 
-	private FileLocation location = FileLocation.UNKNOWN;
-	
-	@Override
-	public FileLocation getLocation() {
-		return location; 
-	}
+    public DeclSequence getDecls() {
+        return decls;
+    }
 
-	@Override
-	public DeclType genILType(GenContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private FileLocation location = FileLocation.UNKNOWN;
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public FileLocation getLocation() {
+        return location;
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public DeclType genILType(GenContext ctx) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public List<DeclType> genDeclTypeSeq(GenContext ctx){
-		List<DeclType> declts = new LinkedList<DeclType>();
-		for(Declaration d : decls.getDeclIterator()) {
-			 // temporary context for verifying existence of variables within the same type so far
-			if (d instanceof EffectDeclaration) { 
-				/* HACK: only do it for effect-checking purposes (otherwise results in NullPointerException
-				 * for tests like testTSL). */
-				ctx = ctx.extend(d.getName(), null, new StructuralType(d.getName(), declts));
-			}
-			declts.add(d.genILType(ctx));
-		}
-		
-		return declts;
-	}
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<DeclType> genDeclTypeSeq(GenContext ctx) {
+        List<DeclType> declts = new LinkedList<DeclType>();
+        for (Declaration d : decls.getDeclIterator()) {
+            // temporary context for verifying existence of variables within the same type so far
+            if (d instanceof EffectDeclaration) {
+                /* HACK: only do it for effect-checking purposes (otherwise results in NullPointerException
+                 * for tests like testTSL). */
+                ctx = ctx.extend(d.getName(), null, new StructuralType(d.getName(), declts));
+            }
+            declts.add(d.genILType(ctx));
+        }
+
+        return declts;
+    }
 
     @Override
     public String getName() {
         // TODO Auto-generated method stub
         return name;
     }
-	
+
 }
