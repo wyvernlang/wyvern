@@ -14,35 +14,35 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
 public class DemoTests {
-	private static final String BASE_PATH = TestUtil.BASE_PATH;
-	private static final String PATH = BASE_PATH + "demo/";	
-	
+    private static final String BASE_PATH = TestUtil.BASE_PATH;
+    private static final String PATH = BASE_PATH + "demo/";
+
     @BeforeClass public static void setupResolver() {
-    	TestUtil.setPaths();
-		WyvernResolver.getInstance().addPath(PATH);
+        TestUtil.setPaths();
+        WyvernResolver.getInstance().addPath(PATH);
     }
-    
-	@Test
-	public void testSafeSQL() throws ParseException {
-		TestUtil.doTestScriptModularly("modules.sqlMain", Util.intType(), new IntegerLiteral(5));
-	}
-	
-	@Test
-	public void testWebServer() throws ParseException {
-		TestUtil.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
-	}
-	
-	@Test
-	public void testListClient() throws ParseException {
-		TestUtil.doTestScriptModularly("demo.ListClient", Util.intType(), new IntegerLiteral(8));
-	}
-	
-	
-	@Test
-	public void testSimpleDelegation() throws ParseException {
-		String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
-		TypedAST ast = TestUtil.getNewAST(program, "test input");
-		// TODO: implement delegation in the new IL and run this test
-	}
-	
+
+    @Test
+    public void testSafeSQL() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.sqlMain", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testWebServer() throws ParseException {
+        TestUtil.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
+    }
+
+    @Test
+    public void testListClient() throws ParseException {
+        TestUtil.doTestScriptModularly("demo.ListClient", Util.intType(), new IntegerLiteral(8));
+    }
+
+
+    @Test
+    public void testSimpleDelegation() throws ParseException {
+        String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
+        TypedAST ast = TestUtil.getNewAST(program, "test input");
+        // TODO: implement delegation in the new IL and run this test
+    }
+
 }
