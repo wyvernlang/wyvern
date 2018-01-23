@@ -4,22 +4,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
-import wyvern.target.corewyvernIL.expression.*;
-import wyvern.target.corewyvernIL.support.*;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.reflection.Mirror;
 import wyvern.tools.tests.reflection.TestTools;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.tests.TestUtil;
-import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.interfaces.TypedAST;
-
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 @Category(RegressionTests.class)
 public class ReflectionTests {
