@@ -112,6 +112,7 @@
       -->
       <fileset dir="${src.dir}"
                includes="wyvern/tools/typedAST/**/*.java
+               wyvern/tools/types/**/*.java
                wyvern/tools/util/*.java" />
 <!-- 			 wyvern/tools/util/TreeWritable.java
 			 wyvern/tools/tests/suites/AntRegressionTestSuite.java
