@@ -261,8 +261,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     @Override
     public void genTopLevel(TopLevelContext tlc) {
         Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext(), tlc.getDependencies());
-        VarBinding binding = bindingAndCtx.first;
-        GenContext newCtx = bindingAndCtx.second;
+        VarBinding binding = bindingAndCtx.getFirst();
+        GenContext newCtx = bindingAndCtx.getSecond();
         ValueType type = binding.getExpression().typeCheck(newCtx, null);
         tlc.addLet(binding.getVarName(), type, binding.getExpression(), false);
         tlc.updateContext(newCtx);

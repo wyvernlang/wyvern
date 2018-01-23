@@ -174,8 +174,8 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         GenContext current = ctx;
         for (ImportDeclaration imp : imports) {
             Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(current, dependencies);
-            current = bindingAndCtx.second;
-            seq.addBinding(bindingAndCtx.first);
+            current = bindingAndCtx.getSecond();
+            seq.addBinding(bindingAndCtx.getFirst());
         }
         return current;
     }
@@ -240,7 +240,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             List<Pair<ImportDeclaration, ValueType>> moduleDependencies = new LinkedList<>();
             for (ImportDeclaration imp : platformDependentImports) {
                 Pair<VarBinding, GenContext> bindingCtx = imp.genBinding(methodContext, new LinkedList<TypedModuleSpec>());
-                moduleDependencies.add(new Pair<ImportDeclaration, ValueType>(imp, bindingCtx.first.getType()));
+                moduleDependencies.add(new Pair<ImportDeclaration, ValueType>(imp, bindingCtx.getFirst().getType()));
             }
             return new wyvern.target.corewyvernIL.decl.ModuleDeclaration(name, formalArgs, returnType, body, moduleDependencies, getLocation());
         }

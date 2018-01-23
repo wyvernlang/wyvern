@@ -48,8 +48,8 @@ public class ModuleDeclaration extends DefDeclaration {
 
         IExpr body = getBody();
         for (Pair<ImportDeclaration, ValueType> decl : dependencies) {
-            Pair<VarBinding, GenContext> pair = decl.first.genBinding(resolver, ctx, recursiveDependencies);
-            body = new Let(pair.first, body);
+            Pair<VarBinding, GenContext> pair = decl.getFirst().genBinding(resolver, ctx, recursiveDependencies);
+            body = new Let(pair.getFirst(), body);
         }
 
         if (getFormalArgs().isEmpty())
@@ -62,9 +62,9 @@ public class ModuleDeclaration extends DefDeclaration {
     public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
         ModuleResolver resolver = InterpreterState.getLocalThreadInterpreter().getResolver();
         for (Pair<ImportDeclaration, ValueType> pair: dependencies) {
-            Module module = resolver.resolveModule(pair.first.getUri().getSchemeSpecificPart());
+            Module module = resolver.resolveModule(pair.getFirst().getUri().getSchemeSpecificPart());
             String internalName = module.getSpec().getInternalName();
-            thisCtx = thisCtx.extend(internalName, pair.second);
+            thisCtx = thisCtx.extend(internalName, pair.getSecond());
         }
         return super.typeCheck(ctx, thisCtx);
     }

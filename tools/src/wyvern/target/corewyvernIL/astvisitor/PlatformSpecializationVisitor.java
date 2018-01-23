@@ -81,10 +81,10 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, ModuleDeclaration moduleDecl) {
         Pair<Declaration, List<TypedModuleSpec>> pair = moduleDecl.specialize(state.platform, state.ctx);
-        for (TypedModuleSpec spec : pair.second) {
+        for (TypedModuleSpec spec : pair.getSecond()) {
             state.dependencies.add(spec);
         }
-        return pair.first;
+        return pair.getFirst();
     }
 
     public ASTNode visit(PSVState state, New newExpr) {

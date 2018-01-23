@@ -190,7 +190,7 @@ public class Globals {
 		ctx = ctx.extend("system", Globals.getSystemValue());
         SeqExpr sexpr = prelude;
         assert sexpr != null; // invariant: we must have gotten a type context already 
-        ctx = sexpr.interpretCtx(ctx).second;
+        ctx = sexpr.interpretCtx(ctx).getSecond();
 		return ctx;
 	}
 

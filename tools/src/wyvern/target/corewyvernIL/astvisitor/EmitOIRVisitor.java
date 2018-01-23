@@ -539,11 +539,11 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
             list.addLast(new Pair<String,OIRExpression>(varName, newExpr));
         }
         
-        OIRExpression current = list.getLast().second;
+        OIRExpression current = list.getLast().getSecond();
 
         for (int i = list.size()-2; i >= 0; --i) {
-            String varName = list.get(i).first;
-            OIRExpression oirExpr = list.get(i).second;
+            String varName = list.get(i).getFirst();
+            OIRExpression oirExpr = list.get(i).getSecond();
             OIRLet oirLet = new OIRLet(varName, oirExpr, current);
             oirLet.copyMetadata(seqExpr);
             current = oirLet;

@@ -135,7 +135,7 @@ public class SeqExpr extends Expression {
 
     @Override
     public Value interpret(EvalContext ctx) {
-        return interpretCtx(ctx).first;
+        return interpretCtx(ctx).getFirst();
     }
 
 	@Override
