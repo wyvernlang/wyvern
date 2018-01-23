@@ -1,16 +1,20 @@
 package wyvern.tools.reflection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
-import wyvern.target.corewyvernIL.expression.*;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.interop.JObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ewang on 2/16/16.
@@ -76,14 +80,14 @@ public class Mirror {
         JavaValue typeOrig1 = (JavaValue) (type1.getField("structType"));
         JavaValue typeOrig2 = (JavaValue) (type2.getField("structType"));
         //try {
-            StructuralType structType1 = (StructuralType)
-                    ((JObject) (typeOrig1.getFObject())).getWrappedValue();
-            StructuralType structType2 = (StructuralType)
-                    ((JObject) (typeOrig2.getFObject())).getWrappedValue();
-            if (structType1.equalsInContext(structType2, evalCtx)) {
-                return 1;
-            }
-            return 0;
+        StructuralType structType1 = (StructuralType)
+                ((JObject) (typeOrig1.getFObject())).getWrappedValue();
+        StructuralType structType2 = (StructuralType)
+                ((JObject) (typeOrig2.getFObject())).getWrappedValue();
+        if (structType1.equalsInContext(structType2, evalCtx)) {
+            return 1;
+        }
+        return 0;
         /*} catch (ReflectiveOperationException e) {
             return 0;
         }*/

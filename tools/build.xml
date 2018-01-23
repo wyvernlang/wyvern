@@ -114,6 +114,7 @@
                includes="wyvern/tools/typedAST/**/*.java
                wyvern/tools/types/**/*.java
                wyvern/tools/util/*.java
+               wyvern/tools/reflection/*.java
                wyvern/tools/tests/CoreParserTests.java
                wyvern/tools/tests/DemoTests.java
                wyvern/tools/tests/EffectSystemTests.java
@@ -129,9 +130,7 @@
                wyvern/tools/tests/reflection/*.java
                wyvern/tools/tests/suites/*.java
                wyvern/tools/tests/utils/*.java" />
-<!-- 			 wyvern/tools/util/TreeWritable.java
-			 wyvern/target/corewyvernIL/support/CallableExprGenerator.java"
-               /> -->
+<!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
     </checkstyle>
   </target>
   
