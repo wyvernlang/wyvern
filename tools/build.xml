@@ -124,7 +124,9 @@
                wyvern/tools/tests/FFITests.java
                wyvern/tools/tests/Figures.java
                wyvern/tools/tests/FreeVars.java
+               wyvern/tools/tests/LexingTests.java
                wyvern/tools/tests/ModuleSystemTests.java
+               wyvern/tools/tests/OIRTests.java
                wyvern/tools/tests/RossettaCodeTests.java
                wyvern/tools/tests/StdlibTests.java
                wyvern/tools/tests/TestUtil.java
