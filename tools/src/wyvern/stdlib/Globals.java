@@ -72,7 +72,7 @@ public class Globals {
     	    try {
                 ast = TestUtil.getNewAST(file);
             } catch (ParseException e) {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
             }
             final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
             IExpr program = ((ExpressionAST)ast).generateIL(ctx, null, dependencies);

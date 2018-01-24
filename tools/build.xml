@@ -113,6 +113,7 @@
                wyvern/tools/imports/extensions/*.java
                wyvern/tools/interop/*.java
                wyvern/tools/lexing/**/*.java
+               wyvern/tools/parsing/**/*.java
                wyvern/tools/reflection/*.java
                wyvern/tools/tests/**/*.java
                wyvern/tools/typedAST/**/*.java
@@ -121,6 +122,12 @@
             <!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
                 <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
                 <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>
+                <exclude name="wyvern/tools/parsing/coreparser/ArchParserConstants.java"/>
+                <exclude name="wyvern/tools/parsing/coreparser/Token.java"/>
+                <exclude name="wyvern/tools/parsing/coreparser/TokenManager.java"/>
+                <exclude name="wyvern/tools/parsing/coreparser/TokenMgrError.java"/>
+                <exclude name="wyvern/tools/parsing/coreparser/WyvernParser.java"/>
+                <exclude name="wyvern/tools/parsing/coreparser/WyvernParserConstants.java"/>
             </fileset>
         </checkstyle>
     </target>

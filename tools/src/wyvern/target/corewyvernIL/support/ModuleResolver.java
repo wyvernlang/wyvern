@@ -206,7 +206,7 @@ public class ModuleResolver {
 		try {
 			ast = TestUtil.getNewAST(file);
 		} catch (ParseException e) {
-			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
+			ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
 		}
         
 		final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
