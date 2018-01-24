@@ -109,7 +109,8 @@
            <fileset dir="${src.dir}" includes="**/*.java"/>
       -->
             <fileset dir="${src.dir}"
-               includes="wyvern/tools/**/*.java">
+               includes="wyvern/tools/**/*.java
+                    wyvern/stdlib/**/*.java">
             <!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
                 <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
                 <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>

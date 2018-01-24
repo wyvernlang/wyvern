@@ -1,15 +1,18 @@
 package wyvern.stdlib.support;
-import java.net.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * Created by mkirwin on 7/18/17.
  */
 public class IO {
-    public static IO io = new IO();
-    public IO () {
-
-    }
+    public static final IO io = new IO();
+    public IO() { }
 
     /**
      * Make a new ServerSocket using a provided port

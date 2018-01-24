@@ -5,12 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class FileIO
-{
-    public static FileIO file = new FileIO();
+public class FileIO {
+    public static final FileIO file = new FileIO();
 
-    public PrintWriter openForAppend(String path) throws IOException
-    {
+    public PrintWriter openForAppend(String path) throws IOException {
         FileWriter fileWriter = new FileWriter(path, true);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 

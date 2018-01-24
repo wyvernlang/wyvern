@@ -6,14 +6,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import wyvern.stdlib.Globals;
-import wyvern.tools.tests.TestUtil;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
@@ -24,7 +22,12 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
-import wyvern.target.corewyvernIL.decltype.*;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
@@ -56,6 +59,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.WyvernParser;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -63,7 +67,7 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
 
 public class AST {
-	public static AST utils = new AST();
+    public static final AST utils = new AST();
 
     private int identNum = 0;
 
@@ -108,21 +112,21 @@ public class AST {
         return new RefinementType(typeParams, getType(base), null);
     }
 
-	public Expression intLiteral(int i) {
-		return new IntegerLiteral(i);
-	}
-	
-	public Value stringLiteral(String s) {
-		return new StringLiteral(s);
-	}
+    public Expression intLiteral(int i) {
+        return new IntegerLiteral(i);
+    }
+
+    public Value stringLiteral(String s) {
+        return new StringLiteral(s);
+    }
 
     public Value booleanLiteral(boolean b) {
         return new BooleanLiteral(b);
     }
 
-	public Expression variable(String s) {
-		return new Variable(s);
-	}
+    public Expression variable(String s) {
+        return new Variable(s);
+    }
 
     public Expression methodCall(ObjectValue receiver, String methodName, List<ObjectValue> arguments) {
         List<Expression> translArgs = new LinkedList<>();
@@ -137,23 +141,23 @@ public class AST {
         FileLocation loc = null;
         for (ObjectValue decl : decls) {
             JavaValue fieldValue = (JavaValue) decl.getField("decl");
-            javaDecls.add((NamedDeclaration)fieldValue.getWrappedValue());
+            javaDecls.add((NamedDeclaration) fieldValue.getWrappedValue());
             loc = decl.getLocation();
         }
         return new New(javaDecls, loc);
     }
 
-	private Expression getExpr(ObjectValue wyvernAST) {
-		final Value ast = wyvernAST.getField("ast");
-		if (ast instanceof JavaValue) {
-			final JavaValue value = (JavaValue) ast;
-			return (Expression) value.getWrappedValue();
-		} else if (ast instanceof Literal) {
-			return (Expression) ast;
-		} else {
-			throw new RuntimeException("unexpected!");
-		}
-	}
+    private Expression getExpr(ObjectValue wyvernAST) {
+        final Value ast = wyvernAST.getField("ast");
+        if (ast instanceof JavaValue) {
+            final JavaValue value = (JavaValue) ast;
+            return (Expression) value.getWrappedValue();
+        } else if (ast instanceof Literal) {
+            return (Expression) ast;
+        } else {
+            throw new RuntimeException("unexpected!");
+        }
+    }
 
     private ValueType getType(ObjectValue wyvernType) {
         final JavaValue fieldValue = (JavaValue) wyvernType.getField("typ");
@@ -164,7 +168,7 @@ public class AST {
         List<FormalArg> formalArgs = new LinkedList<>();
         for (ObjectValue arg: objs) {
             final JavaValue fieldValue = (JavaValue) arg.getField("formalArg");
-            formalArgs.add((FormalArg)fieldValue.getWrappedValue());
+            formalArgs.add((FormalArg) fieldValue.getWrappedValue());
         }
         return formalArgs;
     }
@@ -177,7 +181,8 @@ public class AST {
         return new DelegateDeclaration(getType(valueType), fieldName, null);
     }
 
-    public ModuleDeclaration moduleDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType, ObjectValue body, List<String> dependencyURIs) throws URISyntaxException {
+    public ModuleDeclaration moduleDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType,
+                                               ObjectValue body, List<String> dependencyURIs) throws URISyntaxException {
         List<Pair<ImportDeclaration, ValueType>> dependencies = new LinkedList<>();
         for (String dependency: dependencyURIs) {
             ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false);
@@ -210,8 +215,8 @@ public class AST {
     public IExpr bind(List<ObjectValue> bindingObjects, ObjectValue inExpr) {
         List<VarBinding> bindings = new LinkedList<>();
         for (ObjectValue bndObj: bindingObjects) {
-            JavaValue fieldValue = (JavaValue)bndObj.getField("binding");
-            bindings.add((VarBinding)fieldValue.getWrappedValue());
+            JavaValue fieldValue = (JavaValue) bndObj.getField("binding");
+            bindings.add((VarBinding) fieldValue.getWrappedValue());
         }
         return new Bind(bindings, getExpr(inExpr));
     }
@@ -239,14 +244,14 @@ public class AST {
     public IExpr matchExpr(ObjectValue matchObj, ObjectValue elseObj, List<ObjectValue> caseObjs) {
         List<Case> cases = new LinkedList<>();
         for (ObjectValue obj: caseObjs) {
-            JavaValue fieldValue = (JavaValue)obj.getField("caseValue");
-            cases.add((Case)fieldValue.getWrappedValue());
+            JavaValue fieldValue = (JavaValue) obj.getField("caseValue");
+            cases.add((Case) fieldValue.getWrappedValue());
         }
         return new Match(getExpr(matchObj), getExpr(elseObj), cases);
     }
 
     public Case makeCase(String varName, ObjectValue pattern, ObjectValue body) {
-        return new Case(varName, (NominalType)getType(pattern), getExpr(body));
+        return new Case(varName, (NominalType) getType(pattern), getExpr(body));
     }
 
     public FormalArg formalArg(String name, ObjectValue type) {
@@ -294,16 +299,19 @@ public class AST {
         //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
 
         for (TypedAST ast: exprASTs) {
-            result.add(((ExpressionAST)ast).generateIL(ctx, null, new LinkedList<TypedModuleSpec>()));
+            result.add(((ExpressionAST) ast).generateIL(ctx, null, new LinkedList<TypedModuleSpec>()));
         }
 
         return result;
     }
 
     private String commonPrefix(String s1, String s2) {
-        if (s1 == null) return s2;
-        if (s2 == null) return s1;
-
+        if (s1 == null) {
+            return s2;
+        }
+        if (s2 == null) {
+            return s1;
+        }
         int minLen = Math.min(s1.length(), s2.length());
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < minLen; i++) {
@@ -323,13 +331,13 @@ public class AST {
         BufferedReader bufReader = new BufferedReader(new StringReader(input));
         Pattern p = Pattern.compile("^(\\s+).+");
         while ((line = bufReader.readLine()) != null) {
-        	Matcher m = p.matcher(line);
-        	String leadingWhitespace;
-        	if (m.matches()) {
-        		leadingWhitespace = m.group(1);
-        	} else {
-        		leadingWhitespace = "";
-        	}
+            Matcher m = p.matcher(line);
+            String leadingWhitespace;
+            if (m.matches()) {
+                leadingWhitespace = m.group(1);
+            } else {
+                leadingWhitespace = "";
+            }
             toStrip = commonPrefix(leadingWhitespace, toStrip);
         }
         bufReader = new BufferedReader(new StringReader(input));
