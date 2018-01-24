@@ -115,23 +115,7 @@
                wyvern/tools/imports/extensions/*.java
                wyvern/tools/interop/*.java
                wyvern/tools/reflection/*.java
-               wyvern/tools/tests/CoreParserTests.java
-               wyvern/tools/tests/DemoTests.java
-               wyvern/tools/tests/EffectSystemTests.java
-               wyvern/tools/tests/ExampleTests.java
-               wyvern/tools/tests/FFITests.java
-               wyvern/tools/tests/Figures.java
-               wyvern/tools/tests/FreeVars.java
-               wyvern/tools/tests/LexingTests.java
-               wyvern/tools/tests/ModuleSystemTests.java
-               wyvern/tools/tests/OIRTests.java
-               wyvern/tools/tests/RossettaCodeTests.java
-               wyvern/tools/tests/StdlibTests.java
-               wyvern/tools/tests/TestUtil.java
-               wyvern/tools/tests/TransformTests.java
-               wyvern/tools/tests/reflection/*.java
-               wyvern/tools/tests/suites/*.java
-               wyvern/tools/tests/utils/*.java" />
+               wyvern/tools/tests/**/*.java" />
             <!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
         </checkstyle>
     </target>

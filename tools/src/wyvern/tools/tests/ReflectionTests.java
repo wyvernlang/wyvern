@@ -16,8 +16,8 @@ import wyvern.tools.tests.suites.RegressionTests;
 @Category(RegressionTests.class)
 public class ReflectionTests {
 
-    public static Mirror mirror = new Mirror();
-    public static TestTools tools = new TestTools();
+    public static final Mirror mirror = new Mirror();
+    public static final TestTools tools = new TestTools();
     private static final String PATH = TestUtil.BASE_PATH + "reflection/";
 
     @BeforeClass

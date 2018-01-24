@@ -848,17 +848,17 @@ public class ILTests {
         TestUtil.doTest(input, Util.intType(), new IntegerLiteral(1));
     }
 
-    public static ImportTestClass importTest = new ImportTestClass();
+    public static final ImportTestClass importTest = new ImportTestClass();
     public static class ImportTestClass {
         public int addOne(int i) {
             return i + 1;
         }
         public String addOneString(String s) {
-            return Integer.toString(Integer.parseInt(s)+1);
+            return Integer.toString(Integer.parseInt(s) + 1);
         }
     }
 
-    public static IntLibrary intLibrary = new IntLibrary();
+    public static final IntLibrary intLibrary = new IntLibrary();
     public static class IntLibrary {
         public int add(int i, int j) {
             return i + j;
