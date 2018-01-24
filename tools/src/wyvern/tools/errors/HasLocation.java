@@ -6,9 +6,11 @@ package wyvern.tools.errors;
  * here as a placeholder.
  */
 public interface HasLocation {
-	public FileLocation getLocation();
-	
-	public static HasLocation UNKNOWN = new HasLocation() {
-		public FileLocation getLocation() { return new FileLocation("Unknown",-1,-1); }
-	};
+    FileLocation getLocation();
+
+    HasLocation UNKNOWN = new HasLocation() {
+        public FileLocation getLocation() {
+            return new FileLocation("Unknown", -1, -1);
+        }
+    };
 }

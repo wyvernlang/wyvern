@@ -109,13 +109,14 @@
            <fileset dir="${src.dir}" includes="**/*.java"/>
       -->
             <fileset dir="${src.dir}"
-               includes="wyvern/tools/typedAST/**/*.java
-               wyvern/tools/types/**/*.java
-               wyvern/tools/util/*.java
+               includes="wyvern/tools/errors/*.java
                wyvern/tools/imports/extensions/*.java
                wyvern/tools/interop/*.java
                wyvern/tools/reflection/*.java
-               wyvern/tools/tests/**/*.java" />
+               wyvern/tools/tests/**/*.java
+               wyvern/tools/typedAST/**/*.java
+               wyvern/tools/types/**/*.java
+               wyvern/tools/util/*.java" />
             <!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
         </checkstyle>
     </target>

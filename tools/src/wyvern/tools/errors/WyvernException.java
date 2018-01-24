@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public class WyvernException extends RuntimeException {
     public WyvernException(String text) {
-        super("Positionless error: "+text);
+        super("Positionless error: " + text);
     }
 
     public WyvernException(String text, FileLocation location) {
