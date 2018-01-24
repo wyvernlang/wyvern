@@ -11,13 +11,13 @@ public class EmitOIRState {
         this.ctx = ctx;
         this.env = env;
     }
-    
+
     public TypeContext getContext() {
-    	return ctx;
+        return ctx;
     }
-    
+
     public OIREnvironment getEnvironment() {
-    	return env;
+        return env;
     }
-    
+
 }
