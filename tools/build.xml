@@ -112,12 +112,16 @@
                includes="wyvern/tools/errors/*.java
                wyvern/tools/imports/extensions/*.java
                wyvern/tools/interop/*.java
+               wyvern/tools/lexing/**/*.java
                wyvern/tools/reflection/*.java
                wyvern/tools/tests/**/*.java
                wyvern/tools/typedAST/**/*.java
                wyvern/tools/types/**/*.java
-               wyvern/tools/util/*.java" />
+               wyvern/tools/util/*.java">
             <!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
+                <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
+                <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>
+            </fileset>
         </checkstyle>
     </target>
 

@@ -14,11 +14,11 @@ public final class LexerUtils {
     private LexerUtils() { }
     public static <T> boolean isSpecial(Token t, Class<T> tClass) {
         try {
-            int SINGLE_LINE_COMMENT = tClass.getField("SINGLE_LINE_COMMENT").getInt(null);
-            int MULTI_LINE_COMMENT = tClass.getField("MULTI_LINE_COMMENT").getInt(null);
-            int WHITESPACE = tClass.getField("WHITESPACE").getInt(null);
+            int singleLineComment = tClass.getField("SINGLE_LINE_COMMENT").getInt(null);
+            int multiLineComment = tClass.getField("MULTI_LINE_COMMENT").getInt(null);
+            int whitespace = tClass.getField("WHITESPACE").getInt(null);
 
-            if ((t.kind == SINGLE_LINE_COMMENT) || (t.kind == MULTI_LINE_COMMENT) || (t.kind == WHITESPACE)) {
+            if ((t.kind == singleLineComment) || (t.kind == multiLineComment) || (t.kind == whitespace)) {
                 return true;
             }
 
@@ -99,10 +99,10 @@ public final class LexerUtils {
         List<Token> tokenList = emptyList();
 
         try {
-            int DEDENT = tClass.getField("DEDENT").getInt(null);
+            int dedent = tClass.getField("DEDENT").getInt(null);
 
             while (levelChange < 0) {
-                Token t = makeToken(DEDENT, "", tokenLoc);
+                Token t = makeToken(dedent, "", tokenLoc);
                 tokenList.add(t);
                 levelChange++;
             }
@@ -121,10 +121,10 @@ public final class LexerUtils {
             Stack<String> indents, Class<T> tClass)
                     throws CopperParserException {
         try {
-            int DEDENT = tClass.getField("DEDENT").getInt(null);
-            int INDENT = tClass.getField("INDENT").getInt(null);
-            int NEWLINE = tClass.getField("NEWLINE").getInt(null);
-            int WHITESPACE = tClass.getField("WHITESPACE").getInt(null);
+            int dedent = tClass.getField("DEDENT").getInt(null);
+            int indent = tClass.getField("INDENT").getInt(null);
+            int newline = tClass.getField("NEWLINE").getInt(null);
+            int whitespace = tClass.getField("WHITESPACE").getInt(null);
 
             if (LexerUtils.<T>hasNonSpecialToken(aLine, tClass)) {
                 // it's a logical line...let's adjust it!
@@ -132,24 +132,24 @@ public final class LexerUtils {
                 // find the indent for this line
                 Token firstToken = aLine.getFirst();
                 String lineIndent = "";
-                if (firstToken.kind == WHITESPACE) {
+                if (firstToken.kind == whitespace) {
                     lineIndent = firstToken.image;
                 }
 
                 // add indents/dedents as needed
                 int levelChange = adjustIndent(lineIndent, firstToken, fileName, indents);
                 if (levelChange == 1) {
-                    aLine.addFirst(makeToken(INDENT, "", firstToken));
+                    aLine.addFirst(makeToken(indent, "", firstToken));
                 }
                 while (levelChange < 0) {
-                    aLine.addFirst(makeToken(DEDENT, "", firstToken));
+                    aLine.addFirst(makeToken(dedent, "", firstToken));
                     levelChange++;
                 }
 
                 // add a NEWLINE at the end
                 Token lastToken = aLine.getLast();
-                Token NL = makeToken(NEWLINE, "", lastToken);
-                aLine.addLast(NL);
+                Token nl = makeToken(newline, "", lastToken);
+                aLine.addLast(nl);
             }
             // ELSE do nothing: this line has only comments/whitespace
 
