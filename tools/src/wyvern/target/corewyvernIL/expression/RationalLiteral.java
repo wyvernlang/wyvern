@@ -10,50 +10,49 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public class RationalLiteral extends Literal {
 
-	private int numerator;
-	private int denominator;
+    private int numerator;
+    private int denominator;
 
-	public RationalLiteral(int numerator, int denominator) {
-		super(null, null);
-		this.numerator = numerator;
-		this.denominator = denominator;
-	}
+    public RationalLiteral(int numerator, int denominator) {
+        super(null, null);
+        this.numerator = numerator;
+        this.denominator = denominator;
+    }
 
-	public int getNumerator() {
-		return numerator;
-	}
+    public int getNumerator() {
+        return numerator;
+    }
 
-	public void setNumerator(int numerator) {
-		this.numerator = numerator;
-	}
+    public void setNumerator(int numerator) {
+        this.numerator = numerator;
+    }
 
-	public int getDenominator() {
-		return denominator;
-	}
+    public int getDenominator() {
+        return denominator;
+    }
 
-	public void setDenominator(int denominator) {
-		this.denominator = denominator;
-	}
+    public void setDenominator(int denominator) {
+        this.denominator = denominator;
+    }
 
-	@Override
-	public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-			S state) {
-		return emitILVisitor.visit(state, this);
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
 
-	public Set<String> getFreeVariables() {
-		return new HashSet<>();
-	}
+    public Set<String> getFreeVariables() {
+        return new HashSet<>();
+    }
 
-	@Override
-	public ValueType getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ValueType getType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

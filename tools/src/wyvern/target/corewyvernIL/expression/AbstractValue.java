@@ -5,13 +5,12 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public abstract class AbstractValue extends Expression implements Value {
-	protected AbstractValue(ValueType exprType, FileLocation loc) {
-		super(exprType, loc);
-	}
+    protected AbstractValue(ValueType exprType, FileLocation loc) {
+        super(exprType, loc);
+    }
 
-	@Override
-	public Value interpret(EvalContext ctx) {
-		return this;
-	}
-	
+    @Override
+    public Value interpret(EvalContext ctx) {
+        return this;
+    }
 }
