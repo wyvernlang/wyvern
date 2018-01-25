@@ -104,24 +104,7 @@
 
     <target name="lint">
         <checkstyle config="checkstyle.xml" maxWarnings="0">
-            <!-- This is the fileset of all java files in our project.
-           Uncommenting this line would be useful only have we've trimmed down the number of lint violations we have. Right now this takes 16 seconds just to dump the output of all the lint violations. Instead, we'll add files one at a time until we've got a lot covered.
-           <fileset dir="${src.dir}" includes="**/*.java"/>
-      -->
-            <fileset dir="${src.dir}"
-               includes="wyvern/tools/**/*.java
-                    wyvern/target/corewyvernIL/astvisitor/*.java
-                    wyvern/target/corewyvernIL/decl/*.java
-                    wyvern/target/corewyvernIL/decltype/*.java
-                    wyvern/target/corewyvernIL/effects/*.java
-                    wyvern/target/corewyvernIL/expression/*.java
-                    wyvern/target/corewyvernIL/metadata/*.java
-                    wyvern/target/corewyvernIL/modules/*.java
-                    wyvern/target/corewyvernIL/support/*.java
-                    wyvern/target/corewyvernIL/transformers/*.java
-                    wyvern/target/corewyvernIL/type/*.java
-                    wyvern/target/oir/**/*.java
-                    wyvern/stdlib/**/*.java">
+            <fileset dir="${src.dir}" includes="**/*.java">
                 <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
                 <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>
                 <exclude name="wyvern/tools/parsing/coreparser/ArchParserConstants.java"/>
