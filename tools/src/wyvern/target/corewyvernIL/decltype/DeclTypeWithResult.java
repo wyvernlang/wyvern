@@ -6,26 +6,26 @@ import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class DeclTypeWithResult extends DeclType {
-	private Type rawType;
-	
-	DeclTypeWithResult(String name, Type sourceType) {
-		super(name);
-		this.rawType = sourceType;
-	}
+    private Type rawType;
 
-	public ValueType getResultType(View v) {
-		//TODO: this is a hack, fix it
-		return ((ValueType)rawType).adapt(v);
-	}
+    DeclTypeWithResult(String name, Type sourceType) {
+        super(name);
+        this.rawType = sourceType;
+    }
 
-	public ValueType getRawResultType() {
-		//TODO: this is a hack, fix it
-		return (ValueType) rawType;
-	}
+    public ValueType getResultType(View v) {
+        //TODO: this is a hack, fix it
+        return ((ValueType) rawType).adapt(v);
+    }
 
-	@Override
-	public void checkWellFormed(TypeContext ctx) {
-		rawType.checkWellFormed(ctx);
-	}
+    public ValueType getRawResultType() {
+        //TODO: this is a hack, fix it
+        return (ValueType) rawType;
+    }
+
+    @Override
+    public void checkWellFormed(TypeContext ctx) {
+        rawType.checkWellFormed(ctx);
+    }
 
 }

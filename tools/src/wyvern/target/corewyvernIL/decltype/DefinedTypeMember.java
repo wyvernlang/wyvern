@@ -5,6 +5,6 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public interface DefinedTypeMember {
 
-	ValueType getResultType(View from);
+    ValueType getResultType(View from);
 
 }
