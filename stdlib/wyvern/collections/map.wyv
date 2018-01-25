@@ -1,4 +1,4 @@
-module list
+module map
 
 import wyvern.option
 import wyvern.collections.list
