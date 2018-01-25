@@ -29,7 +29,7 @@ public class StructuralTypesFromJava extends StructuralType {
             List<DeclType> newDeclTypes = new ArrayList<DeclType>(this.getDeclTypes().size() + 1);
             newDeclTypes.addAll(this.getDeclTypes());
             newDeclTypes.add(packageDecl);
-            this.declTypes = newDeclTypes;
+            this.setDeclTypes(newDeclTypes);
         }
         StructuralTypesFromJava packageType = (StructuralTypesFromJava) ((ValDeclType) packageDecl).getRawResultType();
         ConcreteTypeMember classDecl = (ConcreteTypeMember) packageType.findDecl(className, ctx);
@@ -40,7 +40,7 @@ public class StructuralTypesFromJava extends StructuralType {
             List<DeclType> newDeclTypes = new ArrayList<DeclType>(packageType.getDeclTypes().size() + 1);
             newDeclTypes.addAll(packageType.getDeclTypes());
             newDeclTypes.add(classDecl);
-            packageType.declTypes = newDeclTypes;
+            packageType.setDeclTypes(newDeclTypes);
         }
         Path path = new FieldGet(GenUtil.getJavaTypesObject(), packageName, null);
         ValueType type = new NominalType(path, className);

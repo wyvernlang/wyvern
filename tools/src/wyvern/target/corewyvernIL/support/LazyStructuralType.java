@@ -62,7 +62,7 @@ public class LazyStructuralType extends StructuralType {
         // TODO: extend to fields
 
         // update declTypes
-        declTypes = newDeclTypes;
+        setDeclTypes(newDeclTypes);
     }
 
 }

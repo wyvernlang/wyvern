@@ -11,18 +11,18 @@ public class ExtensibleTagType extends TagType {
     }
 
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor,
-                                  S state) {
+            S state) {
         return emitILVisitor.visit(state, this);
     }
-    
-	@Override
-	public TagType adapt(View v) {
-		return new ExtensibleTagType((NominalType)getParentType(v), getValueType().adapt(v));
-	}
-	
-	@Override
-	public TagType doAvoid(String varName, TypeContext ctx, int depth) {
-		final NominalType newPT = parentType!=null?(NominalType)parentType.doAvoid(varName, ctx, depth):null;
-		return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth));
-	}
+
+    @Override
+    public TagType adapt(View v) {
+        return new ExtensibleTagType((NominalType) getParentType(v), getValueType().adapt(v));
+    }
+
+    @Override
+    public TagType doAvoid(String varName, TypeContext ctx, int depth) {
+        final NominalType newPT = getParentType() != null ? (NominalType) getParentType().doAvoid(varName, ctx, depth) : null;
+        return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth));
+    }
 }
