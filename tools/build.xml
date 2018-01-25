@@ -117,8 +117,8 @@
                     wyvern/target/corewyvernIL/expression/*.java
                     wyvern/target/corewyvernIL/metadata/*.java
                     wyvern/target/corewyvernIL/modules/*.java
+                    wyvern/target/corewyvernIL/support/*.java
                     wyvern/stdlib/**/*.java">
-            <!-- wyvern/target/corewyvernIL/support/CallableExprGenerator.java" /> -->
                 <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
                 <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>
                 <exclude name="wyvern/tools/parsing/coreparser/ArchParserConstants.java"/>

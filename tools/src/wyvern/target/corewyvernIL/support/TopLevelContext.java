@@ -21,115 +21,115 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class TopLevelContext {
-	
-	//private Stack<VarBinding> pending = new Stack<VarBinding>();
-	private List<Declaration> moduleDecls = new LinkedList<Declaration>();
-	private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
-	private List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-	private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
-	private GenContext ctx;
-	private String receiverName;
-	private SeqExpr expr = new SeqExpr();
-	//private GenContext origCtx;
 
-	public TopLevelContext(GenContext ctx) {
-		this.ctx = ctx;
-		//origCtx = ctx;
-	}
+    //private Stack<VarBinding> pending = new Stack<VarBinding>();
+    private List<Declaration> moduleDecls = new LinkedList<Declaration>();
+    private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
+    private List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+    private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
+    private GenContext ctx;
+    private String receiverName;
+    private SeqExpr expr = new SeqExpr();
+    //private GenContext origCtx;
 
-	public GenContext getContext() {
-		return ctx;
-	}
+    public TopLevelContext(GenContext ctx) {
+        this.ctx = ctx;
+        //origCtx = ctx;
+    }
 
-	public IExpr getExpression() {
-		/*VarBinding binding = pending.pop();
-		IExpr exp = binding.getExpression();
-		while (!pending.isEmpty()) {
-			binding = pending.pop();
-			exp = new Let(binding, exp);
-		}
-		return exp;*/
-	    //expr.typeCheck(origCtx, null);
-		return expr;
-	}
+    public GenContext getContext() {
+        return ctx;
+    }
 
-	public IExpr getModuleExpression() {
-		String newName = GenContext.generateName();
-		
-		// Determine if we need to be a resource type.
-		boolean isModule = false;
-		for (Declaration d: moduleDecls) {
-			d.typeCheck(ctx, ctx);
-			if (d.containsResource(ctx)) {
-				isModule = true;
-				break;
-			}
-		}
-		
-		ValueType vt = new StructuralType(newName, moduleDeclTypes, isModule);
-		vt = adapt(vt, newName);
-		
-		IExpr exp = new New(moduleDecls, newName, vt, null);
-		addExpression(exp, vt);
-		
-		return getExpression();
-	}
-	/** Adapts the type vt to account for the names we have to
-	 * avoid.
-	 */
-	private ValueType adapt(ValueType vt, String thisName) {
-		for (Map.Entry<String, Boolean> e : avoidanceMap.entrySet()) {
-			Variable v = new Variable(e.getKey());
-			boolean isDeclBlock = e.getValue();
-			Variable receiver = new Variable(thisName);
-			Path newPath = receiver;
-			if (!isDeclBlock) {
-				newPath = new FieldGet(receiver, e.getKey(), receiver.getLocation());
-			}
-			View view = new ReceiverView(v, newPath);
-			vt = vt.adapt(view);
-		}
-		return vt;
-	}
-	
-	public void addExpression(IExpr exp, ValueType type) {
-		//pending.push(new VarBinding(GenContext.generateName(), type, exp));
-		expr.addExpr(exp);
-	}
-	
-	/**
-	 * Adds a binding to the sequence being generated
-	 * 
-	 * @param name	the name of the variable being bound
-	 * @param type	the variable's type
-	 * @param iExpr	the right-hand side of the binding
-	 * @param isDeclBlock flags a let statement that represents a block of recursive declarations, or a var
-	 */
-	public void addLet(String name, ValueType type, IExpr iExpr, boolean isDeclBlock) {
-		//pending.push(new VarBinding(name, type, iExpr));
-		ctx = ctx.extend(name, new Variable(name), type);
-		avoidanceMap.put(name, isDeclBlock);
-		expr.addBinding(name, type, iExpr);
-	}
+    public IExpr getExpression() {
+        /*VarBinding binding = pending.pop();
+        IExpr exp = binding.getExpression();
+        while (!pending.isEmpty()) {
+            binding = pending.pop();
+            exp = new Let(binding, exp);
+        }
+        return exp;*/
+        //expr.typeCheck(origCtx, null);
+        return expr;
+    }
 
-	public void updateContext(GenContext newCtx) {
-		ctx = newCtx;
-	}
+    public IExpr getModuleExpression() {
+        String newName = GenContext.generateName();
 
-	public void addModuleDecl(Declaration decl, DeclType dt) {
-		moduleDecls.add(decl);
-		moduleDeclTypes.add(dt);
-	}
+        // Determine if we need to be a resource type.
+        boolean isModule = false;
+        for (Declaration d: moduleDecls) {
+            d.typeCheck(ctx, ctx);
+            if (d.containsResource(ctx)) {
+                isModule = true;
+                break;
+            }
+        }
 
-	public String getReceiverName() {
-		return receiverName;
-	}
-	
-	public void setReceiverName(String rn) {
-		receiverName = rn;
-	}
+        ValueType vt = new StructuralType(newName, moduleDeclTypes, isModule);
+        vt = adapt(vt, newName);
 
-	public List<TypedModuleSpec> getDependencies() {
-		return dependencies;
-	}
+        IExpr exp = new New(moduleDecls, newName, vt, null);
+        addExpression(exp, vt);
+
+        return getExpression();
+    }
+    /** Adapts the type vt to account for the names we have to
+     * avoid.
+     */
+    private ValueType adapt(ValueType vt, String thisName) {
+        for (Map.Entry<String, Boolean> e : avoidanceMap.entrySet()) {
+            Variable v = new Variable(e.getKey());
+            boolean isDeclBlock = e.getValue();
+            Variable receiver = new Variable(thisName);
+            Path newPath = receiver;
+            if (!isDeclBlock) {
+                newPath = new FieldGet(receiver, e.getKey(), receiver.getLocation());
+            }
+            View view = new ReceiverView(v, newPath);
+            vt = vt.adapt(view);
+        }
+        return vt;
+    }
+
+    public void addExpression(IExpr exp, ValueType type) {
+        //pending.push(new VarBinding(GenContext.generateName(), type, exp));
+        expr.addExpr(exp);
+    }
+
+    /**
+     * Adds a binding to the sequence being generated
+     *
+     * @param name  the name of the variable being bound
+     * @param type  the variable's type
+     * @param iExpr the right-hand side of the binding
+     * @param isDeclBlock flags a let statement that represents a block of recursive declarations, or a var
+     */
+    public void addLet(String name, ValueType type, IExpr iExpr, boolean isDeclBlock) {
+        //pending.push(new VarBinding(name, type, iExpr));
+        ctx = ctx.extend(name, new Variable(name), type);
+        avoidanceMap.put(name, isDeclBlock);
+        expr.addBinding(name, type, iExpr);
+    }
+
+    public void updateContext(GenContext newCtx) {
+        ctx = newCtx;
+    }
+
+    public void addModuleDecl(Declaration decl, DeclType dt) {
+        moduleDecls.add(decl);
+        moduleDeclTypes.add(dt);
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String rn) {
+        receiverName = rn;
+    }
+
+    public List<TypedModuleSpec> getDependencies() {
+        return dependencies;
+    }
 }

@@ -26,18 +26,18 @@ public class StructuralTypesFromJava extends StructuralType {
         if (packageDecl == null) {
             packageDecl = new ValDeclType(packageName, new StructuralTypesFromJava());
 
-            List<DeclType> newDeclTypes = new ArrayList<DeclType>(this.getDeclTypes().size()+1);
+            List<DeclType> newDeclTypes = new ArrayList<DeclType>(this.getDeclTypes().size() + 1);
             newDeclTypes.addAll(this.getDeclTypes());
             newDeclTypes.add(packageDecl);
             this.declTypes = newDeclTypes;
         }
-        StructuralTypesFromJava packageType = (StructuralTypesFromJava)((ValDeclType)packageDecl).getRawResultType();
-        ConcreteTypeMember classDecl = (ConcreteTypeMember)packageType.findDecl(className, ctx);
+        StructuralTypesFromJava packageType = (StructuralTypesFromJava) ((ValDeclType) packageDecl).getRawResultType();
+        ConcreteTypeMember classDecl = (ConcreteTypeMember) packageType.findDecl(className, ctx);
         if (classDecl == null) {
             LazyStructuralType classType = new LazyStructuralType(javaClass, ctx);
             classDecl = new ConcreteTypeMember(className, classType);
 
-            List<DeclType> newDeclTypes = new ArrayList<DeclType>(packageType.getDeclTypes().size()+1);
+            List<DeclType> newDeclTypes = new ArrayList<DeclType>(packageType.getDeclTypes().size() + 1);
             newDeclTypes.addAll(packageType.getDeclTypes());
             newDeclTypes.add(classDecl);
             packageType.declTypes = newDeclTypes;
