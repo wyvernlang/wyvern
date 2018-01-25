@@ -601,8 +601,8 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     StringBuilder constructor_args = new StringBuilder();
     StringBuilder constructor_body = new StringBuilder();
     for (OIRFieldValueInitializePair pair : oirClassDeclaration.getFieldValuePairs()) {
-      OIRFieldDeclaration dec = pair.fieldDeclaration;
-      OIRExpression value = pair.valueDeclaration;
+      OIRFieldDeclaration dec = pair.getFieldDeclaration();
+      OIRExpression value = pair.getValueDeclaration();
       constructor_body.append("\n");
       constructor_body.append(indent + indentIncrement);
       constructor_body.append("this.");

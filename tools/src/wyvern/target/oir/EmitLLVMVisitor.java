@@ -160,9 +160,9 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 		
 			for (OIRFieldValueInitializePair pair : classDecl.getFieldValuePairs())
 			{
-				initializeValueNames[i] = pair.valueDeclaration.acceptVisitor(this, oirEnv);
-				typeNames[i] = pair.valueDeclaration.typeCheck(oirEnv).getName();
-				fieldsToInitialize[i] = classDecl.getFieldPosition(pair.fieldDeclaration.getName());
+				initializeValueNames[i] = pair.getValueDeclaration().acceptVisitor(this, oirEnv);
+				typeNames[i] = pair.getValueDeclaration().typeCheck(oirEnv).getName();
+				fieldsToInitialize[i] = classDecl.getFieldPosition(pair.getFieldDeclaration().getName());
 				i++;
 			}
 		}
