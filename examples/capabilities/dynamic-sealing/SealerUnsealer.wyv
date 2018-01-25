@@ -20,14 +20,15 @@ function make_sealer () {
 
 module capabilities
 
-import wyvern.option
+// import wyvern.option
 import wyvern.collections.map
 import wyvern.String
 
 // This example would be a lot nicer if parameterised Option[T]
 // worked! Will rewrite when this bug is fixed. :-)
-type Option = option.Option
+type Option = map.Option // option.Option
 
+/*
 type Map = map.Map
 
 // Instead of the usual Boxes, I will use Strings first.
@@ -46,9 +47,12 @@ resource type SealerUnsealer
 //     var unsealer:Unsealer
      var blah:String
 
-def make():SealerUnsealer
-    var map:Map = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
-    new
+def make():String
+    "ABC"
+    
+//SealerUnsealer
+    //var map:Map = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
+    //new
 //        var sealer:Sealer = new
 //            def seal(object:Option):String
 //                map.put("ABC",object)
@@ -56,4 +60,5 @@ def make():SealerUnsealer
 //        var unsealer:Unsealer = new
 //            def unseal(box:String):Option
 //                map.get("ABC")
-                 var blah:String = "ABCD"
+//                 var blah:String = "ABCD"
+*/
