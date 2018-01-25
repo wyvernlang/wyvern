@@ -5,7 +5,7 @@ import wyvern.tools.errors.FileLocation;
 
 public abstract class Literal extends AbstractValue {
 
-	protected Literal(ValueType exprType, FileLocation loc) {
-		super(exprType, loc);
-	}
+    protected Literal(ValueType exprType, FileLocation loc) {
+        super(exprType, loc);
+    }
 }

@@ -8,7 +8,6 @@ import wyvern.target.corewyvernIL.metadata.HasMetadata;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 
 public abstract class OIRAST implements EmitLLVM, HasMetadata {
-
     private HashSet<Metadata> metadataSet;
 
     public OIRAST() {
@@ -29,5 +28,4 @@ public abstract class OIRAST implements EmitLLVM, HasMetadata {
             addMetadata(m);
         }
     }
-
 }

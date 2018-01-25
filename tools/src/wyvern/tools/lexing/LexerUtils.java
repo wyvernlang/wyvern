@@ -1,52 +1,52 @@
 package wyvern.tools.lexing;
 
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.Token;
 
-public class LexerUtils {
-	public static <T> boolean isSpecial (Token t, Class<T> tClass) {
-	    try {
-            int SINGLE_LINE_COMMENT = tClass.getField("SINGLE_LINE_COMMENT").getInt(null);
-            int MULTI_LINE_COMMENT = tClass.getField("MULTI_LINE_COMMENT").getInt(null);
-            int WHITESPACE = tClass.getField("WHITESPACE").getInt(null);
+public final class LexerUtils {
+    private LexerUtils() { }
+    public static <T> boolean isSpecial(Token t, Class<T> tClass) {
+        try {
+            int singleLineComment = tClass.getField("SINGLE_LINE_COMMENT").getInt(null);
+            int multiLineComment = tClass.getField("MULTI_LINE_COMMENT").getInt(null);
+            int whitespace = tClass.getField("WHITESPACE").getInt(null);
 
-            if ((t.kind == SINGLE_LINE_COMMENT) || (t.kind == MULTI_LINE_COMMENT) || (t.kind == WHITESPACE)) {
+            if ((t.kind == singleLineComment) || (t.kind == multiLineComment) || (t.kind == whitespace)) {
                 return true;
             }
 
             return false;
         } catch (IllegalAccessException | NoSuchFieldException e) {
-	        throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
-	}
+    }
 
-	/** convenient construction function for tokens.  The location of
-	 * the new token is taken from the tokenLoc argument
-	 */
-	public static Token makeToken(int kind, String s, Token tokenLoc) {
-		return makeToken(kind, s,tokenLoc.beginLine, tokenLoc.beginColumn);
-	}
+    /** convenient construction function for tokens.  The location of
+     * the new token is taken from the tokenLoc argument
+     */
+    public static Token makeToken(int kind, String s, Token tokenLoc) {
+        return makeToken(kind, s, tokenLoc.beginLine, tokenLoc.beginColumn);
+    }
 
-	/** convenient construction function for tokens.
-	 */
-	public static Token makeToken(int kind, String s, int beginLine, int beginColumn) {
-		Token t = new Token(kind, s);
-		t.beginLine = beginLine;
-		t.beginColumn = beginColumn;
-		return t;
-	}
+    /** convenient construction function for tokens.
+     */
+    public static Token makeToken(int kind, String s, int beginLine, int beginColumn) {
+        Token t = new Token(kind, s);
+        t.beginLine = beginLine;
+        t.beginColumn = beginColumn;
+        return t;
+    }
 
-	/** Constructor for an empty list of Tokens.
-	 */
-	public static List<Token> emptyList() {
+    /** Constructor for an empty list of Tokens.
+     */
+    public static List<Token> emptyList() {
         return new LinkedList<Token>();
     }
 
@@ -69,8 +69,7 @@ public class LexerUtils {
             }
             if (newIndent.equals(currentIndent)) {
                 return dedentCount;
-            }
-            else {
+            } else {
                 ToolError.reportError(ErrorMessage.INCONSISTENT_INDENT, loc(fileName, tokenLoc));
                 // unreachable because reportError will throw. But the compiler doesn't know that.
                 // So, we throw an exception to get it to stop complaining.
@@ -82,8 +81,8 @@ public class LexerUtils {
                 indents.push(newIndent);
                 return 1;
             } else {
-                throw new CopperParserException("Illegal indent at line " +tokenLoc.beginLine
-                                                + ": not a superset of previous indent level");
+                throw new CopperParserException("Illegal indent at line " + tokenLoc.beginLine
+                        + ": not a superset of previous indent level");
             }
         } else {
             return 0;
@@ -100,10 +99,10 @@ public class LexerUtils {
         List<Token> tokenList = emptyList();
 
         try {
-            int DEDENT = tClass.getField("DEDENT").getInt(null);
+            int dedent = tClass.getField("DEDENT").getInt(null);
 
             while (levelChange < 0) {
-                Token t = makeToken(DEDENT, "", tokenLoc);
+                Token t = makeToken(dedent, "", tokenLoc);
                 tokenList.add(t);
                 levelChange++;
             }
@@ -119,13 +118,13 @@ public class LexerUtils {
      * creates a NEWLINE at the end if necessary
      */
     public static <T> LinkedList<Token> adjustLogicalLine(LinkedList<Token> aLine, String fileName,
-                                                          Stack<String> indents, Class<T> tClass)
-            throws CopperParserException {
+            Stack<String> indents, Class<T> tClass)
+                    throws CopperParserException {
         try {
-            int DEDENT = tClass.getField("DEDENT").getInt(null);
-            int INDENT = tClass.getField("INDENT").getInt(null);
-            int NEWLINE = tClass.getField("NEWLINE").getInt(null);
-            int WHITESPACE = tClass.getField("WHITESPACE").getInt(null);
+            int dedent = tClass.getField("DEDENT").getInt(null);
+            int indent = tClass.getField("INDENT").getInt(null);
+            int newline = tClass.getField("NEWLINE").getInt(null);
+            int whitespace = tClass.getField("WHITESPACE").getInt(null);
 
             if (LexerUtils.<T>hasNonSpecialToken(aLine, tClass)) {
                 // it's a logical line...let's adjust it!
@@ -133,22 +132,24 @@ public class LexerUtils {
                 // find the indent for this line
                 Token firstToken = aLine.getFirst();
                 String lineIndent = "";
-                if (firstToken.kind == WHITESPACE)
+                if (firstToken.kind == whitespace) {
                     lineIndent = firstToken.image;
+                }
 
                 // add indents/dedents as needed
                 int levelChange = adjustIndent(lineIndent, firstToken, fileName, indents);
-                if (levelChange == 1)
-                    aLine.addFirst(makeToken(INDENT, "", firstToken));
+                if (levelChange == 1) {
+                    aLine.addFirst(makeToken(indent, "", firstToken));
+                }
                 while (levelChange < 0) {
-                    aLine.addFirst(makeToken(DEDENT, "", firstToken));
+                    aLine.addFirst(makeToken(dedent, "", firstToken));
                     levelChange++;
                 }
 
                 // add a NEWLINE at the end
                 Token lastToken = aLine.getLast();
-                Token NL = makeToken(NEWLINE, "", lastToken);
-                aLine.addLast(NL);
+                Token nl = makeToken(newline, "", lastToken);
+                aLine.addLast(nl);
             }
             // ELSE do nothing: this line has only comments/whitespace
 
@@ -169,30 +170,35 @@ public class LexerUtils {
     /** @return true if there are tokens other than comments and whitespace in this token list
      */
     public static <T> boolean hasNonSpecialToken(List<Token> l, Class<T> tClass) {
-        for (Token t : l)
+        for (Token t : l) {
             if (!LexerUtils.<T>isSpecial(t, tClass)
-                    /*&& t.image.trim().length() > 0 /* takes out "DSLs" that are just whitespace*/)
+                    /*&& t.image.trim().length() > 0 /* takes out "DSLs" that are just whitespace*/) {
                 return true;
+            }
+        }
         return false;
     }
-    
+
     public static boolean isCommentsAndWhitespace(String s) {
         String simpler = s.trim();
         if (simpler.startsWith("/*")) {
             int loc = simpler.indexOf("*/");
-            if (loc != -1)
-                simpler = simpler.substring(loc+2);
+            if (loc != -1) {
+                simpler = simpler.substring(loc + 2);
+            }
         }
         if (simpler.startsWith("//")) {
             int loc = simpler.indexOf("\n");
-            if (loc != -1)
-                simpler = simpler.substring(loc+1);
+            if (loc != -1) {
+                simpler = simpler.substring(loc + 1);
+            }
         }
-        if (simpler.length() == 0)
+        if (simpler.length() == 0) {
             return true;
-        else if (simpler.length() < s.length())
+        } else if (simpler.length() < s.length()) {
             return isCommentsAndWhitespace(simpler);
-        else
+        } else {
             return false;
+        }
     }
 }

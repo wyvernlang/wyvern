@@ -11,54 +11,51 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
-public class Cast extends Expression{
+public class Cast extends Expression {
+    private IExpr toCastExpr;
 
-	private IExpr toCastExpr;
-
-	public Cast(IExpr toCastExpr, ValueType exprType) {
-		super(exprType);
-		this.toCastExpr = toCastExpr;
-	}
-
-	public IExpr getToCastExpr() {
-		return toCastExpr;
-	}
-
-	@Override
-	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-		toCastExpr.typeCheck(ctx, effectAccumulator);
-		return getExprType().getCanonicalType(ctx);
-	}
-
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-                                S state) {
-		return emitILVisitor.visit(state, this);
-	}
-
-	@Override
-	public Value interpret(EvalContext ctx) {
-		Value value = getToCastExpr().interpret(ctx);
-		ValueType actualType = value.typeCheck(ctx, null);
-		ValueType goalType = getExprType();
-		if (!actualType.isSubtypeOf(goalType, ctx))
-			ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString());
-		return value;
-	}
-
-	@Override
-	public Set<String> getFreeVariables() {
-		return toCastExpr.getFreeVariables();
-	}
-	
-	@Override
-    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-	    dest.append("((");
-	    getExprType().doPrettyPrint(dest, "");
-	    dest.append(") ");
-	    toCastExpr.doPrettyPrint(dest, "");
-	    dest.append(")"); 
+    public Cast(IExpr toCastExpr, ValueType exprType) {
+        super(exprType);
+        this.toCastExpr = toCastExpr;
     }
-    
-	
+
+    public IExpr getToCastExpr() {
+        return toCastExpr;
+    }
+
+    @Override
+    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        toCastExpr.typeCheck(ctx, effectAccumulator);
+        return getExprType().getCanonicalType(ctx);
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
+
+    @Override
+    public Value interpret(EvalContext ctx) {
+        Value value = getToCastExpr().interpret(ctx);
+        ValueType actualType = value.typeCheck(ctx, null);
+        ValueType goalType = getExprType();
+        if (!actualType.isSubtypeOf(goalType, ctx)) {
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString());
+        }
+        return value;
+    }
+
+    @Override
+    public Set<String> getFreeVariables() {
+        return toCastExpr.getFreeVariables();
+    }
+
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append("((");
+        getExprType().doPrettyPrint(dest, "");
+        dest.append(") ");
+        toCastExpr.doPrettyPrint(dest, "");
+        dest.append(")");
+    }
 }

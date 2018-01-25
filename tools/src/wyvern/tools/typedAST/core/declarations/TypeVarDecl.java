@@ -1,7 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.util.List;
-import java.util.Optional;
 
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -13,61 +12,60 @@ import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
-import wyvern.tools.typedAST.core.declarations.DeclSequence;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
 /** Represents a declaration of a structural type.
- * 
+ *
  * A thin wrapper for a TypeDeclaration (but note that I think TypeDeclaration is *only*
  * used as part of this class)
- * 
+ *
  * @author aldrich
  *
  */
 public class TypeVarDecl extends Declaration {
-	private final String name;
-	private final Declaration body;
-	private final FileLocation fileLocation;
-	private final TypedAST metadata;
-	private TaggedInfo taggedInfo = null;
-	private boolean resourceFlag = false;
+    private final String name;
+    private final Declaration body;
+    private final FileLocation fileLocation;
+    private final TypedAST metadata;
+    private TaggedInfo taggedInfo = null;
+    private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
     private String activeSelfName;
     private IExpr metadataExp = null;
 
-	public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName ) {
-		this.metadata = metadata;
-		this.name = name;
-		this.body = new TypeDeclaration(name, body, taggedInfo, fileLocation);
-		this.fileLocation = fileLocation;
-		this.taggedInfo = taggedInfo;
-		this.resourceFlag = isResource;
+    public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo,
+            TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName) {
+        this.metadata = metadata;
+        this.name = name;
+        this.body = new TypeDeclaration(name, body, taggedInfo, fileLocation);
+        this.fileLocation = fileLocation;
+        this.taggedInfo = taggedInfo;
+        this.resourceFlag = isResource;
         this.activeSelfName = selfName;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public Type getType() {
-		return null;
-	}
+    }
 
     @Override
-	public FileLocation getLocation() {
-		return fileLocation;
-	}
+    public String getName() {
+        return name;
+    }
 
-	/*@Override
-	public Expression generateIL(GenContext ctx) {
-		return body.generateIL(ctx);
-	}*/
+    @Override
+    public Type getType() {
+        return null;
+    }
+
+    @Override
+    public FileLocation getLocation() {
+        return fileLocation;
+    }
+
+    /*@Override
+    public Expression generateIL(GenContext ctx) {
+        return body.generateIL(ctx);
+    }*/
 
     private String getSelfName() {
         String s = defaultSelfName;
@@ -76,52 +74,53 @@ public class TypeVarDecl extends Declaration {
         }
         return s;
     }
-    
+
     private StructuralType computeInternalILType(GenContext ctx) {
-    	TypeDeclaration td = (TypeDeclaration) this.body;
-		GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
-		return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
-	}
-	
-	@Override
-	public DeclType genILType(GenContext ctx) {
-		StructuralType type = computeInternalILType(ctx);
-		return new ConcreteTypeMember(getName(), type, getMetadata(ctx));
-	}
+        TypeDeclaration td = (TypeDeclaration) this.body;
+        GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
+        return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-		return computeInternalDecl(thisContext);
-	}
-	
-	private IExpr getMetadata(GenContext ctx) {
-		if (metadata != null) {
-			if (metadataExp == null)
-				metadataExp = ((ExpressionAST)metadata).generateIL(ctx, null, null);
-			return metadataExp;
-		} else {
-			return null;
-		}
-	}
+    @Override
+    public DeclType genILType(GenContext ctx) {
+        StructuralType type = computeInternalILType(ctx);
+        return new ConcreteTypeMember(getName(), type, getMetadata(ctx));
+    }
 
-	private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
-		StructuralType type = computeInternalILType(ctx);
-		return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
-	}
-	
-	public boolean isResource() {
-		return this.resourceFlag;
-	}
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
+        return computeInternalDecl(thisContext);
+    }
 
-	@Override
-	public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
-		return computeInternalDecl(ctx);
-	}
-	
-	@Override
-	public void addModuleDecl(TopLevelContext tlc) {
-		wyvern.target.corewyvernIL.decl.Declaration decl = computeInternalDecl(tlc.getContext());
-		DeclType dt = genILType(tlc.getContext());
-		tlc.addModuleDecl(decl,dt);
-	}
+    private IExpr getMetadata(GenContext ctx) {
+        if (metadata != null) {
+            if (metadataExp == null) {
+                metadataExp = ((ExpressionAST) metadata).generateIL(ctx, null, null);
+            }
+            return metadataExp;
+        } else {
+            return null;
+        }
+    }
+
+    private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
+        StructuralType type = computeInternalILType(ctx);
+        return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
+    }
+
+    public boolean isResource() {
+        return this.resourceFlag;
+    }
+
+    @Override
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
+        return computeInternalDecl(ctx);
+    }
+
+    @Override
+    public void addModuleDecl(TopLevelContext tlc) {
+        wyvern.target.corewyvernIL.decl.Declaration decl = computeInternalDecl(tlc.getContext());
+        DeclType dt = genILType(tlc.getContext());
+        tlc.addModuleDecl(decl, dt);
+    }
 }

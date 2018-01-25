@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class BooleanLiteral extends Literal implements Invokable {
+    private boolean value;
 
     @Override
     public int hashCode() {
@@ -25,19 +26,21 @@ public class BooleanLiteral extends Literal implements Invokable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         BooleanLiteral other = (BooleanLiteral) obj;
-        if (value != other.value)
+        if (value != other.value) {
             return false;
+        }
         return true;
     }
-
-    private boolean value;
 
     public BooleanLiteral(boolean value) {
         super(Util.booleanType(), null);
@@ -48,70 +51,70 @@ public class BooleanLiteral extends Literal implements Invokable {
         return value;
     }
 
-	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(value?"true":"false");
-	}
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append(value ? "true" : "false");
+    }
 
     @Override
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
         return Util.booleanType();
     }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
-      return emitILVisitor.visit(state, this);
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
 
-	@Override
-	public Set<String> getFreeVariables() {
-		return new HashSet<>();
-	}
+    @Override
+    public Set<String> getFreeVariables() {
+        return new HashSet<>();
+    }
 
-	@Override
-	public ValueType getType() {
-		return Util.booleanType();
-	}
+    @Override
+    public ValueType getType() {
+        return Util.booleanType();
+    }
 
-	@Override
-	public Value invoke(String methodName, List<Value> args) {
-		switch (methodName) {
-			case "ifTrue":
-				if (this.value) {
-					return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
-						@Override public Value interpret(EvalContext ignored) {
-							return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
-						}
+    @Override
+    public Value invoke(String methodName, List<Value> args) {
+        switch (methodName) {
+        case "ifTrue":
+            if (this.value) {
+                return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+                    @Override public Value interpret(EvalContext ignored) {
+                        return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
+                    }
 
-						@Override
-						public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-							// TODO Auto-generated method stub
-							return null;
-						}
-					};
-				}
-				return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
-					@Override public Value interpret(EvalContext ignored) {
-						return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
-					}
+                    @Override
+                    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
+                };
+            }
+            return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+                @Override public Value interpret(EvalContext ignored) {
+                    return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
+                }
 
-					@Override
-					public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-						// TODO Auto-generated method stub
-						return null;
-					}
-				};
-      case "&&":
-        return new BooleanLiteral(this.value && ((BooleanLiteral) args.get(0)).value);
-      case "||":
-        return new BooleanLiteral(this.value || ((BooleanLiteral) args.get(0)).value);
-			default: throw new RuntimeException();
-		}
-	}
+                @Override
+                public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+            };
+        case "&&":
+            return new BooleanLiteral(this.value && ((BooleanLiteral) args.get(0)).value);
+        case "||":
+            return new BooleanLiteral(this.value || ((BooleanLiteral) args.get(0)).value);
+        default: throw new RuntimeException();
+        }
+    }
 
-	@Override
-	public Value getField(String fieldName) {
-		throw new RuntimeException("no fields");
-	}
+    @Override
+    public Value getField(String fieldName) {
+        throw new RuntimeException("no fields");
+    }
 }
 

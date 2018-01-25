@@ -3,17 +3,17 @@ package wyvern.target.corewyvernIL.support;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class EmptyTypeContext extends TypeContext {
-	public ValueType lookupTypeOf(String varName) {
-		throw new RuntimeException("Variable " + varName + " not found");
-	}
+    public ValueType lookupTypeOf(String varName) {
+        throw new RuntimeException("Variable " + varName + " not found");
+    }
 
-	@Override
-	protected TypeContext getNext() {
-		return null;
-	}
-	
-	@Override
-	protected String endToString() {
-		return "]";
-	}
+    @Override
+    protected TypeContext getNext() {
+        return null;
+    }
+
+    @Override
+    protected String endToString() {
+        return "]";
+    }
 }

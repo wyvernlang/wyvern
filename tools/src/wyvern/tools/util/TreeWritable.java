@@ -1,3 +1,3 @@
 package wyvern.tools.util;
 
-public interface TreeWritable {}
+public interface TreeWritable { }

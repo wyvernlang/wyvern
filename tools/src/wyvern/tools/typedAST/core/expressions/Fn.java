@@ -35,12 +35,12 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
     private FileLocation location = FileLocation.UNKNOWN;
 
     /**
-      * Creates a new function with the argument bindings and the AST node pointing to the body.
-      *
-      * @param bindings The arguments to the function call
-      * @param body the body of the function
-      * @param loc the location in the source code where this function is defined.
-      */
+     * Creates a new function with the argument bindings and the AST node pointing to the body.
+     *
+     * @param bindings The arguments to the function call
+     * @param body the body of the function
+     * @param loc the location in the source code where this function is defined.
+     */
     public Fn(List<NameBinding> bindings, TypedAST body, FileLocation loc) {
         this.bindings = bindings;
         this.body = (ExpressionAST) body;
@@ -81,29 +81,29 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
 
         // Convert the bindings into formals
         List<FormalArg> intermediateArgs = convertBindingToArgs(
-            this.bindings,
-            ctx,
-            expectedType
-        );
+                this.bindings,
+                ctx,
+                expectedType
+                );
 
         // Extend the generalContext to include the parameters passed into the function.
         ctx = extendCtxWithParams(ctx, intermediateArgs);
 
         // Generate the IL for the body, and get its return type.
         ValueType expectedBodyType = (expectedType == null)
-                                     ? null : this.getExpectedResult(ctx, expectedType);
+                ? null : Fn.getExpectedResult(ctx, expectedType);
         IExpr il = this.body.generateIL(ctx, expectedBodyType, dependencies);
         ValueType bodyReturnType = il.typeCheck(ctx, null);
 
         // Create a new list of function declaration,
         // which is a singleton, containing only Util.APPLY_NAME
         DefDeclaration applyDef = new DefDeclaration(
-            Util.APPLY_NAME,
-            intermediateArgs,
-            bodyReturnType,
-            il,
-            getLocation()
-        );
+                Util.APPLY_NAME,
+                intermediateArgs,
+                bodyReturnType,
+                il,
+                getLocation()
+                );
         List<Declaration> declList = new LinkedList<>();
         declList.add(applyDef);
 
@@ -115,10 +115,10 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
         // set up containsResources() properly by typechecking applyDef
         applyDef.typeCheck(ctx, ctx);
         ValueType newType = new StructuralType(
-            LAMBDA_STRUCTUAL_DECL,
-            declTypes,
-            applyDef.containsResource(ctx)
-        );
+                LAMBDA_STRUCTUAL_DECL,
+                declTypes,
+                applyDef.containsResource(ctx)
+                );
 
         return new New(declList, "@lambda-decl", newType, getLocation());
     }
@@ -134,7 +134,7 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
             ValueType declType) {
 
         List<FormalArg> expectedFormals =
-            declType == null ? null : getExpectedFormls(ctx, declType);
+                declType == null ? null : getExpectedFormls(ctx, declType);
 
         List<FormalArg> result = new LinkedList<FormalArg>();
 
@@ -144,14 +144,14 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
                 ToolError.reportError(ErrorMessage.SYNTAX_FOR_NO_ARG_LAMBDA, this);
             } else {
                 ToolError.reportError(
-                    ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
-                    this,
-                    Integer.toString(expectedSize),
-                    Integer.toString(bindings.size())
-                );
+                        ErrorMessage.WRONG_NUMBER_OF_ARGUMENTS,
+                        this,
+                        Integer.toString(expectedSize),
+                        Integer.toString(bindings.size())
+                        );
             }
         }
-        
+
         for (int i = 0; i < bindings.size(); i++) {
             NameBinding binding = bindings.get(i);
             ValueType argType = null;
@@ -165,14 +165,14 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
                 argType = expectedFormals.get(i).getType();
             }
 
-            result.add( new FormalArg(
+            result.add(new FormalArg(
                     binding.getName(),
                     argType
-                )
-            );
+                    )
+                    );
         }
-        
-        
+
+
 
         return result;
     }
@@ -218,10 +218,10 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
     private static GenContext extendCtxWithParams(GenContext ctx, List<FormalArg> formalArgs) {
         for (FormalArg binding : formalArgs) {
             ctx = ctx.extend(
-                binding.getName(),
-                new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
-                binding.getType()
-            );
+                    binding.getName(),
+                    new wyvern.target.corewyvernIL.expression.Variable(binding.getName()),
+                    binding.getType()
+                    );
         }
         return ctx;
     }

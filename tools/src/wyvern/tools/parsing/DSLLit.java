@@ -29,83 +29,88 @@ import wyvern.tools.types.Type;
  * Created by Ben Chung on 3/11/14.
  */
 public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
-	Optional<String> dslText = Optional.empty();
-	TypedAST dslAST = null;
-	Type dslASTType = null;
-	FileLocation location;
+    private Optional<String> dslText = Optional.empty();
+    private TypedAST dslAST = null;
+    private Type dslASTType = null;
+    private FileLocation location;
 
-	public void setText(String text) {
-		if (dslText == null)
-			throw new RuntimeException();
-		dslText = Optional.of(text);
-	}
+    public void setText(String text) {
+        if (dslText == null) {
+            throw new RuntimeException();
+        }
+        dslText = Optional.of(text);
+    }
 
-	public Optional<String> getText() { return dslText; }
+    public Optional<String> getText() {
+        return dslText;
+    }
 
-	public DSLLit(Optional<String> dslText, FileLocation loc) {
-		location = loc;
-		this.dslText = (dslText);
-	}
+    public DSLLit(Optional<String> dslText, FileLocation loc) {
+        location = loc;
+        this.dslText = (dslText);
+    }
 
-	public TypedAST getAST() { return (dslAST); }
+    public TypedAST getAST() {
+        return (dslAST);
+    }
 
-	@Override
-	public Type getType() {
-		return dslASTType;
-	}
+    @Override
+    public Type getType() {
+        return dslASTType;
+    }
 
-	private Type getDefaultType() {
-		//TODO
-		return null;
-	}
+    private Type getDefaultType() {
+        //TODO
+        return null;
+    }
 
-	@Override
-	public FileLocation getLocation() {
-		return location;
-	}
+    @Override
+    public FileLocation getLocation() {
+        return location;
+    }
 
-	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		if (expectedType == null) {
-			ToolError.reportError(ErrorMessage.NO_EXPECTED_TYPE, this);
-		}
-		try {
-			final wyvern.target.corewyvernIL.expression.Value metadata = expectedType.getMetadata(ctx);
-			if (!(metadata instanceof Invokable)) {
-				ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
-			}
-			ValueType metaType = metadata.getType();
-			final DeclType parseTSLDecl = metaType.getStructuralType(ctx).findDecl("parseTSL", ctx);
-			if (parseTSLDecl == null) {
-				ToolError.reportError(ErrorMessage.METADATA_MUST_INCLUDE_PARSETSL, this, expectedType.toString());				
-			}
-			// TODO: check that parseTSLDecl has the right signature
-			List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
-			args.add(new StringLiteral(dslText.get()));
-      args.add(new JavaValue(JavaWrapper.wrapObject(ctx), new NominalType("system", "Context")));
-			wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable)metadata).invoke("parseTSL", args).executeIfThunk();
-			// we get an option back, is it success?
-			ValDeclaration isDefined = (ValDeclaration)((ObjectValue)parsedAST).findDecl("isDefined");			
-			BooleanLiteral success = (BooleanLiteral)isDefined.getDefinition();
-			if (success.getValue()) {
-				ValDeclaration valueDecl = (ValDeclaration)((ObjectValue)parsedAST).findDecl("value");
-				ObjectValue astWrapper = (ObjectValue)valueDecl.getDefinition();
-				ValDeclaration astDecl = (ValDeclaration)((ObjectValue)astWrapper).findDecl("ast");
-				return (Expression) ((JavaValue)astDecl.getDefinition()).getWrappedValue();
-			} else {
-				ToolError.reportError(ErrorMessage.TSL_ERROR, this, "[detailed TSL error messages not supported yet]");
-				throw new RuntimeException("can't get here");
-			}
-		} catch (ToolError e) {
-			if (e.getTypecheckingErrorMessage() == ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE) {
-				if (e.getLocation() == null) {
-					// provide an error with the usage location
-					ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
-				}
-			}
-			throw e;
-		}
-	}
+    @Override
+    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+        if (expectedType == null) {
+            ToolError.reportError(ErrorMessage.NO_EXPECTED_TYPE, this);
+        }
+        try {
+            final wyvern.target.corewyvernIL.expression.Value metadata = expectedType.getMetadata(ctx);
+            if (!(metadata instanceof Invokable)) {
+                ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
+            }
+            ValueType metaType = metadata.getType();
+            final DeclType parseTSLDecl = metaType.getStructuralType(ctx).findDecl("parseTSL", ctx);
+            if (parseTSLDecl == null) {
+                ToolError.reportError(ErrorMessage.METADATA_MUST_INCLUDE_PARSETSL, this, expectedType.toString());
+            }
+            // TODO: check that parseTSLDecl has the right signature
+            List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
+            args.add(new StringLiteral(dslText.get()));
+            args.add(new JavaValue(JavaWrapper.wrapObject(ctx), new NominalType("system", "Context")));
+            wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable) metadata).invoke("parseTSL", args).executeIfThunk();
+            // we get an option back, is it success?
+            ValDeclaration isDefined = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("isDefined");
+            BooleanLiteral success = (BooleanLiteral) isDefined.getDefinition();
+            if (success.getValue()) {
+                ValDeclaration valueDecl = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("value");
+                ObjectValue astWrapper = (ObjectValue) valueDecl.getDefinition();
+                ValDeclaration astDecl = (ValDeclaration) ((ObjectValue) astWrapper).findDecl("ast");
+                return (Expression) ((JavaValue) astDecl.getDefinition()).getWrappedValue();
+            } else {
+                ToolError.reportError(ErrorMessage.TSL_ERROR, this, "[detailed TSL error messages not supported yet]");
+                throw new RuntimeException("can't get here");
+            }
+        } catch (ToolError e) {
+            if (e.getTypecheckingErrorMessage() == ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE) {
+                if (e.getLocation() == null) {
+                    // provide an error with the usage location
+                    ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
+                }
+            }
+            throw e;
+        }
+    }
 
     @Override
     public StringBuilder prettyPrint() {

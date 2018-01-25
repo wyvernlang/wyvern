@@ -35,7 +35,7 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     public String toString() {
         return name;
     }
-    
+
     @Override
     public Type getType() {
         throw new RuntimeException();

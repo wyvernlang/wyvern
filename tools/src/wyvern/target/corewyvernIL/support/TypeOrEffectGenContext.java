@@ -6,6 +6,8 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 /** Used to look up the paths associated with a type abbreviation or an effect abbreviation */
 public class TypeOrEffectGenContext extends GenContext {
+    private String typeName;
+    private Path objName;
 
     @Override
     public String desugarType(Path var, String member) {
@@ -14,9 +16,6 @@ public class TypeOrEffectGenContext extends GenContext {
         }
         return super.desugarType(var, member);
     }
-
-    String typeName;
-    Path objName;
 
     public TypeOrEffectGenContext(String typeName, Path objName, GenContext genContext) {
         super(genContext);
@@ -32,8 +31,11 @@ public class TypeOrEffectGenContext extends GenContext {
 
     @Override
     public Path getContainerForTypeAbbrev(String typeName) {
-        if(this.typeName.equals(typeName)) return objName;
-        else return getNext().getContainerForTypeAbbrev(typeName);
+        if (this.typeName.equals(typeName)) {
+            return objName;
+        } else {
+            return getNext().getContainerForTypeAbbrev(typeName);
+        }
     }
 
     @Override
@@ -55,13 +57,14 @@ public class TypeOrEffectGenContext extends GenContext {
     public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
         return getNext().getCallableExprRec(varName, origCtx);
     }
-    
-	@Override
-	public boolean isPresent(String varName, boolean isValue) {
-		if (!isValue && this.typeName.equals(varName))
-			return true;
-		else
-			return super.isPresent(varName, isValue);
-	}
+
+    @Override
+    public boolean isPresent(String varName, boolean isValue) {
+        if (!isValue && this.typeName.equals(varName)) {
+            return true;
+        } else {
+            return super.isPresent(varName, isValue);
+        }
+    }
 
 }

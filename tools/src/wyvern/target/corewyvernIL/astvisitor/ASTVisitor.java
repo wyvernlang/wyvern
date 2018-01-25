@@ -72,7 +72,7 @@ public abstract class ASTVisitor<S, T> {
     public abstract T visit(S state, DataType dataType);
     public abstract T visit(S state, FFIImport ffiImport);
     public abstract T visit(S state, FFI ffi);
-    public abstract T visit(S state, EffectDeclaration effectDeclaration) ;
+    public abstract T visit(S state, EffectDeclaration effectDeclaration);
     public abstract T visit(S state, EffectDeclType effectDeclType);
     public abstract T visit(S state, SeqExpr seqExpr);
 }

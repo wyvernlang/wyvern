@@ -28,12 +28,12 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
     private FileLocation location = FileLocation.UNKNOWN;
 
     /**
-      * An assignment from a r-value (value) to an l-value (target).
-      *
-      * @param target the receiver of the assignment
-      * @param value  the expression on the right hand side of the =
-      * @param fileLocation the location in the source code where the assignment occurs
-      */
+     * An assignment from a r-value (value) to an l-value (target).
+     *
+     * @param target the receiver of the assignment
+     * @param value  the expression on the right hand side of the =
+     * @param fileLocation the location in the source code where the assignment occurs
+     */
     public Assignment(TypedAST target, TypedAST value, FileLocation fileLocation) {
         this.target = (ExpressionAST) target;
         this.value = (ExpressionAST) value;
@@ -57,7 +57,7 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
     }
 
     private IExpr generateFieldGet(GenContext ctx, List<TypedModuleSpec> dependencies) {
-    
+
         // In most cases we can get a generator to do this for us.
         CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
         if (cegReceiver.getDeclType(ctx) != null) {
@@ -73,39 +73,39 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
                     invocation.getOperationName(),
                     getLocation());
         } else if (target instanceof Variable) {
-            return ctx.lookupExp(((Variable)target).getName(), getLocation());
+            return ctx.lookupExp(((Variable) target).getName(), getLocation());
         } else {
             throw new RuntimeException("Getting field of dynamic object,"
                     + "but dynamic object's AST is some unsupported type: " + target.getClass());
         }
     }
-    
+
     @Override
     public Expression generateIL(
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
-        
+
         // Figure out expression being assigned and target it is being assigned to.
         IExpr exprToAssign = value.generateIL(ctx, expectedType, dependencies);
-        ValueType exprType = exprToAssign.typeCheck(ctx, null); 
+        ValueType exprType = exprToAssign.typeCheck(ctx, null);
         IExpr exprFieldGet = generateFieldGet(ctx, dependencies);
-        
+
         // Assigning to a top-level var.
         if (exprFieldGet instanceof MethodCall) {
-            
+
             // Figure out the var being assigned and get the name of its setter.
             MethodCall methCall = (MethodCall) exprFieldGet;
             String methName     = methCall.getMethodName();
             String varName      = GetterAndSetterGeneration.getterToVarName(methName);
             String setterName   = GetterAndSetterGeneration.varNameToSetter(varName);
-            
+
             // Return an invocation to the setter w/ appropriate argmuents supplied.
             IExpr receiver = methCall.getObjectExpr();
             List<IExpr> setterArgs = new LinkedList<>();
             setterArgs.add(exprToAssign);
             return new MethodCall(receiver, setterName, setterArgs, this);
-            
+
         } else if (exprFieldGet instanceof FieldGet) {
             // Assigning to an object's field.
             // Return a FieldSet to the appropriate field.
@@ -113,10 +113,10 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
             String fieldName = fieldGet.getName();
             IExpr objExpr = fieldGet.getObjectExpr();
             return new wyvern.target.corewyvernIL.expression.FieldSet(
-                exprType,
-                objExpr,
-                fieldName,
-                exprToAssign);
+                    exprType,
+                    objExpr,
+                    fieldName,
+                    exprToAssign);
         } else {
             // Unknown what's going on.
             ToolError.reportError(ErrorMessage.NOT_ASSIGNABLE, this);

@@ -13,26 +13,28 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.Value;
 
 
-public class UnitVal extends AbstractExpressionAST implements Value, CoreAST {
-	private UnitVal(FileLocation location) { this.location = location; }
-	// private static UnitVal instance = new UnitVal(); // FIXME: I have to move away from instance to provide line number! :(
-	public static UnitVal getInstance(FileLocation fileLocation) {
-		return new UnitVal(fileLocation); // instance; 
-	}
-	
-	@Override
-	public String toString() {
-		return "()";
-	}
+public final class UnitVal extends AbstractExpressionAST implements Value, CoreAST {
+    private UnitVal(FileLocation location) {
+        this.location = location;
+    }
+    // private static UnitVal instance = new UnitVal(); // FIXME: I have to move away from instance to provide line number! :(
+    public static UnitVal getInstance(FileLocation fileLocation) {
+        return new UnitVal(fileLocation); // instance;
+    }
+
+    @Override
+    public String toString() {
+        return "()";
+    }
 
     private FileLocation location;
-	public FileLocation getLocation() {
-		return this.location;
-	}
-	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		return Util.unitValue();
-	}
+    public FileLocation getLocation() {
+        return this.location;
+    }
+    @Override
+    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+        return Util.unitValue();
+    }
 
     @Override
     public StringBuilder prettyPrint() {

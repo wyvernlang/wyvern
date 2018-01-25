@@ -8,43 +8,43 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
 public abstract class DeclType extends ASTNode implements IASTNode {
-	private String name;
-	
-	DeclType(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
+    private String name;
 
-	public abstract boolean isSubtypeOf(DeclType dt, TypeContext ctx);
+    DeclType(String name) {
+        this.name = name;
+    }
 
-	public abstract DeclType adapt(View v);
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Evaluates any metadata that might be present in this type to a value  
-	 */
-	public DeclType interpret(EvalContext ctx) {
-		return this;
-	}
-	
-	/**
-	 * Gets the metadata, if any, for this DeclType.
-	 * Returns null if no metadata is associated with this DeclType.
-	 */
-	public Value getMetadataValue() {
-		return null;
-	}
+    public abstract boolean isSubtypeOf(DeclType dt, TypeContext ctx);
 
-	abstract public void checkWellFormed(TypeContext ctx);
+    public abstract DeclType adapt(View v);
 
-	/**
-	 * Avoids the specified variable.  Returns the original DeclType object
-	 * if the variable was not used.
-	 * @param count TODO
-	 */
-	public abstract DeclType doAvoid(String varName, TypeContext ctx, int count);
+    /**
+     * Evaluates any metadata that might be present in this type to a value
+     */
+    public DeclType interpret(EvalContext ctx) {
+        return this;
+    }
 
-	public abstract boolean isTypeDecl();
+    /**
+     * Gets the metadata, if any, for this DeclType.
+     * Returns null if no metadata is associated with this DeclType.
+     */
+    public Value getMetadataValue() {
+        return null;
+    }
+
+    public abstract void checkWellFormed(TypeContext ctx);
+
+    /**
+     * Avoids the specified variable.  Returns the original DeclType object
+     * if the variable was not used.
+     * @param count TODO
+     */
+    public abstract DeclType doAvoid(String varName, TypeContext ctx, int count);
+
+    public abstract boolean isTypeDecl();
 }

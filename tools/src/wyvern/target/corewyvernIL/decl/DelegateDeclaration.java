@@ -11,42 +11,41 @@ import wyvern.tools.errors.FileLocation;
 
 public class DelegateDeclaration extends Declaration {
 
-	private ValueType valueType;
-	private String fieldName;
+    private ValueType valueType;
+    private String fieldName;
 
-	public DelegateDeclaration(ValueType valueType, String fieldName, FileLocation loc) {
-		super(loc);
-		this.valueType = valueType;
-		this.fieldName = fieldName;
-	}
+    public DelegateDeclaration(ValueType valueType, String fieldName, FileLocation loc) {
+        super(loc);
+        this.valueType = valueType;
+        this.fieldName = fieldName;
+    }
 
-	public ValueType getValueType() {
-		return valueType;
-	}
+    public ValueType getValueType() {
+        return valueType;
+    }
 
-	public String getFieldName() {
-		return fieldName;
-	}
+    public String getFieldName() {
+        return fieldName;
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-			S state) {
-		return emitILVisitor.visit(state, this);
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
 
-	@Override
-	public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public String getName() {
-		return null;
-	}
+    @Override
+    public String getName() {
+        return null;
+    }
 
-	@Override
-	public Set<String> getFreeVariables() {
-		return new HashSet<>();
-	}
+    @Override
+    public Set<String> getFreeVariables() {
+        return new HashSet<>();
+    }
 }

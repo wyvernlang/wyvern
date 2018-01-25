@@ -1,9 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.net.URI;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;

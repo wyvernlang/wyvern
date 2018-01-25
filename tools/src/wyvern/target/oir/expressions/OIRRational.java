@@ -6,39 +6,39 @@ import wyvern.target.oir.declarations.OIRRationalType;
 import wyvern.target.oir.declarations.OIRType;
 
 public class OIRRational extends OIRLiteral implements OIRValue {
-	private int numerator;
-	private int denominator;
-	
-	public int getNumerator() {
-		return numerator;
-	}
+    private int numerator;
+    private int denominator;
 
-	public void setNumerator(int numerator) {
-		this.numerator = numerator;
-	}
+    public int getNumerator() {
+        return numerator;
+    }
 
-	public int getDenominator() {
-		return denominator;
-	}
+    public void setNumerator(int numerator) {
+        this.numerator = numerator;
+    }
 
-	public void setDenominator(int denominator) {
-		this.denominator = denominator;
-	}
+    public int getDenominator() {
+        return denominator;
+    }
 
-	public OIRRational(int numerator, int denominator) {
-		super();
-		this.numerator = numerator;
-		this.denominator = denominator;
-	}
+    public void setDenominator(int denominator) {
+        this.denominator = denominator;
+    }
 
-	@Override
-	public OIRType typeCheck(OIREnvironment oirEnv) {
-		setExprType (OIRRationalType.getRationalType());
-		return getExprType ();
-	}
+    public OIRRational(int numerator, int denominator) {
+        super();
+        this.numerator = numerator;
+        this.denominator = denominator;
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
-		return visitor.visit(state, this);
-	}
+    @Override
+    public OIRType typeCheck(OIREnvironment oirEnv) {
+        setExprType(OIRRationalType.getRationalType());
+        return getExprType();
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
 }

@@ -1,9 +1,9 @@
 package wyvern.stdlib.support;
 
 public class Int {
-	public static Int utils = new Int();
+    public static final Int utils = new Int();
 
-	public int from(String s) {
-		return Integer.parseInt(s.trim());
-	}
+    public int from(String s) {
+        return Integer.parseInt(s.trim());
+    }
 }

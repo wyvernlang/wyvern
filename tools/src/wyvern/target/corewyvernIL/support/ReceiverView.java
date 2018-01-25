@@ -8,52 +8,54 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class ReceiverView extends View {
-	private Variable from;
-	private Path to;
-	private TypeContext ctx;
+    private Variable from;
+    private Path to;
+    private TypeContext ctx;
 
-	public ReceiverView(IExpr e, TypeContext ctx) {
+    public ReceiverView(IExpr e, TypeContext ctx) {
         this.ctx = ctx;
-		if (e instanceof Variable) {
-			to = (Variable) e;
-		} else if (e instanceof FieldGet) {
-			to = (FieldGet) e;
+        if (e instanceof Variable) {
+            to = (Variable) e;
+        } else if (e instanceof FieldGet) {
+            to = (FieldGet) e;
         } else {
             to = null;
-		}
-		ValueType vt = e.typeCheck(ctx, null);
-		StructuralType st = vt.getStructuralType(ctx);
-		if (st != null) {
-			from = new Variable(st.getSelfName());
-		} else {
-			from = null;
-		}
-	}
+        }
+        ValueType vt = e.typeCheck(ctx, null);
+        StructuralType st = vt.getStructuralType(ctx);
+        if (st != null) {
+            from = new Variable(st.getSelfName());
+        } else {
+            from = null;
+        }
+    }
 
-	public ReceiverView(Variable from, Path to) {
-		this.from = from;
-		this.to = to;
-	}
-	
-	@Override
-	public Path adapt(Variable v) {
-		if (from == null)
-			return v;
-		if (v.equals(from)) {
-			if (to == null)
-				throw new RuntimeException("view adaptation failed (from = " + from.toString() + ")");
-			return to;
-		} else {
-			return v;
-		}
-	}
-	
-	@Override
-	public String toString() {
-		return "ReceiverView(" + from + " => " + to + ')';
-	}
+    public ReceiverView(Variable from, Path to) {
+        this.from = from;
+        this.to = to;
+    }
 
-	@Override
+    @Override
+    public Path adapt(Variable v) {
+        if (from == null) {
+            return v;
+        }
+        if (v.equals(from)) {
+            if (to == null) {
+                throw new RuntimeException("view adaptation failed (from = " + from.toString() + ")");
+            }
+            return to;
+        } else {
+            return v;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ReceiverView(" + from + " => " + to + ')';
+    }
+
+    @Override
     public TypeContext getContext() {
         return ctx;
     }

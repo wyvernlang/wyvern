@@ -10,27 +10,26 @@ import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
 public class StdlibTests {
-	@Test
-	public void testRegex() throws ParseException {
-		String input = ""
-				 + "import wyvern.Int\n"
-				 + "import wyvern.option\n"
-				 + "import wyvern.util.matching.regex\n\n"
-				 + "val r = regex(\"\\\\d\")\n"
-				 + "val threeString = r.findPrefixOf(\"3 men in a tub\")\n"
-				 + "Int.from(threeString.getOrElse(() => 5))"
-				 ;
-	    TestUtil.doTestInt(input, 3);
-	}
+    @Test
+    public void testRegex() throws ParseException {
+        String input = ""
+                + "import wyvern.Int\n"
+                + "import wyvern.option\n"
+                + "import wyvern.util.matching.regex\n\n"
+                + "val r = regex(\"\\\\d\")\n"
+                + "val threeString = r.findPrefixOf(\"3 men in a tub\")\n"
+                + "Int.from(threeString.getOrElse(() => 5))";
+        TestUtil.doTestInt(input, 3);
+    }
 
-	@Test
-	public void testRegexLexer() throws ParseException {
-		TestUtil.doTestScriptModularly("tsls.testLexer", Util.stringType(), new StringLiteral("*"));
-	}
+    @Test
+    public void testRegexLexer() throws ParseException {
+        TestUtil.doTestScriptModularly("tsls.testLexer", Util.stringType(), new StringLiteral("*"));
+    }
 
-	@Test
-	public void testParser() throws ParseException {
-		TestUtil.doTestScriptModularly("tsls.testParser", null, null);
-	}
+    @Test
+    public void testParser() throws ParseException {
+        TestUtil.doTestScriptModularly("tsls.testParser", null, null);
+    }
 
 }

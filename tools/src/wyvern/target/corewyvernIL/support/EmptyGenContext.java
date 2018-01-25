@@ -4,40 +4,40 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class EmptyGenContext extends GenContext {
-	private InterpreterState state;
-	
-	protected EmptyGenContext() {
-		super(null);
-	}
+    private InterpreterState state;
 
-	public EmptyGenContext(InterpreterState state) {
-		super(null);
-		this.state = state;
-	}
+    protected EmptyGenContext() {
+        super(null);
+    }
 
-	@Override
-	public ValueType lookupTypeOf(String varName) {
-		throw new RuntimeException("Variable " + varName + " not found");
-	}
+    public EmptyGenContext(InterpreterState state) {
+        super(null);
+        this.state = state;
+    }
 
-	@Override
-	protected String endToString() {
-		return "]";
-	}
+    @Override
+    public ValueType lookupTypeOf(String varName) {
+        throw new RuntimeException("Variable " + varName + " not found");
+    }
 
-	@Override
-	public Path getContainerForTypeAbbrev(String typeName) {
-		return null;
-		//throw new RuntimeException("Type " + varName + " not found");
-	}
+    @Override
+    protected String endToString() {
+        return "]";
+    }
 
-	@Override
-	public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
-		throw new RuntimeException("Variable " + varName + " not found");
-	}
+    @Override
+    public Path getContainerForTypeAbbrev(String typeName) {
+        return null;
+        //throw new RuntimeException("Type " + varName + " not found");
+    }
 
-	@Override
-	public InterpreterState getInterpreterState() {
-		return state;
-	}
+    @Override
+    public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
+        throw new RuntimeException("Variable " + varName + " not found");
+    }
+
+    @Override
+    public InterpreterState getInterpreterState() {
+        return state;
+    }
 }

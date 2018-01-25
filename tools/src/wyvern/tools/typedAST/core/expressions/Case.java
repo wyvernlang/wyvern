@@ -50,8 +50,8 @@ public class Case {
     }
 
     /**
-      * toString generates a String representation of this Case, and embeds the tag as well.
-      */
+     * toString generates a String representation of this Case, and embeds the tag as well.
+     */
     public String toString() {
         if (taggedType != null) {
             return "Case " + taggedType.toString() + " with expression: " + ast;

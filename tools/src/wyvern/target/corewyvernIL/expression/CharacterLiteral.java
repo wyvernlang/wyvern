@@ -13,25 +13,24 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public class CharacterLiteral extends Literal implements Invokable {
+    private java.lang.Character value;
 
-	private java.lang.Character value;
+    public CharacterLiteral(java.lang.Character value) {
+        this(value, FileLocation.UNKNOWN);
+    }
 
-	public CharacterLiteral(java.lang.Character value) {
-		this(value, FileLocation.UNKNOWN);
-	}
-	
-	public CharacterLiteral(java.lang.Character value, FileLocation loc) {
-		super(Util.charType(), loc);
-		this.value = value;
-	}
+    public CharacterLiteral(java.lang.Character value, FileLocation loc) {
+        super(Util.charType(), loc);
+        this.value = value;
+    }
 
-	public java.lang.Character getValue() {
-		return value;
-	}
+    public java.lang.Character getValue() {
+        return value;
+    }
 
-	public void setValue(java.lang.Character value) {
-		this.value = value;
-	}
+    public void setValue(java.lang.Character value) {
+        this.value = value;
+    }
 
     @Override
     public int hashCode() {
@@ -43,59 +42,58 @@ public class CharacterLiteral extends Literal implements Invokable {
         if (this == obj) {
             return true;
         }
-        if(obj == null) {
+        if (obj == null) {
             return false;
         }
-        if(this.getClass() != obj.getClass()) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
         try {
             CharacterLiteral other = (CharacterLiteral) obj;
             return this.getValue().equals(other.getValue());
-        } catch(ClassCastException e) {
+        } catch (ClassCastException e) {
             return false;
         }
     }
 
-	@Override
-	public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
+    @Override
+    public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
         return getType();
-	}
+    }
 
-	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append('\'').append(value).append('\'');
-	}
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append('\'').append(value).append('\'');
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-			S state) {
-		throw new RuntimeException("not implemented");
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        throw new RuntimeException("not implemented");
+    }
 
-	@Override
-	public Set<String> getFreeVariables() {
-		return new HashSet<>();
-	}
+    @Override
+    public Set<String> getFreeVariables() {
+        return new HashSet<>();
+    }
 
 
-	@Override
-	public ValueType getType() {
-		return Util.charType();
-	}
+    @Override
+    public ValueType getType() {
+        return Util.charType();
+    }
 
     public Value invoke(String methodName, List<Value> args) {
         switch (methodName) {
-            case "<": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral)args.get(0)).getValue()) < 0);
-            case ">": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral)args.get(0)).getValue()) > 0);
-            case "==": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral)args.get(0)).getValue()) == 0);
-            default: throw new RuntimeException("runtime error: character operation " + methodName + "not supported by the runtime");
+        case "<": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) < 0);
+        case ">": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) > 0);
+        case "==": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) == 0);
+        default: throw new RuntimeException("runtime error: character operation " + methodName + "not supported by the runtime");
         }
-	}
+    }
 
-	@Override
-	public Value getField(String fieldName) {
-		throw new RuntimeException("no fields");
-	}
+    @Override
+    public Value getField(String fieldName) {
+        throw new RuntimeException("no fields");
+    }
 
 }

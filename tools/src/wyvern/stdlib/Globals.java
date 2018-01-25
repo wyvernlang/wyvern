@@ -45,96 +45,98 @@ import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-public class Globals {
-	public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
+public final class Globals {
+    private Globals() { }
+    public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
     public static final NominalType PYTHON_IMPORT_TYPE = new NominalType("system", "Python");
-	public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
-	public static final boolean checkRuntimeTypes = false;
-	private static final Set<String> javaWhiteList = new HashSet<String>();
-	private static final String PRELUDE_NAME = "prelude.wyv";
-	private static SeqExpr prelude = null;
-	
-	static {
-		// the whitelist that anyone can import without requiring java or becoming a resource module
-		// WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
-		javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
-		javaWhiteList.add("wyvern.stdlib.support.Int.utils");
-		javaWhiteList.add("wyvern.stdlib.support.AST.utils");
-		javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
-		javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
-	}
-	
-	private static SeqExpr getPrelude(GenContext ctx) {
-	    if (prelude == null) {
-    	    String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
-    	    File file = new File(preludeLocation);
-    	    TypedAST ast = null;
-    	    try {
+    public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
+    public static final boolean checkRuntimeTypes = false;
+    private static final Set<String> javaWhiteList = new HashSet<String>();
+    private static final String PRELUDE_NAME = "prelude.wyv";
+    private static SeqExpr prelude = null;
+
+    static {
+        // the whitelist that anyone can import without requiring java or becoming a resource module
+        // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
+        javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
+        javaWhiteList.add("wyvern.stdlib.support.Int.utils");
+        javaWhiteList.add("wyvern.stdlib.support.AST.utils");
+        javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
+        javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
+    }
+
+    private static SeqExpr getPrelude(GenContext ctx) {
+        if (prelude == null) {
+            String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
+            File file = new File(preludeLocation);
+            TypedAST ast = null;
+            try {
                 ast = TestUtil.getNewAST(file);
             } catch (ParseException e) {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR, new FileLocation(file.getPath(), e.currentToken.beginLine, e.currentToken.beginColumn), e.getMessage());
+                ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
             }
             final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-            IExpr program = ((ExpressionAST)ast).generateIL(ctx, null, dependencies);
+            IExpr program = ((ExpressionAST) ast).generateIL(ctx, null, dependencies);
             prelude = (SeqExpr) program;
-	    }
+        }
         return prelude;
-	}
-	
-	public static boolean checkSafeJavaImport(String packageName) {
-		return javaWhiteList.contains(packageName);
-	}
+    }
 
-	public static GenContext getStandardGenContext() {
-      return Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
-	}
+    public static boolean checkSafeJavaImport(String packageName) {
+        return javaWhiteList.contains(packageName);
+    }
 
-	public static GenContext getGenContext(InterpreterState state) {
-		if (state.getGenContext() != null) {
-			return state.getGenContext();
-		}
-		GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), Globals.getSystemType());
-		genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
+    public static GenContext getStandardGenContext() {
+        return Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
+    }
+
+    public static GenContext getGenContext(InterpreterState state) {
+        if (state.getGenContext() != null) {
+            return state.getGenContext();
+        }
+        GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), Globals.getSystemType());
+        genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Character", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("Boolean", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("Dyn", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
-		genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
-		genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
-		genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
-		SeqExpr sexpr = getPrelude(genCtx);
-		GenContext newCtx = sexpr.extendContext(genCtx);
-		return newCtx;
-	}
+        genCtx = new TypeOrEffectGenContext("Boolean", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Dyn", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
+        genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
+        genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
+        SeqExpr sexpr = getPrelude(genCtx);
+        GenContext newCtx = sexpr.extendContext(genCtx);
+        return newCtx;
+    }
 
     private static ValueType getSystemType() {
         List<FormalArg> ifTrueArgs = Arrays.asList(
-				new FormalArg("trueBranch", Util.unitToDynType()),
-				new FormalArg("falseBranch", Util.unitToDynType()));
+                new FormalArg("trueBranch", Util.unitToDynType()),
+                new FormalArg("falseBranch", Util.unitToDynType()));
         List<DeclType> boolDeclTypes = new LinkedList<DeclType>();
         boolDeclTypes.add(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
         boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
-		// construct a type for the system object
-		List<DeclType> declTypes = new LinkedList<DeclType>();
-		List<DeclType> intDeclTypes = new LinkedList<DeclType>();
-		intDeclTypes.add(new DefDeclType("+", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("-", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("*", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("/", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("%", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
-		intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        // construct a type for the system object
+        List<DeclType> declTypes = new LinkedList<DeclType>();
+        List<DeclType> intDeclTypes = new LinkedList<DeclType>();
+        intDeclTypes.add(new DefDeclType("+", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("-", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("*", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("/", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("%", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
-		ValueType intType = new StructuralType("intSelf", intDeclTypes);
-		ValueType boolType = new StructuralType("boolean", boolDeclTypes);
-		declTypes.add(new ConcreteTypeMember("Int", intType));
-		declTypes.add(new ConcreteTypeMember("Boolean", boolType));
-		declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
+        ValueType intType = new StructuralType("intSelf", intDeclTypes);
+        ValueType boolType = new StructuralType("boolean", boolDeclTypes);
+        declTypes.add(new ConcreteTypeMember("Int", intType));
+        declTypes.add(new ConcreteTypeMember("Boolean", boolType));
+        declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
 
         List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
         stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
@@ -143,7 +145,8 @@ public class Globals {
         stringDeclTypes.add(new DefDeclType("+", Util.stringType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
         stringDeclTypes.add(new DefDeclType("length", Util.intType(), new LinkedList<FormalArg>()));
-        stringDeclTypes.add(new DefDeclType("substring", Util.stringType(), Arrays.asList(new FormalArg[]{new FormalArg("start", Util.intType()),new FormalArg("end", Util.intType())})));
+        stringDeclTypes.add(new DefDeclType("substring", Util.stringType(),
+                Arrays.asList(new FormalArg[]{new FormalArg("start", Util.intType()), new FormalArg("end", Util.intType())})));
         stringDeclTypes.add(new DefDeclType("concat", Util.stringType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
         declTypes.add(new ConcreteTypeMember("String", stringType));
@@ -163,8 +166,9 @@ public class Globals {
         declTypes.add(new TaggedTypeMember("Java", javaType));
         //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
-        pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));	
-        pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(), Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
+        pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
+        pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(),
+                Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
         ExtensibleTagType pythonTagType = new ExtensibleTagType(systemPlatform, pythonType);
         //declTypes.add(new ConcreteTypeMember("Python", pythonType));
@@ -174,39 +178,39 @@ public class Globals {
         declTypes.add(new EffectDeclType("ffiEffect", null, null));
         ValueType systemType = new StructuralType("system", declTypes);
         return systemType;
-	}
+    }
 
-	public static TypeContext getStandardTypeContext() {
-		GenContext ctx = GenContext.empty();
-		ctx = ctx.extend("system", new Variable("system"), getSystemType());
-		ctx = GenUtil.ensureJavaTypesPresent(ctx);
+    public static TypeContext getStandardTypeContext() {
+        GenContext ctx = GenContext.empty();
+        ctx = ctx.extend("system", new Variable("system"), getSystemType());
+        ctx = GenUtil.ensureJavaTypesPresent(ctx);
         SeqExpr sexpr = getPrelude(ctx);
         GenContext newCtx = sexpr.extendContext(ctx);
-		return newCtx;
-	}
+        return newCtx;
+    }
 
-	public static EvalContext getStandardEvalContext() {
-		EvalContext ctx = EvalContext.empty();
-		ctx = ctx.extend("system", Globals.getSystemValue());
+    public static EvalContext getStandardEvalContext() {
+        EvalContext ctx = EvalContext.empty();
+        ctx = ctx.extend("system", Globals.getSystemValue());
         SeqExpr sexpr = prelude;
-        assert sexpr != null; // invariant: we must have gotten a type context already 
-        ctx = sexpr.interpretCtx(ctx).second;
-		return ctx;
-	}
+        assert sexpr != null; // invariant: we must have gotten a type context already
+        ctx = sexpr.interpretCtx(ctx).getSecond();
+        return ctx;
+    }
 
-	private static ObjectValue getSystemValue() {
-		// construct a type for the system object
-		List<Declaration> decls = new LinkedList<Declaration>();
-		decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
+    private static ObjectValue getSystemValue() {
+        // construct a type for the system object
+        List<Declaration> decls = new LinkedList<Declaration>();
+        decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
-		decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
-		ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
-		return systemVal;
-	}
+        ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
+        return systemVal;
+    }
 }

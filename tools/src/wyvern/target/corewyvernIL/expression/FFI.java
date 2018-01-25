@@ -20,34 +20,34 @@ import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.util.Pair;
 
 public class FFI extends AbstractValue {
-	private ValueType type;
-  private String importName;
+    private ValueType type;
+    private String importName;
 
-	public FFI(String importName, ValueType type, FileLocation loc) {
-		super(type, loc);
-		this.type = type;
-    this.importName = importName;
-	}
+    public FFI(String importName, ValueType type, FileLocation loc) {
+        super(type, loc);
+        this.type = type;
+        this.importName = importName;
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
-      return emitILVisitor.visit(state, this);
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
 
-	@Override
-	public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-		return type;
-	}
+    @Override
+    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        return type;
+    }
 
-	@Override
-	public Set<String> getFreeVariables() {
-		return new HashSet<>();
-	}
+    @Override
+    public Set<String> getFreeVariables() {
+        return new HashSet<>();
+    }
 
-	@Override
-	public ValueType getType() {
-		return type;
-	}
+    @Override
+    public ValueType getType() {
+        return type;
+    }
 
     public String getImportName() {
         return this.importName;
@@ -66,11 +66,11 @@ public class FFI extends AbstractValue {
         }
     }
 
-	public static Pair<VarBinding, GenContext> doJavaImport(URI uri, GenContext ctx, HasLocation errorLocation) {
-		String importName = uri.getSchemeSpecificPart();
-	    if (importName.contains(".")) {
-	        importName = importName.substring(importName.lastIndexOf(".")+1);
-	      }
+    public static Pair<VarBinding, GenContext> doJavaImport(URI uri, GenContext ctx, HasLocation errorLocation) {
+        String importName = uri.getSchemeSpecificPart();
+        if (importName.contains(".")) {
+            importName = importName.substring(importName.lastIndexOf(".") + 1);
+        }
         String importPath = uri.getRawSchemeSpecificPart();
         FObject obj = null;
         try {
@@ -78,15 +78,15 @@ public class FFI extends AbstractValue {
         } catch (ReflectiveOperationException e1) {
             throw new RuntimeException(e1);
         }
-	
+
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
         ctx = ImportDeclaration.extendWithImportCtx(obj, ctx);
-	
+
         ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
         Expression importExp = new FFIImport(new NominalType("system", "java"), importPath, type);
         ctx = ctx.extend(importName, new Variable(importName), type);
         return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
-	}
+    }
 
     public static Pair<VarBinding, GenContext> doPythonImport(URI uri, GenContext ctx) {
         String importName = uri.getSchemeSpecificPart();

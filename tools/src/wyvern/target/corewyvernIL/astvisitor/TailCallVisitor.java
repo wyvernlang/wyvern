@@ -137,53 +137,53 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
 
     public Void visit(Boolean inTailPosition,
-                         IntegerLiteral integerLiteral) {
+            IntegerLiteral integerLiteral) {
         return null;
     }
 
 
     public Void visit(Boolean inTailPosition,
-                      BooleanLiteral booleanLiteral) {
+            BooleanLiteral booleanLiteral) {
         return null;
     }
 
 
     public Void visit(Boolean inTailPosition,
-                         RationalLiteral rational) {
+            RationalLiteral rational) {
         return null;
     }
 
 
     public Void visit(Boolean inTailPosition,
-                         FormalArg formalArg) {
+            FormalArg formalArg) {
         return null;
     }
 
 
     public Void visit(Boolean inTailPosition,
-                         VarDeclType varDeclType) {
+            VarDeclType varDeclType) {
         return null;
     }
 
     public Void visit(Boolean inTailPosition,
-                         ValDeclType valDeclType) {
-        return null;
-    }
-    
-
-    public Void visit(Boolean inTailPosition,
-                         DefDeclType defDeclType) {
+            ValDeclType valDeclType) {
         return null;
     }
 
 
     public Void visit(Boolean inTailPosition,
-                         AbstractTypeMember abstractDeclType) {
+            DefDeclType defDeclType) {
+        return null;
+    }
+
+
+    public Void visit(Boolean inTailPosition,
+            AbstractTypeMember abstractDeclType) {
         return null;
     }
 
     public Void visit(Boolean inTailPosition,
-                         StructuralType structuralType) {
+            StructuralType structuralType) {
         return null;
     }
 
@@ -210,31 +210,31 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     @Override
     public Void visit(Boolean inTailPosition,
-                         ConcreteTypeMember concreteTypeMember) {
+            ConcreteTypeMember concreteTypeMember) {
         return null;
     }
 
     @Override
     public Void visit(Boolean inTailPosition,
-                         TypeDeclaration typeDecl) {
+            TypeDeclaration typeDecl) {
         return null;
     }
 
     @Override
     public Void visit(Boolean inTailPosition,
-    		ValueType caseType) {
+            ValueType caseType) {
         return null;
     }
 
     @Override
     public Void visit(Boolean inTailPosition,
-                         ExtensibleTagType extensibleTagType) {
+            ExtensibleTagType extensibleTagType) {
         return null;
     }
 
     @Override
     public Void visit(Boolean inTailPosition,
-                         DataType dataType) {
+            DataType dataType) {
         return null;
     }
 
@@ -250,15 +250,15 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     @Override
     public Void visit(Boolean inTailPosition, ModuleDeclaration moduleDecl) {
-        ((DefDeclaration)moduleDecl).acceptVisitor(this, inTailPosition);
+        ((DefDeclaration) moduleDecl).acceptVisitor(this, inTailPosition);
         return null;
     }
 
-	@Override
-	public Void visit(Boolean state, EffectDeclaration effectDeclaration) {
-//		effectDeclaration.acceptVisitor(this, false); // causes StackOverflow (inf loop, probably)
-		return null;
-	}
+    @Override
+    public Void visit(Boolean state, EffectDeclaration effectDeclaration) {
+//        effectDeclaration.acceptVisitor(this, false); // causes StackOverflow (inf loop, probably)
+        return null;
+    }
 
     @Override
     public Void visit(Boolean state, EffectDeclType effectDeclType) {
@@ -270,16 +270,17 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     public Void visit(Boolean inTailPosition, SeqExpr seqExpr) {
         List<HasLocation> elements = seqExpr.getElements();
         int count = elements.size();
-        if (elements.get(count-1) instanceof IExpr) {
-            ((IExpr)elements.get(count-1)).acceptVisitor(this, inTailPosition);
+        if (elements.get(count - 1) instanceof IExpr) {
+            ((IExpr) elements.get(count - 1)).acceptVisitor(this, inTailPosition);
             count--;
         }
         for (int i = 0; i < count; ++i) {
             HasLocation hl = elements.get(i);
-            if (hl instanceof IExpr)
-                ((IExpr)hl).acceptVisitor(this, false);
-            else
-                ((VarBinding)hl).getExpression().acceptVisitor(this, false);
+            if (hl instanceof IExpr) {
+                ((IExpr) hl).acceptVisitor(this, false);
+            } else {
+                ((VarBinding) hl).getExpression().acceptVisitor(this, false);
+            }
         }
         return null;
     }

@@ -11,26 +11,25 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
-import wyvern.tools.types.Type;
 
 public class BooleanConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
-	private boolean value;
-	
-	public BooleanConstant(boolean b) {
-		this.value = b;
-	}
+    private boolean value;
 
-	public boolean getValue() {
-		return this.value;
-	}
+    public BooleanConstant(boolean b) {
+        this.value = b;
+    }
+
+    public boolean getValue() {
+        return this.value;
+    }
 
     private FileLocation location = FileLocation.UNKNOWN;
-	public FileLocation getLocation() {
-		return this.location;
-	}
+    public FileLocation getLocation() {
+        return this.location;
+    }
 
-	@Override
-	public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-		return new BooleanLiteral(value);
-	}
+    @Override
+    public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+        return new BooleanLiteral(value);
+    }
 }

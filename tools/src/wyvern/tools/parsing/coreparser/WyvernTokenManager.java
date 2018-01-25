@@ -14,71 +14,68 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.lexing.LexerUtils;
 
-public class WyvernTokenManager<Lexer extends SingleDFAEngine<List< Token >, CopperParserException>, ParserConstants>
-		implements TokenManager {
-	private Constructor<Lexer> lexerCtor;
-	private Class<ParserConstants> parserConstantsClass;
+public class WyvernTokenManager<Lexer extends SingleDFAEngine<List<Token>, CopperParserException>, ParserConstants> implements TokenManager {
+    private Constructor<Lexer> lexerCtor;
+    private Class<ParserConstants> parserConstantsClass;
 
-	private Reader input;
-	private String filename;
-	private Iterator<Token> tokens;
-	private Token specialToken;
+    private Reader input;
+    private String filename;
+    private Iterator<Token> tokens;
+    private Token specialToken;
 
-	public WyvernTokenManager(Reader input, String filename, Class<Lexer> lexerClass, Class<ParserConstants> parserConstantsClass) {
-		try {
-			this.lexerCtor = lexerClass.getConstructor();
-			this.parserConstantsClass = parserConstantsClass;
+    public WyvernTokenManager(Reader input, String filename, Class<Lexer> lexerClass, Class<ParserConstants> parserConstantsClass) {
+        try {
+            this.lexerCtor = lexerClass.getConstructor();
+            this.parserConstantsClass = parserConstantsClass;
 
-			this.input = input;
-			this.filename = filename;
-			this.tokens = null;
-		}
-		catch (NoSuchMethodException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private void readTokenList() throws CopperParserException, IOException, InstantiationException,
-										IllegalAccessException, InvocationTargetException {
-		List<Token> tokenList = this.lexerCtor.newInstance().parse(input, filename);
-		//System.out.println(tokenList);
-        tokens = tokenList.iterator();
-	}
-
-	@Override
-	public Token getNextToken() {
-		if (tokens == null) {
-			try {
-				readTokenList();
-			} catch (CopperParserException e) {
-				ToolError.reportError(ErrorMessage.PARSE_ERROR, (FileLocation) null, e.getMessage());
-				throw new RuntimeException(e);
-			} catch (IOException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		while (tokens.hasNext()) {
-			Token t = tokens.next();
-			t.specialToken = specialToken;
-			if (!LexerUtils.<ParserConstants>isSpecial(t, parserConstantsClass)) {
-				specialToken = null;
-				return t;
-			}
-			specialToken = t;
-		}
-
-		try {
-		    int EOF = parserConstantsClass.getField("EOF").getInt(null);
-            return new Token(EOF);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-		    throw new RuntimeException(e);
+            this.input = input;
+            this.filename = filename;
+            this.tokens = null;
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
-	}
-	
-	public String getFilename() {
-		return filename;
-	}
+    }
+
+    private void readTokenList() throws CopperParserException, IOException, InstantiationException,
+    IllegalAccessException, InvocationTargetException {
+        List<Token> tokenList = this.lexerCtor.newInstance().parse(input, filename);
+        //System.out.println(tokenList);
+        tokens = tokenList.iterator();
+    }
+
+    @Override
+    public Token getNextToken() {
+        if (tokens == null) {
+            try {
+                readTokenList();
+            } catch (CopperParserException e) {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, (FileLocation) null, e.getMessage());
+                throw new RuntimeException(e);
+            } catch (IOException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        while (tokens.hasNext()) {
+            Token t = tokens.next();
+            t.specialToken = specialToken;
+            if (!LexerUtils.<ParserConstants>isSpecial(t, parserConstantsClass)) {
+                specialToken = null;
+                return t;
+            }
+            specialToken = t;
+        }
+
+        try {
+            int eof = parserConstantsClass.getField("EOF").getInt(null);
+            return new Token(eof);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getFilename() {
+        return filename;
+    }
 
 }

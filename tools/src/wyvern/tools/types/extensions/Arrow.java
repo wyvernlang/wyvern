@@ -17,56 +17,57 @@ import wyvern.tools.types.ApplyableType;
 import wyvern.tools.types.Type;
 
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
-	private Type result;
-	private List<Type> arguments;
-	
-	public Arrow(List<Type> arguments, Type result) {
-		this.arguments = arguments;
-		this.result = result;
-	}
+    private Type result;
+    private List<Type> arguments;
 
-	public Type getResult() {
-		return result;
-	}
-	
-	public List<Type> getArguments() {
-		return arguments;
-	}
-	
-	@Override
-	public String toString() {
-		String argString = (arguments == null)?null:arguments.toString();
-		return argString + " -> " + result;
-	}
-	
-	@Override
-	public boolean equals(Object otherT) {
-		if (!(otherT instanceof Arrow))
-			return false;
-		Arrow otherAT = (Arrow) otherT; 
-		return arguments.equals(otherAT.arguments) && result.equals(otherAT.result);
-	}
-	
-	@Override
-	public int hashCode() {
-		return 37*arguments.hashCode()+result.hashCode();
-	}	
+    public Arrow(List<Type> arguments, Type result) {
+        this.arguments = arguments;
+        this.result = result;
+    }
 
-    static final ValueType nominalUnit = new NominalType("system", "Unit"); 
-    
-	@Override
-	public ValueType getILType(GenContext ctx) {
-		List<FormalArg> formals = new LinkedList<FormalArg>();
+    public Type getResult() {
+        return result;
+    }
+
+    public List<Type> getArguments() {
+        return arguments;
+    }
+
+    @Override
+    public String toString() {
+        String argString = (arguments == null) ? null : arguments.toString();
+        return argString + " -> " + result;
+    }
+
+    @Override
+    public boolean equals(Object otherT) {
+        if (!(otherT instanceof Arrow)) {
+            return false;
+        }
+        Arrow otherAT = (Arrow) otherT;
+        return arguments.equals(otherAT.arguments) && result.equals(otherAT.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return arguments.hashCode() + result.hashCode();
+    }
+
+    static final ValueType NOMINAL_UNIT = new NominalType("system", "Unit");
+
+    @Override
+    public ValueType getILType(GenContext ctx) {
+        List<FormalArg> formals = new LinkedList<FormalArg>();
         for (int i = 0; i < arguments.size(); ++i) {
             ValueType argType = arguments.get(i).getILType(ctx);
-            if (!Util.unitType().equals(argType) && !nominalUnit.equals(argType)) {
+            if (!Util.unitType().equals(argType) && !NOMINAL_UNIT.equals(argType)) {
                 // it's a real argument, add it to the list
                 formals.add(new FormalArg("arg" + i, argType));
             }
         }
-        
-		return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)));
-	}
+
+        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)));
+    }
 
     @Override
     public ValueType generateILType() {
