@@ -121,6 +121,7 @@
                     wyvern/target/corewyvernIL/transformers/*.java
                     wyvern/target/corewyvernIL/type/*.java
                     wyvern/target/oir/declarations/*.java
+                    wyvern/target/oir/expressions/*.java
                     wyvern/stdlib/**/*.java">
                 <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
                 <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>
