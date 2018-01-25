@@ -16,59 +16,60 @@ import wyvern.tools.errors.FileLocation;
 
 public class VarDeclaration extends DeclarationWithRHS {
 
-	private ValueType type;
+    private ValueType type;
 
-	/*@Override
-	public String toString() {
-		return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
-	}*/
+    /*@Override
+    public String toString() {
+        return "VarDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
+    }*/
 
-	public VarDeclaration(String name, ValueType type, IExpr value, FileLocation loc) {
-		super(name, value, loc);
-		if (type == null) throw new RuntimeException();
-		this.type = type;
-	}
+    public VarDeclaration(String name, ValueType type, IExpr value, FileLocation loc) {
+        super(name, value, loc);
+        if (type == null) {
+            throw new RuntimeException();
+        }
+        this.type = type;
+    }
 
-	@Override
-	public boolean containsResource(TypeContext ctx) {
-		return true;
-	}
+    @Override
+    public boolean containsResource(TypeContext ctx) {
+        return true;
+    }
 
-	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("var ").append(getName()).append(':');
-		type.doPrettyPrint(dest, indent);
-		dest.append(" = ");
-		getDefinition().doPrettyPrint(dest, indent);
-		dest.append('\n');
-	}
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append(indent).append("var ").append(getName()).append(':');
+        type.doPrettyPrint(dest, indent);
+        dest.append(" = ");
+        getDefinition().doPrettyPrint(dest, indent);
+        dest.append('\n');
+    }
 
-	@Override
-	public ValueType getType() {
-		return type;
-	}
+    @Override
+    public ValueType getType() {
+        return type;
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-			S state) {
-		return emitILVisitor.visit(state, this);
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
 
-	@Override
-	public DeclType getDeclType() {
-		return new VarDeclType(getName(), type);
-	}
+    @Override
+    public DeclType getDeclType() {
+        return new VarDeclType(getName(), type);
+    }
 
-	@Override
-	public Declaration interpret(EvalContext ctx) {
-		Expression newValue = (Expression) getDefinition().interpret(ctx);
-		return new VarDeclaration(getName(), type, newValue, getLocation());
-	}
+    @Override
+    public Declaration interpret(EvalContext ctx) {
+        Expression newValue = (Expression) getDefinition().interpret(ctx);
+        return new VarDeclaration(getName(), type, newValue, getLocation());
+    }
 
-	public Set<String> getFreeVariables() {
-		Set<String> freeVars = new HashSet<>();
-		freeVars.addAll(getDefinition().getFreeVariables());
-		return freeVars;
-	}
+    public Set<String> getFreeVariables() {
+        Set<String> freeVars = new HashSet<>();
+        freeVars.addAll(getDefinition().getFreeVariables());
+        return freeVars;
+    }
 
 }

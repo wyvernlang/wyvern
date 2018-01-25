@@ -25,7 +25,7 @@ public class ModuleDeclaration extends DefDeclaration {
     private List<Pair<ImportDeclaration, ValueType>> dependencies; // The list of platform-dependent modules we depend on
 
     public ModuleDeclaration(String moduleName, List<FormalArg> formalArgs, ValueType type, IExpr body,
-                             List<Pair<ImportDeclaration, ValueType>> dependencies, FileLocation loc) {
+            List<Pair<ImportDeclaration, ValueType>> dependencies, FileLocation loc) {
         super(moduleName, formalArgs, type, body, loc);
         this.dependencies = dependencies;
     }
@@ -52,10 +52,11 @@ public class ModuleDeclaration extends DefDeclaration {
             body = new Let(pair.getFirst(), body);
         }
 
-        if (getFormalArgs().isEmpty())
+        if (getFormalArgs().isEmpty()) {
             return new Pair(new ValDeclaration(getName(), getType(), body, getLocation()), recursiveDependencies);
-        else
+        } else {
             return new Pair(new DefDeclaration(getName(), getFormalArgs(), getType(), body, getLocation()), recursiveDependencies);
+        }
     }
 
     @Override

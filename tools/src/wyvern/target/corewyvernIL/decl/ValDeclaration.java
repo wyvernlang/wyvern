@@ -15,56 +15,55 @@ import wyvern.tools.errors.FileLocation;
 
 public class ValDeclaration extends DeclarationWithRHS {
 
-	/*@Override
-	public String toString() {
-		return "ValDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
-	}*/
+    /*@Override
+    public String toString() {
+        return "ValDeclaration[" + getName() + " : " + type + " = " + getDefinition() + "]";
+    }*/
 
-	public ValDeclaration(String fieldName, ValueType type, IExpr iExpr, FileLocation loc) {
-		super(fieldName, iExpr, loc);
-		this.type = type;
-	}
+    public ValDeclaration(String fieldName, ValueType type, IExpr iExpr, FileLocation loc) {
+        super(fieldName, iExpr, loc);
+        this.type = type;
+    }
 
-	private ValueType type;
+    private ValueType type;
 
-	@Override
-	public boolean containsResource(TypeContext ctx) {
-		return type.isResource(ctx);
-	}
+    @Override
+    public boolean containsResource(TypeContext ctx) {
+        return type.isResource(ctx);
+    }
 
-	@Override
-	public ValueType getType() {
-		return type;
-	}
+    @Override
+    public ValueType getType() {
+        return type;
+    }
 
-	@Override
-	public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-		dest.append(indent).append("val ").append(getName()).append(':');
-		type.doPrettyPrint(dest, indent);
-		dest.append(" = ");
-		getDefinition().doPrettyPrint(dest, indent);
-		dest.append('\n');
-	}
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append(indent).append("val ").append(getName()).append(':');
+        type.doPrettyPrint(dest, indent);
+        dest.append(" = ");
+        getDefinition().doPrettyPrint(dest, indent);
+        dest.append('\n');
+    }
 
-	@Override
-	public <S, T> T acceptVisitor(ASTVisitor <S, T> emitILVisitor,
-			S state) {
-		return emitILVisitor.visit(state, this);
-	}
+    @Override
+    public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
+        return emitILVisitor.visit(state, this);
+    }
 
-	@Override
-	public DeclType getDeclType() {
-		return new ValDeclType(getName(), type);
-	}
+    @Override
+    public DeclType getDeclType() {
+        return new ValDeclType(getName(), type);
+    }
 
-	@Override
-	public Declaration interpret(EvalContext ctx) {
-		Expression newValue = (Expression) getDefinition().interpret(ctx);
-		return new ValDeclaration(getName(), type, newValue, getLocation());
-	}
+    @Override
+    public Declaration interpret(EvalContext ctx) {
+        Expression newValue = (Expression) getDefinition().interpret(ctx);
+        return new ValDeclaration(getName(), type, newValue, getLocation());
+    }
 
-	public Set<String> getFreeVariables() {
-		return getDefinition().getFreeVariables();
-	}
+    public Set<String> getFreeVariables() {
+        return getDefinition().getFreeVariables();
+    }
 
 }

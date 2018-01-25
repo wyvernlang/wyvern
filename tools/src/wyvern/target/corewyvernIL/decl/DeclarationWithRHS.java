@@ -10,25 +10,26 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public abstract class DeclarationWithRHS extends NamedDeclaration {
-	private IExpr definition;
-	
-	public DeclarationWithRHS(String name, IExpr definition, FileLocation loc) {
-		super(name, loc);
-		this.definition = definition;
-	}
+    private IExpr definition;
 
-	public IExpr getDefinition() {
-		return (Expression) definition;
-	}
-	
-	public abstract ValueType getType();
-	
-	@Override
-	public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-		ValueType defType = definition.typeCheck(thisCtx, null); 
-		if (!defType.isSubtypeOf(getType(), thisCtx))
-			ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
-		return getDeclType();
-	}
-	
+    public DeclarationWithRHS(String name, IExpr definition, FileLocation loc) {
+        super(name, loc);
+        this.definition = definition;
+    }
+
+    public IExpr getDefinition() {
+        return (Expression) definition;
+    }
+
+    public abstract ValueType getType();
+
+    @Override
+    public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
+        ValueType defType = definition.typeCheck(thisCtx, null);
+        if (!defType.isSubtypeOf(getType(), thisCtx)) {
+            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
+        }
+        return getDeclType();
+    }
+
 }
