@@ -192,9 +192,4 @@ public class ExampleTests {
 		}
 	}
 	
-    @Test
-    public void testPair() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.brandPair", null, null);
-    }
-
 }
