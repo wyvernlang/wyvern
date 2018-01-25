@@ -118,6 +118,7 @@
                     wyvern/target/corewyvernIL/metadata/*.java
                     wyvern/target/corewyvernIL/modules/*.java
                     wyvern/target/corewyvernIL/support/*.java
+                    wyvern/target/corewyvernIL/transformers/*.java
                     wyvern/stdlib/**/*.java">
                 <exclude name="wyvern/tools/lexing/archlexer/ArchLexer.java"/>
                 <exclude name="wyvern/tools/lexing/WyvernLexer.java"/>
