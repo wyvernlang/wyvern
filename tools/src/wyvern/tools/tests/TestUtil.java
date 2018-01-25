@@ -86,7 +86,7 @@ public final class TestUtil {
      * Loads and parses the given file into the TypedAST representation, using the
      * new Wyvern parser.
      *
-     * @param program
+     * @param programLocation
      * @return
      * @throws IOException
      * @throws CopperParserException

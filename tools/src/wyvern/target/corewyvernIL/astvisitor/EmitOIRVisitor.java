@@ -150,7 +150,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
                 fieldValuePairs, newExpr.getFreeVariables());
         state.getEnvironment().addType(className, classDecl);
         classEnv.addName(newExpr.getSelfName(), classDecl);
-        OIRProgram.program.addTypeDeclaration(classDecl);
+        OIRProgram.PROGRAM.addTypeDeclaration(classDecl);
         OIRExpression oirExpr = new OIRNew(args, className);
         oirExpr.copyMetadata(newExpr);
         return oirExpr;
@@ -385,7 +385,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
         // Construct and return the interface.
         OIRInterface oirinterface = new OIRInterface(oirInterfaceEnv, interfaceName, structuralType.getSelfName(), methodDecls);
         state.getEnvironment().addType(interfaceName, oirinterface);
-        OIRProgram.program.addTypeDeclaration(oirinterface);
+        OIRProgram.PROGRAM.addTypeDeclaration(oirinterface);
         oirinterface.copyMetadata(structuralType);
         return oirinterface;
     }
