@@ -1,6 +1,9 @@
 ;; Emacs support for Wyvern
 ;; Currently this only provides syntax highlighting
 
+;; Mixing tabs and spaces confuses Wyvern compiler, so disabled tabs.
+(setq-default indent-tabs-mode nil)
+
 (defvar wyvern-mode-hook nil)
 
 (defvar wyvern-mode-keymap
