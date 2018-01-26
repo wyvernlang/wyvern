@@ -52,18 +52,6 @@ public class LexingTests {
         }
     }
 
-    public static void printTokenList(List l) {
-        for (Object e : l) {
-            if (e instanceof Token) {
-                Token t = (Token) e;
-                System.out.print(kindToName(t.kind) + "(" + t.image + ")");
-            } else {
-                System.out.print("notToken(" + e + ")");
-            }
-            System.out.println();
-        }
-    }
-
     public String concat(List<Token> tokens) {
         StringBuffer buf = new StringBuffer();
         for (Token t:tokens) {
@@ -185,7 +173,7 @@ public class LexingTests {
                 IDENTIFIER, WHITESPACE, MULTI_LINE_COMMENT,
                 WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
         };
-        List<Token> tokens = checkLex(input, expected);
+        checkLex(input, expected);
     }
     @Test
     public void testIndentComment() throws IOException, CopperParserException {
@@ -200,7 +188,7 @@ public class LexingTests {
                 WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
                 WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE, DEDENT,
         };
-        List<Token> tokens = checkLex(input, expected);
+        checkLex(input, expected);
     }
     @Test
     public void testIndentParen() throws IOException, CopperParserException {
@@ -215,7 +203,7 @@ public class LexingTests {
                 WHITESPACE, IDENTIFIER, RPAREN, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
                 WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE, DEDENT,
         };
-        List<Token> tokens = checkLex(input, expected);
+        checkLex(input, expected);
     }
     @Test
     public void testContinuationAndEOFDedent() throws IOException, CopperParserException {

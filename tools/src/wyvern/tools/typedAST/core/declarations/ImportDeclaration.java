@@ -56,13 +56,13 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         if (uriString != null) {
             uriString = uri.toString();
         }
-        String binderString = "<todo>";
-        String locationString = "null";
-        if (location != null) {
-            locationString = location.toString();
-        }
-        String requireString = String.valueOf(requireFlag);
-        String metadataString = String.valueOf(metadataFlag);
+//        String binderString = "<todo>";
+//        String locationString = "null";
+//        if (location != null) {
+//            locationString = location.toString();
+//        }
+//        String requireString = String.valueOf(requireFlag);
+//        String metadataString = String.valueOf(metadataFlag);
         sb.append("ImportDeclaration(uri=" + uriString
 //                 + ", binder=" + binderString
 //                 + ", location=" + locationString
@@ -114,7 +114,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         if (obj.getWrappedValue() instanceof java.lang.Class) {
             // then this is a Class import
             // and we need to extend the context
-            String qualifiedName = ((Class) obj.getWrappedValue()).getName();
+            String qualifiedName = ((Class<?>) obj.getWrappedValue()).getName();
             int lastDot = qualifiedName.lastIndexOf('.');
             String className = qualifiedName.substring(lastDot + 1);
             String packageName = qualifiedName.substring(0, lastDot);

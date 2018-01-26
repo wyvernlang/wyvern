@@ -1,7 +1,5 @@
 package wyvern.tools.typedAST.core.declarations;
 
-
-
 import java.util.LinkedList;
 import java.util.List;
 

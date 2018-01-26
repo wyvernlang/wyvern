@@ -53,9 +53,11 @@ public class ModuleDeclaration extends DefDeclaration {
         }
 
         if (getFormalArgs().isEmpty()) {
-            return new Pair(new ValDeclaration(getName(), getType(), body, getLocation()), recursiveDependencies);
+            return new Pair<Declaration, List<TypedModuleSpec>>(
+                    new ValDeclaration(getName(), getType(), body, getLocation()), recursiveDependencies);
         } else {
-            return new Pair(new DefDeclaration(getName(), getFormalArgs(), getType(), body, getLocation()), recursiveDependencies);
+            return new Pair<Declaration, List<TypedModuleSpec>>(
+                    new DefDeclaration(getName(), getFormalArgs(), getType(), body, getLocation()), recursiveDependencies);
         }
     }
 

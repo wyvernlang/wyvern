@@ -14,8 +14,6 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.types.Type;
-
 
 public class Variable extends AbstractExpressionAST implements CoreAST, Assignable {
 
@@ -34,11 +32,6 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
     @Override
     public String toString() {
         return name;
-    }
-
-    @Override
-    public Type getType() {
-        throw new RuntimeException();
     }
 
     public FileLocation getLocation() {

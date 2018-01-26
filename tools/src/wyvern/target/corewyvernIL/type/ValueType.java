@@ -96,6 +96,7 @@ public abstract class ValueType extends Type implements IASTNode {
     }
 
     /** Find the declaration type with the specified name, or return null if it is not present */
+    @SuppressWarnings("unchecked")
     public List<DeclType> findDecls(String declName, TypeContext ctx) {
         StructuralType st = getStructuralType(ctx);
         if (st == null) {
