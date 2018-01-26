@@ -21,11 +21,6 @@ public class TypeExtension extends AbstractTypeImpl implements Type {
     }
 
     @Override
-    public ValueType generateILType() {
-        throw new RuntimeException("deprecated");
-    }
-
-    @Override
     public ValueType getILType(GenContext ctx) {
         final ValueType baseType = base.getILType(ctx);
         /*List<ConcreteTypeMember> decls = new LinkedList<ConcreteTypeMember>();
