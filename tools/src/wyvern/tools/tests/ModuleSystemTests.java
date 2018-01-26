@@ -10,7 +10,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
 public class ModuleSystemTests {
@@ -26,7 +25,7 @@ public class ModuleSystemTests {
     @Test
     public void testInst() throws ParseException {
         String program = TestUtil.readFile(PATH + "inst.wyv");
-        TypedAST ast = TestUtil.getNewAST(program, "test input");
+        TestUtil.getNewAST(program, "test input");
     }
 
     @Test

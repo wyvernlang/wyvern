@@ -37,7 +37,7 @@ public class TaggedInfo {
 
     // The only thing that matters is TaggedInfo address and caseOf/comprises relation below.
     private TaggedInfo caseOfTaggedInfo;
-    private List<TaggedInfo> comprisesTaggedInfos;
+    // private List<TaggedInfo> comprisesTaggedInfos;
 
     /**
      * Constructs an empty TaggedInfo.
@@ -64,7 +64,7 @@ public class TaggedInfo {
 
     public TaggedInfo(TaggedInfo caseOfTaggedInfo, List<TaggedInfo> comprisesTaggedInfos) {
         this.caseOfTaggedInfo = caseOfTaggedInfo;
-        this.comprisesTaggedInfos = comprisesTaggedInfos;
+        // this.comprisesTaggedInfos = comprisesTaggedInfos;
     }
 
     /**
@@ -103,10 +103,10 @@ public class TaggedInfo {
         this.tagName = tagName;
 
         // One of these will be null:
-        this.td = td;
+        // this.td = td;
     }
 
-    private AbstractTypeDeclaration td;
+    // private AbstractTypeDeclaration td;
 
     /**
      * Gets the tag's name.

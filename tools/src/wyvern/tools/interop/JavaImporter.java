@@ -18,7 +18,7 @@ public class JavaImporter implements Importer {
         boolean isField = false;
         JObject obj = null;
         try {
-            Class cls = java.lang.Class.forName(qualifiedName);
+            Class<?> cls = java.lang.Class.forName(qualifiedName);
             obj = new JObject(cls);
         } catch (ReflectiveOperationException e1) {
             isField = true;
@@ -31,7 +31,7 @@ public class JavaImporter implements Importer {
                 int lastDot = qualifiedName.lastIndexOf('.');
                 String fieldName = qualifiedName.substring(lastDot + 1);
                 String className = qualifiedName.substring(0, lastDot);
-                Class cls = java.lang.Class.forName(className);
+                Class<?> cls = java.lang.Class.forName(className);
                 Field field = cls.getField(fieldName);
                 if (!Modifier.isStatic(field.getModifiers())) {
                     reportError(ErrorMessage.IMPORT_MUST_BE_STATIC_FIELD, errorLocation, qualifiedName);

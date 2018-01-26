@@ -23,19 +23,9 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
     private String name;
     private DeclSequence decls;
 
-    // FIXME: I am not convinced typeGuard is required (alex).
-    private boolean typeGuard = false;
-
-    private boolean declGuard = false;
     public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
-        // System.out.println("Initialising TypeDeclaration ( " + name + "): decls" + decls);
         this.name = name;
         this.decls = decls;
-
-
-
-        // System.out.println("TypeDeclaration: " + nameBinding.getName() + " is now bound to type: " + objectType);
-
         this.location = clsNameLine;
     }
 

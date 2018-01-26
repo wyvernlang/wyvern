@@ -59,11 +59,6 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
         return dslASTType;
     }
 
-    private Type getDefaultType() {
-        //TODO
-        return null;
-    }
-
     @Override
     public FileLocation getLocation() {
         return location;

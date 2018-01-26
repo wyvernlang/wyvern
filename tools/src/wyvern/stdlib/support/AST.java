@@ -187,7 +187,7 @@ public class AST {
         for (String dependency: dependencyURIs) {
             ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false);
             Pair<VarBinding, GenContext> bindingCtx = imp.genBinding(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
-            dependencies.add(new Pair(imp, bindingCtx.getFirst().getType()));
+            dependencies.add(new Pair<ImportDeclaration, ValueType>(imp, bindingCtx.getFirst().getType()));
         }
         return new ModuleDeclaration(name, getFormalArgs(formalArgObjs), getType(returnType), getExpr(body), dependencies, null);
     }

@@ -10,7 +10,6 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 @Category(RegressionTests.class)
 public class DemoTests {
@@ -41,7 +40,7 @@ public class DemoTests {
     @Test
     public void testSimpleDelegation() throws ParseException {
         String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
-        TypedAST ast = TestUtil.getNewAST(program, "test input");
+        TestUtil.getNewAST(program, "test input");
         // TODO: implement delegation in the new IL and run this test
     }
 
