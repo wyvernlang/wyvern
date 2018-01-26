@@ -10,7 +10,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Type;
 
 public class Instantiation extends Declaration implements CoreAST {
 
@@ -48,12 +47,6 @@ public class Instantiation extends Declaration implements CoreAST {
 
     public String getName() {
         return name;
-    }
-
-    @Override
-    public Type getType() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
