@@ -52,18 +52,6 @@ public class LexingTests {
         }
     }
 
-    public static void printTokenList(List<?> l) {
-        for (Object e : l) {
-            if (e instanceof Token) {
-                Token t = (Token) e;
-                System.out.print(kindToName(t.kind) + "(" + t.image + ")");
-            } else {
-                System.out.print("notToken(" + e + ")");
-            }
-            System.out.println();
-        }
-    }
-
     public String concat(List<Token> tokens) {
         StringBuffer buf = new StringBuffer();
         for (Token t:tokens) {

@@ -71,21 +71,15 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
     }
 
     @Override
-    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(
-            GenContext ctx, GenContext thisContext) {
-        // TODO Auto-generated method stub
+    public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
         if (reference == null) {
-            System.out.print("reference is null with alias=");
-            System.out.print(alias);
-            System.out.print(", location = ");
-            System.out.println(getLocation().toString());
+            System.out.println("reference is null with alias =" + alias + ", location = " + getLocation().toString());
         }
         return new TypeDeclaration(alias, reference.getILType(ctx), getLocation());
     }
 
     @Override
-    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(
-            GenContext ctx, List<TypedModuleSpec> dependencies) {
+    public wyvern.target.corewyvernIL.decl.Declaration topLevelGen(GenContext ctx, List<TypedModuleSpec> dependencies) {
         if (reference == null) {
             reportError(ErrorMessage.NO_ABSTRACT_TYPES_IN_OBJECTS, this);
         }
@@ -96,7 +90,6 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
         if (metadata != null) {
             metadataExp = ((ExpressionAST) metadata).generateIL(ctx, null, null);
         }
-
         return new TypeDeclaration(getName(), referenceILType, metadataExp, getLocation());
     }
 
@@ -106,9 +99,4 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
         DeclType dt = genILType(tlc.getContext());
         tlc.addModuleDecl(decl, dt);
     }
-
-
-
-
-
 }

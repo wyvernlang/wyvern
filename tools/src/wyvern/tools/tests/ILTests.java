@@ -379,8 +379,6 @@ public class ILTests {
         List<wyvern.target.corewyvernIL.decl.Declaration> decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
 
         for(String fileName : fileList) {
-
-            System.out.println(fileName);
             String source = TestUtil.readFile(PATH + fileName);
             TypedAST ast = TestUtil.getNewAST(source);
             wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);
