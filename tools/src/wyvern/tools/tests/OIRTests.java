@@ -56,7 +56,7 @@ public class OIRTests {
         InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_PYTHON,
                 new File(TestUtil.BASE_PATH),
                 new File(TestUtil.LIB_PATH));
-        GenContext javaGenContext = Globals.getStandardGenContext();
+        // GenContext javaGenContext = Globals.getStandardGenContext();
         GenContext pythonGenContext = Globals.getGenContext(state);
         LinkedList<TypedModuleSpec> dependencies = new LinkedList<>();
         IExpr iLprogram = ast.generateIL(pythonGenContext, null, dependencies);

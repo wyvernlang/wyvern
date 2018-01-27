@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Type;
 import wyvern.tools.util.AbstractTreeWritable;
 
 // TODO: Consider adding a class "ListOfDeclarations" that only handles indents with decls and make
@@ -47,5 +48,12 @@ public abstract class Declaration extends AbstractTreeWritable implements TypedA
     //public abstract void addModuleDecl(TopLevelContext tlc);
     public void addModuleDecl(TopLevelContext tlc) {
         throw new RuntimeException("not implemented");
+    }
+
+    /**
+     * Override this method when necessary.
+     */
+    public Type getType() {
+        throw new RuntimeException();
     }
 }

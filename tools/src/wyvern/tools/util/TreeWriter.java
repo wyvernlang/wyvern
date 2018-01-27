@@ -30,6 +30,7 @@ public class TreeWriter {
             buf.append('\"');
         } else if (o instanceof List) {
             buf.append('[');
+            @SuppressWarnings("unchecked")
             List<Object> list = (List<Object>) o;
             if (list.size() > 0) {
                 first = true;

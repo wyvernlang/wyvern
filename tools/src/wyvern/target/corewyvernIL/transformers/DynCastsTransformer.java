@@ -79,7 +79,6 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
             newDecls.add(newDecl);
         }
 
-
         // Don't bother recomputing the type--it will stay the same.
         return new New(newDecls, newExpr.getSelfName(), newExpr.getExprType(), newExpr.getLocation());
     }
@@ -200,7 +199,6 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 
         // Transform the expression on the left-hand side. If we assign to a dynamic object,
         // we should cast the receiver to an object with the specified field.
-        System.out.println();
         IExpr receiver = (IExpr) fieldSet.getObjectExpr().acceptVisitor(this, ctx);
         if (hasDynamicType(receiver, ctx)) {
             VarDeclType varDecl = new VarDeclType(fieldSet.getFieldName(), toAssign.typeCheck(ctx, null));

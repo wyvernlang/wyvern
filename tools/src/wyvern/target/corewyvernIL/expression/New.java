@@ -25,7 +25,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class New extends Expression {
-
     private List<? extends Declaration> decls;
     private String selfName;
     private boolean hasDelegate;
@@ -67,6 +66,7 @@ public class New extends Expression {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Declaration> getDecls() {
         return (List<Declaration>) decls;
     }

@@ -234,7 +234,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		if (lexeme.length() > currentIndent.length() && lexeme.startsWith(currentIndent)) {
 			// indented
 			/*if (DSLNext != isDSLNext()) {
-				System.out.println("whoa");
 			    //throw new RuntimeException("unexpected difference");
 			}*/
 			if (/*DSLNext*/ isDSLNext() || inDSL) {
@@ -346,8 +345,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
                | booleanor_t:t {: RESULT = t; :}
 	           ;
 
-	anyLineElement ::= whitespace_t:n {: RESULT = LexerUtils.makeList(n); /*System.out.println(n);*/ :}
-	                 | nonWSLineElement:n {: RESULT = n; /*System.out.println(n);*/ :};
+	anyLineElement ::= whitespace_t:n {: RESULT = LexerUtils.makeList(n); :}
+	                 | nonWSLineElement:n {: RESULT = n; :};
 
 	// a non-whitespace line element 
 	nonWSLineElement ::= identifier_t:n {: RESULT = LexerUtils.makeList(n); :}
@@ -366,7 +365,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     
 	lineElementSequence ::= indent_t:n {: RESULT = LexerUtils.makeList(n); flagTok = null; lastIndent = n; :}
 	                      | nonWSLineElement:n {:
-	                            //System.out.println(n);
 	                            lastIndent = null;
 	                            // handles lines that start without any indent
 	                            if (inDSL)

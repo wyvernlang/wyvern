@@ -39,10 +39,10 @@ public class JavaValue extends AbstractValue implements Invokable {
     @Override
     public Value invoke(String methodName, List<Value> args) {
         List<Object> javaArgs = new LinkedList<Object>();
-        Class[] hints = foreignObject.getTypeHints(methodName);
+        Class<?>[] hints = foreignObject.getTypeHints(methodName);
         int hintNum = 0;
         for (Value arg : args) {
-            Class hintClass = (hints != null && hints.length > hintNum) ? hints[hintNum] : null;
+            Class<?> hintClass = (hints != null && hints.length > hintNum) ? hints[hintNum] : null;
             javaArgs.add(wyvernToJava(arg, hintClass));
             hintNum++;
         }
@@ -81,7 +81,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             try {
                 v = (ObjectValue) TestUtil.evaluate("import wyvern.collections.list\n"
                       + "list.make()\n");
-                for (Object elem : (List) result) {
+                for (Object elem : (List<?>) result) {
                     List<Value> args = new LinkedList<>();
                     args.add(javaToWyvern(elem));
                     v.invoke("append", args);
@@ -108,7 +108,7 @@ public class JavaValue extends AbstractValue implements Invokable {
      * Only handles integers right now
      * @param hintClass
      */
-    private Object wyvernToJava(Value arg, Class hintClass) {
+    private Object wyvernToJava(Value arg, Class<?> hintClass) {
         if (arg instanceof IntegerLiteral) {
             if (hintClass != null && hintClass == BigInteger.class) {
                 return ((IntegerLiteral) arg).getFullValue();

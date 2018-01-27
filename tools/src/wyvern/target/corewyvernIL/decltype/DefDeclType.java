@@ -158,10 +158,7 @@ public class DefDeclType extends DeclTypeWithResult {
             for (Effect e : effectSet.getEffects()) {
                 /* e.addPath(ctx) wouldn't work here, but there seems to be no
                  * logical place to add paths before here (and there are effects
-                 * that have missing paths here) */
-//                if (e.getPath()==null) {
-//                    System.out.println("null"); // use breakpoint here
-//                }
+                 * that have missing paths here, i.e., e.getPath() here can be null) */
                 if (e.getPath() != null) {
                     e.adapt(v);
                 } // TODO: find some way to have all paths ready before this is called

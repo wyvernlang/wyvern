@@ -23,7 +23,6 @@ import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Type;
 
 /**
  * Created by Ben Chung on 3/11/14.
@@ -31,7 +30,6 @@ import wyvern.tools.types.Type;
 public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
     private Optional<String> dslText = Optional.empty();
     private TypedAST dslAST = null;
-    private Type dslASTType = null;
     private FileLocation location;
 
     public void setText(String text) {
@@ -52,16 +50,6 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
 
     public TypedAST getAST() {
         return (dslAST);
-    }
-
-    @Override
-    public Type getType() {
-        return dslASTType;
-    }
-
-    private Type getDefaultType() {
-        //TODO
-        return null;
     }
 
     @Override
