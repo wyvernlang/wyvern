@@ -4,9 +4,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
@@ -326,7 +328,17 @@ public class ModuleResolver {
     }
 
     public IExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
-        for (TypedModuleSpec spec : dependencies) {
+        Set<String> wrapped = new HashSet<String>();
+        LinkedList<TypedModuleSpec> noDups = new LinkedList<TypedModuleSpec>();
+        for (int i = dependencies.size()-1; i >= 0; i--) {
+            TypedModuleSpec spec = dependencies.get(i);
+            String qualifiedName = spec.getQualifiedName();
+            if (!wrapped.contains(qualifiedName)) {
+                wrapped.add(qualifiedName);
+                noDups.addFirst(spec);
+            }
+        }        
+        for (TypedModuleSpec spec : noDups) {
             Module m = resolveModule(spec.getQualifiedName());
             program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
         }
