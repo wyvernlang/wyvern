@@ -109,7 +109,7 @@ public class TopLevelContext {
         //pending.push(new VarBinding(name, type, iExpr));
         ctx = ctx.extend(name, new Variable(name), type);
         avoidanceMap.put(name, isDeclBlock);
-        expr.addBinding(name, type, iExpr);
+        expr.addBindingLast(name, type, iExpr);
     }
 
     public void updateContext(GenContext newCtx) {

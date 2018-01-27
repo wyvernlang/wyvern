@@ -20,8 +20,8 @@ import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -328,6 +328,7 @@ public class ModuleResolver {
     }
 
     public IExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
+        SeqExpr seqProg = (program instanceof SeqExpr) ? (SeqExpr) program : new SeqExpr().addExpr(program);
         Set<String> wrapped = new HashSet<String>();
         LinkedList<TypedModuleSpec> noDups = new LinkedList<TypedModuleSpec>();
         for (int i = dependencies.size() - 1; i >= 0; i--) {
@@ -340,9 +341,10 @@ public class ModuleResolver {
         }
         for (TypedModuleSpec spec : noDups) {
             Module m = resolveModule(spec.getQualifiedName());
-            program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
         }
-        return program;
+        return seqProg;
     }
 
     public static ModuleResolver getLocal() {

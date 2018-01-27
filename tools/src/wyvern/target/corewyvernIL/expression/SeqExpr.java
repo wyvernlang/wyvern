@@ -28,23 +28,42 @@ public class SeqExpr extends Expression {
         elements = new LinkedList<HasLocation>();
     }
 
-    public void addExpr(IExpr expr) {
+    /** Side-effects the current SeqExpr to add an expression.
+     *
+     * @param expr
+     * @return this
+     */
+    public SeqExpr addExpr(IExpr expr) {
         elements.addLast(expr);
+        return this;
     }
 
-    public void addBinding(VarBinding binding) {
-        elements.addLast(binding);
+    public void addBindingLast(VarBinding binding) {
+        addBinding(binding, true);
     }
-    public void addBinding(String varName, ValueType type, IExpr toReplace) {
-        addBinding(new VarBinding(varName, type, toReplace));
+    public void addBinding(VarBinding binding, boolean isLast) {
+        if (isLast) {
+            elements.addLast(binding);
+        } else {
+            elements.addFirst(binding);
+        }
     }
+    public void addBindingLast(String varName, ValueType type, IExpr toReplace) {
+        addBinding(varName, type, toReplace, true);
+    }
+    public void addBinding(String varName, ValueType type, IExpr toReplace, boolean isLast) {
+        addBinding(new VarBinding(varName, type, toReplace), isLast);
+    }
+
 
     public List<HasLocation> getElements() {
         return Collections.unmodifiableList(elements);
     }
 
-    @Override
-    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+    public ValueType typecheckNoAvoidance(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        return typecheckWithCtx(ctx, effectAccumulator).getSecond();
+    }
+    public Pair<TypeContext, ValueType> typecheckWithCtx(TypeContext ctx, EffectAccumulator effectAccumulator) {
         TypeContext extendedCtx = ctx;
         ValueType result = Util.unitType();
         for (HasLocation elem : elements) {
@@ -59,10 +78,22 @@ public class SeqExpr extends Expression {
                 throw new RuntimeException("invariant broken");
             }
         }
+        return new Pair<TypeContext, ValueType>(extendedCtx, result);
+    }
+
+    @Override
+    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        Pair<TypeContext, ValueType> p = typecheckWithCtx(ctx, effectAccumulator);
+        TypeContext extendedCtx = p.getFirst();
+        ValueType result = p.getSecond();
         for (int i = elements.size() - 1; i >= 0; --i) {
             HasLocation elem = elements.get(i);
             if (elem instanceof VarBinding) {
-                result = result.avoid(((VarBinding) elem).getVarName(), extendedCtx);
+                String varName = ((VarBinding) elem).getVarName();
+                // TODO (hack): avoid only variables not present outside
+                if (!ctx.isPresent(varName, true)) {
+                    result = result.avoid(varName, extendedCtx);
+                }
             }
         }
         if (getExprType() == null) {

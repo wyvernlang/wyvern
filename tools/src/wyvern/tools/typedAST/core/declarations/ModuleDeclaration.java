@@ -175,7 +175,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         for (ImportDeclaration imp : imports) {
             Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(current, dependencies);
             current = bindingAndCtx.getSecond();
-            seq.addBinding(bindingAndCtx.getFirst());
+            seq.addBindingLast(bindingAndCtx.getFirst());
         }
         return current;
     }

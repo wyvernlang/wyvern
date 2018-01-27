@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -39,6 +40,7 @@ import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
+import wyvern.tools.util.Pair;
 
 public final class TestUtil {
     public static final String WYVERN_HOME = System.getenv("WYVERN_HOME");
@@ -248,7 +250,14 @@ public final class TestUtil {
     public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
         // resolveModule already typechecked, but we'll do it again to verify the type
         TypeContext ctx = Globals.getStandardTypeContext();
-        ValueType t = program.typeCheck(ctx, null);
+        ValueType t = null;
+        if (program instanceof SeqExpr) {
+            Pair<TypeContext, ValueType> p = ((SeqExpr) program).typecheckWithCtx(ctx, null);
+            ctx = p.getFirst();
+            t = p.getSecond();
+        } else {
+            t = program.typeCheck(ctx, null);
+        }
         TailCallVisitor.annotate(program);
 
         if (expectedType != null) {
