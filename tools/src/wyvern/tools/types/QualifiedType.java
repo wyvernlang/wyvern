@@ -5,7 +5,9 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
@@ -58,6 +60,9 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
 
     private static Path getPath(ExpressionAST ast, GenContext ctx) {
         IExpr exp = ast.generateIL(ctx, null, null);
+        if (!(exp instanceof Path)) {
+            ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS, ast);
+        }
         return (Path) exp;
     }
 }

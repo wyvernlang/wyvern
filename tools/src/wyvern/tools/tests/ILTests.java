@@ -683,6 +683,11 @@ public class ILTests {
         TestUtil.doTestScriptModularly("tsls.postTSLIndentation", Util.intType(), new IntegerLiteral(23));
     }
 
+    @Test
+    public void testFunctionInType() throws ParseException {
+        TestUtil.doTestScriptModularlyFailing("errors.ReturnTypeBug", ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS);
+    }
+
     // @Test
     // public void testTSLIndentation() throws ParseException {
     //     doTestScriptModularly("tsls.indentationTest", Util.intType(), new IntegerLiteral(5));
