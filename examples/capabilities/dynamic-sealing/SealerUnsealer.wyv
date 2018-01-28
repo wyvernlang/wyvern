@@ -27,7 +27,7 @@ import wyvern.String
 
 // This example would be a lot nicer if parameterised Option[T]
 // worked! Will rewrite when this bug is fixed. :-)
-type Option = map.Option // option.Option
+type Option = option.Option
 
 type Map = map.Map
 
@@ -36,10 +36,10 @@ type List = list.List
 type Box
      val name:String
 
-type Sealer
+resource type Sealer
      def seal(object:Option):Box
 
-type Unsealer
+resource type Unsealer
      def unseal(box:Box):Option
 
 // This example would be a lot nicer if we can pass tuples or pairs as
@@ -49,27 +49,14 @@ resource type SealerUnsealer
      var unsealer:Unsealer
 
 def make():SealerUnsealer
-    // var map:Map = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
-    var boxes:List = list.Nil
-    var values:List = list.Nil
+    var map:Map = map.make((b1:Box,b2:Box) => String.equals(b1.name,b2.name))
     new
         var sealer:Sealer = new
             def seal(object:Option):Box
                 val newBox:Box = new
-                    val name:String = "ABC"
-                // map.put(newBox,object)
-                boxes = list.Cons(newBox, boxes)
-                values = list.Cons(object, values)
+                    val name:String = "NEED TO GENERATE UNIQUE STRING"
+                map.put(newBox,object)
                 newBox
         var unsealer:Unsealer = new
             def unseal(box:Box):Option
-                // map.get(box)
-                var count:Int = -1
-                var index:Int = boxes.caseAnalyze(
-                        () => count,
-                        (b,bs) => (box == b).ifTrue(
-                               () => count + 1,
-                               () => count = count + 1
-                        )
-                    )
-                values.get(index)
+                map.get(box)
