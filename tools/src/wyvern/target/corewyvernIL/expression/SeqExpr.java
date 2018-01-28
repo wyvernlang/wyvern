@@ -130,10 +130,10 @@ public class SeqExpr extends Expression {
                 VarBinding binding = (VarBinding) elem;
                 binding.doPrettyPrint(dest, newIndent);
             } else if (elem instanceof Expression) {
-                dest.append(indent);
+                dest.append(newIndent);
                 ((Expression) elem).doPrettyPrint(dest, newIndent);
             } else {
-                dest.append(indent).append("unexpected item in sequence!\n");
+                dest.append(newIndent).append("unexpected item in sequence!\n");
             }
         }
     }

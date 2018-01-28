@@ -126,6 +126,7 @@ public class NominalType extends ValueType {
     }
 
     public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+        // check if they are the same type
         if (super.isSubtypeOf(t, ctx)) {
             return true;
         }
