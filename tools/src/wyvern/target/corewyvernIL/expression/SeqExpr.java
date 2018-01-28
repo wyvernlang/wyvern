@@ -60,6 +60,7 @@ public class SeqExpr extends Expression {
         return Collections.unmodifiableList(elements);
     }
 
+    @Override
     public ValueType typecheckNoAvoidance(TypeContext ctx, EffectAccumulator effectAccumulator) {
         return typecheckWithCtx(ctx, effectAccumulator).getSecond();
     }

@@ -18,4 +18,7 @@ public interface IExpr extends IASTNode {
     Value interpret(EvalContext ctx);
     void doPrettyPrint(Appendable dest, String indent) throws IOException;
     Set<String> getFreeVariables();
+    default ValueType typecheckNoAvoidance(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        return typeCheck(ctx, effectAccumulator);
+    }
 }
