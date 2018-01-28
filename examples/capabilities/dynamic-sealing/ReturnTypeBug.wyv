@@ -22,7 +22,6 @@ module capabilities
 
 import wyvern.option
 import wyvern.collections.map
-import wyvern.collections.list
 import wyvern.String
 
 // This example would be a lot nicer if parameterised Option[T]
@@ -31,16 +30,14 @@ type Option = map.Option // option.Option
 
 type Map = map.Map
 
-type List = list.List
-
-type Box
-     val name:String
+// Instead of the usual Boxes, I will use Strings first.
+type Box = String
 
 type Sealer
-     def seal(object:Option):Box
+     def seal(object:Option):String
 
 type Unsealer
-     def unseal(box:Box):Option
+     def unseal(box:String):Option
 
 // This example would be a lot nicer if we can pass tuples or pairs as
 // return type! Will rewrite when supported. :-)
@@ -49,27 +46,12 @@ resource type SealerUnsealer
      var unsealer:Unsealer
 
 def make():SealerUnsealer
-    // var map:Map = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
-    var boxes:List = list.Nil
-    var values:List = list.Nil
+    var map:Map = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
     new
         var sealer:Sealer = new
-            def seal(object:Option):Box
-                val newBox:Box = new
-                    val name:String = "ABC"
-                // map.put(newBox,object)
-                boxes = list.Cons(newBox, boxes)
-                values = list.Cons(object, values)
-                newBox
+            def seal(object:Option):String
+                // map.put("ABC",object)
+                "ABC"
         var unsealer:Unsealer = new
-            def unseal(box:Box):Option
-                // map.get(box)
-                var count:Int = -1
-                var index:Int = boxes.caseAnalyze(
-                        () => count,
-                        (b,bs) => (box == b).ifTrue(
-                               () => count + 1,
-                               () => count = count + 1
-                        )
-                    )
-                values.get(index)
+            def unseal(box:String):map.Option
+                map.get(box)
