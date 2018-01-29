@@ -142,3 +142,21 @@ string = jonathanBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING
 // The following should return empty value or wrong value but cannot test until stdout bug is fixed:
 string = alexBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX (???)")
 string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX (???)")
+
+
+// Mint Example from E:
+/*
+? def carolMint := makeMint("Carol")
+# value: <Carol's mint>
+
+? def aliceMainPurse := carolMint.makePurse(1000)
+# value: <has 1000 Carol bucks>
+
+? def bobMainPurse := carolMint.makePurse(0)
+# value: <has 0 Carol bucks>
+
+? def paymentForBob := aliceMainPurse.sprout()
+# value: <has 0 Carol bucks>
+
+? paymentForBob.deposit(10, aliceMainPurse)
+*/

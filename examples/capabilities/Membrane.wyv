@@ -1,3 +1,7 @@
+require stdout
+
+stdout.print("Hello\n")
+
 // Copyright (C) 2011 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +25,8 @@
  * @overrides window
  * @provides TamingMembrane
  */
+
+/*
 function TamingMembrane(helper, schema) {
 
   'use strict';
@@ -155,17 +161,15 @@ function TamingMembrane(helper, schema) {
     }
   }
 
-  /**
-   * Given a builtin object "o" from either side of the membrane, return a copy
-   * constructed in the taming frame. Return undefined if "o" is not of a type
-   * handled here. Note that we only call this function if we know that "o" is
-   * *not* a primitive.
-   *
-   * This function handles only objects which we copy exactly once and reuse
-   * the copy (via tamesTo()) if the same object is met again. For objects which
-   * we copy every  time they are passed across the membrane, see
-   * copyTreatedMutable below.
-   */
+  // Given a builtin object "o" from either side of the membrane, return a copy
+  // constructed in the taming frame. Return undefined if "o" is not of a type
+  // handled here. Note that we only call this function if we know that "o" is
+  // *not* a primitive.
+  //
+  // This function handles only objects which we copy exactly once and reuse
+  // the copy (via tamesTo()) if the same object is met again. For objects which
+  // we copy every  time they are passed across the membrane, see
+  // copyTreatedMutable below.
   function copyTreatedImmutable(o) {
     var t = void 0;
     // Object.prototype.toString is spoofable (as of ES6). Therefore, each
@@ -240,16 +244,14 @@ function TamingMembrane(helper, schema) {
     return Object.freeze(copy);
   }
 
-  /**
-   * Helper function; return a copy of a typed array object without depending on
-   * the typed array constructor to do it.
-   *
-   * This is needed, or at least reasonable caution, because typed array
-   * constructors have overloads that will share an ArrayBuffer with the
-   * provided value, rather than copying. In current specification and
-   * implementation it does not appear to be possible to create an object which
-   * exploits this, but we don't wish to rely on that invariant.
-   */
+  // Helper function; return a copy of a typed array object without depending on
+  // the typed array constructor to do it.
+  //
+  // This is needed, or at least reasonable caution, because typed array
+  // constructors have overloads that will share an ArrayBuffer with the
+  // provided value, rather than copying. In current specification and
+  // implementation it does not appear to be possible to create an object which
+  // exploits this, but we don't wish to rely on that invariant.
   function copyTArray(ctor, o) {
     // Get a copy of the relevant portion of the underlying buffer in a way
     // which has no overloads and guarantees a copy.
@@ -261,16 +263,14 @@ function TamingMembrane(helper, schema) {
     return new ctor(buffer);
   }
 
-  /**
-   * Given a builtin object "o" from either side of the membrane, return a copy
-   * constructed in the taming frame. Return undefined if "o" is not of a type
-   * handled here. Note that we only call this function if we know that "o" is
-   * *not* a primitive.
-   *
-   * This function handles only objects which should be copied every time they
-   * are passed across the membrane. For objects which we wish to copy at most
-   * once, see copyTreatedImmutable above.
-   */
+  // Given a builtin object "o" from either side of the membrane, return a copy
+  // constructed in the taming frame. Return undefined if "o" is not of a type
+  // handled here. Note that we only call this function if we know that "o" is
+  // *not* a primitive.
+  //
+  // This function handles only objects which should be copied every time they
+  // are passed across the membrane. For objects which we wish to copy at most
+  // once, see copyTreatedImmutable above.
   function copyTreatedMutable(o, recursor) {
     if (Array.isArray(o)) {
       // No tamesTo(...) for arrays; we copy across the membrane
@@ -332,16 +332,14 @@ function TamingMembrane(helper, schema) {
     return makeNeutralException(t);
   }
 
-  /**
-   * Records that f is t's feral twin and t is f's tame twin.
-   * <p>
-   * A <i>feral</i> object is one safe to make accessible to trusted
-   * but possibly innocent host code. A <i>tame</i> object is one
-   * safe to make accessible to untrusted guest
-   * code. tamesTo(f, t) records that f is feral, that t is tamed,
-   * and that they are in one-to-one correspondence so that
-   * tame(f) === t and untame(t) === f.
-   */
+  // Records that f is t's feral twin and t is f's tame twin.
+  // <p>
+  // A <i>feral</i> object is one safe to make accessible to trusted
+  // but possibly innocent host code. A <i>tame</i> object is one
+  // safe to make accessible to untrusted guest
+  // code. tamesTo(f, t) records that f is feral, that t is tamed,
+  // and that they are in one-to-one correspondence so that
+  // tame(f) === t and untame(t) === f.
   function tamesTo(f, t) {
     if ((f && tameByFeral.has(f)) || (t && feralByTame.has(t))) {
       var et = tameByFeral.get(f);
@@ -381,9 +379,7 @@ function TamingMembrane(helper, schema) {
     });
   }
 
-  /**
-   * Returns a tame object representing f, or undefined on failure.
-   */
+  // Returns a tame object representing f, or undefined on failure.
   function tame(f) {
     if (f !== Object(f)) {
       // Primitive value; tames to self
@@ -687,9 +683,7 @@ function TamingMembrane(helper, schema) {
     return t;
   }
 
-  /**
-   * Returns a feral object representing t, or undefined on failure.
-   */
+  // Returns a feral object representing t, or undefined on failure.
   function untame(t) {
     if (t !== Object(t)) {
       // Primitive value; untames to self
@@ -790,4 +784,4 @@ function TamingMembrane(helper, schema) {
 if (typeof window !== 'undefined') {
   window['TamingMembrane'] = TamingMembrane;
 }
-
+*/
