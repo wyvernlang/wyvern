@@ -1,6 +1,6 @@
-module capabilities
+// module capabilities
 
-// require stdout
+require stdout
 
 import wyvern.option
 import wyvern.collections.map
@@ -103,11 +103,12 @@ resource type BrandUnsealer
     def unseal(box:SealedBox):Option
 
 resource type BrandPair
+    var name:String
     var sealer:BrandSealer
     var unsealer:BrandUnsealer
 
 
-def makeBrandPair():BrandPair
+def makeBrandPair(name:String):BrandPair
     var shared:Option = option.None()
     def makeSealedBox(object:Option):SealedBox
         val newBox:SealedBox = new
@@ -115,6 +116,7 @@ def makeBrandPair():BrandPair
                 shared = object
         newBox
     new
+        var name:String = name
         var sealer:BrandSealer = new
             def seal(object:Option):SealedBox
                 makeSealedBox(object)
@@ -127,25 +129,62 @@ def makeBrandPair():BrandPair
 
 
 // Simple example of using brand pair from E Wiki:
-var alexBrandPair:BrandPair = makeBrandPair()
-var jonathanBrandPair:BrandPair = makeBrandPair()
+var alexBrandPair:BrandPair = makeBrandPair("Alex")
+var jonathanBrandPair:BrandPair = makeBrandPair("Jonathan")
 
 var alexBox:SealedBox = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
 var jonathanBox:SealedBox = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
 
 var string:String = "ABCDEFG"
-// stdout.print(string)
+stdout.print(string + "\n")
 
+stdout.print("SHOULD BE: Alex's Secret\n")
 string = alexBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX")
-string = jonathanBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+stdout.print(string + "\n")
 
-// The following should return empty value or wrong value but cannot test until stdout bug is fixed:
-string = alexBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX (???)")
-string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX (???)")
+stdout.print("SHOULD BE: Jonathan's Secret\n")
+string = jonathanBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: NOTHING FOUND IN JONATHAN BOX\n")
+string = alexBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: NOTHING FOUND IN ALEX BOX\n")
+string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+stdout.print(string + "\n")
 
 
 // Mint Example from E:
 /*
+def makeMint(name) :any {
+    def [sealer, unsealer] := makeBrandPair(name)
+    def mint {
+        to __printOn(out) :void { out.print(`<$name's mint>`) }
+ 
+        to makePurse(var balance :(int >= 0)) :any {
+            def decr(amount :(0..balance)) :void {
+                balance -= amount
+            }
+            def purse {
+                to __printOn(out) :void {
+                    out.print(`<has $balance $name bucks>`)
+                }
+                to getBalance() :int { return balance }
+                to sprout()     :any { return mint.makePurse(0) }
+                to getDecr()    :any { return sealer.seal(decr) }
+
+                to deposit(amount :int, src) :void {
+                    unsealer.unseal(src.getDecr())(amount)
+                    balance += amount
+                }
+            }
+            return purse
+        }
+    }
+    return mint
+}
+
 ? def carolMint := makeMint("Carol")
 # value: <Carol's mint>
 
@@ -159,4 +198,27 @@ string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOU
 # value: <has 0 Carol bucks>
 
 ? paymentForBob.deposit(10, aliceMainPurse)
+*/
+
+/*
+// UNDER CONSTRUCTION:
+type Mint
+     def makePurse(balance:Int):Purse
+
+type Purse
+     var balance:Int
+     def getBalance():Int
+     def sprout():Purse
+     def getDecr():SealedBox
+     def deposit(amount:Int):Unit
+
+def makeMint(name:String):Mint
+    var brandPair:BrandPair = makeBrandPair(name)
+    new
+        def makePurse(balance:Int):Purse
+            new
+                var balance:Int = balance
+                def getBalance():Int = balance
+                def sprout():Purse = this.makePurse(0)
+                def getDecr():SealedBox = brandPair.sealer.seal(
 */

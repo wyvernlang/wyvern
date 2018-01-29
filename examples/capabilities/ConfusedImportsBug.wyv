@@ -1,5 +1,0 @@
-module ConfusedImportsSomeOtherName
-
-require stdout
-
-import wyvern.option
