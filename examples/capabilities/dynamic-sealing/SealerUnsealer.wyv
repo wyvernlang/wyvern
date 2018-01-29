@@ -1,5 +1,7 @@
 module capabilities
 
+// require stdout
+
 import wyvern.option
 import wyvern.collections.map
 import wyvern.collections.list
@@ -12,6 +14,7 @@ type Option = option.Option
 type Map = map.Map
 
 type List = list.List
+
 
 /*
 // JavaScript version building on closures:
@@ -48,16 +51,18 @@ resource type SealerUnsealer
 
 def makeSealerUnsealer():SealerUnsealer
     var map:Map = map.make((b1:Box,b2:Box) => String.equals(b1.name,b2.name))
+    var currentKey:String = "S"
     new
         var sealer:Sealer = new
             def seal(object:Option):Box
                 val newBox:Box = new
-                    val name:String = "NEED TO GENERATE UNIQUE STRING"
+                    val name:String = currentKey + "S" // This needs to be made more secure than this!!!
                 map.put(newBox,object)
                 newBox
         var unsealer:Unsealer = new
             def unseal(box:Box):Option
                 map.get(box)
+
 
 /*
 # http://wiki.erights.org/wiki/Walnut/Secure_Distributed_Computing/Capability_Patterns#Sealers_and_Unsealers
@@ -101,6 +106,7 @@ resource type BrandPair
     var sealer:BrandSealer
     var unsealer:BrandUnsealer
 
+
 def makeBrandPair():BrandPair
     var shared:Option = option.None()
     def makeSealedBox(object:Option):SealedBox
@@ -111,10 +117,28 @@ def makeBrandPair():BrandPair
     new
         var sealer:BrandSealer = new
             def seal(object:Option):SealedBox
-                return makeSealedBox(object)
+                makeSealedBox(object)
         var unsealer:BrandUnsealer = new
             def unseal(box:SealedBox):Option
                 shared = option.None()
                 box.shareContent()
                 var result:Option = shared
                 result
+
+
+// Simple example of using brand pair from E Wiki:
+var alexBrandPair:BrandPair = makeBrandPair()
+var jonathanBrandPair:BrandPair = makeBrandPair()
+
+var alexBox:SealedBox = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
+var jonathanBox:SealedBox = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
+
+var string:String = "ABCDEFG"
+// stdout.print(string)
+
+string = alexBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+string = jonathanBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+
+// The following should return empty value or wrong value but cannot test until stdout bug is fixed:
+string = alexBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX (???)")
+string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX (???)")
