@@ -200,25 +200,28 @@ def makeMint(name) :any {
 ? paymentForBob.deposit(10, aliceMainPurse)
 */
 
-// UNDER CONSTRUCTION:
-type Mint
+resource type Mint
      def makePurse(balance:Int):Purse
 
 resource type Purse
-     var balance:Int
      def getBalance():Int
-     def sprout():Purse
+//     def sprout():Purse
      def getDecr():SealedBox
-     def deposit(amount:Int):Unit
+     def deposit(amount:Int, src:Purse):Unit
 
-/*
+// UNDER CONSTRUCTION STILL:
 def makeMint(name:String):Mint
     var brandPair:BrandPair = makeBrandPair(name)
     new
         def makePurse(balance:Int):Purse
+            var balance:Int = 0
+            val decr = (amount:Int) => (balance = balance - amount)
+//            def decr(amount:Int):Unit
+//                balance = balance - amount
             new
-                var balance:Int = balance
                 def getBalance():Int = balance
-                def sprout():Purse = this.makePurse(0)
-                def getDecr():SealedBox = brandPair.sealer.seal(
-*/
+//                 def sprout():Purse = makePurse(0)
+                def getDecr():SealedBox = brandPair.sealer.seal(option.Some(decr))
+                def deposit(amount:Int, src:Purse):Unit
+//                    brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) -> (-1)))(amount)
+                    balance = balance + amount
