@@ -200,18 +200,18 @@ def makeMint(name) :any {
 ? paymentForBob.deposit(10, aliceMainPurse)
 */
 
-/*
 // UNDER CONSTRUCTION:
 type Mint
      def makePurse(balance:Int):Purse
 
-type Purse
+resource type Purse
      var balance:Int
      def getBalance():Int
      def sprout():Purse
      def getDecr():SealedBox
      def deposit(amount:Int):Unit
 
+/*
 def makeMint(name:String):Mint
     var brandPair:BrandPair = makeBrandPair(name)
     new
