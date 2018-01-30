@@ -205,23 +205,20 @@ resource type Mint
 
 resource type Purse
      def getBalance():Int
-//     def sprout():Purse
+     def sprout():Purse
      def getDecr():SealedBox
      def deposit(amount:Int, src:Purse):Unit
 
-// UNDER CONSTRUCTION STILL:
 def makeMint(name:String):Mint
     var brandPair:BrandPair = makeBrandPair(name)
-    new
+    new (selfMint) =>
         def makePurse(balance:Int):Purse
             var balance:Int = 0
             val decr = (amount:Int) => (balance = balance - amount)
-//            def decr(amount:Int):Unit
-//                balance = balance - amount
-            new
+            new (selfPurse) =>
                 def getBalance():Int = balance
-//                 def sprout():Purse = makePurse(0)
+                def sprout():Purse = selfMint.makePurse(0)
                 def getDecr():SealedBox = brandPair.sealer.seal(option.Some(decr))
                 def deposit(amount:Int, src:Purse):Unit
-//                    brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) -> (-1)))(amount)
+                    brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) -> (-1)))(amount)
                     balance = balance + amount
