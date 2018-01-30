@@ -111,24 +111,22 @@ public class ILTests {
 
     @Test
     public void testLetValWithParse() throws ParseException {
-        String input =
-                "val x = 5\n"
-                        + "x\n";
+        String input = "val x = 5\n"
+                     + "x\n";
         TestUtil.doTestInt(input, 5);
     }
 
     @Test
     public void testLetValWithString() throws ParseException {
-        String input =
-                "val x = \"five\"\n"
-                        + "x\n";
+        String input = "val x = \"five\"\n"
+                     + "x\n";
         TestUtil.doTest(input, Util.stringType(), new StringLiteral("five"));
     }
 
     @Test
     public void testLetValWithString3() throws ParseException {
         String input = "val identity = (x: system.Int) => x\n"
-                + "identity(5)";
+                     + "identity(5)";
         TestUtil.doTestInt(input, 5);
     }
 
@@ -1370,5 +1368,15 @@ public class ILTests {
     @Test
     public void testMetadataInterpretation() throws ParseException {
         TestUtil.doTestScriptModularly("modules.importWithMetadata", null, null);
+    }
+
+    @Test
+    public void testObjectSetter() throws ParseException {
+        String src = "val obj = new\n"
+                   + "  var x : Int = 0\n"
+                   + "  def setX(x : Int) : Int\n"
+                   + "    x\n"
+                   + "obj.setX(2)";
+        TestUtil.doTest(src, Util.intType(), new IntegerLiteral(2));
     }
 }
