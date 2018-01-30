@@ -85,16 +85,23 @@ public class Application extends AbstractExpressionAST implements CoreAST {
                 args.add(((ExpressionAST) a).generateIL(ctx, null, dependencies));
             }
 
+            String opName = "apply";
+            IExpr receiver = null;
+
             // Need to do this to find out what the method name is.
             if (!(function instanceof Invocation)) {
-                throw new RuntimeException("Getting field of dynamic object,"
-                        + "which isn't an invocation.");
+                /*throw new RuntimeException("Getting field of dynamic object,"
+                        + "which isn't an invocation.");*/
+                receiver = exprGen.genExpr();
+            } else {
+                Invocation invocation = (Invocation) function;
+                opName = invocation.getOperationName();
+                receiver = invocation.getReceiver().generateIL(ctx, null, dependencies);
             }
-            Invocation invocation = (Invocation) function;
 
             return new MethodCall(
-                    invocation.getReceiver().generateIL(ctx, null, dependencies),
-                    invocation.getOperationName(),
+                    receiver,
+                    opName,
                     args,
                     this);
         }
