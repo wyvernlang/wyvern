@@ -1107,14 +1107,8 @@ public class ILTests {
         TestUtil.doTest(source, null, new IntegerLiteral(3));
     }
 
-    // TODO: the "right fix" for this bug is to allow an expression at the top level to refer
-    // to the type of a variable in scope.  In other words, top-level expressions shouldn't
-    // be turned into let expressions whose type must be interpretable without the bindings
-    // above.
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNestedDecl() throws ParseException {
-
         String source = ""
                 + "type Body (body) => \n"
                 + "    type T \n"
