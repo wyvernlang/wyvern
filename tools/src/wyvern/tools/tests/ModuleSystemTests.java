@@ -84,4 +84,13 @@ public class ModuleSystemTests {
         TestUtil.doTestScriptModularly("modules.simpleADTdriver", Util.intType(), new IntegerLiteral(5));
     }
 
+    @Test
+    public void testSimpleADTWithRenamingImport() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.simpleADTdriver2", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testSimpleADTWithRenamingRequire() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.simpleADTdriver3", Util.intType(), new IntegerLiteral(5));
+    }
 }
