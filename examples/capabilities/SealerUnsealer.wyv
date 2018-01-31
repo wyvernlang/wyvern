@@ -220,5 +220,5 @@ def makeMint(name:String):Mint
                 def sprout():Purse = selfMint.makePurse(0)
                 def getDecr():SealedBox = brandPair.sealer.seal(option.Some(decr))
                 def deposit(amount:Int, src:Purse):Unit
-                    brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) -> (-1)))(amount)
+                    brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) => (-1)))(amount)
                     balance = balance + amount
