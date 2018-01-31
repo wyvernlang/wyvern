@@ -90,8 +90,6 @@ public class Application extends AbstractExpressionAST implements CoreAST {
 
             // Need to do this to find out what the method name is.
             if (!(function instanceof Invocation)) {
-                /*throw new RuntimeException("Getting field of dynamic object,"
-                        + "which isn't an invocation.");*/
                 receiver = exprGen.genExpr();
             } else {
                 Invocation invocation = (Invocation) function;
