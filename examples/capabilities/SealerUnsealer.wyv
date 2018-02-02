@@ -154,6 +154,7 @@ stdout.print("SHOULD BE: NOTHING FOUND IN ALEX BOX\n")
 string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX")
 stdout.print(string + "\n")
 
+stdout.print("\nMINT EXAMPLE:\n")
 
 // Mint Example from E:
 /*
@@ -188,18 +189,20 @@ def makeMint(name) :any {
 
 resource type Mint
      def makePurse(balance:Int):Purse
+     def print():Unit
 
 resource type Purse
      def getBalance():Int
      def sprout():Purse
      def getDecr():SealedBox
      def deposit(amount:Int, src:Purse):Unit
+     def print():Unit
 
 def makeMint(name:String):Mint
     var brandPair:BrandPair = makeBrandPair(name)
     new (selfMint) =>
         def makePurse(balance:Int):Purse
-            var balance:Int = 0
+            var balance:Int = balance
             val decr = (amount:Int) => (balance = balance - amount)
             new (selfPurse) =>
                 def getBalance():Int = balance
@@ -208,6 +211,12 @@ def makeMint(name:String):Mint
                 def deposit(amount:Int, src:Purse):Unit
                     brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) => (-1)))(amount)
                     balance = balance + amount
+                def print():Unit
+                    stdout.print("Purse that has ")
+                    stdout.printInt(balance)
+                    stdout.print(" bucks from mint named " + brandPair.name + "\n")
+        def print():Unit
+            stdout.print("Mint named " + brandPair.name + "\n")
 
 /*
 ? def carolMint := makeMint("Carol")
@@ -223,6 +232,38 @@ def makeMint(name:String):Mint
 # value: <has 0 Carol bucks>
 
 ? paymentForBob.deposit(10, aliceMainPurse)
+
+# See: http://erights.org/elib/capability/ode/ode-capabilities.html
+
+? bobMainPurse.deposit(10, paymentForBob)
+
+? bobMainPurse.getBalance()
+# value: 10
+ 
+? aliceMainPurse.getBalance()
+# value: 990
 */
 
-// TODO
+var carolMint:Mint = makeMint("Carol")
+carolMint.print()
+
+var aliceMainPurse:Purse = carolMint.makePurse(1000)
+aliceMainPurse.print()
+stdout.print("This should be 1000:\n")
+stdout.printInt(aliceMainPurse.getBalance())
+stdout.print("\n")
+
+var bobMainPurse:Purse = carolMint.makePurse(0)
+bobMainPurse.print()
+
+var paymentForBob:Purse = aliceMainPurse.sprout()
+paymentForBob.print()
+
+paymentForBob.deposit(10, aliceMainPurse)
+paymentForBob.print()
+
+bobMainPurse.deposit(10, paymentForBob)
+stdout.print("Should be 10:\n")
+bobMainPurse.print()
+stdout.print("Should be 990:\n")
+aliceMainPurse.print()
