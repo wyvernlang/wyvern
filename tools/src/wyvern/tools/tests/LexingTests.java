@@ -90,11 +90,11 @@ public class LexingTests {
     @Test
     public void testComments1() throws IOException, CopperParserException {
         String input =
-                "exn1\n"
-                      + "\n"
-                      + "// foo\n"
-                      + "\n"
-                      + "exn2\n";
+                  "exn1\n"
+                + "\n"
+                + "// foo\n"
+                + "\n"
+                + "exn2\n";
         int[] expected = new int[] {
                 IDENTIFIER, WHITESPACE, NEWLINE,
                 WHITESPACE,
