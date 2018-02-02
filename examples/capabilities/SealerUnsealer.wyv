@@ -135,7 +135,7 @@ var jonathanBrandPair:BrandPair = makeBrandPair("Jonathan")
 var alexBox:SealedBox = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
 var jonathanBox:SealedBox = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
 
-var string:String = "ABCDEFG"
+var string:String = "Sealer and Unsealer Example\n"
 stdout.print(string + "\n")
 
 stdout.print("SHOULD BE: Alex's Secret\n")
