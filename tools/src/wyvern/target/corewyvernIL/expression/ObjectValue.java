@@ -8,7 +8,9 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public class ObjectValue extends New implements Invokable {
     private final EvalContext evalCtx; // captured eval context
@@ -47,6 +49,7 @@ public class ObjectValue extends New implements Invokable {
         } else if (hasDelegate) {
             return delegateTarget.invoke(methodName, args);
         } else {
+            ToolError.reportError(ErrorMessage.DYNAMIC_METHOD_ERROR, this, methodName);
             throw new RuntimeException("can't reach here");
         }
     }
