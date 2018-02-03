@@ -71,11 +71,14 @@ def makeCarolRevoker(carol:Carol):CarolRevoker
     var target:Option = option.Some(carol)
     new
         def carol():Carol
-            new
+            new (thisCarol) =>
+                var blankCarol:Carol = new
+                    def playWith1():Unit = stdout.print("playWith1 REVOKED\n")
+                    def playWith2():Unit = stdout.print("playWith2 REVOKED\n")
                 def playWith1():Unit
-                    target.getOrElse(() => stdout.print("playWith1 DISABLED")).playWith1()
+                    target.getOrElse(() => thisCarol.blankCarol).playWith1()
                 def playWith2():Unit
-                    target.getOrElse(() => stdout.print("playWith2 DISABLED")).playWith2()
+                    target.getOrElse(() => thisCarol.blankCarol).playWith2()
         def revoker():Revoker
             new
                 def revoke():Unit
