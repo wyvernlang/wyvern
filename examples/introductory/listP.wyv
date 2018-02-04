@@ -3,6 +3,7 @@
 module list
 
 import introductory.OptionPm
+import metadata wyvern.IfTSL
 
 val option = OptionPm
 
@@ -12,30 +13,41 @@ resource type List
     type E
     def append(e:this.E):Unit
     def find(pred:this.E -> Boolean):Option[this.E]
+	//def length():Int
+	//def get(n:Int):Option
+	//def map(f:Dyn -> Dyn):Unit
 
+    
+    
 def make[E]():List
     resource type Cell
         var element:E
         var next:Option[Cell]
         def find(pred:E -> Boolean):Option[E]
-    def makeCell(e:E, n:Option):Cell = new
+    def makeCell(e:E, n:Option):Cell = new (self) =>
         var element:E = e
         var next:Option[Cell] = n
         def find(pred:E -> Boolean):Option[E]
-            this.next.isDefined.ifTrue(
-                () => pred(this.element).ifTrue(
-                    () => option.Some[E](this.element),
-                    () => this.next.flatMap[E]((c:Cell) => c.find(pred))),
+            self.next.isDefined.ifTrue(
+                () => pred(self.element).ifTrue(
+                    () => option.Some[E](self.element),
+                    () => self.next.flatMap[E]((c:Cell) => c.find(pred))),
                 () => option.None[E]())
-    val sentinel : Cell = makeCell(0, option.None[E]())
-    new
+    def makeOneCell(e:E):Cell = makeCell(e, option.None[E]())
+    val l:List = new (self) =>
         type E = E
-        var first:Cell = sentinel
-        var last:Cell = sentinel
-        def append(e:E):Unit
-            this.last.element = e
-            val cell = makeCell(0, option.None[E]())
-            this.last.next = option.Some(cell)
-            this.last = cell
-        def find(pred:E -> Boolean):Option[E]
-            this.first.find(pred)
+        var first:Option[Cell] = option.None[Cell]()
+        var last:Option[Cell] = option.None[Cell]()
+        def append(e:self.E):Unit
+            IfTSL.doif(self.first.isDefined, ~)
+              then
+                val cell = makeOneCell(e)
+                self.last.map[Unit](c:Cell => c.next = option.Some[Cell](cell))
+                self.last = option.Some[Cell](cell)
+              else
+                self.first = option.Some[Cell](makeOneCell(e))
+                self.last = self.first
+        def find(pred:self.E -> Boolean):Option[self.E]
+            self.first.map[self.E](c:Cell => c.find(pred))
+    l
+    // TODO: shouldn't have to let-bind "l" here
