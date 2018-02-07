@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
@@ -45,7 +46,7 @@ public class DefDeclType extends DeclTypeWithResult {
     }
 
     @Override
-    public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+    public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (!(dt instanceof DefDeclType)) {
             return false;
         }
@@ -69,7 +70,7 @@ public class DefDeclType extends DeclTypeWithResult {
                 theirType = theirType.adapt(adaptationView);
                 adaptationView = new ViewExtension(new Variable(theirArg.getName()), new Variable(myArg.getName()), adaptationView);
             }
-            if (!(theirType.isSubtypeOf(myArg.getType(), ctx))) {
+            if (!(theirType.isSubtypeOf(myArg.getType(), ctx, reason))) {
                 return false;
             }
             ctx = ctx.extend(myArg.getName(), myArg.getType());
@@ -79,7 +80,7 @@ public class DefDeclType extends DeclTypeWithResult {
         if (adaptationView != null) {
             otherRawResultType = otherRawResultType.adapt(adaptationView);
         }
-        return rawResultType.isSubtypeOf(otherRawResultType, ctx);
+        return rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
     }
     @Override
     public int hashCode() {

@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.FileLocation;
@@ -36,7 +37,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
      * (effect)DeclTypes before comparing them.
      */
     @Override
-    public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+    public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         // TODO: instead of the code below, implement semantics comparison
         if (!(dt instanceof EffectDeclType)) {
             return false;

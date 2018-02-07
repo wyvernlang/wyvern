@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -127,11 +128,12 @@ public class DefDeclaration extends NamedDeclaration {
             effectsCheck(methodCtx, effectAccumulator);
         }
 
-        if (!bodyType.isSubtypeOf(getType(), methodCtx)) {
+        FailureReason r = new FailureReason();
+        if (!bodyType.isSubtypeOf(getType(), methodCtx, r)) {
             // for debugging
             ValueType resultType = getType();
-            bodyType.isSubtypeOf(resultType, methodCtx);
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type");
+            bodyType.isSubtypeOf(resultType, methodCtx, r);
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type", r.getReason());
 
         }
         return new DefDeclType(getName(), type, formalArgs, effectSet);
@@ -148,10 +150,12 @@ public class DefDeclaration extends NamedDeclaration {
             // compare method call effects with annotated ones
             EffectDeclType actualEffects = new EffectDeclType(getName() + "-actualEffects", new EffectSet(actualEffectSet), getLocation());
             EffectDeclType annotatedEffects = new EffectDeclType(getName() + "-annotatedEffects", effectSet, getLocation());
-            if (!actualEffects.isSubtypeOf(annotatedEffects, methodCtx)) { // changed from ctx
+            FailureReason r = new FailureReason();
+            if (!actualEffects.isSubtypeOf(annotatedEffects, methodCtx, r)) { // changed from ctx
                 ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(),
                         "set of effects from the method calls " + actualEffectSet.toString(),
-                        "set of effects specified by " + getName() + effectSet.toString());
+                        "set of effects specified by " + getName() + effectSet.toString(),
+                        r.getReason());
             }
         }
     }

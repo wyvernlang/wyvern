@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EmptyTypeContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -58,8 +59,9 @@ public class Bind extends Expression {
         TypeContext bodyCtx = EmptyTypeContext.empty();
         for (VarBinding vb : bindings) {
             ValueType t = vb.getExpression().typeCheck(ctx, effectAccumulator);
-            if (!t.isSubtypeOf(vb.getType(), ctx)) {
-                reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), vb.getType().toString());
+            FailureReason r = new FailureReason();
+            if (!t.isSubtypeOf(vb.getType(), ctx, r)) {
+                reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), vb.getType().toString(), r.getReason());
             }
             bodyCtx = bodyCtx.extend(vb.getVarName(), vb.getType());
         }

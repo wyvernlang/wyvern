@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.decltype;
 import java.io.IOException;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.TagType;
@@ -24,7 +25,7 @@ public class TaggedTypeMember extends DeclType implements DefinedTypeMember {
     }
 
     @Override
-    public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+    public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (!(dt instanceof TaggedTypeMember)) {
             return false;
         }

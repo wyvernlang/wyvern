@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -248,7 +249,7 @@ public class DeclSequence extends Sequence {
         if (delegateDecl != null) {
             StructuralType delegateStructuralType = delegateDecl.getType().getILType(ctxTemp).getStructuralType(ctxTemp);
             for (DeclType declType : delegateStructuralType.getDeclTypes()) {
-                if (!declTypes.stream().anyMatch(newDefDecl -> newDefDecl.isSubtypeOf(declType, finalCtxTemp))) {
+                if (!declTypes.stream().anyMatch(newDefDecl -> newDefDecl.isSubtypeOf(declType, finalCtxTemp, new FailureReason()))) {
                     declTypes.add(declType);
                 }
             }

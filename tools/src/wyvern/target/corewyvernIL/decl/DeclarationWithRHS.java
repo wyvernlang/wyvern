@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.decl;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -27,8 +28,9 @@ public abstract class DeclarationWithRHS extends NamedDeclaration {
     public final DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
         ValueType defType = definition.typeCheck(thisCtx, null);
         ValueType myType = getType();
-        if (!defType.isSubtypeOf(myType, thisCtx)) {
-            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
+        FailureReason r = new FailureReason();
+        if (!defType.isSubtypeOf(myType, thisCtx, r)) {
+            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this, r.getReason());
         }
         return getDeclType();
     }

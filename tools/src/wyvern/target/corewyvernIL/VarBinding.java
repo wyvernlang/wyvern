@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -43,9 +44,10 @@ public class VarBinding implements HasLocation {
 
     public TypeContext typecheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         ValueType t = expr.typeCheck(ctx, effectAccumulator);
-        if (!t.isSubtypeOf(type, ctx)) {
+        FailureReason r = new FailureReason();
+        if (!t.isSubtypeOf(type, ctx, r)) {
             //t.isSubtypeOf(type, ctx); // for debugging
-            reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), type.toString());
+            reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), type.toString(), r.getReason());
         }
         final TypeContext extendedCtx = ctx.extend(getVarName(), type);
         return extendedCtx;

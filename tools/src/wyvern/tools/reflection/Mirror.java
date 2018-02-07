@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -39,7 +40,7 @@ public class Mirror {
         EvalContext evalCtx = o1.getEvalCtx();
         // o2 is an ObjectMirror
         Value obj = o2.getField("original");
-        if (!o1.getType().equalsInContext(obj.getType(), evalCtx)) {
+        if (!o1.getType().equalsInContext(obj.getType(), evalCtx, new FailureReason())) {
             return 0;
         }
         if (obj instanceof ObjectValue) {
@@ -84,7 +85,7 @@ public class Mirror {
                 ((JObject) (typeOrig1.getFObject())).getWrappedValue();
         StructuralType structType2 = (StructuralType)
                 ((JObject) (typeOrig2.getFObject())).getWrappedValue();
-        if (structType1.equalsInContext(structType2, evalCtx)) {
+        if (structType1.equalsInContext(structType2, evalCtx, new FailureReason())) {
             return 1;
         }
         return 0;

@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -123,7 +124,7 @@ public class New extends Expression {
             StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
             // new defined declaration will override delegate object's method definition if they had subType relationship
             for (DeclType declType : delegateStructuralType.getDeclTypes()) {
-                if (!dts.stream().anyMatch(newDefDeclType -> newDefDeclType.isSubtypeOf(declType, thisCtx))) {
+                if (!dts.stream().anyMatch(newDefDeclType -> newDefDeclType.isSubtypeOf(declType, thisCtx, new FailureReason()))) {
                     dts.add(declType);
                 }
             }
@@ -132,8 +133,9 @@ public class New extends Expression {
         // check that everything in the claimed structural type was accounted for
         StructuralType requiredT = type.getStructuralType(ctx);
         StructuralType actualT = new StructuralType(selfName, dts);
-        if (!actualT.isSubtypeOf(requiredT, ctx)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName());
+        FailureReason r = new FailureReason();
+        if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName(), r.getReason());
         }
 
         if (isResource && !requiredT.isResource(GenContext.empty())) {

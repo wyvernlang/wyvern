@@ -4,6 +4,7 @@ import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
@@ -18,7 +19,7 @@ public abstract class DeclType extends ASTNode implements IASTNode {
         return name;
     }
 
-    public abstract boolean isSubtypeOf(DeclType dt, TypeContext ctx);
+    public abstract boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason);
 
     public abstract DeclType adapt(View v);
 

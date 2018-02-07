@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.type;
 import java.io.IOException;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
@@ -22,7 +23,7 @@ public class DynamicType extends ValueType {
     }
 
     @Override
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         return true;
     }
 

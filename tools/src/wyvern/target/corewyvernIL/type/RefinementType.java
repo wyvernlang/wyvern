@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
@@ -159,29 +160,29 @@ public class RefinementType extends ValueType {
     }
 
     @Override
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         // if they are equivalent to a DynamicType or equal to us, then return true
         if (equals(t)) {
             return true;
         }
         final ValueType ct = t.getCanonicalType(ctx);
-        if (super.isSubtypeOf(ct, ctx)) {
+        if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
             return true;
         }
 
         // if their canonical type is a NominalType, check if our base is a subtype of it
         if (ct instanceof NominalType) {
-            return base.isSubtypeOf(ct, ctx);
+            return base.isSubtypeOf(ct, ctx, reason);
         }
 
         // if their canonical type is a RefinementType, compare the bases (for any tags) and separately check the structural types
         if (ct instanceof RefinementType) {
-            if (!base.isSubtypeOf(((RefinementType) ct).base, ctx)) {
+            if (!base.isSubtypeOf(((RefinementType) ct).base, ctx, reason)) {
                 return false;
             }
         }
         // compare structural types
-        return this.getStructuralType(ctx).isSubtypeOf(ct.getStructuralType(ctx), ctx);
+        return this.getStructuralType(ctx).isSubtypeOf(ct.getStructuralType(ctx), ctx, reason);
     }
 
     @Override

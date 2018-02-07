@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
@@ -184,6 +185,7 @@ public class MethodCall extends Expression {
 
         // ...use this context to do that.
         TypeContext newCtx = null;
+        String failureReason = null;
         for (DeclType declType : declarationTypes) {
             formalArgTypes = new LinkedList<ValueType>();
 
@@ -218,8 +220,12 @@ public class MethodCall extends Expression {
                 ValueType actualArgType = actualArgTypes.get(i);
 
                 // Check actual argument type accords with formal argument type.
-                if (!actualArgType.isSubtypeOf(formalArgType, newCtx)) {
+                FailureReason r = new FailureReason();
+                if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
                     argsTypechecked = false;
+                    if (failureReason == null) {
+                        failureReason = r.getReason();
+                    }
                     break;
                 }
 
@@ -294,6 +300,9 @@ public class MethodCall extends Expression {
             errMsg.append(formalArgTypes.get(formalArgTypes.size() - 1).desugar(ctx));
         }
         //errMsg.append(")");
+        if (failureReason != null) {
+            errMsg.append("; a subtyping failure was because " + failureReason);
+        }
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
         return null;
     }

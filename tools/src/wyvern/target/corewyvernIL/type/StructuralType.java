@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -77,7 +78,11 @@ public class StructuralType extends ValueType {
                 }
                 arg.getType().doPrettyPrint(dest, indent, ctx);
             }
-            dest.append(" -> ");
+            if (isResource(GenContext.empty())) {
+                dest.append(" -> ");
+            } else {
+                dest.append(" => ");
+            }
             ddt.getRawResultType().doPrettyPrint(dest, indent, ctx);
         } else {
             String newIndent = indent + "    ";
@@ -115,7 +120,7 @@ public class StructuralType extends ValueType {
     }
 
     @Override
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         t = t.getCanonicalType(ctx);
         if (t instanceof DynamicType) {
             return true;
@@ -123,13 +128,15 @@ public class StructuralType extends ValueType {
         if (t instanceof NominalType) {
             StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
             if (st == null) {
+                reason.setReason("cannot look up structural type for " + t.desugar(ctx));
                 return false;
             } else {
-                return isSubtypeOf(st, ctx);
+                return isSubtypeOf(st, ctx, reason);
             }
         }
 
         if (!(t instanceof StructuralType)) {
+            reason.setReason("cannot look up structural type for " + t.desugar(ctx));
             return false;
         }
 
@@ -140,13 +147,14 @@ public class StructuralType extends ValueType {
         for (DeclType dt : st.getDeclTypes()) {
             DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
-            if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx)) {
+            if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx, reason)) {
                 return false;
             }
         }
 
         // a resource type is not a subtype of a non-resource type
         if (isResource(GenContext.empty()) && !st.isResource(GenContext.empty())) {
+            reason.setReason("the destination type is not a resource");
             return false;
         }
 

@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -97,10 +98,11 @@ public class SeqExpr extends Expression {
                 }
             }
         }
+        FailureReason r = new FailureReason();
         if (getExprType() == null) {
             setExprType(result);
-        } else if (!result.isSubtypeOf(getExprType(), extendedCtx)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString());
+        } else if (!result.isSubtypeOf(getExprType(), extendedCtx, r)) {
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString(), r.getReason());
         }
         return getExprType();
     }
