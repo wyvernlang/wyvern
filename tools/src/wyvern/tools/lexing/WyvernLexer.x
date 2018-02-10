@@ -197,7 +197,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token openParen_t ::= /\(/ {: RESULT = token(LPAREN,lexeme); :};
  	terminal Token closeParen_t ::= /\)/ {: RESULT = token(RPAREN,lexeme); :};
  	terminal Token comma_t ::= /,/  {: RESULT = token(COMMA,lexeme); :};
- 	terminal Token arrow_t ::= /=\>/  {: RESULT = token(ARROW,lexeme); :};
+ 	terminal Token arrow_t ::= /=\>/  {: RESULT = token(EQARROW,lexeme); :};
  	terminal Token tarrow_t ::= /-\>/  {: RESULT = token(TARROW,lexeme); :};
  	terminal Token dot_t ::= /\./ {: RESULT = token(DOT,lexeme); :};
  	terminal Token colon_t ::= /:/ {: RESULT = token(COLON,lexeme); :};

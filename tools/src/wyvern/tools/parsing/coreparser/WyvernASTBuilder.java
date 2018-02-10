@@ -146,8 +146,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public Type arrowType(List<Type> arguments, Type result) {
-        return new Arrow(arguments, result);
+    public Type arrowType(List<Type> arguments, Type result, boolean isResource) {
+        return new Arrow(arguments, result, isResource);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.expression.Path;
-import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class TypeContext {
@@ -9,7 +8,7 @@ public abstract class TypeContext {
         return new VarBindingContext(var, type, this);
     }
 
-    public boolean isAssumedSubtype(NominalType t1, ValueType t2) {
+    public boolean isAssumedSubtype(ValueType t1, ValueType t2) {
         if (getNext() == null) {
             return false;
         } else {

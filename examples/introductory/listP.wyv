@@ -1,6 +1,6 @@
 // NOTE: this example triggers a typechecking bug as of 5/31
 
-module list
+//module list
 
 import introductory.OptionPm
 import metadata wyvern.IfTSL
@@ -15,7 +15,7 @@ resource type List
     def find(pred:this.E -> Boolean):Option[this.E]
 	//def length():Int
 	//def get(n:Int):Option
-	//def map(f:Dyn -> Dyn):Unit
+	//def do(f:Dyn -> Dyn):Unit
 
     
     
@@ -51,3 +51,5 @@ def make[E]():List
             self.first.map[self.E](c:Cell => c.find(pred))
     l
     // TODO: shouldn't have to let-bind "l" here
+
+15

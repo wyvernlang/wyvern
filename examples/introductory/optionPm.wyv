@@ -4,7 +4,7 @@ module option
 
 type Option
     type T
-    def map[U](f:this.T -> U):Option[U] // T => U is a resource function type (as opposed to non-resource/pure with ->)
+    def map[U](f:this.T -> U):Option[U] // T -> U is a resource function type (as opposed to non-resource/pure with =>)
     def flatMap[U](f:this.T -> Option[U]):Option[U]
     def getOrElse(x1:Unit -> this.T):this.T
     def orElse(x:Unit -> Option[this.T]):Option[this.T]

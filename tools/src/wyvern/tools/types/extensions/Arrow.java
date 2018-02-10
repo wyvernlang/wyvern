@@ -19,10 +19,12 @@ import wyvern.tools.types.Type;
 public class Arrow extends AbstractTypeImpl implements ApplyableType {
     private Type result;
     private List<Type> arguments;
+    private boolean isResource;
 
-    public Arrow(List<Type> arguments, Type result) {
+    public Arrow(List<Type> arguments, Type result, boolean isResource) {
         this.arguments = arguments;
         this.result = result;
+        this.isResource = isResource;
     }
 
     public Type getResult() {
@@ -66,6 +68,6 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
             }
         }
 
-        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)));
+        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)), isResource);
     }
 }

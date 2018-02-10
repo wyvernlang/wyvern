@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.support.FailureReason;
+import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
@@ -165,6 +166,10 @@ public class RefinementType extends ValueType {
         if (equals(t)) {
             return true;
         }
+        if (ctx.isAssumedSubtype(this, t)) {
+            return true;
+        }
+        ctx = new SubtypeAssumption(this, t, ctx);
         final ValueType ct = t.getCanonicalType(ctx);
         if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
             return true;

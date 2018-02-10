@@ -144,7 +144,7 @@ TOKEN : /* Symbols */
 | <EQUALS>
 | <EQUALSEQUALS>
 | <COMMA>
-| <ARROW>
+| <EQARROW>
 | <TARROW>
 | <DOT>
 | <COLON>
@@ -365,7 +365,7 @@ AST TypeDeclaration() :
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
-  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW> ]
+  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW> ]
   <NEWLINE> <INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT> {
@@ -441,7 +441,7 @@ AST EffectDeclType() :
 
 List Formals_Lambda() :
 { List args = new LinkedList(); Object singleParameter;}
-{     singleParameter = Formal_Lambda() { 
+{     singleParameter = Formal_Lambda_NoEqArrow() { 
             args.add(singleParameter);
             return args;
         }
@@ -466,6 +466,14 @@ Object Formal_Lambda() :
 { Token id; Type type = null; }
 {
   id = <IDENTIFIER> [<COLON> type = Type()] {
+      return build.formalArg(id.image, type);
+  }
+}
+
+Object Formal_Lambda_NoEqArrow() :
+{ Token id; Type type = null; }
+{
+  id = <IDENTIFIER> [<COLON> type = NonArrowType()] {
       return build.formalArg(id.image, type);
   }
 }
@@ -573,7 +581,7 @@ AST ExpressionLine(boolean makeValDecl) :
 Object CaseArm() :
 { Token id; Token t; AST exp; Type type; }
 {
-  id=<IDENTIFIER> <COLON> type=Type() t=<ARROW> exp=ExpressionLine(false) {
+  id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW> exp=ExpressionLine(false) {
     return build.caseArm(id.image,type,exp,loc(t));
   }
 }
@@ -601,7 +609,7 @@ AST AssignmentExpression(ExpFlags flags) :
 AST LambdaFn(ExpFlags flags) :
 { List formals; AST body; Token t; }
 {
-    formals = Formals_Lambda() t=<ARROW> body = Expression(flags) {
+    formals = Formals_Lambda() t=<EQARROW> body = Expression(flags) {
         return build.fn(formals, body, loc(t));
     }
 }
@@ -619,7 +627,7 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Type arrowResult = null; Type t; Type t2; List<Type> tList=null; }
+{ Type arrowResult = null; Token ar=null; Type t; Type t2; List<Type> tList=null; }
 {
  t = NonArrowType()
  (<MULT> t2 = NonArrowType() {
@@ -629,7 +637,7 @@ Type Type() :
    }
    tList.add(t2);
  })*
- (<TARROW> arrowResult = Type() )? {
+ ((ar=<TARROW> | ar=<EQARROW>) arrowResult = Type() )? {
 
     if (arrowResult == null) {
         return t;
@@ -638,7 +646,8 @@ Type Type() :
             tList = new LinkedList<Type>();
             tList.add(t);
         }
-        return build.arrowType(tList, arrowResult);
+        boolean resourceArrow = (ar.kind == TARROW);
+        return build.arrowType(tList, arrowResult, resourceArrow);
     }
  }
 }
@@ -738,7 +747,7 @@ AST PrimaryExpression(ExpFlags flags) :
     return exp;
   }
 |
-  t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW>] {
+  t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW>] {
     String self = (selfName == null) ? null : selfName.image;
     exp = build.newObj(loc(t), self);
     
