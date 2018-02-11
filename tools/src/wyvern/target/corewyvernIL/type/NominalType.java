@@ -150,7 +150,14 @@ public class NominalType extends ValueType {
             return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
         } else {
             ValueType ct = t.getCanonicalType(ctx);
-            return super.isSubtypeOf(ct, ctx, reason); // check for equality with the canonical type
+            // check for equality with the canonical type
+            if (super.isSubtypeOf(ct, ctx, reason)) {
+                return true;
+            } else {
+                // report error in terms of original type
+                reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                return false;
+            }
         }
     }
 

@@ -209,10 +209,12 @@ public class MethodCall extends Expression {
 
                 // Get info about the formal arguments.
                 FormalArg formalArg = formalArgs.get(i);
-                ValueType formalArgType = formalArg.getType().adapt(v);
-                TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
-                if (!(objectExpr instanceof Variable)) {
-                    // adaptation for the receiver won't have worked, so try avoiding "this"
+                ValueType formalArgType = formalArg.getType();
+                if (objectExpr.isPath()) {
+                    formalArgType = formalArgType.adapt(v);
+                } else {
+                    TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
+                    // adaptation for the receiver won't work, so try avoiding "this"
                     formalArgType = formalArgType.avoid(receiverType.getSelfName(), thisCtx);
                 }
                 formalArgTypes.add(formalArgType);
@@ -302,7 +304,7 @@ public class MethodCall extends Expression {
         }
         //errMsg.append(")");
         if (failureReason != null) {
-            errMsg.append("; a subtyping failure was because " + failureReason);
+            errMsg.append("; argument subtyping failed because " + failureReason);
         }
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
         return null;

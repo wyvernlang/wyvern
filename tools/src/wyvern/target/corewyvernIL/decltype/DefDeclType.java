@@ -48,10 +48,12 @@ public class DefDeclType extends DeclTypeWithResult {
     @Override
     public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (!(dt instanceof DefDeclType)) {
+            reason.setReason("declaration type of " + this.getName() + " didn't match");
             return false;
         }
         DefDeclType ddt = (DefDeclType) dt;
         if (args.size() != ddt.args.size() || !ddt.getName().equals(getName())) {
+            reason.setReason("number of arguments of " + this.getName() + " didn't match");
             return false;
         }
         View adaptationView = null;
