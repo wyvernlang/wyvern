@@ -1,5 +1,3 @@
-// NOTE: this example triggers a typechecking bug as of 5/31
-
 //module list
 
 import introductory.OptionPm
@@ -13,9 +11,9 @@ resource type List
     type E
     def append(e:this.E):Unit
     def find(pred:this.E -> Boolean):Option[this.E]
-	//def length():Int
-	//def get(n:Int):Option
-	//def do(f:Dyn -> Dyn):Unit
+    def length():Int
+    //def get(n:Int):Option
+    //def do(f:Dyn -> Dyn):Unit
 
     
     
@@ -34,22 +32,30 @@ def make[E]():List
                     () => self.next.flatMap[E]((c:Cell) => c.find(pred))),
                 () => option.None[E]())
     def makeOneCell(e:E):Cell = makeCell(e, option.None[E]())
-    val l:List = new (self) =>
+    new (self) =>
         type E = E
         var first:Option[Cell] = option.None[Cell]()
         var last:Option[Cell] = option.None[Cell]()
+        var size:Int = 0
         def append(e:self.E):Unit
             IfTSL.doif(self.first.isDefined, ~)
               then
                 val cell = makeOneCell(e)
                 self.last.map[Unit](c:Cell => c.next = option.Some[Cell](cell))
                 self.last = option.Some[Cell](cell)
+                self.size = 1
               else
                 self.first = option.Some[Cell](makeOneCell(e))
                 self.last = self.first
+                self.size = self.size + 1
         def find(pred:self.E -> Boolean):Option[self.E]
             self.first.map[self.E](c:Cell => c.find(pred))
-    l
-    // TODO: shouldn't have to let-bind "l" here
+        def length():Int = self.size
 
+val aList:List[Int] = make[Int]() // TODO: infer the generic argument here
+aList.append(10)
+aList.append(12)
+val found = aList.find(i => i==12)
+val n:Int = found.getOrElse(() => 2)
+n
 15

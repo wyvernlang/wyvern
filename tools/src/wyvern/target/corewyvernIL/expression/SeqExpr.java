@@ -29,6 +29,11 @@ public class SeqExpr extends Expression {
         elements = new LinkedList<HasLocation>();
     }
 
+    public SeqExpr(ValueType expectedType) {
+        this();
+        setExprType(expectedType);
+    }
+
     /** Side-effects the current SeqExpr to add an expression.
      *
      * @param expr
@@ -88,6 +93,13 @@ public class SeqExpr extends Expression {
         Pair<TypeContext, ValueType> p = typecheckWithCtx(ctx, effectAccumulator);
         TypeContext extendedCtx = p.getFirst();
         ValueType result = p.getSecond();
+        FailureReason r = new FailureReason();
+        if (this.getExprType() != null) {
+            if (!result.isSubtypeOf(getExprType(), extendedCtx, r)) {
+                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString(), r.getReason());
+            }
+            return getExprType();
+        }
         for (int i = elements.size() - 1; i >= 0; --i) {
             HasLocation elem = elements.get(i);
             if (elem instanceof VarBinding) {
@@ -98,12 +110,7 @@ public class SeqExpr extends Expression {
                 }
             }
         }
-        FailureReason r = new FailureReason();
-        if (getExprType() == null) {
-            setExprType(result);
-        } else if (!result.isSubtypeOf(getExprType(), extendedCtx, r)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString(), r.getReason());
-        }
+        setExprType(result);
         return getExprType();
     }
 

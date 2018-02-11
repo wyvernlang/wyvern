@@ -31,7 +31,7 @@ public class Script extends AbstractExpressionAST implements CoreAST {
 
     @Override
     public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-        TopLevelContext tlc = new TopLevelContext(ctx);
+        TopLevelContext tlc = new TopLevelContext(ctx, expectedType);
         for (ImportDeclaration i: requires) {
             i.genTopLevel(tlc);
         }

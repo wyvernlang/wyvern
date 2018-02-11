@@ -292,7 +292,7 @@ public class ModuleResolver {
             }
         }
 
-        if (!moduleType.isResource(ctx) && !toplevel) {
+        if (!toplevel && !moduleType.isResource(ctx)) {
             Value v = wrap(program, dependencies).interpret(Globals.getStandardEvalContext());
             moduleType = v.getType();
         }
