@@ -26,11 +26,9 @@ def make[E]():List
         var element:E = e
         var next:Option[Cell] = n
         def find(pred:E -> Boolean):Option[E]
-            self.next.isDefined.ifTrue(
-                () => pred(self.element).ifTrue(
-                    () => option.Some[E](self.element),
-                    () => self.next.flatMap[E]((c:Cell) => c.find(pred))),
-                () => option.None[E]())
+            pred(self.element).ifTrue(
+                () => option.Some[E](self.element),
+                () => self.next.flatMap[E]((c:Cell) => c.find(pred)))
     def makeOneCell(e:E):Cell = makeCell(e, option.None[E]())
     new (self) =>
         type E = E
@@ -48,8 +46,9 @@ def make[E]():List
                 self.first = option.Some[Cell](makeOneCell(e))
                 self.last = self.first
                 self.size = self.size + 1
-        def find(pred:self.E -> Boolean):Option[self.E]
-            self.first.map[self.E](c:Cell => c.find(pred))
+        def find(pred:self.E -> Boolean):Option[E]
+            self.first.flatMap[E](c:Cell => c.find(pred))
+            // TODO: if put map above, it typechecks (but fails below).  why?
         def length():Int = self.size
 
 val aList:List[Int] = make[Int]() // TODO: infer the generic argument here
@@ -57,5 +56,4 @@ aList.append(10)
 aList.append(12)
 val found = aList.find(i => i==12)
 val n:Int = found.getOrElse(() => 2)
-n
-15
+n+3
