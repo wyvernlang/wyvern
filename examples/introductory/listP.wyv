@@ -3,7 +3,7 @@
 import introductory.optionPm
 import metadata wyvern.IfTSL
 
-val option = OptionPm
+val option = optionPm
 
 type Option = option.Option
 
