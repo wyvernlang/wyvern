@@ -199,23 +199,26 @@ public class NominalType extends ValueType {
         }
         //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
         if (path.getFreeVariables().contains(varName)) {
-            DeclType dt = this.getSourceDeclType(ctx);
-            if (dt instanceof ConcreteTypeMember) {
-                final ValueType type = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
-                if (type.equals(this)) {
-                    // avoid infinite loops, just in case
-                    // TODO: make this more principled
-                    return this;
-                    //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+            try {
+                DeclType dt = this.getSourceDeclType(ctx);
+                if (dt instanceof ConcreteTypeMember) {
+                    final ValueType type = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+                    if (type.equals(this)) {
+                        // avoid infinite loops, just in case
+                        // TODO: make this more principled
+                        return this;
+                        //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+                    }
+                    return type.doAvoid(varName, ctx, count + 1);
                 }
-                return type.doAvoid(varName, ctx, count + 1);
-            } else {
-                // was best effort anyway
-                // TODO: be more principled
-                return this;
-                //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
-                //throw new RuntimeException(); // cannot get here
+            } catch (RuntimeException e) {
+                // exception while trying to avoid; fall through to returning "this"
             }
+            // was best effort anyway
+            // TODO: be more principled
+            return this;
+            //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+            //throw new RuntimeException(); // cannot get here
         } else {
             return this;
         }

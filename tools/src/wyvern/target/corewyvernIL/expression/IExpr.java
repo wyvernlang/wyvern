@@ -21,4 +21,7 @@ public interface IExpr extends IASTNode {
     default ValueType typecheckNoAvoidance(TypeContext ctx, EffectAccumulator effectAccumulator) {
         return typeCheck(ctx, effectAccumulator);
     }
+    default boolean isPath() {
+        return false;
+    }
 }

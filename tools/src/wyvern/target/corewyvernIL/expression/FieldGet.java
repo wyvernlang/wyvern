@@ -34,6 +34,11 @@ public class FieldGet extends Expression implements Path {
         dest.append('.').append(fieldName);
     }
 
+    @Override
+    public boolean isPath() {
+        return objectExpr.isPath();
+    }
+
     public IExpr getObjectExpr() {
         return objectExpr;
     }

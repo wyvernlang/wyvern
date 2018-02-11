@@ -260,9 +260,10 @@ public class MethodCall extends Expression {
 
                 ctx = newCtx;
                 ValueType resultType = defDeclType.getResultType(v);
-                resultType = resultType.adapt(v);
-                if (!(objectExpr instanceof Variable)) {
-                    // adaptation for the receiver won't have worked, so try avoiding "this"
+                if (objectExpr.isPath()) {
+                    resultType = resultType.adapt(v);
+                } else {
+                    // adaptation for the receiver won't work, so try avoiding "this"
                     resultType = resultType.avoid(receiverType.getSelfName(), newCtx);
                 }
                 for (int i = args.size() - 1; i >= 0; --i) {
