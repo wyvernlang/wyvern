@@ -99,7 +99,7 @@ public class Mirror {
         return new ArrayList<>();
     }
 
-    public ValueType getFieldType(JavaValue type, String fieldName) {
+    public ValueType getFieldType(ObjectValue type, String fieldName) {
         // TODO
         return new StructuralType("Implement Later", new ArrayList<>());
     }

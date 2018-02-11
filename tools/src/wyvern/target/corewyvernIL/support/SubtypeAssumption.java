@@ -18,7 +18,7 @@ public class SubtypeAssumption extends TypeContext {
         if (at1.equals(t1) && at2.equals(t2)) {
             return true;
         } else {
-            return isAssumedSubtype(t1, t2);
+            return next.isAssumedSubtype(at1, at2);
         }
     }
 
