@@ -5,6 +5,7 @@ import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -24,6 +25,15 @@ public abstract class GenContext extends TypeContext {
         nextContext = next;
     }
 
+    /** Extends the context with a variable-type mapping
+     * returns the functional extension. */
+    public GenContext extend(String var, ValueType type) {
+        return new VarGenContext(var, new Variable(var), type, this);
+    }
+
+    /** Extends the context with a variable-type mapping, where uses of the
+     * variable are transformed to some possibly more complex expression
+     * (typically var.field); returns the functional extension. */
     public GenContext extend(String var, Expression expr, ValueType type) {
         return new VarGenContext(var, expr, type, this);
     }
