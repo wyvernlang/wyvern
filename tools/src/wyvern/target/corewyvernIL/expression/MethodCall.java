@@ -185,12 +185,14 @@ public class MethodCall extends Expression {
 
         // ...use this context to do that.
         TypeContext newCtx = null;
+        TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
             formalArgTypes = new LinkedList<ValueType>();
 
             // Ignore non-methods.
             newCtx = ctx;
+            calleeCtx = ctx.extend(receiverType.getSelfName(), receiver);
             if (!(declType instanceof DefDeclType)) {
                 continue;
             }
@@ -213,9 +215,9 @@ public class MethodCall extends Expression {
                 if (objectExpr.isPath()) {
                     formalArgType = formalArgType.adapt(v);
                 } else {
-                    TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
+                    //TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
                     // adaptation for the receiver won't work, so try avoiding "this"
-                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), thisCtx);
+                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), calleeCtx);
                 }
                 formalArgTypes.add(formalArgType);
                 String formalArgName = formalArg.getName();
@@ -233,6 +235,7 @@ public class MethodCall extends Expression {
 
                 // Update context and view.
                 newCtx = newCtx.extend(formalArgName, actualArgType);
+                calleeCtx = calleeCtx.extend(formalArgName, actualArgType);
                 IExpr e = args.get(i);
                 if (e instanceof Variable) {
                     v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getName()), (Variable) e, v);
@@ -266,10 +269,10 @@ public class MethodCall extends Expression {
                     resultType = resultType.adapt(v);
                 } else {
                     // adaptation for the receiver won't work, so try avoiding "this"
-                    resultType = resultType.avoid(receiverType.getSelfName(), newCtx);
+                    resultType = resultType.avoid(receiverType.getSelfName(), calleeCtx);
                 }
                 for (int i = args.size() - 1; i >= 0; --i) {
-                    resultType = resultType.avoid(formalArgs.get(i).getName(), ctx);
+                    resultType = resultType.avoid(formalArgs.get(i).getName(), calleeCtx);
                 }
                 setExprType(resultType);
                 return defDeclType;
