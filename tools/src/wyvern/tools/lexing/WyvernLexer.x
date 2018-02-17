@@ -34,6 +34,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		  case TILDE:
 		  		return true;
 		  case TYPE:
+		  case DATATYPE:
 		  case DEF:
 		  case NEW:
 		  case MATCH:
@@ -150,6 +151,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
     terminal Token classKwd_t ::= /class/ in (keywds) {: RESULT = token(CLASS,lexeme); :};
 	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(TYPE,lexeme); flagTok = RESULT; :};
+
+	terminal Token datatypeKwd_t ::= /datatype/ in (keywds) {: RESULT = token(DATATYPE, lexeme); flagTok = RESULT; :};
+
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
 	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
@@ -294,6 +298,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		
 	keyw ::= classKwd_t:t {: RESULT = t; :}
 	       | typeKwd_t:t {: RESULT = t; :}
+	       | datatypeKwd_t:t {: RESULT = t; :}
 	       | valKwd_t:t {: RESULT = t; :}
 	       | defKwd_t:t {: RESULT = t; :}
 	       | varKwd_t:t {: RESULT = t; :}

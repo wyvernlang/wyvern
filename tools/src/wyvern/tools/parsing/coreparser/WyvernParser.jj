@@ -98,6 +98,7 @@ TOKEN : /* Keywords */
 | < VAR: "var" >
 | < DEF: "def" >
 | < TYPE: "type" >
+| < DATATYPE: "datatype" >
 | < CLASS: "class" >
 | < DELEGATE: "delegate" >
 | < TO: "to" >
