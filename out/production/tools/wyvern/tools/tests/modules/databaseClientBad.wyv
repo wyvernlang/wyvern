@@ -1,9 +1,0 @@
-
-import modules.database
-import modules.databaseProxy
-
-val db = database()
-val proxy = databaseProxy(db)
-
-proxy.db.setContents(1) // BAD - proxy leaks db
-db.getContents()

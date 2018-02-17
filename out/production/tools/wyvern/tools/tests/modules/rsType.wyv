@@ -1,3 +1,0 @@
-module def testModule()
-resource type Log
-	def log(x:Str) : Unit
