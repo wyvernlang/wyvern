@@ -1,0 +1,31 @@
+test typechecking1 [():Unit]
+	module TestModule
+		type TestType
+			type TestTypeInner
+				def bar() : Int
+
+test typechecking2 [():Unit]
+	module TestModule
+		type TestType
+			type TestTypeInner
+				def bar() : Int
+		type M
+			type A
+				def create() : Int
+
+test typechecking3 [():Unit]
+	module TestModule
+		type A
+			def create() : A
+
+test typechecking4 [():Unit]
+	module TestModule
+		type M
+			type A
+				def create() : A
+
+test typechecking5 [():Unit]
+	module TestModule
+		type M
+			class A
+				def create() : A = new

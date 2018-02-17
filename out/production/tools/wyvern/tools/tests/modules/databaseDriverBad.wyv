@@ -1,0 +1,11 @@
+
+import modules.database
+import modules.databaseProxy
+import modules.databaseClientBad
+
+val db = database()
+val proxy = databaseProxy(db)
+val client = databaseClientBad(proxy)
+
+client.update()
+db.contents

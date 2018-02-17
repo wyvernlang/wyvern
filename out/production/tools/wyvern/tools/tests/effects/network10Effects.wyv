@@ -1,0 +1,4 @@
+// for testing effects defined by pure modules
+module network10Effects //: effects.Network10EffectsType
+effect sendFx = {}
+effect receiveFx = {sendFx} // same as {}

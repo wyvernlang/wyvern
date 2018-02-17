@@ -1,0 +1,102 @@
+module def base(java:Java)
+
+//import reflection.modules.Lists
+import java:wyvern.tools.tests.ReflectionTests.mirror
+
+//val lists = Lists(java)
+
+type Any = Unit
+//type List = lists.List
+
+/**
+* Mirror to reflect an object at run time.
+*/
+type Object
+    def equals(object:Object) : Int
+    //def invoke (m:String, args:List) : Object
+    // def set(f:Field, value:Object) : Unit
+    // def get(f:Field) : Object
+    def typeOf() : Type
+
+/**
+* Reflects the static type.
+*/
+type Type
+    def equals(typ:Type) : Int
+    //def fields() : List
+    def fieldByName(name:String) : Field
+    //def methodByName(name:String) : Method
+    //def methods() : List
+    def name() : String
+
+/**
+* Mirror to reflect the compile time attributes of a method.
+*/
+type Method
+    //def arguments() : List
+    def equals(method:Method) : Unit // Boolean
+    def name() : String
+    def returnType() : Type
+
+/**
+* Mirror to reflect the static attributes of a variable.
+*/
+type Variable
+    def equals(variable:Variable) : Unit // Boolean
+    def name() : String
+    def typeOf() : Type
+
+/**
+* Mirror to reflect the static attributes of a field. Fields are
+* distinct from variables in that they are declared with object scope.
+*/
+type Field
+    def equals(field:Field) : Unit // Boolean
+    def name() : String
+    def typeOf() : Type
+
+// Must be called on the result of a java interop function which returns a structural type.
+def createField(name:String, tp:Type) : Field = new
+    def equals(field:Field) : Unit = mirror.equalFields(this, field)
+    def name() : String = name
+    def typeOf() : Type = tp
+
+// Must be called on the result of a java interop function which returns a structural type.
+/*def createMethod(arguments:lists.List, name:String, returnType:Type) : Method = new
+    def arguments() : lists.List = arguments
+    def equals(method:Method) : Unit = mirror.equalMethods(this, method)
+    def name() : String = name
+    def returnType() : Type = returnType*/
+
+// Must be called on the result of a java interop function which returns a structural type.
+def createType(typ:Any) : Type = new
+    val structType = typ
+    def equals(typ2:Type) : Int = mirror.equalTypes(this, typ2)
+    /*def fields() : lists.List = let
+        val fieldNames = lists.fromJavaList(mirror.getFieldNames(typ))
+      in
+        lists.map(name:String => createField(name, createType(mirror.getFieldType(typ, name))), fieldNames)*/
+    def fieldByName(name:String) : Field = createField(name, createType(mirror.getFieldType(typ, name)))
+    // TODO: fix this to allow getting arg types
+    /*def methodByName(name:String) : Method = createMethod(
+        name, mirror.getMethodArgNames(typ, name), createType(mirror.getMethodRetType(typ, name)))*/
+    /*def methods() : List = let
+      // TODO: here too
+        val methodNames = lists.fromJavaList(mirror.getMethodNames(typ))
+      in
+        lists.map(name:String => createMethod(
+            name, mirror.getMethodArgNames(typ, name), mirror.getMethodRetType(typ, name)), methodNames)*/
+    def name() : String = mirror.typeName(this)
+
+def reflect(object:Any) : Object = new
+    val original : Any = object
+    def equals(object2:Object) : Int = mirror.equals2(object, object2)
+    //def invoke(m:Method, args:lists.List) : Object = reflect(mirror.invoke(object, m.name(), args))
+    def typeOf() : Type = createType(mirror.getObjectType(object))
+        /* let
+        val fields = mirror.getObjectFields(object)
+        val methods = mirror.getObjectMethods(object)
+        val name = mirror.typeName(object)
+        in createType(fields, methods, name) // createType(object) */
+
+// def typeReflect[T]() : Type

@@ -1,0 +1,15 @@
+module iso
+
+import python:pygame
+
+type Color = Unit
+
+type Pygame
+  def Color(name : String) : Color
+
+val pygame : Pygame = pygame
+
+def Color(name : String) : Color = pygame.Color(name)
+
+
+// problem 1: all code above is present, get an issue from subtyping (and the error is reported horribly)

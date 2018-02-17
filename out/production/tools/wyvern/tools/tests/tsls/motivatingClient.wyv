@@ -1,0 +1,12 @@
+require stdout
+
+import metadata tsls.expr
+
+def run(expr:expr.Expr):Int
+	expr.eval()
+
+val x = run(3 4 5 + -)
+
+stdout.printInt(x)
+
+x

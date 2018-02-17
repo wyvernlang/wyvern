@@ -1,0 +1,10 @@
+
+import modules.database
+import modules.databaseProxy
+
+val db = database()
+val proxy = databaseProxy(db)
+
+db.setContents(0)
+proxy.increment()
+db.getContents()

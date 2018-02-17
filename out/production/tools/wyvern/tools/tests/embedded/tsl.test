@@ -1,0 +1,20 @@
+test ASTTSL1[JavaObj([IntegerConstant(2)]):JavaClass(wyvern.tools.typedAST.interfaces.TypedAST)]
+	import java:wyvern.tools.typedAST.interfaces.TypedAST
+	val test:TypedAST = ~
+		2
+	test
+
+test ASTTSL2[JavaObj([Invocation(IntegerConstant(2), "+", Sequence(IntegerConstant(5)))]):JavaClass(wyvern.tools.typedAST.interfaces.TypedAST)]
+	import java:wyvern.tools.typedAST.interfaces.TypedAST
+	val x:TypedAST = { 5 }
+	val test:TypedAST = ~
+		2 + $x
+	test
+
+test ASTTSL3[JavaObj([Invocation(IntegerConstant(2), "+", IntegerConstant(5))]):JavaClass(wyvern.tools.typedAST.interfaces.TypedAST)]
+	import java:wyvern.tools.typedAST.interfaces.TypedAST
+	import java:wyvern.tools.typedAST.core.values.IntegerConstant
+	val x:TypedAST = IntegerConstant.create(5)
+	val test:TypedAST = ~
+		2 + $x
+	test

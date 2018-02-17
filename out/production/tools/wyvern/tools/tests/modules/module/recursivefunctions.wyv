@@ -1,0 +1,16 @@
+// Test almost-recursive functions
+// If this test works, recursive functions will probably work!
+
+type IntHolder
+	def getValue():system.Int
+
+def baz():system.Int = 4
+	
+def foo():IntHolder = new
+	def getValue():system.Int = bar()	// make this baz() to test w/o recursive defs
+
+def bar():system.Int
+	val aHolder:IntHolder = foo()
+	5
+
+foo().getValue()

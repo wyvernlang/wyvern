@@ -1,0 +1,5 @@
+module def wordCloudFig4(log : figs.Logger, list : figs.ListFactory2) : figs.WordCloud
+
+val words : list.List = list.create()
+
+val x : system.Int = words

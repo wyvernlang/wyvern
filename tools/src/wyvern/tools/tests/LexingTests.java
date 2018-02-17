@@ -17,6 +17,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.SINGLE_LINE_
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TILDE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TYPE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.WHITESPACE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DATATYPE;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -287,6 +288,23 @@ public class LexingTests {
         };
         checkLex(input, expected);
     }
+
+    @Test
+    public void datatypeDedents() throws IOException, CopperParserException {
+        String input =
+                "def\n"
+                        + " datatype\n"
+                        + "  bam\n"
+                        + "baz\n";
+        int[] expected = new int[] {
+                DEF, WHITESPACE, NEWLINE,
+                INDENT, WHITESPACE, DATATYPE, WHITESPACE, NEWLINE,
+                INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
+                DEDENT, DEDENT, IDENTIFIER, WHITESPACE, NEWLINE,
+        };
+        checkLex(input, expected);
+    }
+
     @Test(expected = CopperParserException.class)
     public void testMissingDSL2() throws IOException, CopperParserException {
         String input =

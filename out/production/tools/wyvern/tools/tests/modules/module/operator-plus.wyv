@@ -1,0 +1,26 @@
+require java
+
+import java:wyvern.tools.tests.ILTests.importTest
+
+// this is just normal ints for now, but will be bigints soon
+import java:wyvern.tools.tests.ILTests.intLibrary
+
+type BigInt
+	def add(v:BigInt):BigInt
+	def +(v:BigInt):BigInt
+	def asInt():Int
+
+def makeBigInt(x:Int):BigInt
+	new
+		def add(v:BigInt):BigInt
+			makeBigInt(intLibrary.add(x,v.asInt()))
+		def +(v:BigInt):BigInt
+			makeBigInt(intLibrary.add(x,v.asInt()))
+		def asInt():Int = x
+
+val two = makeBigInt(2)
+val one = makeBigInt(1)
+val four = two.add(two)
+val three = one+two
+
+three.add(two).asInt()

@@ -1,0 +1,14 @@
+require stdout
+import effects.network03
+
+val n03 = network03(stdout)
+n03.sendData("Network03 with effects")	// print "data sent: Network03 with effects"
+n03.receiveData()		// print "data received"
+//n03.processData()
+/* network03 has NetworkType01 ascription, but defines a
+ * processData() that NetworkType01 doesn't have, therefore
+ * calling it on n03 will not work. It also defines a "process"
+ * effect that NetworkType01 doesn't have, which should be
+ * hidden from any other modules that network03 objects are
+ * passed into.
+ */

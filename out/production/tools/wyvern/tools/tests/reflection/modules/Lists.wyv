@@ -1,0 +1,39 @@
+module def Lists(java:Java)
+
+import java:wyvern.tools.tests.ReflectionTests.tools
+
+type Any = Unit
+
+// Need booleans or equality tests to be implemented in order to properly check
+// for the empty list. Need type parameters to properly constrain the type of
+// values in the list.
+
+type DynDynFn
+    def apply(d:Dyn):Dyn
+
+type List
+    val isEmpty : Boolean // Booleans.Bool
+    val length : Int
+    def getVal() : Dyn
+    def getNext() : List
+
+def nil(emptyVal:Dyn) : List = new
+    val isEmpty : Boolean = true
+    val length : Int = 0
+    def getVal() : Dyn = emptyVal
+    def getNext() : List = this
+
+def cons(x:Dyn, y:List) : List = new
+    val isEmpty : Boolean = false
+    val length : Int = tools.add(y.length, 1)
+    def getVal() : Dyn = x
+    def getNext() : List = y
+
+def map(f:Dyn -> Dyn, list:List) : Dyn = tools.ifTrue(list.isEmpty,
+    () => list, () => cons(f(list.getVal()), map(f, list.getNext())))
+
+def fromJavaListHelp(javaList:system.List, ind:Int, size:Int) : List = tools.intEquals(tools.add(ind, 1), size).ifTrue(
+        () => nil(0),
+        () => cons(javaList.get(ind), fromJavaListHelp(javaList, tools.add(ind, 1), size)))
+
+def fromJavaList(javaList:system.List) : List = fromJavaListHelp(javaList, 0, javaList.size())
