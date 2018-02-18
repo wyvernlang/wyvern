@@ -44,6 +44,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -359,6 +360,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
     @Override
     public ASTNode visit(TypeContext state, SeqExpr seqExpr) {
         throw new RuntimeException("not impl");
+    }
+
+    @Override
+    public ASTNode visit(TypeContext state, RefinementType type) {
+        return type;
     }
 
 }

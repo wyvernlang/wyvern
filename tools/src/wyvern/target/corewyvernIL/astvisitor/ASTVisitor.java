@@ -34,6 +34,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -63,6 +64,7 @@ public abstract class ASTVisitor<S, T> {
     public abstract T visit(S state, AbstractTypeMember abstractDeclType);
     public abstract T visit(S state, NominalType nominalType);
     public abstract T visit(S state, StructuralType structuralType);
+    public abstract T visit(S state, RefinementType type);
     public abstract T visit(S state, StringLiteral stringLiteral);
     public abstract T visit(S state, DelegateDeclaration delegateDecl);
     public abstract T visit(S state, ConcreteTypeMember concreteTypeMember);

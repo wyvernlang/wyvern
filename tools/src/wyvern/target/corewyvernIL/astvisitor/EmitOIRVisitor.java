@@ -46,6 +46,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.OIRAST;
@@ -549,5 +550,13 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
         }
 
         return current;
+    }
+
+    @Override
+    public OIRAST visit(EmitOIRState state, RefinementType type) {
+        StructuralType defaultType = new StructuralType("emptyType", new ArrayList<DeclType>());
+        OIRAST result = defaultType.acceptVisitor(this, state);
+        result.copyMetadata(type);
+        return result;
     }
 }

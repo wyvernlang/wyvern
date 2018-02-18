@@ -65,7 +65,7 @@ public class RefinementType extends ValueType {
 
     @Override
     public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
-        throw new RuntimeException("need to add a visitor method call here");
+        return visitor.visit(state,  this);
     }
 
     @Override

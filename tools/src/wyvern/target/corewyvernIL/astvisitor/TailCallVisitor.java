@@ -40,6 +40,7 @@ import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.HasLocation;
@@ -282,6 +283,12 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
                 ((VarBinding) hl).getExpression().acceptVisitor(this, false);
             }
         }
+        return null;
+    }
+
+    @Override
+    public Void visit(Boolean state, RefinementType type) {
+        // TODO Auto-generated method stub
         return null;
     }
 

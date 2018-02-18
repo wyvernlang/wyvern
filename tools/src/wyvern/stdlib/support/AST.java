@@ -99,9 +99,16 @@ public class AST {
         List<DeclType> declTypes = new LinkedList<>();
         for (ObjectValue declType: declTypeObjs) {
             JavaValue fieldValue = (JavaValue) declType.getField("declType");
-            return (ValueType) fieldValue.getWrappedValue();
+            throw new RuntimeException("implementation needs to be fixed"); 
+            //return (ValueType) fieldValue.getWrappedValue();
         }
         return new StructuralType(selfName, declTypes);
+    }
+
+    public ValueType typeParam(String name, ObjectValue type) {
+        List<DeclType> declTypes = new LinkedList<>();
+        declTypes.add(concreteTypeMember(name, type));
+        return new StructuralType("ignore$Me", declTypes);
     }
 
     public ValueType refinementType(List<ObjectValue> typeParamObjs, ObjectValue base) {
