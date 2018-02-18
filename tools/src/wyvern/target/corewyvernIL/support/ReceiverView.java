@@ -42,7 +42,9 @@ public class ReceiverView extends View {
         }
         if (v.equals(from)) {
             if (to == null) {
-                throw new RuntimeException("view adaptation failed (from = " + from.toString() + ")");
+                // oh well
+                return v;
+                //throw new RuntimeException("view adaptation failed (from = " + from.toString() + ")");
             }
             return to;
         } else {

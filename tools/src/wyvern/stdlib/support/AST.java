@@ -99,7 +99,7 @@ public class AST {
         List<DeclType> declTypes = new LinkedList<>();
         for (ObjectValue declType: declTypeObjs) {
             JavaValue fieldValue = (JavaValue) declType.getField("declType");
-            throw new RuntimeException("implementation needs to be fixed"); 
+            throw new RuntimeException("implementation needs to be fixed");
             //return (ValueType) fieldValue.getWrappedValue();
         }
         return new StructuralType(selfName, declTypes);
