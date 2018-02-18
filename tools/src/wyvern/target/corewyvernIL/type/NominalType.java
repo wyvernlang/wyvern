@@ -63,7 +63,12 @@ public class NominalType extends ValueType {
 
     @Override
     public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
-        DeclType dt = getSourceDeclType(ctx);
+        DeclType dt = null;
+        try {
+            dt = getSourceDeclType(ctx);
+        } catch (RuntimeException e) {
+            return super.getStructuralType(ctx, theDefault); // can't look up a structural type
+        }
         if (dt instanceof DefinedTypeMember) {
             ValueType vt = ((DefinedTypeMember) dt).getResultType(View.from(path, ctx));
             if (vt.equals(this)) {
@@ -83,7 +88,13 @@ public class NominalType extends ValueType {
 
     @Override
     public ValueType getCanonicalType(TypeContext ctx) {
-        DeclType dt = getSourceDeclType(ctx);
+        DeclType dt = null;
+        try {
+            dt = getSourceDeclType(ctx);
+        } catch (RuntimeException e) {
+            // failed to get a canonical type
+            return this;
+        }
         if (dt instanceof ConcreteTypeMember) {
             final ValueType resultType = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
             if (this.equals(resultType)) {
