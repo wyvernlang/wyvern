@@ -8,7 +8,7 @@ import metadata wyvern.IfTSL
 
 type List = list.List
   metadata new
-    def parseTSL(input : String, ctx : system.Context) : option.Option
+    def parseTSL(input : String, ctx : system.Context) : option.Option[ast.AST]
       val exprList : list.List = ast.parseExpressionList(input, ctx)
       val n = exprList.length()
       val listIdent = ast.genIdent()
@@ -22,7 +22,7 @@ type List = list.List
           else
             listAST
       val appendsAST = build(n, ast.variable(listIdent))
-      option.Some(ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appendsAST))
+      option.Some[ast.AST](ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appendsAST))
 
 def make():List = list.make()
 
