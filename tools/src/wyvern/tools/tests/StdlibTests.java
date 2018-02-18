@@ -18,7 +18,7 @@ public class StdlibTests {
                 + "import wyvern.util.matching.regex\n\n"
                 + "val r = regex(\"\\\\d\")\n"
                 + "val threeString = r.findPrefixOf(\"3 men in a tub\")\n"
-                + "Int.from(threeString.getOrElse(() => 5))";
+                + "Int.from(threeString.getOrElse(() => \"5\"))";
         TestUtil.doTestInt(input, 3);
     }
 
