@@ -205,7 +205,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST addArguments(TypedAST application, List<String> names, List<TypedAST> arguments) throws ParseException {
         if (!(application instanceof Application)) {
-            throw new ParseException("Juxtaposed an additional argument to something that was not an application");
+            ToolError.reportError(ErrorMessage.ILLEGAL_JUXTAPOSITION, application);
+            //throw new ParseException("Juxtaposed an additional argument to something that was not an application");
         }
         Application app = (Application) application;
         List<Type> generics = app.getGenerics();
@@ -223,7 +224,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         } else if (function instanceof Invocation) {
             Invocation inv = (Invocation) function;
             if (inv.getArgument() != null) {
-                throw new ParseException("Cannot juxtapose an additional argument to a binary operation");
+                ToolError.reportError(ErrorMessage.ILLEGAL_BINARY_JUXTAPOSITION, application);
             }
             name.append(inv.getOperationName());
             names.forEach(name::append);
