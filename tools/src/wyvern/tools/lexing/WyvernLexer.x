@@ -167,9 +167,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
  	terminal Token comprisesKwd_t   ::= /comprises/ in (keywds) {: RESULT = token(COMPRISES,lexeme); :};
  	terminal Token extendsKwd_t   ::= /extends/ in (keywds) {: RESULT = token(EXTENDS,lexeme); :};
-	terminal Token ifKwd_t 	::= /if/ in (keywds);
- 	terminal Token thenKwd_t   ::= /then/ in (keywds);
- 	terminal Token elseKwd_t   ::= /else/ in (keywds);
+	//terminal Token ifKwd_t 	::= /if/ in (keywds);
+ 	//terminal Token thenKwd_t   ::= /then/ in (keywds);
+ 	//terminal Token elseKwd_t   ::= /else/ in (keywds);
  	terminal Token objtypeKwd_t   ::= /objtype/ in (keywds);
  	terminal Token effectKwd_t	::= /effect/ in (keywds) {: RESULT = token(EFFECT,lexeme); :};
  	
