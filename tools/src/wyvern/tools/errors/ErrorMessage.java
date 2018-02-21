@@ -44,6 +44,8 @@ public enum ErrorMessage {
             + "If this is the last line in the program, try ending the program with a value of built-in type, e.g. the integer 0.", 1),
     DELEGATE_MUST_BE_VARIABLE("Expected variable in delegate declaration, got %ARG", 1),
     QUALIFIED_TYPES_ONLY_FIELDS("Qualified types can only include val fields", 0),
+    ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
+    ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),
 
     // Syntax errors
     LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
