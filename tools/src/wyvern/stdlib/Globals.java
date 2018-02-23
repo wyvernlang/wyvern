@@ -18,16 +18,16 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
-import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -37,13 +37,8 @@ import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public final class Globals {
     private Globals() { }
@@ -65,20 +60,29 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
     }
 
+    private static boolean gettingPrelude = false;
+
     private static SeqExpr getPrelude(GenContext ctx) {
         if (prelude == null) {
+            if (gettingPrelude) {
+                return new SeqExpr();
+            }
+            gettingPrelude = true;
             String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
             File file = new File(preludeLocation);
-            TypedAST ast = null;
+
+            Module preludeM = ModuleResolver.getLocal().load("<prelude>", file, true);
+
+            /*TypedAST ast = null;
             try {
                 ast = TestUtil.getNewAST(file);
             } catch (ParseException e) {
                 ToolError.reportError(ErrorMessage.PARSE_ERROR,
                         new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
             }
-            final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-            IExpr program = ((ExpressionAST) ast).generateIL(ctx, null, dependencies);
-            prelude = (SeqExpr) program;
+            IExpr program = ((ExpressionAST) ast).generateIL(ctx, null, dependencies);*/
+            //prelude = (SeqExpr) preludeM.getExpression();
+            prelude = ModuleResolver.getLocal().wrap(preludeM.getExpression(), preludeM.getDependencies());
         }
         return prelude;
     }
@@ -193,8 +197,9 @@ public final class Globals {
         EvalContext ctx = EvalContext.empty();
         ctx = ctx.extend("system", Globals.getSystemValue());
         SeqExpr sexpr = prelude;
-        assert sexpr != null; // invariant: we must have gotten a type context already
-        ctx = sexpr.interpretCtx(ctx).getSecond();
+        if (sexpr != null) {
+            ctx = sexpr.interpretCtx(ctx).getSecond();
+        }
         return ctx;
     }
 

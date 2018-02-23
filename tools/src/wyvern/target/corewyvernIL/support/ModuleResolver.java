@@ -331,7 +331,7 @@ public class ModuleResolver {
         return ctx;
     }
 
-    public IExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
+    public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
         SeqExpr seqProg = (program instanceof SeqExpr) ? (SeqExpr) program : new SeqExpr().addExpr(program);
         Set<String> wrapped = new HashSet<String>();
         LinkedList<TypedModuleSpec> noDups = new LinkedList<TypedModuleSpec>();
