@@ -1,1 +1,4 @@
+import wyvern.decls
+
+val hjlk = decls.aNum
 val asdf = 8

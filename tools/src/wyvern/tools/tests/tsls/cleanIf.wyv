@@ -1,14 +1,17 @@
 import metadata wyvern.IfTSL2
 
-// TODO: put this in the standard prelude, and allow it be called 'if'
-val iffelsARG = (cond:Boolean, tt:IfTSL2.FnExpr, ff:IfTSL2.FnExpr) => IfTSL2.doif(cond, tt, ff)
-val iff = (cond:Boolean, blocks:IfTSL2.Blocks) => IfTSL2.doifblk(cond, blocks)
+val ifelseARG = (cond:Boolean, tt:IfTSL2.FnExpr, ff:IfTSL2.FnExpr) => IfTSL2.doif(cond, tt, ff)
+val if = (cond:Boolean, blocks:IfTSL2.Blocks) => IfTSL2.doifblk(cond, blocks)
 
+// testing the prelude
 val p = asdf
+val q = hjlk
+val r = decls.aNum
 
+// testing the nice if
 val x = -5
-val y : Int = iff (x>0) {x} els {-x}
-val z : Int = iff (x>0)
+val y : Int = if (x>0) {x} else {-x}
+val z : Int = if (x>0)
         x
     else
         -x
