@@ -10,7 +10,7 @@ resource type List
 	def find(pred:Dyn -> Boolean):Option[Dyn]
 	def length():Int
 	def get(n:Int):Option[Dyn]
-	def map(f:Dyn -> Dyn):Unit
+	def map(f:Dyn -> Dyn):Unit // side-effects this list
 
 def make():List
     resource type Cell
@@ -30,7 +30,7 @@ def make():List
                     () => this.next.flatMap[Dyn]((c:Cell) => c.find(pred))),
                 () => option.None[Dyn]())
         def map(f:Dyn -> Dyn):Unit
-            f(this.element)
+            this.element = f(this.element)
             this.next.map[Unit](c:Cell => c.map(f))
         def length():Int
             this.next.isDefined.ifTrue(
