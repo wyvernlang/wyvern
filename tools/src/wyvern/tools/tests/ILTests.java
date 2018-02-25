@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,11 +42,16 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 @Category(RegressionTests.class)
 public class ILTests {
 
-    private static final String PATH = TestUtil.BASE_PATH;
+    static final String PATH = TestUtil.BASE_PATH;
 
-    @BeforeClass public static void setupResolver() {
+    @BeforeClass public static void setup() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
+        Globals.setUsePrelude(false);
+    }
+
+    @AfterClass public static void teardown() {
+        Globals.setUsePrelude(true);  // restore the default to use the prelude
     }
 
     @Test
@@ -654,11 +660,6 @@ public class ILTests {
     @Test
     public void testNonResourceImport() throws ParseException {
         TestUtil.doTestScriptModularlyFailing("bugs.a", ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA);
-    }
-
-    @Test
-    public void testIf() throws ParseException {
-        TestUtil.doTestScriptModularly("tsls.cleanIf", Util.intType(), new IntegerLiteral(5));
     }
 
     @Test
