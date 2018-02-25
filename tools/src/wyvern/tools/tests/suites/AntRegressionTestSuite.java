@@ -14,6 +14,7 @@ import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.Figures;
 import wyvern.tools.tests.FreeVars;
 import wyvern.tools.tests.ILTests;
+import wyvern.tools.tests.ILTestsWithPrelude;
 import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
@@ -40,6 +41,7 @@ import wyvern.tools.tests.TransformTests;
             LexingTests.class,      // tests the new lexer
             CoreParserTests.class,  // tests the new parser
             ILTests.class,          // tests the new IL
+            ILTestsWithPrelude.class,          // tests the new IL and the standard prelude
             RossettaCodeTests.class, // a few of these are out of date, but some use new everything
             FFITests.class,
             OIRTests.class,

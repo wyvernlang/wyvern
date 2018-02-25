@@ -61,8 +61,17 @@ public final class Globals {
     }
 
     private static boolean gettingPrelude = false;
+    private static boolean usePrelude = true;
+
+    /** Allows us to disable the prelude for testing purposes if necessary */
+    public static void setUsePrelude(boolean update) {
+        usePrelude = update;
+    }
 
     private static SeqExpr getPrelude(GenContext ctx) {
+        if (!usePrelude) {
+            return new SeqExpr();
+        }
         if (prelude == null) {
             if (gettingPrelude) {
                 return new SeqExpr();

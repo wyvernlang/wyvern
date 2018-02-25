@@ -1,35 +1,28 @@
 module option
 
-type DynToDyn
-	def apply(x:Dyn):Dyn
-	
-resource type UnitToDyn
-	def apply():Dyn
-
-resource type UnitToOption
-	def apply():Option
-
-resource type DynToOption
-	def apply(x:Dyn):Option
+/** This is a parameterized version of the option module */
 
 type Option
-	def map(f:DynToDyn):Option
-	def flatMap(f:DynToOption):Option
-	def getOrElse(x:UnitToDyn):Dyn
-	def orElse(x:UnitToOption):Option
-	val isDefined:Boolean
+    type T
+    def map[U](f:this.T -> U):Option[U] // T -> U is a resource function type (as opposed to non-resource/pure with =>)
+    def flatMap[U](f:this.T -> Option[U]):Option[U]
+    def getOrElse(x1:Unit -> this.T):this.T
+    def orElse(x:Unit -> Option[this.T]):Option[this.T]
+    val isDefined:Boolean
 	
-def Some(x:Dyn):Option = new
-	def map(f:DynToDyn):Option = Some(f(x))
-	def flatMap(f:DynToOption):Option = f(x)
-	def getOrElse(defaultValue:UnitToDyn):Dyn = x
-	val value:Dyn = x
-	def orElse(x:UnitToOption):Option = this
-	val isDefined:Boolean = true
+def Some[T](x:T):Option[T] = new
+    type T = T
+    def map[U](f:T -> U):Option[U] = Some[U](f(x))
+    def flatMap[U](f:T -> Option[U]):Option[U] = f(x)
+    def getOrElse(defaultValue:Unit -> T):T = x
+    val value:T = x
+    def orElse(x:Unit -> Option[T]):Option[T] = this
+    val isDefined:Boolean = true
 
-def None():Option = new
-	def map(f:DynToDyn):Option = this
-	def flatMap(f:DynToOption):Option = this
-	def getOrElse(defaultValue:UnitToDyn):Dyn = defaultValue()
-	def orElse(x:UnitToOption):Option = x()
-	val isDefined:Boolean = false
+def None[T]():Option[T] = new
+    type T = T
+    def map[U](f:T -> U):Option[U] = None[U]()
+    def flatMap[U](f:T -> Option[U]):Option[U] = None[U]()
+    def getOrElse(defaultValue:Unit -> T):T = defaultValue()
+    def orElse(x:Unit -> Option[T]):Option[T] = x()
+    val isDefined:Boolean = false
