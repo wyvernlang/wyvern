@@ -301,6 +301,8 @@ public class ModuleResolver {
         if (loadingType) {
             typeName = moduleType.getStructuralType(ctx).getDeclTypes().get(0).getName();
         }
+        // make sure the module type is well-formed
+        moduleType.checkWellFormed(ctx);
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
         return new Module(spec, program, dependencies);
     }

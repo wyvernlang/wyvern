@@ -1,10 +1,10 @@
-resource type StringSQL
+resource type StringSQL (self) =>
 	type SQL
 		def query():String
 	type PreparedQuery
-		def apply(arg1:String, arg2:String):this.SQL
+		def apply(arg1:String, arg2:String):self.SQL
 		
-	def prepare(q:String):this.PreparedQuery
+	def prepare(q:String):self.PreparedQuery
 	
 	def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
 									 checkColumn:String):Int
