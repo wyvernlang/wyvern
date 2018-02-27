@@ -82,6 +82,7 @@ public class NominalType extends ValueType {
 
     private DeclType getSourceDeclType(TypeContext ctx) {
         final StructuralType structuralType = path.typeCheck(ctx, null).getStructuralType(ctx);
+        // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
         //return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
     }
