@@ -174,6 +174,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public void checkWellFormed(TypeContext ctx) {
         for (FormalArg arg : args) {
             arg.getType().checkWellFormed(ctx);
+            ctx = ctx.extend(arg.getName(), arg.getType());
         }
         super.checkWellFormed(ctx);
     }
