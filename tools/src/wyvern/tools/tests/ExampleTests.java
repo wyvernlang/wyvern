@@ -7,10 +7,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
@@ -28,6 +30,11 @@ import wyvern.tools.tests.suites.RegressionTests;
 @Category(RegressionTests.class)
 public class ExampleTests {
     private static final String PATH = TestUtil.EXAMPLES_PATH;
+
+    @Before
+    public void setup() {
+        Globals.resetPrelude();
+    }
 
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
@@ -133,6 +140,31 @@ public class ExampleTests {
     public void testExplicitCrossPlatformHello() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "xplatform.hello-explicit-writer", Util.unitType(), Util.unitValue());
     }
+
+    /*@Test
+    public void testOptionBug() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.OptionBug", null, null);
+    }
+
+    @Test
+    public void testSealingBug() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.SealerUnsealer", null, null);
+    }
+
+    @Test
+    public void testSealingBug2() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.SealerUnsealer2", null, null);
+    }
+
+    @Test
+    public void testCaretakerBug() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.Caretaker", null, null);
+    }
+
+    @Test
+    public void testSealingBug3() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.SealerUnsealer", null, null);
+    }*/
 
     @Test
     public void testPythonCompilerOnScript() {

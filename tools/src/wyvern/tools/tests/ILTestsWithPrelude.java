@@ -1,9 +1,11 @@
 package wyvern.tools.tests;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -13,6 +15,10 @@ import wyvern.tools.tests.suites.RegressionTests;
 @Category(RegressionTests.class)
 public class ILTestsWithPrelude {
 
+    @Before
+    public void setup() {
+        Globals.resetPrelude();
+    }
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(ILTests.PATH);

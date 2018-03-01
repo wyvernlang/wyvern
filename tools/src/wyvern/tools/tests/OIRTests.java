@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,6 +41,10 @@ public class OIRTests {
     private static final String BASE_PATH = TestUtil.BASE_PATH;
     private static final String PATH = BASE_PATH + "modules/module/";
 
+    @Before
+    public void setup() {
+        Globals.resetPrelude();
+    }
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);

@@ -68,6 +68,11 @@ public final class Globals {
         usePrelude = update;
     }
 
+    public static void resetPrelude() {
+        prelude = null;
+        gettingPrelude = false;
+    }
+
     private static SeqExpr getPrelude(GenContext ctx) {
         if (!usePrelude) {
             return new SeqExpr();
