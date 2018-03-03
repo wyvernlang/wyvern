@@ -16,6 +16,7 @@ resource type List
     def length():Int
     def get(n:Int):Option[this.E]
     def do(f:this.E -> Unit):Unit
+    def map[F](f:this.E -> F):List[F] // functional map
 
     
     
@@ -61,6 +62,10 @@ def make[E]():List
         def length():Int = self.size
         def get(n:Int):Option[E] = self.first.flatMap[E](c:Cell => c.get(n))
         def do(f:E -> Unit):Unit = self.first.map[Unit](c:Cell => c.do(f))
+        def map[F](f:self.E -> F):List[F]
+            val newList:List[F] = make[F]()
+            self.do(e => newList.append(f(e)))
+            newList
 
 val aList:List[Int] = make[Int]() // TODO: infer the generic argument here
 aList.append(10)
@@ -68,5 +73,6 @@ aList.append(13)
 val found = aList.find(i => i==13)
 val n:Int = found.getOrElse(() => 2)
 val ten:Option[Int] = aList.get(0)
-aList.do(n:Int => stdout.printInt(n))
+val bList:List[Int] = aList.map[Int](x => x+1)
+bList.do(n:Int => stdout.printInt(n))
 n+aList.length()
