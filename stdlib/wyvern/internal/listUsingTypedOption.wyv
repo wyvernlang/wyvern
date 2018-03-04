@@ -10,7 +10,7 @@ resource type List
 	def find(pred:Dyn -> Boolean):Option[Dyn]
 	def length():Int
 	def get(n:Int):Option[Dyn]
-	def map(f:Dyn -> Dyn):Unit
+	def map(f:Dyn -> Dyn):List // functional map
 
 def make():List
     resource type Cell
@@ -20,6 +20,7 @@ def make():List
         def length():Int
         def get(n:Int):Option[Dyn]
         def map(f:Dyn -> Dyn):Unit
+        def do(f:Dyn -> Unit):Unit
     def makeCell(e:Dyn, n:Option[Cell]):Cell = new
         var element:Dyn = e
         var next:Option[Cell] = n
@@ -30,8 +31,13 @@ def make():List
                     () => this.next.flatMap[Dyn]((c:Cell) => c.find(pred))),
                 () => option.None[Dyn]())
         def map(f:Dyn -> Dyn):Unit
-            f(this.element)
+            this.element = f(this.element)
             this.next.map[Unit](c:Cell => c.map(f))
+        def do(f:Dyn -> Unit):Unit
+            def action(c:Cell):Unit
+                f(this.element)
+                c.do(f)
+            this.next.map[Unit](c:Cell => action(c))
         def length():Int
             this.next.isDefined.ifTrue(
                 () => 1 + this.next.map[Int](c:Cell => c.length()).getOrElse(() => 0),
@@ -55,4 +61,7 @@ def make():List
             this.first.find(pred)
         def length():Int = this.first.length()
         def get(n:Int):Option[Dyn] = this.first.get(n)
-        def map(f:Dyn -> Dyn):Unit = this.first.map(f)
+        def map(f:Dyn -> Dyn):List
+            val newList = make()
+            this.first.do(x => newList.append(f(x)))
+            newList
