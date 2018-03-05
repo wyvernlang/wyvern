@@ -35,13 +35,14 @@ function make_sealer () {
 */
 
 type Box
+     type T
      val name:String
 
 resource type Sealer
-     def seal(object:Option):Box
+     def seal(object:Option):Box[object.T]
 
 resource type Unsealer
-     def unseal(box:Box):Option
+     def unseal(box:Box):Option[box.T]
 
 // This example would be a lot nicer if we can pass tuples or pairs as
 // return type! Will rewrite when supported. :-)
@@ -54,13 +55,14 @@ def makeSealerUnsealer():SealerUnsealer
     var currentKey:String = "S"
     new
         var sealer:Sealer = new
-            def seal(object:Option):Box
-                val newBox:Box = new
+            def seal(object:Option):Box[object.T]
+                val newBox = new
+                    type T = object.T
                     val name:String = currentKey + "S" // This needs to be made more secure than this!!!
                 map.put(newBox,object)
                 newBox
         var unsealer:Unsealer = new
-            def unseal(box:Box):Option
+            def unseal(box:Box):Option[box.T]
                 map.get(box)
 
 
@@ -94,46 +96,49 @@ def makeBrandPair(nickname) {
 */
 
 resource type SealedBox
+    type T
     def shareContent():Unit
 
 resource type BrandSealer
-    def seal(object:Option):SealedBox
+    def seal(object:Option):SealedBox[object.T]
 
 resource type BrandUnsealer
-    def unseal(box:SealedBox):Option
+    def unseal(box:SealedBox):Option[box.T]
 
 resource type BrandPair
+    type T
     var name:String
     var sealer:BrandSealer
     var unsealer:BrandUnsealer
 
-
-def makeBrandPair(name:String):BrandPair
-    var shared:Option = option.None()
-    def makeSealedBox(object:Option):SealedBox
+def makeBrandPair[T](name:String):BrandPair[T]
+    var shared:Option = option.None[SealedBox]()
+    def makeSealedBox(object:Option):SealedBox[object.T]
         val newBox:SealedBox = new
+            type T = object.T
             def shareContent():Unit
                 shared = object
         newBox
     new
+        type T = T
         var name:String = name
         var sealer:BrandSealer = new
-            def seal(object:Option):SealedBox
+            def seal(object:Option):SealedBox[object.T]
                 makeSealedBox(object)
         var unsealer:BrandUnsealer = new
-            def unseal(box:SealedBox):Option
-                shared = option.None()
+            def unseal(box:SealedBox):Option[box.T]
+                shared = option.None[SealedBox]()
                 box.shareContent()
-                var result:Option = shared
+                var result:Option[box.T] = shared
                 result
 
 
 // Simple example of using brand pair from E Wiki:
-var alexBrandPair:BrandPair = makeBrandPair("Alex")
-var jonathanBrandPair:BrandPair = makeBrandPair("Jonathan")
+var alexBrandPair:BrandPair = makeBrandPair[String]("Alex")
+var jonathanBrandPair:BrandPair = makeBrandPair[String]("Jonathan")
 
-var alexBox:SealedBox = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
-var jonathanBox:SealedBox = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
+var alexBox:SealedBox[String] = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
+var jonathanBox:SealedBox[String] = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
 
 var string:String = "Sealer and Unsealer Example\n"
 stdout.print(string + "\n")
@@ -194,12 +199,12 @@ resource type Mint
 resource type Purse
      def getBalance():Int
      def sprout():Purse
-     def getDecr():SealedBox
+     def getDecr():SealedBox[Int -> Int]
      def deposit(amount:Int, src:Purse):Unit
      def print():Unit
 
 def makeMint(name:String):Mint
-    var brandPair:BrandPair = makeBrandPair(name)
+    var brandPair:BrandPair = makeBrandPair[Int -> Int](name)
     new (selfMint) =>
         def makePurse(balance:Int):Purse
             var balance:Int = balance
@@ -207,7 +212,7 @@ def makeMint(name:String):Mint
             new (selfPurse) =>
                 def getBalance():Int = balance
                 def sprout():Purse = selfMint.makePurse(0)
-                def getDecr():SealedBox = brandPair.sealer.seal(option.Some(decr))
+                def getDecr():SealedBox[Int -> Int] = brandPair.sealer.seal(option.Some(decr))
                 def deposit(amount:Int, src:Purse):Unit
                     brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) => (-1)))(amount)
                     balance = balance + amount
@@ -244,6 +249,7 @@ def makeMint(name:String):Mint
 # value: 990
 */
 
+/*
 var carolMint:Mint = makeMint("Carol")
 carolMint.print()
 
@@ -267,3 +273,4 @@ stdout.print("Should be 10:\n")
 bobMainPurse.print()
 stdout.print("Should be 990:\n")
 aliceMainPurse.print()
+*/

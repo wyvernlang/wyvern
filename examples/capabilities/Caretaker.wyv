@@ -68,7 +68,7 @@ resource type CarolRevoker
      def revoker():Revoker
 
 def makeCarolRevoker(carol:Carol):CarolRevoker
-    var target:Option = option.Some(carol)
+    var target:Option[Carol] = option.Some(carol)
     new
         def carol():Carol
             new (thisCarol) =>
@@ -82,7 +82,7 @@ def makeCarolRevoker(carol:Carol):CarolRevoker
         def revoker():Revoker
             new
                 def revoke():Unit
-                    target = option.None()
+                    target = option.None[Carol]()
 
 stdout.print("Creating Carol with caretaker.\n")
 var carolRevoker:CarolRevoker = makeCarolRevoker(carol1)

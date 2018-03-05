@@ -19,7 +19,9 @@ import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -38,7 +40,7 @@ import wyvern.tools.util.TreeWritable;
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
 public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
-    private ExpressionAST body; // HACK
+    private ExpressionAST body; // HACK // FIXME:
     private String name;
     private Type returnType;
     private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
@@ -57,7 +59,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         }
         this.returnType = returnType;
         this.name = name;
-        this.body = (ExpressionAST) body;
+
+        if (body == null || body instanceof ExpressionAST) {
+            this.body = (ExpressionAST) body;
+        } else {
+            // FIXME:
+            ToolError.reportError(ErrorMessage.PARSE_ERROR, location, "Body of a method declaration is not expression!");
+        }
+
         this.argNames = argNames;
         this.isClass = isClassDef;
         this.location = location;

@@ -141,30 +141,22 @@ public class ExampleTests {
         TestUtil.doTestScriptModularly(PATH, "xplatform.hello-explicit-writer", Util.unitType(), Util.unitValue());
     }
 
-    /*@Test
-    public void testOptionBug() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.OptionBug", null, null);
-    }
-
     @Test
-    public void testSealingBug() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.SealerUnsealer", null, null);
-    }
-
-    @Test
-    public void testSealingBug2() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "capabilities.dynamic-sealing.SealerUnsealer2", null, null);
-    }
-
-    @Test
-    public void testCaretakerBug() throws ParseException {
+    public void testCaretaker() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "capabilities.Caretaker", null, null);
     }
 
+    /*
     @Test
-    public void testSealingBug3() throws ParseException {
+    public void testSealerUnsealer() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "capabilities.SealerUnsealer", null, null);
-    }*/
+    }
+    */
+
+    @Test
+    public void testMembrane() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.Membrane", null, null);
+    }
 
     @Test
     public void testPythonCompilerOnScript() {
