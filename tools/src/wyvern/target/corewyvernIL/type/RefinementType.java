@@ -108,9 +108,8 @@ public class RefinementType extends ValueType {
     public void checkWellFormed(TypeContext ctx) {
         base.checkWellFormed(ctx);
         StructuralType t = base.getStructuralType(ctx);
-        final TypeContext selfCtx = ctx.extend(t.getSelfName(), this);
         for (DeclType dt : getDeclTypes(ctx)) {
-            dt.checkWellFormed(selfCtx);
+            dt.checkWellFormed(ctx);
         }
     }
 
