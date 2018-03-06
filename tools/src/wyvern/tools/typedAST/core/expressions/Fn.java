@@ -187,8 +187,10 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
         DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
 
         if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
-            ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_APPLIED, location,
-                                  "the declType (" + declType + ") is not a lambda type (it has no apply method)");
+            // there is some imprecision in the expected type; just return null and force the programmer to be explicit
+            return null;
+            //ToolError.reportError(ErrorMessage.TYPE_CANNOT_BE_APPLIED, location,
+            //                      "the declType (" + declType + ") is not a lambda type (it has no apply method)");
         }
 
         DefDeclType applyDef = (DefDeclType) applyDecl;
@@ -206,8 +208,9 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
         DeclType applyDecl = declStructuralType.findDecl(Util.APPLY_NAME, ctx);
 
         if (applyDecl == null || !(applyDecl instanceof DefDeclType)) {
-            //TODO: will replace with ToolError in the future
-            throw new RuntimeException("the declType is not a lambda type(it has no apply method)");
+            // there is some imprecision in the expected type; just return null and force the programmer to be explicit
+            return null;
+            //throw new RuntimeException("the declType is not a lambda type(it has no apply method)");
         }
 
         DefDeclType applyDef = (DefDeclType) applyDecl;
