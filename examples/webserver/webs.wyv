@@ -69,3 +69,27 @@ def run(server_class=BaseHTTPServer.HTTPServer, handler_class=S, port=80):
 if __name__ == "__main__":
     run()
 */
+
+/* IN PYTHON:
+
+import BaseHTTPServer
+
+def run(wyvernHandler, server_class=BaseHTTPServer.HTTPServer, handler_class=S, port=80):
+    class S(BaseHTTPServer.BaseHTTPRequestHandler):
+        def _set_headers(self):
+            wyvernHandler.setHeaders(self)
+
+        def do_GET(self):
+            wyvernHandler.do_GET(self)
+
+        def do_HEAD(self):
+            wyvernHandler.do_HEAD(self)
+            
+        def do_POST(self):
+            wyvernHandler.do_POST(self)
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print 'Starting httpd...'
+    httpd.serve_forever()
+
+*/
