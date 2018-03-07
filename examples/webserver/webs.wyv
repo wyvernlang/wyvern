@@ -1,0 +1,71 @@
+require stdout
+
+//import debug
+import python:BaseHTTPServer
+import python:helper
+
+/*
+def _set_headers(): Unit
+  baseHTTPRequestHandler.send_response(200)
+  baseHTTPRequestHandler.send_header("Content-type", "text/html")
+  baseHTTPRequestHandler.end_headers()
+
+def do_GET(): Unit
+  //debug.print("GET request\n")
+  _set_headers()
+  baseHTTPRequestHandler.wfile.write("<html><body><h1>hi!</h1></body></html>")
+
+def do_HEAD(): Unit
+  //debug.print("HEAD request\n")
+  _set_headers()
+
+def do_POST(): Unit
+  // Doesn't do anything with posted data
+  //debug.print("POST request\n")
+  _set_headers()
+  baseHTTPRequestHandler.wfile.write("<html><body><h1>POST!</h1></body></html>")
+*/
+
+val baseHTTPServer = BaseHTTPServer
+val helper = helper
+
+def run(): Unit
+  //debug.print("HI")
+  val server_address = helper.make2Tuple("", 8888)
+  val httpd = baseHTTPServer.HTTPServer(server_address, baseHTTPServer.BaseHTTPRequestHandler)
+  stdout.print("Starting httpd...")
+  httpd.serve_forever()
+
+run()
+
+
+/*
+import BaseHTTPServer
+
+class S(BaseHTTPServer.BaseHTTPRequestHandler):
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+    def do_GET(self):
+        self._set_headers()
+        self.wfile.write("<html><body><h1>hi!</h1></body></html>")
+
+    def do_HEAD(self):
+        self._set_headers()
+        
+    def do_POST(self):
+        # Doesn't do anything with posted data
+        self._set_headers()
+        self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+        
+def run(server_class=BaseHTTPServer.HTTPServer, handler_class=S, port=80):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print 'Starting httpd...'
+    httpd.serve_forever()
+
+if __name__ == "__main__":
+    run()
+*/
