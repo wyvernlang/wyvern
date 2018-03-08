@@ -195,6 +195,7 @@ public class ModuleResolver {
         try {
             File canonical = f.getCanonicalFile();
             String lastName = canonical.getName();
+            // make sure capitalization matches on Windows platforms
             if (!lastName.equals(names[names.length - 1])) {
                 return null;
             }
