@@ -96,11 +96,12 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         ASTNode result = ast.acceptVisitor(new PlatformSpecializationVisitor(), state);
 
         ModuleResolver interpResolver = ModuleResolver.getLocal();
-        ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
+        final ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
         resolver.setInterpreterState(InterpreterState.getLocalThreadInterpreter());
 
 
         List<TypedModuleSpec> dependenciesList = new ArrayList<>(state.getDependencies());
+        dependenciesList = resolver.sortDependencies(dependenciesList);
         return (ASTNode) resolver.wrap((IExpr) result, dependenciesList);
     }
 

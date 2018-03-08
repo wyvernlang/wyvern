@@ -34,4 +34,8 @@ public class Module {
     public String toString() {
         return "Module(" + spec.getQualifiedName() + ")";
     }
+
+    public boolean dependsOn(TypedModuleSpec o2) {
+        return dependencies.contains(o2);
+    }
 }

@@ -128,7 +128,9 @@ public class StructuralType extends ValueType {
         if (t instanceof NominalType) {
             StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
             if (st == null) {
-                reason.setReason("cannot look up structural type for " + t.desugar(ctx));
+                if (!reason.isDefined()) {
+                    reason.setReason("cannot look up structural type for " + t.desugar(ctx));
+                }
                 return false;
             } else {
                 return isSubtypeOf(st, ctx, reason);
@@ -147,7 +149,15 @@ public class StructuralType extends ValueType {
         for (DeclType dt : st.getDeclTypes()) {
             DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
-            if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx, reason)) {
+            if (candidateDT == null) {
+                if (!reason.isDefined()) {
+                    reason.setReason("missing declaration " + dt.getName());
+                }
+                return false;
+            } else if (!candidateDT.isSubtypeOf(dt, extendedCtx, reason)) {
+                if (!reason.isDefined()) {
+                    reason.setReason("declaration " + dt.getName() + " is not a subtype of the expected declaration");
+                }
                 return false;
             }
         }

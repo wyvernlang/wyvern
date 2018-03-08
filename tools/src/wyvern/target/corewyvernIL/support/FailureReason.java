@@ -11,4 +11,11 @@ public class FailureReason {
     public String getReason() {
         return reason == null ? "" : reason;
     }
+    @Override
+    public String toString() {
+        return reason;
+    }
+    public boolean isDefined() {
+        return reason != null;
+    }
 }
