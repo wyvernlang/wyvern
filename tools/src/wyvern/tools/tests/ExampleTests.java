@@ -20,7 +20,6 @@ import wyvern.tools.PythonCompiler;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 /** Runs the Wyvern compiler on the example source code in the wyvern/examples directory tree
@@ -148,7 +147,6 @@ public class ExampleTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testSealerUnsealer() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "capabilities.SealerUnsealer", null, null);
     }
