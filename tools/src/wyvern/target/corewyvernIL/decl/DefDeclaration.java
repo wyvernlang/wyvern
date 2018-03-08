@@ -133,7 +133,11 @@ public class DefDeclaration extends NamedDeclaration {
             // for debugging
             ValueType resultType = getType();
             bodyType.isSubtypeOf(resultType, methodCtx, r);
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, "method body's type", "declared type", r.getReason());
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
+                                  this,
+                                  "method body's type " + bodyType.desugar(methodCtx),
+                                  "declared type " + resultType.desugar(thisCtx),
+                                  r.getReason());
 
         }
         return new DefDeclType(getName(), type, formalArgs, effectSet);
