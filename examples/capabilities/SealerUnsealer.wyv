@@ -212,17 +212,21 @@ resource type Purse
 
 def makeMint(name:String):Mint
     var brandPair:BrandPair = makeBrandPair[Int -> Unit](name)
+    val blankBox:SealedBox[Int -> Unit] = new
+        type T = Int -> Unit
+        def shareContent():Unit
+            stdout.print("This is a blank box.")
     new (selfMint) =>
         def makePurse(balance:Int):Purse
             var balance:Int = balance
-            val decr:Int -> Int = ((amount:Int) => (balance = balance - amount))
+            val decr:Int -> Unit = ((amount:Int) => (balance = balance - amount))
             new (selfPurse) =>
                 def getBalance():Int = balance
                 def sprout():Purse = selfMint.makePurse(0)
                 def getDecr():SealedBox[Int -> Unit] = brandPair.sealer.seal(option.Some(decr))
                 def deposit(amount:Int, src:Purse):Unit
-                    var myBox:SealedBox[Int -> Unit] = brandPair.unsealer.unseal(src.getDecr())
-                    myBox.getOrElse(() => ((a:Int) => (-1)))(amount)
+                    var option:Option[Int -> Unit] = brandPair.unsealer.unseal(src.getDecr())
+                    option.getOrElse(() => (a:Int) => stdout.print("Blank box detected"))(amount)
                     balance = balance + amount
                 def print():Unit
                     stdout.print("Purse that has ")
@@ -257,7 +261,6 @@ def makeMint(name:String):Mint
 # value: 990
 */
 
-/*
 var carolMint:Mint = makeMint("Carol")
 carolMint.print()
 
@@ -281,4 +284,3 @@ stdout.print("Should be 10:\n")
 bobMainPurse.print()
 stdout.print("Should be 990:\n")
 aliceMainPurse.print()
-*/
