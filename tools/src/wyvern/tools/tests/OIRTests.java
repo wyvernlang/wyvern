@@ -637,8 +637,8 @@ public class OIRTests {
                 + "import debug\n\n"
                 + "val debug2 = debug(python)\n\n"
                       + "debug2.print(\"The world is buggy\")\n"
-                      + "\n";
-        testPyFromInput(input, "18");
+                      + "3\n";
+        testPyFromInput(input, "3");
     }
 
     @Test
