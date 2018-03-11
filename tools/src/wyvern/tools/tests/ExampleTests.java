@@ -153,7 +153,6 @@ public class ExampleTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testSealerUnsealer() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "capabilities.SealerUnsealer", null, null);
     }
