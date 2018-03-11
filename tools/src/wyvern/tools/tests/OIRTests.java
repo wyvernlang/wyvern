@@ -631,6 +631,17 @@ public class OIRTests {
     }
 
     @Test
+    public void testDebug() throws ParseException {
+        String input =
+                "require python\n\n"
+                + "import debug\n\n"
+                + "val debug2 = debug(python)\n\n"
+                      + "debug2.print(\"The world is buggy\")\n"
+                      + "\n";
+        testPyFromInput(input, "18");
+    }
+
+    @Test
     public void testIfResourceType() throws ParseException {
         String input =
                 "val obj = new\n"

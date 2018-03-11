@@ -241,9 +241,13 @@ public class ModuleResolver {
                 //program = wrap(program, dependencies);
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
-                ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
-                        oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
-                program = new New(moduleDecl);
+                if (oldModuleDecl.getFormalArgs().size() == 0) {
+                    program = oldModuleDecl.getBody();
+                } else {
+                    ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
+                            oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
+                    program = new New(moduleDecl);
+                }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 // rename according to "apply"

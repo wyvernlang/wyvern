@@ -133,6 +133,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testDebug() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.testDebug", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
     public void testCrossPlatformHello() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "xplatform.hello-via-writer", Util.unitType(), Util.unitValue());
     }
