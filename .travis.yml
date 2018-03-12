@@ -1,5 +1,7 @@
 language: java
 jdk: oraclejdk8
+install:
+  - pip install future
 script:
   - cd tools
   - ant test
