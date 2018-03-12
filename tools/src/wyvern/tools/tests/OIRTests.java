@@ -633,10 +633,10 @@ public class OIRTests {
     @Test
     public void testDebug() throws ParseException {
         String input =
-                "require python\n\n"
-                + "import debug\n\n"
-                + "val debug2 = debug(python)\n\n"
-                      + "debug2.print(\"The world is buggy\")\n"
+                        "require python\n\n"
+                      + "import debug\n\n"
+                      + "val debug2 = debug(python)\n\n"
+                      + "debug2.print(\"The world is buggy\n\")\n"
                       + "3\n";
         testPyFromInput(input, "3");
     }
