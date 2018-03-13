@@ -102,7 +102,7 @@ public class OIRTests {
             fw.write(pprint);
             fw.close();
 
-            Process p = Runtime.getRuntime().exec("python " + tempFile.getAbsolutePath());
+            Process p = Runtime.getRuntime().exec("python3 " + tempFile.getAbsolutePath());
 
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
