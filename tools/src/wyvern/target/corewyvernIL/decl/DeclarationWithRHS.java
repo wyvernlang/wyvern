@@ -30,7 +30,7 @@ public abstract class DeclarationWithRHS extends NamedDeclaration {
         ValueType myType = getType();
         FailureReason r = new FailureReason();
         if (!defType.isSubtypeOf(myType, thisCtx, r)) {
-            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this, r.getReason());
+            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this, defType.desugar(thisCtx), myType.desugar(thisCtx), r.getReason());
         }
         return getDeclType();
     }

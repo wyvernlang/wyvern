@@ -86,7 +86,7 @@ public class FieldSet extends Expression {
         FailureReason r = new FailureReason();
         // Make sure assigned type is compatible with the field's type.
         if (!varTypeExpr.isSubtypeOf(valTypeField, ctx, r)) {
-            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this, r.getReason());
+            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this, varTypeExpr.desugar(ctx), valTypeField.desugar(ctx), r.getReason());
         }
         return Util.unitType();
     }
