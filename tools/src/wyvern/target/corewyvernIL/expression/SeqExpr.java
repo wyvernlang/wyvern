@@ -195,4 +195,15 @@ public class SeqExpr extends Expression {
         }
         return freeVars;
     }
+
+    /** Works like addExpr, except that if body is a SeqExpr then the elements of the other SeqExpr are appended to this one.
+     * This allows us to avoid nested SeqExprs, which makes for a more understandable IL. */
+    public void merge(IExpr body) {
+        if (body instanceof SeqExpr) {
+            SeqExpr bodySE = (SeqExpr) body;
+            elements.addAll(bodySE.elements);
+        } else {
+            addExpr(body);
+        }
+    }
 }

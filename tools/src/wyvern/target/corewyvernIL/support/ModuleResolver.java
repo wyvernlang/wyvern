@@ -350,7 +350,8 @@ public class ModuleResolver {
     }
 
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
-        SeqExpr seqProg = (program instanceof SeqExpr) ? (SeqExpr) program : new SeqExpr().addExpr(program);
+        SeqExpr seqProg = new SeqExpr();
+        seqProg.merge(program);
         LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
         for (TypedModuleSpec spec : noDups) {
             Module m = resolveModule(spec.getQualifiedName());
