@@ -1,6 +1,7 @@
 resource type Stdout
-	type Printable
+    type Printable
 
-	def print(text : String) : Unit
-	def printInt(n : Int) : Unit
-	def println() : Unit
+    def print(text : String) : Unit
+    def printInt(n : Int) : Unit
+    def println() : Unit
+    def flush() : Unit

@@ -1,4 +1,4 @@
-module def stdout(python : Python)
+module def stdout(python : Python) : Stdout
 
 import wyvern.String
 
@@ -8,6 +8,7 @@ type Printable = Unit
 
 type PySysStdout
   def write(text : String) : Unit
+  def flush() : Unit
 type Sys
   val stdout : PySysStdout
 
@@ -16,3 +17,4 @@ val sys : Sys = sys
 def print(text : String) : Unit = sys.stdout.write(text)
 def printInt(n : Int) : Unit = sys.stdout.write(String(python).ofInt(n))
 def println() : Unit = sys.stdout.write("\n")
+def flush() : Unit = sys.stdout.flush()

@@ -118,7 +118,7 @@ public class ExampleTests {
 
     @Test
     public void testPalindromeChecker() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "rosetta/check-palindrome", Util.unitType(), Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "rosetta.check-palindrome", Util.unitType(), Util.unitValue());
     }
 
     @Test
@@ -129,6 +129,11 @@ public class ExampleTests {
     @Test
     public void testJavaFFI() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "ffi.callFromJava", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testDebug() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.testDebug", Util.unitType(), Util.unitValue());
     }
 
     @Test
@@ -146,12 +151,10 @@ public class ExampleTests {
         TestUtil.doTestScriptModularly(PATH, "capabilities.Caretaker", null, null);
     }
 
-    /*
     @Test
     public void testSealerUnsealer() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "capabilities.SealerUnsealer", null, null);
     }
-    */
 
     @Test
     public void testMembrane() throws ParseException {

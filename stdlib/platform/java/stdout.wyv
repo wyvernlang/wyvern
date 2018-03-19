@@ -1,4 +1,4 @@
-module def stdout(java : Java) /*: Stdout*/
+module def stdout(java : Java) : Stdout
 
 import java:wyvern.stdlib.support.Stdio.stdio
 
@@ -19,3 +19,6 @@ def printBoolean(b:Boolean):Unit
 
 def println():Unit
 	stdio.println()
+
+def flush():Unit
+	stdio.flush()

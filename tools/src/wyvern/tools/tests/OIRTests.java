@@ -102,7 +102,7 @@ public class OIRTests {
             fw.write(pprint);
             fw.close();
 
-            Process p = Runtime.getRuntime().exec("python " + tempFile.getAbsolutePath());
+            Process p = Runtime.getRuntime().exec("python3 " + tempFile.getAbsolutePath());
 
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -628,6 +628,17 @@ public class OIRTests {
                       + "stdout.println()\n"
                       + "v1 + v2\n";
         testPyFromInput(input, "8\n8");
+    }
+
+    @Test
+    public void testDebug() throws ParseException {
+        String input =
+                        "require python\n\n"
+                      + "import debug\n\n"
+                      + "val debug2 = debug(python)\n\n"
+                      + "debug2.print(\"The world is buggy\n\")\n"
+                      + "3\n";
+        testPyFromInput(input, "3");
     }
 
     @Test

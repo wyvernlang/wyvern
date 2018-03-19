@@ -1,8 +1,10 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -177,7 +179,7 @@ public class ModuleResolver {
         File f = null;
         for (File searchDir : searchPath) {
             f = findFile(names, searchDir.getAbsolutePath());
-            if (f.exists()) {
+            if (f != null && f.exists()) {
                 break;
             }
         }
@@ -190,6 +192,16 @@ public class ModuleResolver {
             filename += names[i];
         }
         File f = new File(filename);
+        try {
+            File canonical = f.getCanonicalFile();
+            String lastName = canonical.getName();
+            // make sure capitalization matches on Windows platforms
+            if (!lastName.equals(names[names.length - 1])) {
+                return null;
+            }
+        } catch (IOException e) {
+            return f;
+        }
         return f;
     }
 
@@ -229,9 +241,13 @@ public class ModuleResolver {
                 //program = wrap(program, dependencies);
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
-                ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
-                        oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
-                program = new New(moduleDecl);
+                if (oldModuleDecl.getFormalArgs().size() == 0) {
+                    program = oldModuleDecl.getBody();
+                } else {
+                    ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
+                            oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
+                    program = new New(moduleDecl);
+                }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 // rename according to "apply"
@@ -334,7 +350,18 @@ public class ModuleResolver {
     }
 
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
-        SeqExpr seqProg = (program instanceof SeqExpr) ? (SeqExpr) program : new SeqExpr().addExpr(program);
+        SeqExpr seqProg = new SeqExpr();
+        seqProg.merge(program);
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        for (TypedModuleSpec spec : noDups) {
+            Module m = resolveModule(spec.getQualifiedName());
+            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
+        }
+        return seqProg;
+    }
+
+    private LinkedList<TypedModuleSpec> deDuplicate(List<TypedModuleSpec> dependencies) {
         Set<String> wrapped = new HashSet<String>();
         LinkedList<TypedModuleSpec> noDups = new LinkedList<TypedModuleSpec>();
         for (int i = dependencies.size() - 1; i >= 0; i--) {
@@ -345,12 +372,7 @@ public class ModuleResolver {
                 noDups.addFirst(spec);
             }
         }
-        for (TypedModuleSpec spec : noDups) {
-            Module m = resolveModule(spec.getQualifiedName());
-            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
-            seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
-        }
-        return seqProg;
+        return noDups;
     }
 
     public static ModuleResolver getLocal() {
@@ -367,5 +389,28 @@ public class ModuleResolver {
 
     public File getLibDir() {
         return libDir;
+    }
+
+    /** de-duplicates dependencies and sorts them so that if A depends on B, A comes earlier in the list */
+    public List<TypedModuleSpec> sortDependencies(List<TypedModuleSpec> dependencies) {
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        noDups.sort(new Comparator<TypedModuleSpec>() {
+
+            @Override
+            public int compare(TypedModuleSpec o1, TypedModuleSpec o2) {
+                Module m1 = resolveModule(o1.getQualifiedName());
+                Module m2 = resolveModule(o2.getQualifiedName());
+                // if o1 depends on o2 then o1 should come first; wrapping will proceed from the end of the list
+                if (m1.dependsOn(o2)) {
+                    return -1;
+                } else if (m2.dependsOn(o1)) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+        });
+        return noDups;
     }
 }

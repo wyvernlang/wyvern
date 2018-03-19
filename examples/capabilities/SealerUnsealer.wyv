@@ -100,38 +100,41 @@ resource type SealedBox
     def shareContent():Unit
 
 resource type BrandSealer
-    def seal(object:Option):SealedBox[object.T]
+    type T
+    def seal(object:Option[this.T]):SealedBox[this.T]
 
 resource type BrandUnsealer
-    def unseal(box:SealedBox):Option[box.T]
+    type T
+    def unseal(box:SealedBox[this.T]):Option[this.T]
 
 resource type BrandPair
     type T
     var name:String
-    var sealer:BrandSealer
-    var unsealer:BrandUnsealer
+    var sealer:BrandSealer[this.T]
+    var unsealer:BrandUnsealer[this.T]
 
 def makeBrandPair[T](name:String):BrandPair[T]
     var shared:Option = option.None[SealedBox]()
-    def makeSealedBox(object:Option):SealedBox[object.T]
-        val newBox:SealedBox = new
-            type T = object.T
+    def makeSealedBox(object:Option[T]):SealedBox[T]
+        val newBox:SealedBox[T] = new
+            type T = T
             def shareContent():Unit
                 shared = object
         newBox
     new
         type T = T
         var name:String = name
-        var sealer:BrandSealer = new
-            def seal(object:Option):SealedBox[object.T]
+        var sealer:BrandSealer[T] = new
+            type T = T
+            def seal(object:Option[T]):SealedBox[T]
                 makeSealedBox(object)
-        var unsealer:BrandUnsealer = new
-            def unseal(box:SealedBox):Option[box.T]
-                shared = option.None[SealedBox]()
+        var unsealer:BrandUnsealer[T] = new
+            type T = T
+            def unseal(box:SealedBox[T]):Option[T]
+                shared = option.None[SealedBox[T]]()
                 box.shareContent()
-                var result:Option[box.T] = shared
+                var result:Option[T] = shared
                 result
-
 
 // Simple example of using brand pair from E Wiki:
 var alexBrandPair:BrandPair = makeBrandPair[String]("Alex")
@@ -144,19 +147,23 @@ var string:String = "Sealer and Unsealer Example\n"
 stdout.print(string + "\n")
 
 stdout.print("SHOULD BE: Alex's Secret\n")
-string = alexBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+var result:Option[String] = alexBrandPair.unsealer.unseal(alexBox)
+string = result.getOrElse(() => "NOTHING FOUND IN ALEX BOX")
 stdout.print(string + "\n")
 
 stdout.print("SHOULD BE: Jonathan's Secret\n")
-string = jonathanBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
-stdout.print(string + "\n")
-
-stdout.print("SHOULD BE: NOTHING FOUND IN JONATHAN BOX\n")
-string = alexBrandPair.unsealer.unseal(jonathanBox).getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+result = jonathanBrandPair.unsealer.unseal(jonathanBox)
+string = result.getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
 stdout.print(string + "\n")
 
 stdout.print("SHOULD BE: NOTHING FOUND IN ALEX BOX\n")
-string = jonathanBrandPair.unsealer.unseal(alexBox).getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+result = jonathanBrandPair.unsealer.unseal(alexBox)
+string = result.getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: NOTHING FOUND IN JONATHAN BOX\n")
+result = alexBrandPair.unsealer.unseal(jonathanBox)
+string = result.getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
 stdout.print(string + "\n")
 
 stdout.print("\nMINT EXAMPLE:\n")
@@ -199,22 +206,27 @@ resource type Mint
 resource type Purse
      def getBalance():Int
      def sprout():Purse
-     def getDecr():SealedBox[Int -> Int]
+     def getDecr():SealedBox[Int -> Unit]
      def deposit(amount:Int, src:Purse):Unit
      def print():Unit
 
 def makeMint(name:String):Mint
-    var brandPair:BrandPair = makeBrandPair[Int -> Int](name)
+    var brandPair:BrandPair = makeBrandPair[Int -> Unit](name)
+    val blankBox:SealedBox[Int -> Unit] = new
+        type T = Int -> Unit
+        def shareContent():Unit
+            stdout.print("This is a blank box.")
     new (selfMint) =>
         def makePurse(balance:Int):Purse
             var balance:Int = balance
-            val decr = (amount:Int) => (balance = balance - amount)
+            val decr:Int -> Unit = ((amount:Int) => (balance = balance - amount))
             new (selfPurse) =>
                 def getBalance():Int = balance
                 def sprout():Purse = selfMint.makePurse(0)
-                def getDecr():SealedBox[Int -> Int] = brandPair.sealer.seal(option.Some(decr))
+                def getDecr():SealedBox[Int -> Unit] = brandPair.sealer.seal(option.Some(decr))
                 def deposit(amount:Int, src:Purse):Unit
-                    brandPair.unsealer.unseal(src.getDecr()).getOrElse(() => ((a:Int) => (-1)))(amount)
+                    var option:Option[Int -> Unit] = brandPair.unsealer.unseal(src.getDecr())
+                    option.getOrElse(() => (a:Int) => stdout.print("Blank box detected"))(amount)
                     balance = balance + amount
                 def print():Unit
                     stdout.print("Purse that has ")
@@ -249,7 +261,6 @@ def makeMint(name:String):Mint
 # value: 990
 */
 
-/*
 var carolMint:Mint = makeMint("Carol")
 carolMint.print()
 
@@ -273,4 +284,3 @@ stdout.print("Should be 10:\n")
 bobMainPurse.print()
 stdout.print("Should be 990:\n")
 aliceMainPurse.print()
-*/

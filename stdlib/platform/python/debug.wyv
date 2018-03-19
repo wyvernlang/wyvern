@@ -1,0 +1,19 @@
+module def debug(python : Python)
+
+//import wyvern.String
+
+import python:sys
+import python:builtins
+
+type PySysStderr
+  def write(text : String) : Unit
+  def flush() : Unit
+type Sys
+  val stderr : PySysStderr
+
+val sys : Sys = sys
+
+def print(text : String) : Unit = sys.stderr.write(text)
+def printInt(n : Int) : Unit = sys.stderr.write(builtins.str(n))
+def println() : Unit = sys.stderr.write("\n")
+def flush() : Unit = sys.stderr.flush()
