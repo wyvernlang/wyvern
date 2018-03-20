@@ -1,0 +1,6 @@
+module def example5(fileIO : illustrations.FileIO)
+
+instantiate logger(fileIO) as logger
+instantiate wavyUnderlineV1() as wavyUnderliner
+
+val x : system.Int = wavyUnderliner.underlineIt()

@@ -1,0 +1,9 @@
+import wyvern.Int // TODO: should not be necessary
+import metadata tsls.postfix
+
+val expr:postfix.PostfixExpr = ~
+  23
+// Note: removing this line and the next two makes this test case work
+type Foo
+  val Bar : Int
+expr.eval()

@@ -1,0 +1,6 @@
+module def dummyTakerDef(d : effects.DummyType)
+effect e4 = {}
+effect e5 = {e4, d.e3}
+def m5() : {e5} String
+    val s:String = d.m3()
+    "dummyTakerDef.m5()"

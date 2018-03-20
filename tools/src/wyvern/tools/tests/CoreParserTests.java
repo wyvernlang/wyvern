@@ -71,4 +71,28 @@ public class CoreParserTests {
                 + "obj.getValue()\n";
         TestUtil.doTestInt(input, 5);
     }
+
+    @Test
+    public void testDatatypeDecl() throws ParseException {
+        String input = ""
+                + "datatype Exp\n"
+                + "    Var(name: String)\n"
+                + "    Apply(fn: Exp, arg: Exp)\n"
+                + "    Lambda(param: String, body: Exp)\n"
+                + "    Unit\n"
+                + "5\n";
+        TestUtil.doTestInt(input, 5);
+    }
+
+    @Test
+    public void testDatatypeDecl2() throws ParseException {
+        String input = ""
+                + "datatype Color\n"
+                + "    Red\n"
+                + "    Blue\n"
+                + "    Green\n"
+                + "    Yellow\n"
+                + "5\n";
+        TestUtil.doTestInt(input, 5);
+    }
 }

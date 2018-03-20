@@ -1,0 +1,18 @@
+// Example from the Wyvern guide
+// TODO: fully qualified name here, wyvern.examples.logging
+resource module logging
+
+import wyvern.collections.list
+require files
+
+resource type Log
+	// TODO: allow Unit to be left off, as in Scala?
+	def log(x:String):Unit
+
+def makeLog(path:String):Log
+	val logFile = files.openForAppend(path)
+	val messageList = list.make()
+	new
+		def log(x:String):Unit
+			messageList.append(x)
+			logFile.print(x)

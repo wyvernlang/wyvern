@@ -1,0 +1,4 @@
+module def logger(logIO : illustrations.FileIO)
+
+def log(entry : Int) : Int
+	logIO.write(entry)

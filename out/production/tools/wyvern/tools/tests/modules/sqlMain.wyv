@@ -1,0 +1,10 @@
+require db.stringSQL
+
+import db.safeSQL
+import modules.sqlApplication
+
+val sql = safeSQL(stringSQL)
+
+val app = sqlApplication(sql)
+
+app.run()

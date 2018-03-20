@@ -1,0 +1,9 @@
+module lists
+
+val listFactory = new
+	type List
+		val contents : Int
+
+	def create():this.List
+		new
+			val contents = 5

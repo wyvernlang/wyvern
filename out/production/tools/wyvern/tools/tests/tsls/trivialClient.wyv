@@ -1,0 +1,10 @@
+require stdout
+
+import metadata tsls.TrivialTSL
+
+def run(t:TrivialTSL):Int
+  t.eval()
+val x = run(~)
+  don't really care about this!
+stdout.printInt(x)
+x

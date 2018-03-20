@@ -1,0 +1,5 @@
+import modules.importWithoutMetadata
+import metadata wyvern.collections.list
+
+val l : list.List = { 1, 2, 3 }
+l.length()

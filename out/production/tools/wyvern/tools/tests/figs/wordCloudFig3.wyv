@@ -1,0 +1,7 @@
+module def wordCloudFig3(log : figs.Logger) : figs.WordCloud
+
+import figs.listFactory
+
+val words : listFactory.List = listFactory.create()
+
+val x : system.Int = words.contents

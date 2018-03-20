@@ -1,0 +1,12 @@
+require java
+
+import figs.fileIO
+import figs.logger
+import figs.wordCloudFig3
+
+val io = fileIO(java)
+val log = logger(io)
+
+val wc = wordCloudFig3(log)
+
+wc.x

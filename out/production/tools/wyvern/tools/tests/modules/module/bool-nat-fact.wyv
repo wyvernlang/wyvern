@@ -1,0 +1,56 @@
+// a simple library for natural numbers and booleans,
+// and a recursive implementation of the factorial function
+
+type UnitNatFn
+	def apply():Nat
+
+type NatNatFn
+	def apply(n:Nat):Nat
+
+type Bool
+	def iff(trueCase:UnitNatFn, falsecase:UnitNatFn):Nat
+
+type Nat
+	//def equals(n:Nat):Bool
+	def isZero():Bool
+	def caseAnalyze(zeroCase:UnitNatFn, succCase:NatNatFn):Nat
+	def plus(n:Nat):Nat
+	def times(n:Nat):Nat
+	
+
+val True : Bool = new
+	def iff(trueCase:UnitNatFn, falsecase:UnitNatFn):Nat
+		trueCase()
+	 
+val False : Bool = new
+	def iff(trueCase:UnitNatFn, falseCase:UnitNatFn):Nat
+		falseCase()
+	
+// TODO(3 - delegate): really need to rename "this" in the source syntax
+val zero : Nat = new //z =>
+	def isZero():Bool
+		True
+	def caseAnalyze(zeroCase:UnitNatFn, succCase:NatNatFn):Nat
+		zeroCase()
+	def plus(n:Nat):Nat
+		n
+	def times(n:Nat):Nat
+		this // z
+
+def succ(n:Nat):Nat
+	new
+		def isZero():Bool
+			False
+		def caseAnalyze(zeroCase:UnitNatFn, succCase:NatNatFn):Nat
+			succCase(n)
+		def plus(n1:Nat):Nat
+			succ(n.plus(n1))
+		def times(n1:Nat):Nat
+			succ(n.times(n1).plus(n))
+			
+def fact(n:Nat):Nat
+	n.caseAnalyze(
+		() => succ(zero),
+		(p:Nat) => n.times(fact(p)))
+
+fact(succ(succ(succ(zero))))
