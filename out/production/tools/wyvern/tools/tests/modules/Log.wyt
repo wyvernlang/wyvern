@@ -1,2 +1,0 @@
-resource type Log
-	def log(x:Str) : Unit

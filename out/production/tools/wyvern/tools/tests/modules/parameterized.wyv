@@ -1,3 +1,0 @@
-module def parameterized(formal : modules.Formal)
-
-def getFive():Int = formal.f()

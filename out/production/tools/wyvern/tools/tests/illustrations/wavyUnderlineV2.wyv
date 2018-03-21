@@ -1,6 +1,0 @@
-module def wavyUnderlineV2()
-
-import illustrations.userInfo as userInfo
-
-def leakUserInfo() : system.Int
-	userInfo.getName()

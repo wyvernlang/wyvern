@@ -1,7 +1,0 @@
-module def wordProcessor(io : figs.FileIO) : figs.WordProcessor
-
-import figs.logger
-
-val log = logger(io)
-
-val x : system.Int = 5

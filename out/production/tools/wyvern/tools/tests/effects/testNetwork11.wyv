@@ -1,6 +1,0 @@
-require stdout
-import effects.network11
-
-val n11 = network11(stdout)
-n11.sendData("Network11 with effects")	// print "data sent: Network11 with effects"
-n11.receiveData()		// print "data received"

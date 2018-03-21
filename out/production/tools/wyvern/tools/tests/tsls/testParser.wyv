@@ -1,3 +1,0 @@
-import tsls.parser
-
-parser.parse("54  *3-").getOrElse(()=>-1)

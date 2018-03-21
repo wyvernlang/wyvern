@@ -1,2 +1,0 @@
-module three : Three
-def m(y: system.Int) : system.Int = 42
