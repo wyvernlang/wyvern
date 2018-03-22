@@ -7,7 +7,9 @@ import java:wyvern.stdlib.support.Stdio.stdio
 // not associated with the standard output stream in particular
 type Printable = Unit
 
-
+/* Note: print() may not print right away. To print right away,
+either add a '\n' to the string you want to print, to use println()
+instead, or call flush() right after print(). */
 def print(text:String):Unit
 	stdio.print(text)
 
