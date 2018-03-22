@@ -1,0 +1,20 @@
+module def wyvernHandler(python: Python)
+import HTTPRequestHandler
+import python:builtins
+
+def setHeaders(hrh: HTTPRequestHandler): Unit
+  hrh.send_response(200)
+  hrh.send_header("Content-type", "text/html")
+  hrh.end_headers()
+
+def doGET(hrh: HTTPRequestHandler): Unit
+  setHeaders(hrh)
+  hrh.wfile.write(builtins.bytes("<html><body><h1>Hello there!</h1></body></html>", "utf-8"))
+
+def doHEAD(hrh: HTTPRequestHandler): Unit
+  setHeaders(hrh)
+
+def doPOST(hrh: HTTPRequestHandler): Unit
+  // Doesn't do anything with posted data
+  setHeaders(hrh)
+  hrh.wfile.write(builtins.bytes("<html><body><h1>POST request received!</h1></body></html>", "utf-8"))
