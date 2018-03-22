@@ -386,19 +386,16 @@ AST DatatypeDeclaration() :
   Object tagInfo = null; boolean isResource = false;
 }
 {
-  [<TAGGED> { isTagged = true; } ]
   [<RESOURCE> { isResource = true; } ]
   <DATATYPE> name=<IDENTIFIER>
-  [ <EXTENDS> extendedType=Type() ]
-  [ <COMPRISES> comprisesList=TypeList() ]
-  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW> ]
+  [ <LPAREN> <IDENTIFIER> <RPAREN> <ARROW> ]
   <NEWLINE> <INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT> {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
-    String self = (selfName == null) ? null : selfName.image;
+    String self = null;
 	return build.datatypeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
   }
 }

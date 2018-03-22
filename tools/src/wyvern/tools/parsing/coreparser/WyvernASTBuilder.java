@@ -115,7 +115,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST constructDeclType(String name, List<String> generics, List args, FileLocation loc) {
-        return new ConstructDeclaration(name, args, null, loc);
+        return new ConstructDeclaration(name, args, loc);
     }
 
     @Override

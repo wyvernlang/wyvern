@@ -16,19 +16,15 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 
 public class ConstructDeclaration extends Declaration implements CoreAST {
-    private ExpressionAST definition;
     private NameBinding binding;
     private List<NameBinding> argNames;
 
-    public ConstructDeclaration(String name, List<NameBinding> argNames, TypedAST definition, FileLocation location) {
-        this.definition = (ExpressionAST) definition;
-        binding = new NameBindingImpl(name, null);
+    public ConstructDeclaration(String name, List<NameBinding> argNames, FileLocation location) {
+        binding = new NameBindingImpl(name, new UnresolvedType(name, FileLocation.UNKNOWN));
         this.argNames = argNames;
         this.location = location;
     }
@@ -48,19 +44,9 @@ public class ConstructDeclaration extends Declaration implements CoreAST {
         return binding.getName();
     }
 
-    public ExpressionAST getDefinition() {
-        return definition;
-    }
-
     private FileLocation location = FileLocation.UNKNOWN;
     public FileLocation getLocation() {
-        return this.location; //TODO
-    }
-
-    @Override
-    public void genTopLevel(TopLevelContext tlc) {
-        ValueType declType = getILValueType(tlc.getContext());
-        tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
+        return this.location;
     }
 
     @Override
@@ -92,7 +78,7 @@ public class ConstructDeclaration extends Declaration implements CoreAST {
         }
 
         //need to create ConstructDeclaration which accepts args
-        return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, definition.generateIL(ctx, expectedType, null), location);
+        return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, null, location);
     }
 
     @Override
@@ -116,11 +102,7 @@ public class ConstructDeclaration extends Declaration implements CoreAST {
         StringBuilder sb = new StringBuilder();
         sb.append("constructor ");
         sb.append(" : ");
-        if (definition != null) {
-            sb.append(definition.prettyPrint());
-        } else {
-            sb.append("null");
-        }
+        sb.append("null");
         return sb;
     }
 }
