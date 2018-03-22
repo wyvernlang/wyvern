@@ -510,7 +510,6 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
             if (state.isExpectingReturn()) {
                 int tcoId = uniqueId;
                 uniqueId++;
-
                 String tcoWrapper =
                         "def tcoFn" + Integer.toString(tcoId) + "():\n"
                                     + indent + indentIncrement + wrapTcoTry(state, resultTco, resultNoTco, indent + indentIncrement) + "\n"

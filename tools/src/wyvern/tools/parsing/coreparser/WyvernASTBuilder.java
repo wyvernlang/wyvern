@@ -206,7 +206,6 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST addArguments(TypedAST application, List<String> names, List<TypedAST> arguments) throws ParseException {
         if (!(application instanceof Application)) {
             ToolError.reportError(ErrorMessage.ILLEGAL_JUXTAPOSITION, application);
-            //throw new ParseException("Juxtaposed an additional argument to something that was not an application");
         }
         Application app = (Application) application;
         List<Type> generics = app.getGenerics();

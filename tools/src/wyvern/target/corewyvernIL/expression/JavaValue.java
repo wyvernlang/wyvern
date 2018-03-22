@@ -100,7 +100,6 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else {
             // return it as a unit; try to do better than this later
             return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
-            //throw new RuntimeException("some Java->Wyvern cases not implemented");
         }
     }
 
