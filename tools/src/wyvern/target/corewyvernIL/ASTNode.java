@@ -46,7 +46,6 @@ public abstract class ASTNode implements HasLocation, IASTNode, HasMetadata {
         dest.append("NOT_IMPLEMENTED(")
         .append(this.getClass().getName())
         .append(')');
-        //throw new RuntimeException("not implemented");
     }
 
     @Override
