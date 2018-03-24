@@ -1,0 +1,23 @@
+require stdout
+
+import modules.cell
+
+// TODO: get the following line to work
+// import modules.TCell
+
+// do this instead temporarily
+type TCell
+    resource type Cell
+        def set(newValue:Int):Unit
+        def get():Int
+    
+    def make(initVal:Int):this.Cell
+
+// illustrates that the module "cell" has its own type matching TCell
+// in fact we can and do use cell and cell2 interchangably below
+val cell2: TCell = cell
+
+val myCell : cell.Cell = cell2.make(3)
+myCell.set(7)
+stdout.printInt(myCell.get())
+myCell.get() // evalutes to 7

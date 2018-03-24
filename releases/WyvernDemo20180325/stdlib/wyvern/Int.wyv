@@ -1,0 +1,6 @@
+module Int
+
+import java:wyvern.stdlib.support.Int.utils
+
+def from(str:String):Int
+	utils.from(str)

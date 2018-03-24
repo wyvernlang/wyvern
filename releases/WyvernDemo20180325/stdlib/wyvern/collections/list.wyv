@@ -1,0 +1,28 @@
+module list
+
+import wyvern.internal.ast
+import wyvern.internal.list
+import wyvern.option
+import wyvern.util.matching.regex
+import metadata wyvern.IfTSL
+
+type List = list.List
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option[ast.AST]
+      val exprList : list.List = ast.parseExpressionList(input, ctx)
+      val n = exprList.length()
+      val listIdent = ast.genIdent()
+      def build(i : Int, listAST : ast.AST) : ast.AST
+        IfTSL.doif(i > 0, ~)
+          then
+            val appendArgs : list.List = list.make()
+            appendArgs.append(exprList.get(i - 1).getOrElse(() => 0))
+            val appendAST : ast.AST = ast.call(ast.variable(listIdent), "append", appendArgs)
+            build(i - 1, ast.let(ast.genIdent(), ast.types.unit(), appendAST, listAST))
+          else
+            listAST
+      val appendsAST = build(n, ast.variable(listIdent))
+      option.Some[ast.AST](ast.let(listIdent, ast.types.nominal("list", "List"), ast.call(ast.variable("list"), "make", list.make()), appendsAST))
+
+def make():List = list.make()
+

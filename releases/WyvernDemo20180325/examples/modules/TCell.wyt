@@ -1,0 +1,6 @@
+type TCell
+    resource type Cell
+        def set(newValue:Int):Unit
+        def get():Int
+    
+    def make(initVal:Int):this.Cell

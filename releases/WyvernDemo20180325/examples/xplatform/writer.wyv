@@ -1,0 +1,8 @@
+module def writer(p:Platform)
+
+import stdout
+
+val stdout2 = stdout(p)
+
+def print(s:String):Unit
+    stdout2.print(s)

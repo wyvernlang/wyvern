@@ -1,0 +1,15 @@
+require stdout
+
+import modules.cellAsModule
+
+val m1 = cellAsModule()	
+val m2 = cellAsModule()
+m1.set(1)
+m2.set(2)
+
+stdout.printInt(m1.get())
+stdout.print("\n")
+stdout.printInt(m2.get())
+
+m1.get() // evalutes to 1
+m2.get() // evalutes to 2

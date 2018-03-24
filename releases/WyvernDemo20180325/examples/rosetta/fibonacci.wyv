@@ -1,0 +1,16 @@
+require stdout
+
+def fibRec(n:Int):Int
+	(n < 2).ifTrue(
+		() => n,
+		() => fibRec(n-1) + fibRec(n-2)
+	)
+/* IDEAL SYNTAX:
+	if n < 2:
+	    2
+	  else
+	    fibRec(n-1) + fibRec(n-2)
+*/
+
+stdout.print("Fib(10) = ")
+stdout.printInt(fibRec(10))

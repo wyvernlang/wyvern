@@ -1,0 +1,48 @@
+module def io(java:Java)
+import java:wyvern.stdlib.support.IO.io
+
+// === Library Types ===
+type InputStream
+    def close():Unit
+
+type OutputStream
+    def close():Unit
+
+type DataInputStream
+    def readUTF():String
+    def close():Unit
+
+type DataOutputStream
+    def writeUTF(str:String):Unit
+    def close():Unit
+
+type Socket
+    def getOutputStream():OutputStream
+    def getInputStream():InputStream
+    def close():Unit
+
+type ServerSocket
+    def accept():Socket
+
+// === Creator Functions ===
+def makeServerSocket(port:Int):ServerSocket
+    io.makeServerSocket(port)
+
+def makeSocket(hostname:String, port:Int):Socket
+    io.makeSocket(hostname, port)
+
+/**
+* TODO: Hide functions that take arg:Dyn from the user
+*/
+
+def getDataOutputStream(out:Dyn):DataOutputStream // This will be the hidden function
+    io.getDataOutputStream(out)
+
+def makeDataOutputStream(out:OutputStream):DataOutputStream
+    getDataOutputStream(out)
+
+def getDataInputStream(in:Dyn):DataInputStream // This will be the hidden function
+    io.getDataInputStream(in)
+
+def makeDataInputStream(in:InputStream):DataInputStream
+    getDataInputStream(in)

@@ -1,0 +1,14 @@
+resource type Cell
+    def set(newValue:Int):Unit
+    def get():Int
+
+def makeCell(initVal:Int):Cell = new
+    var value : Int = initVal
+    def set(newValue:Int):Unit
+        this.value = newValue
+    def get():Int = this.value
+
+val c = makeCell(5)
+c.get() // evalutes to 5
+c.set(3)
+c.get() // evalutes to 3

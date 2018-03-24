@@ -1,0 +1,12 @@
+resource type SafeSQL (self) =>
+	resource type SSQL
+		val row:String
+		val from:String
+		def execute():String
+		
+	resource type SQLSelect
+		val row:String
+		def from(table:String):self.SSQL
+
+	def querySelectFromWhereEquals(selectColumn:String, table:String, \
+								   checkColumn:String, searchValue:String):Int

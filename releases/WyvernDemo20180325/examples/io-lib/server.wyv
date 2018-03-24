@@ -1,0 +1,32 @@
+/**
+* This is a simple example server program based off
+* of the following example: http://www.buyya.com/java/Chapter13.pdf
+*/
+
+require java
+require stdout
+import io
+val ioobj = io(java)
+
+
+// Make a ServerSocket on port 1254
+val serverSocket = ioobj.makeServerSocket(1254)
+
+// Wait and accept a connection
+stdout.print("Waiting for a client connection...\n")
+val s1 = serverSocket.accept()
+stdout.print("Accepted a connection.\n")
+
+// Get a communication stream associated with the socket
+val s1out = s1.getOutputStream()
+
+val dos = ioobj.makeDataOutputStream(s1out)
+
+dos.writeUTF("This is a server message\n")
+stdout.print("Wrote to DataOutputStream\n")
+
+// Close the connection but not the server socket
+dos.close()
+// Call to "s1out.close()" causes an error.
+// This call is not necessary, but was provided in the example cited.
+s1.close()

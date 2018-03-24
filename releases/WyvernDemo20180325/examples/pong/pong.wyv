@@ -1,0 +1,273 @@
+require pygame
+require wyvern.String
+
+import metadata wyvern.IfTSL
+
+resource type GameLoop
+  val fps : Int
+  val done : Boolean
+  def oneIteration() : Unit
+  def processEvent(e : pygame.Event) : Unit
+
+val clock : pygame.Clock = pygame.helper.makeClock()
+
+def processEvents(gameLoop : GameLoop) : Unit
+  val event = pygame.event.poll()
+  def f() : Unit
+    gameLoop.processEvent(event)
+    processEvents(gameLoop)
+  (pygame.helper.getType(event) == pygame.NOEVENT).ifTrue(() => 0, () => f())
+
+def run(gameLoop : GameLoop) : Unit
+  clock.tick(gameLoop.fps)
+  gameLoop.oneIteration()
+  processEvents(gameLoop)
+  IfTSL.doifR(gameLoop.done, ~)
+    then
+      0
+    else
+      run(gameLoop)
+
+val width = 640
+val height = 480
+val screen = pygame.display.set_mode(pygame.helper.make2Tuple(width, height), 0, 0)
+
+pygame.mixer.pre_init(44100, -16, 1, 512)
+pygame.mixer.init()
+
+val blip = pygame.mixer.Sound("blip.wav")
+val blop = pygame.mixer.Sound("blop.wav")
+
+resource type Paddle
+  def draw(screen : pygame.Surface) : Unit
+  def update() : Unit
+  def processEvent(e : pygame.Event) : Unit
+  def hitbox() : pygame.Rect
+
+resource type NonInteractivePaddle
+  var speed : Int
+  var y : Int
+  def draw(screen : pygame.Surface) : Unit
+  def update() : Unit
+  def hitbox() : pygame.Rect
+  def setPaddleSpeed(speed : Int) : Unit
+
+val paddleWidth = 20
+val paddleHeight = 60
+
+resource type Scoreboard
+  var playerScore : Int
+  var opponentScore : Int
+  def draw(screen : pygame.Surface) : Unit
+
+def makeScoreboard() : Scoreboard
+  pygame.font.init()
+  val font = pygame.font.SysFont(pygame.font.get_default_font(),
+                                 80,
+                                 false,
+                                 false)
+  new
+    var playerScore : Int = 0
+    var opponentScore : Int = 0
+    
+    def draw(screen : pygame.Surface) : Unit
+      val playerSurf = font.render(String.ofInt(this.playerScore),
+                                   true,
+                                   pygame.helper.white)
+      val opponentString = String.ofInt(this.opponentScore)
+      val opponentSurf = font.render(opponentString,
+                                     true,
+                                     pygame.helper.white)
+      val spacing = 100
+      val fromTop = 40
+      screen.blit(playerSurf, pygame.Rect(width / 2 - spacing, fromTop, 0, 0))
+      screen.blit(opponentSurf, pygame.Rect(width / 2 + spacing - pygame.helper.fst(font.size(opponentString)), fromTop, 0, 0))
+
+val scoreboard = makeScoreboard()
+
+def makePaddle(paddleX : Int) : NonInteractivePaddle = new
+  val x = paddleX
+  var y : Int = (height - paddleHeight) / 2
+  var speed : Int = 0
+
+  def draw(screen : pygame.Surface) : Unit
+    pygame.draw.rect(screen, pygame.helper.white, this.hitbox(), 0)
+
+  def hitbox() : pygame.Rect
+    pygame.Rect(this.x, this.y, paddleWidth, paddleHeight)
+
+  def update() : Unit
+    this.y = this.y + this.speed
+    IfTSL.doifR(this.y + paddleHeight > height, ~)
+      then
+        this.y = height - paddleHeight
+    IfTSL.doifR(this.y < 0, ~)
+      then
+        this.y = 0
+
+  def setPaddleSpeed(speed : Int) : Unit
+    this.speed = speed
+
+def makePlayerPaddle() : Paddle = new
+  var upPressed : Boolean = false
+  var downPressed : Boolean = false
+  val paddle = makePaddle(10)
+  def draw(screen : pygame.Surface) : Unit = this.paddle.draw(screen)
+  def update() : Unit = this.paddle.update()
+  def hitbox() : pygame.Rect = this.paddle.hitbox()
+  def processEvent(e : pygame.Event) : Unit
+    val eventType = pygame.helper.getType(e)
+    IfTSL.doifR(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP, ~)
+      then
+        IfTSL.doifR(e.key == pygame.K_UP,  ~)
+          then
+            this.upPressed = (eventType == pygame.KEYDOWN)
+          else
+            IfTSL.doifR(e.key == pygame.K_DOWN, ~)
+              then
+                this.downPressed = (eventType == pygame.KEYDOWN)
+    IfTSL.doifR(this.upPressed, ~)
+      then
+        this.paddle.speed = -3
+      else
+        IfTSL.doifR(this.downPressed, ~)
+          then
+            this.paddle.speed = 3
+          else
+            this.paddle.speed = 0
+
+val ball = new
+  var x : Int = 0
+  var y : Int = 0
+  val radius = 10
+  var xSpeed : Int = 2
+  var ySpeed : Int = 2
+
+  def draw(screen : pygame.Surface) : Unit
+    pygame.draw.circle(screen,
+                       pygame.helper.white,
+                       pygame.helper.make2Tuple(this.x, this.y),
+                       this.radius)
+
+  def flipX() : Unit
+    this.xSpeed = -this.xSpeed
+    blip.play()
+
+  def flipXBlop() : Unit
+    this.xSpeed = -this.xSpeed
+    blop.play()
+
+  def flipY() : Unit
+    this.ySpeed = -this.ySpeed
+    blip.play()
+
+  def update(leftHitbox : pygame.Rect, rightHitbox : pygame.Rect) : Unit
+    IfTSL.doifR(this.x < 0, ~)
+      then
+        this.flipX()
+        scoreboard.opponentScore = scoreboard.opponentScore + 1
+    IfTSL.doifR(this.x > width, ~)
+      then
+        this.flipX()
+        scoreboard.playerScore = scoreboard.playerScore + 1
+    IfTSL.doifR(this.y < 0 || this.y > height, ~)
+      then
+        this.flipY()
+
+    IfTSL.doifR(this.x < leftHitbox.right &&
+                this.x > leftHitbox.left &&
+                this.y > leftHitbox.top &&
+                this.y < leftHitbox.bottom &&
+                this.xSpeed < 0,
+                ~)
+      then
+        this.flipXBlop()
+
+    IfTSL.doifR(this.x < rightHitbox.right &&
+                this.x > rightHitbox.left &&
+                this.y > rightHitbox.top &&
+                this.y < rightHitbox.bottom &&
+                this.xSpeed > 0,
+                ~)
+      then
+        this.flipXBlop()
+
+    this.x = this.x + this.xSpeed
+    this.y = this.y + this.ySpeed
+
+def makeAIPaddle() : Paddle = new
+  val paddle = makePaddle(width - 30)
+  def draw(screen : pygame.Surface) : Unit = this.paddle.draw(screen)
+  def update() : Unit
+    val center = this.paddle.y + paddleWidth / 2
+    IfTSL.doifR(center > ball.y, ~)
+      then
+        this.paddle.speed = -2
+      else
+        this.paddle.speed = 0
+    IfTSL.doifR(center < ball.y, ~)
+      then
+        this.paddle.speed = 2
+    this.paddle.update()
+  def hitbox() : pygame.Rect = this.paddle.hitbox()
+  def processEvent(e : pygame.Event) : Unit = 0
+
+val loop : GameLoop = new
+  val fps = 144
+  var y : Int = 10
+  var done : Boolean = false
+
+  var upPressed : Boolean = false
+  var downPressed : Boolean = false
+
+  val width = 20
+  val height = 60
+
+  val playerPaddle = makePlayerPaddle()
+  val aiPaddle = makeAIPaddle()
+
+  def oneIteration() : Unit
+    screen.fill(pygame.helper.black)
+    scoreboard.draw(screen)
+    this.playerPaddle.draw(screen)
+    this.aiPaddle.draw(screen)
+    ball.draw(screen)
+    pygame.display.flip()
+
+    val gameLoop = this
+    this.playerPaddle.update()
+    IfTSL.doifR(this.upPressed, ~)
+      then
+        gameLoop.y = gameLoop.y - 2
+    IfTSL.doifR(this.downPressed, ~)
+      then
+        gameLoop.y = gameLoop.y + 2
+    ball.update(this.playerPaddle.hitbox(), this.aiPaddle.hitbox())
+    this.aiPaddle.update()
+
+  def processEvent(e : pygame.Event) : Unit
+    val eventType = pygame.helper.getType(e)
+    this.playerPaddle.processEvent(e)
+    IfTSL.doifR(eventType == pygame.QUIT, ~)
+      then
+        this.done = true
+    def keyEvents() : Unit
+      IfTSL.doifR(e.key == pygame.K_UP, ~)
+        then
+          this.upPressed = (eventType == pygame.KEYDOWN)
+      IfTSL.doifR(e.key == pygame.K_DOWN, ~)
+        then
+          this.downPressed = (eventType == pygame.KEYDOWN)
+      IfTSL.doifR(e.key == pygame.K_ESCAPE, ~)
+        then
+          this.done = true
+    IfTSL.doifR(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP, ~)
+      then
+        keyEvents()
+    
+
+run(loop)
+pygame.quit()
+
+// blip.wav made by NoiseCollector at https://www.freesound.org/people/NoiseCollector/sounds/4391/
+// blop.wav made by NoiseCollector at https://www.freesound.org/people/NoiseCollector/sounds/4385/

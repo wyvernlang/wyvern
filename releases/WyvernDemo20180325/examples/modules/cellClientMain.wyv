@@ -1,0 +1,10 @@
+require stdout
+
+import modules.cellAsModule
+import modules.cellClientFunctor
+
+val client = cellClientFunctor(cellAsModule())
+client.addOne()
+
+stdout.printInt(client.getValue())
+client.getValue() // evalutes to 1
