@@ -1,0 +1,35 @@
+require stdout
+import metadata wyvern.IfTSL
+val iff = (x:Boolean, y:IfTSL.IfExprR) => IfTSL.doifR(x,y)
+
+def checkPalindrome(s:String):Boolean
+    iff (s.length() < 2, ~)
+        then
+            true
+        else
+            (s.charAt(0) == s.charAt(s.length()-1)) && checkPalindrome(s.substring(1, s.length()-1)) // [start_ind, end_ind)
+
+def printResult(s:String): Unit
+    iff (checkPalindrome(s), ~)
+        then
+            stdout.print("\"")
+            stdout.print(s) 
+            stdout.print("\" is a palindrome.")
+        else
+            stdout.print("\"")
+            stdout.print(s)
+            stdout.print("\" is not a palindrome.")
+    stdout.print("\n") // newline
+
+printResult("abccba") // palindromes
+printResult("racecar")
+printResult("")
+printResult("6")
+printResult("definitely not a palindrome") // not palindromes
+printResult("abcda")
+
+
+
+// string examples: examples/introductory/strings.wyv
+
+// it seems that && would be interpreted as short-circuited based on wyvern/tools/src/wyvern/target/corewyvernIL/expression/BooleanLiteral.java

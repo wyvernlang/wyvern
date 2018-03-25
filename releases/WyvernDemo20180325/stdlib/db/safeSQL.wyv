@@ -1,0 +1,26 @@
+module def safeSQL(stringSQL : db.StringSQL)
+
+resource type SSQL
+	val row:String
+	val from:String
+	def execute():String
+	
+resource type SQLSelect
+	val row:String
+	def from(table:String):SSQL
+
+def select(row:String):SQLSelect = new
+	val row:String = row
+	def from(table:String):SSQL = new
+		val row:String = row
+		val from:String = table
+		def execute():String
+			stringSQL.prepare("SELECT %1 FROM %2").apply(row, table).query()
+
+
+
+def querySelectFromWhereEquals(selectColumn:String, table:String, \
+							   checkColumn:String, searchValue:String):Int
+	val genericQuery = stringSQL.prepareSelectFromWhereEquals(selectColumn, table, checkColumn)
+	val actualQuery = stringSQL.substitute(genericQuery,searchValue)
+	stringSQL.runQuery(actualQuery)

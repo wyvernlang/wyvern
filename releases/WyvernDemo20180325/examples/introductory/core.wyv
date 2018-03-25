@@ -1,0 +1,44 @@
+/* This file is as close as you can get to pure Wyvern type theory.
+ * We use no top-level declarations, just a single expression.
+ * The file uses all the interesting core concepts of Wyvern.
+ * NOTE: the file currently parses, but does not evaluate successfully.
+ */
+
+new (this) =>
+    resource type Account (self) =>
+        val max : system.Int
+        var current : system.Int
+        def deposit(money : system.Int) : system.Unit
+        type AccountType
+        def duplicate() : this.Account[self.AccountType]
+        
+    val a:this.Account = new (self) =>
+        val name : system.String = "an Account"
+        var current : system.Int = 0
+        def deposit(money : system.Int) : system.Unit
+            self.current = self.current + money
+        type AccountType = system.Int
+        def duplicate() : this.Account[self.AccountType]
+            self
+            
+    def setup():system.Unit
+        this.a.deposit(100)
+        
+    def dependentFunction(a:this.Account, b:this.Account[a.AccountType]):this.Account[b.AccountType]
+        b
+
+    def id(t:this.a.AccountType):this.a.AccountType = t
+
+    tagged type List comprises this.Cons, this.Nil
+        type T
+    tagged type Cons extends this.List
+        type T
+        val value:this.T
+        val next:this.List
+    tagged type Nil extends this.List
+        type T
+
+    def getFirst(list:this.List[system.Int]):system.Int
+        match list:
+            c:this.Cons => c.value
+            n:this.Nil => 0

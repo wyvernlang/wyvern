@@ -1,0 +1,20 @@
+type Box
+    type T
+    val contents: this.T
+    def copy():Box[this.T]
+    
+def makeBox[X](contents:X):Box[X]
+    new
+        type T = X
+        val contents:X = contents
+        def copy():Box[this.T] = makeBox[X](this.contents)
+
+def copyBox[X](in:Box[X]):Box[X]
+    makeBox[X](in.contents)
+
+val y = makeBox[Int](15)
+val y2 = makeBox(15) // X=Int can be inferred in this case
+val z : Box[Int] = copyBox[Int](y)
+val v : Box[z.T] = z.copy()
+
+v.contents

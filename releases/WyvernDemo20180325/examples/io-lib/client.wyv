@@ -1,0 +1,27 @@
+/**
+* This is a simple example client program based off
+* of the following example: http://www.buyya.com/java/Chapter13.pdf
+*/
+
+require java
+require stdout
+import io
+val ioobj = io(java)
+
+// Open a connection to a server at port 1254
+val s1 = ioobj.makeSocket("localhost", 1254)
+
+// Get an input file handle from the socket and read input
+val s1in = s1.getInputStream()
+val dis = ioobj.makeDataInputStream(s1in)
+
+// Read in from server
+val str = dis.readUTF()
+stdout.print("Got a string from the server :o, here's what it said:\n")
+stdout.print(str)
+
+// When done, close the connection and exit
+dis.close()
+// Call to "s1in.close()" causes an error
+// As in the server, this call is not needed but came from the cited example
+s1.close()

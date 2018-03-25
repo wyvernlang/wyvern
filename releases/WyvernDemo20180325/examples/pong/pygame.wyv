@@ -1,0 +1,157 @@
+module def pygame(python:Python)
+
+import python:pygame
+import python:helper
+import python:time
+
+type Float
+  val concrete : Unit
+
+resource type Rect
+  var top : Int
+  var left : Int
+  var bottom : Int
+  var right : Int
+
+type Surface
+  def fill(color : Color) : Unit
+  def blit(source : Surface, dest : Rect) : Unit
+
+type Color
+  val concrete : Unit
+
+type Clock
+  def tick(fps : Int) : Unit
+
+type Draw
+  def rect(surface : Surface,
+           color : Color,
+           rect : Rect,
+           width : Int) : Unit
+  def circle(surface : Surface,
+             color : Color,
+             center : Dyn,
+             radius : Int) : Unit
+
+type EventType = Int
+type Key = Int
+
+type Event
+  val key : Key
+
+type PygameEvent
+  def poll() : Event
+
+type Display
+  def set_mode(size : Dyn,
+               flags : Int,
+               depth : Int) : Surface
+  def flip() : Unit
+
+type Music
+  def load(file : String) : Unit
+  def play() : Unit
+  def rewind() : Unit
+  def stop() : Unit
+  def pause() : Unit
+  def unpause() : Unit
+  def set_volume(volume : Float) : Unit
+
+type Channel
+  val concrete : Unit
+
+type Sound
+  def play() : Channel
+  def stop() : Unit
+
+type Mixer
+  def pre_init(frequency : Int, size : Int, channels : Int, buffersize : Int) : Unit
+  def init() : Unit
+  val music : Music
+  def Sound(filename : String) : Sound
+
+type Font
+  def render(text : String, antialias : Boolean, color : Color) : Surface
+  def size(text : String) : Dyn
+  def set_underline(underline : Boolean) : Unit
+  def get_underline() : Boolean
+  def set_bold(bold : Boolean) : Unit
+  def get_bold() : Boolean
+  def set_italic(italic : Boolean) : Unit
+  def get_italic() : Boolean
+  def get_linesize() : Int
+  def get_height() : Int
+  def get_ascent() : Int
+  def get_descent() : Int
+
+type FontModule
+  def init() : Unit
+  def quit() : Unit
+  def get_init() : Boolean
+  def get_default_font() : String
+  // def get_fonts() : String List
+  def match_font(name : String, bold : Boolean, italic : Boolean) : String
+  def SysFont(name : String, size : Int, bold : Boolean, italic : Boolean) : Font
+
+type Helper
+  def make2Tuple(a : Dyn, b : Dyn) : Dyn
+  def fst(a : Dyn) : Dyn
+  def snd(a : Dyn) : Dyn
+  def makeRect(left : Int, top : Int, width : Int, height : Int) : Rect
+  val white : Color
+  val black : Color
+  def makeClock() : Clock
+  def debug(msg : String) : Unit
+  def getType(event : Event) : EventType
+  def floatOfString(float : String) : Float
+val helper : Helper = helper
+
+type Pygame
+  def init() : Unit
+  def quit() : Unit
+
+  val draw : Draw
+  val display : Display
+  val event : PygameEvent
+  val mixer : Mixer
+  val font : FontModule
+
+  def Rect(x : Int, y : Int, height : Int, width : Int) : Rect
+  val QUIT : EventType
+  val KEYDOWN : EventType
+  val KEYUP : EventType
+  val MOUSEBUTTONDOWN : EventType
+  val MOUSEBUTTONUP : EventType
+  val NOEVENT : EventType
+
+  val K_UP : Key
+  val K_DOWN : Key
+  val K_ESCAPE : Key
+
+type Time
+  def sleep(t : Int) : Unit
+val time : Time = time
+
+val pygame : Pygame = pygame
+
+def init() : Unit = pygame.init()
+def quit() : Unit = pygame.quit()
+
+val draw = pygame.draw
+val display = pygame.display
+val event = pygame.event
+val mixer = pygame.mixer
+val font = pygame.font
+
+def Rect(x : Int, y : Int, height : Int, width : Int) : Rect = pygame.Rect(x,y,height,width)
+
+val QUIT = pygame.QUIT
+val KEYDOWN = pygame.KEYDOWN
+val KEYUP = pygame.KEYUP
+val MOUSEBUTTONDOWN = pygame.MOUSEBUTTONDOWN
+val MOUSEBUTTONUP = pygame.MOUSEBUTTONUP
+val NOEVENT = pygame.NOEVENT
+
+val K_UP = pygame.K_UP
+val K_DOWN = pygame.K_DOWN
+val K_ESCAPE = pygame.K_ESCAPE

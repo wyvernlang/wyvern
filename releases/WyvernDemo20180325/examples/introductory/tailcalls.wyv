@@ -1,0 +1,13 @@
+require stdout
+
+// This would overflow the stack if tail calls were not implemented
+def countFromTo(current:Int, goal:Int):Int
+	(current < goal).ifTrue(
+		() => countFromTo(current+1, goal),
+		() => current
+	)
+
+stdout.print("Counting to 10000: ")
+val total = countFromTo(0,10000)
+stdout.printInt(total)
+total

@@ -1,0 +1,26 @@
+module def stdout(java : Java) : Stdout
+
+import java:wyvern.stdlib.support.Stdio.stdio
+
+// TODO: define me, probably using a stream abstraction for efficiency
+// actually this should probably go in a stream library
+// not associated with the standard output stream in particular
+type Printable = Unit
+
+/* Note: print() may not print right away. To print right away,
+either add a '\n' to the string you want to print, to use println()
+instead, or call flush() right after print(). */
+def print(text:String):Unit
+	stdio.print(text)
+
+def printInt(n:Int):Unit
+	stdio.printInt(n)
+
+def printBoolean(b:Boolean):Unit
+	stdio.printBoolean(b)
+
+def println():Unit
+	stdio.println()
+
+def flush():Unit
+	stdio.flush()

@@ -1,0 +1,14 @@
+require stdout
+
+import metadata tsls.postfix
+
+def run(expr:postfix.PostfixExpr):Int
+	expr.eval()
+
+val x = run(~)
+	2 3 2 6
+	* + 3 / +
+
+stdout.printInt(x)
+
+x

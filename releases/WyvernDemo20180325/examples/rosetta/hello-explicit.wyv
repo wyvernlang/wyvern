@@ -1,0 +1,7 @@
+require platform // could use 'java' here if we wanted this code to be specific to the java platform
+
+import stdout
+
+val stdout2 = stdout(platform)
+
+stdout2.print("Hello, World!")

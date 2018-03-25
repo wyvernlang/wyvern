@@ -1,0 +1,23 @@
+module regex
+
+import wyvern.option
+
+import java:wyvern.stdlib.support.Regex.utils
+
+type Regex
+	def findPrefixOf(source:String):option.Option[String]
+	def findPrefixMatchOf(source:String):option.Option[Match]
+
+type Match
+	def matched():String
+	def after():String
+
+def makeMatch(m:String, a:String):Match = new
+	def matched():String = m
+	def after():String = a
+	
+def apply(regex:String):Regex = new
+	def findPrefixOf(source:String):option.Option[String]
+		utils.findPrefixOf(regex,source)
+	def findPrefixMatchOf(source:String):option.Option[Match]
+		utils.findPrefixMatchOf(regex,source)

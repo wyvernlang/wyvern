@@ -1,0 +1,63 @@
+module list
+
+import wyvern.option
+import wyvern.util.matching.regex
+
+type Option = option.Option
+
+resource type List
+	def append(e:Dyn):Unit
+	def find(pred:Dyn -> Boolean):Option[Dyn]
+	def length():Int
+	def get(n:Int):Option[Dyn]
+	def map(f:Dyn -> Dyn):List // functional map
+
+def make():List
+    resource type Cell
+        var element:Dyn
+        var next:Option[Cell]
+        def find(pred:Dyn -> Boolean):Option[Dyn]
+        def length():Int
+        def get(n:Int):Option[Dyn]
+        def do(f:Dyn -> Unit):Unit
+    def makeCell(e:Dyn, n:Option[Cell]):Cell = new
+        var element:Dyn = e
+        var next:Option[Cell] = n
+        def find(pred:Dyn -> Boolean):Option[Dyn]
+            this.next.isDefined.ifTrue(
+                () => pred(this.element).ifTrue(
+                    () => option.Some(this.element),
+                    () => this.next.flatMap[Dyn]((c:Cell) => c.find(pred))),
+                () => option.None[Dyn]())
+        def do(f:Dyn -> Unit):Unit
+            def action(c:Cell):Unit
+                f(this.element)
+                c.do(f)
+            this.next.map[Unit](c:Cell => action(c))
+        def length():Int
+            this.next.isDefined.ifTrue(
+                () => 1 + this.next.map[Int](c:Cell => c.length()).getOrElse(() => 0),
+                () => 0)
+        def get(n:Int):Option[Dyn]
+            this.next.isDefined.ifTrue(
+                () => (n == 0).ifTrue(
+                    () => option.Some(this.element),
+                    () => this.next.flatMap[Dyn](opt => opt.get(n-1))),
+                () => option.None[Dyn]())
+    val sentinel : Cell = makeCell(0, option.None[Cell]())
+    new
+        var first:Cell = sentinel
+        var last:Cell = sentinel
+        def append(e:Dyn):Unit
+            this.last.element = e
+            val cell = makeCell(0, option.None[Cell]())
+            this.last.next = option.Some(cell)
+            this.last = cell
+        def find(pred:Dyn -> Boolean):Option[Dyn]
+            this.first.find(pred)
+        def length():Int = this.first.length()
+        def get(n:Int):Option[Dyn] = this.first.get(n)
+        def map(f:Dyn -> Dyn):List
+            val newList = make()
+            this.first.do(x => newList.append(f(x)))
+            newList

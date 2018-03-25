@@ -1,0 +1,36 @@
+module map
+
+import wyvern.option
+import wyvern.collections.list
+
+type DynDynBoolean
+	def apply(x:Dyn,y:Dyn):Boolean
+
+type Option = option.Option
+
+resource type Map
+	def get(key:Dyn):Option[Dyn]
+	def put(key:Dyn, value:Dyn):Unit
+
+def make(equals:DynDynBoolean):Map
+	resource type Entry
+		val key:Dyn
+		var value:Dyn
+	new
+		val elements = list.make()
+		def freshEntry(key:Dyn,value:Dyn):Entry
+			val e:Entry = new
+				val key = key
+				var value:Dyn = value
+			this.elements.append(e)
+			e
+		def findEntry(key:Dyn):Option[Dyn]
+			def keyMatches(e:Entry):Boolean
+				equals(key,e.key)
+			this.elements.find(e => keyMatches(e))
+		def get(key:Dyn):Option[Dyn]
+			this.findEntry(key).map[Dyn](e:Entry => e.value)
+		def put(key:Dyn, value:Dyn):Unit
+			val entryOption = this.findEntry(key)
+			val e:Entry = entryOption.getOrElse(() => this.freshEntry(key,value))
+			e.value = value

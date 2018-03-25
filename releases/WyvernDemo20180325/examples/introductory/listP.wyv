@@ -1,0 +1,78 @@
+//module list
+
+require stdout
+
+import introductory.optionPm
+import metadata wyvern.IfTSL
+
+val option = optionPm
+
+type Option = option.Option
+
+resource type List
+    type E
+    def append(e:this.E):Unit
+    def find(pred:this.E -> Boolean):Option[this.E]
+    def length():Int
+    def get(n:Int):Option[this.E]
+    def do(f:this.E -> Unit):Unit
+    def map[F](f:this.E -> F):List[F] // functional map
+
+    
+    
+def make[E]():List
+    resource type Cell
+        var element:E
+        var next:Option[Cell]
+        def find(pred:E -> Boolean):Option[E]
+        def get(n:Int):Option[E]
+        def do(f:E -> Unit):Unit
+    def makeCell(e:E, n:Option):Cell = new (self) =>
+        var element:E = e
+        var next:Option[Cell] = n
+        def find(pred:E -> Boolean):Option[E]
+            pred(self.element).ifTrue(
+                () => option.Some[E](self.element),
+                () => self.next.flatMap[E]((c:Cell) => c.find(pred)))
+        def get(n:Int):Option[E]
+            (n == 0).ifTrue(
+                () => option.Some[E](self.element),
+                () => self.next.flatMap[E]((c:Cell) => c.get(n-1)))
+        def do(f:E -> Unit):Unit
+            f(self.element)
+            self.next.map[Unit](c:Cell => c.do(f))
+    def makeOneCell(e:E):Cell = makeCell(e, option.None[E]())
+    new (self) =>
+        type E = E
+        var first:Option[Cell] = option.None[Cell]()
+        var last:Option[Cell] = option.None[Cell]()
+        var size:Int = 0
+        def append(e:self.E):Unit
+            IfTSL.doif(self.first.isDefined, ~)
+              then
+                val cell = makeOneCell(e)
+                self.last.map[Unit](c:Cell => c.next = option.Some[Cell](cell))
+                self.last = option.Some[Cell](cell)
+              else
+                self.first = option.Some[Cell](makeOneCell(e))
+                self.last = self.first
+            self.size = self.size + 1
+        def find(pred:self.E -> Boolean):Option[E]
+            self.first.flatMap[E](c:Cell => c.find(pred))
+        def length():Int = self.size
+        def get(n:Int):Option[E] = self.first.flatMap[E](c:Cell => c.get(n))
+        def do(f:E -> Unit):Unit = self.first.map[Unit](c:Cell => c.do(f))
+        def map[F](f:self.E -> F):List[F]
+            val newList:List[F] = make[F]()
+            self.do(e => newList.append(f(e)))
+            newList
+
+val aList:List[Int] = make[Int]() // TODO: infer the generic argument here
+aList.append(10)
+aList.append(13)
+val found = aList.find(i => i==13)
+val n:Int = found.getOrElse(() => 2)
+val ten:Option[Int] = aList.get(0)
+val bList:List[Int] = aList.map[Int](x => x+1)
+bList.do(n:Int => stdout.printInt(n))
+n+aList.length()

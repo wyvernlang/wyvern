@@ -1,0 +1,8 @@
+import metadata wyvern.IfTSL2
+//import wyvern.decls
+
+//val hjlk = decls.aNum
+//val asdf = 8
+
+val ifelseARG = (cond:Boolean, tt:IfTSL2.FnExpr, ff:IfTSL2.FnExpr) => IfTSL2.doif(cond, tt, ff)
+val if = (cond:Boolean, blocks:IfTSL2.Blocks) => IfTSL2.doifblk(cond, blocks)

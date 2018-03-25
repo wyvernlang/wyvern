@@ -1,0 +1,15 @@
+/*resource */module logging
+
+import wyvern.collections.list
+import examples.logging.files
+
+resource type Log
+    def log(x: String): Unit
+
+def makeLog(path: String): Log
+    val logFile = files.openForAppend(path)
+    val messageList = list.make()
+    new
+        def log(x: String): Unit
+            messageList.append(x)
+            logFile.print(x)

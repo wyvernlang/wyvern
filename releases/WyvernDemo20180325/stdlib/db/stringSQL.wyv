@@ -1,0 +1,19 @@
+module def stringSQL(java : Java)
+
+type SQL
+	def query():String
+
+type PreparedQuery
+	def apply(arg1:String, arg2:String):SQL
+	
+def prepare(q:String):PreparedQuery = new
+	def apply(arg1:String, arg2:String):SQL = new
+		def query():String = "hello!"	
+
+def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
+								 checkColumn:String):Int
+	5
+def substitute(queryNumber:Int, searchValue:String):Int
+	5
+def runQuery(queryNumber:Int):Int
+	5

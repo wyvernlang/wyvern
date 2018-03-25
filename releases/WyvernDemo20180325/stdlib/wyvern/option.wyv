@@ -1,0 +1,28 @@
+module option
+
+/** This is a parameterized version of the option module */
+
+type Option
+    type T
+    def map[U](f:this.T -> U):Option[U] // T -> U is a resource function type (as opposed to non-resource/pure with =>)
+    def flatMap[U](f:this.T -> Option[U]):Option[U]
+    def getOrElse(x1:Unit -> this.T):this.T
+    def orElse(x:Unit -> Option[this.T]):Option[this.T]
+    val isDefined:Boolean
+	
+def Some[T](x:T):Option[T] = new
+    type T = T
+    def map[U](f:T -> U):Option[U] = Some[U](f(x))
+    def flatMap[U](f:T -> Option[U]):Option[U] = f(x)
+    def getOrElse(defaultValue:Unit -> T):T = x
+    val value:T = x
+    def orElse(x:Unit -> Option[T]):Option[T] = this
+    val isDefined:Boolean = true
+
+def None[T]():Option[T] = new
+    type T = T
+    def map[U](f:T -> U):Option[U] = None[U]()
+    def flatMap[U](f:T -> Option[U]):Option[U] = None[U]()
+    def getOrElse(defaultValue:Unit -> T):T = defaultValue()
+    def orElse(x:Unit -> Option[T]):Option[T] = x()
+    val isDefined:Boolean = false

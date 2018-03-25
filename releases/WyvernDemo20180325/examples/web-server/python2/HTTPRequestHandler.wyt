@@ -1,0 +1,8 @@
+type HTTPRequestHandler
+  def send_response(response: Int): Unit
+  def send_header(keyword: String, value: String): Unit
+  def end_headers(): Unit
+  val wfile: WFileType
+
+type WFileType
+  def write(s: String): Unit

@@ -1,0 +1,12 @@
+module debug
+
+import java:wyvern.stdlib.support.Stdio.debug
+
+def print(text:String):Unit
+	debug.print(text)
+
+def printInt(n:Int):Unit
+	debug.printInt(n)
+
+def println():Unit
+	debug.println()

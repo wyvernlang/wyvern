@@ -1,0 +1,4 @@
+require python
+import python:webserver
+import wyvernHandler
+webserver.run(wyvernHandler(python))

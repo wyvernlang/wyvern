@@ -1,0 +1,59 @@
+module IfTSL2
+
+import wyvern.internal.ast
+import wyvern.option
+import wyvern.util.matching.regex
+import wyvern.internal.list              // We use wyvern.internal.list because wyvern.collections.list depends on IfTSL
+
+type AST = ast.AST
+
+def elseMatch(input : String) : regex.Match
+  val thenRegex = regex("^else\n")
+  val mOpt = thenRegex.findPrefixMatchOf(input)
+  mOpt.getOrElse(() => regex.makeMatch("", input))
+
+def indentedBlockMatch(input : String) : regex.Match
+  val blockRegex = regex("(\\s[^\n]*\n)+")
+  val blockMatchOpt = blockRegex.findPrefixMatchOf(input)
+
+  val emptymatch = regex.makeMatch("", input)
+  val m : regex.Match = blockMatchOpt.getOrElse(() => emptymatch)
+  m
+
+def toUnitOrAST(input : String, ctx : system.Context) : ast.AST
+  val stripped = ast.stripLeadingWhitespace(input)
+  (input == "").ifTrue(() => ast.int(0), () => ast.parseExpression(stripped, ctx))
+
+resource type FnExpr
+  def apply() : Dyn
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option
+      val fnAST : AST = ast.parseExpression(input, ctx)
+      val applyDefn = ast.defDeclaration("apply", list.make(), ast.types.dyn(), fnAST)
+      val declList : list.List = list.make()
+      declList.append(applyDefn)
+      option.Some(ast.object(declList))
+
+resource type Blocks
+  def evalTrue() : Dyn
+  def evalFalse() : Dyn
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option
+      val trimmedInput = ast.stripLeadingWhitespace(input)
+      val trueMatch = indentedBlockMatch(trimmedInput)
+      val em = elseMatch(trueMatch.after())
+      val trueAST : AST = toUnitOrAST(trueMatch.matched(), ctx)
+      val falseAST : AST = toUnitOrAST(em.after(), ctx)
+      val trueDefn = ast.defDeclaration("evalTrue", list.make(), ast.types.dyn(), trueAST)
+      val falseDefn = ast.defDeclaration("evalFalse", list.make(), ast.types.dyn(), falseAST)
+      val declList : list.List = list.make()
+      declList.append(trueDefn)
+      declList.append(falseDefn)
+      option.Some(ast.object(declList))
+
+      
+def doif(condition : Boolean, tt:FnExpr, ff:FnExpr) : Dyn
+  condition.ifTrue(() => tt.apply(), () => ff.apply())
+  
+def doifblk(condition : Boolean, block:Blocks) : Dyn
+  condition.ifTrue(() => block.evalTrue(), () => block.evalFalse())

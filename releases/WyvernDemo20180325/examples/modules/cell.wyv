@@ -1,0 +1,12 @@
+module cell : modules.TCell
+// TODO: get the above type annotation to typecheck properly
+
+resource type Cell
+    def set(newValue:Int):Unit
+    def get():Int
+
+def make(initVal:Int):Cell = new
+    var value : Int = initVal
+    def set(newValue:Int):Unit
+        this.value = newValue
+    def get():Int = this.value
