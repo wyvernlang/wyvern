@@ -85,15 +85,21 @@ public class StructuralType extends ValueType {
             }
             ddt.getRawResultType().doPrettyPrint(dest, indent, ctx);
         } else {
-            String newIndent = indent + "    ";
+            String newIndent = indent + "  ";
             if (isResource(GenContext.empty())) {
                 dest.append("resource ");
             }
-            dest.append("type { ").append(selfName).append(" =>\n");
-            for (DeclType dt : getDeclTypes()) {
-                dt.doPrettyPrint(dest, newIndent);
+            dest.append("type { ");
+            if (indent.length() == 0) {
+                dest.append(selfName).append(" =>\n");
+                for (DeclType dt : getDeclTypes()) {
+                    dt.doPrettyPrint(dest, newIndent);
+                }
+                dest.append(indent).append(" }");
+            } else {
+                /** If we are already indented, then abbreviate. */
+                dest.append("... }");
             }
-            dest.append(indent).append("  }");
         }
     }
 

@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
@@ -31,6 +33,14 @@ public class ObjectValue extends New implements Invokable {
         if (hasDelegate) {
             delegateTarget = (ObjectValue) ctx.lookupValue(delegateDecl.getFieldName());
         }
+        // assert that this ObjectValue is well-formed
+        checkWellFormed();
+    }
+
+    /** already a value */
+    @Override
+    public Value interpret(EvalContext ctx) {
+        return this;
     }
 
     @Override
@@ -110,5 +120,19 @@ public class ObjectValue extends New implements Invokable {
     @Override
     public int hashCode() {
         return evalCtx.hashCode() + delegateTarget.hashCode();
+    }
+
+    /** make sure all free variables are captured in the evalCtx */
+    public void checkWellFormed() {
+        Set<String> freeVars = this.getFreeVariables();
+        for (String varName : freeVars) {
+            evalCtx.lookupValue(varName);
+        }
+    }
+
+    /** no free variables because each ObjectValue closes over its environment */
+    @Override
+    public Set<String> getFreeVariables() {
+        return (Set<String>) Collections.EMPTY_SET;
     }
 }

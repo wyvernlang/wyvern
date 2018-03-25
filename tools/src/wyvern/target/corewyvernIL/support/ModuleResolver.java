@@ -309,7 +309,7 @@ public class ModuleResolver {
         }
 
         if (!toplevel && !moduleType.isResource(ctx)) {
-            Value v = wrap(program, dependencies).interpret(Globals.getStandardEvalContext());
+            Value v = wrapWithCtx(program, dependencies, Globals.getStandardEvalContext()).interpret(Globals.getStandardEvalContext());
             moduleType = v.getType();
         }
 
@@ -349,6 +349,14 @@ public class ModuleResolver {
         return ctx;
     }
 
+    /** Deprecated; the plan is to move all calls to wrapWithCtx, which is
+     * more efficient (linear instead of quadratic).
+     *
+     * @param program
+     * @param dependencies
+     * @return
+     */
+    @Deprecated
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
         SeqExpr seqProg = new SeqExpr();
         seqProg.merge(program);
@@ -358,6 +366,41 @@ public class ModuleResolver {
             //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
             seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
         }
+        return seqProg;
+    }
+
+    /** Wraps this program with all its dependencies.  The dependencies are
+     * evaluated to values using the ctx, and the values are cached in
+     * order to reduce duplicate evaluation.
+     * @param program
+     * @param dependencies The modules this program depends on.  These must
+     * be in order, so that if one module depends on another than the the
+     * second module comes later (i.e. the modules are in reverse order
+     * than they will appear in the linked program).  Duplicate modules are
+     * OK; duplicates will be eliminated before the program is linked.
+     *
+     * @param ctx
+     * @return
+     */
+    public SeqExpr wrapWithCtx(IExpr program, List<TypedModuleSpec> dependencies, EvalContext ctx) {
+        SeqExpr seqProg = new SeqExpr();
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        for (int i = noDups.size() - 1; i >= 0; --i) {
+            TypedModuleSpec spec = noDups.get(i);
+            Module m = resolveModule(spec.getQualifiedName());
+            Value v = m.getAsValue(ctx);
+            String internalName = m.getSpec().getInternalName();
+            ctx = ctx.extend(internalName, v);
+            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            ValueType type = m.getSpec().getType();
+            /*ValueType valType = v.getType();
+            if (!type.equals(valType))
+                throw new RuntimeException();
+            type.checkWellFormed(ctx);
+            ((ObjectValue)v).checkWellFormed();*/
+            seqProg.addBinding(internalName, type, v /*m.getExpression()*/, true);
+        }
+        seqProg.merge(program);
         return seqProg;
     }
 
