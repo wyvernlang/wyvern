@@ -87,7 +87,7 @@ public class OIRTests {
 
         String pprint =
                 new EmitPythonVisitor().emitPython(oirast,
-                        OIREnvironment.getRootEnvironment());
+                        OIREnvironment.getRootEnvironment(), true);
 
         if (debug) {
             System.out.println("OIR Program:\n" + pprint);

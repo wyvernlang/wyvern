@@ -225,7 +225,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         }
     }
 
-    public String emitPython(OIRAST oirast, OIREnvironment oirenv) {
+    public String emitPython(OIRAST oirast, OIREnvironment oirenv, boolean printResult) {
         String classDefs = "";
         EmitPythonState state = new EmitPythonState();
         state.setOirenv(oirenv);
@@ -257,7 +257,9 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         String python = NameMangleVisitor.mangleAST(oirast).acceptVisitor(this, state);
         String[] lines = python.split("\\n");
         int lastIndex = lines.length - 1;
-        lines[lastIndex] = "print(" + lines[lastIndex] + ")";
+        if (printResult) {
+            lines[lastIndex] = "print(" + lines[lastIndex] + ")";
+        }
         StringBuilder out = new StringBuilder();
         for (String line : lines) {
             out.append(line);
