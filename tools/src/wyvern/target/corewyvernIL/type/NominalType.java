@@ -84,7 +84,6 @@ public class NominalType extends ValueType {
         final StructuralType structuralType = path.typeCheck(ctx, null).getStructuralType(ctx);
         // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
-        //return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
     }
 
     @Override
@@ -216,7 +215,6 @@ public class NominalType extends ValueType {
             // TODO: make this more principled
             return this;
         }
-        //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
         if (path.getFreeVariables().contains(varName)) {
             try {
                 DeclType dt = this.getSourceDeclType(ctx);
@@ -226,7 +224,6 @@ public class NominalType extends ValueType {
                         // avoid infinite loops, just in case
                         // TODO: make this more principled
                         return this;
-                        //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
                     }
                     return type.doAvoid(varName, ctx, count + 1);
                 }
@@ -236,8 +233,6 @@ public class NominalType extends ValueType {
             // was best effort anyway
             // TODO: be more principled
             return this;
-            //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
-            //throw new RuntimeException(); // cannot get here
         } else {
             return this;
         }

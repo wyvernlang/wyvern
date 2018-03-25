@@ -291,7 +291,9 @@ AST Declaration(boolean inModule) :
 |
   exp = EffectDeclaration() { return exp; }
 |
-   LOOKAHEAD(4) exp =   TypeDeclaration()  { return exp; }
+   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
+|
+   LOOKAHEAD(4) exp = DatatypeDeclaration() { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
 |
@@ -378,6 +380,26 @@ AST TypeDeclaration() :
   }
 }
 
+AST DatatypeDeclaration() :
+{ Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
+  Token selfName = null;
+  Object tagInfo = null; boolean isResource = false;
+}
+{
+  [<RESOURCE> { isResource = true; } ]
+  <DATATYPE> name=<IDENTIFIER>
+  [ <LPAREN> <IDENTIFIER> <RPAREN> <ARROW> ]
+  <NEWLINE> <INDENT> body=DeclTypes()
+                    [ <METADATA> metadata = ExpressionLine(false) ]
+             <DEDENT> {
+    if (isTagged || (extendedType != null) || (comprisesList != null)) {
+      tagInfo = build.tagInfo(extendedType, comprisesList);
+    }
+    String self = null;
+	return build.datatypeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
+  }
+}
+
 AST DeclTypes() :
 { AST decl1; AST decl2; AST body; }
 {
@@ -395,9 +417,13 @@ AST DeclType() :
 |
   exp = VarDeclType()  { return exp; }
 |
-  exp = EffectDeclType() { return exp; } 
+  exp = EffectDeclType() { return exp; }
+|
+  exp = ConstructDeclType() { return exp; }
 |
   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
+|
+  LOOKAHEAD(4) exp = DatatypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
 }
@@ -437,6 +463,14 @@ AST EffectDeclType() :
     	return build.effectDeclType(name.image, null, loc(name));
   	}
   	return build.effectDeclType(name.image, effects.image, loc(name));
+  }
+}
+
+AST ConstructDeclType() :
+{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null; }
+{
+  (name = <IDENTIFIER>) [gentypes = GenericsDecl()] [args = Formals()] <NEWLINE> {
+  	return build.constructDeclType(name.image, gentypes, args, loc(name));
   }
 }
 

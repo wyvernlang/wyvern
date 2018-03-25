@@ -75,7 +75,6 @@ public class IntegerLiteral extends Literal implements Invokable {
     @Override
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
         return emitILVisitor.visit(state, this);
-        //throw new RuntimeException("not implemented");
     }
 
     @Override
@@ -91,7 +90,6 @@ public class IntegerLiteral extends Literal implements Invokable {
 
     @Override
     public Value invoke(String methodName, List<Value> args) {
-
         switch (methodName) {
         case "+": return new IntegerLiteral(this.value.add(((IntegerLiteral) args.get(0)).getFullValue()));
         case "-": return new IntegerLiteral(this.value.subtract(((IntegerLiteral) args.get(0)).getFullValue()));

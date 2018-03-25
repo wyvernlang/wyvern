@@ -170,6 +170,22 @@ public class ExampleTests {
     }
 
     @Test
+    public void testPython2Webserver() {
+        String[] args = new String[] {TestUtil.EXAMPLES_PATH + "web-server/python2/webserver.wyv"};
+        PythonCompiler.wyvernHome.set("..");
+        PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "web-server/python2/");
+        PythonCompiler.main(args);
+    }
+
+    @Test
+    public void testPython3Webserver() {
+        String[] args = new String[] {TestUtil.EXAMPLES_PATH + "web-server/python3/webserver.wyv"};
+        PythonCompiler.wyvernHome.set("..");
+        PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "web-server/python3/");
+        PythonCompiler.main(args);
+    }
+
+    @Test
     public void testIOLibServerClient() throws ParseException {
         ExecutorService executor = Executors.newFixedThreadPool(2);
 

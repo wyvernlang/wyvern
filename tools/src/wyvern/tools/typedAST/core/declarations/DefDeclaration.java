@@ -156,7 +156,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         return !this.generics.isEmpty();
     }
 
-    public static  boolean isGeneric(FormalArg a) {
+    public static boolean isGeneric(FormalArg a) {
         return a.getName().startsWith(GENERIC_PREFIX);
     }
 

@@ -125,7 +125,6 @@ public class Mirror {
             return ((NominalType) type).getTypeMember();
         }
         return "<anonymous structural type>";
-        //throw new Exception("Error: Requested name of a structural type");
         // return obj.getType().toString();
     }
 

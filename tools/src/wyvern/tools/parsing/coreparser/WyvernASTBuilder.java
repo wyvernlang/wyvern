@@ -16,6 +16,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
@@ -113,6 +114,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
+    public TypedAST constructDeclType(String name, List<String> generics, List args, FileLocation loc) {
+        return new ConstructDeclaration(name, args, loc);
+    }
+
+    @Override
     public TypedAST typeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
         if (body == null) {
             body = new DeclSequence();
@@ -127,6 +133,22 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
         //Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);
         //return new TypeDeclaration(name, (DeclSequence) body, null, (TaggedInfo) tagInfo, loc);
+        return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
+    }
+
+    @Override
+    public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
+        if (body == null) {
+            body = new DeclSequence();
+        }
+        if (!(body instanceof DeclSequence)) {
+            body = new DeclSequence(Arrays.asList(body));
+        }
+
+        if (((DeclSequence) body).hasVarDeclaration() && !isResource) {
+            ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);
+        }
+
         return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
     }
 
@@ -206,7 +228,6 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST addArguments(TypedAST application, List<String> names, List<TypedAST> arguments) throws ParseException {
         if (!(application instanceof Application)) {
             ToolError.reportError(ErrorMessage.ILLEGAL_JUXTAPOSITION, application);
-            //throw new ParseException("Juxtaposed an additional argument to something that was not an application");
         }
         Application app = (Application) application;
         List<Type> generics = app.getGenerics();

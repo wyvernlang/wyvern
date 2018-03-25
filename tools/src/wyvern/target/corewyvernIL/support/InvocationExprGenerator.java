@@ -22,7 +22,6 @@ public class InvocationExprGenerator implements CallableExprGenerator {
     private final FileLocation location;
 
     public InvocationExprGenerator(IExpr iExpr, String operationName, GenContext ctx, FileLocation loc) {
-
         this.receiver = iExpr;
         this.location = loc;
 
@@ -52,8 +51,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
             return new FieldGet(receiver, declType.getName(), location);
         } else {
             ToolError.reportError(ErrorMessage.METHODS_MUST_BE_INVOKED, location);
-            throw new RuntimeException("can't get here");
-            //throw new RuntimeException("eta-expansion of a method reference not implemented");
+            return null;
         }
     }
 
@@ -69,7 +67,6 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 
     @Override
     public DefDeclType getDeclType(TypeContext ctx) {
-
         if (declType == null) {
             return null;
         } else if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
@@ -81,7 +78,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
             return (DefDeclType) declType;
         } else {
             ToolError.reportError(ErrorMessage.NOT_A_METHOD, location, declType.getName());
-            throw new RuntimeException("can't get here");
+            return null;
         }
     }
 }
