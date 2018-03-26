@@ -2,15 +2,20 @@ package wyvern.tools.typedAST.core.expressions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.types.Type;
 
 /**
  * Represents a match statement in Wyvern.
@@ -19,7 +24,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
  */
 public class Match extends AbstractExpressionAST implements CoreAST {
 
-    private TypedAST matchingOver;
+    private ExpressionAST matchingOver;
 
     private List<Case> cases;
     private Case defaultCase;
@@ -37,7 +42,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
         //clone original list so we have a canonical copy
         this.originalCaseList = new ArrayList<Case>(cases);
 
-        this.matchingOver = matchingOver;
+        this.matchingOver = (ExpressionAST) matchingOver;
         this.cases = cases;
 
         //find the default case and remove it from the typed cases
@@ -49,7 +54,6 @@ public class Match extends AbstractExpressionAST implements CoreAST {
         }
 
         cases.remove(defaultCase);
-
         this.location = location;
     }
 
@@ -62,7 +66,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
      * @param location
      */
     private Match(TypedAST matchingOver, List<Case> cases, Case defaultCase, FileLocation location) {
-        this.matchingOver = matchingOver;
+        this.matchingOver = (ExpressionAST) matchingOver;
         this.cases = cases;
         this.defaultCase = defaultCase;
         this.location = location;
@@ -75,7 +79,44 @@ public class Match extends AbstractExpressionAST implements CoreAST {
 
     @Override
     public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-        // TODO Auto-generated method stub
-        return null;
+        // First, translate & typecheck the expression we're matching over
+        IExpr matchExpr = matchingOver.generateIL(ctx, null, dependencies);
+        ValueType expectedMatchType = matchExpr.typeCheck(ctx, null);
+
+        /** Our version of "type unification", where we use the first non-null type to be the type or super-type of all
+         * matched expressions/binders. Note that this is not really bidirectional since the matched expression
+         * type is the one we originally use.
+         */
+        for (Case c : cases) {
+            Type t = c.getTaggedTypeMatch();
+            ValueType vt = t == null ? null : t.getILType(ctx);
+            if (expectedMatchType == null) {
+                expectedMatchType = vt;
+            } else if (vt != null && !(vt.isSubtypeOf(expectedMatchType, ctx, null))) {
+                throw new RuntimeException("Case types don't agree");
+            }
+        }
+        ValueType matchType = expectedMatchType;
+
+
+        // Translate & typecheck each individual case, separately for the default case
+        Expression elseExpr = null;
+        if (defaultCase != null) {
+            ExpressionAST defaultExp = defaultCase.getAST();
+            elseExpr = (Expression) defaultExp.generateIL(ctx, expectedType, dependencies);
+        }
+        List<wyvern.target.corewyvernIL.Case> casesIL = cases.stream()
+                                                             .map(c -> c.generateILCase(ctx, matchType, (NominalType) expectedType, dependencies))
+                                                             .collect(Collectors.toList());
+        ValueType expectedCaseType = expectedType;
+        for (wyvern.target.corewyvernIL.Case c : casesIL) {
+            ValueType caseType = c.getBody().getType();
+            if (expectedCaseType != null && caseType != null && caseType != expectedType) {
+                throw new RuntimeException("Nope");
+            } else {
+                expectedCaseType = caseType;
+            }
+        }
+        return new wyvern.target.corewyvernIL.expression.Match((Expression) matchExpr, elseExpr, casesIL);
     }
 }

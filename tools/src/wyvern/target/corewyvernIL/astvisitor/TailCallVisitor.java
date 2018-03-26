@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -82,7 +83,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     public Void visit(Boolean inTailPosition, Match match) {
         match.getMatchExpr().acceptVisitor(this, false);
-        match.getElseExpr().acceptVisitor(this, inTailPosition);
+        Expression elseExpr = match.getElseExpr();
+        if (elseExpr != null) {
+            elseExpr.acceptVisitor(this, inTailPosition);
+        }
         for (Case matchCase : match.getCases()) {
             matchCase.getBody().acceptVisitor(this, inTailPosition);
         }
