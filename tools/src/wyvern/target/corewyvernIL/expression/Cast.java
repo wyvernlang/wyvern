@@ -27,7 +27,7 @@ public class Cast extends Expression {
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         toCastExpr.typeCheck(ctx, effectAccumulator);
-        return getExprType().getCanonicalType(ctx);
+        return getType().getCanonicalType(ctx);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Cast extends Expression {
     public Value interpret(EvalContext ctx) {
         Value value = getToCastExpr().interpret(ctx);
         ValueType actualType = value.typeCheck(ctx, null);
-        ValueType goalType = getExprType();
+        ValueType goalType = getType();
         FailureReason r = new FailureReason();
         if (!actualType.isSubtypeOf(goalType, ctx, r)) {
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString(), r.getReason());
@@ -55,7 +55,7 @@ public class Cast extends Expression {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append("((");
-        getExprType().doPrettyPrint(dest, "");
+        getType().doPrettyPrint(dest, "");
         dest.append(") ");
         toCastExpr.doPrettyPrint(dest, "");
         dest.append(")");

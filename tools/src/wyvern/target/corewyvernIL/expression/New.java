@@ -79,7 +79,7 @@ public class New extends Expression {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append("new ").append(selfName).append(" : ");
-        getExprType().doPrettyPrint(dest, indent + "  ");
+        getType().doPrettyPrint(dest, indent + "  ");
         dest.append(" =>\n");
 
         for (Declaration decl: decls) {
@@ -107,7 +107,7 @@ public class New extends Expression {
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         List<DeclType> dts = new LinkedList<DeclType>();
 
-        TypeContext thisCtx = ctx.extend(selfName, getExprType());
+        TypeContext thisCtx = ctx.extend(selfName, getType());
 
         boolean isResource = false;
         for (Declaration d : declsExceptDelegate()) {
@@ -118,7 +118,7 @@ public class New extends Expression {
             }
         }
 
-        ValueType type = getExprType();
+        ValueType type = getType();
         if (hasDelegate) {
             ValueType delegateObjectType = ctx.lookupTypeOf(delegateDeclaration.getFieldName());
             StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
@@ -161,7 +161,7 @@ public class New extends Expression {
         Declaration newD = d.interpret(ctx);
         ds.add(newD);
         }
-        result = new ObjectValue(ds, selfName, getExprType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
+        result = new ObjectValue(ds, selfName, getType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
 
         return result;
     }

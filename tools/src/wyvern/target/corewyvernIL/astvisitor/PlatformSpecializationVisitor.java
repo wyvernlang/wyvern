@@ -119,7 +119,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             ASTNode result = decl.acceptVisitor(this, state);
             newDecls.add((Declaration) result);
         }
-        New result = new New(newDecls, newExpr.getSelfName(), newExpr.getExprType(), newExpr.getLocation());
+        New result = new New(newDecls, newExpr.getSelfName(), newExpr.getType(), newExpr.getLocation());
         result.copyMetadata(newExpr);
         return result;
     }
@@ -180,7 +180,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         IExpr objectExpr = (IExpr) fieldSet.getObjectExpr().acceptVisitor(this, state);
         IExpr exprToAssign = (IExpr) fieldSet.getExprToAssign().acceptVisitor(this, state);
 
-        FieldSet result = new FieldSet(fieldSet.getExprType(), objectExpr, fieldSet.getFieldName(), exprToAssign);
+        FieldSet result = new FieldSet(fieldSet.getType(), objectExpr, fieldSet.getFieldName(), exprToAssign);
         result.copyMetadata(fieldSet);
         return result;
     }
@@ -193,7 +193,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, Cast cast) {
         IExpr resultExpr = (IExpr) cast.getToCastExpr().acceptVisitor(this, state);
-        Cast result = new Cast(resultExpr, cast.getExprType());
+        Cast result = new Cast(resultExpr, cast.getType());
         result.copyMetadata(cast);
         return result;
     }

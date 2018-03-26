@@ -241,7 +241,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
     public OIRAST visit(EmitOIRState state, Cast cast) {
         IExpr expr = cast.getToCastExpr();
         OIRExpression oirExpr = (OIRExpression) expr.acceptVisitor(this, state);
-        OIRType oirType = (OIRType) cast.getExprType().acceptVisitor(this, state);
+        OIRType oirType = (OIRType) cast.getType().acceptVisitor(this, state);
         OIRCast oirCast = new OIRCast(oirExpr, oirType);
         oirCast.copyMetadata(cast);
         return oirCast;

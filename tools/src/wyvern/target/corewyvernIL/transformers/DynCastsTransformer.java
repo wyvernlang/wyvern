@@ -73,7 +73,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 
         // Transform all declarations inside the object.
         List<Declaration> newDecls = new LinkedList<>();
-        TypeContext thisCtx = ctx.extend(newExpr.getSelfName(), newExpr.getExprType());
+        TypeContext thisCtx = ctx.extend(newExpr.getSelfName(), newExpr.getType());
 
         for (Declaration decl : newExpr.getDecls()) {
             Declaration newDecl = (Declaration) decl.acceptVisitor(this, thisCtx);
@@ -81,7 +81,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
         }
 
         // Don't bother recomputing the type--it will stay the same.
-        return new New(newDecls, newExpr.getSelfName(), newExpr.getExprType(), newExpr.getLocation());
+        return new New(newDecls, newExpr.getSelfName(), newExpr.getType(), newExpr.getLocation());
     }
 
     @Override
@@ -210,7 +210,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
         }
 
         // Construct and return the transformed FieldSet.
-        return new FieldSet(fieldSet.getExprType(), receiver, fieldSet.getFieldName(), toAssign);
+        return new FieldSet(fieldSet.getType(), receiver, fieldSet.getFieldName(), toAssign);
     }
 
     @Override

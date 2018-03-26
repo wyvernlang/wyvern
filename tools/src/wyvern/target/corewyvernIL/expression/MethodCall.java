@@ -95,7 +95,7 @@ public class MethodCall extends Expression {
             return Util.dynType();
         }
         typeMethodDeclaration(ctx, effectAccumulator);
-        return getExprType();
+        return getType();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class MethodCall extends Expression {
             argValues.add(e.interpret(ctx));
         }
         if (isTailCall()) {
-            return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+            return new SuspendedTailCall(this.getType(), this.getLocation()) {
 
                 @Override
                 public Value interpret(EvalContext ignored) {

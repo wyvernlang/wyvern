@@ -94,11 +94,11 @@ public class SeqExpr extends Expression {
         TypeContext extendedCtx = p.getFirst();
         ValueType result = p.getSecond();
         FailureReason r = new FailureReason();
-        if (this.getExprType() != null) {
-            if (!result.isSubtypeOf(getExprType(), extendedCtx, r)) {
-                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString(), r.getReason());
+        if (this.getType() != null) {
+            if (!result.isSubtypeOf(getType(), extendedCtx, r)) {
+                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getType().toString(), r.getReason());
             }
-            return getExprType();
+            return getType();
         }
         for (int i = elements.size() - 1; i >= 0; --i) {
             HasLocation elem = elements.get(i);
@@ -111,7 +111,7 @@ public class SeqExpr extends Expression {
             }
         }
         setExprType(result);
-        return getExprType();
+        return getType();
     }
 
     public GenContext extendContext(GenContext ctx) {

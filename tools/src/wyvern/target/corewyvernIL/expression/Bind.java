@@ -66,7 +66,7 @@ public class Bind extends Expression {
             bodyCtx = bodyCtx.extend(vb.getVarName(), vb.getType());
         }
         this.setExprType(inExpr.typeCheck(bodyCtx, effectAccumulator));
-        return getExprType();
+        return getType();
     }
 
     @Override

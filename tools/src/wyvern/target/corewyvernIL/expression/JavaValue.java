@@ -151,7 +151,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-        return this.getExprType();
+        return this.getType();
     }
 
     @Override
@@ -161,7 +161,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 
     @Override
     public ValueType getType() {
-        return this.getExprType();
+        return this.getType();
     }
 
     public Object getWrappedValue() {

@@ -59,7 +59,7 @@ public class Let extends Expression {
         final ValueType cleanExprType = exprType.avoid(binding.getVarName(), extendedCtx);
         //cleanExprType.checkWellFormed(ctx);
         this.setExprType(cleanExprType);
-        return getExprType();
+        return getType();
     }
 
     @Override

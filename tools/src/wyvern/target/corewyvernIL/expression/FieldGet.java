@@ -61,7 +61,7 @@ public class FieldGet extends Expression implements Path {
             ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, this, dt.getName(), objectExpr.toString());
         }
         this.setExprType(((DeclTypeWithResult) dt).getResultType(View.from(objectExpr, ctx)));
-        return getExprType();
+        return getType();
     }
 
     @Override

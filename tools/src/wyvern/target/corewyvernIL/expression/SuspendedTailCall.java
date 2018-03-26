@@ -16,7 +16,7 @@ public abstract class SuspendedTailCall extends Expression implements Value {
 
     @Override
     public ValueType getType() {
-        return this.getExprType();
+        return this.getType();
     }
 
     @Override
