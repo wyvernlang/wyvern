@@ -317,8 +317,13 @@ public class ModuleResolver {
         if (loadingType) {
             typeName = moduleType.getStructuralType(ctx).getDeclTypes().get(0).getName();
         }
-        // make sure the module type is well-formed
-        moduleType.checkWellFormed(ctx);
+        // if not a top-level module, make sure the module type is well-formed
+        // top-level modules are exempted from this check because the module returns the thing
+        // defined on the last line, and that might not be type-checkable without the things
+        // added to the context by previous lines.
+        if (!toplevel) {
+            moduleType.checkWellFormed(ctx);
+        }
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
         return new Module(spec, program, dependencies);
     }

@@ -1372,6 +1372,11 @@ public class ILTests {
     }
 
     @Test
+    public void testPreviousTopLevelBug() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.topLevelBug", null, null);
+    }
+
+    @Test
     public void testObjectSetter() throws ParseException {
         String src = "val obj = new\n"
                    + "  var x : Int = 0\n"
