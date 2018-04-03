@@ -1,6 +1,5 @@
-module def wyvernHandler(python: Python)
+module def wyvernHandler(builtins: Builtins)
 import HTTPRequestHandler
-import python:builtins
 
 def setHeaders(hrh: HTTPRequestHandler): Unit
   hrh.send_response(200)
