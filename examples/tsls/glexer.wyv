@@ -1,4 +1,4 @@
-module lexer
+module def glexer(tokens:tsls.TokenSpec) /* a generic lexer */
 
 import wyvern.Int
 import wyvern.option
@@ -6,23 +6,6 @@ import wyvern.util.matching.regex
 import wyvern.collections.list
 
 type List = list.List
-
-// TODO: make the library generic in TokensType / tokens
-type TokensType
-	type Kind = Int
-	val NUMBER:this.Kind
-	val OPERATOR:this.Kind
-	val WHITESPACE:this.Kind
-	val EOF:this.Kind
-	val ERROR:this.Kind
-
-val tokens : TokensType = new
-	type Kind = Int
-	val NUMBER:this.Kind = 0
-	val OPERATOR:this.Kind = 1
-	val WHITESPACE:this.Kind = 2
-	val EOF:this.Kind = 3
-	val ERROR:this.Kind = 4
 
 type Token
 	def print():String

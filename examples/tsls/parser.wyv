@@ -2,14 +2,23 @@ module parser
 
 import metadata wyvern.collections.list
 import wyvern.util.matching.regex
-import tsls.lexer
+import tsls.glexer
 import wyvern.ast
 import wyvern.Int
 import wyvern.option
 import debug
 
+val tokens = new
+	type Kind = Int
+	val NUMBER:this.Kind = 0
+	val OPERATOR:this.Kind = 1
+	val WHITESPACE:this.Kind = 2
+	val EOF:this.Kind = 3
+	val ERROR:this.Kind = 4
+
+val lexer = glexer(tokens)
+
 // local bindings to make things easier
-val tokens = lexer.tokens
 type AST = ast.AST
 
 // A parse function for reverse Polish notation
