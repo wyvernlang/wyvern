@@ -1,0 +1,7 @@
+/* This type represents the built-in functions of the Python 3 interpreter.
+These functions are built into the interpreter and are always available.
+Currently, the type contains only a few functions; more functions should be added as required. */
+type Builtins
+  type Bytes
+  def abs(x: Int): Int
+  def bytes(source: String, encoding: String): this.Bytes
