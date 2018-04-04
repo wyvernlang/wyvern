@@ -19,7 +19,7 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class RefinementType extends ValueType {
-    public RefinementType(ValueType base, List<ConcreteTypeMember> declTypes, HasLocation hasLoc) {
+    public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc) {
         this.base = base;
         this.declTypes = declTypes;
     }
@@ -31,12 +31,12 @@ public class RefinementType extends ValueType {
     }
 
     private ValueType base;
-    private List<ConcreteTypeMember> declTypes = null; // may be computed lazily from typeParams
+    private List<DeclType> declTypes = null; // may be computed lazily from typeParams
     private List<ValueType> typeParams;
 
-    private List<ConcreteTypeMember> getDeclTypes(TypeContext ctx) {
+    private List<DeclType> getDeclTypes(TypeContext ctx) {
         if (declTypes == null) {
-            declTypes = new LinkedList<ConcreteTypeMember>();
+            declTypes = new LinkedList<DeclType>();
             base.checkWellFormed(ctx);
             StructuralType st = base.getStructuralType(ctx, null);
             if (st == null) {
@@ -74,8 +74,8 @@ public class RefinementType extends ValueType {
         if (declTypes == null) {
             return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase, this);
         }
-        List<ConcreteTypeMember> newDTs = new LinkedList<ConcreteTypeMember>();
-        for (ConcreteTypeMember dt : declTypes) {
+        List<DeclType> newDTs = new LinkedList<DeclType>();
+        for (DeclType dt : declTypes) {
             newDTs.add(dt.adapt(v));
         }
         return new RefinementType(newBase, newDTs, this);
@@ -83,15 +83,15 @@ public class RefinementType extends ValueType {
 
     @Override
     public ValueType doAvoid(String varName, TypeContext ctx, int depth) {
-        List<ConcreteTypeMember> newDeclTypes = new LinkedList<ConcreteTypeMember>();
+        List<DeclType> newDeclTypes = new LinkedList<DeclType>();
         boolean changed = false;
         ValueType newBase = base.doAvoid(varName, ctx, depth);
         if (declTypes == null) {
             List<ValueType> newTPs = typeParams.stream().map(p -> p.doAvoid(varName, ctx, depth)).collect(Collectors.toList());
             return new RefinementType(newTPs, base, this);
         }
-        for (ConcreteTypeMember dt : declTypes) {
-            ConcreteTypeMember newDT = dt.doAvoid(varName, ctx, depth + 1);
+        for (DeclType dt : declTypes) {
+            DeclType newDT = dt.doAvoid(varName, ctx, depth + 1);
             newDeclTypes.add(newDT);
             if (newDT != dt) {
                 changed = true;
@@ -107,7 +107,6 @@ public class RefinementType extends ValueType {
     @Override
     public void checkWellFormed(TypeContext ctx) {
         base.checkWellFormed(ctx);
-        StructuralType t = base.getStructuralType(ctx);
         for (DeclType dt : getDeclTypes(ctx)) {
             dt.checkWellFormed(ctx);
         }
@@ -205,8 +204,11 @@ public class RefinementType extends ValueType {
         dest.append("[");
         int count = 0;
         if (declTypes != null) {
-            for (ConcreteTypeMember ctm: declTypes) {
-                ctm.getRawResultType().doPrettyPrint(dest, indent, ctx);
+            for (DeclType ctm: declTypes) {
+                // limitation: would be better to actually print the DeclTypes that aren't ConcreteTypeMembers as part of the underlying type
+                if (ctm instanceof ConcreteTypeMember) {
+                    ((ConcreteTypeMember) ctm).getRawResultType().doPrettyPrint(dest, indent, ctx);
+                }
                 if (++count < declTypes.size()) {
                     dest.append(", ");
                 }
