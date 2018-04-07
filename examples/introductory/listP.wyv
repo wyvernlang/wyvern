@@ -48,14 +48,22 @@ def make[E]():List
         var last:Option[Cell] = option.None[Cell]()
         var size:Int = 0
         def append(e:self.E):Unit
-            IfTSL.doif(self.first.isDefined, ~)
+            def thenCase():Unit
+                val cell = makeOneCell(e)
+                self.last.map[Unit](c:Cell => c.next = option.Some[Cell](cell))
+                self.last = option.Some[Cell](cell)
+            def elseCase():Unit
+                self.first = option.Some[Cell](makeOneCell(e))
+                self.last = self.first
+            self.first.isDefined.ifTrue(() => thenCase(), () => elseCase())
+            /*IfTSL.doif(self.first.isDefined, ~)
               then
                 val cell = makeOneCell(e)
                 self.last.map[Unit](c:Cell => c.next = option.Some[Cell](cell))
                 self.last = option.Some[Cell](cell)
               else
                 self.first = option.Some[Cell](makeOneCell(e))
-                self.last = self.first
+                self.last = self.first*/
             self.size = self.size + 1
         def find(pred:self.E -> Boolean):Option[E]
             self.first.flatMap[E](c:Cell => c.find(pred))
