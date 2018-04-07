@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -222,5 +223,9 @@ public class RefinementType extends ValueType {
             }
         }
         dest.append(']');
+    }
+    @Override
+    public Value getMetadata(TypeContext ctx) {
+        return base.getMetadata(ctx);
     }
 }

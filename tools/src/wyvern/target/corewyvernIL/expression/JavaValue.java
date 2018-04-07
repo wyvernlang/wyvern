@@ -80,7 +80,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             ObjectValue v = null;
             try {
                 v = (ObjectValue) TestUtil.evaluate("import wyvern.collections.list\n"
-                      + "list.make()\n");
+                      + "list.makeD()\n");
                 for (Object elem : (List<?>) result) {
                     List<Value> args = new LinkedList<>();
                     args.add(javaToWyvern(elem));

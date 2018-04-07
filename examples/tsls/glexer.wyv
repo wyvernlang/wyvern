@@ -41,11 +41,11 @@ resource type ScannerConfig
 	// TODO: make this private
 	def getScanResult(s:String):ScanResult
 	
-def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new
-	val regexList : List = list.make()
+def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new (self)=>
+	val regexList : List[RegexpKindPair] = list.make[RegexpKindPair]()
 	
 	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
-		this.regexList.append(makeRKPair(r,k))
+		self.regexList.append(makeRKPair(r,k))
 
 	// TODO: enforce that the scanner config is frozen before calling this
 	def getScanResult(s:String):ScanResult
@@ -55,7 +55,7 @@ def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new
 		val sWithoutWS : String = wsMatch.getOrElse(()=> s)
 		
 		// find a match, if possible
-		val tokMatch : option.Option[RegexpKindPair] = this.regexList.find((rkp:RegexpKindPair) =>
+		val tokMatch : option.Option[RegexpKindPair] = self.regexList.find((rkp:RegexpKindPair) =>
 			rkp.regex.findPrefixMatchOf(sWithoutWS).isDefined
 		)
 		

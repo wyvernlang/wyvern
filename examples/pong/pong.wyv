@@ -1,8 +1,6 @@
 require pygame
 require wyvern.String
 
-import metadata wyvern.IfTSL
-
 resource type GameLoop
   val fps : Int
   val done : Boolean
@@ -22,8 +20,7 @@ def run(gameLoop : GameLoop) : Unit
   clock.tick(gameLoop.fps)
   gameLoop.oneIteration()
   processEvents(gameLoop)
-  IfTSL.doifR(gameLoop.done, ~)
-    then
+  if(gameLoop.done)
       0
     else
       run(gameLoop)
@@ -98,11 +95,9 @@ def makePaddle(paddleX : Int) : NonInteractivePaddle = new
 
   def update() : Unit
     this.y = this.y + this.speed
-    IfTSL.doifR(this.y + paddleHeight > height, ~)
-      then
+    if(this.y + paddleHeight > height)
         this.y = height - paddleHeight
-    IfTSL.doifR(this.y < 0, ~)
-      then
+    if(this.y < 0)
         this.y = 0
 
   def setPaddleSpeed(speed : Int) : Unit
@@ -117,21 +112,16 @@ def makePlayerPaddle() : Paddle = new
   def hitbox() : pygame.Rect = this.paddle.hitbox()
   def processEvent(e : pygame.Event) : Unit
     val eventType = pygame.helper.getType(e)
-    IfTSL.doifR(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP, ~)
-      then
-        IfTSL.doifR(e.key == pygame.K_UP,  ~)
-          then
+    if(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP)
+        if(e.key == pygame.K_UP)
             this.upPressed = (eventType == pygame.KEYDOWN)
           else
-            IfTSL.doifR(e.key == pygame.K_DOWN, ~)
-              then
+            if(e.key == pygame.K_DOWN)
                 this.downPressed = (eventType == pygame.KEYDOWN)
-    IfTSL.doifR(this.upPressed, ~)
-      then
+    if(this.upPressed)
         this.paddle.speed = -3
       else
-        IfTSL.doifR(this.downPressed, ~)
-          then
+        if(this.downPressed)
             this.paddle.speed = 3
           else
             this.paddle.speed = 0
@@ -162,34 +152,27 @@ val ball = new
     blip.play()
 
   def update(leftHitbox : pygame.Rect, rightHitbox : pygame.Rect) : Unit
-    IfTSL.doifR(this.x < 0, ~)
-      then
+    if(this.x < 0)
         this.flipX()
         scoreboard.opponentScore = scoreboard.opponentScore + 1
-    IfTSL.doifR(this.x > width, ~)
-      then
+    if(this.x > width)
         this.flipX()
         scoreboard.playerScore = scoreboard.playerScore + 1
-    IfTSL.doifR(this.y < 0 || this.y > height, ~)
-      then
+    if(this.y < 0 || this.y > height)
         this.flipY()
 
-    IfTSL.doifR(this.x < leftHitbox.right &&
+    if(this.x < leftHitbox.right &&
                 this.x > leftHitbox.left &&
                 this.y > leftHitbox.top &&
                 this.y < leftHitbox.bottom &&
-                this.xSpeed < 0,
-                ~)
-      then
+                this.xSpeed < 0)
         this.flipXBlop()
 
-    IfTSL.doifR(this.x < rightHitbox.right &&
+    if(this.x < rightHitbox.right &&
                 this.x > rightHitbox.left &&
                 this.y > rightHitbox.top &&
                 this.y < rightHitbox.bottom &&
-                this.xSpeed > 0,
-                ~)
-      then
+                this.xSpeed > 0)
         this.flipXBlop()
 
     this.x = this.x + this.xSpeed
@@ -200,13 +183,11 @@ def makeAIPaddle() : Paddle = new
   def draw(screen : pygame.Surface) : Unit = this.paddle.draw(screen)
   def update() : Unit
     val center = this.paddle.y + paddleWidth / 2
-    IfTSL.doifR(center > ball.y, ~)
-      then
+    if(center > ball.y)
         this.paddle.speed = -2
       else
         this.paddle.speed = 0
-    IfTSL.doifR(center < ball.y, ~)
-      then
+    if(center < ball.y)
         this.paddle.speed = 2
     this.paddle.update()
   def hitbox() : pygame.Rect = this.paddle.hitbox()
@@ -236,11 +217,9 @@ val loop : GameLoop = new
 
     val gameLoop = this
     this.playerPaddle.update()
-    IfTSL.doifR(this.upPressed, ~)
-      then
+    if(this.upPressed)
         gameLoop.y = gameLoop.y - 2
-    IfTSL.doifR(this.downPressed, ~)
-      then
+    if(this.downPressed)
         gameLoop.y = gameLoop.y + 2
     ball.update(this.playerPaddle.hitbox(), this.aiPaddle.hitbox())
     this.aiPaddle.update()
@@ -248,21 +227,16 @@ val loop : GameLoop = new
   def processEvent(e : pygame.Event) : Unit
     val eventType = pygame.helper.getType(e)
     this.playerPaddle.processEvent(e)
-    IfTSL.doifR(eventType == pygame.QUIT, ~)
-      then
+    if(eventType == pygame.QUIT)
         this.done = true
     def keyEvents() : Unit
-      IfTSL.doifR(e.key == pygame.K_UP, ~)
-        then
+      if(e.key == pygame.K_UP)
           this.upPressed = (eventType == pygame.KEYDOWN)
-      IfTSL.doifR(e.key == pygame.K_DOWN, ~)
-        then
+      if(e.key == pygame.K_DOWN)
           this.downPressed = (eventType == pygame.KEYDOWN)
-      IfTSL.doifR(e.key == pygame.K_ESCAPE, ~)
-        then
+      if(e.key == pygame.K_ESCAPE)
           this.done = true
-    IfTSL.doifR(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP, ~)
-      then
+    if(eventType == pygame.KEYDOWN || eventType == pygame.KEYUP)
         keyEvents()
     
 
