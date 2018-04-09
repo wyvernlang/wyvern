@@ -65,7 +65,7 @@ public class OIRTests {
         GenContext pythonGenContext = Globals.getGenContext(state);
         LinkedList<TypedModuleSpec> dependencies = new LinkedList<>();
         IExpr iLprogram = ast.generateIL(pythonGenContext, null, dependencies);
-        iLprogram = state.getResolver().wrap(iLprogram, dependencies);
+        iLprogram = state.getResolver().wrapForPython(iLprogram, dependencies);
         TailCallVisitor.annotate(iLprogram);
 
         if (debug) {
@@ -662,7 +662,7 @@ public class OIRTests {
                       + "  else\n"
                       + "    8"
                       + "\n";
-        testPyFromInput(input, "");
+        testPyFromInput(input, "8");
     }
 
     @Test
@@ -676,7 +676,7 @@ public class OIRTests {
                       + "  else\n"
                       + "    6\n"
                       + "x\n\n";
-        testPyFromInput(input, "");
+        testPyFromInput(input, "7");
     }
 
     @Test

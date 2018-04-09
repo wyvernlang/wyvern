@@ -49,6 +49,7 @@ public final class Globals {
     private static final Set<String> javaWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
     private static SeqExpr prelude = null;
+    private static Module preludeModule = null;
 
     static {
         // the whitelist that anyone can import without requiring java or becoming a resource module
@@ -73,7 +74,17 @@ public final class Globals {
         gettingPrelude = false;
     }
 
-    private static SeqExpr getPrelude(GenContext ctx) {
+    public static Module getPreludeModule() {
+        if (!usePrelude) {
+            throw new RuntimeException("may not call getPreludeModule if preludes are disabled");
+        }
+        if (prelude == null) {
+            getPrelude();
+        }
+        return preludeModule;
+    }
+
+    private static SeqExpr getPrelude() {
         if (!usePrelude) {
             return new SeqExpr();
         }
@@ -85,18 +96,8 @@ public final class Globals {
             String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
             File file = new File(preludeLocation);
 
-            Module preludeM = ModuleResolver.getLocal().load("<prelude>", file, true);
-
-            /*TypedAST ast = null;
-            try {
-                ast = TestUtil.getNewAST(file);
-            } catch (ParseException e) {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR,
-                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
-            }
-            IExpr program = ((ExpressionAST) ast).generateIL(ctx, null, dependencies);*/
-            //prelude = (SeqExpr) preludeM.getExpression();
-            prelude = ModuleResolver.getLocal().wrap(preludeM.getExpression(), preludeM.getDependencies());
+            preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
+            prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
         }
         return prelude;
     }
@@ -125,7 +126,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
         genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
-        SeqExpr sexpr = getPrelude(genCtx);
+        SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(genCtx);
         return newCtx;
     }
@@ -202,7 +203,7 @@ public final class Globals {
         GenContext ctx = GenContext.empty();
         ctx = ctx.extend("system", new Variable("system"), getSystemType());
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
-        SeqExpr sexpr = getPrelude(ctx);
+        SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(ctx);
         return newCtx;
     }
