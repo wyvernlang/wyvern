@@ -1,4 +1,4 @@
-module IfTSL2
+module IfTSL
 
 import wyvern.internal.ast
 import wyvern.option
@@ -12,12 +12,12 @@ def elseMatch(input : String) : regex.Match
   val mOpt = thenRegex.findPrefixMatchOf(input)
   mOpt.getOrElse(() => regex.makeMatch("", input))
 
-def indentedBlockMatch(input : String) : regex.Match
+def thenBlockMatch(input : String) : regex.Match
   val blockRegex = regex("(\\s[^\n]*\n)+")
   val blockMatchOpt = blockRegex.findPrefixMatchOf(input)
-
-  val emptymatch = regex.makeMatch("", input)
-  val m : regex.Match = blockMatchOpt.getOrElse(() => emptymatch)
+  // if no match with an indent, then there is a "then" with no "else"
+  val fullMatch = regex.makeMatch(input, "")
+  val m : regex.Match = blockMatchOpt.getOrElse(() => fullMatch)
   m
 
 def toUnitOrAST(input : String, ctx : system.Context) : ast.AST
@@ -40,7 +40,7 @@ resource type Blocks
   metadata new
     def parseTSL(input : String, ctx : system.Context) : option.Option
       val trimmedInput = ast.stripLeadingWhitespace(input)
-      val trueMatch = indentedBlockMatch(trimmedInput)
+      val trueMatch = thenBlockMatch(trimmedInput)
       val em = elseMatch(trueMatch.after())
       val trueAST : AST = toUnitOrAST(trueMatch.matched(), ctx)
       val falseAST : AST = toUnitOrAST(em.after(), ctx)
