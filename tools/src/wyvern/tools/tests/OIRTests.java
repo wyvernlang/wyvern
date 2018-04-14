@@ -620,8 +620,8 @@ public class OIRTests {
         String input =
                 "require stdout\n"
                       + "import wyvern.option\n"
-                      + "val orElse : option.UnitToDyn = new\n"
-                      + "  def apply() : Dyn = 5\n"
+                      + "val orElse : Unit -> Int = new\n"
+                      + "  def apply() : Int = 5\n"
                       + "val v1 : Int = option.Some(3).getOrElse(orElse)\n"
                       + "val v2 : Int = option.None[Int]().getOrElse(orElse)\n"
                       + "stdout.printInt(v1+v2)\n"
