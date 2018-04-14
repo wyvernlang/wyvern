@@ -1,0 +1,26 @@
+tagged type List comprises Cons, Nil
+	type T
+	val length:system.Int
+    
+tagged type Cons extends List
+	type T
+	val value:this.T
+	val next:List[this.T]
+	val length:system.Int
+    
+tagged type Nil extends List
+	type T
+	val length:system.Int
+
+def head(list:List[system.Int]):system.Int
+	match list:
+		c:Cons[system.Int] => c.value
+		n:Nil[system.Int] => 0
+
+val x : Nil[system.Int] = new
+	type T = system.Int
+	val length = 0
+	
+val h = head(x)
+
+h

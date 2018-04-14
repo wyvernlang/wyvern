@@ -618,6 +618,18 @@ public class ILTests {
         TestUtil.doTestScriptModularly("modules.module.operator-plus", Util.intType(), new IntegerLiteral(5));
     }
 
+
+    @Test
+    public void testTaggedList() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.module.taggedList", Util.intType(), Util.intValue(0));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testParametrizedTaggedList() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.module.parametrizedList", Util.intType(), Util.intValue(0));
+    }
+
     @Test
     public void testJavaImport2() throws ParseException {
         String input = "module def main(java : Java)\n\n"

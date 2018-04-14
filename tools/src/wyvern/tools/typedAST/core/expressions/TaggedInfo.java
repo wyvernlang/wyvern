@@ -3,7 +3,6 @@ package wyvern.tools.typedAST.core.expressions;
 import java.util.ArrayList;
 import java.util.List;
 
-import wyvern.tools.typedAST.core.declarations.AbstractTypeDeclaration;
 import wyvern.tools.types.Type;
 
 /**
@@ -14,30 +13,10 @@ import wyvern.tools.types.Type;
  */
 public class TaggedInfo {
 
-    // private static Map<TypeBinding, TaggedInfo> globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
-    private static List<TaggedInfo> globalTagStoreList = new ArrayList<TaggedInfo>();
-
     private String tagName;
     private Type tagType;
-
-
-    // Note that caseOf and comprises only use Type when parsing, they should all be replaced with appropriate
-    // TaggedInfo during runtime or for type checking of tags to work.
     private Type caseOf;
-
     private List<Type> comprises;
-
-    public TaggedInfo getCaseOfTaggedInfo() {
-        return caseOfTaggedInfo;
-    }
-
-    public void setCaseOfTaggedInfo(TaggedInfo caseOfTaggedInfo) {
-        this.caseOfTaggedInfo = caseOfTaggedInfo;
-    }
-
-    // The only thing that matters is TaggedInfo address and caseOf/comprises relation below.
-    private TaggedInfo caseOfTaggedInfo;
-    // private List<TaggedInfo> comprisesTaggedInfos;
 
     /**
      * Constructs an empty TaggedInfo.
@@ -49,27 +28,21 @@ public class TaggedInfo {
 
     public TaggedInfo(String name, Type type) {
         this.comprises = new ArrayList<Type>();
-
         this.tagName = name;
         this.tagType = type;
     }
 
     /**
      * Constructs a TaggedInfo with the given caseOf, and no comprises.
-     * @param caseOf
+     * @param caseOf the datatype that this tagged type is a subtype of
      */
     public TaggedInfo(Type caseOf) {
         this(caseOf, null);
     }
 
-    public TaggedInfo(TaggedInfo caseOfTaggedInfo, List<TaggedInfo> comprisesTaggedInfos) {
-        this.caseOfTaggedInfo = caseOfTaggedInfo;
-        // this.comprisesTaggedInfos = comprisesTaggedInfos;
-    }
-
     /**
      * Constructs a TaggedInfo with the given comprises tags.
-     * @param comprises
+     * @param comprises the list of subtypes for a tagged type
      */
     public TaggedInfo(List<Type> comprises) {
         this(null, comprises);
@@ -80,8 +53,8 @@ public class TaggedInfo {
      *
      * comprises cannot be null or a NullPointerException is thrown.
      *
-     * @param caseOf
-     * @param comprises
+     * @param caseOf the datatype that this tagged type is a subtype of
+     * @param comprises the list of subtypes for a tagged type
      */
     public TaggedInfo(Type caseOf, List<Type> comprises) {
         this.caseOf = caseOf;
@@ -99,14 +72,9 @@ public class TaggedInfo {
      *
      * @param tagName
      */
-    public void setTagName(String tagName, AbstractTypeDeclaration td) {
+    public void setTagName(String tagName) {
         this.tagName = tagName;
-
-        // One of these will be null:
-        // this.td = td;
     }
-
-    // private AbstractTypeDeclaration td;
 
     /**
      * Gets the tag's name.
@@ -158,44 +126,6 @@ public class TaggedInfo {
     }
 
     public static void clearGlobalTaggedInfos() {
-//        globalTagStore = new HashMap<TypeBinding, TaggedInfo>();
-        globalTagStoreList = new ArrayList<TaggedInfo>();
+        // TODO Auto-generated method stub
     }
-
-//    public static Map<TypeBinding, TaggedInfo> getGlobalTagStore() {
-//        return globalTagStore;
-//    }
-
-    /**
-     * Returns the global tag store, as a list.
-     *
-     * This has the same contents as the Map<String, TaggedInfo> map, just
-     * without them being mapped by the tag name.
-     *
-     * @return
-     */
-    public static List<TaggedInfo> getGlobalTagStoreList() {
-        return globalTagStoreList;
-    }
-
-//    public static TaggedInfo lookupTag(TypeBinding t) {
-//        TaggedInfo info = globalTagStore.get(t);
-//
-//        return info;
-//    }
-
-    public static TaggedInfo lookupTagByType(Type t) {
-        if (t == null) {
-            return null;
-        }
-
-        for (TaggedInfo i : globalTagStoreList) {
-
-            if (i.tagType.equals(t)) {
-                return i;
-            }
-        }
-        return null;
-    }
-
 }

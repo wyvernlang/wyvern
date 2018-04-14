@@ -129,7 +129,11 @@ public class RefinementType extends ValueType {
         }
         if (current != max) {
             // TODO: replace with a nice warning
-            throw new RuntimeException("invalid refinement type " + this);
+            // throw new RuntimeException("invalid refinement type " + this);
+
+            // this RefinementType was created by "new", therefore just use
+            // all the DeclTypes from the RefinementType and none from the base
+            newDTs = getDeclTypes(ctx);
         }
 
         return new StructuralType(baseST.getSelfName(), newDTs, isResource(ctx));

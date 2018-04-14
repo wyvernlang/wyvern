@@ -129,7 +129,7 @@ public class DefDeclaration extends NamedDeclaration {
         }
 
         FailureReason r = new FailureReason();
-        if (!bodyType.isSubtypeOf(getType(), methodCtx, r)) {
+        if (bodyType != null && !bodyType.isSubtypeOf(getType(), methodCtx, r)) {
             // for debugging
             ValueType resultType = getType();
             bodyType.isSubtypeOf(resultType, methodCtx, r);

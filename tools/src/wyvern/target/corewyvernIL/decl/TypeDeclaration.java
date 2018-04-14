@@ -66,7 +66,7 @@ public class TypeDeclaration extends NamedDeclaration {
      */
     @Override
     public DeclType getDeclType() {
-        return new ConcreteTypeMember(getName(), (ValueType) sourceType, this.metadata);
+        return new ConcreteTypeMember(getName(), (ValueType) (sourceType.getValueType()), this.metadata);
     }
 
 }

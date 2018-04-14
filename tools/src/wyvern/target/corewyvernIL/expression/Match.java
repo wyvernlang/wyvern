@@ -7,8 +7,11 @@ import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 
 public class Match extends Expression {
 
@@ -48,8 +51,27 @@ public class Match extends Expression {
 
     @Override
     public Value interpret(EvalContext ctx) {
-        // TODO Auto-generated method stub
-        return null;
+        Value matchValue = matchExpr.interpret(ctx);
+        ValueType matchType = matchValue.getType();
+        Case matchedCase = null;
+        FailureReason reason = new FailureReason();
+        for (Case c : cases) {
+            ValueType caseMatchedType = c.getPattern();
+            if (matchType.isSubtypeOf(caseMatchedType, ctx, reason)) {
+                matchedCase = c;
+            }
+        }
+        FailureReason r = new FailureReason();
+        if (matchedCase == null && elseExpr == null) {
+            ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchValue.toString());
+        }
+        if (matchedCase == null) {
+            return elseExpr.interpret(ctx);
+        } else {
+            ctx = ctx.extend(matchedCase.getVarName(), matchValue);
+            Expression caseBody = matchedCase.getBody();
+            return caseBody.interpret(ctx);
+        }
     }
 
     @Override
@@ -66,7 +88,9 @@ public class Match extends Expression {
             // if p returns y.f.x, the variable at the root of the path = y
 
         }
-        freeVars.addAll(elseExpr.getFreeVariables());
+        if (elseExpr != null) {
+            freeVars.addAll(elseExpr.getFreeVariables());
+        }
         return freeVars;
     }
 }
