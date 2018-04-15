@@ -19,11 +19,15 @@ public class Match extends Expression {
     private Expression elseExpr;
     private List<Case> cases;
 
-    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases) {
-        super();
+    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases, ValueType caseType) {
+        super(caseType);
         this.matchExpr = matchExpr;
         this.elseExpr = elseExpr;
         this.cases = cases;
+    }
+
+    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases) {
+        this(matchExpr, elseExpr, cases, null);
     }
 
     public Expression getMatchExpr() {
@@ -40,8 +44,40 @@ public class Match extends Expression {
 
     @Override
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
-        // TODO Auto-generated method stub
-        return null;
+        // typecheck the match expression
+        ValueType matchType = matchExpr.typeCheck(env, effectAccumulator);
+
+        if (getType() == null) {
+            Case c = cases.get(0);
+            TypeContext caseCtx = env.extend(c.getVarName(), c.getPattern());
+            ValueType type = c.getBody().typeCheck(caseCtx, effectAccumulator);
+            this.setExprType(type);
+        }
+
+        // typecheck the default case
+        if (elseExpr != null) {
+            ValueType elseType = elseExpr.typeCheck(env, effectAccumulator);
+            FailureReason reason = new FailureReason();
+            if (elseType.isSubtypeOf(getType(), env, reason)) {
+                ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, elseExpr, reason.getReason());
+            }
+        }
+
+        // typecheck the other cases
+        for (Case c : cases) {
+            FailureReason reason = new FailureReason();
+            if (!c.getPattern().isSubtypeOf(matchType, env, reason)) {
+                ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, c, c.getPattern().desugar(env), matchType.desugar(env), reason.getReason());
+            }
+
+            TypeContext caseCtx = env.extend(c.getVarName(), c.getPattern());
+            ValueType caseType = c.getBody().typeCheck(caseCtx, effectAccumulator);
+            reason = new FailureReason();
+            if (!caseType.isSubtypeOf(getType(), caseCtx, reason)) {
+                ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, elseExpr, reason.getReason());
+            }
+        }
+        return getType();
     }
 
     @Override

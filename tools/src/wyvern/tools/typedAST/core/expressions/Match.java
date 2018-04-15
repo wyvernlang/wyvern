@@ -7,10 +7,13 @@ import java.util.stream.Collectors;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -90,10 +93,11 @@ public class Match extends AbstractExpressionAST implements CoreAST {
         for (Case c : cases) {
             Type t = c.getTaggedTypeMatch();
             ValueType vt = t == null ? null : t.getILType(ctx);
+            FailureReason reason = new FailureReason();
             if (expectedMatchType == null) {
                 expectedMatchType = vt;
-            } else if (vt != null && !(vt.isSubtypeOf(expectedMatchType, ctx, null))) {
-                throw new RuntimeException("Case types don't agree");
+            } else if (vt != null && !(vt.isSubtypeOf(expectedMatchType, ctx, reason))) {
+                ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, c.getAST(), vt.desugar(ctx), expectedMatchType.desugar(ctx), reason.getReason());
             }
         }
         ValueType matchType = expectedMatchType;
@@ -110,13 +114,15 @@ public class Match extends AbstractExpressionAST implements CoreAST {
                                                              .collect(Collectors.toList());
         ValueType expectedCaseType = expectedType;
         for (wyvern.target.corewyvernIL.Case c : casesIL) {
-            ValueType caseType = c.getBody().getType();
-            if (expectedCaseType != null && caseType != null && caseType != expectedType) {
-                throw new RuntimeException("Nope");
+            GenContext caseCtx = ctx.extend(c.getVarName(), c.getPattern());
+            ValueType caseType = c.getBody().typeCheck(caseCtx, null);
+            FailureReason reason = new FailureReason();
+            if (expectedCaseType != null && !caseType.isSubtypeOf(expectedCaseType, ctx, reason)) {
+                ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
             } else {
                 expectedCaseType = caseType;
             }
         }
-        return new wyvern.target.corewyvernIL.expression.Match((Expression) matchExpr, elseExpr, casesIL);
+        return new wyvern.target.corewyvernIL.expression.Match((Expression) matchExpr, elseExpr, casesIL, expectedCaseType);
     }
 }

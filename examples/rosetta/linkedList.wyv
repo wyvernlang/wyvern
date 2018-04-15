@@ -1,0 +1,45 @@
+// implements a singly-linked list data structure, insertion, and traversal from rosettacode.org
+
+require stdout
+
+// TODO: would be cleaner with a datatype declaration
+tagged resource type LList comprises Cons, Nil
+    
+tagged resource type Cons extends LList
+    val value:system.Int
+    var next:LList
+    
+tagged type Nil extends LList
+
+val Nil = new
+
+def Cons(v:Int, n:LList):Cons = new
+    val value = v
+    var next:LList = n
+
+def length(l:LList):Int
+    match l:
+        n:Nil => 0
+        c:Cons => length(c.next)+1
+
+// TODO: would be cleaner with recursive pattern matching, using newElement
+def insertAfter(l:LList, locationElement:Int, newElement:Int):Unit = match l:
+    n:Nil => unit // not found
+    c:Cons => if (c.value == locationElement)
+            c.next = Cons(newElement, c.next)
+        else
+            insertAfter(c.next, locationElement, newElement)
+
+def traverse(l:LList):Unit
+    // TODO: allow this whole thing to be an indented DSL block in the second case arm
+    def printAndContinue(c:Cons):Unit
+        stdout.printInt(c.value)
+        traverse(c.next)
+    match l:
+        n:Nil => unit
+        c:Cons => printAndContinue(c)
+            
+val aList = Cons(5, Cons(4, Nil))
+insertAfter(aList, 5, 3)
+traverse(aList)
+length(aList)

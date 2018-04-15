@@ -170,7 +170,7 @@ public class StructuralType extends ValueType {
 
         // a resource type is not a subtype of a non-resource type
         if (isResource(GenContext.empty()) && !st.isResource(GenContext.empty())) {
-            reason.setReason("the destination type is not a resource");
+            reason.setReason("the second type is not a resource");
             return false;
         }
 

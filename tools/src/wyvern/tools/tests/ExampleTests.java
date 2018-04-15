@@ -62,6 +62,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testLinkedList() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.linkedList", Util.intType(), Util.intValue(3));
+    }
+
+    @Test
     public void testTSL() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
     }
