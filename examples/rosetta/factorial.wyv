@@ -12,7 +12,12 @@ def fact(n:Int):Int
         else
             n * fact(n-1)
 
+def fact2(n:Int):Int
+    if (n < 2) { 1 } else { n * fact2(n-1) }
+            
 stdout.print("factorial(15) = ")
 stdout.printInt(factorial(15))
 stdout.print("\nand another way:")
 stdout.printInt(fact(15))
+stdout.print("\nand yet another:")
+stdout.printInt(fact2(15))
