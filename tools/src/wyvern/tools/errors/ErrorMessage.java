@@ -36,6 +36,7 @@ public enum ErrorMessage {
     NO_METADATA_FROM_RESOURCE("Cannot load metadata from a resource module", 0),
     MUST_BE_A_RESOURCE("%ARG must be a resource type", 1),
     MUST_BE_A_RESOURCE_MODULE("%ARG must be a resource module", 1),
+    NO_METADATA_WHEN_PARSING_TSL("Cannot parse TSL as type %ARG has no metadata", 1),
     METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method", 0),
     METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object", 1),
     WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG, but found %ARG", 2),

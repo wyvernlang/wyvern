@@ -336,7 +336,7 @@ public class AST {
         String toStrip = null;
         String line = null;
         BufferedReader bufReader = new BufferedReader(new StringReader(input));
-        Pattern p = Pattern.compile("^(\\s+).+");
+        Pattern p = Pattern.compile("^(\\s+).*");
         while ((line = bufReader.readLine()) != null) {
             Matcher m = p.matcher(line);
             String leadingWhitespace;

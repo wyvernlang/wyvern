@@ -64,6 +64,9 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
         }
         try {
             final wyvern.target.corewyvernIL.expression.Value metadata = expectedType.getMetadata(ctx);
+            if (metadata == null) {
+                ToolError.reportError(ErrorMessage.NO_METADATA_WHEN_PARSING_TSL, this, expectedType.desugar(ctx));
+            }
             if (!(metadata instanceof Invokable)) {
                 ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
             }

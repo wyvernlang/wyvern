@@ -62,4 +62,6 @@ interface ASTBuilder<AST, Type> {
 
     void addArgument(AST application, AST argument) throws ParseException;
 
+    AST parseExpr(String source, FileLocation loc);
+
 }

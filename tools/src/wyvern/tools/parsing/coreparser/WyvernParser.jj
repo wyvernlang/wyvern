@@ -639,15 +639,15 @@ AST ExpressionLine(boolean makeValDecl) :
 }
 
 Object CaseArm() :
-{ Token id; Token t; AST exp; Type type; }
+{ Token id; Token t; Token dslTok = null; AST exp = null; Type type; }
 {
   id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW>
   ( exp=ExpressionLine(false)
-  /*| <NEWLINE> <INDENT> exp = DeclSequence(false) <DEDENT>
-  | exp=DSLLines() // likely will get this*/
+  | <NEWLINE> dslTok=DSLLines()
   ) {
-                //AST dsl = build.dsl(loc(t2));
-                //build.setDSLBody(dsl, t2.image);
+    if (dslTok != null) {
+	    exp = build.parseExpr(dslTok.image, loc(dslTok));
+    }
     return build.caseArm(id.image,type,exp,loc(t));
   }
 }

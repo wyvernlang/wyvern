@@ -1,5 +1,6 @@
 package wyvern.tools.parsing.coreparser;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,12 +12,13 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.Script;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
@@ -39,6 +41,7 @@ import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
 import wyvern.tools.types.QualifiedType;
@@ -309,6 +312,41 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST instantiation(URI uri, List<TypedAST> args, Token name, FileLocation loc) {
         return new Instantiation(uri, args, name.image, loc);
+    }
+
+    @Override
+    public TypedAST parseExpr(String source, FileLocation loc) {
+        ExpressionAST ast;
+        try {
+            String withoutLeading = wyvern.stdlib.support.AST.utils.stripLeadingWhitespace(source);
+            //TODO: adjust error messages below based on whitespace stripped above;
+            ast = (ExpressionAST) TestUtil.getNewAST(withoutLeading + "\n", "Indented Parse");
+            if (ast instanceof Script) {
+                Script s = (Script) ast;
+                if (!s.getImports().isEmpty() || !s.getRequires().isEmpty()) {
+                    ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                                          s.getImports().isEmpty() ? s.getRequires().get(0).getLocation() : s.getImports().get(0).getLocation(),
+                                          "may not have import or requires here");
+                }
+            }
+        } catch (ParseException e) {
+            Token errorLocToken = e.getCurrentToken();
+            FileLocation newLoc = adjustLocation(loc, errorLocToken);
+            ToolError.reportError(ErrorMessage.PARSE_ERROR, newLoc, e.getMessage());
+            throw new RuntimeException("weird, shouldn't get here");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new RuntimeException("weird, shouldn't get here");
+        }
+        return ast;
+    }
+
+    private FileLocation adjustLocation(FileLocation baseLocation, Token errorLocToken) {
+        int line = errorLocToken.beginLine;
+        int character = errorLocToken.beginColumn;
+        FileLocation newLoc = new FileLocation(baseLocation.getFilename(), baseLocation.getLine() + line - 1, baseLocation.getCharacter() + character - 1);
+        return newLoc;
     }
 
     @Override

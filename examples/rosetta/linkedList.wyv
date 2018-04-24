@@ -31,13 +31,11 @@ def insertAfter(l:LList, locationElement:Int, newElement:Int):Unit = match l:
             insertAfter(c.next, locationElement, newElement)
 
 def traverse(l:LList):Unit
-    // TODO: allow this whole thing to be an indented DSL block in the second case arm
-    def printAndContinue(c:Cons):Unit
-        stdout.printInt(c.value)
-        traverse(c.next)
     match l:
         n:Nil => unit
-        c:Cons => printAndContinue(c)
+        c:Cons =>
+            stdout.printInt(c.value)
+            traverse(c.next)
             
 val aList = Cons(5, Cons(4, Nil))
 insertAfter(aList, 5, 3)

@@ -46,7 +46,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
     }
     @Override
     public Value getMetadataValue() {
-        if (!(metadata instanceof Value)) {
+        if (metadata != null && !(metadata instanceof Value)) {
             ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
         }
         return (Value) metadata;
