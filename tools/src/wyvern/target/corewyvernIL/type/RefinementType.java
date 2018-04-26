@@ -153,14 +153,34 @@ public class RefinementType extends ValueType {
             return false;
         }
         RefinementType other = (RefinementType) obj;
-        if (declTypes == null) {
-            if (other.declTypes == null) {
-                return base.equals(other.base) && typeParams.equals(other.typeParams);
-            } else {
+        if (declTypes == null && other.declTypes == null) {
+            return base.equals(other.base) && typeParams.equals(other.typeParams);
+        }
+        if (declTypes == null || other.declTypes == null) {
+            if (!base.equals(other.base)) {
                 return false;
             }
+            return countRefinements() == other.countRefinements() && getParamList().equals(other.getParamList());
         }
         return base.equals(other.base) && declTypes.equals(other.declTypes);
+    }
+
+    private int countRefinements() {
+        return (declTypes != null) ? declTypes.size() : typeParams.size();
+    }
+
+    private List<ValueType> getParamList() {
+        if (typeParams != null) {
+            return typeParams;
+        }
+        LinkedList<ValueType> result = new LinkedList<ValueType>();
+        for (DeclType dt : declTypes) {
+            if (dt instanceof ConcreteTypeMember) {
+                ConcreteTypeMember ctm = (ConcreteTypeMember) dt;
+                result.addLast(ctm.getRawResultType());
+            }
+        }
+        return result;
     }
 
     @Override

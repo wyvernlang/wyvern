@@ -58,7 +58,7 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
 
     @Override
     public ValueType getILType(GenContext ctx) {
-        return new NominalType(getPath(base,ctx), name, getLocation());
+        return new NominalType(getPath(base, ctx), name, getLocation());
     }
 
     private static Path getPathOld(ExpressionAST ast, GenContext ctx) {
@@ -70,7 +70,7 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
         if (!exp.equals(path2)) {
             throw new RuntimeException("surprise!");
         }
-        return (Path)exp;
+        return (Path) exp;
     }
     /** Gets a Path from an ExpressionAST without typechecking.
      * We do still take a context for looking up variable renamings.
@@ -84,7 +84,7 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
             if (!(exp instanceof Path)) {
                 ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS, ast);
             }
-            return (Path)exp;
+            return (Path) exp;
         } else if (ast instanceof Invocation) {
             Invocation i = (Invocation) ast;
             Path subPath = getPath(i.getReceiver(), ctx);
