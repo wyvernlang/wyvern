@@ -248,8 +248,8 @@ public class ILTests {
                 + "c.element\n\n"
                 + "val l : List = t\n\n"
                 + "match(l)\n"
-                + "    case Nil => 0\n"
-                + "    case c:Cons => c.element\n";
+                + "    Nil => 0\n"
+                + "    c:Cons => c.element\n";
         TestUtil.getNewAST(input, "test input");
     }
 
