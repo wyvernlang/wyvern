@@ -106,8 +106,12 @@ public class New extends AbstractExpressionAST implements CoreAST {
          */
         ValueType type = null;
         if (expectedType != null) {
-            List<DeclType> declTypes = structuralType.getDeclTypes();
-            type = new RefinementType(expectedType, declTypes, this);
+            if (expectedType.isTagged(ctx)) {
+                List<DeclType> declTypes = structuralType.getDeclTypes();
+                type = new RefinementType(expectedType, declTypes, this, selfName);
+            } else {
+                type = structuralType;
+            }
         } else {
             type = structuralType;
         }

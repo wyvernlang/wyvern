@@ -52,4 +52,9 @@ public class DynamicType extends ValueType {
     public ValueType doAvoid(String varName, TypeContext ctx, int count) {
         return this;
     }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return false;
+    }
 }

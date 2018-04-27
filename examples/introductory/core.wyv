@@ -40,9 +40,9 @@ new (this) =>
 
     tagged type List comprises this.Cons, this.Nil
         type T
-    tagged type Cons extends this.List
+    tagged type Cons extends this.List (self) =>
         type T
-        val value:this.T
+        val value:self.T
         val next:this.List
     tagged type Nil extends this.List
         type T

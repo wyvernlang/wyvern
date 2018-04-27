@@ -20,9 +20,10 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class RefinementType extends ValueType {
-    public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc) {
+    public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, String selfName) {
         this.base = base;
         this.declTypes = declTypes;
+        this.selfName = selfName;
     }
 
     public RefinementType(List<ValueType> typeParams, ValueType base, HasLocation hasLoc) {
@@ -32,6 +33,7 @@ public class RefinementType extends ValueType {
     }
 
     private ValueType base;
+    private String selfName;
     private List<DeclType> declTypes = null; // may be computed lazily from typeParams
     private List<ValueType> typeParams;
 
@@ -79,7 +81,7 @@ public class RefinementType extends ValueType {
         for (DeclType dt : declTypes) {
             newDTs.add(dt.adapt(v));
         }
-        return new RefinementType(newBase, newDTs, this);
+        return new RefinementType(newBase, newDTs, this, selfName);
     }
 
     @Override
@@ -101,16 +103,22 @@ public class RefinementType extends ValueType {
         if (!changed && base == newBase) {
             return this;
         } else {
-            return new RefinementType(newBase, newDeclTypes, this);
+            return new RefinementType(newBase, newDeclTypes, this, selfName);
         }
     }
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
         base.checkWellFormed(ctx);
+        final TypeContext selfCtx = selfName == null ? ctx : ctx.extend(selfName, this);
         for (DeclType dt : getDeclTypes(ctx)) {
-            dt.checkWellFormed(ctx);
+            dt.checkWellFormed(selfCtx);
         }
+    }
+
+    /** Returns the self name if there is one, otherwise null */
+    public String getSelfName() {
+        return selfName;
     }
 
     @Override
@@ -251,5 +259,10 @@ public class RefinementType extends ValueType {
     @Override
     public Value getMetadata(TypeContext ctx) {
         return base.getMetadata(ctx);
+    }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return base.isTagged(ctx);
     }
 }

@@ -119,6 +119,7 @@ public class New extends Expression {
         }
 
         ValueType type = getType();
+        type.checkWellFormed(ctx);
         if (hasDelegate) {
             ValueType delegateObjectType = ctx.lookupTypeOf(delegateDeclaration.getFieldName());
             StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
