@@ -279,6 +279,11 @@ public class StructuralType extends ValueType {
         return resourceFlag == other.resourceFlag && selfName.equals(other.selfName) && declTypes.equals(other.declTypes);
     }
 
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return false;
+    }
+
 
     /*@Override
     public String toString() {

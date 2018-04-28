@@ -238,4 +238,10 @@ public class NominalType extends ValueType {
         }
     }
 
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        DeclType dt = this.getSourceDeclType(ctx);
+        return dt instanceof TaggedTypeMember;
+    }
+
 }
