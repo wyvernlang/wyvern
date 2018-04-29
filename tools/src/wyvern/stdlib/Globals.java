@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -98,6 +99,7 @@ public final class Globals {
 
             preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
             prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
+            TailCallVisitor.annotate(prelude);
         }
         return prelude;
     }

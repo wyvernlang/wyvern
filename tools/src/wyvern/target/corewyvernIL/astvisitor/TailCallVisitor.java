@@ -36,6 +36,7 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.type.DataType;
@@ -216,6 +217,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     @Override
     public Void visit(Boolean inTailPosition,
             ConcreteTypeMember concreteTypeMember) {
+        Value val = concreteTypeMember.getMetadataValue();
+        if (val != null) {
+            val.acceptVisitor(this, false);
+        }
         return null;
     }
 
