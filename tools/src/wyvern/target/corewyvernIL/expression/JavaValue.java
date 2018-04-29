@@ -124,7 +124,8 @@ public class JavaValue extends AbstractValue implements Invokable {
                 for (int i = 0; i < listLen; i++) {
                     LinkedList<Value> args = new LinkedList<>();
                     args.add(new IntegerLiteral(i));
-                    Value v = ((ObjectValue) (wyvList.invoke("get", args))).getField("value");
+                    Value element = MethodCall.trampoline(wyvList.invoke("get", args));
+                    Value v = ((ObjectValue) element).getField("value");
                     javaList.add(v);
                 }
                 return javaList;
