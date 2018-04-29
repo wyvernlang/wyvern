@@ -1,0 +1,11 @@
+// for testing effects defined by pure modules
+module def network10(stdout : Stdout) : effects.NetworkType01
+import effects.network10Effects as fx
+effect send = {fx.sendFx}
+effect receive = {fx.receiveFx}
+def sendData(data : String) : {} Unit
+    stdout.print("data sent: ")
+    stdout.print(data)
+    stdout.print("\n")
+def receiveData() : {receive} Unit
+    stdout.print("data received\n")

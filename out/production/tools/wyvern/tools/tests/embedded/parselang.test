@@ -1,0 +1,311 @@
+module test singleParser[IntegerConstant(2):Int]
+	file main
+		import wyv:hellolang
+		val helloed:Hellolang.Hello = {hello world}
+		helloed.get()
+	file hellolang
+		module Hellolang
+		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.parsing.HasParser
+		import java:wyvern.tools.parsing.ExtParser
+		import java:wyvern.tools.parsing.ParseBuffer
+		import java:java.lang.System
+		type Hello
+			def get():Int
+			metadata:HasParser = new
+				def getParser():ExtParser
+					new
+						def parse(buf:ParseBuffer):TypedAST
+							var depth:Int = 0
+
+							val iparser:ExtParser = ~
+								%%
+								%parser HelloWorld
+								%lex{
+									terminal TypedAST hello_t ::= /hello/ {:
+										~
+											2
+									:};
+									terminal Int world_t ::= /world/ {: 1 :};
+									terminal Unit space_t ::= / / {: () :};
+								%lex}
+								%cf{
+									non terminal TypedAST helloworld;
+									start with helloworld;
+									helloworld ::= hello_t:a space_t world_t:b {: a :};
+								%cf}
+
+							val parsed = iparser.parse(buf)
+							~
+								new
+									def get():Int = $parsed
+
+module test uriParser[StringConstant("http"):Str]
+	file main
+		import wyv:uri
+		val githubUri:URI.URI = {http://github.org}
+		githubUri.getProtocol()
+	file uri
+		module URI
+		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.parsing.HasParser
+		import java:wyvern.tools.parsing.ExtParser
+		import java:wyvern.tools.parsing.ParseBuffer
+		import java:java.lang.Integer
+		import java:java.lang.String
+		type URI
+			def getProtocol():Str
+			metadata:HasParser = new
+				def getParser():ExtParser = ~
+					%%
+					%parser URI
+					%lex{
+						terminal Unit plus_t ::= /\+/ {: () :};
+						terminal Unit divide_t ::= /\// {: () :};
+						terminal Unit colon_t ::= /:/ {: () :};
+						terminal Unit pound_t ::= /#/ {: () :};
+
+						terminal Str ialpha_t ::= /[a-zA-Z][a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]*/ {: lexeme :};
+						terminal Str xalphas_t ::= /[a-zA-Z0-9\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: lexeme :};
+						terminal Str xpalphas_t ::= /[a-zA-Z0-9\+\$\-\_\@\.\&\!\*\"\'\(\)\,\%]+/ {: lexeme :};
+						terminal Int num_t ::= /[0-9]+/ {: Integer.parseInt(String.create(lexeme).trim()) :};
+
+					%lex}
+					%cf{
+						non terminal TypedAST fragaddr;
+						non terminal Str*(Str*Str) uri;
+						non terminal Str path;
+						non terminal Str scheme;
+						non terminal Str fragmentid;
+						non terminal Str search;
+
+						start with fragaddr;
+						precedence right divide_t;
+
+						fragaddr ::= uri:re {:
+							~
+								new
+									def getProtocol():Str = $(re.n0)
+						:}
+						| uri:re pound_t fragmentid:fid {:
+							~
+								new
+									def getProtocol():Str = $(re.n0)
+						:};
+
+						non terminal Str*Str hier_part;
+						non terminal Str opt_path;
+						non terminal Str authority;
+
+						uri ::= scheme:schm colon_t hier_part:part {: (schm,part) :};
+
+						hier_part ::=
+								path:pth {: ("", pth) :}
+							|	divide_t divide_t authority:auth opt_path:pth {: (auth, pth) :};
+
+						opt_path ::= divide_t path:pth {: pth :}
+									| {: "" :};
+
+						non terminal Str ip;
+
+						ip ::= ip:xa divide_t xpalphas_t:xb {: xa + "/" + xb :}
+							|  xpalphas_t:xa {: xa :};
+
+						path ::= xpalphas_t:xa {: xa :}
+							|    ip:xa divide_t xpalphas_t:xb {: xa + "/" + xb :}
+							|    {: "" :};
+
+						authority ::= xpalphas_t:auth {: auth :};
+
+						scheme ::= ialpha_t:sch {: sch :};
+						fragmentid ::= xalphas_t:xa {: xa :};
+						search ::= xalphas_t:xa{: xa :} | xalphas_t:xa plus_t search:sh {: xa + sh :};
+					%cf}
+
+module test htmlParser[StringConstant("<html><body>Hello<span>World!</span></body></html>"):Str]
+	file main
+		import wyv:html
+		val hello = "Hello"
+		val bod = "body"
+		val page:HTML.HTML = ~
+			>html
+				>{bod}
+					{
+					val k = hello
+					k
+					}
+					>span
+						World!
+		page.string()
+	file html
+		module HTML
+		import java:wyvern.tools.typedAST.interfaces.TypedAST
+		import java:wyvern.tools.typedAST.core.values.StringConstant
+		import java:wyvern.tools.parsing.HasParser
+		import java:wyvern.tools.parsing.ExtParser
+		import java:wyvern.tools.parsing.ParseBuffer
+		import java:wyvern.tools.util.LangUtil
+		import java:java.util.regex.Matcher
+		import java:java.util.regex.Pattern
+		import java:java.util.Stack
+		import java:java.lang.String
+		import java:java.lang.Integer
+		import java:java.lang.System
+		type HTML
+			def string():Str
+			metadata:HasParser = new
+				def getParser():ExtParser = new
+					def parse(buf:ParseBuffer):TypedAST
+						val depths = Stack.create()
+						val depthRegex = Pattern.compile("(\r\n|\n)([\t ]*)")
+						var curly:Int = 0
+						depths.push(Integer.create(0))
+
+						def getLastMatch(patt:Pattern,str:Str,groupN:Int):Str
+							val istr = if String.create(str).startsWith("\n") then str else "\n" + str
+							val inpMatcher = patt.matcher(istr)
+							def recurser(last:Str):Str
+								if inpMatcher.find() then recurser(inpMatcher.group(groupN)) else last
+							recurser("")
+
+						val parser:ExtParser = ~
+							%%
+							%parser ExtParser
+							%lex{
+								terminal nose_t ::= />/;
+								terminal Str identifier_t ::= /[a-zA-Z_][a-zA-Z_0-9]*/ {: lexeme :};
+								terminal Str usercode_t ::= /[^>{\n\\]+/ {: lexeme :};
+
+								terminal Unit ocurly_t ::= /{/ {:
+									curly = curly + 1
+									()
+								:};
+								terminal Unit ccurly_t ::= /}/ {:
+									curly = curly - 1
+									()
+								:};
+								terminal Str nocurlies_t ::= /[^{}]*/ {: lexeme :};
+
+								terminal Unit Indent_t ::= /(((\r\n)|\n)([ \t]*))+/
+								{:
+									depths.push(Integer.create(getLastMatch(depthRegex, lexeme, 2).length()))
+									()
+								:};
+
+								terminal Unit Dedent_t ::= /(((\r\n)|\n)([ \t]*))+/
+								{:
+									val ostr = getLastMatch(depthRegex, lexeme, 2)
+									val newDepth = String.create(ostr).length()
+									depths.pop()
+									(if(newDepth < LangUtil.castInt(depths.peek())) then
+										pushToken(Terminals.Dedent_t,ostr)
+									else
+										pushToken(Terminals.Newline_t,ostr)
+									)
+								:};
+
+								ignore terminal Unit IgnoredNewline_t ::= /((\n|(\r\n))([ \t]*))+/ {: :};
+
+								terminal Unit Newline_t ::= /((\n|(\r\n))([ \t]*))+/ {:
+								:};
+
+								terminal Unit DedentRepair_t ::= /(\n[ \t]*)+/
+								{:
+									pushToken(Terminals.Dedent_t,lexeme)
+								:};
+
+								disambiguate ignoredNewline1:(IgnoredNewline_t,nocurlies_t) {:
+								 	if (curly > 0) then nocurlies_t else IgnoredNewline_t
+								:};
+
+								disambiguate ignoredNewline2:(IgnoredNewline_t,Newline_t) {:
+								 	if (curly > 0) then IgnoredNewline_t else Newline_t
+								:};
+
+								disambiguate ignoredNewline3:(Dedent_t,IgnoredNewline_t,Newline_t) {:
+								 	val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+
+									val res = (if(newDepth < LangUtil.castInt(depths.peek())) then
+													Dedent_t
+											   else
+													Newline_t)
+
+								 	if (curly > 0) then IgnoredNewline_t else res
+								:};
+
+								disambiguate ignoredNewline4:(IgnoredNewline_t,Indent_t,Newline_t) {:
+								 	val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+
+									val res = (if(newDepth > LangUtil.castInt(depths.peek())) then
+													Indent_t
+											   else
+													Newline_t)
+
+								 	if (curly > 0) then IgnoredNewline_t else res
+								:};
+
+								disambiguate ignoredNewline5:(Dedent_t,IgnoredNewline_t,Indent_t,Newline_t) {:
+								 	val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+									val odepth = LangUtil.castInt(depths.peek())
+									val res = (if(newDepth == odepth) then
+													Newline_t
+											   else
+													(if(newDepth > odepth) then Indent_t else Newline_t))
+
+								 	if (curly > 0) then IgnoredNewline_t else res
+								:};
+
+								disambiguate indent:(Indent_t,Newline_t) {:
+									val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+									(if(newDepth > LangUtil.castInt(depths.peek())) then
+										Indent_t
+									else
+										Newline_t)
+								:};
+								disambiguate dedent:(Dedent_t,Newline_t) {:
+									val newDepth:Int = String.create(getLastMatch(depthRegex, lexeme, 2)).length()
+									(if(newDepth < LangUtil.castInt(depths.peek())) then
+										Dedent_t
+									else
+										Newline_t)
+								:};
+							%lex}
+							%cf{
+								non terminal TypedAST block;
+								non terminal TypedAST blocks;
+								non terminal TypedAST tag;
+								non terminal TypedAST tagbody;
+								non terminal TypedAST fs;
+
+								non terminal Str inlinelit;
+								non terminal Str innerdsl;
+
+								start with fs;
+								
+								fs ::= block:bl Newline_t {: bl :};
+
+								block ::= tag:tag tagbody:body {:
+									~
+										val itag = $tag
+										"<" + itag + ">" + $body + "</"+itag+">"
+								:}
+								| 		  usercode_t:str {: StringConstant.create(str) :}
+								|		  inlinelit:code {: LangUtil.spliceUnsafe(code) :};
+
+								blocks ::= block:bl {: bl :} | blocks:ib Newline_t block:bl {: {$ib + $bl} :};
+
+								tag ::= nose_t identifier_t:id {: StringConstant.create(id) :}
+									|   nose_t inlinelit:code {: LangUtil.spliceUnsafe(code) :};
+
+								tagbody ::= Indent_t blocks:blks Dedent_t {: blks :}
+										|   Newline_t {: StringConstant.create("") :};
+
+								inlinelit ::= ocurly_t innerdsl:idsl ccurly_t {: idsl :};
+								innerdsl ::= nocurlies_t:str {: str :}
+								| 			 nocurlies_t:str ocurly_t innerdsl:idsl ccurly_t innerdsl:stre {: str + "{" + idsl + "}" + stre :}
+								| 			{: "" :};
+							%cf}
+						val parsed = parser.parse(buf.ensureNewline())
+						~
+							new
+								def string():Str = $parsed

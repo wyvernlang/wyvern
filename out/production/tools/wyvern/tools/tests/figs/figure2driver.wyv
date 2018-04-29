@@ -1,0 +1,9 @@
+require java
+
+import figs.fileIO
+import figs.wordProcessor
+
+val io = fileIO(java)
+val wp = wordProcessor(io)
+
+wp.x

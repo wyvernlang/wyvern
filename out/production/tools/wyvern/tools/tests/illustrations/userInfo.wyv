@@ -1,0 +1,18 @@
+module def userInfo() : illustrations.UserInfo
+
+import illustrations.lists
+
+val listFactory = lists.listFactory
+
+val name : Int = 5
+
+def setName(uName : Int) : Int
+	0
+
+def init(uName : Int) : Int
+	setName(uName)
+	val actionHistory = listFactory.create()
+	0
+	
+def getName() : Int
+	name

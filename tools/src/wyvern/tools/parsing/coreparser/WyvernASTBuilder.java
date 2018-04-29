@@ -16,6 +16,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
+import wyvern.tools.typedAST.core.declarations.DatatypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
@@ -23,6 +24,7 @@ import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.Instantiation;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
+import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -138,12 +140,32 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
-        if (body == null) {
-            body = new DeclSequence();
+//        if (body == null) {
+//            body = new DeclSequence();
+//        }
+//
+//        if (!(body instanceof DeclSequence)) {
+//            body = new DeclSequence(Arrays.asList(body));
+//        }
+
+        LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
+
+        TypedAST dt = new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
+        exps.add(dt);
+
+        for (TypedAST elem : ((DeclSequence) body).getIterator()) {
+
+            String constructor_name = ((ConstructDeclaration) elem).getName();
+            System.out.println(constructor_name);
+            //TypedAST constructor = new TaggedTypeMember;
+            //exps.add(constructor);
         }
-        if (!(body instanceof DeclSequence)) {
-            body = new DeclSequence(Arrays.asList(body));
+
+        for (TypedAST elem : ((DeclSequence) body).getIterator()) {
+            exps.add(elem);
         }
+
+        body = new DeclSequence(exps);
 
         if (((DeclSequence) body).hasVarDeclaration() && !isResource) {
             ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);

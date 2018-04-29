@@ -1,0 +1,7 @@
+resource type DummyType
+  effect e1
+  effect e2
+  effect e3
+  def m1() : {e1} Int
+  def m2() : {e2} Int
+  def m3() : {e3} String

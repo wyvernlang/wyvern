@@ -1,0 +1,3 @@
+// top level
+require effects.dummy
+dummy.nop()

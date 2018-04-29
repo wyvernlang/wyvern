@@ -1,0 +1,59 @@
+// module CalculatorTokens
+
+tagged type Token //comprises StringToken, NumberToken
+
+type StringToken extends Token
+    val string:Str
+
+type NumberToken extends Token
+    val number:Int
+
+/* shorter version that will eventually work
+type Token
+	case StringToken(Str)
+	case NumberToken(Int)
+// "case class" means generates members and unapply, as in Scala
+// "case" alone means that this type is comprised of the case classes,
+// and that the case classes are top-level decls, alongside Token
+*/
+
+/*
+TYPES
+
+An unqualified "type" is purely structural.
+
+A "tagged type" is a type that is associated with a tag
+	it is distinct from any untagged type with otherwise has the same structure
+	it may have cases
+	
+A "comprises" clause limits the cases of a tagged type
+	a type with a comprises clause is implicitly tagged
+	
+An "extends" clause inherits members from the supertype
+	If the supertype is tagged, the subtype is tagged with a subtag
+*/
+
+def isNumber(t:Token):Int
+    match t:
+        st:StringToken => 0
+        nt:NumberToken => 3 //nt.number // TODO: FIX ME!
+
+def makeNumber(n:Int):NumberToken = new
+    val number = n
+
+// should return 3
+def test():Int
+    isNumber(makeNumber(3))
+
+test()
+
+/* cleaner version to eventually support:
+def isNumber(t:Token):Int
+	match t:
+		StringToken => 0
+		NumberToken(n) => n
+
+// should return 3
+def test():Int
+	isNumber(NumberToken(3))
+*/

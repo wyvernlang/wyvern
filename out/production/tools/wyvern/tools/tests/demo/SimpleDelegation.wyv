@@ -1,0 +1,17 @@
+// module SimpleDelegation
+
+type Foo
+    def foo():Int
+
+type FooBar
+    def foo():Int
+    def bar():Int
+
+val aFoo:Foo = new // TODO: allow specifying type here
+    def foo():Int = 5
+
+val aBar:FooBar = new
+    def bar():Int = 3
+    delegate Foo to aFoo
+
+aBar.foo()

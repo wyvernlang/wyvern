@@ -1,0 +1,107 @@
+test classAndField[StringConstant("hello"):Str]
+	class Hello
+		class def make():Hello
+			new
+		val hiString : Str = "hello"
+	val h : Hello = Hello.make()
+	h.hiString
+
+test mutual[IntegerConstant(5):Int]
+	class A
+		class def create():A = new
+		def get():B = B.create()
+	class B
+		class def create():B = new
+		def get():A = A.create()
+	5
+
+test classAndMethod[IntegerConstant(9):Int]
+	class Hello
+		class def make():Hello = new
+		def get4():Int = 4
+		def get5():Int = 5
+		def getP():Int = this.get4()+this.get5()
+	val h:Hello = Hello.make()
+	h.getP()
+
+test varInClass[IntegerConstant(10):Int]
+	class Hello
+		class def make():Hello = new
+		var testVal:Int = 5
+		def setV(n : Int):Unit
+			this.testVal = n
+		def getV():Int = this.testVal
+	val h:Hello = Hello.make()
+	h.setV(10)
+	h.getV()
+
+test class1[IntegerConstant(3):Int]
+	class X
+		class def create(i:Int):X = new
+			val t = i
+		val t:Int
+		def get():Int
+			this.t
+	val c:X = X.create(1)
+	val a = c.get
+	val b = X.create(2).get
+	b() + a()
+
+test class2[IntegerConstant(4):Int]
+	class C
+		class def create(i:Int):C = new
+			val t = i
+		def create(i:Int):Int
+			9
+	1
+	4
+
+test class3[IntegerConstant(2):Int]
+	class C
+		class def create(i:Int):C
+			new
+				val t = i
+		val k = 2
+	C.create(4).k
+
+test newlineClass1[IntegerConstant(9):Int]
+	class C
+
+		class def create(i:Int):C
+			new
+				val t = i
+		val k = 9
+	C.create(0).k
+test newlineClass2[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+
+			new
+				val t = i
+		val k = 9
+	C.create(0).k
+test newlineClass3[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+			new
+
+				val t = i
+		val k = 9
+	C.create(0).k
+test newlineClass4[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+			new
+				val t = i
+
+		val k = 9
+	C.create(0).k
+
+test newlineClass5[IntegerConstant(9):Int]
+	class C
+		class def create(i:Int):C
+			new
+				val t = i
+		val k = 9
+
+	C.create(0).k

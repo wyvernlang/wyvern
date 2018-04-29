@@ -1,0 +1,7 @@
+require stdout
+import effects.dummyDef
+import effects.dummyTakerDef
+
+val d = dummyDef()
+val dt = dummyTakerDef(d)
+dt.m5()

@@ -78,6 +78,9 @@ public class ConstructDeclaration extends Declaration implements CoreAST {
         }
 
         //need to create ConstructDeclaration which accepts args
+        //return new wyvern.target.corewyvernIL.decl.DefDeclaration(
+        //        getName(), args, this.resultType, body.generateIL(methodContext, this.resultType, null), location, null);
+
         return new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), expectedType, null, location);
     }
 
@@ -94,6 +97,7 @@ public class ConstructDeclaration extends Declaration implements CoreAST {
                         getILValueType(tlc.getContext()),
                         new wyvern.target.corewyvernIL.expression.Variable(getName()), location);
         DeclType dt = genILType(tlc.getContext());
+
         tlc.addModuleDecl(decl, dt);
     }
 

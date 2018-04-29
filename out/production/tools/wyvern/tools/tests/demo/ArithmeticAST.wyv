@@ -1,0 +1,35 @@
+// module ArithmeticAST
+
+type AST
+	def eval():Int
+
+def makeInt(x:Int):AST = new
+	def eval():Int = x
+
+def makeAdd(op1:AST, op2:AST):AST = new
+	def eval():Int = op1.eval() + op2.eval()
+
+def makeSubtract(op1:AST, op2:AST):AST = new
+	def eval():Int = op1.eval() - op2.eval()
+
+def makeMultiply(op1:AST, op2:AST):AST = new
+	def eval():Int = op1.eval() * op2.eval()
+
+def makeDivide(op1:AST, op2:AST):AST = new
+	def eval():Int = op1.eval() / op2.eval()
+
+val one = makeInt(1)
+
+val two = makeInt(2)
+	
+val four = makeAdd(two, two)
+	
+val three = makeSubtract(four, one)
+	
+val six = makeMultiply(two,three)
+	
+// should return 2
+def test():Int
+	makeDivide(six,three).eval()
+	
+test()

@@ -1,0 +1,33 @@
+/*
+lambda syntax
+
+general: (x:Int,y:Boolean) => expression/block
+no-arg: { statements }	// using type-directed parsing
+one-arg, inferred type: x => expression
+
+still to test:
+	nicer function type abbreviations
+	one-arg functions with inferred types
+	no-arg lambda syntax
+*/
+
+// Lambda test case
+
+type UnitIntFn
+	def apply():system.Int
+
+type IntIntFn
+	def apply(x:system.Int):system.Int
+
+type HigherIntFn
+	def apply(x:system.Int,y:IntIntFn):system.Int
+
+val getFive:UnitIntFn = () => 5
+
+val id:IntIntFn = (x:system.Int) => x
+
+val higherOrder:HigherIntFn = (x:system.Int,y:IntIntFn) => y.apply(x)
+
+val x = getFive.apply()
+
+higherOrder.apply(x,id)

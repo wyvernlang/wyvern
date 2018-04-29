@@ -1,0 +1,8 @@
+require stdout
+import effects.network01
+import effects.dataProcessor2
+
+val n01 = network01(stdout)
+
+val dp1 = dataProcessor2(n01, stdout)
+dp1.processData() // print "dataProcessor2 w/ multiple layers of effect abstraction: ", "data received", "data processed", "from dataProcessor2...", then "dataProcessor2 done!"
