@@ -128,7 +128,7 @@ public class ExampleTests {
 
     @Test
     public void testListParameterized() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "introductory.listClient", Util.intType(), new IntegerLiteral(30));
+        TestUtil.doTestScriptModularly(PATH, "introductory.listClient", Util.intType(), new IntegerLiteral(32));
     }
 
     @Test
