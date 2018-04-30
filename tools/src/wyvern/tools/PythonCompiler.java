@@ -18,6 +18,8 @@ import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.EmitPythonVisitor;
 import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
@@ -110,7 +112,7 @@ public final class PythonCompiler {
             }
             Module m = state.getResolver().load("unknown", filepath.toFile(), true);
             IExpr program = m.getExpression();
-            program = state.getResolver().wrap(program, m.getDependencies());
+            program = state.getResolver().wrapForPython(program, m.getDependencies());
             program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "python", Globals.getGenContext(state));
             TailCallVisitor.annotate(program);
 
@@ -126,7 +128,8 @@ public final class PythonCompiler {
             }
 
             TypeContext ctx = Globals.getStandardTypeContext();
-            program.typecheckNoAvoidance(ctx, null);
+            ValueType type = program.typecheckNoAvoidance(ctx, null);
+            boolean printResult = (type.equals(Util.unitType()));
 
             OIRAST oirast =
                     program.acceptVisitor(new EmitOIRVisitor(),
@@ -134,7 +137,7 @@ public final class PythonCompiler {
                                     OIREnvironment.getRootEnvironment()));
             String python =
                     new EmitPythonVisitor().emitPython(oirast,
-                            OIREnvironment.getRootEnvironment());
+                            OIREnvironment.getRootEnvironment(), printResult);
 
             try (PrintWriter out = new PrintWriter(outputFile)) {
                 out.println(python);

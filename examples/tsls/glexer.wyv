@@ -1,0 +1,79 @@
+module def glexer(tokens:tsls.TokenSpec) /* a generic lexer */
+
+import wyvern.Int
+import wyvern.option
+import wyvern.util.matching.regex
+import wyvern.collections.list
+
+type List = list.List
+
+type Token
+	def print():String
+	def kind():tokens.Kind
+	
+def makeToken(s:String,k:tokens.Kind):Token = new
+	def print():String = s
+	def kind():tokens.Kind = k
+
+// TODO: replace with a generic Pair
+type RegexpKindPair
+	val regex:regex.Regex
+	val kind:tokens.Kind
+	
+def makeRKPair(r:regex.Regex, k:tokens.Kind):RegexpKindPair = new
+	val regex:regex.Regex = r
+	val kind:tokens.Kind = k
+
+// TODO: make private
+type ScanResult
+	def token():Token
+	def rest():String
+	
+def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
+	val tok = makeToken(s,k)
+	new
+		def token():Token = tok
+		def rest():String = r
+	
+resource type ScannerConfig
+	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
+	
+	// TODO: make this private
+	def getScanResult(s:String):ScanResult
+	
+def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new (self)=>
+	val regexList : List[RegexpKindPair] = list.make[RegexpKindPair]()
+	
+	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
+		self.regexList.append(makeRKPair(r,k))
+
+	// TODO: enforce that the scanner config is frozen before calling this
+	def getScanResult(s:String):ScanResult
+		// strip whitespace, if any
+		val wsMatch : option.Option[String] = wsRX.findPrefixMatchOf(s).map[String](
+		                                    (m:regex.Match) => m.after())
+		val sWithoutWS : String = wsMatch.getOrElse(()=> s)
+		
+		// find a match, if possible
+		val tokMatch : option.Option[RegexpKindPair] = self.regexList.find((rkp:RegexpKindPair) =>
+			rkp.regex.findPrefixMatchOf(sWithoutWS).isDefined
+		)
+		
+		// compute the resulting token
+		val resultOption : option.Option[ScanResult] = tokMatch.flatMap[ScanResult]((rkp:RegexpKindPair) =>
+			rkp.regex.findPrefixMatchOf(sWithoutWS).map[ScanResult]((m:regex.Match) =>
+				makeScanResult(m.matched(), rkp.kind, m.after()))
+		)
+		
+		// return the result, or error
+		resultOption.getOrElse(() => makeScanResult("ERROR",tokens.ERROR,""))
+		
+resource type Scanner
+	def nextToken():Token
+
+def makeScanner(config:ScannerConfig, s:String):Scanner = new
+	var current:String = s
+	def nextToken():Token
+		val result : ScanResult = config.getScanResult(this.current)
+		this.current = result.rest()
+		result.token()

@@ -1,0 +1,7 @@
+require platform
+
+import xplatform.writer
+
+val w = writer(platform)
+
+w.print("Hello, World!")

@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
@@ -35,11 +36,13 @@ import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.HasLocation;
@@ -81,7 +84,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     public Void visit(Boolean inTailPosition, Match match) {
         match.getMatchExpr().acceptVisitor(this, false);
-        match.getElseExpr().acceptVisitor(this, inTailPosition);
+        Expression elseExpr = match.getElseExpr();
+        if (elseExpr != null) {
+            elseExpr.acceptVisitor(this, inTailPosition);
+        }
         for (Case matchCase : match.getCases()) {
             matchCase.getBody().acceptVisitor(this, inTailPosition);
         }
@@ -211,6 +217,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     @Override
     public Void visit(Boolean inTailPosition,
             ConcreteTypeMember concreteTypeMember) {
+        Value val = concreteTypeMember.getMetadataValue();
+        if (val != null) {
+            val.acceptVisitor(this, false);
+        }
         return null;
     }
 
@@ -282,6 +292,12 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
                 ((VarBinding) hl).getExpression().acceptVisitor(this, false);
             }
         }
+        return null;
+    }
+
+    @Override
+    public Void visit(Boolean state, RefinementType type) {
+        // TODO Auto-generated method stub
         return null;
     }
 

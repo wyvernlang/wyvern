@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -78,7 +79,7 @@ public class New extends Expression {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append("new ").append(selfName).append(" : ");
-        getExprType().doPrettyPrint(dest, indent);
+        getType().doPrettyPrint(dest, indent + "  ");
         dest.append(" =>\n");
 
         for (Declaration decl: decls) {
@@ -106,7 +107,7 @@ public class New extends Expression {
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         List<DeclType> dts = new LinkedList<DeclType>();
 
-        TypeContext thisCtx = ctx.extend(selfName, getExprType());
+        TypeContext thisCtx = ctx.extend(selfName, getType());
 
         boolean isResource = false;
         for (Declaration d : declsExceptDelegate()) {
@@ -117,13 +118,14 @@ public class New extends Expression {
             }
         }
 
-        ValueType type = getExprType();
+        ValueType type = getType();
+        type.checkWellFormed(ctx);
         if (hasDelegate) {
             ValueType delegateObjectType = ctx.lookupTypeOf(delegateDeclaration.getFieldName());
             StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
             // new defined declaration will override delegate object's method definition if they had subType relationship
             for (DeclType declType : delegateStructuralType.getDeclTypes()) {
-                if (!dts.stream().anyMatch(newDefDeclType -> newDefDeclType.isSubtypeOf(declType, thisCtx))) {
+                if (!dts.stream().anyMatch(newDefDeclType -> newDefDeclType.isSubtypeOf(declType, thisCtx, new FailureReason()))) {
                     dts.add(declType);
                 }
             }
@@ -132,8 +134,9 @@ public class New extends Expression {
         // check that everything in the claimed structural type was accounted for
         StructuralType requiredT = type.getStructuralType(ctx);
         StructuralType actualT = new StructuralType(selfName, dts);
-        if (!actualT.isSubtypeOf(requiredT, ctx)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName());
+        FailureReason r = new FailureReason();
+        if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName(), r.getReason());
         }
 
         if (isResource && !requiredT.isResource(GenContext.empty())) {
@@ -159,7 +162,7 @@ public class New extends Expression {
         Declaration newD = d.interpret(ctx);
         ds.add(newD);
         }
-        result = new ObjectValue(ds, selfName, getExprType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
+        result = new ObjectValue(ds, selfName, getType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
 
         return result;
     }

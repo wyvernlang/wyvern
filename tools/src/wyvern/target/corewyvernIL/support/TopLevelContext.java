@@ -29,11 +29,12 @@ public class TopLevelContext {
     private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
     private GenContext ctx;
     private String receiverName;
-    private SeqExpr expr = new SeqExpr();
+    private SeqExpr expr;
     //private GenContext origCtx;
 
-    public TopLevelContext(GenContext ctx) {
+    public TopLevelContext(GenContext ctx, ValueType expectedType) {
         this.ctx = ctx;
+        this.expr = new SeqExpr(expectedType);
         //origCtx = ctx;
     }
 

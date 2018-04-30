@@ -1,1 +1,4 @@
-val asdf = 8
+import metadata wyvern.IfTSL
+
+val ifelseARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => IfTSL.doif(cond, tt, ff)
+val if = (cond:Boolean, blocks:IfTSL.Blocks) => IfTSL.doifblk(cond, blocks)

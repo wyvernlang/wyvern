@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -18,16 +19,16 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
-import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
-import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -37,13 +38,8 @@ import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.ToolError;
-import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.typedAST.interfaces.ExpressionAST;
-import wyvern.tools.typedAST.interfaces.TypedAST;
 
 public final class Globals {
     private Globals() { }
@@ -54,6 +50,7 @@ public final class Globals {
     private static final Set<String> javaWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
     private static SeqExpr prelude = null;
+    private static Module preludeModule = null;
 
     static {
         // the whitelist that anyone can import without requiring java or becoming a resource module
@@ -65,20 +62,44 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
     }
 
-    private static SeqExpr getPrelude(GenContext ctx) {
+    private static boolean gettingPrelude = false;
+    private static boolean usePrelude = true;
+
+    /** Allows us to disable the prelude for testing purposes if necessary */
+    public static void setUsePrelude(boolean update) {
+        usePrelude = update;
+    }
+
+    public static void resetPrelude() {
+        prelude = null;
+        gettingPrelude = false;
+    }
+
+    public static Module getPreludeModule() {
+        if (!usePrelude) {
+            throw new RuntimeException("may not call getPreludeModule if preludes are disabled");
+        }
         if (prelude == null) {
+            getPrelude();
+        }
+        return preludeModule;
+    }
+
+    private static SeqExpr getPrelude() {
+        if (!usePrelude) {
+            return new SeqExpr();
+        }
+        if (prelude == null) {
+            if (gettingPrelude) {
+                return new SeqExpr();
+            }
+            gettingPrelude = true;
             String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
             File file = new File(preludeLocation);
-            TypedAST ast = null;
-            try {
-                ast = TestUtil.getNewAST(file);
-            } catch (ParseException e) {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR,
-                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
-            }
-            final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-            IExpr program = ((ExpressionAST) ast).generateIL(ctx, null, dependencies);
-            prelude = (SeqExpr) program;
+
+            preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
+            prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
+            TailCallVisitor.annotate(prelude);
         }
         return prelude;
     }
@@ -107,7 +128,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
         genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
-        SeqExpr sexpr = getPrelude(genCtx);
+        SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(genCtx);
         return newCtx;
     }
@@ -184,7 +205,7 @@ public final class Globals {
         GenContext ctx = GenContext.empty();
         ctx = ctx.extend("system", new Variable("system"), getSystemType());
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
-        SeqExpr sexpr = getPrelude(ctx);
+        SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(ctx);
         return newCtx;
     }
@@ -193,8 +214,9 @@ public final class Globals {
         EvalContext ctx = EvalContext.empty();
         ctx = ctx.extend("system", Globals.getSystemValue());
         SeqExpr sexpr = prelude;
-        assert sexpr != null; // invariant: we must have gotten a type context already
-        ctx = sexpr.interpretCtx(ctx).getSecond();
+        if (sexpr != null) {
+            ctx = sexpr.interpretCtx(ctx).getSecond();
+        }
         return ctx;
     }
 

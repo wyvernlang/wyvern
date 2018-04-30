@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -26,6 +27,11 @@ public class SeqExpr extends Expression {
     public SeqExpr() {
         //setExprType(Util.unitType()); // default to Unit
         elements = new LinkedList<HasLocation>();
+    }
+
+    public SeqExpr(ValueType expectedType) {
+        this();
+        setExprType(expectedType);
     }
 
     /** Side-effects the current SeqExpr to add an expression.
@@ -87,6 +93,13 @@ public class SeqExpr extends Expression {
         Pair<TypeContext, ValueType> p = typecheckWithCtx(ctx, effectAccumulator);
         TypeContext extendedCtx = p.getFirst();
         ValueType result = p.getSecond();
+        FailureReason r = new FailureReason();
+        if (this.getType() != null) {
+            if (!result.isSubtypeOf(getType(), extendedCtx, r)) {
+                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getType().toString(), r.getReason());
+            }
+            return getType();
+        }
         for (int i = elements.size() - 1; i >= 0; --i) {
             HasLocation elem = elements.get(i);
             if (elem instanceof VarBinding) {
@@ -97,12 +110,8 @@ public class SeqExpr extends Expression {
                 }
             }
         }
-        if (getExprType() == null) {
-            setExprType(result);
-        } else if (!result.isSubtypeOf(getExprType(), extendedCtx)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getExprType().toString());
-        }
-        return getExprType();
+        setExprType(result);
+        return getType();
     }
 
     public GenContext extendContext(GenContext ctx) {
@@ -185,5 +194,16 @@ public class SeqExpr extends Expression {
             index--;
         }
         return freeVars;
+    }
+
+    /** Works like addExpr, except that if body is a SeqExpr then the elements of the other SeqExpr are appended to this one.
+     * This allows us to avoid nested SeqExprs, which makes for a more understandable IL. */
+    public void merge(IExpr body) {
+        if (body instanceof SeqExpr) {
+            SeqExpr bodySE = (SeqExpr) body;
+            elements.addAll(bodySE.elements);
+        } else {
+            addExpr(body);
+        }
     }
 }

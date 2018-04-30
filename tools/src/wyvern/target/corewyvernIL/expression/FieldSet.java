@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
@@ -82,9 +83,10 @@ public class FieldSet extends Expression {
         }
         ValueType valTypeField = ((VarDeclType) declTypeField).getResultType(View.from(objectExpr, ctx));
 
+        FailureReason r = new FailureReason();
         // Make sure assigned type is compatible with the field's type.
-        if (!varTypeExpr.isSubtypeOf(valTypeField, ctx)) {
-            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this);
+        if (!varTypeExpr.isSubtypeOf(valTypeField, ctx, r)) {
+            ToolError.reportError(ErrorMessage.ASSIGNMENT_SUBTYPING, this, varTypeExpr.desugar(ctx), valTypeField.desugar(ctx), r.getReason());
         }
         return Util.unitType();
     }

@@ -1,0 +1,5 @@
+require python
+import python:webserver
+import python:builtins
+import wyvernHandler
+webserver.run(wyvernHandler(builtins))

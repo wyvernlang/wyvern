@@ -1,13 +1,21 @@
 package wyvern.tools.typedAST.core.expressions;
 
+import java.util.List;
+
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 
 public class Case {
 
-    private TypedAST ast;
+    private ExpressionAST ast;
     private Type taggedType;
     private NameBinding binding; // may be null if we are not binding a name
     //TODO refactor this class into two classes for each type?
@@ -22,7 +30,7 @@ public class Case {
      * @param ast the body of the expression to be executed
      */
     public Case(String name, Type taggedType, TypedAST ast) {
-        this(taggedType, ast);
+        this(taggedType, (ExpressionAST) ast);
         this.binding = new NameBindingImpl(name, taggedType);
     }
 
@@ -35,7 +43,7 @@ public class Case {
      */
     public Case(Type taggedType, TypedAST ast) {
         this.taggedType = taggedType;
-        this.ast = ast;
+        this.ast = (ExpressionAST) ast;
         this.caseType = CaseType.TYPED;
     }
 
@@ -45,7 +53,7 @@ public class Case {
      * @param ast the body of the expression to be executed
      */
     public Case(TypedAST ast) {
-        this.ast = ast;
+        this.ast = (ExpressionAST) ast;
         this.caseType = CaseType.DEFAULT;
     }
 
@@ -64,7 +72,7 @@ public class Case {
         return taggedType;
     }
 
-    public TypedAST getAST() {
+    public ExpressionAST getAST() {
         return ast;
     }
 
@@ -78,6 +86,22 @@ public class Case {
 
     public boolean isTyped() {
         return caseType == CaseType.TYPED;
+    }
+
+    public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, NominalType expectedType, List<TypedModuleSpec> dependencies) {
+        String bindingVar = binding.getName();
+        wyvern.target.corewyvernIL.expression.Variable expr = new wyvern.target.corewyvernIL.expression.Variable(bindingVar);
+        ValueType vt = taggedType == null ? null : taggedType.getILType(ctx);
+        ValueType bestType = vt;
+        // Figure out the best type to use here between the match type and the tag
+        if (matchType != null && vt != null && vt.isSubtypeOf(matchType, ctx, null)) {
+            ctx = ctx.extend(bindingVar, expr, vt);
+        } else {
+            bestType = vt == null ? matchType : vt;
+            ctx = ctx.extend(bindingVar, expr, bestType);
+        }
+        Expression body = (Expression) ast.generateIL(ctx, expectedType, dependencies);
+        return new wyvern.target.corewyvernIL.Case(bindingVar, (NominalType) bestType, body);
     }
 
     /**

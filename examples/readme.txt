@@ -14,3 +14,12 @@ wyvern rosetta/hello.wyv
 
 
 To run the pong example, which requires python, see the readme.txt file in the pong subdirectory.
+
+For more examples, look in the Wyvern standard library (../stdlib).  Some good examples there include:
+ * wyvern/option.wyv - an option datatype
+ * wyvern/internal/list.wyv - parameterized linked lists
+ * prelude.wyv - the standard Wyvern prelude, automatically included before every Wyvern program
+ * wyvern/util/matching/regexp.wyv - a regular expression library
+ * platform/java/stdout.wyv - the Java standard output library
+ * platform/python/stdout.wyv - the Python standard output library
+ 

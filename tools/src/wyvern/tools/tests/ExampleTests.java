@@ -7,10 +7,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
@@ -18,7 +20,6 @@ import wyvern.tools.PythonCompiler;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 /** Runs the Wyvern compiler on the example source code in the wyvern/examples directory tree
@@ -29,6 +30,11 @@ import wyvern.tools.tests.suites.RegressionTests;
 @Category(RegressionTests.class)
 public class ExampleTests {
     private static final String PATH = TestUtil.EXAMPLES_PATH;
+
+    @Before
+    public void setup() {
+        Globals.resetPrelude();
+    }
 
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
@@ -53,6 +59,11 @@ public class ExampleTests {
     @Test
     public void testFactorial() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "rosetta.factorial", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testLinkedList() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.linkedList", Util.intType(), Util.intValue(3));
     }
 
     @Test
@@ -91,6 +102,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testCore() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.core", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
     public void testCellClient() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "modules.cellClient", Util.intType(), new IntegerLiteral(7));
     }
@@ -106,24 +122,23 @@ public class ExampleTests {
     }
 
     @Test
-    public void testOptionParameterized() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "introductory.optionP", Util.intType(), new IntegerLiteral(15));
-    }
-
-    @Test
     public void testPalindromeChecker() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "rosetta/check-palindrome", Util.unitType(), Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "rosetta.check-palindrome", Util.unitType(), Util.unitValue());
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testListParameterized() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "introductory.listP", Util.intType(), new IntegerLiteral(15));
+        TestUtil.doTestScriptModularly(PATH, "introductory.listClient", Util.intType(), new IntegerLiteral(32));
     }
 
     @Test
     public void testJavaFFI() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "ffi.callFromJava", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testDebug() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.testDebug", Util.unitType(), Util.unitValue());
     }
 
     @Test
@@ -137,10 +152,41 @@ public class ExampleTests {
     }
 
     @Test
+    public void testCaretaker() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.Caretaker", null, null);
+    }
+
+    @Test
+    public void testSealerUnsealer() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.SealerUnsealer", null, null);
+    }
+
+    @Test
+    public void testMembrane() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "capabilities.Membrane", null, null);
+    }
+
+    @Test
     public void testPythonCompilerOnScript() {
         String[] args = new String[] {TestUtil.EXAMPLES_PATH + "pong/pong.wyv"};
         PythonCompiler.wyvernHome.set("..");
         PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "pong/");
+        PythonCompiler.main(args);
+    }
+
+    @Test
+    public void testPython2Webserver() {
+        String[] args = new String[] {TestUtil.EXAMPLES_PATH + "web-server/python2/webserver.wyv"};
+        PythonCompiler.wyvernHome.set("..");
+        PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "web-server/python2/");
+        PythonCompiler.main(args);
+    }
+
+    @Test
+    public void testPython3Webserver() {
+        String[] args = new String[] {TestUtil.EXAMPLES_PATH + "web-server/python3/webserver.wyv"};
+        PythonCompiler.wyvernHome.set("..");
+        PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "web-server/python3/");
         PythonCompiler.main(args);
     }
 

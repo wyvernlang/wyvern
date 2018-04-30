@@ -8,13 +8,14 @@ public enum ErrorMessage {
     CANNOT_INFER_GENERIC("Cannot infer the type of the generic argument at the call site. "
                        + "Please provide the type of the generic argument at the call site.", 0),
     EXTRA_GENERICS_AT_CALL_SITE("More generic arguments were provided at the call site than in the declaration of the function.", 0),
-    MISSING_GENERICS_AT_CALL_SITE("One or more generic arguments were defined for the method %ARG "
-                                + "but not provided at the call site, and are not inferrable.", 1),
+    MISSING_GENERICS_AT_CALL_SITE("Generic argument(s) for the method %ARG "
+                                + "were not inferrable and must be provided at the call site", 1),
     TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
     CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
     TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
     VARIABLE_NOT_DECLARED("No variable named \"%ARG\" is in scope", 1),
     NO_SUCH_METHOD("There is no visible method named %ARG", 1),
+    DYNAMIC_METHOD_ERROR("Called method %ARG, but the method does not exist on the receiver object.  Did you use type Dyn?", 1),
     NO_SUCH_FIELD("There is no visible field named %ARG", 1),
     NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
     NOT_A_METHOD("%ARG is not a method", 1),
@@ -22,8 +23,8 @@ public enum ErrorMessage {
     OPERATOR_DOES_NOT_APPLY("Operator %ARG cannot be applied to type %ARG", 2),
     OPERATOR_DOES_NOT_APPLY2("Operator %ARG cannot be applied to types %ARG and %ARG", 3),
     MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
-    NOT_SUBTYPE("%ARG is not a subtype of %ARG", 2),
-    ASSIGNMENT_SUBTYPING("The assigned value is not a subtype of the left-hand side of this assignment", 0),
+    NOT_SUBTYPE("%ARG is not a subtype of %ARG; %ARG", 3),
+    ASSIGNMENT_SUBTYPING("The assigned value's type %ARG is not a subtype of the left-hand side type $ARG of this assignment; %ARG", 3),
     DUPLICATE_MEMBER("%ARG has more than one member named %ARG", 2),
     EXPECTED_RECORD_TYPE("Expected a type with members", 0),
     NO_SUCH_TYPE_MEMBER("No such type member: %ARG", 1),
@@ -35,6 +36,7 @@ public enum ErrorMessage {
     NO_METADATA_FROM_RESOURCE("Cannot load metadata from a resource module", 0),
     MUST_BE_A_RESOURCE("%ARG must be a resource type", 1),
     MUST_BE_A_RESOURCE_MODULE("%ARG must be a resource module", 1),
+    NO_METADATA_WHEN_PARSING_TSL("Cannot parse TSL as type %ARG has no metadata", 1),
     METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method", 0),
     METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object", 1),
     WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG, but found %ARG", 2),
@@ -43,6 +45,8 @@ public enum ErrorMessage {
             + "If this is the last line in the program, try ending the program with a value of built-in type, e.g. the integer 0.", 1),
     DELEGATE_MUST_BE_VARIABLE("Expected variable in delegate declaration, got %ARG", 1),
     QUALIFIED_TYPES_ONLY_FIELDS("Qualified types can only include val fields", 0),
+    ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
+    ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),
 
     // Syntax errors
     LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
@@ -74,8 +78,9 @@ public enum ErrorMessage {
     MULTIPLE_DEFAULTS("More than 1 default case defined", 0),
     SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG: unreachable case", 2),
     UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
-    UNMATCHABLE_CASE("A variable of tag-type %ARG cannot possibly match against case %ARG", 2),
-    MATCH_NO_COMMON_RETURN("Match statement does not have a common return type", 0),
+    UNMATCHABLE_CASE("Case type %ARG is not a subtype of match expression type %ARG: %ARG", 3),
+    UNMATCHED_CASE("Matched expression %ARG has no matching case", 1),
+    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: ", 1),
 
     // Evaluation errors
     VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
@@ -96,7 +101,8 @@ public enum ErrorMessage {
     SCRIPT_REQUIRED_MODULE_ONLY_JAVA("A module required by a top-level script must have exactly one argument, a platform such as java", 0),
     NOT_AN_FFI("Expected an FFI object as the schema in an import URI", 0),
     SCHEME_NOT_RECOGNIZED("import scheme %ARG not recognized; did you forget to \"require java\"?", 1),
-    UNSAFE_JAVA_IMPORT("To import the java package %ARG, make sure you \"require java\" or add the package to the built-in whitelist (experts only)", 1),
+    UNSAFE_JAVA_IMPORT("To import the java object %ARG, make sure you \"require java\" "
+                       + "(security experts only: if this object is harmless, you can add it to the built-in whitelist (see Globals.java)", 1),
     ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
     UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
     NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),

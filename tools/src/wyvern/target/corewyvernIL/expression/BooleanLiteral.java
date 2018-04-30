@@ -81,7 +81,7 @@ public class BooleanLiteral extends Literal implements Invokable {
         switch (methodName) {
         case "ifTrue":
             if (this.value) {
-                return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+                return new SuspendedTailCall(this.getType(), this.getLocation()) {
                     @Override public Value interpret(EvalContext ignored) {
                         return ((ObjectValue) args.get(0)).invoke("apply", new ArrayList<>());
                     }
@@ -93,7 +93,7 @@ public class BooleanLiteral extends Literal implements Invokable {
                     }
                 };
             }
-            return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+            return new SuspendedTailCall(this.getType(), this.getLocation()) {
                 @Override public Value interpret(EvalContext ignored) {
                     return ((ObjectValue) args.get(1)).invoke("apply", new ArrayList<>());
                 }

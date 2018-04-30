@@ -1,0 +1,150 @@
+module ast
+
+import wyvern.internal.list
+import java:wyvern.stdlib.support.AST.utils
+
+type AST
+	val ast:Unit
+
+type Decl
+	val decl:Unit
+
+type Type
+	val typ:Unit
+
+type DeclType
+  val declType:Unit
+
+type VarBinding
+  val binding:Unit
+
+type Case
+  val caseValue:Unit
+
+type FormalArg
+  val formalArg:Unit
+
+def varBinding(varName : String, varType : Type, toReplace : AST) : VarBinding = new
+  val binding:Unit = utils.varBinding(varName, varType, toReplace)
+
+def makeCase(varName : String, pattern : Type, body : AST) : Case = new
+  val caseValue:Unit = utils.makeCase(varName, pattern, body)
+
+def formalArg(name : String, argType : Type) : FormalArg = new
+  val formalArg:Unit = utils.formalArg(name, argType)
+
+def bind(bindings : list.List, inExpr : AST) : AST = new
+  val ast:Unit = utils.bind(bindings, inExpr)
+
+def object(decls : list.List) : AST = new
+	val ast:Unit = utils.object(decls)
+
+def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST):Decl = new
+	val decl:Unit = utils.defDeclaration(name, formalArgs, returnType, body)
+
+def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = new
+  val decl:Unit = utils.delegateDeclaration(delegateType, fieldName)
+
+def moduleDeclaration(name : String, formalArgs : list.List, moduleType : Type, body : AST, dependencies : list.List) : Decl = new
+  val decl:Unit = utils.moduleDeclaration(name, formalArgs, moduleType, body, dependencies)
+
+def typeDeclaration(typeName : String, sourceType : Type) : Decl = new
+  val decl:Unit = utils.typeDeclaration(typeName, sourceType)
+
+def valDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = new
+  val decl:Unit = utils.valDeclaration(fieldName, fieldType, value)
+
+def varDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = new
+  val decl:Unit = utils.varDeclaration(fieldName, fieldType, value)
+
+def int(i:Int):AST = new
+	val ast:Unit = utils.intLiteral(i)
+
+def boolean(b:Boolean):AST = new
+  val ast:Unit = utils.booleanLiteral(b)
+
+def string(s:String):AST = new
+	val ast:Unit = utils.stringLiteral(s)
+
+def variable(s:String):AST = new
+	val ast:Unit = utils.variable(s)
+
+def call(receiver:AST, methodName:String, arguments:list.List):AST = new
+	val ast:Unit = utils.methodCall(receiver,methodName, arguments)
+
+def cast(toCastExpr : AST, exprType : Type) : AST = new
+  val ast:Unit = utils.cast(toCastExpr, exprType)
+
+def ffi(importName : String, importType : Type) : AST = new
+  val ast:Unit = utils.ffi(importName, importType)
+
+def ffiImport(ffiType : Type, path : String, importType : Type) : AST = new
+  val ast:Unit = utils.ffiImport(ffiType, path, importType)
+
+def fieldGet(objectExpr : AST, fieldName : String) : AST = new
+  val ast:Unit = utils.fieldGet(objectExpr, fieldName)
+
+def fieldSet(exprType : Type, object : AST, fieldName : String, exprToAssign : AST) : AST = new
+  val ast:Unit = utils.fieldSet(exprType, object, fieldName, exprToAssign)
+
+def matchExpr(matchExpr : AST, elseExpr : AST, cases : list.List) : AST = new
+  val ast:Unit = utils.matchExpr(matchExpr, elseExpr, cases)
+
+def abstractTypeMember(name : String, isResource : Boolean) : DeclType = new
+  val declType:Unit = utils.abstractTypeMember(name, isResource)
+
+def concreteTypeMember(name : String, sourceType : Type) : DeclType = new
+  val declType:Unit = utils.concreteTypeMember(name, sourceType)
+
+def defDeclType(methodName : String, returnType : Type, formalArgs : list.List) : DeclType = new
+  val declType:Unit = utils.defDeclType(methodName, returnType, formalArgs)
+
+def valDeclType(field : String, valType : Type) : DeclType = new
+  val declType:Unit = utils.valDeclType(field, valType)
+
+def varDeclType(field : String, varType : Type) : DeclType = new
+  val declType:Unit = utils.varDeclType(field, varType)
+
+def parseExpression(input : String, ctx : system.Context) : AST
+  val ctxDyn:Dyn = ctx
+  new
+    val ast:Unit = utils.parseExpression(input, ctxDyn)
+
+def parseExpressionList(input : String, ctx : system.Context) : list.List
+  val ctxDyn:Dyn = ctx
+  def javaASTToWyvAST(jAST : Dyn):Dyn = new
+    val ast:Unit = jAST
+  val l = utils.parseExpressionList(input, ctxDyn)
+  l.map(ast => javaASTToWyvAST(ast))
+
+val types = new
+  def int():Type = new
+    val typ:Unit = utils.intType()
+
+  def dyn():Type = new
+    val typ:Unit = utils.dynType()
+
+  def unit():Type = new
+    val typ:Unit = utils.unitType()
+
+  def boolean():Type = new
+    val typ:Unit = utils.booleanType()
+
+  def string():Type = new
+    val typ:Unit = utils.stringType()
+
+  def nominal(pathVariable : String, typeMember : String):Type = new
+    val typ:Unit = utils.nominalType(pathVariable, typeMember)
+
+  def structural(selfName : String, declTypes : list.List):Type = new
+    val typ:Unit = utils.structuralType(selfName, declTypes)
+
+  def refinement(typeParams : list.List, base : Type):Type = new
+    val typ:Unit = utils.refinementType(typeParams, base)
+
+def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
+
+def genIdent() : String = utils.genIdent()
+
+def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = new
+  val ast:Unit = utils.let(ident, bindingType, bindingValue, inExpr)

@@ -34,7 +34,7 @@ public abstract class Expression extends ASTNode implements IASTNode, IExpr {
         // if this constructor is used, exprType must be set later!
     }
 
-    public ValueType getExprType() {
+    public ValueType getType() {
         return exprType;
 
     }

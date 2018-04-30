@@ -1,0 +1,7 @@
+//require python
+
+import debug
+
+//val debug2 = debug(python)
+
+debug.print("The world is buggy")

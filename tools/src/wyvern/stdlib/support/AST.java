@@ -55,7 +55,9 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.WyvernParser;
@@ -99,9 +101,16 @@ public class AST {
         List<DeclType> declTypes = new LinkedList<>();
         for (ObjectValue declType: declTypeObjs) {
             JavaValue fieldValue = (JavaValue) declType.getField("declType");
-            return (ValueType) fieldValue.getWrappedValue();
+            throw new RuntimeException("implementation needs to be fixed");
+            //return (ValueType) fieldValue.getWrappedValue();
         }
         return new StructuralType(selfName, declTypes);
+    }
+
+    public ValueType typeParam(String name, ObjectValue type) {
+        List<DeclType> declTypes = new LinkedList<>();
+        declTypes.add(concreteTypeMember(name, type));
+        return new StructuralType("ignore$Me", declTypes);
     }
 
     public ValueType refinementType(List<ObjectValue> typeParamObjs, ObjectValue base) {
@@ -109,7 +118,7 @@ public class AST {
         for (ObjectValue obj: typeParamObjs) {
             typeParams.add(getType(obj));
         }
-        return new RefinementType(typeParams, getType(base), null);
+        return new RefinementType(typeParams, getType(base), base);
     }
 
     public Expression intLiteral(int i) {
@@ -324,13 +333,21 @@ public class AST {
         return result.toString();
     }
 
-    public String stripLeadingWhitespace(String input) throws IOException {
-        // Remove the least common whitespace prefix from all lines in [input]
+    /** Remove the least common whitespace prefix from all lines in [input].
+     * Report an error if there is no common leading whitespace and mustStrip is set
+     *
+     * @param input
+     * @return
+     * @throws IOException
+     */
+    public String stripLeadingWhitespace(String input, boolean mustStrip) throws IOException {
         String toStrip = null;
         String line = null;
+        int lineNo = 0;
         BufferedReader bufReader = new BufferedReader(new StringReader(input));
-        Pattern p = Pattern.compile("^(\\s+).+");
+        Pattern p = Pattern.compile("^(\\s+).*");
         while ((line = bufReader.readLine()) != null) {
+            lineNo++;
             Matcher m = p.matcher(line);
             String leadingWhitespace;
             if (m.matches()) {
@@ -339,6 +356,9 @@ public class AST {
                 leadingWhitespace = "";
             }
             toStrip = commonPrefix(leadingWhitespace, toStrip);
+            if (toStrip.length() == 0 && mustStrip) {
+                ToolError.reportError(ErrorMessage.INCONSISTENT_INDENT, new FileLocation("TSL", lineNo, 1));
+            }
         }
         bufReader = new BufferedReader(new StringReader(input));
         StringBuilder result = new StringBuilder();

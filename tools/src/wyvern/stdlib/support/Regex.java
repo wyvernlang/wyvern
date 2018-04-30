@@ -16,11 +16,12 @@ public class Regex {
         Matcher m = Pattern.compile(regex).matcher(source);
         EvalContext ctx = ModuleResolver.getLocal().contextWith("wyvern.option");
         Expression call = null;
+        Expression typeParam = ExpressionUtils.typeParam("T", AST.utils.nominalType("system", "String"));
         if (m.find() && m.start() == 0) {
             String matchedString = m.group();
-            call = ExpressionUtils.call("option", "Some", new StringLiteral(matchedString));
+            call = ExpressionUtils.call("option", "Some", typeParam, new StringLiteral(matchedString));
         } else {
-            call = ExpressionUtils.call("option", "None");
+            call = ExpressionUtils.call("option", "None", typeParam);
         }
         return (ObjectValue) call.interpret(ctx);
     }
@@ -29,13 +30,14 @@ public class Regex {
         Matcher m = Pattern.compile(regex).matcher(source);
         EvalContext ctx = ModuleResolver.getLocal().contextWith("wyvern.option", "wyvern.util.matching.regex");
         Expression call = null;
+        Expression typeParam = ExpressionUtils.typeParam("T", AST.utils.nominalType("regex", "Match"));
         if (m.find() && m.start() == 0) {
             String matchedString = m.group();
             String rest = source.substring(m.end());
             Expression match = ExpressionUtils.call("regex", "makeMatch", new StringLiteral(matchedString), new StringLiteral(rest));
-            call = ExpressionUtils.call("option", "Some", match);
+            call = ExpressionUtils.call("option", "Some", typeParam, match);
         } else {
-            call = ExpressionUtils.call("option", "None");
+            call = ExpressionUtils.call("option", "None", typeParam);
         }
         return (ObjectValue) call.interpret(ctx);
     }

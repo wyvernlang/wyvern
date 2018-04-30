@@ -1,0 +1,18 @@
+// here we demonstrate operations on strings and characters
+// "truth" should be true at the end
+
+var truth:Boolean = "hi" == "hi"
+truth = truth && "aa" < "ab"
+truth = truth && "zz" > "aa"
+truth = truth && "Wyvern".length() == 6
+
+val y:Character = "Wyvern".charAt(2)
+val v:Character = "Wyvern".charAt(3)
+truth = truth && y > v
+truth = truth && v < y
+truth = truth && y == y
+
+val ver:String = "Wyvern".substring(2,5)
+truth = truth && ver == "ver"
+
+truth

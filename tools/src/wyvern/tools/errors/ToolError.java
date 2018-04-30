@@ -19,6 +19,7 @@ public class ToolError extends RuntimeException {
         this.location = location;
         assert message.numberOfArguments() == args.length;
         this.errorMessage = message;
+        this.arguments = args;
     }
 
     protected ToolError(ErrorMessage message, HasLocation errorLocation, String... args) {
@@ -31,9 +32,14 @@ public class ToolError extends RuntimeException {
 
     private ErrorMessage errorMessage;
     private FileLocation location;
+    private String[] arguments;
 
     public FileLocation getLocation() {
         return location;
+    }
+
+    public String[] getArguments() {
+        return arguments;
     }
 
     public int getLine() {
@@ -44,5 +50,9 @@ public class ToolError extends RuntimeException {
      * For serialization
      */
     private static final long serialVersionUID = -4348846559537743643L;
+
+    public ToolError withNewLocation(FileLocation newLoc) {
+        return new ToolError(errorMessage, newLoc, arguments);
+    }
 
 }

@@ -1,9 +1,11 @@
 package wyvern.tools.tests;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
@@ -15,6 +17,11 @@ import wyvern.tools.tests.suites.RegressionTests;
 public class DemoTests {
     private static final String BASE_PATH = TestUtil.BASE_PATH;
     private static final String PATH = BASE_PATH + "demo/";
+
+    @Before
+    public void setup() {
+        Globals.resetPrelude();
+    }
 
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();

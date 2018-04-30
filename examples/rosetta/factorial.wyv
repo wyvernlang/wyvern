@@ -1,25 +1,26 @@
 require stdout
 
-import metadata wyvern.IfTSL
-// TODO: put this in the standard prelude, and allow it be called 'if'
-val iff = (x:Boolean, y:IfTSL.IfExprR) => IfTSL.doifR(x, y)
+// optimizing for readability
+def fact(n:Int):Int
+    if (n < 2)
+            1
+        else
+            n * fact(n-1)
 
+// optimizing for compactness
+def fact2(n:Int):Int
+    if (n < 2) { 1 } else { n * fact2(n-1) }
+
+// this version shows a more explicit, but verbose, syntax for if
 def factorial(n:Int):Int
 	(n < 2).ifTrue(
 		() => 1,
 		() => n * factorial(n-1)
 	)
-
-// TODO: can we make this even cleaner by defining if as a macro,
-// so we don't need to use ~?    
-def fact(n:Int):Int
-    iff (n < 2, ~)
-        then
-            1
-        else
-            n * fact(n-1)
-
+    
 stdout.print("factorial(15) = ")
 stdout.printInt(factorial(15))
 stdout.print("\nand another way:")
 stdout.printInt(fact(15))
+stdout.print("\nand yet another:")
+stdout.printInt(fact2(15))

@@ -47,6 +47,7 @@ import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.HasLocation;
@@ -95,11 +96,12 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         ASTNode result = ast.acceptVisitor(new PlatformSpecializationVisitor(), state);
 
         ModuleResolver interpResolver = ModuleResolver.getLocal();
-        ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
+        final ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
         resolver.setInterpreterState(InterpreterState.getLocalThreadInterpreter());
 
 
         List<TypedModuleSpec> dependenciesList = new ArrayList<>(state.getDependencies());
+        dependenciesList = resolver.sortDependencies(dependenciesList);
         return (ASTNode) resolver.wrap((IExpr) result, dependenciesList);
     }
 
@@ -117,7 +119,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             ASTNode result = decl.acceptVisitor(this, state);
             newDecls.add((Declaration) result);
         }
-        New result = new New(newDecls, newExpr.getSelfName(), newExpr.getExprType(), newExpr.getLocation());
+        New result = new New(newDecls, newExpr.getSelfName(), newExpr.getType(), newExpr.getLocation());
         result.copyMetadata(newExpr);
         return result;
     }
@@ -144,10 +146,11 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, Match match) {
         Expression matchExpr = (Expression) match.getMatchExpr().acceptVisitor(this, state);
-        Expression elseExpr = (Expression) match.getElseExpr().acceptVisitor(this, state);
+        Expression elseExpr = match.getElseExpr();
+        elseExpr =  elseExpr == null ? null : (Expression) elseExpr.acceptVisitor(this, state);
         List<Case> cases = new ArrayList<Case>();
         for (Case matchCase : match.getCases()) {
-            cases.add((Case) matchCase.getBody().acceptVisitor(this, state));
+            cases.add((Case) matchCase.acceptVisitor(this, state));
         }
 
         Match result = new Match(matchExpr, elseExpr, cases);
@@ -178,7 +181,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         IExpr objectExpr = (IExpr) fieldSet.getObjectExpr().acceptVisitor(this, state);
         IExpr exprToAssign = (IExpr) fieldSet.getExprToAssign().acceptVisitor(this, state);
 
-        FieldSet result = new FieldSet(fieldSet.getExprType(), objectExpr, fieldSet.getFieldName(), exprToAssign);
+        FieldSet result = new FieldSet(fieldSet.getType(), objectExpr, fieldSet.getFieldName(), exprToAssign);
         result.copyMetadata(fieldSet);
         return result;
     }
@@ -191,7 +194,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, Cast cast) {
         IExpr resultExpr = (IExpr) cast.getToCastExpr().acceptVisitor(this, state);
-        Cast result = new Cast(resultExpr, cast.getExprType());
+        Cast result = new Cast(resultExpr, cast.getType());
         result.copyMetadata(cast);
         return result;
     }
@@ -361,5 +364,10 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     @Override
     public ASTNode visit(PSVState state, EffectDeclType effectDeclType) {
         return effectDeclType;
+    }
+
+    @Override
+    public ASTNode visit(PSVState state, RefinementType type) {
+        return type;
     }
 }

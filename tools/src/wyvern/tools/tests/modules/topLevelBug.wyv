@@ -1,0 +1,38 @@
+/* tests a bug previously seen in top-level code.  Should be OK after the fix. */
+
+require stdout
+
+type IntList
+    def sum():Int
+
+type List
+    type X
+    def len():Int
+
+val empty:IntList = new
+   def sum(): Int = 0
+   def alex(): Int = 42
+
+def cons(elem:Int, rest:IntList):IntList = new
+   def sum(): Int = elem + rest.sum()
+
+stdout.printInt(cons(3,cons(4, empty)).sum())
+stdout.print("\n")
+
+val mine:List = new
+   type X = Int
+   def len():Int
+       42
+
+// the bug was that this module returns the internal value defining the following 3 declarations, and that's not well-typed in isolation from the previous declarations
+// the fix was to not force the return values of top-level code to be well-typed without the declarations above.
+       
+type Stack
+    type X
+    def len():Int
+
+def yours(l:List):Stack = new
+   type X = l.X
+   def len():Int = 31
+
+def blah(ll:List[Int]):Int = 42

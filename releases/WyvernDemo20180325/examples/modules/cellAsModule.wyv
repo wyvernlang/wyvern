@@ -1,0 +1,6 @@
+module def cellAsModule():modules.TCellAsModule
+
+var value : Int = 0
+def set(newValue:Int):Unit
+    value = newValue
+def get():Int = value

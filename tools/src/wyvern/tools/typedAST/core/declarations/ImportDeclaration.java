@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -84,7 +85,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
     @Override
     public String getName() {
-        return "";
+        return asName;
     }
 
     @Override
@@ -114,15 +115,13 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         if (obj.getWrappedValue() instanceof java.lang.Class) {
             // then this is a Class import
             // and we need to extend the context
-            String qualifiedName = ((Class<?>) obj.getWrappedValue()).getName();
+            Class<?> wrappedValue = (Class<?>) obj.getWrappedValue();
+            String qualifiedName = wrappedValue.getName();
             int lastDot = qualifiedName.lastIndexOf('.');
             String className = qualifiedName.substring(lastDot + 1);
             String packageName = qualifiedName.substring(0, lastDot);
-            ctx = new TypeOrEffectGenContext(
-                    className,
-                    new Variable(GenUtil.javaTypesObjectName + packageName),
-                    ctx
-                    );
+            ValueType type = GenUtil.javaClassToWyvernType(wrappedValue, ctx);
+            ctx = new TypeOrEffectGenContext(className, new FieldGet(new Variable(GenUtil.javaTypesObjectName), packageName, null), ctx);
         }
         return ctx;
     }
@@ -162,7 +161,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             // right now the only supported case is java
             // TODO: make this more generic
             if (importName.equals("java")) {
-                // TODO: implement me
                 type = Globals.JAVA_IMPORT_TYPE;
                 importExp = new FFI(importName, type, this.getLocation());
                 ctx = ctx.extend(importName, importExp, type);
@@ -191,7 +189,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                 // instantiate the module
                 DefDeclType modDeclType = (DefDeclType) ((StructuralType) m.getSpec().getType()).findDecl(Util.APPLY_NAME, ctx);
                 if (modDeclType == null || modDeclType.getFormalArgs().size() != 1) {
-                    //System.err.println("Expected modArgs.size() = 1, got " + modArgs.size());
                     ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
                 }
                 List<FormalArg> modArgs = modDeclType.getFormalArgs();
@@ -219,7 +216,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                 dependencies.add(m.getSpec());
                 dependencies.addAll(m.getDependencies());
                 // ctx gets extended in the standard way, with a variable
-                ctx = ctx.extend(importName, new Variable(importName), type);
+                String name = this.asName == null ? importName : this.asName;
+                ctx = ctx.extend(name, new Variable(name), type);
             }
         } else if (scheme.equals("wyv")) {
             // TODO: need to add types for non-java imports
@@ -245,12 +243,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             if (module.getSpec().getDefinedTypeName() != null) {
                 ctx = new TypeOrEffectGenContext(importName, (Variable) importExp, ctx);
             } else {
-                ctx = ctx.extend(importName, new Variable(internalName), type);
+                ctx = ctx.extend(this.asName == null ? importName : this.asName, new Variable(internalName), type);
             }
         } else {
             ToolError.reportError(ErrorMessage.SCHEME_NOT_RECOGNIZED, this, scheme);
         }
-        return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
+        return new Pair<VarBinding, GenContext>(new VarBinding(this.asName == null ? importName : this.asName, type, importExp), ctx);
     }
 
     @Override
@@ -266,11 +264,6 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         ValueType type = binding.getExpression().typeCheck(newCtx, null);
         tlc.addLet(binding.getVarName(), type, binding.getExpression(), false);
         tlc.updateContext(newCtx);
-    }
-
-
-    public String getAsName() {
-        return asName;
     }
 
     @Override

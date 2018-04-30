@@ -6,6 +6,7 @@ import java.util.Set;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -26,7 +27,7 @@ public class Cast extends Expression {
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         toCastExpr.typeCheck(ctx, effectAccumulator);
-        return getExprType().getCanonicalType(ctx);
+        return getType().getCanonicalType(ctx);
     }
 
     @Override
@@ -38,9 +39,10 @@ public class Cast extends Expression {
     public Value interpret(EvalContext ctx) {
         Value value = getToCastExpr().interpret(ctx);
         ValueType actualType = value.typeCheck(ctx, null);
-        ValueType goalType = getExprType();
-        if (!actualType.isSubtypeOf(goalType, ctx)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString());
+        ValueType goalType = getType();
+        FailureReason r = new FailureReason();
+        if (!actualType.isSubtypeOf(goalType, ctx, r)) {
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), actualType.toString(), goalType.toString(), r.getReason());
         }
         return value;
     }
@@ -53,7 +55,7 @@ public class Cast extends Expression {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append("((");
-        getExprType().doPrettyPrint(dest, "");
+        getType().doPrettyPrint(dest, "");
         dest.append(") ");
         toCastExpr.doPrettyPrint(dest, "");
         dest.append(")");

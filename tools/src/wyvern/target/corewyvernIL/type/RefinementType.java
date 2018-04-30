@@ -10,6 +10,9 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.support.FailureReason;
+import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
@@ -17,9 +20,10 @@ import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class RefinementType extends ValueType {
-    public RefinementType(ValueType base, List<ConcreteTypeMember> declTypes, HasLocation hasLoc) {
+    public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, String selfName) {
         this.base = base;
         this.declTypes = declTypes;
+        this.selfName = selfName;
     }
 
     public RefinementType(List<ValueType> typeParams, ValueType base, HasLocation hasLoc) {
@@ -29,12 +33,13 @@ public class RefinementType extends ValueType {
     }
 
     private ValueType base;
-    private List<ConcreteTypeMember> declTypes = null; // may be computed lazily from typeParams
+    private String selfName;
+    private List<DeclType> declTypes = null; // may be computed lazily from typeParams
     private List<ValueType> typeParams;
 
-    private List<ConcreteTypeMember> getDeclTypes(TypeContext ctx) {
+    private List<DeclType> getDeclTypes(TypeContext ctx) {
         if (declTypes == null) {
-            declTypes = new LinkedList<ConcreteTypeMember>();
+            declTypes = new LinkedList<DeclType>();
             base.checkWellFormed(ctx);
             StructuralType st = base.getStructuralType(ctx, null);
             if (st == null) {
@@ -63,7 +68,7 @@ public class RefinementType extends ValueType {
 
     @Override
     public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
-        throw new RuntimeException("need to add a visitor method call here");
+        return visitor.visit(state,  this);
     }
 
     @Override
@@ -72,24 +77,24 @@ public class RefinementType extends ValueType {
         if (declTypes == null) {
             return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase, this);
         }
-        List<ConcreteTypeMember> newDTs = new LinkedList<ConcreteTypeMember>();
-        for (ConcreteTypeMember dt : declTypes) {
+        List<DeclType> newDTs = new LinkedList<DeclType>();
+        for (DeclType dt : declTypes) {
             newDTs.add(dt.adapt(v));
         }
-        return new RefinementType(newBase, newDTs, this);
+        return new RefinementType(newBase, newDTs, this, selfName);
     }
 
     @Override
     public ValueType doAvoid(String varName, TypeContext ctx, int depth) {
-        List<ConcreteTypeMember> newDeclTypes = new LinkedList<ConcreteTypeMember>();
+        List<DeclType> newDeclTypes = new LinkedList<DeclType>();
         boolean changed = false;
         ValueType newBase = base.doAvoid(varName, ctx, depth);
         if (declTypes == null) {
             List<ValueType> newTPs = typeParams.stream().map(p -> p.doAvoid(varName, ctx, depth)).collect(Collectors.toList());
             return new RefinementType(newTPs, base, this);
         }
-        for (ConcreteTypeMember dt : declTypes) {
-            ConcreteTypeMember newDT = dt.doAvoid(varName, ctx, depth + 1);
+        for (DeclType dt : declTypes) {
+            DeclType newDT = dt.doAvoid(varName, ctx, depth + 1);
             newDeclTypes.add(newDT);
             if (newDT != dt) {
                 changed = true;
@@ -98,18 +103,22 @@ public class RefinementType extends ValueType {
         if (!changed && base == newBase) {
             return this;
         } else {
-            return new RefinementType(newBase, newDeclTypes, this);
+            return new RefinementType(newBase, newDeclTypes, this, selfName);
         }
     }
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
         base.checkWellFormed(ctx);
-        StructuralType t = base.getStructuralType(ctx);
-        final TypeContext selfCtx = ctx.extend(t.getSelfName(), this);
+        final TypeContext selfCtx = selfName == null ? ctx : ctx.extend(selfName, this);
         for (DeclType dt : getDeclTypes(ctx)) {
             dt.checkWellFormed(selfCtx);
         }
+    }
+
+    /** Returns the self name if there is one, otherwise null */
+    public String getSelfName() {
+        return selfName;
     }
 
     @Override
@@ -128,7 +137,11 @@ public class RefinementType extends ValueType {
         }
         if (current != max) {
             // TODO: replace with a nice warning
-            throw new RuntimeException("invalid refinement type " + this);
+            // throw new RuntimeException("invalid refinement type " + this);
+
+            // this RefinementType was created by "new", therefore just use
+            // all the DeclTypes from the RefinementType and none from the base
+            newDTs = getDeclTypes(ctx);
         }
 
         return new StructuralType(baseST.getSelfName(), newDTs, isResource(ctx));
@@ -148,40 +161,64 @@ public class RefinementType extends ValueType {
             return false;
         }
         RefinementType other = (RefinementType) obj;
-        if (declTypes == null) {
-            if (other.declTypes == null) {
-                return base.equals(other.base) && typeParams.equals(other.typeParams);
-            } else {
+        if (declTypes == null && other.declTypes == null) {
+            return base.equals(other.base) && typeParams.equals(other.typeParams);
+        }
+        if (declTypes == null || other.declTypes == null) {
+            if (!base.equals(other.base)) {
                 return false;
             }
+            return countRefinements() == other.countRefinements() && getParamList().equals(other.getParamList());
         }
         return base.equals(other.base) && declTypes.equals(other.declTypes);
     }
 
+    private int countRefinements() {
+        return (declTypes != null) ? declTypes.size() : typeParams.size();
+    }
+
+    private List<ValueType> getParamList() {
+        if (typeParams != null) {
+            return typeParams;
+        }
+        LinkedList<ValueType> result = new LinkedList<ValueType>();
+        for (DeclType dt : declTypes) {
+            if (dt instanceof ConcreteTypeMember) {
+                ConcreteTypeMember ctm = (ConcreteTypeMember) dt;
+                result.addLast(ctm.getRawResultType());
+            }
+        }
+        return result;
+    }
+
     @Override
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         // if they are equivalent to a DynamicType or equal to us, then return true
         if (equals(t)) {
             return true;
         }
+        if (ctx.isAssumedSubtype(this, t)) {
+            return true;
+        }
+        ctx = new SubtypeAssumption(this, t, ctx);
         final ValueType ct = t.getCanonicalType(ctx);
-        if (super.isSubtypeOf(ct, ctx)) {
+        if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
             return true;
         }
 
         // if their canonical type is a NominalType, check if our base is a subtype of it
         if (ct instanceof NominalType) {
-            return base.isSubtypeOf(ct, ctx);
+            return base.isSubtypeOf(ct, ctx, reason);
         }
 
         // if their canonical type is a RefinementType, compare the bases (for any tags) and separately check the structural types
         if (ct instanceof RefinementType) {
-            if (!base.isSubtypeOf(((RefinementType) ct).base, ctx)) {
+            if (!base.isSubtypeOf(((RefinementType) ct).base, ctx, reason)) {
                 return false;
             }
         }
         // compare structural types
-        return this.getStructuralType(ctx).isSubtypeOf(ct.getStructuralType(ctx), ctx);
+        return this.getStructuralType(ctx).isSubtypeOf(ct.getStructuralType(ctx), ctx, reason);
     }
 
     @Override
@@ -200,8 +237,11 @@ public class RefinementType extends ValueType {
         dest.append("[");
         int count = 0;
         if (declTypes != null) {
-            for (ConcreteTypeMember ctm: declTypes) {
-                ctm.getRawResultType().doPrettyPrint(dest, indent, ctx);
+            for (DeclType ctm: declTypes) {
+                // limitation: would be better to actually print the DeclTypes that aren't ConcreteTypeMembers as part of the underlying type
+                if (ctm instanceof ConcreteTypeMember) {
+                    ((ConcreteTypeMember) ctm).getRawResultType().doPrettyPrint(dest, indent, ctx);
+                }
                 if (++count < declTypes.size()) {
                     dest.append(", ");
                 }
@@ -215,5 +255,14 @@ public class RefinementType extends ValueType {
             }
         }
         dest.append(']');
+    }
+    @Override
+    public Value getMetadata(TypeContext ctx) {
+        return base.getMetadata(ctx);
+    }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return base.isTagged(ctx);
     }
 }

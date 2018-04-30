@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,6 +41,10 @@ public class OIRTests {
     private static final String BASE_PATH = TestUtil.BASE_PATH;
     private static final String PATH = BASE_PATH + "modules/module/";
 
+    @Before
+    public void setup() {
+        Globals.resetPrelude();
+    }
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
@@ -60,7 +65,7 @@ public class OIRTests {
         GenContext pythonGenContext = Globals.getGenContext(state);
         LinkedList<TypedModuleSpec> dependencies = new LinkedList<>();
         IExpr iLprogram = ast.generateIL(pythonGenContext, null, dependencies);
-        iLprogram = state.getResolver().wrap(iLprogram, dependencies);
+        iLprogram = state.getResolver().wrapForPython(iLprogram, dependencies);
         TailCallVisitor.annotate(iLprogram);
 
         if (debug) {
@@ -82,7 +87,7 @@ public class OIRTests {
 
         String pprint =
                 new EmitPythonVisitor().emitPython(oirast,
-                        OIREnvironment.getRootEnvironment());
+                        OIREnvironment.getRootEnvironment(), true);
 
         if (debug) {
             System.out.println("OIR Program:\n" + pprint);
@@ -97,7 +102,7 @@ public class OIRTests {
             fw.write(pprint);
             fw.close();
 
-            Process p = Runtime.getRuntime().exec("python " + tempFile.getAbsolutePath());
+            Process p = Runtime.getRuntime().exec("python3 " + tempFile.getAbsolutePath());
 
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -615,14 +620,25 @@ public class OIRTests {
         String input =
                 "require stdout\n"
                       + "import wyvern.option\n"
-                      + "val orElse : option.UnitToDyn = new\n"
-                      + "  def apply() : Dyn = 5\n"
+                      + "val orElse : Unit -> Int = new\n"
+                      + "  def apply() : Int = 5\n"
                       + "val v1 : Int = option.Some(3).getOrElse(orElse)\n"
-                      + "val v2 : Int = option.None().getOrElse(orElse)\n"
+                      + "val v2 : Int = option.None[Int]().getOrElse(orElse)\n"
                       + "stdout.printInt(v1+v2)\n"
                       + "stdout.println()\n"
                       + "v1 + v2\n";
         testPyFromInput(input, "8\n8");
+    }
+
+    @Test
+    public void testDebug() throws ParseException {
+        String input =
+                        "require python\n\n"
+                      + "import debug\n\n"
+                      + "val debug2 = debug(python)\n\n"
+                      + "debug2.print(\"The world is buggy\n\")\n"
+                      + "3\n";
+        testPyFromInput(input, "3");
     }
 
     @Test
@@ -639,9 +655,9 @@ public class OIRTests {
     @Test
     public void testTSLIfElse() throws ParseException {
         String input =
-                "import metadata wyvern.IfTSL\n"
-                      + "IfTSL.doif(false, ~)\n"
-                      + "  then\n"
+//                "import metadata wyvern.IfTSL\n"
+                        "if(false)\n"
+//                      + "  then\n"
                       + "    7\n"
                       + "  else\n"
                       + "    8"
@@ -653,11 +669,13 @@ public class OIRTests {
     public void testTSLIf() throws ParseException {
         String input =
                 "require python\n"
-                      + "import metadata wyvern.IfTSL\n"
-                      + "IfTSL.doif(true, ~)\n"
-                      + "  then\n"
+//                      + "import metadata wyvern.IfTSL\n"
+                      + "val x:Int = if (true)\n"
+//                      + "  then\n"
                       + "    7\n"
-                      + "\n";
+                      + "  else\n"
+                      + "    6\n"
+                      + "x\n\n";
         testPyFromInput(input, "7");
     }
 

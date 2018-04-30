@@ -34,6 +34,11 @@ public class FieldGet extends Expression implements Path {
         dest.append('.').append(fieldName);
     }
 
+    @Override
+    public boolean isPath() {
+        return objectExpr.isPath();
+    }
+
     public IExpr getObjectExpr() {
         return objectExpr;
     }
@@ -56,7 +61,7 @@ public class FieldGet extends Expression implements Path {
             ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, this, dt.getName(), objectExpr.toString());
         }
         this.setExprType(((DeclTypeWithResult) dt).getResultType(View.from(objectExpr, ctx)));
-        return getExprType();
+        return getType();
     }
 
     @Override

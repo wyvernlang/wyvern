@@ -1,8 +1,10 @@
 package wyvern.target.corewyvernIL.support;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -177,7 +179,7 @@ public class ModuleResolver {
         File f = null;
         for (File searchDir : searchPath) {
             f = findFile(names, searchDir.getAbsolutePath());
-            if (f.exists()) {
+            if (f != null && f.exists()) {
                 break;
             }
         }
@@ -190,6 +192,16 @@ public class ModuleResolver {
             filename += names[i];
         }
         File f = new File(filename);
+        try {
+            File canonical = f.getCanonicalFile();
+            String lastName = canonical.getName();
+            // make sure capitalization matches on Windows platforms
+            if (!lastName.equals(names[names.length - 1])) {
+                return null;
+            }
+        } catch (IOException e) {
+            return f;
+        }
         return f;
     }
 
@@ -209,8 +221,12 @@ public class ModuleResolver {
         try {
             ast = TestUtil.getNewAST(file);
         } catch (ParseException e) {
-            ToolError.reportError(ErrorMessage.PARSE_ERROR,
-                    new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
+            if (e.getCurrentToken() != null) {
+                 ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                 new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
+            } else {
+                 ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
+            }
         }
 
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
@@ -225,9 +241,13 @@ public class ModuleResolver {
                 //program = wrap(program, dependencies);
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
-                ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
-                        oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
-                program = new New(moduleDecl);
+                if (oldModuleDecl.getFormalArgs().size() == 0) {
+                    program = oldModuleDecl.getBody();
+                } else {
+                    ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
+                            oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
+                    program = new New(moduleDecl);
+                }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 // rename according to "apply"
@@ -288,14 +308,21 @@ public class ModuleResolver {
             }
         }
 
-        if (!moduleType.isResource(ctx) && !toplevel) {
-            Value v = wrap(program, dependencies).interpret(Globals.getStandardEvalContext());
+        if (!toplevel && !moduleType.isResource(ctx)) {
+            Value v = wrapWithCtx(program, dependencies, Globals.getStandardEvalContext()).interpret(Globals.getStandardEvalContext());
             moduleType = v.getType();
         }
 
         String typeName = null;
         if (loadingType) {
             typeName = moduleType.getStructuralType(ctx).getDeclTypes().get(0).getName();
+        }
+        // if not a top-level module, make sure the module type is well-formed
+        // top-level modules are exempted from this check because the module returns the thing
+        // defined on the last line, and that might not be type-checkable without the things
+        // added to the context by previous lines.
+        if (!toplevel) {
+            moduleType.checkWellFormed(ctx);
         }
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
         return new Module(spec, program, dependencies);
@@ -327,8 +354,89 @@ public class ModuleResolver {
         return ctx;
     }
 
-    public IExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
-        SeqExpr seqProg = (program instanceof SeqExpr) ? (SeqExpr) program : new SeqExpr().addExpr(program);
+    /** Deprecated; the plan is to move all calls to wrapWithCtx, which is
+     * more efficient (linear instead of quadratic).
+     *
+     * @param program
+     * @param dependencies
+     * @return
+     */
+    @Deprecated
+    public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
+        SeqExpr seqProg = new SeqExpr();
+        seqProg.merge(program);
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        for (TypedModuleSpec spec : noDups) {
+            Module m = resolveModule(spec.getQualifiedName());
+            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
+        }
+        return seqProg;
+    }
+
+    /** Wraps this program with all its dependencies.  The dependencies are
+     * evaluated to values using the ctx, and the values are cached in
+     * order to reduce duplicate evaluation.
+     * @param program
+     * @param dependencies The modules this program depends on.  These must
+     * be in order, so that if one module depends on another than the the
+     * second module comes later (i.e. the modules are in reverse order
+     * than they will appear in the linked program).  Duplicate modules are
+     * OK; duplicates will be eliminated before the program is linked.
+     *
+     * @param ctx
+     * @return
+     */
+    public SeqExpr wrapWithCtx(IExpr program, List<TypedModuleSpec> dependencies, EvalContext ctx) {
+        SeqExpr seqProg = new SeqExpr();
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        for (int i = noDups.size() - 1; i >= 0; --i) {
+            TypedModuleSpec spec = noDups.get(i);
+            Module m = resolveModule(spec.getQualifiedName());
+            Value v = m.getAsValue(ctx);
+            String internalName = m.getSpec().getInternalName();
+            ctx = ctx.extend(internalName, v);
+            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            ValueType type = m.getSpec().getType();
+            /*ValueType valType = v.getType();
+            if (!type.equals(valType))
+                throw new RuntimeException();
+            type.checkWellFormed(ctx);
+            ((ObjectValue)v).checkWellFormed();*/
+            seqProg.addBinding(internalName, type, v /*m.getExpression()*/, true);
+        }
+        seqProg.merge(program);
+        return seqProg;
+    }
+
+    public SeqExpr wrapForPython(IExpr program, List<TypedModuleSpec> dependencies) {
+        SeqExpr seqProg = new SeqExpr();
+        Module prelude = Globals.getPreludeModule();
+        addDeps(seqProg, prelude.getDependencies());
+        seqProg.merge(prelude.getExpression());
+        List<TypedModuleSpec> deps = new ArrayList<TypedModuleSpec>(dependencies);
+        deps.removeAll(prelude.getDependencies());
+        addDeps(seqProg, deps);
+        seqProg.merge(program);
+        return seqProg;
+    }
+
+    /** Does not modify deps.
+     * Adds deduplicated deps to seqProg. */
+    private void addDeps(SeqExpr seqProg, List<TypedModuleSpec> deps) {
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(deps);
+        for (int i = noDups.size() - 1; i >= 0; --i) {
+            TypedModuleSpec spec = noDups.get(i);
+            Module m = resolveModule(spec.getQualifiedName());
+            String internalName = m.getSpec().getInternalName();
+            ValueType type = m.getSpec().getType();
+            seqProg.addBinding(internalName, type, m.getExpression(), true);
+        }
+    }
+    /** Returns a fresh list, with duplicates eliminated.
+     * The last occurrence of each element is left in the returned list.
+     */
+    private LinkedList<TypedModuleSpec> deDuplicate(List<TypedModuleSpec> dependencies) {
         Set<String> wrapped = new HashSet<String>();
         LinkedList<TypedModuleSpec> noDups = new LinkedList<TypedModuleSpec>();
         for (int i = dependencies.size() - 1; i >= 0; i--) {
@@ -339,12 +447,7 @@ public class ModuleResolver {
                 noDups.addFirst(spec);
             }
         }
-        for (TypedModuleSpec spec : noDups) {
-            Module m = resolveModule(spec.getQualifiedName());
-            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
-            seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
-        }
-        return seqProg;
+        return noDups;
     }
 
     public static ModuleResolver getLocal() {
@@ -361,5 +464,28 @@ public class ModuleResolver {
 
     public File getLibDir() {
         return libDir;
+    }
+
+    /** de-duplicates dependencies and sorts them so that if A depends on B, A comes earlier in the list */
+    public List<TypedModuleSpec> sortDependencies(List<TypedModuleSpec> dependencies) {
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        noDups.sort(new Comparator<TypedModuleSpec>() {
+
+            @Override
+            public int compare(TypedModuleSpec o1, TypedModuleSpec o2) {
+                Module m1 = resolveModule(o1.getQualifiedName());
+                Module m2 = resolveModule(o2.getQualifiedName());
+                // if o1 depends on o2 then o1 should come first; wrapping will proceed from the end of the list
+                if (m1.dependsOn(o2)) {
+                    return -1;
+                } else if (m2.dependsOn(o1)) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+        });
+        return noDups;
     }
 }

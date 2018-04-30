@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.FileLocation;
@@ -82,7 +83,7 @@ public abstract class ValueType extends Type implements IASTNode {
         return false;
     }
 
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         return t instanceof DynamicType || equals(t); // default
     }
 
@@ -111,8 +112,8 @@ public abstract class ValueType extends Type implements IASTNode {
     @Override
     public abstract ValueType doAvoid(String varName, TypeContext ctx, int depth);
 
-    public boolean equalsInContext(ValueType otherType, TypeContext ctx) {
-        return this.isSubtypeOf(otherType, ctx) && otherType.isSubtypeOf(this, ctx);
+    public boolean equalsInContext(ValueType otherType, TypeContext ctx, FailureReason reason) {
+        return this.isSubtypeOf(otherType, ctx, reason) && otherType.isSubtypeOf(this, ctx, reason);
     }
 
     /**
@@ -143,4 +144,5 @@ public abstract class ValueType extends Type implements IASTNode {
         return doAvoid(varName, ctx, 0);
     }
     public static final int MAX_RECURSION_DEPTH = 10;
+    public abstract boolean isTagged(TypeContext ctx);
 }

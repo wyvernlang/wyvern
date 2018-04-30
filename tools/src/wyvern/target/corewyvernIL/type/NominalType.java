@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
@@ -62,7 +63,12 @@ public class NominalType extends ValueType {
 
     @Override
     public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
-        DeclType dt = getSourceDeclType(ctx);
+        DeclType dt = null;
+        try {
+            dt = getSourceDeclType(ctx);
+        } catch (RuntimeException e) {
+            return super.getStructuralType(ctx, theDefault); // can't look up a structural type
+        }
         if (dt instanceof DefinedTypeMember) {
             ValueType vt = ((DefinedTypeMember) dt).getResultType(View.from(path, ctx));
             if (vt.equals(this)) {
@@ -76,13 +82,19 @@ public class NominalType extends ValueType {
 
     private DeclType getSourceDeclType(TypeContext ctx) {
         final StructuralType structuralType = path.typeCheck(ctx, null).getStructuralType(ctx);
+        // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
-        //return path.typeCheck(ctx).getStructuralType(ctx).findDecl(typeMember, ctx);
     }
 
     @Override
     public ValueType getCanonicalType(TypeContext ctx) {
-        DeclType dt = getSourceDeclType(ctx);
+        DeclType dt = null;
+        try {
+            dt = getSourceDeclType(ctx);
+        } catch (RuntimeException e) {
+            // failed to get a canonical type
+            return this;
+        }
         if (dt instanceof ConcreteTypeMember) {
             final ValueType resultType = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
             if (this.equals(resultType)) {
@@ -125,9 +137,10 @@ public class NominalType extends ValueType {
         return path.equals(other.path) && typeMember.equals(other.typeMember);
     }
 
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    @Override
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         // check if they are the same type
-        if (super.isSubtypeOf(t, ctx)) {
+        if (super.isSubtypeOf(t, ctx, new FailureReason())) {
             return true;
         }
         if (ctx.isAssumedSubtype(this, t)) {
@@ -140,15 +153,22 @@ public class NominalType extends ValueType {
             // if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
             //if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
             ctx = new SubtypeAssumption(this, t, ctx);
-            return vt.isSubtypeOf(ct, ctx);
+            return vt.isSubtypeOf(ct, ctx, reason);
         } else if (dt instanceof TaggedTypeMember) {
             Type typeDefn = ((TaggedTypeMember) dt).getTypeDefinition(View.from(path, ctx));
             NominalType superType = typeDefn.getParentType(View.from(path, ctx));
             // TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
-            return superType == null ? false : superType.isSubtypeOf(t, ctx);
+            return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
         } else {
             ValueType ct = t.getCanonicalType(ctx);
-            return super.isSubtypeOf(ct, ctx); // check for equality with the canonical type
+            // check for equality with the canonical type
+            if (super.isSubtypeOf(ct, ctx, reason)) {
+                return true;
+            } else {
+                // report error in terms of original type
+                reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                return false;
+            }
         }
     }
 
@@ -195,28 +215,33 @@ public class NominalType extends ValueType {
             // TODO: make this more principled
             return this;
         }
-        //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
         if (path.getFreeVariables().contains(varName)) {
-            DeclType dt = this.getSourceDeclType(ctx);
-            if (dt instanceof ConcreteTypeMember) {
-                final ValueType type = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
-                if (type.equals(this)) {
-                    // avoid infinite loops, just in case
-                    // TODO: make this more principled
-                    return this;
-                    //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
+            try {
+                DeclType dt = this.getSourceDeclType(ctx);
+                if (dt instanceof ConcreteTypeMember) {
+                    final ValueType type = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+                    if (type.equals(this)) {
+                        // avoid infinite loops, just in case
+                        // TODO: make this more principled
+                        return this;
+                    }
+                    return type.doAvoid(varName, ctx, count + 1);
                 }
-                return type.doAvoid(varName, ctx, count + 1);
-            } else {
-                // was best effort anyway
-                // TODO: be more principled
-                return this;
-                //ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation)null, varName);
-                //throw new RuntimeException(); // cannot get here
+            } catch (RuntimeException e) {
+                // exception while trying to avoid; fall through to returning "this"
             }
+            // was best effort anyway
+            // TODO: be more principled
+            return this;
         } else {
             return this;
         }
+    }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        DeclType dt = this.getSourceDeclType(ctx);
+        return dt instanceof TaggedTypeMember;
     }
 
 }

@@ -218,7 +218,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
     @Override
     public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         Sequence seqWithBlocks = combine();
-        TopLevelContext tlc = new TopLevelContext(ctx);
+        TopLevelContext tlc = new TopLevelContext(ctx, expectedType);
         seqWithBlocks.genTopLevel(tlc, expectedType);
         if (tlc.getDependencies().size() > 0) {
             dependencies.addAll(tlc.getDependencies());
@@ -249,7 +249,7 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
         Sequence seqWithBlocks = combine();
 
         // generate a top-level context to help with translation
-        TopLevelContext tlc = new TopLevelContext(ctx);
+        TopLevelContext tlc = new TopLevelContext(ctx, null);
 
         // do the actual translation
         seqWithBlocks.genTopLevel(tlc);

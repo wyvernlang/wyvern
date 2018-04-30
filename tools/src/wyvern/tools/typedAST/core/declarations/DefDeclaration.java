@@ -19,7 +19,9 @@ import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -38,9 +40,9 @@ import wyvern.tools.util.TreeWritable;
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
 public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
-    private ExpressionAST body; // HACK
+    private ExpressionAST body; // HACK // FIXME:
     private String name;
-    private Type type;
+    private Type returnType;
     private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
     private List<FormalArg> argILTypes = new LinkedList<FormalArg>(); // store to preserve IL arguments types and return types
     private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
@@ -55,9 +57,16 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         if (argNames == null) {
             argNames = new LinkedList<NameBinding>();
         }
-        this.type = getMethodType(argNames, returnType);
+        this.returnType = returnType;
         this.name = name;
-        this.body = (ExpressionAST) body;
+
+        if (body == null || body instanceof ExpressionAST) {
+            this.body = (ExpressionAST) body;
+        } else {
+            // FIXME:
+            ToolError.reportError(ErrorMessage.PARSE_ERROR, location, "Body of a method declaration is not expression!");
+        }
+
         this.argNames = argNames;
         this.isClass = isClassDef;
         this.location = location;
@@ -70,12 +79,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         this(name, returnType, null, argNames, body, isClassDef, location, null);
     }
 
-    public static Arrow getMethodType(List<NameBinding> args, Type returnType) {
+    public static Arrow getMethodType(List<NameBinding> args, Type returnType, boolean isResource) {
         List<Type> argTypes = new LinkedList<Type>();
         for (int i = 0; i < args.size(); i++) {
             argTypes.add(args.get(i).getType());
         }
-        return new Arrow(argTypes, returnType);
+        return new Arrow(argTypes, returnType, isResource);
     }
 
 
@@ -152,8 +161,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     }
 
     private ValueType getResultILType(GenContext ctx) {
-        Arrow a = (Arrow) this.type;
-        return a.getResult().getILType(ctx);
+        return returnType.getILType(ctx);
     }
 
     @Override
@@ -305,7 +313,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
             }
         }
         sb.append(") -> ");
-        sb.append(type.toString());
+        sb.append(returnType.toString());
         sb.append(" = ");
         sb.append(body.prettyPrint());
         if (effectSet != null) {

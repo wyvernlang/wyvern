@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
@@ -45,12 +46,14 @@ public class DefDeclType extends DeclTypeWithResult {
     }
 
     @Override
-    public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+    public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (!(dt instanceof DefDeclType)) {
+            reason.setReason("declaration type of " + this.getName() + " didn't match");
             return false;
         }
         DefDeclType ddt = (DefDeclType) dt;
         if (args.size() != ddt.args.size() || !ddt.getName().equals(getName())) {
+            reason.setReason("number of arguments of " + this.getName() + " didn't match");
             return false;
         }
         View adaptationView = null;
@@ -69,7 +72,7 @@ public class DefDeclType extends DeclTypeWithResult {
                 theirType = theirType.adapt(adaptationView);
                 adaptationView = new ViewExtension(new Variable(theirArg.getName()), new Variable(myArg.getName()), adaptationView);
             }
-            if (!(theirType.isSubtypeOf(myArg.getType(), ctx))) {
+            if (!(theirType.isSubtypeOf(myArg.getType(), ctx, reason))) {
                 return false;
             }
             ctx = ctx.extend(myArg.getName(), myArg.getType());
@@ -79,7 +82,7 @@ public class DefDeclType extends DeclTypeWithResult {
         if (adaptationView != null) {
             otherRawResultType = otherRawResultType.adapt(adaptationView);
         }
-        return rawResultType.isSubtypeOf(otherRawResultType, ctx);
+        return rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
     }
     @Override
     public int hashCode() {
@@ -171,6 +174,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public void checkWellFormed(TypeContext ctx) {
         for (FormalArg arg : args) {
             arg.getType().checkWellFormed(ctx);
+            ctx = ctx.extend(arg.getName(), arg.getType());
         }
         super.checkWellFormed(ctx);
     }

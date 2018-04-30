@@ -50,7 +50,7 @@ interface ASTBuilder<AST, Type> {
     Object tagInfo(Type type, List<Type> comprises);
 
     Type nominalType(String name, FileLocation loc);
-    Type arrowType(List<Type> arguments, Type result);
+    Type arrowType(List<Type> arguments, Type result, boolean isResource);
     Type parameterizedType(Type base, List<Type> arguments, FileLocation loc);
 
     Type qualifiedType(AST base, String name);
@@ -61,5 +61,7 @@ interface ASTBuilder<AST, Type> {
     AST instantiation(URI uri, List<AST> args, Token name, FileLocation loc);
 
     void addArgument(AST application, AST argument) throws ParseException;
+
+    AST parseExpr(String source, FileLocation loc);
 
 }

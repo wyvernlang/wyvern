@@ -1,6 +1,8 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
@@ -8,7 +10,9 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public class ObjectValue extends New implements Invokable {
     private final EvalContext evalCtx; // captured eval context
@@ -29,6 +33,14 @@ public class ObjectValue extends New implements Invokable {
         if (hasDelegate) {
             delegateTarget = (ObjectValue) ctx.lookupValue(delegateDecl.getFieldName());
         }
+        // assert that this ObjectValue is well-formed
+        checkWellFormed();
+    }
+
+    /** already a value */
+    @Override
+    public Value interpret(EvalContext ctx) {
+        return this;
     }
 
     @Override
@@ -47,6 +59,7 @@ public class ObjectValue extends New implements Invokable {
         } else if (hasDelegate) {
             return delegateTarget.invoke(methodName, args);
         } else {
+            ToolError.reportError(ErrorMessage.DYNAMIC_METHOD_ERROR, this, methodName);
             throw new RuntimeException("can't reach here");
         }
     }
@@ -72,11 +85,6 @@ public class ObjectValue extends New implements Invokable {
             }
         }
         throw new RuntimeException("cannot set decl " + decl.getName());
-    }
-
-    @Override
-    public ValueType getType() {
-        return getExprType();
     }
 
     public EvalContext getEvalCtx() {
@@ -107,5 +115,19 @@ public class ObjectValue extends New implements Invokable {
     @Override
     public int hashCode() {
         return evalCtx.hashCode() + delegateTarget.hashCode();
+    }
+
+    /** make sure all free variables are captured in the evalCtx */
+    public void checkWellFormed() {
+        Set<String> freeVars = this.getFreeVariables();
+        for (String varName : freeVars) {
+            evalCtx.lookupValue(varName);
+        }
+    }
+
+    /** no free variables because each ObjectValue closes over its environment */
+    @Override
+    public Set<String> getFreeVariables() {
+        return (Set<String>) Collections.EMPTY_SET;
     }
 }

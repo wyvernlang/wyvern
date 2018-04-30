@@ -76,6 +76,11 @@ public class Variable extends Expression implements Path {
     }
 
     @Override
+    public boolean isPath() {
+        return true;
+    }
+
+    @Override
     public Path adapt(View v) {
         return v.adapt(this);
     }

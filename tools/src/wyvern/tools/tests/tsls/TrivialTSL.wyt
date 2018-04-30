@@ -6,7 +6,7 @@ import metadata wyvern.collections.list
 type TrivialTSL
   def eval() : Int
   metadata new
-    def parseTSL(input : String, ctx : system.Context) : option.Option
-      option.Some(ast.int(5))
+    def parseTSL(input : String, ctx : system.Context) : option.Option[ast.AST]
+      option.Some[ast.AST](ast.int(5))
       val evalDefn = ast.defDeclaration("eval", {}, ast.types.int(), ast.int(5))
-      option.Some(ast.object({evalDefn}))
+      option.Some[ast.AST](ast.object({evalDefn}))

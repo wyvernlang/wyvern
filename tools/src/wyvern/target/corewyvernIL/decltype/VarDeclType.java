@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -20,17 +21,17 @@ public class VarDeclType extends DeclTypeWithResult implements IASTNode {
     }
 
     @Override
-    public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+    public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (!(dt instanceof VarDeclType)) {
             if (dt instanceof ValDeclType) {
                 ValDeclType vdt = (ValDeclType) dt;
-                return vdt.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(vdt.getRawResultType(), ctx);
+                return vdt.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(vdt.getRawResultType(), ctx, reason);
             } else {
                 return false;
             }
         }
         VarDeclType vdt = (VarDeclType) dt;
-        return vdt.getName().equals(getName()) && this.getRawResultType().equalsInContext(vdt.getRawResultType(), ctx);
+        return vdt.getName().equals(getName()) && this.getRawResultType().equalsInContext(vdt.getRawResultType(), ctx, reason);
     }
 
     @Override

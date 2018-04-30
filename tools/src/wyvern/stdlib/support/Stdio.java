@@ -14,6 +14,9 @@ public class Stdio {
     public void println() {
         java.lang.System.out.println();
     }
+    public void flush() {
+        java.lang.System.out.flush();
+    }
     public void printInt(BigInteger n) {
         java.lang.System.out.print(n);
     }

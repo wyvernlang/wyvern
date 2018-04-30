@@ -48,7 +48,7 @@ public class FFIImport extends Expression {
 
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-        return this.getExprType();
+        return this.getType();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class FFIImport extends Expression {
         if (this.ffiType.equals(new NominalType("system", "java"))) {
             try {
                 FObject obj = wyvern.tools.interop.Default.importer().find(path, this);
-                return new JavaValue(obj, this.getExprType());
+                return new JavaValue(obj, this.getType());
             } catch (ReflectiveOperationException e1) {
                 throw new RuntimeException(e1);
             }

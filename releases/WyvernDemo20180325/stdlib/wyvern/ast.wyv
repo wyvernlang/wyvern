@@ -1,0 +1,90 @@
+module ast
+
+import wyvern.collections.list
+import wyvern.internal.ast
+
+type AST = ast.AST
+
+type Decl = ast.Decl
+
+type Type = ast.Type
+
+type DeclType = ast.DeclType
+
+type VarBinding = ast.VarBinding
+
+type Case = ast.Case
+
+type FormalArg = ast.FormalArg
+
+// Expressions
+def object(decls : list.List) : AST = ast.object(decls)
+
+def int(i:Int):AST = ast.int(i)
+
+def string(s:String):AST = ast.string(s)
+
+def boolean(b:Boolean):AST = ast.boolean(b)
+
+def variable(s:String):AST = ast.variable(s)
+
+def call(receiver:AST, methodName:String, arguments:list.List):AST = ast.call(receiver, methodName, arguments)
+
+def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = ast.let(ident, bindingType, bindingValue, inExpr)
+
+def bind(bindings : list.List, inExpr : AST) : AST = ast.bind(bindings, inExpr)
+
+def cast(toCastExpr : AST, exprType : Type) : AST = ast.cast(toCastExpr, exprType)
+
+def ffi(importName : String, importType : Type) : AST = ast.ffi(importName, importType)
+
+def ffiImport(ffiType : Type, path : String, importType : Type) : AST = ast.ffiImport(ffiType, path, importType)
+
+def fieldGet(object : AST, fieldName : String) : AST = ast.fieldGet(object, fieldName)
+
+def fieldSet(exprType : Type, object : AST, fieldName : String, exprToAssign : AST) : AST = ast.fieldSet(exprType, object, fieldName, exprToAssign)
+
+def matchExpr(matchExpr : AST, elseExpr : AST, cases : list.List) : AST = ast.matchExpr(matchExpr, elseExpr, cases)
+
+def parseExpression(input : String, ctx : system.Context) : AST = ast.parseExpression(input, ctx)
+
+// Declarations
+def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST) : Decl = ast.defDeclaration(name, formalArgs, returnType, body)
+
+def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = ast.delegateDeclaration(delegateType, fieldName)
+
+def moduleDeclaration(name : String, formalArgs : list.List, moduleType : Type, body : AST, dependencies : list.List) : Decl = ast.moduleDeclaration(name, formalArgs, moduleType, body, dependencies)
+
+def typeDeclaration(typeName : String, sourceType : Type) : Decl = ast.typeDeclaration(typeName, sourceType)
+
+def valDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = ast.valDeclaration(fieldName, fieldType, value)
+
+def varDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = ast.valDeclaration(fieldName, fieldType, value)
+
+// Types
+val types = ast.types
+
+// DeclTypes
+
+def abstractTypeMember(name : String, isResource : Boolean) : DeclType = ast.abstractTypeMember(name, isResource)
+
+def concreteTypeMember(name : String, sourceType : Type) : DeclType = ast.concreteTypeMember(name, sourceType)
+
+def defDeclType(methodName : String, returnType : Type, formalArgs : list.List) : DeclType = ast.defDeclType(methodName, returnType, formalArgs)
+
+def valDeclType(field : String, valType : Type) : DeclType = ast.valDeclType(field, valType)
+
+def varDeclType(field : String, varType : Type) : DeclType = ast.varDeclType(field, varType)
+
+// Other
+
+def varBinding(varName : String, varType : Type, toReplace : AST) : VarBinding = ast.varBinding(varName, varType, toReplace)
+
+def makeCase(varName : String, pattern : Type, body : AST) : Case = ast.makeCase(varName, pattern, body)
+
+def formalArg(name : String, argType : Type) : FormalArg = ast.formalArg(name, argType)
+
+// Utility Functions
+def stripLeadingWhitespace(input : String) : String = ast.stripLeadingWhitespace(input)
+
+def genIdent() : String = ast.genIdent()

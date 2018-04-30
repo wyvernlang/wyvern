@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -77,18 +78,28 @@ public class StructuralType extends ValueType {
                 }
                 arg.getType().doPrettyPrint(dest, indent, ctx);
             }
-            dest.append(" -> ");
+            if (isResource(GenContext.empty())) {
+                dest.append(" -> ");
+            } else {
+                dest.append(" => ");
+            }
             ddt.getRawResultType().doPrettyPrint(dest, indent, ctx);
         } else {
-            String newIndent = indent + "    ";
+            String newIndent = indent + "  ";
             if (isResource(GenContext.empty())) {
                 dest.append("resource ");
             }
-            dest.append("type { ").append(selfName).append(" =>\n");
-            for (DeclType dt : getDeclTypes()) {
-                dt.doPrettyPrint(dest, newIndent);
+            dest.append("type { ");
+            if (indent.length() == 0) {
+                dest.append(selfName).append(" =>\n");
+                for (DeclType dt : getDeclTypes()) {
+                    dt.doPrettyPrint(dest, newIndent);
+                }
+                dest.append(indent).append(" }");
+            } else {
+                /** If we are already indented, then abbreviate. */
+                dest.append("... }");
             }
-            dest.append(indent).append("  }");
         }
     }
 
@@ -115,7 +126,7 @@ public class StructuralType extends ValueType {
     }
 
     @Override
-    public boolean isSubtypeOf(ValueType t, TypeContext ctx) {
+    public boolean isSubtypeOf(ValueType t, TypeContext ctx, FailureReason reason) {
         t = t.getCanonicalType(ctx);
         if (t instanceof DynamicType) {
             return true;
@@ -123,13 +134,17 @@ public class StructuralType extends ValueType {
         if (t instanceof NominalType) {
             StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
             if (st == null) {
+                if (!reason.isDefined()) {
+                    reason.setReason("cannot look up structural type for " + t.desugar(ctx));
+                }
                 return false;
             } else {
-                return isSubtypeOf(st, ctx);
+                return isSubtypeOf(st, ctx, reason);
             }
         }
 
         if (!(t instanceof StructuralType)) {
+            reason.setReason("cannot look up structural type for " + t.desugar(ctx));
             return false;
         }
 
@@ -140,24 +155,34 @@ public class StructuralType extends ValueType {
         for (DeclType dt : st.getDeclTypes()) {
             DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
-            if (candidateDT == null || !candidateDT.isSubtypeOf(dt, extendedCtx)) {
+            if (candidateDT == null) {
+                if (!reason.isDefined()) {
+                    reason.setReason("missing declaration " + dt.getName());
+                }
+                return false;
+            } else if (!candidateDT.isSubtypeOf(dt, extendedCtx, reason)) {
+                if (!reason.isDefined()) {
+                    reason.setReason("declaration " + dt.getName() + " is not a subtype of the expected declaration");
+                }
                 return false;
             }
         }
 
         // a resource type is not a subtype of a non-resource type
         if (isResource(GenContext.empty()) && !st.isResource(GenContext.empty())) {
+            reason.setReason("the second type is not a resource");
             return false;
         }
 
         return true;
     }
 
-    /** if there is exactly one decl type of name and class given, return it, otherwise null
+    /** Search for decl types with the name given.  Take out those that match the exclusionFilter.
+     * If exactly one remains, return it.  Otherwise, return null.
      */
-    DeclType findMatchingDecl(String name, Predicate<? super DeclType> filter, TypeContext ctx) {
+    DeclType findMatchingDecl(String name, Predicate<? super DeclType> exclusionFilter, TypeContext ctx) {
         List<DeclType> ds = findDecls(name, ctx);
-        ds.removeIf(filter);
+        ds.removeIf(exclusionFilter);
         if (ds.size() != 1) {
             return null;
         } else {
@@ -252,6 +277,11 @@ public class StructuralType extends ValueType {
         }
         StructuralType other = (StructuralType) obj;
         return resourceFlag == other.resourceFlag && selfName.equals(other.selfName) && declTypes.equals(other.declTypes);
+    }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return false;
     }
 
 

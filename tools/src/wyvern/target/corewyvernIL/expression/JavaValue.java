@@ -80,7 +80,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             ObjectValue v = null;
             try {
                 v = (ObjectValue) TestUtil.evaluate("import wyvern.collections.list\n"
-                      + "list.make()\n");
+                      + "list.makeD()\n");
                 for (Object elem : (List<?>) result) {
                     List<Value> args = new LinkedList<>();
                     args.add(javaToWyvern(elem));
@@ -100,7 +100,6 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else {
             // return it as a unit; try to do better than this later
             return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
-            //throw new RuntimeException("some Java->Wyvern cases not implemented");
         }
     }
 
@@ -125,7 +124,8 @@ public class JavaValue extends AbstractValue implements Invokable {
                 for (int i = 0; i < listLen; i++) {
                     LinkedList<Value> args = new LinkedList<>();
                     args.add(new IntegerLiteral(i));
-                    Value v = ((ObjectValue) (wyvList.invoke("get", args))).getField("value");
+                    Value element = MethodCall.trampoline(wyvList.invoke("get", args));
+                    Value v = ((ObjectValue) element).getField("value");
                     javaList.add(v);
                 }
                 return javaList;
@@ -152,7 +152,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-        return this.getExprType();
+        return this.getType();
     }
 
     @Override
@@ -162,7 +162,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 
     @Override
     public ValueType getType() {
-        return this.getExprType();
+        return this.getType();
     }
 
     public Object getWrappedValue() {

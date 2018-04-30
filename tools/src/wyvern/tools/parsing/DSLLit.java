@@ -64,6 +64,9 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
         }
         try {
             final wyvern.target.corewyvernIL.expression.Value metadata = expectedType.getMetadata(ctx);
+            if (metadata == null) {
+                ToolError.reportError(ErrorMessage.NO_METADATA_WHEN_PARSING_TSL, this, expectedType.desugar(ctx));
+            }
             if (!(metadata instanceof Invokable)) {
                 ToolError.reportError(ErrorMessage.METADATA_MUST_BE_AN_OBJECT, this, expectedType.toString());
             }
@@ -96,7 +99,11 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
                     ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
                 }
             }
-            throw e;
+            FileLocation loc = e.getLocation();
+            FileLocation myLoc = this.getLocation();
+            FileLocation newLoc = new FileLocation(myLoc.getFilename(), myLoc.getLine() + loc.getLine() - 1, myLoc.getCharacter() + loc.getCharacter() - 1);
+            ToolError updatedE = e.withNewLocation(newLoc);
+            throw updatedE;
         }
     }
 

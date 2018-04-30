@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
@@ -94,7 +95,7 @@ public class MethodCall extends Expression {
             return Util.dynType();
         }
         typeMethodDeclaration(ctx, effectAccumulator);
-        return getExprType();
+        return getType();
     }
 
     @Override
@@ -111,7 +112,7 @@ public class MethodCall extends Expression {
             argValues.add(e.interpret(ctx));
         }
         if (isTailCall()) {
-            return new SuspendedTailCall(this.getExprType(), this.getLocation()) {
+            return new SuspendedTailCall(this.getType(), this.getLocation()) {
 
                 @Override
                 public Value interpret(EvalContext ignored) {
@@ -184,11 +185,14 @@ public class MethodCall extends Expression {
 
         // ...use this context to do that.
         TypeContext newCtx = null;
+        TypeContext calleeCtx = null;
+        String failureReason = null;
         for (DeclType declType : declarationTypes) {
             formalArgTypes = new LinkedList<ValueType>();
 
             // Ignore non-methods.
             newCtx = ctx;
+            calleeCtx = ctx.extend(receiverType.getSelfName(), receiver);
             if (!(declType instanceof DefDeclType)) {
                 continue;
             }
@@ -207,24 +211,31 @@ public class MethodCall extends Expression {
 
                 // Get info about the formal arguments.
                 FormalArg formalArg = formalArgs.get(i);
-                ValueType formalArgType = formalArg.getType().adapt(v);
-                TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
-                if (!(objectExpr instanceof Variable)) {
-                    // adaptation for the receiver won't have worked, so try avoiding "this"
-                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), thisCtx);
+                ValueType formalArgType = formalArg.getType();
+                if (objectExpr.isPath()) {
+                    formalArgType = formalArgType.adapt(v);
+                } else {
+                    //TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
+                    // adaptation for the receiver won't work, so try avoiding "this"
+                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), calleeCtx);
                 }
                 formalArgTypes.add(formalArgType);
                 String formalArgName = formalArg.getName();
                 ValueType actualArgType = actualArgTypes.get(i);
 
                 // Check actual argument type accords with formal argument type.
-                if (!actualArgType.isSubtypeOf(formalArgType, newCtx)) {
+                FailureReason r = new FailureReason();
+                if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
                     argsTypechecked = false;
+                    if (failureReason == null) {
+                        failureReason = r.getReason();
+                    }
                     break;
                 }
 
                 // Update context and view.
                 newCtx = newCtx.extend(formalArgName, actualArgType);
+                calleeCtx = calleeCtx.extend(formalArgName, actualArgType);
                 IExpr e = args.get(i);
                 if (e instanceof Variable) {
                     v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getName()), (Variable) e, v);
@@ -254,13 +265,14 @@ public class MethodCall extends Expression {
 
                 ctx = newCtx;
                 ValueType resultType = defDeclType.getResultType(v);
-                resultType = resultType.adapt(v);
-                if (!(objectExpr instanceof Variable)) {
-                    // adaptation for the receiver won't have worked, so try avoiding "this"
-                    resultType = resultType.avoid(receiverType.getSelfName(), newCtx);
+                if (objectExpr.isPath()) {
+                    resultType = resultType.adapt(v);
+                } else {
+                    // adaptation for the receiver won't work, so try avoiding "this"
+                    resultType = resultType.avoid(receiverType.getSelfName(), calleeCtx);
                 }
                 for (int i = args.size() - 1; i >= 0; --i) {
-                    resultType = resultType.avoid(formalArgs.get(i).getName(), ctx);
+                    resultType = resultType.avoid(formalArgs.get(i).getName(), calleeCtx);
                 }
                 setExprType(resultType);
                 return defDeclType;
@@ -294,6 +306,9 @@ public class MethodCall extends Expression {
             errMsg.append(formalArgTypes.get(formalArgTypes.size() - 1).desugar(ctx));
         }
         //errMsg.append(")");
+        if (failureReason != null) {
+            errMsg.append("; argument subtyping failed because " + failureReason);
+        }
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
         return null;
     }

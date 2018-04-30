@@ -6,6 +6,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.Type;
@@ -45,7 +46,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
     }
     @Override
     public Value getMetadataValue() {
-        if (!(metadata instanceof Value)) {
+        if (metadata != null && !(metadata instanceof Value)) {
             ToolError.reportError(ErrorMessage.CANNOT_USE_METADATA_IN_SAME_FILE, this);
         }
         return (Value) metadata;
@@ -57,7 +58,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
     }
 
     @Override
-    public boolean isSubtypeOf(DeclType dt, TypeContext ctx) {
+    public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (dt instanceof AbstractTypeMember) {
             return true;
         }
@@ -65,7 +66,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
             return false;
         }
         ConcreteTypeMember ctm = (ConcreteTypeMember) dt;
-        return ctm.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(ctm.getRawResultType(), ctx);
+        return ctm.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(ctm.getRawResultType(), ctx, reason);
     }
 
     @Override

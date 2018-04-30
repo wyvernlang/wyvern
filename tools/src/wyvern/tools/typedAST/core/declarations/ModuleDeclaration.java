@@ -228,7 +228,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         extended = translateImports(platformIndependentImports, extended, seqExpr, dependencies);
         wyvern.target.corewyvernIL.expression.IExpr body = innerTranslate(normalSeq, extended);
         TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(/*ctxWithPlatDeps*/methodContext, dependencies);
-        seqExpr.addExpr(body);
+        seqExpr.merge(body);
         body = seqExpr;
         wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext, null);
         if (ascribedValueType != null) {

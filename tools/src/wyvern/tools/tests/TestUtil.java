@@ -21,6 +21,7 @@ import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -261,7 +262,7 @@ public final class TestUtil {
         TailCallVisitor.annotate(program);
 
         if (expectedType != null) {
-            Assert.assertTrue(t.isSubtypeOf(expectedType, ctx));
+            Assert.assertTrue(t.isSubtypeOf(expectedType, ctx, new FailureReason()));
         }
 
         // check the result

@@ -22,4 +22,5 @@ public class TypedModuleSpec extends ModuleSpec {
     public String getDefinedTypeName() {
         return definedTypeName;
     }
+
 }

@@ -1,0 +1,7 @@
+require stdout
+import metadata wyvern.collections.list
+
+val fibonacci : list.List = { 1, 1, 2, 3, 5, 8 }
+
+stdout.printInt(fibonacci.get(4).getOrElse(() => -1))
+stdout.println()

@@ -24,6 +24,13 @@ public class Script extends AbstractExpressionAST implements CoreAST {
         this.body = body instanceof Sequence ? (Sequence) body : new Sequence(body);
     }
 
+    public List<ImportDeclaration> getImports() {
+        return imports;
+    }
+    public List<ImportDeclaration> getRequires() {
+        return requires;
+    }
+
     @Override
     public FileLocation getLocation() {
         return body.getLocation();
@@ -31,7 +38,7 @@ public class Script extends AbstractExpressionAST implements CoreAST {
 
     @Override
     public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
-        TopLevelContext tlc = new TopLevelContext(ctx);
+        TopLevelContext tlc = new TopLevelContext(ctx, expectedType);
         for (ImportDeclaration i: requires) {
             i.genTopLevel(tlc);
         }
@@ -40,7 +47,10 @@ public class Script extends AbstractExpressionAST implements CoreAST {
         }
         Sequence combinedSeq = ((Sequence) body).combine();
         combinedSeq.genTopLevel(tlc, expectedType);
-        dependencies.addAll(tlc.getDependencies());
+        List<TypedModuleSpec> newDeps = tlc.getDependencies();
+        if (!newDeps.isEmpty()) {
+            dependencies.addAll(newDeps);
+        }
         return tlc.getExpression();
     }
 
