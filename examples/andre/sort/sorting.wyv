@@ -1,0 +1,8 @@
+module sorting
+import java:wyvern.examples.andre.support.java.Sorting.sorting
+import wyvern.collections.list
+
+type List = list.List
+
+def sort(list:List[E]):List[F]
+	sorting.sort(list)

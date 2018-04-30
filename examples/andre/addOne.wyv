@@ -1,0 +1,17 @@
+require stdout
+
+val addOne = (x:Int) => x + 1
+stdout.printInt(addOne(1))
+stdout.println()
+
+val doSomeMaths: Int -> Int -> Int -> Int = x => y => z => (x + y)/z
+stdout.print("Should print 5: ")
+stdout.printInt(doSomeMaths (5)(5)(2))
+stdout.println()
+
+
+val invokeIt = (func:Int->Int->Int->Int, x:Int, y:Int, z:Int) => func(x)(y)(z)
+stdout.print("Should print something 9: ")
+val invokedAns = invokeIt(doSomeMaths, 9, 20, 3)
+stdout.printInt(invokedAns)
+stdout.println()

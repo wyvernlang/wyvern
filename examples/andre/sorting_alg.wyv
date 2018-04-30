@@ -1,0 +1,12 @@
+require stdout
+
+import wyvern.Int
+
+//find the min of list, add it to new list
+def min():Unit
+    val min = Int.minValue()
+    stdout.print("SMALLEST INT VALUE: ")
+    stdout.printInt(min)
+	
+	
+min()

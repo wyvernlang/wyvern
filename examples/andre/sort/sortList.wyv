@@ -1,0 +1,37 @@
+require stdout
+require java
+
+import sorting
+import wyvern.collections.list
+
+
+
+type List = list.List
+
+
+def printItem(x:Int):Unit
+	stdout.printInt(x)
+	stdout.print(" ")
+	
+
+val unsortedList:List[Int] = list.make[Int]()
+unsortedList.append(12)
+unsortedList.append(4)
+unsortedList.append(7)
+unsortedList.append(21)
+unsortedList.append(2)
+
+stdout.print("Unsorted List: [ ")
+unsortedList.do(x:Int => printItem(x))
+stdout.print("]\n")
+
+sorting.sort(unsortedList)
+
+stdout.print("Sorted List: [ ")
+unsortedList.do(x:Int => printItem(x))
+stdout.print("]\n")
+
+
+
+
+

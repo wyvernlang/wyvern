@@ -1,0 +1,55 @@
+require stdout
+
+import wyvern.internal.list
+
+//make list
+val listObj = list.make[Int]()
+
+// get size of list - should be 0
+stdout.print("Size of List(should be 0): ")
+stdout.printInt(listObj.length())
+stdout.println()
+stdout.println()
+
+//append list - add items
+
+stdout.print("Appending Items 1,2,3,4 to list\n")
+listObj.append(1)
+listObj.append(2)
+listObj.append(3)
+listObj.append(4)
+
+stdout.print("Result:")
+listObj.do(n:Int => stdout.printInt(n) stdout.println(","))
+
+stdout.print("Size of List(should be 4): ")
+stdout.printInt(listObj.length())
+stdout.println()
+
+
+//get last item
+val lastItem = listObj.get(3)
+stdout.print("Retrieving Last item: ")
+lastItem.map[Unit]( x => stdout.printInt(x))
+stdout.println()
+
+
+//get middle item
+val middleItem = listObj.get(listObj.length()/2 + 1)
+stdout.print("Retrieving middle item: ")
+middleItem.map[Unit](x => stdout.printInt(x))
+stdout.println()
+stdout.println()
+stdout.print("Will now apply AddOne Function to List\n")
+
+//apply function to elements of list
+
+def addOne (n:Int):Int = n + 1
+listObj.map[Int](addOne())
+
+
+
+
+
+
+
