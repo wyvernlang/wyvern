@@ -1,5 +1,6 @@
 package wyvern.tools.parsing.coreparser;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,20 +12,19 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.DSLLit;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.Script;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.declarations.DatatypeDeclaration;
-import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
 import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.Instantiation;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
-import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
@@ -41,6 +41,7 @@ import wyvern.tools.typedAST.core.values.BooleanConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
 import wyvern.tools.types.QualifiedType;
@@ -140,32 +141,12 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
-//        if (body == null) {
-//            body = new DeclSequence();
-//        }
-//
-//        if (!(body instanceof DeclSequence)) {
-//            body = new DeclSequence(Arrays.asList(body));
-//        }
-
-        LinkedList<TypedAST> exps = new LinkedList<TypedAST>();
-
-        TypedAST dt = new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
-        exps.add(dt);
-
-        for (TypedAST elem : ((DeclSequence) body).getIterator()) {
-
-            String constructor_name = ((ConstructDeclaration) elem).getName();
-            System.out.println(constructor_name);
-            //TypedAST constructor = new TaggedTypeMember;
-            //exps.add(constructor);
+        if (body == null) {
+            body = new DeclSequence();
         }
-
-        for (TypedAST elem : ((DeclSequence) body).getIterator()) {
-            exps.add(elem);
+        if (!(body instanceof DeclSequence)) {
+            body = new DeclSequence(Arrays.asList(body));
         }
-
-        body = new DeclSequence(exps);
 
         if (((DeclSequence) body).hasVarDeclaration() && !isResource) {
             ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);
@@ -190,8 +171,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public Type arrowType(List<Type> arguments, Type result) {
-        return new Arrow(arguments, result);
+    public Type arrowType(List<Type> arguments, Type result, boolean isResource) {
+        return new Arrow(arguments, result, isResource);
     }
 
     @Override
@@ -249,7 +230,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST addArguments(TypedAST application, List<String> names, List<TypedAST> arguments) throws ParseException {
         if (!(application instanceof Application)) {
-            throw new ParseException("Juxtaposed an additional argument to something that was not an application");
+            ToolError.reportError(ErrorMessage.ILLEGAL_JUXTAPOSITION, application);
         }
         Application app = (Application) application;
         List<Type> generics = app.getGenerics();
@@ -267,7 +248,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         } else if (function instanceof Invocation) {
             Invocation inv = (Invocation) function;
             if (inv.getArgument() != null) {
-                throw new ParseException("Cannot juxtapose an additional argument to a binary operation");
+                ToolError.reportError(ErrorMessage.ILLEGAL_BINARY_JUXTAPOSITION, application);
             }
             name.append(inv.getOperationName());
             names.forEach(name::append);
@@ -331,6 +312,41 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST instantiation(URI uri, List<TypedAST> args, Token name, FileLocation loc) {
         return new Instantiation(uri, args, name.image, loc);
+    }
+
+    @Override
+    public TypedAST parseExpr(String source, FileLocation loc) {
+        ExpressionAST ast;
+        try {
+            String withoutLeading = wyvern.stdlib.support.AST.utils.stripLeadingWhitespace(source, false);
+            //TODO: adjust error messages below based on whitespace stripped above;
+            ast = (ExpressionAST) TestUtil.getNewAST(withoutLeading + "\n", "Indented Parse");
+            if (ast instanceof Script) {
+                Script s = (Script) ast;
+                if (!s.getImports().isEmpty() || !s.getRequires().isEmpty()) {
+                    ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                                          s.getImports().isEmpty() ? s.getRequires().get(0).getLocation() : s.getImports().get(0).getLocation(),
+                                          "may not have import or requires here");
+                }
+            }
+        } catch (ParseException e) {
+            Token errorLocToken = e.getCurrentToken();
+            FileLocation newLoc = adjustLocation(loc, errorLocToken);
+            ToolError.reportError(ErrorMessage.PARSE_ERROR, newLoc, e.getMessage());
+            throw new RuntimeException("weird, shouldn't get here");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new RuntimeException("weird, shouldn't get here");
+        }
+        return ast;
+    }
+
+    private FileLocation adjustLocation(FileLocation baseLocation, Token errorLocToken) {
+        int line = errorLocToken.beginLine;
+        int character = errorLocToken.beginColumn;
+        FileLocation newLoc = new FileLocation(baseLocation.getFilename(), baseLocation.getLine() + line - 1, baseLocation.getCharacter() + character - 1);
+        return newLoc;
     }
 
     @Override
