@@ -12,6 +12,8 @@ resource type List
     def find(pred:this.E -> Boolean):Option[this.E]
     def length():Int
     def get(n:Int):Option[this.E]
+    /** Removes the n'th element from the List; indexing starts with 0.
+     *  Returns true if the removal succeeded (i.e. if n was in range) */
     def remove(n:Int):Boolean
     def do(f:this.E -> Unit):Unit
     def map[F](f:this.E -> F):List[F] // functional map
@@ -90,7 +92,7 @@ def make[E]():List[E]
                 )
                 self.size = self.size - 1
                 true
-            (n > self.size-1).ifTrue(
+            (n > self.size-1 || n < 0).ifTrue(
                 () => false,
                 () => definitelyRemove()
             )

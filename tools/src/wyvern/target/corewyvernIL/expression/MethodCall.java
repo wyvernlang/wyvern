@@ -176,7 +176,7 @@ public class MethodCall extends Expression {
         // Sanity check: make sure it has declarations.
         List<DeclType> declarationTypes = receiverType.findDecls(methodName, ctx);
         if (declarationTypes.isEmpty()) {
-            ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName);
+            ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName, receiver.desugar(ctx));
         }
 
         // Go through all declarations, typechecking against the actual types passed in...
