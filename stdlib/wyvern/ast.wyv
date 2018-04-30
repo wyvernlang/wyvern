@@ -85,6 +85,6 @@ def makeCase(varName : String, pattern : Type, body : AST) : Case = ast.makeCase
 def formalArg(name : String, argType : Type) : FormalArg = ast.formalArg(name, argType)
 
 // Utility Functions
-def stripLeadingWhitespace(input : String) : String = ast.stripLeadingWhitespace(input)
+def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = ast.stripLeadingWhitespace(input, mustStrip)
 
 def genIdent() : String = ast.genIdent()

@@ -142,7 +142,7 @@ val types = new
   def refinement(typeParams : list.List[Type], base : Type):Type = new
     val typ:Unit = utils.refinementType(typeParams, base)
 
-def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
+def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = utils.stripLeadingWhitespace(input, mustStrip)
 
 def genIdent() : String = utils.genIdent()
 

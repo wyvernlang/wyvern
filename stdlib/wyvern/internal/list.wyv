@@ -8,6 +8,7 @@ type Option = option.Option
 resource type List
     type E
     def append(e:this.E):Unit
+    def appendAll(other:List[this.E]):Unit
     def find(pred:this.E -> Boolean):Option[this.E]
     def length():Int
     def get(n:Int):Option[this.E]
@@ -60,6 +61,8 @@ def make[E]():List[E]
                 self.first = option.Some[Cell](makeOneCell(e))
                 self.last = self.first*/
             self.size = self.size + 1
+        def appendAll(other:List[self.E]):Unit
+            other.do(e:self.E => self.append(e))
         def find(pred:self.E -> Boolean):Option[E]
             self.first.flatMap[E](c:Cell => c.find(pred))
         def length():Int = self.size

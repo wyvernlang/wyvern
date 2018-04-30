@@ -591,6 +591,7 @@ Token DSLLines() :
       return null;
     }
     t.image = content;
+    t.beginColumn = 0; // this DSL line should start at the beginning of the line
     return t;
   }
 }

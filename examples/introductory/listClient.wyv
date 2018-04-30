@@ -21,5 +21,6 @@ val n:Int = found.getOrElse(() => 2)
 val ten:Option[Int] = aList.get(0)
 val bList:List[Int] = aList.map[Int](x => x+1)
 bList.do(n:Int => stdout.printInt(n))
+aList.appendAll(bList)
 n+aList.length() + optionResult
 

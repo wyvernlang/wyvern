@@ -318,7 +318,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST parseExpr(String source, FileLocation loc) {
         ExpressionAST ast;
         try {
-            String withoutLeading = wyvern.stdlib.support.AST.utils.stripLeadingWhitespace(source);
+            String withoutLeading = wyvern.stdlib.support.AST.utils.stripLeadingWhitespace(source, false);
             //TODO: adjust error messages below based on whitespace stripped above;
             ast = (ExpressionAST) TestUtil.getNewAST(withoutLeading + "\n", "Indented Parse");
             if (ast instanceof Script) {
