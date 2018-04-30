@@ -8,7 +8,7 @@ import wyvern.internal.list              // We use wyvern.internal.list because 
 type AST = ast.AST
 
 def elseMatch(input : String) : regex.Match
-  val thenRegex = regex("^else\n")
+  val thenRegex = regex("^else\\s*\n")
   val mOpt = thenRegex.findPrefixMatchOf(input)
   mOpt.getOrElse(() => regex.makeMatch("", input))
 
@@ -21,7 +21,7 @@ def thenBlockMatch(input : String) : regex.Match
   m
 
 def toUnitOrAST(input : String, ctx : system.Context) : ast.AST
-  val stripped = ast.stripLeadingWhitespace(input)
+  val stripped = ast.stripLeadingWhitespace(input, false)
   (input == "").ifTrue(() => ast.int(0), () => ast.parseExpression(stripped, ctx))
 
 resource type FnExpr
@@ -39,7 +39,7 @@ resource type Blocks
   def evalFalse() : Dyn
   metadata new
     def parseTSL(input : String, ctx : system.Context) : option.Option
-      val trimmedInput = ast.stripLeadingWhitespace(input)
+      val trimmedInput = ast.stripLeadingWhitespace(input, true)
       val trueMatch = thenBlockMatch(trimmedInput)
       val em = elseMatch(trueMatch.after())
       val trueAST : AST = toUnitOrAST(trueMatch.matched(), ctx)
