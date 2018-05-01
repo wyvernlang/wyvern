@@ -12,6 +12,9 @@ resource type List
     def find(pred:this.E -> Boolean):Option[this.E]
     def length():Int
     def get(n:Int):Option[this.E]
+    /** Removes the n'th element from the List; indexing starts with 0.
+     *  Returns true if the removal succeeded (i.e. if n was in range) */
+    def remove(n:Int):Boolean
     def do(f:this.E -> Unit):Unit
     def map[F](f:this.E -> F):List[F] // functional map
     
@@ -22,6 +25,7 @@ def make[E]():List[E]
         var next:Option[Cell]
         def find(pred:E -> Boolean):Option[E]
         def get(n:Int):Option[E]
+        def getCell(n:Int):Option[Cell]
         def do(f:E -> Unit):Unit
     def makeCell(e:E, n:Option):Cell = new (self) =>
         var element:E = e
@@ -34,6 +38,10 @@ def make[E]():List[E]
             (n == 0).ifTrue(
                 () => option.Some[E](self.element),
                 () => self.next.flatMap[E]((c:Cell) => c.get(n-1)))
+        def getCell(n:Int):Option[Cell]
+            (n == 0).ifTrue(
+                () => option.Some[Cell](self),
+                () => self.next.flatMap[Cell]((c:Cell) => c.getCell(n-1)))
         def do(f:E -> Unit):Unit
             f(self.element)
             self.next.map[Unit](c:Cell => c.do(f))
@@ -67,6 +75,27 @@ def make[E]():List[E]
             self.first.flatMap[E](c:Cell => c.find(pred))
         def length():Int = self.size
         def get(n:Int):Option[E] = self.first.flatMap[E](c:Cell => c.get(n))
+        def remove(n:Int):Boolean
+            def definitelyRemove():Boolean
+                var lastCell:Option[Cell] = option.None[Cell]()
+                def removeInMiddle():Unit
+                    val cellBefore = self.first.flatMap[Cell](c:Cell => c.getCell(n-1))
+                    cellBefore.map[Unit](c:Cell => c.next = c.next.flatMap[Cell](c2:Cell => c2.next))
+                    lastCell = cellBefore
+                (n == 0).ifTrue(
+                    () => self.first = self.first.flatMap[Cell](c:Cell => c.next),
+                    () => removeInMiddle()
+                )
+                (n == self.size - 1).ifTrue(
+                    () => self.last = lastCell,
+                    () => unit
+                )
+                self.size = self.size - 1
+                true
+            (n > self.size-1 || n < 0).ifTrue(
+                () => false,
+                () => definitelyRemove()
+            )
         def do(f:E -> Unit):Unit = self.first.map[Unit](c:Cell => c.do(f))
         def map[F](f:self.E -> F):List[F]
             val newList:List[F] = make[F]()

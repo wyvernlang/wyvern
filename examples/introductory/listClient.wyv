@@ -22,5 +22,10 @@ val ten:Option[Int] = aList.get(0)
 val bList:List[Int] = aList.map[Int](x => x+1)
 bList.do(n:Int => stdout.printInt(n))
 aList.appendAll(bList)
+aList.remove(7) // test remove not present
+aList.remove(3) // test remove last
+aList.remove(1) // test remove middle
+aList.remove(0) // test remove first
+aList.remove(0) // test remove only
 n+aList.length() + optionResult
 
