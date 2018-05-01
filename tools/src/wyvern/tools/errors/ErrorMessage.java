@@ -14,7 +14,7 @@ public enum ErrorMessage {
     CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
     TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
     VARIABLE_NOT_DECLARED("No variable named \"%ARG\" is in scope", 1),
-    NO_SUCH_METHOD("There is no visible method named %ARG", 1),
+    NO_SUCH_METHOD("There is no visible method named %ARG in type %ARG", 2),
     DYNAMIC_METHOD_ERROR("Called method %ARG, but the method does not exist on the receiver object.  Did you use type Dyn?", 1),
     NO_SUCH_FIELD("There is no visible field named %ARG", 1),
     NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
