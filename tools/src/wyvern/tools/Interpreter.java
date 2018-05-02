@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.ASTNode;
@@ -11,9 +12,16 @@ import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.TestUtil;
+import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
 public final class Interpreter {
     private Interpreter() { }
@@ -76,10 +84,73 @@ public final class Interpreter {
             System.err.println(e.getMessage());
         }
     }
+    
+    
+    public static Value runFile(String input) {
+//    	if (codepath.isEmpty() || codepath == null) {
+//    		return null; //UnitVal.getInstance(null); // "Error: Invalid code path";
+//        }
+//        Path filepath = Paths.get(codepath);
+//        if (!Files.isReadable(filepath)) {
+//            System.err.println("Cannot read file " + filepath);
+//            System.exit(1);
+//        }
+        try {
+            String rootLoc = System.getenv("WYVERN_ROOT");
+            if (wyvernRoot.get() != null) {
+                rootLoc = wyvernRoot.get();
+            } else {
+                rootLoc = System.getProperty("user.dir");
+            }
+            File rootDir = new File(rootLoc);
+            String wyvernPath = System.getenv("WYVERN_HOME");
+            if (wyvernPath == null) {
+                if (wyvernHome.get() != null) {
+                    wyvernPath = wyvernHome.get();
+                } else {
+                    System.err.println("must set WYVERN_HOME environmental variable to wyvern project directory");
+                    return null; // UnitVal.getInstance(null); // "must set WYVERN_HOME environmental variable to wyvern project directory";
+                }
+            }
+            wyvernPath += "/stdlib/";
+            // sanity check: is the wyvernPath a valid directory?
+            if (!Files.isDirectory(Paths.get(wyvernPath))) {
+                System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
+                return null; // UnitVal.getInstance(null); // "Error: WYVERN_HOME is not set to a valid Wyvern project directory";
+            }
+            final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, rootDir, new File(wyvernPath));
+            
+            
+            // Module m = state.getResolver().load("unknown", filepath.toFile(), true);
+            ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input, "test input");
+            GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                    new File(TestUtil.BASE_PATH),
+                    new File(TestUtil.LIB_PATH)));
+            final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+            IExpr program = ast.generateIL(genCtx, null, dependencies);
+            // IExpr program = m.getExpression();
+            
+            
+            program = state.getResolver().wrap(program, dependencies); // m.getDependencies());
+            program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", Globals.getGenContext(state));
+
+            TypeContext ctx = Globals.getStandardTypeContext();
+            program.typecheckNoAvoidance(ctx, null);
+            TailCallVisitor.annotate(program);
+            return program.interpret(Globals.getStandardEvalContext());
+        } catch (ParseException e) {
+        	System.out.println("Cannot parse: " + e);
+        } catch (ToolError e) {
+            System.err.println(e.getMessage());
+        }
+		return null; //UnitVal.getInstance(null); // "Error: Invalid code path";
+    	
+    }
 
     // used to set WYVERN_HOME when called programmatically
     public static final ThreadLocal<String> wyvernHome = new ThreadLocal<String>();
 
     // used to set WYVERN_ROOT when called programmatically
     public static final ThreadLocal<String> wyvernRoot = new ThreadLocal<String>();
+
 }
