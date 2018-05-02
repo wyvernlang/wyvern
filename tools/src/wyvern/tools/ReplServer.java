@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 
+import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.tools.Interpreter;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -36,18 +39,23 @@ public class ReplServer {
 	        	br.close();
 	        	isr.close();
 	        	
+	        	String response = "";
 	        	//  saving body of post request into file to use in interpreter
 	        	if (t.getRequestMethod().equals("POST")){
-	        		System.out.println("this is a Post request");
+//	        		PrintWriter out = new PrintWriter("code.wyv");
+//	        		out.println(buf.toString());
+//	        		System.out.println(buf.toString());
+//	        		out.close();
 	        		
-	        		PrintWriter out = new PrintWriter("code.wyv");
-	        		out.println(buf.toString());
+	        		System.out.println("PROGRAM START");
 	        		System.out.println(buf.toString());
-	        		out.close();
+	        		System.out.println("PROGRAM END");
 	        		
+	        		Value v = Interpreter.runFile(buf.toString()); // "C:\\Users\\dinht\\git\\wyvern489\\tools\\code.wyv");
+	        		response = v.toString();
 	        	}
 	        	
-	            String response = "This is the response";
+	            
 	            t.sendResponseHeaders(200, response.length());
 	            OutputStream os = t.getResponseBody();
 	            os.write(response.getBytes());
