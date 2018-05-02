@@ -1,0 +1,61 @@
+require stdout
+
+import wyvern.collections.list
+import sort
+
+type List = list.List
+
+// function for printing the Int values of a list with spaces in between
+def printItem(x:Int):Unit
+	stdout.printInt(x)
+	stdout.print(" ")
+
+def sortList(xlist: List[Int]):Unit
+    stdout.print("Unsorted List: [ ")
+    xlist.do(x:Int => printItem(x))
+    stdout.print("]\n")
+    stdout.print("sorting list ...\n")
+    //sort list and print out values
+    val sortedList:List[Int] = sort.sort(xlist)
+    stdout.print("Sorted List: [ ")
+    sortedList.do(x:Int => printItem(x))
+    stdout.print("]\n")
+    stdout.println()    
+
+// create list
+val unsortedList1:List[Int] = list.make[Int]()
+
+//append 5 random
+unsortedList1.append(12)
+unsortedList1.append(4)
+unsortedList1.append(7)
+unsortedList1.append(21)
+unsortedList1.append(2)
+
+stdout.print("Welcome to the Sorting Client..\n")
+stdout.print("Creating a list of 5 elements\n")
+sortList(unsortedList1)
+stdout.print("Creating a list of 7 elements\n")
+
+// create list
+val unsortedList2:List[Int] = list.make[Int]()
+
+//append 5 random
+unsortedList2.append(88)
+unsortedList2.append(69)
+unsortedList2.append(26)
+unsortedList2.append(112)
+unsortedList2.append(74)
+unsortedList2.append(90)
+unsortedList2.append(18)
+sortList(unsortedList2)
+
+stdout.print("Done!")
+
+
+
+
+
+
+
+

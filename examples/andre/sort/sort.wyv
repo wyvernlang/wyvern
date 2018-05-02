@@ -1,0 +1,62 @@
+module sort
+
+import wyvern.Int
+import wyvern.collections.list
+
+type List = list.List
+
+// finds the minimum Int value in a list
+def min(xlist: List[Int], minimum:Int, count:Int):Int
+    
+    val n = xlist.length()
+    val optionItem = xlist.get(count)
+    val item = optionItem.getOrElse(()=>-1)
+    var minV: Int = minimum
+    
+    if (item < minV)
+        minV = item
+
+    if (n == count)
+        minimum
+      else
+        if (item == -1 || count > n)
+            -1
+          else	
+            min(xlist,minV,count+1)
+
+// takes the index of the min value of a list
+def minIndex(xlist: List[Int], minimum:Int, count:Int, index:Int):Int
+    val n = xlist.length()
+    val optionItem = xlist.get(count)
+    val item = optionItem.getOrElse(()=>-1)
+    var minV: Int = minimum
+    var indexV: Int = index    
+
+    if (item < minV)
+        indexV = count
+        minV = item
+
+    if (n-1 == count)
+        indexV
+      else     
+        if (item == -1 || count > n)
+            -1
+          else	
+            minIndex(xlist,minV,count+1, indexV)
+
+// helper function that sorts out a list, removing the minimum value from one list and adding it to another list (already sorted)
+def sortHelper(xlist:List[Int], ylist:List[Int]):List[Int]
+    val minimumValue = min(xlist, Int.maxValue(), 0)
+    val minimumIndex = minIndex(xlist, Int.maxValue(), 0, 0)
+    ylist.append(minimumValue)
+    xlist.remove(minimumIndex)
+    
+    if (xlist.length() == 0)
+        ylist
+      else
+        sortHelper(xlist, ylist)
+//returns a new sorted list from an unsortedlist
+def sort(unsortedList:List[Int]):List[Int]
+    val sortedList: List[Int] = list.make [Int]()
+    sortHelper(unsortedList, sortedList)
+
