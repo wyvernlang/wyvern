@@ -54,8 +54,9 @@ public class REPL {
 		
 	}
 	public static void main(String[] args) throws Exception {
-		String input = "require stdout\n\n"
-		        + "val x = \"Hello, \"\n";
+		String input = "" // "require stdout\n\n"
+		        + "val x = \"Hello, \"\n"
+		        + "x \n";
 		
 		interepetProgram(input);
 		
@@ -65,14 +66,15 @@ public class REPL {
 	    String lines[] = input.split("\\r?\\n");
 	    
 	    for (String s: lines){
-	        System.out.println(s);
-	        parseVar(s);
-	        
+	        System.out.println("STARTED PROCESSING: " + s);
+	        parseVar(s + "\n");
+	        System.out.println("FINISHED PROCESSING: " + s);
 	    }
 	}
 	
 	public static void parseVar(String input) throws ParseException {
 	    if (programContext == null || program == null){
+	        System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
 	        programContext = Globals.getStandardEvalContext();
 	        ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
 	        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
