@@ -3,5 +3,6 @@ resource type Stdout
 
     def print(text : String) : Unit
     def printInt(n : Int) : Unit
+    def printBoolean(b : Boolean) : Unit
     def println() : Unit
     def flush() : Unit

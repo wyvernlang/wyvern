@@ -2,6 +2,6 @@ require platform // could use 'java' here if we wanted this code to be specific 
 
 import stdout
 
-val stdout2 = stdout(platform)
+val stdout = stdout(platform)
 
-stdout2.print("Hello, World!")
+stdout.print("Hello, World!")

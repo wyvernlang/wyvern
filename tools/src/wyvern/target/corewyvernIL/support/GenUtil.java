@@ -40,6 +40,8 @@ public final class GenUtil {
 
         if (javaClass.getName().equals("java.util.List")
             || javaClass.getName().equals("java.util.LinkedList") || javaClass.getName().equals("java.util.ArrayList")) {
+            StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupTypeOf(javaTypesObjectName);
+            type.getJavaType(javaClass, ctx); // run for side effect - makes sure this java type is in the contxt
             return Util.listType();
         }
 

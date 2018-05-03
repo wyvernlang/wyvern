@@ -22,15 +22,21 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST {
     private String name;
     private DeclSequence decls;
+    private TaggedInfo taggedInfo;
 
     public TypeDeclaration(String name, DeclSequence decls, TaggedInfo taggedInfo, FileLocation clsNameLine) {
         this.name = name;
         this.decls = decls;
         this.location = clsNameLine;
+        this.taggedInfo = taggedInfo;
     }
 
     public DeclSequence getDecls() {
         return decls;
+    }
+
+    public TaggedInfo getTaggedInfo() {
+        return taggedInfo;
     }
 
     private FileLocation location = FileLocation.UNKNOWN;

@@ -23,6 +23,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
     private NameBinding binding;
     private Type declaredType;
     private String variableName;
+    private ValueType cachedValueType;
 
     public ValDeclaration(String name, TypedAST definition, FileLocation location) {
         this.definition = (ExpressionAST) definition;
@@ -73,6 +74,13 @@ public class ValDeclaration extends Declaration implements CoreAST {
     }
 
     private ValueType getILValueType(GenContext ctx) {
+        /* this method does not work properly if called when the variable being
+         * declared has already been added to ctx.  We solve this problem by
+         * caching the value resulting from the first time this method is
+         * invoked on this object */
+        if (cachedValueType != null) {
+            return cachedValueType;
+        }
         ValueType vt;
         if (declaredType != null) {
             // convert the declared type if there is one
@@ -90,6 +98,7 @@ public class ValDeclaration extends Declaration implements CoreAST {
                 vt = definition.generateIL(ctx, null, null).typeCheck(ctx, null);
             }
         }
+        cachedValueType = vt;
         return vt;
     }
 

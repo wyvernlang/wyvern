@@ -146,10 +146,11 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, Match match) {
         Expression matchExpr = (Expression) match.getMatchExpr().acceptVisitor(this, state);
-        Expression elseExpr = (Expression) match.getElseExpr().acceptVisitor(this, state);
+        Expression elseExpr = match.getElseExpr();
+        elseExpr =  elseExpr == null ? null : (Expression) elseExpr.acceptVisitor(this, state);
         List<Case> cases = new ArrayList<Case>();
         for (Case matchCase : match.getCases()) {
-            cases.add((Case) matchCase.getBody().acceptVisitor(this, state));
+            cases.add((Case) matchCase.acceptVisitor(this, state));
         }
 
         Match result = new Match(matchExpr, elseExpr, cases);

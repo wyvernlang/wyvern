@@ -1,0 +1,31 @@
+require stdout
+
+import wyvern.option
+import wyvern.collections.list
+
+type Option = option.Option
+type List = list.List
+
+val y:Option[Int] = option.None[Int]()
+val x:Option[Int] = option.Some[Int](14)
+val w = x.map[Int](z => z+1)
+x.isDefined
+val z = w.orElse(() => x)
+val optionResult:Int = z.getOrElse(() => 3)
+
+val aList:List[Int] = list.make[Int]() // TODO: infer the generic argument here
+aList.append(10)
+aList.append(13)
+val found = aList.find(i => i==13)
+val n:Int = found.getOrElse(() => 2)
+val ten:Option[Int] = aList.get(0)
+val bList:List[Int] = aList.map[Int](x => x+1)
+bList.do(n:Int => stdout.printInt(n))
+aList.appendAll(bList)
+aList.remove(7) // test remove not present
+aList.remove(3) // test remove last
+aList.remove(1) // test remove middle
+aList.remove(0) // test remove first
+aList.remove(0) // test remove only
+n+aList.length() + optionResult
+

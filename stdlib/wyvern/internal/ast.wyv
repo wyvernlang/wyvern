@@ -39,7 +39,7 @@ def bind(bindings : list.List, inExpr : AST) : AST = new
 def object(decls : list.List) : AST = new
 	val ast:Unit = utils.object(decls)
 
-def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST):Decl = new
+def defDeclaration(name : String, formalArgs : list.List[FormalArg], returnType : Type, body : AST):Decl = new
 	val decl:Unit = utils.defDeclaration(name, formalArgs, returnType, body)
 
 def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = new
@@ -110,12 +110,12 @@ def parseExpression(input : String, ctx : system.Context) : AST
   new
     val ast:Unit = utils.parseExpression(input, ctxDyn)
 
-def parseExpressionList(input : String, ctx : system.Context) : list.List
+def parseExpressionList(input : String, ctx : system.Context) : list.List[AST]
   val ctxDyn:Dyn = ctx
   def javaASTToWyvAST(jAST : Dyn):Dyn = new
     val ast:Unit = jAST
   val l = utils.parseExpressionList(input, ctxDyn)
-  l.map(ast => javaASTToWyvAST(ast))
+  l.map[AST](ast => javaASTToWyvAST(ast))
 
 val types = new
   def int():Type = new
@@ -139,10 +139,10 @@ val types = new
   def structural(selfName : String, declTypes : list.List):Type = new
     val typ:Unit = utils.structuralType(selfName, declTypes)
 
-  def refinement(typeParams : list.List, base : Type):Type = new
+  def refinement(typeParams : list.List[Type], base : Type):Type = new
     val typ:Unit = utils.refinementType(typeParams, base)
 
-def stripLeadingWhitespace(input : String) : String = utils.stripLeadingWhitespace(input)
+def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = utils.stripLeadingWhitespace(input, mustStrip)
 
 def genIdent() : String = utils.genIdent()
 

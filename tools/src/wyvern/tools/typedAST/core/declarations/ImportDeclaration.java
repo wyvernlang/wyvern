@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -114,11 +115,13 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         if (obj.getWrappedValue() instanceof java.lang.Class) {
             // then this is a Class import
             // and we need to extend the context
-            String qualifiedName = ((Class<?>) obj.getWrappedValue()).getName();
+            Class<?> wrappedValue = (Class<?>) obj.getWrappedValue();
+            String qualifiedName = wrappedValue.getName();
             int lastDot = qualifiedName.lastIndexOf('.');
             String className = qualifiedName.substring(lastDot + 1);
             String packageName = qualifiedName.substring(0, lastDot);
-            ctx = new TypeOrEffectGenContext(className, new Variable(GenUtil.javaTypesObjectName + packageName), ctx);
+            ValueType type = GenUtil.javaClassToWyvernType(wrappedValue, ctx);
+            ctx = new TypeOrEffectGenContext(className, new FieldGet(new Variable(GenUtil.javaTypesObjectName), packageName, null), ctx);
         }
         return ctx;
     }

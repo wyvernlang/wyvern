@@ -248,8 +248,8 @@ public class ILTests {
                 + "c.element\n\n"
                 + "val l : List = t\n\n"
                 + "match(l)\n"
-                + "    case Nil => 0\n"
-                + "    case c:Cons => c.element\n";
+                + "    Nil => 0\n"
+                + "    c:Cons => c.element\n";
         TestUtil.getNewAST(input, "test input");
     }
 
@@ -618,6 +618,18 @@ public class ILTests {
         TestUtil.doTestScriptModularly("modules.module.operator-plus", Util.intType(), new IntegerLiteral(5));
     }
 
+
+    @Test
+    public void testTaggedList() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.module.taggedList", Util.intType(), Util.intValue(0));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testParametrizedTaggedList() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.module.parametrizedList", Util.intType(), Util.intValue(0));
+    }
+
     @Test
     public void testJavaImport2() throws ParseException {
         String input = "module def main(java : Java)\n\n"
@@ -660,31 +672,6 @@ public class ILTests {
     @Test
     public void testNonResourceImport() throws ParseException {
         TestUtil.doTestScriptModularlyFailing("bugs.a", ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA);
-    }
-
-    @Test
-    public void testTSL2() throws ParseException {
-        TestUtil.doTestScriptModularly("tsls.identityClient", Util.intType(), new IntegerLiteral(5));
-    }
-
-    @Test
-    public void testTSL3() throws ParseException {
-        TestUtil.doTestScriptModularly("tsls.trivialClient", Util.intType(), new IntegerLiteral(5));
-    }
-
-    @Test
-    public void testTSL4() throws ParseException {
-        TestUtil.doTestScriptModularlyFailing("tsls.failingClient", ErrorMessage.TSL_ERROR);
-    }
-
-    @Test
-    public void testPostTSLIndentation() throws ParseException {
-        TestUtil.doTestScriptModularly("tsls.postTSLIndentation", Util.intType(), new IntegerLiteral(23));
-    }
-
-    @Test
-    public void testFunctionInType() throws ParseException {
-        TestUtil.doTestScriptModularlyFailing("errors.ReturnTypeBug", ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS);
     }
 
     // @Test
@@ -1333,42 +1320,6 @@ public class ILTests {
                 + "    def method(x: Int): Int = x\n"
                 + "obj.method(5)";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(5));
-    }
-
-    @Test
-    public void testListLength() throws ParseException {
-        String src
-        = "import wyvern.collections.list\n"
-                + "val x : list.List = list.make()\n"
-                + "x.append(1)\n"
-                + "x.append(2)\n"
-                + "x.length()\n";
-        TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(2));
-    }
-
-    @Test
-    public void testListGet() throws ParseException {
-        String src
-        = "import wyvern.collections.list\n"
-                + "val x : list.List = list.make()\n"
-                + "x.append(1)\n"
-                + "x.append(2)\n"
-                + "x.get(0).getOrElse(() => -1)\n";
-        TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(1));
-    }
-
-    @Test
-    public void testListTSL() throws ParseException {
-        String src
-        = "import metadata wyvern.collections.list\n"
-                + "val l : list.List = {1, 2, 3, 4}\n"
-                + "l.get(1).getOrElse(() => -1)\n";
-        TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(2));
-    }
-
-    @Test
-    public void testMetadataInterpretation() throws ParseException {
-        TestUtil.doTestScriptModularly("modules.importWithMetadata", null, null);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -9,6 +10,9 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.type.DataType;
+import wyvern.target.corewyvernIL.type.ExtensibleTagType;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
@@ -27,7 +31,7 @@ import wyvern.tools.types.Type;
  */
 public class TypeVarDecl extends Declaration {
     private final String name;
-    private final Declaration body;
+    private final TypeDeclaration body;
     private final FileLocation fileLocation;
     private final TypedAST metadata;
     private TaggedInfo taggedInfo = null;
@@ -53,7 +57,7 @@ public class TypeVarDecl extends Declaration {
     }
 
     @Override
-    public Type getType() {
+    public wyvern.tools.types.Type getType() {
         return null;
     }
 
@@ -75,15 +79,34 @@ public class TypeVarDecl extends Declaration {
         return s;
     }
 
-    private StructuralType computeInternalILType(GenContext ctx) {
-        TypeDeclaration td = (TypeDeclaration) this.body;
+    private wyvern.target.corewyvernIL.type.Type computeInternalILType(GenContext ctx) {
+        TypeDeclaration td = this.body;
         GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
-        return new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+        TaggedInfo taggedInfo = td.getTaggedInfo();
+        StructuralType thisType = new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+        if (taggedInfo == null) {
+            return thisType;
+        } else {
+            Type parent = taggedInfo.getCaseOfTag();
+            NominalType parentType = null;
+            if (parent != null) {
+                parentType = (NominalType) parent.getILType(localCtx);
+            }
+            List<Type> children = taggedInfo.getComprisesTags();
+            if (children == null) {
+                return new ExtensibleTagType(parentType, thisType);
+            } else {
+                List<NominalType> cases = children.stream()
+                                                  .map(child -> (NominalType) child.getILType(localCtx))
+                                                  .collect(Collectors.toList());
+                return new DataType(parentType, thisType, cases);
+            }
+        }
     }
 
     @Override
     public DeclType genILType(GenContext ctx) {
-        StructuralType type = computeInternalILType(ctx);
+        wyvern.target.corewyvernIL.type.Type type = computeInternalILType(ctx);
         return new ConcreteTypeMember(getName(), type, getMetadata(ctx));
     }
 
@@ -104,7 +127,7 @@ public class TypeVarDecl extends Declaration {
     }
 
     private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
-        StructuralType type = computeInternalILType(ctx);
+        wyvern.target.corewyvernIL.type.Type type = computeInternalILType(ctx);
         return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
     }
 

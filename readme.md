@@ -1,5 +1,8 @@
 The Wyvern project
 ==================
+
+[![Build Status](https://travis-ci.org/wyvernlang/wyvern.svg?branch=master)](https://travis-ci.org/wyvernlang/wyvern)
+
 Wyvern is a new general-purpose programming language designed to support adaptation and assurance.  Key features of Wyvern's evolving design include:
 
 * A simple object model with good support for both object-oriented and functional programming

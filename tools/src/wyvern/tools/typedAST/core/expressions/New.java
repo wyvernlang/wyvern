@@ -5,9 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.RefinementType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
@@ -95,7 +98,23 @@ public class New extends AbstractExpressionAST implements CoreAST {
             List<TypedModuleSpec> dependencies
             ) {
 
-        ValueType type = seq.inferStructuralType(ctx, this.self());
+        StructuralType structuralType = seq.inferStructuralType(ctx, this.self());
+        /* We need access to both the structural contents of the object and
+         * the expected type. The object can have extra decls on top of the
+         * expected type it has been ascribed to, and typechecking requires
+         * use of both.
+         */
+        ValueType type = null;
+        if (expectedType != null) {
+            if (expectedType.isTagged(ctx)) {
+                List<DeclType> declTypes = structuralType.getDeclTypes();
+                type = new RefinementType(expectedType, declTypes, this, selfName);
+            } else {
+                type = structuralType;
+            }
+        } else {
+            type = structuralType;
+        }
 
         // Translate the declarations.
         GenContext thisContext = ctx.extend(
@@ -146,7 +165,7 @@ public class New extends AbstractExpressionAST implements CoreAST {
                 decls.add(setter);
             }
         }
-        // if type is not specified, infer
+
         return new wyvern.target.corewyvernIL.expression.New(
                 decls,
                 this.self(),

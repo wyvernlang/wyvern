@@ -65,7 +65,7 @@ public class OIRTests {
         GenContext pythonGenContext = Globals.getGenContext(state);
         LinkedList<TypedModuleSpec> dependencies = new LinkedList<>();
         IExpr iLprogram = ast.generateIL(pythonGenContext, null, dependencies);
-        iLprogram = state.getResolver().wrap(iLprogram, dependencies);
+        iLprogram = state.getResolver().wrapForPython(iLprogram, dependencies);
         TailCallVisitor.annotate(iLprogram);
 
         if (debug) {
@@ -620,8 +620,8 @@ public class OIRTests {
         String input =
                 "require stdout\n"
                       + "import wyvern.option\n"
-                      + "val orElse : option.UnitToDyn = new\n"
-                      + "  def apply() : Dyn = 5\n"
+                      + "val orElse : Unit -> Int = new\n"
+                      + "  def apply() : Int = 5\n"
                       + "val v1 : Int = option.Some(3).getOrElse(orElse)\n"
                       + "val v2 : Int = option.None[Int]().getOrElse(orElse)\n"
                       + "stdout.printInt(v1+v2)\n"
@@ -655,9 +655,9 @@ public class OIRTests {
     @Test
     public void testTSLIfElse() throws ParseException {
         String input =
-                "import metadata wyvern.IfTSL\n"
-                      + "IfTSL.doif(false, ~)\n"
-                      + "  then\n"
+//                "import metadata wyvern.IfTSL\n"
+                        "if(false)\n"
+//                      + "  then\n"
                       + "    7\n"
                       + "  else\n"
                       + "    8"
@@ -669,11 +669,13 @@ public class OIRTests {
     public void testTSLIf() throws ParseException {
         String input =
                 "require python\n"
-                      + "import metadata wyvern.IfTSL\n"
-                      + "IfTSL.doif(true, ~)\n"
-                      + "  then\n"
+//                      + "import metadata wyvern.IfTSL\n"
+                      + "val x:Int = if (true)\n"
+//                      + "  then\n"
                       + "    7\n"
-                      + "\n";
+                      + "  else\n"
+                      + "    6\n"
+                      + "x\n\n";
         testPyFromInput(input, "7");
     }
 

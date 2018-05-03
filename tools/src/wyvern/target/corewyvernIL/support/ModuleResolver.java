@@ -409,6 +409,33 @@ public class ModuleResolver {
         return seqProg;
     }
 
+    public SeqExpr wrapForPython(IExpr program, List<TypedModuleSpec> dependencies) {
+        SeqExpr seqProg = new SeqExpr();
+        Module prelude = Globals.getPreludeModule();
+        addDeps(seqProg, prelude.getDependencies());
+        seqProg.merge(prelude.getExpression());
+        List<TypedModuleSpec> deps = new ArrayList<TypedModuleSpec>(dependencies);
+        deps.removeAll(prelude.getDependencies());
+        addDeps(seqProg, deps);
+        seqProg.merge(program);
+        return seqProg;
+    }
+
+    /** Does not modify deps.
+     * Adds deduplicated deps to seqProg. */
+    private void addDeps(SeqExpr seqProg, List<TypedModuleSpec> deps) {
+        LinkedList<TypedModuleSpec> noDups = deDuplicate(deps);
+        for (int i = noDups.size() - 1; i >= 0; --i) {
+            TypedModuleSpec spec = noDups.get(i);
+            Module m = resolveModule(spec.getQualifiedName());
+            String internalName = m.getSpec().getInternalName();
+            ValueType type = m.getSpec().getType();
+            seqProg.addBinding(internalName, type, m.getExpression(), true);
+        }
+    }
+    /** Returns a fresh list, with duplicates eliminated.
+     * The last occurrence of each element is left in the returned list.
+     */
     private LinkedList<TypedModuleSpec> deDuplicate(List<TypedModuleSpec> dependencies) {
         Set<String> wrapped = new HashSet<String>();
         LinkedList<TypedModuleSpec> noDups = new LinkedList<TypedModuleSpec>();

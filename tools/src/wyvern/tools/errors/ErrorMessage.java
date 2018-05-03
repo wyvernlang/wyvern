@@ -14,7 +14,7 @@ public enum ErrorMessage {
     CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
     TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
     VARIABLE_NOT_DECLARED("No variable named \"%ARG\" is in scope", 1),
-    NO_SUCH_METHOD("There is no visible method named %ARG", 1),
+    NO_SUCH_METHOD("There is no visible method named %ARG in type %ARG", 2),
     DYNAMIC_METHOD_ERROR("Called method %ARG, but the method does not exist on the receiver object.  Did you use type Dyn?", 1),
     NO_SUCH_FIELD("There is no visible field named %ARG", 1),
     NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
@@ -36,6 +36,7 @@ public enum ErrorMessage {
     NO_METADATA_FROM_RESOURCE("Cannot load metadata from a resource module", 0),
     MUST_BE_A_RESOURCE("%ARG must be a resource type", 1),
     MUST_BE_A_RESOURCE_MODULE("%ARG must be a resource module", 1),
+    NO_METADATA_WHEN_PARSING_TSL("Cannot parse TSL as type %ARG has no metadata", 1),
     METADATA_MUST_INCLUDE_PARSETSL("Metadata used to parse a TSL must include a parseTSL method", 0),
     METADATA_MUST_BE_AN_OBJECT("Metadata of type %ARG must be an object", 1),
     WRONG_NUMBER_OF_ARGUMENTS("Wrong number of arguments, expected %ARG, but found %ARG", 2),
@@ -77,8 +78,9 @@ public enum ErrorMessage {
     MULTIPLE_DEFAULTS("More than 1 default case defined", 0),
     SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG: unreachable case", 2),
     UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
-    UNMATCHABLE_CASE("A variable of tag-type %ARG cannot possibly match against case %ARG", 2),
-    MATCH_NO_COMMON_RETURN("Match statement does not have a common return type", 0),
+    UNMATCHABLE_CASE("Case type %ARG is not a subtype of match expression type %ARG: %ARG", 3),
+    UNMATCHED_CASE("Matched expression %ARG has no matching case", 1),
+    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: ", 1),
 
     // Evaluation errors
     VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

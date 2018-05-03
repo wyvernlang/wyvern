@@ -170,7 +170,7 @@ public class StructuralType extends ValueType {
 
         // a resource type is not a subtype of a non-resource type
         if (isResource(GenContext.empty()) && !st.isResource(GenContext.empty())) {
-            reason.setReason("the destination type is not a resource");
+            reason.setReason("the second type is not a resource");
             return false;
         }
 
@@ -277,6 +277,11 @@ public class StructuralType extends ValueType {
         }
         StructuralType other = (StructuralType) obj;
         return resourceFlag == other.resourceFlag && selfName.equals(other.selfName) && declTypes.equals(other.declTypes);
+    }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return false;
     }
 
 

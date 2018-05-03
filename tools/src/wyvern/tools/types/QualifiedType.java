@@ -1,5 +1,6 @@
 package wyvern.tools.types;
 
+import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -8,6 +9,8 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.expressions.Invocation;
+import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
@@ -58,11 +61,37 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
         return new NominalType(getPath(base, ctx), name, getLocation());
     }
 
-    private static Path getPath(ExpressionAST ast, GenContext ctx) {
+    private static Path getPathOld(ExpressionAST ast, GenContext ctx) {
+        Path path2 = getPath(ast, ctx);
         IExpr exp = ast.generateIL(ctx, null, null);
         if (!(exp instanceof Path)) {
             ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS, ast);
         }
+        if (!exp.equals(path2)) {
+            throw new RuntimeException("surprise!");
+        }
         return (Path) exp;
+    }
+    /** Gets a Path from an ExpressionAST without typechecking.
+     * We do still take a context for looking up variable renamings.
+     * Reports an ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS if the ExpressionAST
+     * is not a variable with field dereferences after it.
+     * We postpone checking that the fields are immutable until later.
+     * */
+    private static Path getPath(ExpressionAST ast, GenContext ctx) {
+        if (ast instanceof Variable) {
+            IExpr exp = ast.generateIL(ctx, null, null);
+            if (!(exp instanceof Path)) {
+                ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS, ast);
+            }
+            return (Path) exp;
+        } else if (ast instanceof Invocation) {
+            Invocation i = (Invocation) ast;
+            Path subPath = getPath(i.getReceiver(), ctx);
+            return new FieldGet(subPath, i.getOperationName(), i.getLocation());
+        } else {
+            ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS, ast);
+        }
+        throw new RuntimeException("can't get here");
     }
 }

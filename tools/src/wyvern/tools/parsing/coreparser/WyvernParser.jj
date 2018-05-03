@@ -293,6 +293,8 @@ AST Declaration(boolean inModule) :
 |
    LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
+   LOOKAHEAD(4) exp = TaggedTypeDeclaration()  { return exp; }
+|
    LOOKAHEAD(4) exp = DatatypeDeclaration() { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
@@ -363,7 +365,6 @@ AST TypeDeclaration() :
   Object tagInfo = null; boolean isResource = false;
 }
 {
-  [<TAGGED> { isTagged = true; } ]
   [<RESOURCE> { isResource = true; } ]
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
@@ -375,6 +376,28 @@ AST TypeDeclaration() :
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
+    String self = (selfName == null) ? null : selfName.image;
+	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
+  }
+}
+
+AST TaggedTypeDeclaration() :
+{ Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
+  Token selfName = null;
+  Object tagInfo = null; boolean isResource = false;
+}
+{
+  <TAGGED>
+  [<RESOURCE> { isResource = true; } ]
+  <TYPE> name=<IDENTIFIER>
+  [ <EXTENDS> extendedType=Type() ]
+  [ <COMPRISES> comprisesList=TypeList() ]
+  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW> ]
+  <NEWLINE> (<INDENT> body=DeclTypes()
+                    [ <METADATA> metadata = ExpressionLine(false) ]
+             <DEDENT>)?
+  {
+    tagInfo = build.tagInfo(extendedType, comprisesList);
     String self = (selfName == null) ? null : selfName.image;
 	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
   }
@@ -422,6 +445,8 @@ AST DeclType() :
   exp = ConstructDeclType() { return exp; }
 |
   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
+|
+  LOOKAHEAD(4) exp = TaggedTypeDeclaration()  { return exp; }
 |
   LOOKAHEAD(4) exp = DatatypeDeclaration()  { return exp; }
 |
@@ -566,6 +591,7 @@ Token DSLLines() :
       return null;
     }
     t.image = content;
+    t.beginColumn = 0; // this DSL line should start at the beginning of the line
     return t;
   }
 }
@@ -614,9 +640,15 @@ AST ExpressionLine(boolean makeValDecl) :
 }
 
 Object CaseArm() :
-{ Token id; Token t; AST exp; Type type; }
+{ Token id; Token t; Token dslTok = null; AST exp = null; Type type; }
 {
-  id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW> exp=ExpressionLine(false) {
+  id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW>
+  ( exp=ExpressionLine(false)
+  | <NEWLINE> dslTok=DSLLines()
+  ) {
+    if (dslTok != null) {
+	    exp = build.parseExpr(dslTok.image, loc(dslTok));
+    }
     return build.caseArm(id.image,type,exp,loc(t));
   }
 }
