@@ -1,0 +1,1 @@
+assert "bad arithmetic": 5 == 6

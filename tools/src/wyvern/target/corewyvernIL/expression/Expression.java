@@ -1,10 +1,12 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.ILFactory;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
@@ -40,6 +42,10 @@ public abstract class Expression extends ASTNode implements IASTNode, IExpr {
     }
     protected void setExprType(ValueType exprType) {
         this.exprType = exprType;
+    }
+
+    public MethodCall call(String name, IExpr... args) {
+        return ILFactory.instance().call(this, name, Arrays.asList(args));
     }
 
 }
