@@ -13,8 +13,10 @@ import com.sun.net.httpserver.HttpServer;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.ASTNode;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -48,15 +50,15 @@ public class REPL {
     private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
     
     private static EvalContext programContext = null;
-    private static IExpr program = null;
+    //private static IExpr program = null;
 	
 	public REPL() {
 		
 	}
 	public static void main(String[] args) throws Exception {
 		String input = "" // "require stdout\n\n"
-		        + "val x = \"Hello, \"\n"
-		        + "x \n";
+		        + "val x = \"kjsadfka\"\n"
+		        + "val y = 3\n";
 		
 		interepetProgram(input);
 		
@@ -72,9 +74,9 @@ public class REPL {
 	    }
 	}
 	
-	public static void parseVar(String input) throws ParseException {
-	    if (programContext == null || program == null){
-	        System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
+	public static Value parseVar(String input) throws ParseException {
+	    if (programContext == null){
+	        //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
 	        programContext = Globals.getStandardEvalContext();
 	        ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
 	        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
@@ -86,12 +88,32 @@ public class REPL {
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
             programContext = result.getSecond();
-            System.out.println(result.getFirst().toString());
+            //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
+            //System.out.println(result.getFirst());
+            return result.getFirst();
 	    }else {
+	        ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
+	        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                    new File(BASE_PATH),
+                    new File(LIB_PATH)));
+            final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+            IExpr program =  ast.generateIL(genCtx, null, dependencies);
+            program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
+	        
+	        if (ast instanceof VarBinding) {
+                System.out.println("varbinding");
+            } else if (ast instanceof Expression) {
+                System.out.println("expression");
+            }
+	        
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
 	        programContext = result.getSecond();
-	        System.out.println(result.getFirst().toString());
+	        //System.out.println("Inside OR, btw with pC = " + programContext);
+	        //System.out.println(result.getFirst());
+	        return result.getFirst();
+	        
+	        //System.out.println(programContext.lookupValue("x"));
 	    }
 	}
 	
