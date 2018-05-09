@@ -163,6 +163,7 @@ public class SeqExpr extends Expression {
                 // TODO: return unit
                 System.out.println("var");
                 result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
+                System.out.println("There is already a val with the name : " + binding.getVarName());
             } else if (elem instanceof Expression) {
                 System.out.println("exp");
                 result = ((Expression) elem).interpret(extendedCtx);
