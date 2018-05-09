@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.tools.Interpreter;
+import wyvern.tools.parsing.coreparser.ParseException;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -51,7 +52,13 @@ public class ReplServer {
 	        		System.out.println(buf.toString());
 	        		System.out.println("PROGRAM END");
 	        		
-	        		Value v = Interpreter.runFile(buf.toString()); // "C:\\Users\\dinht\\git\\wyvern489\\tools\\code.wyv");
+	        		Value v = null;
+                    try {
+                        v = REPL.parseVar(buf.toString());
+                    } catch (ParseException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } // "C:\\Users\\dinht\\git\\wyvern489\\tools\\code.wyv");
 	        		response = v.toString();
 	        	}
 	        	

@@ -163,14 +163,18 @@ public class SeqExpr extends Expression {
                 VarBinding binding = (VarBinding) elem;
                 extendedCtx = binding.interpret(extendedCtx);
                 // TODO: return unit
+                System.out.println("var");
                 result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
             } else if (elem instanceof Expression) {
+                System.out.println("exp");
                 result = ((Expression) elem).interpret(extendedCtx);
             } else {
                 throw new RuntimeException("invariant broken");
             }
         }
-
+//        System.out.println("================================");
+//        System.out.println(result);
+//        System.out.println("================================");
         return new Pair<Value, EvalContext>(result, extendedCtx);
     }
 
