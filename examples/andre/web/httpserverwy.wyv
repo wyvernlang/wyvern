@@ -1,8 +1,9 @@
 module def httpserverwy(java:Java)
-import java:web.HttpServerWy.serv
+import java:HttpServerWy.serv
+import java:com.sun.net.httpserver.HttpServer
 
 // === Library Types ===
-type HttpServer
+// type HttpServer
 
 type HttpServerWy
     def startServer(port:Int):HttpServer

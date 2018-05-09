@@ -8,23 +8,29 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.commons.io.FileUtils;
 
 public class HttpServerWy {
 
     public static final HttpServerWy serv = new HttpServerWy();
 
-    public HttpServer startServer(int port){
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/test", new MyHandler());
-        server.setExecutor(null); 
-        server.start();
+    public HttpServer startServer(int port) {
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            server.createContext("/test", new MyHandler());
+            server.setExecutor(null); 
+            server.start();
+            return server;
+        } catch (IOException e) {
+            return null; // FIXME
+        }
     }
 
     static class MyHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
             Headers h = t.getResponseHeaders();
+
+            System.out.println("Doing stuff.");
              
             String response = "";
             try{
