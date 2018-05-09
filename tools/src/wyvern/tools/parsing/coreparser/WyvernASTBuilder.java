@@ -29,6 +29,7 @@ import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
 import wyvern.tools.typedAST.core.declarations.ValDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.core.expressions.Application;
+import wyvern.tools.typedAST.core.expressions.Assertion;
 import wyvern.tools.typedAST.core.expressions.Assignment;
 import wyvern.tools.typedAST.core.expressions.Case;
 import wyvern.tools.typedAST.core.expressions.Fn;
@@ -367,6 +368,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST script(List<TypedAST> requires, List<TypedAST> imports, TypedAST body) {
         return new Script(requires, imports, body);
+    }
+
+    @Override
+    public TypedAST assertion(String description, TypedAST exp, FileLocation loc) {
+        return new Assertion(description, exp, loc);
     }
 
 }

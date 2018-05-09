@@ -60,6 +60,7 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.AST.utils");
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
+        javaWhiteList.add("wyvern.stdlib.support.Sys.utils");
     }
 
     private static boolean gettingPrelude = false;

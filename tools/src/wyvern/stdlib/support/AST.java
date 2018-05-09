@@ -42,14 +42,12 @@ import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Literal;
 import wyvern.target.corewyvernIL.expression.Match;
-import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
-import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
-import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.ILFactory;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
@@ -72,6 +70,7 @@ public class AST {
     public static final AST utils = new AST();
 
     private int identNum = 0;
+    private ILFactory f = ILFactory.instance();
 
     public ValueType intType() {
         return Util.intType();
@@ -126,7 +125,7 @@ public class AST {
     }
 
     public Value stringLiteral(String s) {
-        return new StringLiteral(s);
+        return f.string(s);
     }
 
     public Value booleanLiteral(boolean b) {
@@ -134,15 +133,15 @@ public class AST {
     }
 
     public Expression variable(String s) {
-        return new Variable(s);
+        return f.variable(s);
     }
 
     public Expression methodCall(ObjectValue receiver, String methodName, List<ObjectValue> arguments) {
-        List<Expression> translArgs = new LinkedList<>();
+        List<IExpr> translArgs = new LinkedList<>();
         for (ObjectValue arg : arguments) {
             translArgs.add(getExpr(arg));
         }
-        return new MethodCall(getExpr(receiver), methodName, translArgs, null);
+        return f.call(getExpr(receiver), methodName, translArgs);
     }
 
     public Expression object(List<ObjectValue> decls) {
