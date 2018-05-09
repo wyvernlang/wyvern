@@ -1,0 +1,14 @@
+module def httpserverwy(java:Java)
+import java:web.HttpServerWy.serv
+
+// === Library Types ===
+type HttpServer
+
+type HttpServerWy
+    def startServer(port:Int):HttpServer
+
+// === Creator Functions ===
+
+def startServer(port:Int):HttpServer
+    serv.startServer(port)
+    

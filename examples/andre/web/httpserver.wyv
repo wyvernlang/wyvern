@@ -1,0 +1,7 @@
+require java
+require stdout
+import httpserverwy
+val serv = httpserverwy(java)
+
+serv.startServer(8080)
+stdout.print("Http Server started: Located at port 8080\n")
