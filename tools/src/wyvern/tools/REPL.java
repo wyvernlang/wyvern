@@ -64,14 +64,17 @@ public class REPL {
 		
     }
 	
-	public static void interepetProgram(String input) throws ParseException {
+	public static Value interepetProgram(String input) throws ParseException {
 	    String lines[] = input.split("\\r?\\n");
-	    
+	    Value currentResult = null;
 	    for (String s: lines){
-	        System.out.println("STARTED PROCESSING: " + s);
-	        parseVar(s + "\n");
-	        System.out.println("FINISHED PROCESSING: " + s);
+	        if(!(s.length()==0)) { //does not run code on empty lines
+	            System.out.println("STARTED PROCESSING: " + s);
+	            currentResult = parseVar(s + "\n");
+	            System.out.println("FINISHED PROCESSING: " + s);
+	        }
 	    }
+	    return currentResult;
 	}
 	
 	public static Value parseVar(String input) throws ParseException {
@@ -88,8 +91,8 @@ public class REPL {
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
             programContext = result.getSecond();
-            //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
-            //System.out.println(result.getFirst());
+            System.out.println(programContext );
+            System.out.println(result.getFirst());
             return result.getFirst();
 	    }else {
 	        ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
@@ -109,7 +112,7 @@ public class REPL {
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
 	        programContext = result.getSecond();
-	        //System.out.println("Inside OR, btw with pC = " + programContext);
+	        System.out.println(programContext);
 	        //System.out.println(result.getFirst());
 	        return result.getFirst();
 	        

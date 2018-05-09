@@ -54,7 +54,7 @@ public class ReplServer {
 	        		
 	        		Value v = null;
                     try {
-                        v = REPL.parseVar(buf.toString());
+                        v = REPL.interepetProgram(buf.toString());
                     } catch (ParseException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
