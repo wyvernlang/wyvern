@@ -58,6 +58,7 @@ val lexer = glexer(tokens)
 
 // local bindings to make things easier
 type AST = ast.AST
+type Option = option.Option
 
 def createScanner(input:String):lexer.Scanner
     // Create a scanner configuration, setting up the whitespace operator
@@ -123,15 +124,29 @@ def lex(input:String):Unit
     debugOut(scanner.nextToken())
     debugOut(scanner.nextToken())
     
-  
+/*  
 lex("UPDATE Students SET GPA=3.0 WHERE Name='John'")
 lex("SELECT AVG(GPA) FROM Students")
 lex("INSERT INTO Students VALUES ('John',4.0)")
 lex("CREATE TABLE Students (Name varchar(255), GPA float)")
+*/
 
+// A parse function for SQL queries
+def parse(input:String):Option[String]
+    val scanner = createScanner(input)
+	val t = scanner.nextToken()
+    match t:
+        tokens.UPDATE => parseUpdate(scanner)
+        tokens.SELECT => parseSelect(scanner)
+        tokens.INSERT => parseInsert(scanner)
+        tokens.CREATE => parseCreate(scanner)
+        default => None[String]()
 
-
-
+def parseInsert(scanner:lexer.Scanner):Option[String]
+	val t = scanner.nextToken()
+    match t:
+        tokens.INTO => unit
+        default => error
   
 /*
     // A parse function for reverse Polish notation
