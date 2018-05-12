@@ -1,8 +1,9 @@
 // make sure fail has type bottom
 
 def fakeReturnInt():Int
-    //runtime.fail("reason")
-    assert "can't get here": false
+    runtime.fail("reason")
+    // TODO: this version should also typecheck, perhaps?  Or add a language-level fail primitive?
+    // assert "can't get here": false
     
 def fakeReturnString():String
     runtime.fail("reason")
