@@ -53,32 +53,32 @@ def makeScanResult(s:String, k:tokens.Kind, r:String):ScanResult
 		def rest():String = r
 	
 resource type ScannerConfig
-	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
-	
-	// TODO: make this private
-	def getScanResult(s:String):ScanResult
-	
-def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new
-	val regexList : List = list.make()
-	
-	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
-		this.regexList.append(makeRKPair(r,k))
+    def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
 
-	// TODO: enforce that the scanner config is frozen before calling this
+    // TODO: make this private
+    def getScanResult(s:String):ScanResult
+	
+def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new (self)=>
+	val regexList : List[RegexpKindPair] = list.make[RegexpKindPair]()
+	
+	def addTokenKind(r:regex.Regex, k:tokens.Kind):Unit
+		self.regexList.append(makeRKPair(r,k))
+
+	// TODO: enforce that the scanner config is frozen before calling this method
 	def getScanResult(s:String):ScanResult
 		// strip whitespace, if any
-		val wsMatch : option.Option = wsRX.findPrefixMatchOf(s).map(
+		val wsMatch : option.Option[String] = wsRX.findPrefixMatchOf(s).map[String](
 		                                    (m:regex.Match) => m.after())
 		val sWithoutWS : String = wsMatch.getOrElse(()=> s)
 		
 		// find a match, if possible
-		val tokMatch : option.Option = this.regexList.find((rkp:RegexpKindPair) =>
+		val tokMatch : option.Option[RegexpKindPair] = self.regexList.find((rkp:RegexpKindPair) =>
 			rkp.regex.findPrefixMatchOf(sWithoutWS).isDefined
 		)
 		
 		// compute the resulting token
-		val resultOption : option.Option = tokMatch.flatMap((rkp:RegexpKindPair) =>
-			rkp.regex.findPrefixMatchOf(sWithoutWS).map((m:regex.Match) =>
+		val resultOption : option.Option[ScanResult] = tokMatch.flatMap[ScanResult]((rkp:RegexpKindPair) =>
+			rkp.regex.findPrefixMatchOf(sWithoutWS).map[ScanResult]((m:regex.Match) =>
 				makeScanResult(m.matched(), rkp.kind, m.after()))
 		)
 		

@@ -492,10 +492,10 @@ AST EffectDeclType() :
 }
 
 AST ConstructDeclType() :
-{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null; }
+{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null; Type t;}
 {
   (name = <IDENTIFIER>) [gentypes = GenericsDecl()] [args = Formals()] <NEWLINE> {
-  	return build.constructDeclType(name.image, gentypes, args, loc(name));
+  return build.constructDeclType(name.image, gentypes, args, loc(name));
   }
 }
 

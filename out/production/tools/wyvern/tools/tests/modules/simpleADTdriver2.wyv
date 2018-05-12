@@ -1,0 +1,11 @@
+require java
+
+import db.stringSQL as db1
+import db.safeSQL
+import modules.sqlApplication
+
+val strSQL = db1(java)
+val sql = safeSQL(strSQL)
+val app = sqlApplication(sql)
+
+5

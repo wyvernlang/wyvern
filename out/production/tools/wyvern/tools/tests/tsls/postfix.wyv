@@ -13,11 +13,11 @@ type PostfixExpr
 
 	// define a TSL for postfix expressions
     metadata new
-        def parseTSL(input:String, ctx:system.Context):option.Option // option of AST
+        def parseTSL(input:String, ctx:system.Context):option.Option[AST] // option of AST
             val parseResult = parser.parse(input)
 			
 			// wrap the AST in an object with an eval() method
 			// to match the signature above
-            parseResult.map((r) =>
+            parseResult.map[AST]((r) =>
                 ast.object({ast.defDeclaration("eval", {}, ast.types.int(), r)})
             )

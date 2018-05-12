@@ -66,6 +66,7 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
 
     public List<DeclType> genDeclTypeSeq(GenContext ctx) {
         List<DeclType> declts = new LinkedList<DeclType>();
+
         for (Declaration d : decls.getDeclIterator()) {
             // temporary context for verifying existence of variables within the same type so far
             if (d instanceof EffectDeclaration) {

@@ -15,8 +15,9 @@ import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.Script;
 import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
+//import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
@@ -118,7 +119,22 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST constructDeclType(String name, List<String> generics, List args, FileLocation loc) {
-        return new ConstructDeclaration(name, args, loc);
+
+        TypedAST body;
+        if (args == null) {
+            args = new LinkedList<>();
+        }
+        List<NameBinding> argNames = args;
+        LinkedList<TypedAST> exps = new LinkedList<>();
+
+        for (NameBinding b : argNames) {
+            String nameCons = b.getName();
+            Type t = b.getType();
+            TypedAST constructArgs = varDeclType(nameCons, t, null);
+            exps.add(constructArgs);
+        }
+        body = new DeclSequence(exps);
+        return new TypeVarDecl(name,  (DeclSequence) body, null, null, loc, true, null);
     }
 
     @Override
@@ -141,18 +157,36 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
-        if (body == null) {
-            body = new DeclSequence();
-        }
-        if (!(body instanceof DeclSequence)) {
-            body = new DeclSequence(Arrays.asList(body));
+
+        LinkedList<TypedAST> exps = new LinkedList<>();
+
+        LinkedList<Type> compriseList = new LinkedList<>();
+        for (TypedAST elem : ((DeclSequence) body).getIterator()) {
+            String nameCons = ((TypeVarDecl) elem).getName();
+            Type t = nominalType(nameCons, null);
+            compriseList.add(t);
         }
 
+        Object tagInfoComprise = tagInfo(null, compriseList);
+        TypedAST dt = new TypeVarDecl(name, new DeclSequence(), (TaggedInfo) tagInfoComprise, metadata, loc, true, selfName);
+        exps.add(dt);
+
+        Type extended = nominalType(name, null);
+        Object tagInfoExtend = tagInfo(extended, null);
+
+        for (TypedAST elem : ((DeclSequence) body).getIterator()) {
+            String nameCons = ((TypeVarDecl) elem).getName();
+            DeclSequence bodyCons = ((TypeVarDecl) elem).getBody();
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, true, null);
+            exps.add(cons);
+        }
+
+        body = new DeclSequence(exps);
         if (((DeclSequence) body).hasVarDeclaration() && !isResource) {
             ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);
         }
 
-        return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
+        return body;
     }
 
     @Override

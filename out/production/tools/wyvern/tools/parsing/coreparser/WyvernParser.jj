@@ -145,7 +145,7 @@ TOKEN : /* Symbols */
 | <EQUALS>
 | <EQUALSEQUALS>
 | <COMMA>
-| <ARROW>
+| <EQARROW>
 | <TARROW>
 | <DOT>
 | <COLON>
@@ -293,6 +293,8 @@ AST Declaration(boolean inModule) :
 |
    LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
+   LOOKAHEAD(4) exp = TaggedTypeDeclaration()  { return exp; }
+|
    LOOKAHEAD(4) exp = DatatypeDeclaration() { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
@@ -363,18 +365,39 @@ AST TypeDeclaration() :
   Object tagInfo = null; boolean isResource = false;
 }
 {
-  [<TAGGED> { isTagged = true; } ]
   [<RESOURCE> { isResource = true; } ]
   <TYPE> name=<IDENTIFIER>
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
-  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW> ]
+  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW> ]
   <NEWLINE> <INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT> {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
+    String self = (selfName == null) ? null : selfName.image;
+	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
+  }
+}
+
+AST TaggedTypeDeclaration() :
+{ Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
+  Token selfName = null;
+  Object tagInfo = null; boolean isResource = false;
+}
+{
+  <TAGGED>
+  [<RESOURCE> { isResource = true; } ]
+  <TYPE> name=<IDENTIFIER>
+  [ <EXTENDS> extendedType=Type() ]
+  [ <COMPRISES> comprisesList=TypeList() ]
+  [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW> ]
+  <NEWLINE> (<INDENT> body=DeclTypes()
+                    [ <METADATA> metadata = ExpressionLine(false) ]
+             <DEDENT>)?
+  {
+    tagInfo = build.tagInfo(extendedType, comprisesList);
     String self = (selfName == null) ? null : selfName.image;
 	return build.typeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
   }
@@ -423,6 +446,8 @@ AST DeclType() :
 |
   LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
 |
+  LOOKAHEAD(4) exp = TaggedTypeDeclaration()  { return exp; }
+|
   LOOKAHEAD(4) exp = DatatypeDeclaration()  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
@@ -467,16 +492,16 @@ AST EffectDeclType() :
 }
 
 AST ConstructDeclType() :
-{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null; }
+{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null; Type t;}
 {
   (name = <IDENTIFIER>) [gentypes = GenericsDecl()] [args = Formals()] <NEWLINE> {
-  	return build.constructDeclType(name.image, gentypes, args, loc(name));
+  return build.constructDeclType(name.image, gentypes, args, loc(name));
   }
 }
 
 List Formals_Lambda() :
 { List args = new LinkedList(); Object singleParameter;}
-{     singleParameter = Formal_Lambda() { 
+{     singleParameter = Formal_Lambda_NoEqArrow() { 
             args.add(singleParameter);
             return args;
         }
@@ -501,6 +526,14 @@ Object Formal_Lambda() :
 { Token id; Type type = null; }
 {
   id = <IDENTIFIER> [<COLON> type = Type()] {
+      return build.formalArg(id.image, type);
+  }
+}
+
+Object Formal_Lambda_NoEqArrow() :
+{ Token id; Type type = null; }
+{
+  id = <IDENTIFIER> [<COLON> type = NonArrowType()] {
       return build.formalArg(id.image, type);
   }
 }
@@ -558,6 +591,7 @@ Token DSLLines() :
       return null;
     }
     t.image = content;
+    t.beginColumn = 0; // this DSL line should start at the beginning of the line
     return t;
   }
 }
@@ -606,9 +640,15 @@ AST ExpressionLine(boolean makeValDecl) :
 }
 
 Object CaseArm() :
-{ Token id; Token t; AST exp; Type type; }
+{ Token id; Token t; Token dslTok = null; AST exp = null; Type type; }
 {
-  id=<IDENTIFIER> <COLON> type=Type() t=<ARROW> exp=ExpressionLine(false) {
+  id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW>
+  ( exp=ExpressionLine(false)
+  | <NEWLINE> dslTok=DSLLines()
+  ) {
+    if (dslTok != null) {
+	    exp = build.parseExpr(dslTok.image, loc(dslTok));
+    }
     return build.caseArm(id.image,type,exp,loc(t));
   }
 }
@@ -636,7 +676,7 @@ AST AssignmentExpression(ExpFlags flags) :
 AST LambdaFn(ExpFlags flags) :
 { List formals; AST body; Token t; }
 {
-    formals = Formals_Lambda() t=<ARROW> body = Expression(flags) {
+    formals = Formals_Lambda() t=<EQARROW> body = Expression(flags) {
         return build.fn(formals, body, loc(t));
     }
 }
@@ -654,7 +694,7 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Type arrowResult = null; Type t; Type t2; List<Type> tList=null; }
+{ Type arrowResult = null; Token ar=null; Type t; Type t2; List<Type> tList=null; }
 {
  t = NonArrowType()
  (<MULT> t2 = NonArrowType() {
@@ -664,7 +704,7 @@ Type Type() :
    }
    tList.add(t2);
  })*
- (<TARROW> arrowResult = Type() )? {
+ ((ar=<TARROW> | ar=<EQARROW>) arrowResult = Type() )? {
 
     if (arrowResult == null) {
         return t;
@@ -673,7 +713,8 @@ Type Type() :
             tList = new LinkedList<Type>();
             tList.add(t);
         }
-        return build.arrowType(tList, arrowResult);
+        boolean resourceArrow = (ar.kind == TARROW);
+        return build.arrowType(tList, arrowResult, resourceArrow);
     }
  }
 }
@@ -773,7 +814,7 @@ AST PrimaryExpression(ExpFlags flags) :
     return exp;
   }
 |
-  t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <ARROW>] {
+  t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW>] {
     String self = (selfName == null) ? null : selfName.image;
     exp = build.newObj(loc(t), self);
     
