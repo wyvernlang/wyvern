@@ -1,4 +1,0 @@
-module def wavyUnderlineV3(logger : illustrations.Logger)
-
-def underlineIt() : system.Int
-	logger.log(4)

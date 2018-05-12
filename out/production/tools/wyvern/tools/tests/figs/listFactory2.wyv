@@ -1,5 +1,0 @@
-module listFactory
-
-type List = Int
-
-def create():List = 5

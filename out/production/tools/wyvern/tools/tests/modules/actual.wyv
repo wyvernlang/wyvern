@@ -1,3 +1,0 @@
-module def actual() : modules.Formal
-
-def f():Int = 5

@@ -1,8 +1,0 @@
-module listFactory
-
-type List
-	val contents : Int
-
-def create():List
-	new
-		val contents = 5

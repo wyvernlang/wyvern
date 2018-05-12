@@ -1,4 +1,0 @@
-// Dummy.wyt
-import effects.network10Effects // a pure module in the effects directory
-resource type Dummy
-    def nop(): Int
