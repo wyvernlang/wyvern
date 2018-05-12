@@ -143,6 +143,10 @@ public class StructuralType extends ValueType {
             }
         }
 
+        if (t instanceof BottomType) {
+            return false;
+        }
+
         if (!(t instanceof StructuralType)) {
             reason.setReason("cannot look up structural type for " + t.desugar(ctx));
             return false;

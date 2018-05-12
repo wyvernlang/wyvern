@@ -34,6 +34,7 @@ import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.VarGenContext;
 import wyvern.target.corewyvernIL.type.DynamicType;
+import wyvern.target.corewyvernIL.type.BottomType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -123,6 +124,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Character", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Boolean", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Nothing", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Dyn", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
@@ -142,6 +144,7 @@ public final class Globals {
         boolDeclTypes.add(new DefDeclType("ifTrue", new DynamicType(), ifTrueArgs));
         boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
+        boolDeclTypes.add(new DefDeclType("!", Util.booleanType(), Arrays.asList()));
         // construct a type for the system object
         List<DeclType> declTypes = new LinkedList<DeclType>();
         List<DeclType> intDeclTypes = new LinkedList<DeclType>();
@@ -180,6 +183,7 @@ public final class Globals {
         ValueType charType = new StructuralType("charSelf", charDeclTypes);
         declTypes.add(new ConcreteTypeMember("Character", charType));
 
+        declTypes.add(new ConcreteTypeMember("Nothing", new BottomType()));
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
         ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType());
         declTypes.add(new TaggedTypeMember("Platform", platformType));
@@ -229,6 +233,7 @@ public final class Globals {
         decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Nothing", new BottomType(), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));

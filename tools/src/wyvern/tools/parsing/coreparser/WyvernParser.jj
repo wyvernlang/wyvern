@@ -162,6 +162,7 @@ TOKEN : /* Symbols */
 | <RBRACE>
 | <BOOLEANAND>
 | <BOOLEANOR>
+| <BOOLEANNOT>
 //| <>
 }
 
@@ -181,6 +182,8 @@ AST CompilationUnit() :
   /*ImportDecls(imports)*/ exp=ModuleDecl(imports) { return exp; }
 |
   exp = Script(imports, requires)  { return exp; }
+|
+  /* nothing */ { return build.unitValue(null); }
 }
 
 /** Root production. */
@@ -809,6 +812,10 @@ AST UnaryExpression(ExpFlags flags) :
 |
   t=<DASH> exp = UnaryExpression(flags) {
     return build.invocation(exp, "negate", build.unitValue(loc(t)), loc(t));
+  }
+|
+  t=<BOOLEANNOT> exp = UnaryExpression(flags) {
+    return build.invocation(exp, "!", build.unitValue(loc(t)), loc(t));
   }
 |
   exp = PrimaryExpression(flags) { return exp; }

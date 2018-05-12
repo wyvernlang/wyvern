@@ -216,6 +216,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
     terminal Token booleanand_t ::= /&&/ {: RESULT = token(BOOLEANAND,lexeme); :};
     terminal Token booleanor_t ::= /\|\|/ {: RESULT = token(BOOLEANOR,lexeme); :};
+    terminal Token booleannot_t ::= /!/ {: RESULT = token(BOOLEANNOT,lexeme); :};
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
@@ -350,6 +351,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
                | equalsequals_t:t {: RESULT = t; :}
                | booleanand_t:t {: RESULT = t; :}
                | booleanor_t:t {: RESULT = t; :}
+               | booleannot_t:t {: RESULT = t; :}
 	           ;
 
 	anyLineElement ::= whitespace_t:n {: RESULT = LexerUtils.makeList(n); :}

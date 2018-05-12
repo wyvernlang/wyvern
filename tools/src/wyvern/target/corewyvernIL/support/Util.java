@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.type.BottomType;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -23,6 +24,7 @@ public final class Util {
     private static ValueType theStringType = new NominalType("system", "String");
     private static ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
     private static ValueType theDynType = new DynamicType();
+    private static ValueType theBottomType = new BottomType();
 
     public static ValueType booleanType() {
         return theBooleanType;
@@ -44,6 +46,9 @@ public final class Util {
     }
     public static ValueType dynType() {
         return theDynType;
+    }
+    public static ValueType bottomType() {
+        return theBottomType;
     }
     public static ValueType unitToDynType() {
         LinkedList<DeclType> arrowDecls = new LinkedList<>();

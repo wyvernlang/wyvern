@@ -24,7 +24,7 @@ public enum ErrorMessage {
     OPERATOR_DOES_NOT_APPLY2("Operator %ARG cannot be applied to types %ARG and %ARG", 3),
     MUST_BE_LITERAL_CLASS("The Name %ARG must refer to a class declaration currently in scope", 1),
     NOT_SUBTYPE("%ARG is not a subtype of %ARG; %ARG", 3),
-    ASSIGNMENT_SUBTYPING("The assigned value's type %ARG is not a subtype of the left-hand side type $ARG of this assignment; %ARG", 3),
+    ASSIGNMENT_SUBTYPING("The assigned value's type %ARG is not a subtype of the left-hand side type %ARG of this assignment; %ARG", 3),
     DUPLICATE_MEMBER("%ARG has more than one member named %ARG", 2),
     EXPECTED_RECORD_TYPE("Expected a type with members", 0),
     NO_SUCH_TYPE_MEMBER("No such type member: %ARG", 1),

@@ -674,6 +674,11 @@ public class ILTests {
         TestUtil.doTestScriptModularlyFailing("bugs.a", ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA);
     }
 
+    @Test
+    public void testAdditionRegression() throws ParseException {
+        TestUtil.doTestScriptModularly("bugs.issue162",  Util.intType(), new IntegerLiteral(4));
+    }
+
     // @Test
     // public void testTSLIndentation() throws ParseException {
     //     doTestScriptModularly("tsls.indentationTest", Util.intType(), new IntegerLiteral(5));
@@ -695,6 +700,12 @@ public class ILTests {
         // IL generation doesn't work yet!
         wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);*/
         TestUtil.doTest(input, null, null);
+    }
+
+    @Test
+    public void testEmpty() throws ParseException {
+        String input = "";
+        TestUtil.doTest(input, Util.unitType(), Util.unitValue());
     }
 
     @Test
