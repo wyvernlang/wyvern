@@ -32,6 +32,7 @@ import wyvern.tools.types.Type;
 public class TypeVarDecl extends Declaration {
     private final String name;
     private final TypeDeclaration body;
+    private final DeclSequence bodyOriginal;
     private final FileLocation fileLocation;
     private final TypedAST metadata;
     private TaggedInfo taggedInfo = null;
@@ -44,6 +45,7 @@ public class TypeVarDecl extends Declaration {
             TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName) {
         this.metadata = metadata;
         this.name = name;
+        this.bodyOriginal = body;
         this.body = new TypeDeclaration(name, body, taggedInfo, fileLocation);
         this.fileLocation = fileLocation;
         this.taggedInfo = taggedInfo;
@@ -64,6 +66,10 @@ public class TypeVarDecl extends Declaration {
     @Override
     public FileLocation getLocation() {
         return fileLocation;
+    }
+
+    public DeclSequence getBody() {
+        return bodyOriginal;
     }
 
     /*@Override

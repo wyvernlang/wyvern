@@ -76,11 +76,27 @@ public class CoreParserTests {
     public void testDatatypeDecl() throws ParseException {
         String input = ""
                 + "datatype Exp\n"
-                + "    Var(name: String)\n"
+                + "    Var(name: Int)\n"
                 + "    Apply(fn: Exp, arg: Exp)\n"
-                + "    Lambda(param: String, body: Exp)\n"
+                + "    Lambda(param: String, body: Int)\n"
                 + "    Unit\n"
-                + "5\n";
+                // + "tagged type Exp2 comprises Var, Apply, Lambda\n"
+
+                + "val v : Var = new\n"
+                + "    var name : Int = 5\n"
+
+                + "val k : Lambda = new\n"
+                + "    var param : String = 'abc'\n"
+                + "    var body : Int = 4\n"
+
+                //+ "val v3 : Exp = Var(4)\n"   this currently doesn't work
+
+                + "val e : Exp = v\n"
+                + "val result = match e:\n"
+                + "    v2 : Var => v2.name\n"
+                + "    k : Lambda => k.body\n"
+                + "result\n";
+
         TestUtil.doTestInt(input, 5);
     }
 
@@ -92,6 +108,7 @@ public class CoreParserTests {
                 + "    Blue\n"
                 + "    Green\n"
                 + "    Yellow\n"
+                //+ "val a : Red = new\n"
                 + "5\n";
         TestUtil.doTestInt(input, 5);
     }
