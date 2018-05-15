@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -27,11 +28,19 @@ public final class ILFactory {
     public Variable variable(String varName) {
         return new Variable(varName);
     }
+    public StringLiteral string(String value) {
+        return new StringLiteral(value);
+    }
     public Cast cast(IExpr expr, ValueType type) {
         return new Cast(expr, type);
     }
     public MethodCall call(IExpr receiver, String name, List<IExpr> args) {
         return new MethodCall(receiver, name, args, receiver);
+    }
+    /** Note: the module must have already been loaded; this does not load the module, only mentions an already loaded module */
+    public Variable module(String qualifiedModuleName) {
+        String internalName = ModuleResolver.getLocal().resolveModule(qualifiedModuleName).getSpec().getInternalName();
+        return new Variable(internalName);
     }
     public New newObject(NamedDeclaration decl) {
         return new New(decl);

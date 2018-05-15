@@ -21,6 +21,7 @@ interface ASTBuilder<AST, Type> {
 
     AST delegateDecl(Type type, AST exp, FileLocation loc);
     AST effectDecl(String name, String effects, FileLocation loc);
+    AST assertion(String description, AST exp, FileLocation loc);
 
 
     AST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc, String effects);

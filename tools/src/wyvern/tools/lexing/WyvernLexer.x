@@ -157,6 +157,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
 	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
+	terminal Token assertKwd_t 	::= /assert/ in (keywds) {: RESULT = token(ASSERT,lexeme); :};
 	terminal Token delegateKwd_t::= /delegate/ in (keywds) {: RESULT = token(DELEGATE,lexeme); :};
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
@@ -302,6 +303,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | valKwd_t:t {: RESULT = t; :}
 	       | defKwd_t:t {: RESULT = t; :}
 	       | varKwd_t:t {: RESULT = t; :}
+	       | assertKwd_t:t {: RESULT = t; :}
 	       | delegateKwd_t:t {: RESULT = t; :}
 	       | toKwd_t:t {: RESULT = t; :}
 //	       | fnKwd_t:t {: RESULT = t; :}
