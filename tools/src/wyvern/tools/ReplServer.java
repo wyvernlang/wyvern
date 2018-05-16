@@ -41,12 +41,7 @@ public class ReplServer {
 	        	isr.close();
 	        	
 	        	String response = "";
-	        	//  saving body of post request into file to use in interpreter
 	        	if (t.getRequestMethod().equals("POST")){
-//	        		PrintWriter out = new PrintWriter("code.wyv");
-//	        		out.println(buf.toString());
-//	        		System.out.println(buf.toString());
-//	        		out.close();
 	        		
 	        		System.out.println("PROGRAM START");
 	        		System.out.println(buf.toString());
@@ -58,7 +53,7 @@ public class ReplServer {
                     } catch (ParseException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
-                    } // "C:\\Users\\dinht\\git\\wyvern489\\tools\\code.wyv");
+                    }
 	        		response = v.toString();
 	        	}
 	        	

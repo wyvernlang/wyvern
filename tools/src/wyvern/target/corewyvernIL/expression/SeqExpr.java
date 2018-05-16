@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.support.EmptyValContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -163,19 +164,13 @@ public class SeqExpr extends Expression {
                 VarBinding binding = (VarBinding) elem;
                 extendedCtx = binding.interpret(extendedCtx);
                 // TODO: return unit
-                System.out.println("var");
                 result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
-                System.out.println("There is already a val with the name : " + binding.getVarName());
             } else if (elem instanceof Expression) {
-                System.out.println("exp");
                 result = ((Expression) elem).interpret(extendedCtx);
             } else {
                 throw new RuntimeException("invariant broken");
             }
         }
-//        System.out.println("================================");
-//        System.out.println(result);
-//        System.out.println("================================");
         return new Pair<Value, EvalContext>(result, extendedCtx);
     }
 
