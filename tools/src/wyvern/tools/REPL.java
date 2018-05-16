@@ -67,11 +67,26 @@ public class REPL {
 	public static Value interepetProgram(String input) throws ParseException {
 	    String lines[] = input.split("\\r?\\n");
 	    Value currentResult = null;
-	    for (String s: lines){
-	        if(!(s.length()==0)) { //does not run code on empty lines
-	            System.out.println("STARTED PROCESSING: " + s);
-	            currentResult = parseVar(s + "\n");
-	            System.out.println("FINISHED PROCESSING: " + s);
+	    for (String s: lines) {
+	        if (!(s.length()==0)) { //does not run code on empty lines
+	            if (s.split(" ").length == 1 && programContext != null) { //assuming when user enters 1 word it refers to a val
+	                Value result = programContext.lookupValue(s);
+	                return result;
+	            } else {
+	                String[] line = s.split(" ");
+	                if (line[0].equals("val") && programContext != null ) { // programContext is not empty, and expression is a variable declaration
+	                    System.out.println("got here");
+	                    Value result = programContext.lookupValue(line[1]); // checks if there is an already existing variable in the context with the same name.
+	                    if (result == null) {
+	                        System.out.println("there was not variable named that");
+	                    }
+	                } else if (line[0].equals("var") && programContext != null) {
+	                    System.out.println("shouldnt be here");
+	                }
+	                System.out.println("STARTED PROCESSING: " + s);
+                    currentResult = parseVar(s + "\n");
+                    System.out.println("FINISHED PROCESSING: " + s);
+	            }
 	        }
 	    }
 	    return currentResult;
@@ -95,23 +110,17 @@ public class REPL {
             System.out.println(result.getFirst());
             return result.getFirst();
 	    }else {
+	       
 	        ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
 	        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                    new File(BASE_PATH),
-                    new File(LIB_PATH)));
-            final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-            IExpr program =  ast.generateIL(genCtx, null, dependencies);
-            program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
-	        
-	        if (ast instanceof VarBinding) {
-                System.out.println("varbinding");
-            } else if (ast instanceof Expression) {
-                System.out.println("expression");
-            }
-	        
+	                new File(BASE_PATH),
+	                new File(LIB_PATH)));
+	        final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
+	        IExpr program =  ast.generateIL(genCtx, null, dependencies);
+	        program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
-	        programContext = result.getSecond();
+            programContext = result.getSecond();
 	        System.out.println(programContext);
 	        //System.out.println(result.getFirst());
 	        return result.getFirst();
