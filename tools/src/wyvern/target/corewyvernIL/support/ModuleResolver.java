@@ -337,7 +337,7 @@ public class ModuleResolver {
         for (TypedModuleSpec spec : dependencies) {
             final String internalName = spec.getInternalName();
             if (!ctx.isPresent(internalName, true)) {
-                ctx = ctx.extend(internalName, spec.getType());
+                ctx = ctx.extend(spec.getSite(), spec.getType());
             }
         }
         return ctx;

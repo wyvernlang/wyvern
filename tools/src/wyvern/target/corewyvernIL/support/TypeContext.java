@@ -1,11 +1,12 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class TypeContext {
-    public TypeContext extend(String var, ValueType type) {
-        return new VarBindingContext(var, type, this);
+    public TypeContext extend(BindingSite binding, ValueType type) {
+        return new VarBindingContext(binding, type, this);
     }
 
     public boolean isAssumedSubtype(ValueType t1, ValueType t2) {

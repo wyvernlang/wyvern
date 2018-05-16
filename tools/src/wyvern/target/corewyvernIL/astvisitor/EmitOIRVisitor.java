@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
@@ -107,7 +108,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 
         // Add the object to the context.
         TypeContext ctx = state.getContext();
-        ctx = ctx.extend(newExpr.getSelfName(), newExpr.typeCheck(state.getContext(), null));
+        ctx = ctx.extend(newExpr.getSelfSite(), newExpr.typeCheck(state.getContext(), null));
 
         // Process each declaration.
         for (Declaration decl : newExpr.getDecls()) {
@@ -210,7 +211,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
     }
 
     public OIRAST visit(EmitOIRState state, Let let) {
-        TypeContext ctx = state.getContext().extend(let.getVarName(), let.getVarType());
+        TypeContext ctx = state.getContext().extend(let.getSite(), let.getVarType());
         IExpr toReplace = let.getToReplace();
         OIRExpression oirToReplace = (OIRExpression) toReplace.acceptVisitor(this,
                 new EmitOIRState(ctx, state.getEnvironment()));
@@ -267,7 +268,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
             OIRFormalArg formalArg = (OIRFormalArg) arg.acceptVisitor(this,
                     new EmitOIRState(state.getContext(), state.getEnvironment()));
             defEnv.addName(formalArg.getName(), formalArg.getType());
-            defCxt = defCxt.extend(formalArg.getName(), arg.getType());
+            defCxt = defCxt.extend(formalArg.getSite(), arg.getType());
             listOIRFormalArgs.add(formalArg);
         }
 
@@ -308,7 +309,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
     }
 
     public OIRAST visit(EmitOIRState state, FormalArg formalArg) {
-        OIRFormalArg oirarg = new OIRFormalArg(formalArg.getName(), null);
+        OIRFormalArg oirarg = new OIRFormalArg(formalArg.getSite(), null);
         oirarg.copyMetadata(formalArg);
         return oirarg;
     }
@@ -522,17 +523,20 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
             IExpr expr = null;
             String varName = null;
             ValueType varType = null;
+            BindingSite site = null;
             if (hl instanceof IExpr) {
                 expr = (IExpr) hl;
                 varName = GenContext.generateName();
+                site = new BindingSite(varName);
                 varType = expr.typeCheck(ctx, null);
             } else {
                 VarBinding vb = (VarBinding) hl;
                 expr = vb.getExpression();
                 varName = vb.getVarName();
+                site = vb.getSite();
                 varType = vb.getType();
             }
-            ctx = ctx.extend(varName, varType);
+            ctx = ctx.extend(site, varType);
             OIRExpression newExpr = (OIRExpression) expr.acceptVisitor(this, new EmitOIRState(ctx, state.getEnvironment()));
             state.getEnvironment().addName(varName, null);
 

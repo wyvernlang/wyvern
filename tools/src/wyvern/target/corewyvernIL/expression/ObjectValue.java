@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -22,13 +23,13 @@ public class ObjectValue extends New implements Invokable {
     /** Precondition: the decls argument must be unique.
      * It is owned by this ObjectValue after the constructor call.
      */
-    public ObjectValue(List<Declaration> decls, String selfName, ValueType exprType, DelegateDeclaration delegateDecl, FileLocation loc, EvalContext ctx) {
-        super(decls, selfName, exprType, loc);
+    public ObjectValue(List<Declaration> decls, BindingSite selfSite, ValueType exprType, DelegateDeclaration delegateDecl, FileLocation loc, EvalContext ctx) {
+        super(decls, selfSite, exprType, loc);
 
-        if (selfName == null || selfName.length() == 0) {
+        if (selfSite == null) {
             throw new RuntimeException("selfName invariant violated");
         }
-        evalCtx = ctx.extend(selfName, this);
+        evalCtx = ctx.extend(selfSite, this);
         hasDelegate = (delegateDecl != null);
         if (hasDelegate) {
             delegateTarget = (ObjectValue) ctx.lookupValue(delegateDecl.getFieldName());

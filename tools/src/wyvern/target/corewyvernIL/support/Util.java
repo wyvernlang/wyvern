@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.support;
 
 import java.util.LinkedList;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -59,7 +60,7 @@ public final class Util {
         return new NominalType("list", "List");
     }
     public static ObjectValue unitValue() {
-        return new ObjectValue(new LinkedList<Declaration>(), "unitSelf", theUnitType, null, null, EvalContext.empty());
+        return new ObjectValue(new LinkedList<Declaration>(), new BindingSite("unitSelf"), theUnitType, null, null, EvalContext.empty());
     }
     public static final String APPLY_NAME = "apply";
 

@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
@@ -94,5 +95,9 @@ public class Let extends Expression {
         //freeVars.addAll(getToReplace().getFreeVariables());
         binding.modFreeVars(freeVars);
         return freeVars;
+    }
+
+    public BindingSite getSite() {
+        return binding.getSite();
     }
 }

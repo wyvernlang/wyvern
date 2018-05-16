@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
@@ -238,7 +239,7 @@ public final class Globals {
         decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
-        ObjectValue systemVal = new ObjectValue(decls, "this", getSystemType(), null, null, EvalContext.empty());
+        ObjectValue systemVal = new ObjectValue(decls, new BindingSite("this"), getSystemType(), null, null, EvalContext.empty());
         return systemVal;
     }
 }

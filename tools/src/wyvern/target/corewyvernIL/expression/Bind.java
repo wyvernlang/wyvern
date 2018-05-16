@@ -63,7 +63,7 @@ public class Bind extends Expression {
             if (!t.isSubtypeOf(vb.getType(), ctx, r)) {
                 reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), vb.getType().toString(), r.getReason());
             }
-            bodyCtx = bodyCtx.extend(vb.getVarName(), vb.getType());
+            bodyCtx = bodyCtx.extend(vb.getSite(), vb.getType());
         }
         this.setExprType(inExpr.typeCheck(bodyCtx, effectAccumulator));
         return getType();

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
@@ -27,7 +28,7 @@ import wyvern.tools.errors.ToolError;
 
 public class New extends Expression {
     private List<? extends Declaration> decls;
-    private String selfName;
+    private BindingSite selfSite;
     private boolean hasDelegate;
     private DelegateDeclaration delegateDeclaration;
 
@@ -50,9 +51,12 @@ public class New extends Expression {
     }
 
     public New(List<? extends Declaration> decls, String selfName, ValueType type, FileLocation loc) {
+        this(decls, new BindingSite(selfName), type, loc);
+    }
+    public New(List<? extends Declaration> decls, BindingSite selfSite, ValueType type, FileLocation loc) {
         super(type, loc);
         this.decls = decls;
-        this.selfName = selfName;
+        this.selfSite = selfSite;
         for (Declaration d : decls) {
             if (d == null) {
                 throw new NullPointerException();
@@ -73,12 +77,16 @@ public class New extends Expression {
     }
 
     public String getSelfName() {
-        return selfName;
+        return selfSite.getName();
+    }
+
+    public BindingSite getSelfSite() {
+        return selfSite;
     }
 
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-        dest.append("new ").append(selfName).append(" : ");
+        dest.append("new ").append(getSelfName()).append(" : ");
         getType().doPrettyPrint(dest, indent + "  ");
         dest.append(" =>\n");
 
@@ -107,7 +115,7 @@ public class New extends Expression {
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         List<DeclType> dts = new LinkedList<DeclType>();
 
-        TypeContext thisCtx = ctx.extend(selfName, getType());
+        TypeContext thisCtx = ctx.extend(selfSite, getType());
 
         boolean isResource = false;
         for (Declaration d : declsExceptDelegate()) {
@@ -133,7 +141,7 @@ public class New extends Expression {
 
         // check that everything in the claimed structural type was accounted for
         StructuralType requiredT = type.getStructuralType(ctx);
-        StructuralType actualT = new StructuralType(selfName, dts);
+        StructuralType actualT = new StructuralType(selfSite, dts);
         FailureReason r = new FailureReason();
         if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName(), r.getReason());
@@ -141,7 +149,7 @@ public class New extends Expression {
 
         if (isResource && !requiredT.isResource(GenContext.empty())) {
             if (type instanceof StructuralType) {
-                type = new StructuralType(selfName, dts, isResource);
+                type = new StructuralType(selfSite, dts, isResource);
                 this.setExprType(type);
             } else {
                 // can't update the type
@@ -162,7 +170,7 @@ public class New extends Expression {
         Declaration newD = d.interpret(ctx);
         ds.add(newD);
         }
-        result = new ObjectValue(ds, selfName, getType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
+        result = new ObjectValue(ds, selfSite, getType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
 
         return result;
     }
@@ -180,7 +188,7 @@ public class New extends Expression {
         for (Declaration decl : decls) {
             freeVars.addAll(decl.getFreeVariables());
         }
-        freeVars.remove(selfName);
+        freeVars.remove(getSelfName());
         return freeVars;
     }
 

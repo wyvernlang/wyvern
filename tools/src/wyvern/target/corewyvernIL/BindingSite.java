@@ -6,6 +6,10 @@ public class BindingSite {
     private int index;
 
     public BindingSite(String name) {
+        if (name == null || name.length() == 0) {
+            throw new RuntimeException("bindinb name invariant violated");
+        }
+
         index = globalIndex++;
         this.name = name;
     }
@@ -13,5 +17,9 @@ public class BindingSite {
     @Override
     public String toString() {
         return name + '_' + index;
+    }
+
+    public String getName() {
+        return name;
     }
 }

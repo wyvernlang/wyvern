@@ -5,7 +5,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.NominalType;
 
 public class Case extends ASTNode {
-    private String varName;
+    private BindingSite site;
     private NominalType pattern;
     private Expression body;
 
@@ -13,7 +13,7 @@ public class Case extends ASTNode {
         super();
         this.pattern = pattern;
         this.body = body;
-        this.varName = varName;
+        this.site = new BindingSite(varName);
     }
     public NominalType getPattern() {
         return pattern;
@@ -22,7 +22,10 @@ public class Case extends ASTNode {
         return body;
     }
     public String getVarName() {
-        return varName;
+        return site.getName();
+    }
+    public BindingSite getSite() {
+        return site;
     }
     @Override
     public <S, T> T acceptVisitor(ASTVisitor<S, T> visitor, S state) {
