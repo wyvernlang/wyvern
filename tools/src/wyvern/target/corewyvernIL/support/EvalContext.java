@@ -5,13 +5,8 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class EvalContext extends TypeContext {
-    public EvalContext extend(String var, Value v) {
-        return new VarEvalContext(var, v, this);
-    }
-
     public EvalContext extend(BindingSite site, Value v) {
-        // TODO: fix me
-        return new VarEvalContext(site.getName(), v, this);
+        return new VarEvalContext(site, v, this);
     }
 
     @Override

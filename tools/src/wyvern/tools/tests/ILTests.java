@@ -73,7 +73,7 @@ public class ILTests {
         Expression letExpr = new Let(new VarBinding("x", Util.intType(), new IntegerLiteral(5)), new Variable("y"));
         ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext().extend(ySite, Util.intType()), null);
         Assert.assertEquals(Util.intType(), t);
-        Value v = letExpr.interpret(EvalContext.empty().extend("y", six));
+        Value v = letExpr.interpret(EvalContext.empty().extend(ySite, six));
         Assert.assertEquals(six, v);
     }
 

@@ -51,6 +51,7 @@ public final class Globals {
     public static final boolean checkRuntimeTypes = false;
     private static final Set<String> javaWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
+    private static final BindingSite system = new BindingSite("system");
     private static SeqExpr prelude = null;
     private static Module preludeModule = null;
 
@@ -137,6 +138,10 @@ public final class Globals {
         return newCtx;
     }
 
+    public static BindingSite getSystemSite() {
+        return system;
+    }
+
     private static ValueType getSystemType() {
         List<FormalArg> ifTrueArgs = Arrays.asList(
                 new FormalArg("trueBranch", Util.unitToDynType()),
@@ -218,7 +223,7 @@ public final class Globals {
 
     public static EvalContext getStandardEvalContext() {
         EvalContext ctx = EvalContext.empty();
-        ctx = ctx.extend("system", Globals.getSystemValue());
+        ctx = ctx.extend(system, Globals.getSystemValue());
         SeqExpr sexpr = prelude;
         if (sexpr != null) {
             ctx = sexpr.interpretCtx(ctx).getSecond();

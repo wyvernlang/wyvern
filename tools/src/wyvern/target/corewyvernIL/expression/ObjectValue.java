@@ -54,7 +54,7 @@ public class ObjectValue extends New implements Invokable {
                         + "but " + dd.getFormalArgs().size() + " were expected");
             }
             for (int i = 0; i < args.size(); ++i) {
-                methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getName(), args.get(i));
+                methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getSite(), args.get(i));
             }
             return dd.getBody().interpret(methodCtx);
         } else if (hasDelegate) {

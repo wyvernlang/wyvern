@@ -91,7 +91,7 @@ public class Bind extends Expression {
     public Value interpret(EvalContext ctx) {
         EvalContext evalCtx = ctx;
         for (VarBinding vb : bindings) {
-            evalCtx = evalCtx.extend(vb.getVarName(), vb.getExpression().interpret(ctx));
+            evalCtx = evalCtx.extend(vb.getSite(), vb.getExpression().interpret(ctx));
         }
         return inExpr.interpret(evalCtx);
     }

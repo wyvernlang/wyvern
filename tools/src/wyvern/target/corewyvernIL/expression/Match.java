@@ -97,14 +97,13 @@ public class Match extends Expression {
                 matchedCase = c;
             }
         }
-        FailureReason r = new FailureReason();
         if (matchedCase == null && elseExpr == null) {
             ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchValue.toString());
         }
         if (matchedCase == null) {
             return elseExpr.interpret(ctx);
         } else {
-            ctx = ctx.extend(matchedCase.getVarName(), matchValue);
+            ctx = ctx.extend(matchedCase.getSite(), matchValue);
             Expression caseBody = matchedCase.getBody();
             return caseBody.interpret(ctx);
         }

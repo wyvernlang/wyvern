@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
@@ -121,8 +122,9 @@ public class ModuleResolver {
             String simpleName = names[names.length - 1];
             Module module = resolveModule(qualifiedName);
             final Value moduleValue = module.getExpression().interpret(ctx);
-            ctx = ctx.extend(simpleName, moduleValue);
-            ctx = ctx.extend(module.getSpec().getInternalName(), moduleValue);
+            BindingSite simpleBinding = new BindingSite(simpleName);
+            ctx = ctx.extend(simpleBinding, moduleValue);
+            ctx = ctx.extend(module.getSpec().getSite(), moduleValue);
         }
         return ctx;
     }
@@ -394,7 +396,7 @@ public class ModuleResolver {
             Module m = resolveModule(spec.getQualifiedName());
             Value v = m.getAsValue(ctx);
             String internalName = m.getSpec().getInternalName();
-            ctx = ctx.extend(internalName, v);
+            ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(internalName, type, v /*m.getExpression()*/, true);
         }

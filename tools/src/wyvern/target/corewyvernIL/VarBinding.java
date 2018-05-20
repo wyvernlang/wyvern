@@ -69,7 +69,7 @@ public class VarBinding implements HasLocation {
 
     public EvalContext interpret(EvalContext ctx) {
         Value v = expr.interpret(ctx);
-        return ctx.extend(getVarName(), v);
+        return ctx.extend(getSite(), v);
     }
 
     @Override
