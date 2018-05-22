@@ -66,8 +66,8 @@ public class ModuleDeclaration extends DefDeclaration {
         ModuleResolver resolver = InterpreterState.getLocalThreadInterpreter().getResolver();
         for (Pair<ImportDeclaration, ValueType> pair: dependencies) {
             Module module = resolver.resolveModule(pair.getFirst().getUri().getSchemeSpecificPart());
-            String internalName = module.getSpec().getInternalName();
-            thisCtx = thisCtx.extend(internalName, pair.getSecond());
+            //String internalName = module.getSpec().getInternalName();
+            thisCtx = thisCtx.extend(module.getSpec().getSite(), pair.getSecond());
         }
         return super.typeCheck(ctx, thisCtx);
     }

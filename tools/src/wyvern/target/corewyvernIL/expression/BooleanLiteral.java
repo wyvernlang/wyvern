@@ -108,6 +108,8 @@ public class BooleanLiteral extends Literal implements Invokable {
             return new BooleanLiteral(this.value && ((BooleanLiteral) args.get(0)).value);
         case "||":
             return new BooleanLiteral(this.value || ((BooleanLiteral) args.get(0)).value);
+        case "!":
+            return new BooleanLiteral(!this.value);
         default: throw new RuntimeException();
         }
     }

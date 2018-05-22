@@ -1,5 +1,7 @@
 package wyvern.target.corewyvernIL.modules;
 
+import wyvern.target.corewyvernIL.BindingSite;
+
 public class ModuleSpec {
     @Override
     public int hashCode() {
@@ -34,9 +36,15 @@ public class ModuleSpec {
     private static final String INTERNAL_MODULE_PREFIX = "MOD$";
 
     private final String qualifiedName;
+    private final BindingSite site;
 
     public ModuleSpec(String qualifiedName) {
         this.qualifiedName = qualifiedName;
+        this.site = new BindingSite(getInternalName());
+    }
+
+    public BindingSite getSite() {
+        return site;
     }
 
     public String getQualifiedName() {

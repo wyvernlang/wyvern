@@ -33,6 +33,10 @@ public final class GenUtil {
             return Util.dynType();
         }
 
+        if (javaClass.getName().equals("wyvern.stdlib.support.WyvernNothing")) {
+            return Util.bottomType();
+        }
+
         // TODO: might be unnecessary
         if (javaClass.getName().equals("java.lang.Object")) {
             return Util.dynType();

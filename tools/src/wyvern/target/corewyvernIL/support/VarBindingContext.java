@@ -1,21 +1,22 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarBindingContext extends TypeContext {
     private TypeContext previous;
-    private String varName;
+    private BindingSite binding;
     private ValueType type;
 
-    public VarBindingContext(String var, ValueType type, TypeContext typeContext) {
-        varName = var;
+    public VarBindingContext(BindingSite binding, ValueType type, TypeContext typeContext) {
+        this.binding = binding;
         this.type = type;
         previous = typeContext;
     }
 
     @Override
     public boolean isPresent(String varName, boolean isValue) {
-        if (isValue && this.varName.equals(varName)) {
+        if (isValue && this.binding.getName().equals(varName)) {
             return true;
         } else {
             return super.isPresent(varName, isValue);
@@ -24,7 +25,7 @@ public class VarBindingContext extends TypeContext {
 
     @Override
     public ValueType lookupTypeOf(String varName) {
-        if (varName.equals(this.varName)) {
+        if (varName.equals(this.binding.getName())) {
             return type;
         } else {
             return previous.lookupTypeOf(varName);
@@ -43,6 +44,6 @@ public class VarBindingContext extends TypeContext {
 
     @Override
     protected String endToString() {
-        return varName + " : " + type + ", " + getNext().endToString();
+        return binding.toString() + " : " + type + ", " + getNext().endToString();
     }
 }

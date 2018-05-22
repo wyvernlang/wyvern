@@ -18,11 +18,13 @@ import wyvern.tools.errors.HasLocation;
 
 public class VarBinding implements HasLocation {
     private String varName;
+    private BindingSite site;
     private ValueType type;
     private IExpr expr;
 
     public VarBinding(String varName, ValueType type, IExpr toReplace) {
         this.varName = varName;
+        this.site = new BindingSite(varName);
         this.type = type;
         this.expr = toReplace;
         if (toReplace == null) {
@@ -32,6 +34,10 @@ public class VarBinding implements HasLocation {
 
     public String getVarName() {
         return varName;
+    }
+
+    public BindingSite getSite() {
+        return site;
     }
 
     public ValueType getType() {
@@ -49,7 +55,7 @@ public class VarBinding implements HasLocation {
             //t.isSubtypeOf(type, ctx); // for debugging
             reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), type.toString(), r.getReason());
         }
-        final TypeContext extendedCtx = ctx.extend(getVarName(), type);
+        final TypeContext extendedCtx = ctx.extend(getSite(), type);
         return extendedCtx;
     }
 
@@ -63,7 +69,7 @@ public class VarBinding implements HasLocation {
 
     public EvalContext interpret(EvalContext ctx) {
         Value v = expr.interpret(ctx);
-        return ctx.extend(getVarName(), v);
+        return ctx.extend(getSite(), v);
     }
 
     @Override
