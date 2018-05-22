@@ -4,3 +4,6 @@ import java:wyvern.stdlib.support.Sys.utils
 
 def assertion(description:String, expression:Boolean):Unit
     utils.assertion(description, expression)
+
+def fail(description:String):Nothing
+    utils.assertionFail(description)

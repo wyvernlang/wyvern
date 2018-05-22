@@ -143,6 +143,9 @@ public class NominalType extends ValueType {
         if (super.isSubtypeOf(t, ctx, new FailureReason())) {
             return true;
         }
+        if (t instanceof BottomType) {
+            return false;
+        }
         if (ctx.isAssumedSubtype(this, t)) {
             return true;
         }

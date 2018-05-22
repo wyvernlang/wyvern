@@ -192,7 +192,7 @@ public class MethodCall extends Expression {
 
             // Ignore non-methods.
             newCtx = ctx;
-            calleeCtx = ctx.extend(receiverType.getSelfName(), receiver);
+            calleeCtx = ctx.extend(receiverType.getSelfSite(), receiver);
             if (!(declType instanceof DefDeclType)) {
                 continue;
             }
@@ -234,8 +234,8 @@ public class MethodCall extends Expression {
                 }
 
                 // Update context and view.
-                newCtx = newCtx.extend(formalArgName, actualArgType);
-                calleeCtx = calleeCtx.extend(formalArgName, actualArgType);
+                newCtx = newCtx.extend(formalArg.getSite(), actualArgType);
+                calleeCtx = calleeCtx.extend(formalArg.getSite(), actualArgType);
                 IExpr e = args.get(i);
                 if (e instanceof Variable) {
                     v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getName()), (Variable) e, v);
@@ -265,10 +265,8 @@ public class MethodCall extends Expression {
 
                 ctx = newCtx;
                 ValueType resultType = defDeclType.getResultType(v);
-                if (objectExpr.isPath()) {
-                    resultType = resultType.adapt(v);
-                } else {
-                    // adaptation for the receiver won't work, so try avoiding "this"
+                if (!objectExpr.isPath()) {
+                    // adaptation for the receiver couldn't have worked, so try avoiding "this"
                     resultType = resultType.avoid(receiverType.getSelfName(), calleeCtx);
                 }
                 for (int i = args.size() - 1; i >= 0; --i) {

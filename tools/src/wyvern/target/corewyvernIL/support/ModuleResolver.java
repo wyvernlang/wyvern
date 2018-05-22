@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
@@ -121,8 +122,9 @@ public class ModuleResolver {
             String simpleName = names[names.length - 1];
             Module module = resolveModule(qualifiedName);
             final Value moduleValue = module.getExpression().interpret(ctx);
-            ctx = ctx.extend(simpleName, moduleValue);
-            ctx = ctx.extend(module.getSpec().getInternalName(), moduleValue);
+            BindingSite simpleBinding = new BindingSite(simpleName);
+            ctx = ctx.extend(simpleBinding, moduleValue);
+            ctx = ctx.extend(module.getSpec().getSite(), moduleValue);
         }
         return ctx;
     }
@@ -337,7 +339,7 @@ public class ModuleResolver {
         for (TypedModuleSpec spec : dependencies) {
             final String internalName = spec.getInternalName();
             if (!ctx.isPresent(internalName, true)) {
-                ctx = ctx.extend(internalName, spec.getType());
+                ctx = ctx.extend(spec.getSite(), spec.getType());
             }
         }
         return ctx;
@@ -354,18 +356,19 @@ public class ModuleResolver {
         return ctx;
     }
 
-    /** Deprecated; the plan is to move all calls to wrapWithCtx, which is
-     * more efficient (linear instead of quadratic).
+    /** Wraps this program with all its dependencies.  Unlike wrapWitCtx, we do not cache values as we add dependencies.
      *
      * @param program
-     * @param dependencies
+     * @param dependencies The modules this program depends on.
+     * Duplicate modules are OK; duplicates will be eliminated, and
+     * dependencies will be sorted, before the program is linked.
+     *
      * @return
      */
-    @Deprecated
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
         SeqExpr seqProg = new SeqExpr();
         seqProg.merge(program);
-        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (TypedModuleSpec spec : noDups) {
             Module m = resolveModule(spec.getQualifiedName());
             //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
@@ -378,43 +381,45 @@ public class ModuleResolver {
      * evaluated to values using the ctx, and the values are cached in
      * order to reduce duplicate evaluation.
      * @param program
-     * @param dependencies The modules this program depends on.  These must
-     * be in order, so that if one module depends on another than the the
-     * second module comes later (i.e. the modules are in reverse order
-     * than they will appear in the linked program).  Duplicate modules are
-     * OK; duplicates will be eliminated before the program is linked.
+     * @param dependencies The modules this program depends on.
+     * Duplicate modules are OK; duplicates will be eliminated, and
+     * dependencies will be sorted, before the program is linked.
      *
-     * @param ctx
+     * @param ctx The evaluation context to use; should include the prelude if it is needed
      * @return
      */
     public SeqExpr wrapWithCtx(IExpr program, List<TypedModuleSpec> dependencies, EvalContext ctx) {
         SeqExpr seqProg = new SeqExpr();
-        LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
+        List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
             Module m = resolveModule(spec.getQualifiedName());
             Value v = m.getAsValue(ctx);
             String internalName = m.getSpec().getInternalName();
-            ctx = ctx.extend(internalName, v);
-            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
+            ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
-            /*ValueType valType = v.getType();
-            if (!type.equals(valType))
-                throw new RuntimeException();
-            type.checkWellFormed(ctx);
-            ((ObjectValue)v).checkWellFormed();*/
             seqProg.addBinding(internalName, type, v /*m.getExpression()*/, true);
         }
         seqProg.merge(program);
         return seqProg;
     }
 
+    /** Constructs an executable SeqExpr consisting of the following:
+     *  - The dependencies of the prelude
+     *  - The prelude itself
+     *  - The dependencies of the main program (with the prelude's dependencies removed)
+     *  - The main program
+     *
+     *  It differs from wrap()/wrapWithCtx() mainly in that it does not turn everything into values,
+     *  which seems to create problems when exporting to Python.
+     */
     public SeqExpr wrapForPython(IExpr program, List<TypedModuleSpec> dependencies) {
         SeqExpr seqProg = new SeqExpr();
+        List<TypedModuleSpec> deps = new ArrayList<TypedModuleSpec>(dependencies);
+
         Module prelude = Globals.getPreludeModule();
         addDeps(seqProg, prelude.getDependencies());
         seqProg.merge(prelude.getExpression());
-        List<TypedModuleSpec> deps = new ArrayList<TypedModuleSpec>(dependencies);
         deps.removeAll(prelude.getDependencies());
         addDeps(seqProg, deps);
         seqProg.merge(program);
@@ -422,9 +427,9 @@ public class ModuleResolver {
     }
 
     /** Does not modify deps.
-     * Adds deduplicated deps to seqProg. */
+     * Adds deduplicated deps to seqProg, in order from last to first. */
     private void addDeps(SeqExpr seqProg, List<TypedModuleSpec> deps) {
-        LinkedList<TypedModuleSpec> noDups = deDuplicate(deps);
+        List<TypedModuleSpec> noDups = sortDependencies(deps);
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
             Module m = resolveModule(spec.getQualifiedName());

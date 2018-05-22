@@ -8,4 +8,8 @@ public class Sys {
             throw new WyvernAssertion(description);
         }
     }
+
+    public WyvernNothing assertionFail(String reason) {
+        throw new WyvernAssertion(reason);
+    }
 }

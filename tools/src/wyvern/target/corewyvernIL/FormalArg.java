@@ -7,22 +7,26 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public class FormalArg extends ASTNode implements IASTNode {
 
-    private String name;
+    private BindingSite site;
     private ValueType type;
 
     public FormalArg(String name, ValueType type) {
-        this.name = name;
+        this.site = new BindingSite(name);
         this.type = type;
     }
 
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-        dest.append(name).append(':');
+        dest.append(site.getName()).append(':');
         type.doPrettyPrint(dest, indent);
     }
 
     public String getName() {
-        return name;
+        return site.getName();
+    }
+
+    public BindingSite getSite() {
+        return site;
     }
 
     public ValueType getType() {

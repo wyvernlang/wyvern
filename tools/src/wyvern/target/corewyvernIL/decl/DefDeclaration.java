@@ -107,7 +107,7 @@ public class DefDeclaration extends NamedDeclaration {
     public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
         TypeContext methodCtx = thisCtx;
         for (FormalArg arg : formalArgs) {
-            methodCtx = methodCtx.extend(arg.getName(), arg.getType());
+            methodCtx = methodCtx.extend(arg.getSite(), arg.getType());
         }
         if (!this.containsResource(methodCtx)) {
             for (String freeVar : this.getFreeVariables()) {

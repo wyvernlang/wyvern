@@ -73,7 +73,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
 
         // Transform all declarations inside the object.
         List<Declaration> newDecls = new LinkedList<>();
-        TypeContext thisCtx = ctx.extend(newExpr.getSelfName(), newExpr.getType());
+        TypeContext thisCtx = ctx.extend(newExpr.getSelfSite(), newExpr.getType());
 
         for (Declaration decl : newExpr.getDecls()) {
             Declaration newDecl = (Declaration) decl.acceptVisitor(this, thisCtx);
@@ -176,7 +176,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
         }
 
         //IExpr toReplace = (IExpr) let.getToReplace().acceptVisitor(this, ctx);
-        TypeContext subCtx = ctx.extend(let.getVarName(), let.getVarType());
+        TypeContext subCtx = ctx.extend(let.getSite(), let.getVarType());
         IExpr inExpr = let.getInExpr();
         inExpr = (IExpr) inExpr.acceptVisitor(this, subCtx);
 
@@ -234,7 +234,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
         // Update context with the arguments.
         TypeContext methodCtx = ctx;
         for (FormalArg farg : defDecl.getFormalArgs()) {
-            methodCtx = methodCtx.extend(farg.getName(), farg.getType());
+            methodCtx = methodCtx.extend(farg.getSite(), farg.getType());
         }
 
         IExpr bodyTransformed = (IExpr) defDecl.getBody().acceptVisitor(this, methodCtx);

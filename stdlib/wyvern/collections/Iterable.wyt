@@ -1,0 +1,8 @@
+import wyvern.collections.Iterator
+
+resource type Iterable
+    type E
+    def iterator():Iterator[this.E]
+    // would it be better to require do(f) and getBuilder(), then use them to implement map?
+    def map[T](f:this.E->T):Iterable[T]
+    def isEmpty():Boolean

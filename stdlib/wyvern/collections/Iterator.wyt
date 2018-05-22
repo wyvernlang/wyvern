@@ -1,0 +1,19 @@
+import wyvern.option
+
+type Option = option.Option
+
+resource type Iterator
+    // predicate Owned
+    // predicate HasNext
+    // predicate Exhausted
+    
+    type E
+    
+    // requires this.Owned
+    // ensures result && this.HasNext || !result && this.Exhausted
+    def hasNext():Boolean
+    
+    // requires this.HasNext
+    // ensures this.Owned
+    def next():this.E // throws NoSuchElement if there are no more elements
+    

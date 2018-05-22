@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -25,7 +26,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.expressions.Fn;
 
 public class StructuralType extends ValueType {
-    private String selfName;
+    private BindingSite selfSite;
     private List<DeclType> declTypes;
     private boolean resourceFlag = false;
 
@@ -34,8 +35,14 @@ public class StructuralType extends ValueType {
     }
 
     public StructuralType(String selfName, List<DeclType> declTypes, boolean resourceFlag) {
+        this(new BindingSite(selfName), declTypes, resourceFlag);
+    }
+    public StructuralType(BindingSite selfSite, List<DeclType> declTypes) {
+        this(selfSite, declTypes, false);
+    }
+    public StructuralType(BindingSite selfSite, List<DeclType> declTypes, boolean resourceFlag) {
         super();
-        this.selfName = selfName;
+        this.selfSite = selfSite;
         // check a sanity condition
         //        if (declTypes != null && declTypes.size()>0)
         //            if (declTypes.get(0) == null)
@@ -67,7 +74,7 @@ public class StructuralType extends ValueType {
 
     @Override
     public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
-        if (selfName.equals(Fn.LAMBDA_STRUCTUAL_DECL)) {
+        if (getSelfName().equals(Fn.LAMBDA_STRUCTUAL_DECL)) {
             DefDeclType ddt = (DefDeclType) getDeclTypes().get(0);
             boolean first = true;
             for (FormalArg arg: ddt.getFormalArgs()) {
@@ -91,7 +98,7 @@ public class StructuralType extends ValueType {
             }
             dest.append("type { ");
             if (indent.length() == 0) {
-                dest.append(selfName).append(" =>\n");
+                dest.append(getSelfName()).append(" =>\n");
                 for (DeclType dt : getDeclTypes()) {
                     dt.doPrettyPrint(dest, newIndent);
                 }
@@ -104,7 +111,11 @@ public class StructuralType extends ValueType {
     }
 
     public String getSelfName() {
-        return selfName;
+        return selfSite.getName();
+    }
+
+    public BindingSite getSelfSite() {
+        return selfSite;
     }
 
     public List<DeclType> getDeclTypes() {
@@ -143,15 +154,19 @@ public class StructuralType extends ValueType {
             }
         }
 
+        if (t instanceof BottomType) {
+            return false;
+        }
+
         if (!(t instanceof StructuralType)) {
             reason.setReason("cannot look up structural type for " + t.desugar(ctx));
             return false;
         }
 
         StructuralType st = (StructuralType) t;
-        st = (StructuralType) st.adapt(new ReceiverView(new Variable(st.selfName), new Variable(selfName)));
+        st = (StructuralType) st.adapt(new ReceiverView(new Variable(st.selfSite), new Variable(selfSite)));
 
-        TypeContext extendedCtx = ctx.extend(selfName, this);
+        TypeContext extendedCtx = ctx.extend(selfSite, this);
         for (DeclType dt : st.getDeclTypes()) {
             DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
@@ -221,7 +236,7 @@ public class StructuralType extends ValueType {
         for (DeclType dt : getDeclTypes()) {
             newDTs.add(dt.adapt(v));
         }
-        return new StructuralType(selfName, newDTs, isResource(GenContext.empty()));
+        return new StructuralType(selfSite, newDTs, isResource(GenContext.empty()));
     }
 
     @Override
@@ -230,12 +245,12 @@ public class StructuralType extends ValueType {
         for (DeclType dt : getDeclTypes()) {
             newDTs.add(dt.interpret(ctx));
         }
-        return new StructuralType(selfName, newDTs, isResource(ctx));
+        return new StructuralType(selfSite, newDTs, isResource(ctx));
     }
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
-        final TypeContext selfCtx = ctx.extend(selfName, this);
+        final TypeContext selfCtx = ctx.extend(selfSite, this);
         for (DeclType dt : declTypes) {
             dt.checkWellFormed(selfCtx);
         }
@@ -246,7 +261,7 @@ public class StructuralType extends ValueType {
         if (count > MAX_RECURSION_DEPTH) {
             ToolError.reportError(ErrorMessage.CANNOT_AVOID_VARIABLE, (HasLocation) null, varName);
         }
-        if (varName.equals(selfName)) {
+        if (varName.equals(selfSite.getName())) {
             return this;
         }
         List<DeclType> newDeclTypes = new LinkedList<DeclType>();
@@ -261,13 +276,13 @@ public class StructuralType extends ValueType {
         if (!changed) {
             return this;
         } else {
-            return new StructuralType(selfName, newDeclTypes, resourceFlag);
+            return new StructuralType(selfSite, newDeclTypes, resourceFlag);
         }
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] {selfName, resourceFlag, declTypes});
+        return Arrays.hashCode(new Object[] {selfSite, resourceFlag, declTypes});
     }
 
     @Override
@@ -276,7 +291,7 @@ public class StructuralType extends ValueType {
             return false;
         }
         StructuralType other = (StructuralType) obj;
-        return resourceFlag == other.resourceFlag && selfName.equals(other.selfName) && declTypes.equals(other.declTypes);
+        return resourceFlag == other.resourceFlag && selfSite.equals(other.selfSite) && declTypes.equals(other.declTypes);
     }
 
     @Override
