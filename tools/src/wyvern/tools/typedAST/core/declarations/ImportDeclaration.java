@@ -228,7 +228,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                 if (module.getSpec().getType().isResource(ctx)) {
                     ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
                 }
-                Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
+                //Value v = resolver.wrap(module.getExpression(), module.getDependencies()).interpret(Globals.getStandardEvalContext());
+                Value v = module.getAsValue(resolver);
                 type = v.getType();
             } else {
                 type = module.getSpec().getType();

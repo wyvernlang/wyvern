@@ -5,9 +5,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
+import wyvern.stdlib.support.WyvernAssertion;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
@@ -36,6 +38,17 @@ public class StdlibTests {
     @Test
     public void testParser() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.testParser", null, null);
+    }
+
+    @Test(expected = WyvernAssertion.class)
+    public void testAssertions() throws ParseException {
+        TestUtil.doTestScriptModularly("stdlib.assertionTest", null, null);
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLinkedList() throws ParseException {
+        TestUtil.doTestScriptModularly("stdlib.collections.linkedListTest", null, null);
     }
 
 }

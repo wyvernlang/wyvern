@@ -2,10 +2,12 @@ package wyvern.target.corewyvernIL.modules;
 
 import java.util.List;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 
 public class Module {
     private final TypedModuleSpec spec;
@@ -53,6 +55,19 @@ public class Module {
     public Value getAsValue(EvalContext ctx) {
         if (cachedValue == null) {
             cachedValue = expr.interpret(ctx);
+        }
+        return cachedValue;
+    }
+
+    /** Reduces the module to a value using the passed-in ModuleResolver.  This value is
+     * cached so the second time the method is called, the cached value will be
+     * returned.
+     *
+     * @return
+     */
+    public Value getAsValue(ModuleResolver resolver) {
+        if (cachedValue == null) {
+            cachedValue = resolver.wrapWithCtx(expr, dependencies, Globals.getStandardEvalContext()).interpret(Globals.getStandardEvalContext());
         }
         return cachedValue;
     }

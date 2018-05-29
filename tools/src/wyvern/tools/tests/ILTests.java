@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -68,10 +69,11 @@ public class ILTests {
     @Test
     public void testLetOutside() {
         IntegerLiteral six = new IntegerLiteral(6);
+        BindingSite ySite = new BindingSite("y");
         Expression letExpr = new Let(new VarBinding("x", Util.intType(), new IntegerLiteral(5)), new Variable("y"));
-        ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext().extend("y", Util.intType()), null);
+        ValueType t = letExpr.typeCheck(Globals.getStandardTypeContext().extend(ySite, Util.intType()), null);
         Assert.assertEquals(Util.intType(), t);
-        Value v = letExpr.interpret(EvalContext.empty().extend("y", six));
+        Value v = letExpr.interpret(EvalContext.empty().extend(ySite, six));
         Assert.assertEquals(six, v);
     }
 
@@ -105,11 +107,12 @@ public class ILTests {
     @Test
     public void testBindOutside() {
         NominalType integer = new NominalType("system", "Int");
+        BindingSite ySite = new BindingSite("y");
         Expression bindExpr = new Bind(
                 new ArrayList<VarBinding>(Arrays.asList(new VarBinding("x", integer, new IntegerLiteral(5)))),
                 new Variable("y"));
         try {
-            bindExpr.typeCheck(Globals.getStandardTypeContext().extend("y", integer), null);
+            bindExpr.typeCheck(Globals.getStandardTypeContext().extend(ySite, integer), null);
             Assert.fail("Typechecking should have failed.");
         } catch (RuntimeException e) {
         }
@@ -674,6 +677,11 @@ public class ILTests {
         TestUtil.doTestScriptModularlyFailing("bugs.a", ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA);
     }
 
+    @Test
+    public void testAdditionRegression() throws ParseException {
+        TestUtil.doTestScriptModularly("bugs.issue162",  Util.intType(), new IntegerLiteral(4));
+    }
+
     // @Test
     // public void testTSLIndentation() throws ParseException {
     //     doTestScriptModularly("tsls.indentationTest", Util.intType(), new IntegerLiteral(5));
@@ -695,6 +703,12 @@ public class ILTests {
         // IL generation doesn't work yet!
         wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, null);*/
         TestUtil.doTest(input, null, null);
+    }
+
+    @Test
+    public void testEmpty() throws ParseException {
+        String input = "";
+        TestUtil.doTest(input, Util.unitType(), Util.unitValue());
     }
 
     @Test
@@ -877,7 +891,8 @@ public class ILTests {
 
             // not quite right, but works for now
             // TODO: replace this with a standard prelude
-            program.typeCheck(TypeContext.empty().extend("system", Util.unitType()), null);
+            BindingSite sysSite = new BindingSite("system");
+            program.typeCheck(TypeContext.empty().extend(sysSite, Util.unitType()), null);
             Assert.fail("A type error should have been reported.");
         } catch (ToolError toolError) {
             System.err.println(toolError);

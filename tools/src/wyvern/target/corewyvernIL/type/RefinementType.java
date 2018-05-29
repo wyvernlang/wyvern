@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
@@ -21,9 +22,13 @@ import wyvern.tools.errors.ToolError;
 
 public class RefinementType extends ValueType {
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, String selfName) {
+        this(base, declTypes, hasLoc, new BindingSite(selfName));
+    }
+
+    public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, BindingSite selfSite) {
         this.base = base;
         this.declTypes = declTypes;
-        this.selfName = selfName;
+        this.selfSite = selfSite;
     }
 
     public RefinementType(List<ValueType> typeParams, ValueType base, HasLocation hasLoc) {
@@ -33,7 +38,7 @@ public class RefinementType extends ValueType {
     }
 
     private ValueType base;
-    private String selfName;
+    private BindingSite selfSite;
     private List<DeclType> declTypes = null; // may be computed lazily from typeParams
     private List<ValueType> typeParams;
 
@@ -81,7 +86,7 @@ public class RefinementType extends ValueType {
         for (DeclType dt : declTypes) {
             newDTs.add(dt.adapt(v));
         }
-        return new RefinementType(newBase, newDTs, this, selfName);
+        return new RefinementType(newBase, newDTs, this, selfSite);
     }
 
     @Override
@@ -103,14 +108,14 @@ public class RefinementType extends ValueType {
         if (!changed && base == newBase) {
             return this;
         } else {
-            return new RefinementType(newBase, newDeclTypes, this, selfName);
+            return new RefinementType(newBase, newDeclTypes, this, selfSite);
         }
     }
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
         base.checkWellFormed(ctx);
-        final TypeContext selfCtx = selfName == null ? ctx : ctx.extend(selfName, this);
+        final TypeContext selfCtx = selfSite == null ? ctx : ctx.extend(selfSite, this);
         for (DeclType dt : getDeclTypes(ctx)) {
             dt.checkWellFormed(selfCtx);
         }
@@ -118,7 +123,7 @@ public class RefinementType extends ValueType {
 
     /** Returns the self name if there is one, otherwise null */
     public String getSelfName() {
-        return selfName;
+        return selfSite.getName();
     }
 
     @Override

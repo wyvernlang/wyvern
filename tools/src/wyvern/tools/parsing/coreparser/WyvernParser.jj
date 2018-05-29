@@ -98,6 +98,7 @@ TOKEN : /* Keywords */
 | < VAR: "var" >
 | < DEF: "def" >
 | < TYPE: "type" >
+| < ASSERT: "assert" >
 | < DATATYPE: "datatype" >
 | < CLASS: "class" >
 | < DELEGATE: "delegate" >
@@ -161,6 +162,7 @@ TOKEN : /* Symbols */
 | <RBRACE>
 | <BOOLEANAND>
 | <BOOLEANOR>
+| <BOOLEANNOT>
 //| <>
 }
 
@@ -180,6 +182,8 @@ AST CompilationUnit() :
   /*ImportDecls(imports)*/ exp=ModuleDecl(imports) { return exp; }
 |
   exp = Script(imports, requires)  { return exp; }
+|
+  /* nothing */ { return build.unitValue(null); }
 }
 
 /** Root production. */
@@ -289,6 +293,8 @@ AST Declaration(boolean inModule) :
 |
   exp = VarDeclaration()  { return exp; }
 |
+  exp = AssertDeclaration() { return exp; }
+|
   exp = EffectDeclaration() { return exp; }
 |
    LOOKAHEAD(4) exp = TypeDeclaration()  { return exp; }
@@ -322,6 +328,16 @@ AST ValDeclaration() :
 {
   <VAL> name=<IDENTIFIER> [ <COLON> type = Type() ] <EQUALS> body = ExpressionLine(false) {
 	return build.valDecl(name.image, type, body, loc(name));
+  }
+}
+
+AST AssertDeclaration() :
+{ Token t; Token description = null; AST exp; }
+{
+  t=<ASSERT>
+  [LOOKAHEAD(2) description=<STRING_LITERAL> <COLON>]
+  exp = ExpressionLine(false) {
+	return build.assertion(description == null ? null : description.image, exp, loc(t));
   }
 }
 
@@ -492,10 +508,10 @@ AST EffectDeclType() :
 }
 
 AST ConstructDeclType() :
-{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null; }
+{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null;}
 {
   (name = <IDENTIFIER>) [gentypes = GenericsDecl()] [args = Formals()] <NEWLINE> {
-  	return build.constructDeclType(name.image, gentypes, args, loc(name));
+    return build.constructDeclType(name.image, gentypes, args, loc(name));
   }
 }
 
@@ -796,6 +812,10 @@ AST UnaryExpression(ExpFlags flags) :
 |
   t=<DASH> exp = UnaryExpression(flags) {
     return build.invocation(exp, "negate", build.unitValue(loc(t)), loc(t));
+  }
+|
+  t=<BOOLEANNOT> exp = UnaryExpression(flags) {
+    return build.invocation(exp, "!", build.unitValue(loc(t)), loc(t));
   }
 |
   exp = PrimaryExpression(flags) { return exp; }

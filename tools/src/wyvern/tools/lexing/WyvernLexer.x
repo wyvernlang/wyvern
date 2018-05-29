@@ -157,6 +157,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
 	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
+	terminal Token assertKwd_t 	::= /assert/ in (keywds) {: RESULT = token(ASSERT,lexeme); :};
 	terminal Token delegateKwd_t::= /delegate/ in (keywds) {: RESULT = token(DELEGATE,lexeme); :};
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
@@ -215,6 +216,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
     terminal Token booleanand_t ::= /&&/ {: RESULT = token(BOOLEANAND,lexeme); :};
     terminal Token booleanor_t ::= /\|\|/ {: RESULT = token(BOOLEANOR,lexeme); :};
+    terminal Token booleannot_t ::= /!/ {: RESULT = token(BOOLEANNOT,lexeme); :};
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
@@ -302,6 +304,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | valKwd_t:t {: RESULT = t; :}
 	       | defKwd_t:t {: RESULT = t; :}
 	       | varKwd_t:t {: RESULT = t; :}
+	       | assertKwd_t:t {: RESULT = t; :}
 	       | delegateKwd_t:t {: RESULT = t; :}
 	       | toKwd_t:t {: RESULT = t; :}
 //	       | fnKwd_t:t {: RESULT = t; :}
@@ -348,6 +351,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
                | equalsequals_t:t {: RESULT = t; :}
                | booleanand_t:t {: RESULT = t; :}
                | booleanor_t:t {: RESULT = t; :}
+               | booleannot_t:t {: RESULT = t; :}
 	           ;
 
 	anyLineElement ::= whitespace_t:n {: RESULT = LexerUtils.makeList(n); :}

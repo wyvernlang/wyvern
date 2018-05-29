@@ -75,7 +75,7 @@ public class DefDeclType extends DeclTypeWithResult {
             if (!(theirType.isSubtypeOf(myArg.getType(), ctx, reason))) {
                 return false;
             }
-            ctx = ctx.extend(myArg.getName(), myArg.getType());
+            ctx = ctx.extend(myArg.getSite(), myArg.getType());
         }
         ValueType rawResultType = this.getRawResultType();
         ValueType otherRawResultType = ddt.getRawResultType();
@@ -174,7 +174,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public void checkWellFormed(TypeContext ctx) {
         for (FormalArg arg : args) {
             arg.getType().checkWellFormed(ctx);
-            ctx = ctx.extend(arg.getName(), arg.getType());
+            ctx = ctx.extend(arg.getSite(), arg.getType());
         }
         super.checkWellFormed(ctx);
     }

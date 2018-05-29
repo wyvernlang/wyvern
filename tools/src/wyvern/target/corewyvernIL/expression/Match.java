@@ -49,7 +49,7 @@ public class Match extends Expression {
 
         if (getType() == null) {
             Case c = cases.get(0);
-            TypeContext caseCtx = env.extend(c.getVarName(), c.getPattern());
+            TypeContext caseCtx = env.extend(c.getSite(), c.getPattern());
             ValueType type = c.getBody().typeCheck(caseCtx, effectAccumulator);
             this.setExprType(type);
         }
@@ -70,7 +70,7 @@ public class Match extends Expression {
                 ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, c, c.getPattern().desugar(env), matchType.desugar(env), reason.getReason());
             }
 
-            TypeContext caseCtx = env.extend(c.getVarName(), c.getPattern());
+            TypeContext caseCtx = env.extend(c.getSite(), c.getPattern());
             ValueType caseType = c.getBody().typeCheck(caseCtx, effectAccumulator);
             reason = new FailureReason();
             if (!caseType.isSubtypeOf(getType(), caseCtx, reason)) {
@@ -97,14 +97,13 @@ public class Match extends Expression {
                 matchedCase = c;
             }
         }
-        FailureReason r = new FailureReason();
         if (matchedCase == null && elseExpr == null) {
             ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchValue.toString());
         }
         if (matchedCase == null) {
             return elseExpr.interpret(ctx);
         } else {
-            ctx = ctx.extend(matchedCase.getVarName(), matchValue);
+            ctx = ctx.extend(matchedCase.getSite(), matchValue);
             Expression caseBody = matchedCase.getBody();
             return caseBody.interpret(ctx);
         }

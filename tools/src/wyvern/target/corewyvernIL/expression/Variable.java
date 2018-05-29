@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -14,7 +15,12 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class Variable extends Expression implements Path {
 
     private String name;
+    private BindingSite site;
 
+    public Variable(BindingSite site) {
+        this(site.getName());
+        this.site = site;
+    }
     public Variable(String name) {
         super();
         this.name = name;
