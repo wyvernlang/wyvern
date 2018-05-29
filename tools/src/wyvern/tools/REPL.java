@@ -50,13 +50,15 @@ public class REPL {
     private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
     
     private static EvalContext programContext = null;
+    private static String tempImports = "";
+    private static String tempFunctions = "";
     //private static IExpr program = null;
 	
 	public REPL() {
 		
 	}
 	public static void main(String[] args) throws Exception {
-		String input = "" // "require stdout\n\n"
+		String input = "require stdout\n\n"
 		        + "val x = \"kjsadfka\"\n"
 		        + "val y = 3\n";
 		
@@ -69,30 +71,50 @@ public class REPL {
 	    Value currentResult = null;
 	    for (String s: lines) {
 	        if (!(s.length()==0)) { //does not run code on empty lines
-	            if (s.split(" ").length == 1 && programContext != null) { //assuming when user enters 1 word it refers to a val
+	            if (s.split(" ").length == 1 && programContext != null && tempFunctions.isEmpty()) 
+	            { //assuming when user enters 1 word it refers to a val
+	                System.out.println("looking up var");
 	                Value result = programContext.lookupValue(s);
 	                return result;
-	            } else {
-	                String[] line = s.split(" ");
-	                if (line[0].equals("val") && programContext != null ) { // programContext is not empty, and expression is a variable declaration
-	                    System.out.println("got here");
-	                    Value result = programContext.lookupValue(line[1]); // checks if there is an already existing variable in the context with the same name.
-	                    if (result == null) {
-	                        System.out.println("there was not variable named that");
-	                    }
-	                } else if (line[0].equals("var") && programContext != null) {
-	                    System.out.println("shouldnt be here");
+	            }
+	            else if(s.contains("def"))
+	            {
+	                tempFunctions = tempFunctions + s + "\n";
+	                System.out.println("found a function");
+	            }
+	            else if(s.contains("require"))
+	            {
+	                tempImports = tempImports + s + "\n";
+	            }
+	            else if (s.contains("\t") && !tempFunctions.isEmpty())
+	            {
+	                System.out.println("adding to function");
+	                tempFunctions = tempFunctions + s + "\n";
+	            }
+	            else 
+	            {  
+	                if (!tempImports.isEmpty()) {
+	                    parse(tempImports + s + "\n");
+	                    tempImports = "";
+	                }else if(!tempFunctions.isEmpty())
+	                {
+	                    System.out.println("here");
+	                    parse(tempFunctions + "\n");
+	                    parse(s+ "\n");
+                        tempFunctions = "";
+	                }else {
+	                    System.out.println("here11111111111");
+	                    System.out.println("STARTED PROCESSING: " + s);
+	                    currentResult = parse(s + "\n");
+	                    System.out.println("FINISHED PROCESSING: " + s);
 	                }
-	                System.out.println("STARTED PROCESSING: " + s);
-                    currentResult = parseVar(s + "\n");
-                    System.out.println("FINISHED PROCESSING: " + s);
 	            }
 	        }
 	    }
 	    return currentResult;
 	}
 	
-	public static Value parseVar(String input) throws ParseException {
+	public static Value parse(String input) throws ParseException {
 	    if (programContext == null){
 	        //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
 	        programContext = Globals.getStandardEvalContext();
