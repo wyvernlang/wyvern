@@ -162,9 +162,11 @@ public class SeqExpr extends Expression {
         for (HasLocation elem : elements) {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
-                extendedCtx = binding.interpret(extendedCtx);
-                // TODO: return unit
-                result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
+                if(!ctx.isPresent(binding.getVarName(), true)) {
+                    extendedCtx = binding.interpret(extendedCtx);
+                    // TODO: return unit
+                    result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
+                }
             } else if (elem instanceof Expression) {
                 result = ((Expression) elem).interpret(extendedCtx);
             } else {
