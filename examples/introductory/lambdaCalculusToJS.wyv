@@ -1,0 +1,259 @@
+// Compiles untyped lambda calculus programs to Javascript
+// Usage: `wyvern lambdaCalculusToJS.wyv | node`
+// Lambda Calculus program hardcoded at bottom
+
+require stdout
+
+import wyvern.option
+import wyvern.collections.list
+
+type Option = option.Option
+type List = list.List
+
+tagged type Term comprises Var, Lambda, Apply
+    def compile(): String
+
+tagged type Var extends Term
+    val name : String
+    def compile(): String
+
+def makeVar(n : String): Var = new
+    val name = n
+    def compile(): String
+        this.name
+
+tagged type Lambda extends Term
+    val v : Var
+    val term : Term
+    def compile(): String
+
+def makeLambda(variable : Var, t : Term): Lambda = new
+    val v = variable
+    val term = t
+    def compile(): String
+        "function(" + (this.v.compile()) + ") { return " + ((this.term).compile()) + "}"
+
+tagged type Apply extends Term
+    val left : Term
+    val right : Term
+    def compile(): String
+
+def makeApply(l : Term, r : Term): Apply = new
+    val left = l
+    val right = r
+    def compile(): String
+        this.left.compile() + "(" + this.right.compile() + ")"
+
+tagged type Statement comprises Define, Print
+    def compile(): String
+
+tagged type Define extends Statement
+    val name : String
+    val term : Term
+    def compile(): String
+
+def makeDefine(n : String, t : Term): Define = new
+    val name = n
+    val term = t
+    def compile(): String
+        this.name + " = " + this.term.compile()
+
+tagged type Print extends Statement
+    val term : Term
+    def compile(): String
+
+def makePrint(t : Term): Print = new
+    val term = t
+    def compile(): String
+        "console.log(function(n) { return n(function(x) { return x + 1 })(0)}(" + this.term.compile() + "))"
+
+// Only strips spaces
+def lstrip(s : String) : String
+    // Extra `if` to work around #214
+    if (s.length() > 0)
+            if (s.substring(0, 1) == " ")
+                    lstrip(s.substring(1, s.length()))
+                else
+                    s
+        else
+            ""
+
+// Poor man's enum
+val EOF = 0
+val LPAREN = 1
+val RPAREN = 2
+val LAMBDA = 3
+val VAR = 4
+
+resource type Lexer
+    var input: String
+    def next(t: Int): Boolean
+    def skip(t: Int): Boolean
+    def token(t: Int): String
+
+type Chomp
+    val token : String
+    val tokType : Int
+    val rest : String
+
+def makeChomp(t : String, tt : Int, r : String): Chomp = new
+    val token = t
+    val tokType = tt
+    val rest = r
+
+def isLetter(s : String): Boolean
+    // No <=
+    ("@" < s && s < "[") || ("`" < s && s < "{")
+
+// Assumes vars are [A-z]+
+def findVarEnd(s : String) : Int
+    if (s.length() == 0)
+            0
+        else
+            val c = s.substring(0, 1)
+            if (isLetter(s))
+                    1 + findVarEnd(s.substring(1, s.length()))
+                else
+                    0
+
+def chompToken(string : String) : Chomp
+    val s = lstrip(string)
+    // No else if
+    if (s.length() == 0)
+            makeChomp("", EOF, "")
+        else
+            var rest: String = ""
+            if (s.length() > 1)
+                rest = s.substring(1, s.length())
+            if (s.substring(0, 1) == "/")
+                    makeChomp("/", LAMBDA, rest)
+                else
+                    if (s.substring(0, 1) == "(")
+                            makeChomp("(", LPAREN, rest)
+                        else
+                            if (s.substring(0, 1) == ")")
+                                    makeChomp(")", RPAREN, rest)
+                                else
+                                    val i = findVarEnd(s)
+                                    if (i == s.length())
+                                            makeChomp(s.substring(0, i), VAR, "")
+                                        else
+                                            makeChomp(s.substring(0, i), VAR, s.substring(i, s.length()))
+
+// No exception system yet
+def assertFalse(): Int
+    1 / 0
+
+def makeLexer(i: String): Lexer = new
+    var input : String = i
+    def next(t: Int): Boolean
+        val chomp = chompToken(this.input)
+        chomp.tokType == t
+    def skip(t: Int): Boolean
+        val chomp = chompToken(this.input)
+        if (chomp.tokType == t)
+            this.input = chomp.rest
+        chomp.tokType == t
+    def token(t: Int): String
+        val chomp = chompToken(this.input)
+        if (!(chomp.tokType == t))
+            assertFalse()
+        this.input = chomp.rest
+        chomp.token
+
+def parseAtom(lex : Lexer): Option[Term]
+    if (lex.skip(LPAREN))
+            val term = parseTerm(lex)
+            lex.skip(RPAREN)
+            option.Some(term)
+        else
+            if (lex.next(VAR))
+                    val name = lex.token(VAR)
+                    option.Some(makeVar(name))
+                else
+                    option.None[Term]()
+
+def parseApplication2(lex : Lexer, lhs : Term): Term
+    val rhs = parseAtom(lex)
+    if (rhs.isDefined)
+            // Better way to unwrap/pattern match on Option?
+            parseApplication2(lex, makeApply(lhs, rhs.getOrElse(() => makeVar("error"))))
+        else
+            lhs
+
+def parseApplication(lex : Lexer) : Term
+    val lhs = parseAtom(lex)
+    // TODO: better error handling
+    if (!lhs.isDefined)
+        assertFalse()
+    parseApplication2(lex, lhs.getOrElse(() => makeVar("error")))
+
+def parseTerm(lex : Lexer) : Term
+    if (lex.skip(LAMBDA))
+            val name = makeVar(lex.token(VAR))
+            val term = parseTerm(lex)
+            makeLambda(name, term)
+        else
+            parseApplication(lex)
+
+def parseStatement(line : String) : Statement
+    val lexer = makeLexer(line)
+    val command = lexer.token(VAR)
+    // if (command == "print") in place of else triggers bug #213
+    // Also can't comment on else line due to ifTSL?
+    if (command == "def")
+            val name = lexer.token(VAR)
+            makeDefine(name, parseTerm(lexer))
+        else
+            makePrint(parseTerm(lexer))
+
+resource type Program
+    val statements : List[Statement]
+
+def makeProgram(s: List[Statement]): Program = new
+    val statements : List[Statement] = s
+
+def compileAndPrintStatement(statement : Statement): Unit
+    stdout.print(statement.compile())
+    stdout.println()
+
+def compile(program : Program) : Unit
+    program.statements.do((s : Statement) => compileAndPrintStatement(s))
+
+// No file I/O
+val l = list.make[Statement]()
+
+// Two types of top level statements
+//   * def <var> <expr>  : defines a variable for future use
+//   * print <expr>      : prints an expression assuming it is a natural number
+
+// Variables are [A-z]+
+// A single slash (/) is a lambda
+// Sugar for multi-argument lambdas not implemented (you must curry manually)
+
+l.append(parseStatement("def tru /t /f t"))
+l.append(parseStatement("def fls /t /f f"))
+
+l.append(parseStatement("def pair /f /s /b b f s"))
+l.append(parseStatement("def fst /p p tru"))
+l.append(parseStatement("def snd /p p fls"))
+
+l.append(parseStatement("def Z /s /z z"))
+l.append(parseStatement("def S /n /s /z s (n s z)"))
+
+l.append(parseStatement("def plus /m /n /s /z m s (n s z)"))
+l.append(parseStatement("def times /m /n m (plus n) Z"))
+
+l.append(parseStatement("def zz pair Z Z"))
+l.append(parseStatement("def ss /p pair (snd p) (plus (S(Z)) (snd p))"))
+l.append(parseStatement("def prd /m fst (m ss zz)"))
+l.append(parseStatement("def minus /m /n n prd m"))
+
+l.append(parseStatement("def THREE S(S(S(Z)))"))
+l.append(parseStatement("def FOUR S(THREE)"))
+
+l.append(parseStatement("print plus THREE FOUR"))
+l.append(parseStatement("print times THREE FOUR"))
+l.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
+
+compile(makeProgram(l))
