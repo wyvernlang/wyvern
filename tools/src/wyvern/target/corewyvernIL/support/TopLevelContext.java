@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 //import java.util.Stack;
 
+import wyvern.target.corewyvernIL.BindingSite;
 //import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -26,7 +27,7 @@ public class TopLevelContext {
     private List<Declaration> moduleDecls = new LinkedList<Declaration>();
     private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
     private List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-    private Map<String, Boolean> avoidanceMap = new HashMap<String, Boolean>();
+    private Map<BindingSite, Boolean> avoidanceMap = new HashMap<BindingSite, Boolean>();
     private GenContext ctx;
     private String receiverName;
     private SeqExpr expr;
@@ -79,13 +80,13 @@ public class TopLevelContext {
      * avoid.
      */
     private ValueType adapt(ValueType vt, String thisName) {
-        for (Map.Entry<String, Boolean> e : avoidanceMap.entrySet()) {
+        for (Map.Entry<BindingSite, Boolean> e : avoidanceMap.entrySet()) {
             Variable v = new Variable(e.getKey());
             boolean isDeclBlock = e.getValue();
             Variable receiver = new Variable(thisName);
             Path newPath = receiver;
             if (!isDeclBlock) {
-                newPath = new FieldGet(receiver, e.getKey(), receiver.getLocation());
+                newPath = new FieldGet(receiver, e.getKey().getName(), receiver.getLocation());
             }
             View view = new ReceiverView(v, newPath);
             vt = vt.adapt(view);
@@ -106,11 +107,11 @@ public class TopLevelContext {
      * @param iExpr the right-hand side of the binding
      * @param isDeclBlock flags a let statement that represents a block of recursive declarations, or a var
      */
-    public void addLet(String name, ValueType type, IExpr iExpr, boolean isDeclBlock) {
+    public void addLet(BindingSite site, ValueType type, IExpr iExpr, boolean isDeclBlock) {
         //pending.push(new VarBinding(name, type, iExpr));
-        ctx = ctx.extend(name, new Variable(name), type);
-        avoidanceMap.put(name, isDeclBlock);
-        expr.addBindingLast(name, type, iExpr);
+        ctx = ctx.extend(site, new Variable(site), type);
+        avoidanceMap.put(site, isDeclBlock);
+        expr.addBindingLast(site, type, iExpr);
     }
 
     public void updateContext(GenContext newCtx) {

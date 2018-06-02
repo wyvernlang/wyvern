@@ -350,7 +350,7 @@ public class ModuleResolver {
         for (TypedModuleSpec spec : dependencies) {
             final String internalName = spec.getInternalName();
             if (!ctx.isPresent(internalName, true)) {
-                ctx = ctx.extend(internalName, new Variable(internalName), spec.getType());
+                ctx = ctx.extend(spec.getSite(), new Variable(spec.getSite()), spec.getType());
             }
         }
         return ctx;
@@ -372,7 +372,7 @@ public class ModuleResolver {
         for (TypedModuleSpec spec : noDups) {
             Module m = resolveModule(spec.getQualifiedName());
             //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
-            seqProg.addBinding(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), false);
+            seqProg.addBinding(m.getSpec().getSite(), m.getSpec().getType(), m.getExpression(), false);
         }
         return seqProg;
     }
@@ -398,7 +398,7 @@ public class ModuleResolver {
             String internalName = m.getSpec().getInternalName();
             ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
-            seqProg.addBinding(internalName, type, v /*m.getExpression()*/, true);
+            seqProg.addBinding(m.getSpec().getSite(), type, v /*m.getExpression()*/, true);
         }
         seqProg.merge(program);
         return seqProg;
@@ -435,7 +435,7 @@ public class ModuleResolver {
             Module m = resolveModule(spec.getQualifiedName());
             String internalName = m.getSpec().getInternalName();
             ValueType type = m.getSpec().getType();
-            seqProg.addBinding(internalName, type, m.getExpression(), true);
+            seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
     }
     /** Returns a fresh list, with duplicates eliminated.

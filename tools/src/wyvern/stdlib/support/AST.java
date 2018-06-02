@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
@@ -259,7 +260,7 @@ public class AST {
     }
 
     public Case makeCase(String varName, ObjectValue pattern, ObjectValue body) {
-        return new Case(varName, (NominalType) getType(pattern), getExpr(body));
+        return new Case(new BindingSite(varName), (NominalType) getType(pattern), getExpr(body));
     }
 
     public FormalArg formalArg(String name, ObjectValue type) {
