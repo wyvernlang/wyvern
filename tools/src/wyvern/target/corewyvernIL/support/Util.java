@@ -21,6 +21,7 @@ public final class Util {
     private static ValueType theBooleanType = new NominalType("system", "Boolean");
     private static ValueType theEmptyType = new StructuralType("empty", new LinkedList<>());
     private static ValueType theIntType = new NominalType("system", "Int");
+    private static ValueType theFloatType = new NominalType("system", "Float");
     private static ValueType theCharType = new NominalType("system", "Character");
     private static ValueType theStringType = new NominalType("system", "String");
     private static ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
@@ -32,6 +33,9 @@ public final class Util {
     }
     public static ValueType emptyType() {
         return theEmptyType;
+    }
+    public static ValueType floatType() {
+      return theFloatType;
     }
     public static ValueType intType() {
         return theIntType;

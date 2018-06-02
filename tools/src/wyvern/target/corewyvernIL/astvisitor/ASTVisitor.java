@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Match;
@@ -77,4 +78,5 @@ public abstract class ASTVisitor<S, T> {
     public abstract T visit(S state, EffectDeclaration effectDeclaration);
     public abstract T visit(S state, EffectDeclType effectDeclType);
     public abstract T visit(S state, SeqExpr seqExpr);
+    public abstract T visit(S state, FloatLiteral flt);
 }

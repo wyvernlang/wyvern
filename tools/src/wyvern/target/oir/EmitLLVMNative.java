@@ -3,6 +3,7 @@ package wyvern.target.oir;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRIfThenElse;
 import wyvern.target.oir.expressions.OIRInteger;
+import wyvern.target.oir.expressions.OIRFloat;
 import wyvern.target.oir.expressions.OIRLet;
 import wyvern.target.oir.expressions.OIRLiteral;
 import wyvern.target.oir.expressions.OIRMethodCall;
@@ -22,6 +23,7 @@ public final class EmitLLVMNative {
 
     /* Constants */
     public static native String integerToLLVMIR(OIRInteger oirinteger);
+    public static native String floatToLLVMIR(OIRFloat oirfloat);
     public static native String booleanToLLVMIR(OIRBoolean let);
     public static native String rationalToLLVMIR(OIRRational let);
     public static native String stringToLLVMIR(OIRString let);
