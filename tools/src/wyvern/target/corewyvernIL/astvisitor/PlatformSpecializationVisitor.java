@@ -127,7 +127,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, Case c) {
         Expression resultBody = (Expression) c.getBody().acceptVisitor(this, state);
-        Case result = new Case(c.getVarName(), c.getPattern(), resultBody);
+        Case result = new Case(c.getSite(), c.getPattern(), resultBody);
         result.copyMetadata(c);
         return result;
     }

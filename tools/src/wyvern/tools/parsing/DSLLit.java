@@ -81,12 +81,12 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
             args.add(new JavaValue(JavaWrapper.wrapObject(ctx), new NominalType("system", "Context")));
             wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable) metadata).invoke("parseTSL", args).executeIfThunk();
             // we get an option back, is it success?
-            ValDeclaration isDefined = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("isDefined");
+            ValDeclaration isDefined = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("isDefined", false);
             BooleanLiteral success = (BooleanLiteral) isDefined.getDefinition();
             if (success.getValue()) {
-                ValDeclaration valueDecl = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("value");
+                ValDeclaration valueDecl = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("value", false);
                 ObjectValue astWrapper = (ObjectValue) valueDecl.getDefinition();
-                ValDeclaration astDecl = (ValDeclaration) ((ObjectValue) astWrapper).findDecl("ast");
+                ValDeclaration astDecl = (ValDeclaration) ((ObjectValue) astWrapper).findDecl("ast", false);
                 return (Expression) ((JavaValue) astDecl.getDefinition()).getWrappedValue();
             } else {
                 ToolError.reportError(ErrorMessage.TSL_ERROR, this, "[detailed TSL error messages not supported yet]");

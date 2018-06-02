@@ -5,6 +5,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.JavaValue;
@@ -47,7 +48,7 @@ public class Mirror {
             List<? extends Declaration> objDecls = ((ObjectValue) obj).getDecls();
             for (Declaration decl : objDecls) {
                 if (decl instanceof DeclarationWithRHS) {
-                    Declaration o1Decl = o1.findDecl(decl.getName());
+                    Declaration o1Decl = o1.findDecl(decl.getName(), decl instanceof TypeDeclaration);
                     if (o1Decl == null || !(o1Decl instanceof DeclarationWithRHS)) {
                         return 0;
                     }

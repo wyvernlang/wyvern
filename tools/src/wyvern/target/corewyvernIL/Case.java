@@ -9,11 +9,11 @@ public class Case extends ASTNode {
     private NominalType pattern;
     private Expression body;
 
-    public Case(String varName, NominalType pattern, Expression body) {
+    public Case(BindingSite site, NominalType pattern, Expression body) {
         super();
         this.pattern = pattern;
         this.body = body;
-        this.site = new BindingSite(varName);
+        this.site = site;
     }
     public NominalType getPattern() {
         return pattern;
