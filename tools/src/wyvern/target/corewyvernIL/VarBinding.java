@@ -23,8 +23,12 @@ public class VarBinding implements HasLocation {
     private IExpr expr;
 
     public VarBinding(String varName, ValueType type, IExpr toReplace) {
-        this.varName = varName;
-        this.site = new BindingSite(varName);
+        this(new BindingSite(varName), type, toReplace);
+    }
+
+    public VarBinding(BindingSite site, ValueType type, IExpr toReplace) {
+        this.varName = site.getName();
+        this.site = site;
         this.type = type;
         this.expr = toReplace;
         if (toReplace == null) {

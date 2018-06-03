@@ -3,6 +3,7 @@ package wyvern.tools.typedAST.core.declarations;
 import java.util.LinkedList;
 import java.util.List;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -144,11 +145,12 @@ public class VarDeclaration extends Declaration implements CoreAST {
         // Wrap declarations with a New expression and add to top-level.
         wyvern.target.corewyvernIL.expression.New newExp;
         newExp = new wyvern.target.corewyvernIL.expression.New(declarations, newName, structType, getLocation());
-        tlc.addLet(newName, structType, newExp, true);
+        BindingSite site = new BindingSite(newName);
+        tlc.addLet(site, structType, newExp, true);
 
         // Equate the var with a method call on its getter.
         // This means top-lever var reads are actually calls to the getter method.
-        MethodCall methodCallExpr = new MethodCall(new Variable(newName), getter.getName(), new LinkedList<>(), this);
+        MethodCall methodCallExpr = new MethodCall(new Variable(site), getter.getName(), new LinkedList<>(), this);
         ctx = ctx.extend(varName, methodCallExpr, varValueType);
         tlc.updateContext(ctx);
     }

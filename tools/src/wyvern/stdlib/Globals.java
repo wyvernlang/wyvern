@@ -131,7 +131,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
-        genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
+        genCtx = new VarGenContext(new BindingSite("unit"), Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
         SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(genCtx);

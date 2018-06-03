@@ -47,7 +47,7 @@ public class ObjectValue extends New implements Invokable {
     @Override
     public Value invoke(String methodName, List<Value> args) {
         EvalContext methodCtx = evalCtx;
-        DefDeclaration dd = (DefDeclaration) findDecl(methodName);
+        DefDeclaration dd = (DefDeclaration) findDecl(methodName, false);
         if (dd != null) {
             if (args.size() != dd.getFormalArgs().size()) {
                 throw new RuntimeException("invoke called on " + methodName + " with " + args.size() + " arguments, "
@@ -67,10 +67,10 @@ public class ObjectValue extends New implements Invokable {
 
     @Override
     public Value getField(String fieldName) {
-        DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName);
+        DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName, false);
         if (decl != null) {
             return (Value) decl.getDefinition();
-        } else if (delegateTarget != null && delegateTarget.findDecl(fieldName) != null) {
+        } else if (delegateTarget != null && delegateTarget.findDecl(fieldName, false) != null) {
             return delegateTarget.getField(fieldName);
         }
 
