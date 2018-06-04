@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.decltype;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.DataType;
+import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -14,11 +15,14 @@ public abstract class DeclTypeWithResult extends DeclType {
         this.rawType = sourceType;
     }
 
+    public Type getSourceType() {
+        return rawType;
+    }
+
     public ValueType getRawResultType() {
         //TODO: this is a hack, fix it
-        if (rawType instanceof DataType) {
-            DataType dt = (DataType) rawType;
-            return dt.getValueType();
+        if (rawType instanceof DataType || rawType instanceof ExtensibleTagType) {
+            return rawType.getValueType();
         } else {
             return ((ValueType) rawType);
         }

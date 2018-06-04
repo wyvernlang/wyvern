@@ -1,0 +1,18 @@
+datatype Exp
+    Var(name:String)
+    Apply(fn:Exp, arg:Exp)
+    Lambda(varName:String, body:Exp)
+    Unit
+
+val u:Unit = Unit() // TODO2: get this to work without ()
+val v:Var = Var("x") // TODO1: get this to work
+val id:Lambda = Lambda("y", v)
+val idToUnit:Exp = Apply(id,u)
+
+val s:String = match idToUnit:
+    v:Var => v.name // TODO: allow binding sub-variable x
+    a:Apply => "apply" // TODO: allow leaving out "a:"
+    l:Lambda => l.varName
+    u:Unit => "unit"
+
+s

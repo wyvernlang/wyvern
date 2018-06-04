@@ -15,6 +15,7 @@ import org.junit.experimental.categories.Category;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
 import wyvern.tools.errors.ToolError;
@@ -69,6 +70,11 @@ public class ExampleTests {
     @Test
     public void testTSL() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "tsls.postfixClient", Util.intType(), new IntegerLiteral(7));
+    }
+
+    @Test
+    public void testDatatypes() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.datatypes", Util.stringType(), new StringLiteral("apply"));
     }
 
     @Test
