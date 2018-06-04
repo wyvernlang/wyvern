@@ -32,10 +32,6 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
         sourceType = _type;
     }*/
 
-    public ValueType getSourceType() {
-        return getRawResultType();
-    }
-
     @Override
     public void checkWellFormed(TypeContext ctx) {
         /*if (metadata != null) {
