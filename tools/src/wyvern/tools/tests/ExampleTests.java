@@ -74,7 +74,7 @@ public class ExampleTests {
 
     @Test
     public void testDatatypes() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "introductory.datatypes", Util.stringType(), new StringLiteral("apply"));
+        TestUtil.doTestScriptModularly(PATH, "introductory.datatypes", Util.stringType(), new StringLiteral("(x => x) unit"));
     }
 
     @Test

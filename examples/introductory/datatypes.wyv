@@ -4,9 +4,9 @@ datatype Exp
     Lambda(varName:String, body:Exp)
     Unit
 
-val u:Unit = Unit() // TODO2: get this to work without ()
-val v:Var = Var("x") // TODO1: get this to work
-val id:Lambda = Lambda("y", v)
+val u:Unit = Unit() // TODO1: get this to work without ()
+val v:Var = Var("x")
+val id:Lambda = Lambda("x", v)
 val idToUnit:Exp = Apply(id,u)
 
 val s:String = match idToUnit:
@@ -15,4 +15,10 @@ val s:String = match idToUnit:
     l:Lambda => l.varName
     u:Unit => "unit"
 
-s
+def prettyPrint(e:Exp):String = match e:
+    v:Var => v.name
+    a:Apply => prettyPrint(a.fn) + " " + prettyPrint(a.arg)
+    l:Lambda => "(" + l.varName + " => " + prettyPrint(l.body) + ")"
+    u:Unit => "unit"
+    
+prettyPrint(idToUnit)
