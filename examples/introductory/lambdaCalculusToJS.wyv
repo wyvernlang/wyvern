@@ -220,6 +220,11 @@ def compileAndPrintStatement(statement : Statement): Unit
 def compile(program : Program) : Unit
     program.statements.do((s : Statement) => compileAndPrintStatement(s))
 
+def testCompile(program : Program) : String
+    var out: String = ""
+    program.statements.do((s : Statement) => out = out + s.compile())
+    out
+
 // No file I/O
 val l = list.make[Statement]()
 
@@ -257,3 +262,24 @@ l.append(parseStatement("print times THREE FOUR"))
 l.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
 
 compile(makeProgram(l))
+
+val testProgram = list.make[Statement]()
+testProgram.append(parseStatement("def tru /t /f t"))
+testProgram.append(parseStatement("def fls /t /f f"))
+testProgram.append(parseStatement("def pair /f /s /b b f s"))
+testProgram.append(parseStatement("def fst /p p tru"))
+testProgram.append(parseStatement("def snd /p p fls"))
+testProgram.append(parseStatement("def Z /s /z z"))
+testProgram.append(parseStatement("def S /n /s /z s (n s z)"))
+testProgram.append(parseStatement("def plus /m /n /s /z m s (n s z)"))
+testProgram.append(parseStatement("def times /m /n m (plus n) Z"))
+testProgram.append(parseStatement("def zz pair Z Z"))
+testProgram.append(parseStatement("def ss /p pair (snd p) (plus (S(Z)) (snd p))"))
+testProgram.append(parseStatement("def prd /m fst (m ss zz)"))
+testProgram.append(parseStatement("def minus /m /n n prd m"))
+testProgram.append(parseStatement("def THREE S(S(S(Z)))"))
+testProgram.append(parseStatement("def FOUR S(THREE)"))
+testProgram.append(parseStatement("print plus THREE FOUR"))
+testProgram.append(parseStatement("print times THREE FOUR"))
+testProgram.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
+assert testCompile(makeProgram(testProgram)) == "tru = function(t) { return function(f) { return t}}fls = function(t) { return function(f) { return f}}pair = function(f) { return function(s) { return function(b) { return b(f)(s)}}}fst = function(p) { return p(tru)}snd = function(p) { return p(fls)}Z = function(s) { return function(z) { return z}}S = function(n) { return function(s) { return function(z) { return s(n(s)(z))}}}plus = function(m) { return function(n) { return function(s) { return function(z) { return m(s)(n(s)(z))}}}}times = function(m) { return function(n) { return m(plus(n))(Z)}}zz = pair(Z)(Z)ss = function(p) { return pair(snd(p))(plus(S(Z))(snd(p)))}prd = function(m) { return fst(m(ss)(zz))}minus = function(m) { return function(n) { return n(prd)(m)}}THREE = S(S(S(Z)))FOUR = S(THREE)console.log(function(n) { return n(function(x) { return x + 1 })(0)}(plus(THREE)(FOUR)))console.log(function(n) { return n(function(x) { return x + 1 })(0)}(times(THREE)(FOUR)))console.log(function(n) { return n(function(x) { return x + 1 })(0)}(minus(times(THREE)(FOUR))(plus(THREE)(FOUR))))"
