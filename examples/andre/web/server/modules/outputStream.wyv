@@ -1,0 +1,5 @@
+module def outputStream
+
+def write():Unit
+
+def writeUTF():Unit
