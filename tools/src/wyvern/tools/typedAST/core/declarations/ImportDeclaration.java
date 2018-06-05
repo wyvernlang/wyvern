@@ -263,7 +263,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         VarBinding binding = bindingAndCtx.getFirst();
         GenContext newCtx = bindingAndCtx.getSecond();
         ValueType type = binding.getExpression().typeCheck(newCtx, null);
-        tlc.addLet(binding.getVarName(), type, binding.getExpression(), false);
+        tlc.addLet(binding.getSite(), type, binding.getExpression(), false);
         tlc.updateContext(newCtx);
     }
 

@@ -131,7 +131,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         for (NameBinding b : argNames) {
             String nameCons = b.getName();
             Type t = b.getType();
-            TypedAST constructArgs = varDeclType(nameCons, t, null);
+            TypedAST constructArgs = valDeclType(nameCons, t, null);
             exps.add(constructArgs);
         }
         body = new DeclSequence(exps);
@@ -160,6 +160,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
 
         LinkedList<TypedAST> exps = new LinkedList<>();
+        LinkedList<TypedAST> ctors = new LinkedList<>();
 
         LinkedList<Type> compriseList = new LinkedList<>();
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
@@ -180,12 +181,23 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             DeclSequence bodyCons = ((TypeVarDecl) elem).getBody();
             TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, true, null);
             exps.add(cons);
+
+            LinkedList<Object> args = new LinkedList<>();
+            TypedAST newBody = null;
+            for (TypedAST ast : bodyCons) {
+                ValDeclaration vd = (ValDeclaration) ast;
+                args.add(this.formalArg(vd.getName(), vd.getType()));
+                TypedAST decl = this.valDecl(vd.getName(), vd.getType(), this.var(vd.getName(), loc), loc);
+                newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
+            }
+            TypedAST defBody = this.newObj(loc, nameCons);
+            this.setNewBody(defBody, newBody);
+            TypedAST valueConstructor = this.defDecl(nameCons, this.nominalType(nameCons, loc), null, args, defBody, false, loc, null);
+            ctors.add(valueConstructor);
         }
 
+        exps.addAll(ctors);
         body = new DeclSequence(exps);
-        if (((DeclSequence) body).hasVarDeclaration() && !isResource) {
-            ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);
-        }
 
         return body;
     }

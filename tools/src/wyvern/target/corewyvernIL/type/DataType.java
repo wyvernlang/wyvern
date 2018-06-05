@@ -50,4 +50,9 @@ public class DataType extends TagType {
         }
         return new DataType(newCT, getValueType().doAvoid(varName, ctx, depth), newCases);
     }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return true;
+    }
 }

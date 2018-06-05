@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.expressions;
 
 import java.util.List;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -90,18 +91,19 @@ public class Case {
 
     public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, NominalType expectedType, List<TypedModuleSpec> dependencies) {
         String bindingVar = binding.getName();
+        BindingSite bindingSite = new BindingSite(bindingVar);
         wyvern.target.corewyvernIL.expression.Variable expr = new wyvern.target.corewyvernIL.expression.Variable(bindingVar);
         ValueType vt = taggedType == null ? null : taggedType.getILType(ctx);
         ValueType bestType = vt;
         // Figure out the best type to use here between the match type and the tag
         if (matchType != null && vt != null && vt.isSubtypeOf(matchType, ctx, null)) {
-            ctx = ctx.extend(bindingVar, expr, vt);
+            ctx = ctx.extend(bindingSite, expr, vt);
         } else {
             bestType = vt == null ? matchType : vt;
-            ctx = ctx.extend(bindingVar, expr, bestType);
+            ctx = ctx.extend(bindingSite, expr, bestType);
         }
         Expression body = (Expression) ast.generateIL(ctx, expectedType, dependencies);
-        return new wyvern.target.corewyvernIL.Case(bindingVar, (NominalType) bestType, body);
+        return new wyvern.target.corewyvernIL.Case(bindingSite, (NominalType) bestType, body);
     }
 
     /**

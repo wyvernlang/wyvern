@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
@@ -54,11 +55,11 @@ public class SeqExpr extends Expression {
             elements.addFirst(binding);
         }
     }
-    public void addBindingLast(String varName, ValueType type, IExpr toReplace) {
-        addBinding(varName, type, toReplace, true);
+    public void addBindingLast(BindingSite site, ValueType type, IExpr toReplace) {
+        addBinding(site, type, toReplace, true);
     }
-    public void addBinding(String varName, ValueType type, IExpr toReplace, boolean isLast) {
-        addBinding(new VarBinding(varName, type, toReplace), isLast);
+    public void addBinding(BindingSite site, ValueType type, IExpr toReplace, boolean isLast) {
+        addBinding(new VarBinding(site, type, toReplace), isLast);
     }
 
 
@@ -118,7 +119,7 @@ public class SeqExpr extends Expression {
         for (HasLocation elem : elements) {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
-                ctx = ctx.extend(binding.getVarName(), new Variable(binding.getVarName()), binding.getType());
+                ctx = ctx.extend(binding.getSite(), new Variable(binding.getVarName()), binding.getType());
             }
         }
         return ctx;

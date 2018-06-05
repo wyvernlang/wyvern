@@ -47,7 +47,7 @@ new (this) =>
     tagged type Nil extends this.List
         type T
 
-    def getFirst(list:this.List[system.Int]):system.Int
+    def getFirst(list:this.List):system.Int // TODO: allow List[Int] as argument
         match list:
             n:this.Nil => 0
             c:this.Cons => 1 // TODO: should be c.value
