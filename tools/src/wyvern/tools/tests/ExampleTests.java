@@ -16,6 +16,7 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
 import wyvern.tools.errors.ToolError;
@@ -196,6 +197,11 @@ public class ExampleTests {
         PythonCompiler.main(args);
     }
 
+    @Test
+    public void testBinarySearchTree() throws ParseException  {
+        TestUtil.doTestScriptModularly(PATH, "data-structures.bsttest", Util.unitType(), Util.unitValue());
+    }
+ 
     @Test
     public void testIOLibServerClient() throws ParseException {
         ExecutorService executor = Executors.newFixedThreadPool(2);
