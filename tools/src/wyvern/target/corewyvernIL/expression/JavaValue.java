@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -72,6 +73,8 @@ public class JavaValue extends AbstractValue implements Invokable {
     private Value javaToWyvern(Object result) {
         if (result instanceof Integer) {
             return new IntegerLiteral((Integer) result);
+        } else if (result instanceof Float) {
+            return new FloatLiteral((Float) result);
         } else if (result instanceof String) {
             return new StringLiteral((String) result);
         } else if (result == null) {
@@ -113,6 +116,11 @@ public class JavaValue extends AbstractValue implements Invokable {
                 return ((IntegerLiteral) arg).getFullValue();
             }
             return new Integer(((IntegerLiteral) arg).getValue());
+        } else if (arg instanceof FloatLiteral) {
+            if (hintClass != null && hintClass == BigDecimal.class) {
+                return ((FloatLiteral) arg).getFullValue();
+            }
+            return ((FloatLiteral) arg).getFullValue();
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
         } else if (arg instanceof ObjectValue) {

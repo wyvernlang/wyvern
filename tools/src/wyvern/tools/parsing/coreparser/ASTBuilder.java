@@ -65,4 +65,6 @@ interface ASTBuilder<AST, Type> {
 
     AST parseExpr(String source, FileLocation loc);
 
+    AST floatLit(float parseFloat, FileLocation loc);
+
 }
