@@ -206,7 +206,6 @@ public class RefinementType extends ValueType {
             return true;
         }
         ctx = new SubtypeAssumption(this, t, ctx);
-        System.out.println();
         final ValueType ct = t.getCanonicalType(ctx);
         if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
             return true;
