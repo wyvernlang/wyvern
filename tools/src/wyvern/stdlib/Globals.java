@@ -166,17 +166,11 @@ public final class Globals {
         intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
 
         List<DeclType> floatDeclTypes = new LinkedList<DeclType>();
-        floatDeclTypes.add(new DefDeclType("+", Util.floatType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         floatDeclTypes.add(new DefDeclType("+", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
-        floatDeclTypes.add(new DefDeclType("-", Util.floatType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         floatDeclTypes.add(new DefDeclType("-", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
-        floatDeclTypes.add(new DefDeclType("*", Util.floatType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         floatDeclTypes.add(new DefDeclType("*", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
-        floatDeclTypes.add(new DefDeclType("/", Util.floatType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         floatDeclTypes.add(new DefDeclType("/", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
-        floatDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         floatDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
-        floatDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         floatDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
         floatDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
         floatDeclTypes.add(new DefDeclType("negate", Util.floatType(), Arrays.asList()));

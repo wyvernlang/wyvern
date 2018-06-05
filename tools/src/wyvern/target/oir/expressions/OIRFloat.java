@@ -1,25 +1,23 @@
 package wyvern.target.oir.expressions;
 
-import java.math.BigDecimal;
-
 import wyvern.target.oir.ASTVisitor;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.declarations.OIRFloatType;
 import wyvern.target.oir.declarations.OIRType;
 
 public class OIRFloat extends OIRLiteral implements OIRValue  {
-  private BigDecimal value;
+  private Double value;
 
-  public OIRFloat(BigDecimal bigDecimal) {
+  public OIRFloat(Double d) {
     super();
-    this.value = bigDecimal;
+    this.value = d;
   }
 
-  public BigDecimal getValue() {
+  public Double getValue() {
     return value;
   }
 
-  public void setValue(BigDecimal value) {
+  public void setValue(Double value) {
     this.value = value;
   }
 

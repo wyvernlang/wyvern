@@ -1,0 +1,19 @@
+require stdout
+
+//Escape rate can only be calculated for numbers outside of the Mandelbrot Set.
+//Program doesn't terminate for Mandelbrot Set members.
+
+def iterate(a : Float, b : Float) : Int
+	(a*a + b*b > 4.0).ifTrue(
+			() => 0,
+			() => 1 + iterate(a*a - b*b, a*b + a*b)
+		)
+
+var a:Float = 2.0
+var b:Float = 1.0
+stdout.print("Escape rate of ")
+stdout.printFloat(a)
+stdout.print(" + ")
+stdout.printFloat(b)
+stdout.print("i : ")
+stdout.printInt(iterate(a,b))

@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -75,5 +76,7 @@ public final class Util {
     public static Value intValue(int i) {
         return new IntegerLiteral(i);
     }
-
+    public static Value floatValue(double d)  {
+        return new FloatLiteral(d);
+    }
 }

@@ -1,6 +1,5 @@
 package wyvern.stdlib.support;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class Stdio {
@@ -24,7 +23,7 @@ public class Stdio {
     public void printBoolean(boolean b) {
         java.lang.System.out.print(b);
     }
-    public void printFloat(BigDecimal f) {
+    public void printFloat(Double f) {
         java.lang.System.out.print(f);
     }
 }

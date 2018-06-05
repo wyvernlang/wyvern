@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.math.BigDecimal;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
@@ -14,10 +13,10 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public class FloatLiteral extends Literal implements Invokable  {
-  private final BigDecimal value;
+  private final Double value;
   @Override
   public int hashCode() {
-      return value.hashCode();
+      return (new Double(value)).hashCode();
   }
   @Override
   public boolean equals(Object obj) {
@@ -31,7 +30,7 @@ public class FloatLiteral extends Literal implements Invokable  {
           return false;
       }
       FloatLiteral other = (FloatLiteral) obj;
-      if (!value.equals(other.value)) {
+      if (value != other.value) {
           return false;
       }
       return true;
@@ -39,13 +38,13 @@ public class FloatLiteral extends Literal implements Invokable  {
     public FloatLiteral(double value) {
       this(value, FileLocation.UNKNOWN);
     }
-    public FloatLiteral(BigDecimal value) {
+    public FloatLiteral(Double value) {
       this(value, FileLocation.UNKNOWN);
     }
     public FloatLiteral(double value, FileLocation loc) {
-      this(BigDecimal.valueOf(value), loc);
+      this(new Double(value), loc);
     }
-    public FloatLiteral(BigDecimal value, FileLocation loc) {
+    public FloatLiteral(Double value, FileLocation loc) {
       super(Util.floatType(), loc);
       this.value = value;
     }
@@ -60,21 +59,21 @@ public class FloatLiteral extends Literal implements Invokable  {
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitFLVisitor, S state)  {
       return emitFLVisitor.visit(state, this);
     }
-    public BigDecimal getFullValue() {
+    public Double getFullValue() {
       return value;
     }
     @Override
     public Value invoke(String methodName, List<Value> args)  {
       switch (methodName) {
-      case "+": return new FloatLiteral(this.value.add(((FloatLiteral) args.get(0)).getFullValue()));
-      case "-": return new FloatLiteral(this.value.subtract(((FloatLiteral) args.get(0)).getFullValue()));
-      case "*": return new FloatLiteral(this.value.multiply(((FloatLiteral) args.get(0)).getFullValue()));
-      case "/": return new FloatLiteral(this.value.divide(((FloatLiteral) args.get(0)).getFullValue()));
-      case "negate": return new FloatLiteral(this.value.negate());
+      case "+": return new FloatLiteral(this.value + ((FloatLiteral) args.get(0)).getFullValue());
+      case "-": return new FloatLiteral(this.value - ((FloatLiteral) args.get(0)).getFullValue());
+      case "*": return new FloatLiteral(this.value * ((FloatLiteral) args.get(0)).getFullValue());
+      case "/": return new FloatLiteral(this.value / ((FloatLiteral) args.get(0)).getFullValue());
+      case "negate": return new FloatLiteral(this.value * -1);
       case "<": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) < 0);
       case ">": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) > 0);
       case "==": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) == 0);
-      default: throw new RuntimeException("runtime error: integer operation " + methodName + "not supported by the runtime");
+      default: throw new RuntimeException("runtime error: float operation " + methodName + "not supported by the runtime");
       }
     }
     @Override
