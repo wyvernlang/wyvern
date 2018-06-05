@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
+import wyvern.tools.errors.ToolError;
 
 @Category(RegressionTests.class)
 public class StdlibTests {
@@ -38,6 +39,16 @@ public class StdlibTests {
     @Test
     public void testParser() throws ParseException {
         TestUtil.doTestScriptModularly("tsls.testParser", null, null);
+    }
+
+    @Test
+    public void testArrayList() throws ParseException {
+        TestUtil.doTestScriptModularly("stdlib.platform.java.arraylistTest", null, null);
+    }
+
+    @Test(expected = ToolError.class)
+    public void testArrayListTypeSafety() throws ParseException {
+        TestUtil.doTestScriptModularly("stdlib.platform.java.arraylistTypeSafetyTest", null, null);
     }
 
     @Test(expected = WyvernAssertion.class)

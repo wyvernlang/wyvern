@@ -1,17 +1,6 @@
 module def arraylist(java : Java)
 import java:wyvern.stdlib.support.ArrayListWrapper.arraylist
 
-// private?
-resource type DynArrayList
-    def isEmpty() : Boolean
-    def add(x : Dyn) : Boolean
-    def size() : Int
-    def get(index : Int) : Dyn
-
-// private?
-def makeDynArrayList() : DynArrayList
-    arraylist.makeArrayList()
-
 resource type ArrayList
     type T
     def isEmpty() : Boolean
@@ -21,7 +10,7 @@ resource type ArrayList
 
 def make[T]() : ArrayList[T] = new
     type T = T
-    val l = makeDynArrayList()
+    val l = arraylist.makeArrayList()
     def isEmpty() : Boolean
         this.l.isEmpty()
     def add(x : T) : Boolean
@@ -30,4 +19,3 @@ def make[T]() : ArrayList[T] = new
         this.l.size()
     def get(index : Int) : T
         this.l.get(index)
-
