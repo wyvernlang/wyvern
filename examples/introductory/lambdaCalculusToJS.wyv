@@ -4,6 +4,7 @@
 
 require stdout
 
+import wyvern.runtime
 import wyvern.option
 import wyvern.collections.list
 
@@ -131,20 +132,20 @@ def parseAtom(lex : Lexer): Option[Term]
                 else
                     option.None[Term]()
 
+def unwrap[T](o: Option[T]): T
+    o.getOrElse(() => runtime.fail("Unwrapped None"))
+
 def parseApplication2(lex : Lexer, lhs : Term): Term
     val rhs = parseAtom(lex)
     if (rhs.isDefined)
-            // Better way to unwrap/pattern match on Option?
-            parseApplication2(lex, Apply(lhs, rhs.getOrElse(() => Var("error"))))
+            parseApplication2(lex, Apply(lhs, unwrap[Term](rhs)))
         else
             lhs
 
 def parseApplication(lex : Lexer) : Term
     val lhs = parseAtom(lex)
     // TODO: better error handling
-    if (!lhs.isDefined)
-        assert false
-    parseApplication2(lex, lhs.getOrElse(() => Var("error")))
+    parseApplication2(lex, unwrap[Term](lhs))
 
 def parseTerm(lex : Lexer) : Term
     if (lex.skip(LAMBDA))
