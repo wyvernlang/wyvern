@@ -154,13 +154,17 @@ public class NominalType extends ValueType {
         DeclType dt = getSourceDeclType(ctx);
         if (dt instanceof ConcreteTypeMember) {
             Type definedType = ((ConcreteTypeMember) dt).getSourceType();
+            ValueType ct = t.getCanonicalType(ctx);
             if (definedType instanceof TagType) {
+                // before checking parent, test for equality with canonical type
+                if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
+                    return true;
+                }
                 NominalType superType = ((TagType) definedType).getParentType(View.from(path, ctx));
                 // TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
                 return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
             }
             ValueType vt = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
-            ValueType ct = t.getCanonicalType(ctx);
             // if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
             //if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
             ctx = new SubtypeAssumption(this, t, ctx);
