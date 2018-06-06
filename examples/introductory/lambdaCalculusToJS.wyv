@@ -10,62 +10,24 @@ import wyvern.collections.list
 type Option = option.Option
 type List = list.List
 
-tagged type Term comprises Var, Lambda, Apply
-    def compile(): String
+datatype Term
+    Var(name : String)
+    Lambda(v: String, body: Term)
+    Apply(left: Term, right: Term)
 
-tagged type Var extends Term
-    val name : String
-    def compile(): String
 
-def makeVar(n : String): Var = new
-    val name = n
-    def compile(): String
-        this.name
+def compileTerm(term : Term): String = match term:
+    v: Var => v.name
+    l: Lambda => "function(" + l.v + ") { return " + compileTerm(l.body) + "}"
+    a: Apply => compileTerm(a.left) + "(" + compileTerm(a.right) + ")"
 
-tagged type Lambda extends Term
-    val v : Var
-    val term : Term
-    def compile(): String
+datatype Statement
+    Define(name: String, term: Term)
+    Print(term: Term)
 
-def makeLambda(variable : Var, t : Term): Lambda = new
-    val v = variable
-    val term = t
-    def compile(): String
-        "function(" + (this.v.compile()) + ") { return " + ((this.term).compile()) + "}"
-
-tagged type Apply extends Term
-    val left : Term
-    val right : Term
-    def compile(): String
-
-def makeApply(l : Term, r : Term): Apply = new
-    val left = l
-    val right = r
-    def compile(): String
-        this.left.compile() + "(" + this.right.compile() + ")"
-
-tagged type Statement comprises Define, Print
-    def compile(): String
-
-tagged type Define extends Statement
-    val name : String
-    val term : Term
-    def compile(): String
-
-def makeDefine(n : String, t : Term): Define = new
-    val name = n
-    val term = t
-    def compile(): String
-        this.name + " = " + this.term.compile()
-
-tagged type Print extends Statement
-    val term : Term
-    def compile(): String
-
-def makePrint(t : Term): Print = new
-    val term = t
-    def compile(): String
-        "console.log(function(n) { return n(function(x) { return x + 1 })(0)}(" + this.term.compile() + "))"
+def compileStatement(s : Statement): String = match s:
+    d: Define => d.name + " = " + compileTerm(d.term)
+    p: Print => "console.log(function(n) { return n(function(x) { return x + 1 })(0)}(" + compileTerm(p.term) + "))"
 
 // Only strips spaces
 def lstrip(s : String) : String
@@ -140,10 +102,6 @@ def chompToken(string : String) : Chomp
                                         else
                                             makeChomp(s.substring(0, i), VAR, s.substring(i, s.length()))
 
-// No exception system yet
-def assertFalse(): Int
-    1 / 0
-
 def makeLexer(i: String): Lexer = new
     var input : String = i
     def next(t: Int): Boolean
@@ -157,7 +115,7 @@ def makeLexer(i: String): Lexer = new
     def token(t: Int): String
         val chomp = chompToken(this.input)
         if (!(chomp.tokType == t))
-            assertFalse()
+            assert false
         this.input = chomp.rest
         chomp.token
 
@@ -169,7 +127,7 @@ def parseAtom(lex : Lexer): Option[Term]
         else
             if (lex.next(VAR))
                     val name = lex.token(VAR)
-                    option.Some(makeVar(name))
+                    option.Some(Var(name))
                 else
                     option.None[Term]()
 
@@ -177,7 +135,7 @@ def parseApplication2(lex : Lexer, lhs : Term): Term
     val rhs = parseAtom(lex)
     if (rhs.isDefined)
             // Better way to unwrap/pattern match on Option?
-            parseApplication2(lex, makeApply(lhs, rhs.getOrElse(() => makeVar("error"))))
+            parseApplication2(lex, Apply(lhs, rhs.getOrElse(() => Var("error"))))
         else
             lhs
 
@@ -185,27 +143,25 @@ def parseApplication(lex : Lexer) : Term
     val lhs = parseAtom(lex)
     // TODO: better error handling
     if (!lhs.isDefined)
-        assertFalse()
-    parseApplication2(lex, lhs.getOrElse(() => makeVar("error")))
+        assert false
+    parseApplication2(lex, lhs.getOrElse(() => Var("error")))
 
 def parseTerm(lex : Lexer) : Term
     if (lex.skip(LAMBDA))
-            val name = makeVar(lex.token(VAR))
+            val name = lex.token(VAR)
             val term = parseTerm(lex)
-            makeLambda(name, term)
+            Lambda(name, term)
         else
             parseApplication(lex)
 
 def parseStatement(line : String) : Statement
     val lexer = makeLexer(line)
     val command = lexer.token(VAR)
-    // if (command == "print") in place of else triggers bug #213
-    // Also can't comment on else line due to ifTSL?
     if (command == "def")
             val name = lexer.token(VAR)
-            makeDefine(name, parseTerm(lexer))
+            Define(name, parseTerm(lexer))
         else
-            makePrint(parseTerm(lexer))
+            Print(parseTerm(lexer))
 
 resource type Program
     val statements : List[Statement]
@@ -214,7 +170,7 @@ def makeProgram(s: List[Statement]): Program = new
     val statements : List[Statement] = s
 
 def compileAndPrintStatement(statement : Statement): Unit
-    stdout.print(statement.compile())
+    stdout.print(compileStatement(statement))
     stdout.println()
 
 def compile(program : Program) : Unit
@@ -222,7 +178,7 @@ def compile(program : Program) : Unit
 
 def testCompile(program : Program) : String
     var out: String = ""
-    program.statements.do((s : Statement) => out = out + s.compile())
+    program.statements.do((s : Statement) => out = out + compileStatement(s))
     out
 
 // No file I/O
@@ -263,6 +219,7 @@ l.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
 
 compile(makeProgram(l))
 
+// Assert for ExampleTests.java
 val testProgram = list.make[Statement]()
 testProgram.append(parseStatement("def tru /t /f t"))
 testProgram.append(parseStatement("def fls /t /f f"))
