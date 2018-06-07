@@ -163,6 +163,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         LinkedList<TypedAST> ctors = new LinkedList<>();
 
         LinkedList<Type> compriseList = new LinkedList<>();
+        if (!(body instanceof DeclSequence)) {
+            body = new DeclSequence(Arrays.asList(body));
+        }
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
             String nameCons = ((TypeVarDecl) elem).getName();
             Type t = nominalType(nameCons, null);
