@@ -170,7 +170,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         }
 
         Object tagInfoComprise = tagInfo(null, compriseList);
-        TypedAST dt = new TypeVarDecl(name, new DeclSequence(), (TaggedInfo) tagInfoComprise, metadata, loc, true, selfName);
+        TypedAST dt = new TypeVarDecl(name, new DeclSequence(), (TaggedInfo) tagInfoComprise, metadata, loc, isResource, selfName);
         exps.add(dt);
 
         Type extended = nominalType(name, null);
@@ -179,7 +179,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
             String nameCons = ((TypeVarDecl) elem).getName();
             DeclSequence bodyCons = ((TypeVarDecl) elem).getBody();
-            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, true, null);
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, isResource, null);
             exps.add(cons);
 
             LinkedList<Object> args = new LinkedList<>();
