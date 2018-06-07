@@ -138,6 +138,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testLambdaCalculus() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.lambdaCalculusToJS", null, null);
+    }
+
+    @Test
     public void testJavaFFI() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "ffi.callFromJava", Util.unitType(), Util.unitValue());
     }

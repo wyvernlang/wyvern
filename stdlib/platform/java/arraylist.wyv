@@ -1,0 +1,21 @@
+module def arraylist(java : Java)
+import java:wyvern.stdlib.support.ArrayListWrapper.arraylist
+
+resource type ArrayList
+    type T
+    def isEmpty() : Boolean
+    def add(x : this.T) : Boolean
+    def size() : Int
+    def get(index : Int) : this.T
+
+def make[T]() : ArrayList[T] = new
+    type T = T
+    val l = arraylist.makeArrayList()
+    def isEmpty() : Boolean
+        this.l.isEmpty()
+    def add(x : T) : Boolean
+        this.l.add(x)
+    def size() : Int
+        this.l.size()
+    def get(index : Int) : T
+        this.l.get(index)
