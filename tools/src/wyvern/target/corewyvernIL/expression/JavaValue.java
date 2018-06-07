@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.Double;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.LinkedList;
