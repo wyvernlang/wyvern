@@ -1,0 +1,36 @@
+require stdout
+require dataStructures.binarysearchtree
+
+var x : Int = 3
+var y : Int = 9
+var z : Int = 0
+var testtree : binarysearchtree.BinarySearchTree = binarysearchtree.makeBST[Int]()
+
+stdout.print("Empty: ")
+stdout.printBoolean(testtree.isEmpty())
+assert testtree.isEmpty()
+
+stdout.print("\nAdding in order: 3, 9, 0, -1, 0, 12, -10")
+testtree.add(x)
+testtree.add(y)
+testtree.add(z)
+testtree.add(-1)
+testtree.add(0)
+testtree.add(12)
+testtree.add(-10)
+
+stdout.print("\nTree min: ")
+stdout.printInt(testtree.getMin())
+stdout.print("\nTree max: ")
+stdout.printInt(testtree.getMax())
+
+stdout.print("\nEmpty: ")
+stdout.printBoolean(testtree.isEmpty())
+assert !testtree.isEmpty()
+
+stdout.print("\nFind 3: ")
+stdout.printBoolean(testtree.find(3))
+assert testtree.find(3)
+stdout.print("\nFind 15: ")
+stdout.printBoolean(testtree.find(15))
+assert !testtree.find(15)
