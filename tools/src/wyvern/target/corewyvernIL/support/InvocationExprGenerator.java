@@ -40,8 +40,8 @@ public class InvocationExprGenerator implements CallableExprGenerator {
             boolean startsWith = iExpr.toString().startsWith("MOD$");
             DeclType applyDecl = receiverType.findDecl("apply", ctx);
             if (iExpr instanceof Variable && startsWith && applyDecl != null) {
-                // treating a module def as if it were a module 
-                ToolError.reportError(ErrorMessage.MUST_INSTANTIATE, loc, ((Variable)iExpr).getName().substring(4));
+                // treating a module def as if it were a module
+                ToolError.reportError(ErrorMessage.MUST_INSTANTIATE, loc, ((Variable) iExpr).getName().substring(4));
             }
             ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, loc, operationName, receiverType.desugar(ctx));
         }
