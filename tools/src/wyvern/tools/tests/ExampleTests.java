@@ -198,7 +198,7 @@ public class ExampleTests {
 
     @Test
     public void testBinarySearchTree() throws ParseException  {
-        TestUtil.doTestScriptModularly(PATH, "data-structures.bsttest", Util.unitType(), Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "dataStructures.bsttest", Util.unitType(), Util.unitValue());
     }
 
     @Test
