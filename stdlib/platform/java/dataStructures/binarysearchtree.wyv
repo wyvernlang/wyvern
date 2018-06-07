@@ -1,0 +1,35 @@
+module def binarysearchtree(java : Java)
+import java:wyvern.stdlib.support.BinarySearchTreeWrapper.binarySearchTreeWrapper
+
+resource type BinarySearchTree
+	def add(data : Dyn) : Unit
+	def isEmpty() : Boolean
+	def getMin() : Dyn
+	def getMax() : Dyn
+	def find(key : Dyn) : Boolean
+
+def makeBinarySearchTree() : BinarySearchTree
+	binarySearchTreeWrapper.makeBinarySearchTree()
+
+resource type BST
+	type T
+	def add(data : this.T) : Unit
+	def isEmpty() : Boolean
+	def getMin() : this.T
+	def getMax() : this.T
+	def find(key : this.T) : Boolean
+
+def makeBST[T]() : BST[T] = new
+	type T = T
+	val tree = makeBinarySearchTree()
+	def add(data : T) : Unit
+		this.tree.add(data)
+	def isEmpty() : Boolean
+		this.tree.isEmpty()
+	def getMin() : T
+		this.tree.getMin()
+	def getMax() : T
+		this.tree.getMax()
+	def find(key : T) : Boolean
+		this.tree.find(key)
+

@@ -6,3 +6,4 @@ resource type Stdout
     def printBoolean(b : Boolean) : Unit
     def println() : Unit
     def flush() : Unit
+    def printFloat(f : Float) : Unit

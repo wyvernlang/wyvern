@@ -27,6 +27,7 @@ import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -299,6 +300,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     public Void visit(Boolean state, RefinementType type) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Void visit(Boolean inTailPosition, FloatLiteral flt) {
+      return null;
     }
 
 }

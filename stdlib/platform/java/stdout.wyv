@@ -19,6 +19,9 @@ def printInt(n:Int):Unit
 def printBoolean(b:Boolean):Unit
 	stdio.printBoolean(b)
 
+def printFloat(f:Float):Unit
+	stdio.printFloat(f)
+
 def println():Unit
 	stdio.println()
 

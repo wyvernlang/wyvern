@@ -8,3 +8,6 @@ def ofInt(x : Int) : String
 
 def ofBoolean(b : Boolean) : String
   python.toString(b)
+
+def ofFloat(f : Float) : String
+  python.toString(f)

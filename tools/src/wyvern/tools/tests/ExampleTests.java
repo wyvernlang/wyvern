@@ -202,6 +202,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testBinarySearchTree() throws ParseException  {
+        TestUtil.doTestScriptModularly(PATH, "dataStructures.bsttest", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
     public void testIOLibServerClient() throws ParseException {
         ExecutorService executor = Executors.newFixedThreadPool(2);
 

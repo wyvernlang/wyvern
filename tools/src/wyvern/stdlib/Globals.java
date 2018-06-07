@@ -59,6 +59,7 @@ public final class Globals {
         // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
         javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
         javaWhiteList.add("wyvern.stdlib.support.Int.utils");
+        javaWhiteList.add("wyvern.stdlib.support.Float.utils");
         javaWhiteList.add("wyvern.stdlib.support.AST.utils");
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
@@ -121,6 +122,7 @@ public final class Globals {
         }
         GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), Globals.getSystemType());
         genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Float", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Character", "system", genCtx);
@@ -162,11 +164,24 @@ public final class Globals {
         intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
+
+        List<DeclType> floatDeclTypes = new LinkedList<DeclType>();
+        floatDeclTypes.add(new DefDeclType("+", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("-", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("*", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("/", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("negate", Util.floatType(), Arrays.asList()));
+
         ValueType intType = new StructuralType("intSelf", intDeclTypes);
         ValueType boolType = new StructuralType("boolean", boolDeclTypes);
+        ValueType floatType = new StructuralType("float", floatDeclTypes);
         declTypes.add(new ConcreteTypeMember("Int", intType));
         declTypes.add(new ConcreteTypeMember("Boolean", boolType));
         declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
+        declTypes.add(new ConcreteTypeMember("Float", floatType));
 
         List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
         stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
@@ -234,6 +249,7 @@ public final class Globals {
         // construct a type for the system object
         List<Declaration> decls = new LinkedList<Declaration>();
         decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Float", new NominalType("this", "Float"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));
