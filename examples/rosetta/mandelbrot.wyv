@@ -1,0 +1,64 @@
+require stdout
+
+def iterate_mandelbrot(a_z : Float, b_z : Float, a : Float, b : Float, c : Int) : String
+	(c > 200).ifTrue(
+			() => " ",
+			() => ((a_z*a_z - b_z*b_z + a)*(a_z*a_z - b_z*b_z + a) + (2.0*a_z*b_z + b)*(2.0*a_z*b_z + b) > 2.0).ifTrue(
+					() => encode(c),
+					() => iterate_mandelbrot(a_z*a_z - b_z*b_z + a, 2.0*a_z*b_z + b, a, b, c + 1)
+				)
+		)
+
+def print_complex(a : Float, b : Float) : Unit
+	stdout.printFloat(a)
+	stdout.print(" + ")
+	stdout.printFloat(b)
+	stdout.print("i\n")		
+
+def encode(count : Int) : String
+	(count == 0).ifTrue(
+			() => "D",
+			() => (count < 10).ifTrue(
+				() => "C",
+				() => (count < 50).ifTrue(
+					() => "B",
+					() => (count < 200).ifTrue(
+						() => "A",
+						() => " "
+					)
+				)
+			)
+		)
+
+//complex range [-1.0, 1.0] y axis
+//real range	[-2.0, 1.0] x axis
+
+def iterate_complex(currComplex : Float) : Unit
+	(currComplex > -1.0).ifTrue(
+		() => iter_complex_aux(currComplex),
+		() => stdout.print("")
+	)
+
+def iter_complex_aux(currComplex : Float) : Unit
+	iterate_real(currComplex, -1.7)
+	iterate_complex(currComplex - 0.02)
+	
+def iterate_real(currComplex : Float, currReal : Float) : Unit
+	(currReal < 1.0).ifTrue(
+		() => iter_real_aux(currComplex, currReal),
+		() => stdout.println()
+	)
+
+def iter_real_aux(currComplex : Float, currReal : Float) : Unit
+	stdout.print(iterate_mandelbrot(0.0, 0.0, currReal, currComplex, 0))
+	iterate_real(currComplex, currReal + 0.02)
+
+def iter_real_test(currComplex : Float, currReal : Float) : Unit
+	stdout.print("(")
+	stdout.printFloat(currReal)
+	stdout.print(",")
+	stdout.printFloat(currComplex)
+	stdout.print(")")
+	iterate_real(currComplex, currReal + 0.02)
+
+iterate_complex(1.0)

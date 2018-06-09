@@ -15,6 +15,7 @@ public enum ErrorMessage {
     TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
     VARIABLE_NOT_DECLARED("No variable named \"%ARG\" is in scope", 1),
     NO_SUCH_METHOD("There is no visible method named %ARG in type %ARG", 2),
+    MUST_INSTANTIATE("Must instantiate module def %ARG before using it", 1),
     DYNAMIC_METHOD_ERROR("Called method %ARG, but the method does not exist on the receiver object.  Did you use type Dyn?", 1),
     NO_SUCH_FIELD("There is no visible field named %ARG", 1),
     NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),

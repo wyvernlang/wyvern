@@ -144,5 +144,4 @@ public abstract class ValueType extends Type implements IASTNode {
         return doAvoid(varName, ctx, 0);
     }
     public static final int MAX_RECURSION_DEPTH = 10;
-    public abstract boolean isTagged(TypeContext ctx);
 }

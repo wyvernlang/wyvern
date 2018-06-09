@@ -25,4 +25,9 @@ public class ExtensibleTagType extends TagType {
         final NominalType newPT = getParentType() != null ? (NominalType) getParentType().doAvoid(varName, ctx, depth) : null;
         return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth));
     }
+
+    @Override
+    public boolean isTagged(TypeContext ctx) {
+        return true;
+    }
 }

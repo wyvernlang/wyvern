@@ -30,6 +30,7 @@ import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -369,5 +370,9 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     @Override
     public ASTNode visit(PSVState state, RefinementType type) {
         return type;
+    }
+
+    public ASTNode visit(PSVState state, FloatLiteral flt)  {
+      return flt;
     }
 }

@@ -8,7 +8,6 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
-import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -96,6 +95,9 @@ public class NominalType extends ValueType {
             return this;
         }
         if (dt instanceof ConcreteTypeMember) {
+            if (((ConcreteTypeMember) dt).getSourceType() instanceof TagType) {
+                return this;
+            }
             final ValueType resultType = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
             if (this.equals(resultType)) {
                 return this;
@@ -151,17 +153,27 @@ public class NominalType extends ValueType {
         }
         DeclType dt = getSourceDeclType(ctx);
         if (dt instanceof ConcreteTypeMember) {
-            ValueType vt = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+            Type definedType = ((ConcreteTypeMember) dt).getSourceType();
             ValueType ct = t.getCanonicalType(ctx);
+            if (definedType instanceof TagType) {
+                // before checking parent, test for equality with canonical type
+                if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
+                    return true;
+                }
+                NominalType superType = ((TagType) definedType).getParentType(View.from(path, ctx));
+                // TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
+                return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
+            }
+            ValueType vt = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
             // if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
             //if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
             ctx = new SubtypeAssumption(this, t, ctx);
             return vt.isSubtypeOf(ct, ctx, reason);
-        } else if (dt instanceof TaggedTypeMember) {
+        /*} else if (dt instanceof TaggedTypeMember) {
             Type typeDefn = ((TaggedTypeMember) dt).getTypeDefinition(View.from(path, ctx));
             NominalType superType = typeDefn.getParentType(View.from(path, ctx));
             // TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
-            return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
+            return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);*/
         } else {
             ValueType ct = t.getCanonicalType(ctx);
             // check for equality with the canonical type
@@ -244,7 +256,7 @@ public class NominalType extends ValueType {
     @Override
     public boolean isTagged(TypeContext ctx) {
         DeclType dt = this.getSourceDeclType(ctx);
-        return dt instanceof TaggedTypeMember;
+        return (dt instanceof ConcreteTypeMember) && ((ConcreteTypeMember) dt).getSourceType().isTagged(ctx);
     }
 
 }

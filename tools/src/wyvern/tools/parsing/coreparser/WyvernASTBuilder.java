@@ -40,6 +40,7 @@ import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.core.values.FloatConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
@@ -131,7 +132,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         for (NameBinding b : argNames) {
             String nameCons = b.getName();
             Type t = b.getType();
-            TypedAST constructArgs = varDeclType(nameCons, t, null);
+            TypedAST constructArgs = valDeclType(nameCons, t, null);
             exps.add(constructArgs);
         }
         body = new DeclSequence(exps);
@@ -160,8 +161,12 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
 
         LinkedList<TypedAST> exps = new LinkedList<>();
+        LinkedList<TypedAST> ctors = new LinkedList<>();
 
         LinkedList<Type> compriseList = new LinkedList<>();
+        if (!(body instanceof DeclSequence)) {
+            body = new DeclSequence(Arrays.asList(body));
+        }
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
             String nameCons = ((TypeVarDecl) elem).getName();
             Type t = nominalType(nameCons, null);
@@ -169,7 +174,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         }
 
         Object tagInfoComprise = tagInfo(null, compriseList);
-        TypedAST dt = new TypeVarDecl(name, new DeclSequence(), (TaggedInfo) tagInfoComprise, metadata, loc, true, selfName);
+        TypedAST dt = new TypeVarDecl(name, new DeclSequence(), (TaggedInfo) tagInfoComprise, metadata, loc, isResource, selfName);
         exps.add(dt);
 
         Type extended = nominalType(name, null);
@@ -178,14 +183,25 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
             String nameCons = ((TypeVarDecl) elem).getName();
             DeclSequence bodyCons = ((TypeVarDecl) elem).getBody();
-            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, true, null);
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, isResource, null);
             exps.add(cons);
+
+            LinkedList<Object> args = new LinkedList<>();
+            TypedAST newBody = null;
+            for (TypedAST ast : bodyCons) {
+                ValDeclaration vd = (ValDeclaration) ast;
+                args.add(this.formalArg(vd.getName(), vd.getType()));
+                TypedAST decl = this.valDecl(vd.getName(), vd.getType(), this.var(vd.getName(), loc), loc);
+                newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
+            }
+            TypedAST defBody = this.newObj(loc, nameCons);
+            this.setNewBody(defBody, newBody);
+            TypedAST valueConstructor = this.defDecl(nameCons, this.nominalType(nameCons, loc), null, args, defBody, false, loc, null);
+            ctors.add(valueConstructor);
         }
 
+        exps.addAll(ctors);
         body = new DeclSequence(exps);
-        if (((DeclSequence) body).hasVarDeclaration() && !isResource) {
-            ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, loc, name);
-        }
 
         return body;
     }
@@ -407,6 +423,10 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST assertion(String description, TypedAST exp, FileLocation loc) {
         return new Assertion(description, exp, loc);
+    }
+
+    public TypedAST floatLit(float value, FileLocation loc) {
+      return new FloatConstant(value, loc);
     }
 
 }

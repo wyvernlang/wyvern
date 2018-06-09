@@ -130,6 +130,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
         tlc.addModuleDecl(decl, dt);
     }
 
+    public String toString() {
+        return "val " + variableName + " = ...";
+    }
+
     @Override
     public StringBuilder prettyPrint() {
         StringBuilder sb = new StringBuilder();

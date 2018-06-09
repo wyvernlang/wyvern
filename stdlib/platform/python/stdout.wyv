@@ -17,5 +17,6 @@ val sys : Sys = sys
 def print(text : String) : Unit = sys.stdout.write(text)
 def printInt(n : Int) : Unit = sys.stdout.write(String(python).ofInt(n))
 def printBoolean(b : Boolean) : Unit = sys.stdout.write(String(python).ofBoolean(b))
+def printFloat(f : Float) : Unit = sys.stdout.write(String(python).ofFloat(f))
 def println() : Unit = sys.stdout.write("\n")
 def flush() : Unit = sys.stdout.flush()

@@ -169,6 +169,7 @@ TOKEN : /* Symbols */
 TOKEN : /* Literals */
 {
   < STRING_LITERAL >
+| < FLOATING_POINT_LITERAL >
 | < DECIMAL_LITERAL >
 | < BOOLEAN_LITERAL >
 | < RATIONAL_LITERAL >
@@ -879,6 +880,8 @@ AST PrimaryPrefix(ExpFlags flags) :
 AST Literal() :
 { AST exp; Token lit; }
 {
+  lit = <FLOATING_POINT_LITERAL> { return build.floatLit(Float.parseFloat(lit.image), loc(lit)); }
+|
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
 |
   lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
