@@ -1,6 +1,7 @@
 package wyvern.tools.tests;
 
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DASH;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DATATYPE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEDENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEF;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DIVIDE;
@@ -17,7 +18,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.SINGLE_LINE_
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TILDE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TYPE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.WHITESPACE;
-import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DATATYPE;
 
 import java.io.IOException;
 import java.io.StringReader;

@@ -40,6 +40,7 @@ import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.core.values.CharacterConstant;
 import wyvern.tools.typedAST.core.values.FloatConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
@@ -246,6 +247,12 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST stringLit(String value, FileLocation loc) {
         return new StringConstant(value, loc);
     }
+    
+    @Override
+    public TypedAST characterLit(char value, FileLocation loc) {
+        return new CharacterConstant(value, loc);
+    }
+
 
     @Override
     public TypedAST integerLit(int value, FileLocation loc) {

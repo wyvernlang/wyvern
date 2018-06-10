@@ -36,6 +36,7 @@ interface ASTBuilder<AST, Type> {
     AST fn(List args, AST body, FileLocation loc);
     AST var(String name, FileLocation loc);
     AST stringLit(String value, FileLocation loc);
+    AST characterLit(char value, FileLocation loc);
     AST integerLit(int value, FileLocation loc);
     AST booleanLit(boolean value, FileLocation loc);
     AST invocation(AST receiver, String name, AST argument, FileLocation loc);
