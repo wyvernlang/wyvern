@@ -54,7 +54,7 @@ public abstract class GenContext extends TypeContext {
      */
     public final IExpr lookupExp(String varName, FileLocation loc) {
         try {
-            return getCallableExpr(varName).genExpr();
+            return getCallableExpr(varName).genExpr(loc);
         } catch (RuntimeException e) {
             ToolError.reportError(VARIABLE_NOT_DECLARED, loc, varName);
             throw new RuntimeException("impossible");

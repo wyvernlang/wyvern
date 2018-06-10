@@ -10,7 +10,6 @@ import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.Type;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
@@ -62,7 +61,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
             return false;
         }
         ConcreteTypeMember ctm = (ConcreteTypeMember) dt;
-        return ctm.getName().equals(getName()) && this.getRawResultType().isSubtypeOf(ctm.getRawResultType(), ctx, reason);
+        return ctm.getName().equals(getName()) && this.getSourceType().isTSubtypeOf(ctm.getSourceType(), ctx, reason);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getRawResultType() == null) ? 0 : getRawResultType().hashCode());
+        result = prime * result + ((getSourceType() == null) ? 0 : getSourceType().hashCode());
         return result;
     }
 
@@ -93,11 +92,11 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
         } else if (!getName().equals(other.getName())) {
             return false;
         }
-        if (getRawResultType() == null) {
-            if (other.getRawResultType() != null) {
+        if (getSourceType() == null) {
+            if (other.getSourceType() != null) {
                 return false;
             }
-        } else if (!getRawResultType().equals(other.getRawResultType())) {
+        } else if (!getSourceType().equals(other.getSourceType())) {
             return false;
         }
         return true;
@@ -112,7 +111,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
 
     @Override
     public ConcreteTypeMember adapt(View v) {
-        return new ConcreteTypeMember(getName(), this.getRawResultType().adapt(v), metadata);
+        return new ConcreteTypeMember(getName(), this.getSourceType().adapt(v), metadata);
     }
 
     @Override
@@ -120,12 +119,12 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
         if (metadata == null) {
             return this;
         }
-        return new ConcreteTypeMember(getName(), this.getRawResultType(), metadata.interpret(ctx));
+        return new ConcreteTypeMember(getName(), this.getSourceType(), metadata.interpret(ctx));
     }
     @Override
     public ConcreteTypeMember doAvoid(String varName, TypeContext ctx, int count) {
-        ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
-        if (t.equals(this.getRawResultType())) {
+        Type t = this.getSourceType().doAvoid(varName, ctx, count);
+        if (t.equals(this.getSourceType())) {
             return this;
         } else {
             return new ConcreteTypeMember(this.getName(), t, metadata);

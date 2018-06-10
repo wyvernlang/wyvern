@@ -90,7 +90,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
 
             // Need to do this to find out what the method name is.
             if (!(function instanceof Invocation)) {
-                receiver = exprGen.genExpr();
+                receiver = exprGen.genExpr(function.getLocation());
             } else {
                 Invocation invocation = (Invocation) function;
                 opName = invocation.getOperationName();

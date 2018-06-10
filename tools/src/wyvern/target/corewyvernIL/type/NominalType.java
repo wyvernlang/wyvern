@@ -8,15 +8,19 @@ import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.RuntimeError;
 import wyvern.tools.errors.ToolError;
 
 public class NominalType extends ValueType {
@@ -80,7 +84,8 @@ public class NominalType extends ValueType {
     }
 
     private DeclType getSourceDeclType(TypeContext ctx) {
-        final StructuralType structuralType = path.typeCheck(ctx, null).getStructuralType(ctx);
+        final ValueType t = path.typeCheck(ctx, null);
+        final StructuralType structuralType = t.getStructuralType(ctx);
         // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
     }
@@ -194,6 +199,9 @@ public class NominalType extends ValueType {
 
     @Override
     public ValueType adapt(View v) {
+        if (v == null) {
+            return this;
+        }
         try {
             final Path newPath = path.adapt(v);
             return new NominalType(newPath, typeMember);
@@ -259,4 +267,12 @@ public class NominalType extends ValueType {
         return (dt instanceof ConcreteTypeMember) && ((ConcreteTypeMember) dt).getSourceType().isTagged(ctx);
     }
 
+    @Override
+    public Tag getTag(EvalContext ctx) {
+        Value v = this.getPath().interpret(ctx);
+        if (!(v instanceof ObjectValue)) {
+            throw new RuntimeError("internal invariant: can only get the tag of part of an object, did this typecheck?");
+        }
+        return new Tag((ObjectValue) v, this.getTypeMember());
+    }
 }

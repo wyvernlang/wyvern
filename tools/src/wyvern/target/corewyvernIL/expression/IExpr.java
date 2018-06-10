@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 
 public interface IExpr extends IASTNode {
     ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator);
@@ -23,5 +24,9 @@ public interface IExpr extends IASTNode {
     }
     default boolean isPath() {
         return false;
+    }
+
+    default IExpr locationHint(FileLocation loc) {
+        return this;
     }
 }

@@ -83,6 +83,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testKeys() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.keys", Util.stringType(), new StringLiteral("m1"));
+    }
+
+    @Test
     public void testFunctions() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.functions", Util.intType(), new IntegerLiteral(6));
     }

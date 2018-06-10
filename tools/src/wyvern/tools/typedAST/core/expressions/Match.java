@@ -92,7 +92,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
          */
         for (Case c : cases) {
             Type t = c.getTaggedTypeMatch();
-            ValueType vt = t == null ? null : t.getILType(ctx);
+            ValueType vt = (t == null) ? null : t.getILType(ctx);
             FailureReason reason = new FailureReason();
             if (expectedMatchType == null) {
                 expectedMatchType = vt;
@@ -123,6 +123,6 @@ public class Match extends AbstractExpressionAST implements CoreAST {
                 expectedCaseType = caseType;
             }
         }
-        return new wyvern.target.corewyvernIL.expression.Match((Expression) matchExpr, elseExpr, casesIL, expectedCaseType);
+        return new wyvern.target.corewyvernIL.expression.Match((Expression) matchExpr, elseExpr, casesIL, expectedCaseType, location);
     }
 }

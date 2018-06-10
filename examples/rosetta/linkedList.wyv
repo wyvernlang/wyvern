@@ -11,7 +11,7 @@ tagged resource type Cons extends LList
     
 tagged type Nil extends LList
 
-val Nil = new
+val Nil : Nil = new
 
 def Cons(v:Int, n:LList):Cons = new
     val value = v

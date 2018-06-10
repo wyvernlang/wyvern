@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 
 public class Variable extends Expression implements Path {
 
@@ -21,9 +22,27 @@ public class Variable extends Expression implements Path {
         this(site.getName());
         this.site = site;
     }
+    public Variable(BindingSite site, FileLocation loc) {
+        super(loc);
+        this.name = site.getName();
+        this.site = site;
+    }
+    public Variable(String name, FileLocation loc) {
+        super(loc);
+        this.name = name;
+    }
     public Variable(String name) {
         super();
         this.name = name;
+    }
+    
+    @Override
+    public Variable locationHint(FileLocation loc) {
+        if (getLocation() == null) {
+            return (site == null) ? new Variable(name, loc) : new Variable(site, loc);
+        } else {
+            return this;
+        }
     }
 
     @Override
