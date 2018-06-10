@@ -11,7 +11,9 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -124,6 +126,11 @@ public class RefinementType extends ValueType {
     /** Returns the self name if there is one, otherwise null */
     public String getSelfName() {
         return selfSite.getName();
+    }
+    
+    /** Returns the base type of this refinement */
+    public ValueType getBase() {
+        return base;
     }
 
     @Override
@@ -264,6 +271,11 @@ public class RefinementType extends ValueType {
     @Override
     public Value getMetadata(TypeContext ctx) {
         return base.getMetadata(ctx);
+    }
+
+    @Override
+    public Tag getTag(EvalContext ctx) {
+        return base.getTag(ctx);
     }
 
     @Override

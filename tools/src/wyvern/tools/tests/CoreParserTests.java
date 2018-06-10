@@ -83,11 +83,11 @@ public class CoreParserTests {
                 // + "tagged type Exp2 comprises Var, Apply, Lambda\n"
 
                 + "val v : Var = new\n"
-                + "    var name : Int = 5\n"
+                + "    val name : Int = 5\n"
 
                 + "val k : Lambda = new\n"
-                + "    var param : String = 'abc'\n"
-                + "    var body : Int = 4\n"
+                + "    val param : String = 'abc'\n"
+                + "    val body : Int = 4\n"
 
                 //+ "val v3 : Exp = Var(4)\n"   this currently doesn't work
 

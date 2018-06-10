@@ -10,9 +10,12 @@ import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.RuntimeError;
 import wyvern.tools.errors.ToolError;
 
 public class ObjectValue extends New implements Invokable {
@@ -42,6 +45,18 @@ public class ObjectValue extends New implements Invokable {
     @Override
     public Value interpret(EvalContext ctx) {
         return this;
+    }
+    
+    public Tag getTag() {
+        ValueType vt = this.getType();
+        while (vt instanceof RefinementType) {
+            vt = ((RefinementType) vt).getBase();
+        }
+        if (!(vt instanceof NominalType)) {
+            throw new RuntimeError("internal invariant: can only get the tag of a nominal type, did this typecheck?");
+        }
+        NominalType nt = (NominalType) vt;
+        return nt.getTag(this.getEvalCtx());
     }
 
     @Override

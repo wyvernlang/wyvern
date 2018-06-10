@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class Match extends Expression {
@@ -19,15 +20,15 @@ public class Match extends Expression {
     private Expression elseExpr;
     private List<Case> cases;
 
-    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases, ValueType caseType) {
-        super(caseType);
+    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases, ValueType caseType, FileLocation location) {
+        super(caseType, location);
         this.matchExpr = matchExpr;
         this.elseExpr = elseExpr;
         this.cases = cases;
     }
 
-    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases) {
-        this(matchExpr, elseExpr, cases, null);
+    public Match(Expression matchExpr, Expression elseExpr, List<Case> cases, FileLocation location) {
+        this(matchExpr, elseExpr, cases, null, location);
     }
 
     public Expression getMatchExpr() {
@@ -46,6 +47,9 @@ public class Match extends Expression {
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
         // typecheck the match expression
         ValueType matchType = matchExpr.typeCheck(env, effectAccumulator);
+        if (!matchType.isTagged(env)) {
+            ToolError.reportError(ErrorMessage.TYPE_NOT_TAGGED, matchExpr, matchType.desugar(env));
+        }
 
         if (getType() == null) {
             Case c = cases.get(0);
@@ -88,12 +92,12 @@ public class Match extends Expression {
     @Override
     public Value interpret(EvalContext ctx) {
         Value matchValue = matchExpr.interpret(ctx);
-        ValueType matchType = matchValue.getType();
+        Tag matchTag = ((ObjectValue) matchValue).getTag();
         Case matchedCase = null;
         FailureReason reason = new FailureReason();
         for (Case c : cases) {
             ValueType caseMatchedType = c.getPattern();
-            if (matchType.isSubtypeOf(caseMatchedType, ctx, reason)) {
+            if (matchTag.isSubTag(caseMatchedType.getTag(ctx), ctx)) {
                 matchedCase = c;
             }
         }
