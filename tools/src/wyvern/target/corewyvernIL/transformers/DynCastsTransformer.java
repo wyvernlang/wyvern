@@ -319,7 +319,6 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
         return characterLiteral;
     }
 
-
     @Override
     public DelegateDeclaration visit(TypeContext ctx, DelegateDeclaration delegateDecl) {
         return delegateDecl;

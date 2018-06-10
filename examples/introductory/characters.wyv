@@ -1,0 +1,27 @@
+require stdout
+
+import wyvern.String
+
+// Fails to parse because characters can consist of only one character
+// val c : Character = #"hi"
+
+val c : Character = #"h"
+val s : String = String.ofCharacter(c)
+
+// Fails to typecheck because c is a Character, not a String
+// stdout.print(c)
+
+stdout.print(s) // h
+stdout.println()
+
+stdout.printBoolean(c < #"a") // false
+stdout.println()
+stdout.printBoolean(c == #"a") // false
+stdout.println()
+stdout.printBoolean(c > #"a") // true
+stdout.println()
+
+stdout.printBoolean(c < #'x') // true
+stdout.println()
+stdout.printBoolean(c == #'h') // true
+stdout.println()

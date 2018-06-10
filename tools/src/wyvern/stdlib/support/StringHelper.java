@@ -10,4 +10,8 @@ public class StringHelper {
     public String ofInt(int x) {
         return Integer.toString(x);
     }
+    
+    public String ofCharacter(char x) {
+        return "" + x;
+    }
 }
