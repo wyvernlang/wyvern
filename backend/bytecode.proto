@@ -12,20 +12,14 @@ enum VariableDeclarationType {
     VAR = 2;
 }
 
-// type L = T
-message TypeDeclaration {
-    required string name = 1;
-    required TypeDesc typeDesc = 2;
-}
 
 // b
 message Bytecode {
     // v
     message Version {
-        // Magic number? Having one doesn't make sense if we're using protobuf
-        // since it can do validation of bytestreams.
-        required string major = 1;
-        required string minor = 2;
+        required int32 magic = 1;
+        required string major = 2;
+        required string minor = 3;
     }
     // i
     message Import {
@@ -35,29 +29,32 @@ message Bytecode {
         }
         optional ImportType importType = 1;
         required string platform = 2;
-        // Need to make a global decision here: In the bytecode should we store
-        // paths as '.' delimited strings or arrays of strings? What about
-        // little 'p' paths used in match expressions, datatags, etc?
         required string path = 3;
         required Type type = 4;
         required string name = 5;
     }
-    required Version version = 1;
-    required string path = 2;
+    optional Version version = 1;
+    // required Version version = 1;
+    optional string path = 2;
+    // required string path = 2;
     repeated Import imports = 3;
-    required Module module = 4;
+    optional Module module = 4;
+    // required Module module = 4;
 }
 
 // M
 message Module {
-    message ExpressionModule {
-        required string path = 1;
-        required Type type = 2;
-        required Expression expression = 3;
+    message ValueModule {
+        required Type type = 1;
+        required Expression expression = 2;
     }
+    message TypeModule {
+        required TypeDesc typeDesc = 1;
+    }
+    required string path = 1;
     oneof module {
-        ExpressionModule expressionModule = 1;
-        TypeDeclaration typeModule = 2;
+        ValueModule valueModule = 2;
+        TypeModule typeModule = 3;
     }
 }
 
@@ -103,6 +100,9 @@ message Expression {
         repeated MatchArm arms = 2;
         optional Expression else = 3;
     }
+    message SequenceExpression {
+        repeated Expression expressions = 1;
+    }
     oneof expression {
         string variable = 1;
         NewExpression newExpression = 2;
@@ -111,6 +111,8 @@ message Expression {
         AssignmentExpression assignmentExpression = 5;
         LetExpression letExpression = 6;
         Literal literal = 7;
+        MatchExpression matchExpression = 8;
+        SequenceExpression sequenceExpression = 9;
     }
 }
 
@@ -120,13 +122,17 @@ message Declaration {
         required VariableDeclarationType declarationType = 1;
         required string variable = 2;
         required Type type = 3;
-        required string value = 4;
+        required Expression initializer = 4;
     }
     message MethodDeclaration {
         required string methodName = 1;
         repeated MethodArgument arguments = 2;
         required Type returnType = 3;
         required Expression body = 4;
+    }
+    message TypeDeclaration {
+        required string name = 1;
+        required TypeDesc typeDesc = 2;
     }
     oneof declaration {
         VariableDeclaration variableDeclaration = 1;
@@ -142,36 +148,32 @@ message TypeDesc {
         optional string extends = 1;
         required Type type = 2;
     }
-    message ExTag {
-        // empty?
-    }
-    message DataTag {
+    message Tag {
+        // Length 0 means extag, otherwise datatag
         repeated string paths = 1;
     }
     required CaseDesc caseDesc = 1;
-    optional ExTag extag = 2;
-    optional DataTag datatag = 3;
-    optional Expression metaData = 4;
+    optional Tag tag = 2;
 }
 
 // \tau
 message Type {
     // \tau { x => \overline{\sigma} }_s
-    message CompoundType { // better name?
-        required Type base = 1; // better name?
+    message CompoundType {
+        required Type base = 1;
         required string this = 2;
         repeated DeclType declTypes = 3;
         required Statefulness statefulness = 4;
     }
-    enum SpecialType { // better name? PrimitiveType?
+    enum SimpleType {
         Top = 1;
-        Dyn = 2;
-        // Missing \bot type (expression has no value)?
+        Nothing = 2;
+        Dyn = 3;
     }
     oneof type {
         CompoundType declarationType = 1;
         string path = 2;
-        SpecialType specialType = 3;
+        SimpleType simpleType = 3;
     }
 }
 
@@ -193,14 +195,20 @@ message DeclType {
         repeated MethodArgument arguments = 2;
         required Type returnType = 3;
     }
+    message DeclTypeDeclaration {
+        required string name = 1;
+        required TypeDesc typeDesc = 2;
+        optional Expression metadata = 3;
+    }
     message OpaqueTypeDecl {
         required string name = 1;
-        required Statefulness statefullness = 2;
+        required Statefulness statefulness = 2;
+        optional Expression metadata = 3;
     }
     oneof declaration {
         VariableDeclType variableDecl = 1;
         MethodDeclType methodDecl = 2;
-        TypeDeclaration typeDeclaration = 3;
+        DeclTypeDeclaration declTypeDeclaration = 3;
         OpaqueTypeDecl opaqueTypeDecl = 4;
     }
 }
