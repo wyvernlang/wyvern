@@ -32,14 +32,12 @@ def compileStatement(s : Statement): String = match s:
 
 // Only strips spaces
 def lstrip(s : String) : String
-    // Extra `if` to work around #214
-    if (s.length() > 0)
-            if (s.substring(0, 1) == " ")
-                    lstrip(s.substring(1, s.length()))
-                else
-                    s
-        else
+    if (s.length() == 0)
             ""
+        elif (s.substring(0, 1) == " ")
+                lstrip(s.substring(1, s.length()))
+        else
+            s
 
 // Poor man's enum
 val EOF = 0
@@ -74,7 +72,7 @@ def findVarEnd(s : String) : Int
             0
         else
             val c = s.substring(0, 1)
-            if (isLetter(s))
+            if (isLetter(c))
                     1 + findVarEnd(s.substring(1, s.length()))
                 else
                     0
@@ -85,23 +83,19 @@ def chompToken(string : String) : Chomp
     if (s.length() == 0)
             makeChomp("", EOF, "")
         else
-            var rest: String = ""
-            if (s.length() > 1)
-                rest = s.substring(1, s.length())
+            val rest = s.substring(1, s.length())
             if (s.substring(0, 1) == "/")
                     makeChomp("/", LAMBDA, rest)
+                elif (s.substring(0, 1) == "(")
+                        makeChomp("(", LPAREN, rest)
+                elif (s.substring(0, 1) == ")")
+                    makeChomp(")", RPAREN, rest)
                 else
-                    if (s.substring(0, 1) == "(")
-                            makeChomp("(", LPAREN, rest)
+                    val i = findVarEnd(s)
+                    if (i == s.length())
+                            makeChomp(s.substring(0, i), VAR, "")
                         else
-                            if (s.substring(0, 1) == ")")
-                                    makeChomp(")", RPAREN, rest)
-                                else
-                                    val i = findVarEnd(s)
-                                    if (i == s.length())
-                                            makeChomp(s.substring(0, i), VAR, "")
-                                        else
-                                            makeChomp(s.substring(0, i), VAR, s.substring(i, s.length()))
+                            makeChomp(s.substring(0, i), VAR, s.substring(i, s.length()))
 
 def makeLexer(i: String): Lexer = new
     var input : String = i
@@ -125,12 +119,11 @@ def parseAtom(lex : Lexer): Option[Term]
             val term = parseTerm(lex)
             lex.skip(RPAREN)
             option.Some(term)
+        elif (lex.next(VAR))
+                val name = lex.token(VAR)
+                option.Some(Var(name))
         else
-            if (lex.next(VAR))
-                    val name = lex.token(VAR)
-                    option.Some(Var(name))
-                else
-                    option.None[Term]()
+            option.None[Term]()
 
 def unwrap[T](o: Option[T]): T
     o.getOrElse(() => runtime.fail("Unwrapped None"))
