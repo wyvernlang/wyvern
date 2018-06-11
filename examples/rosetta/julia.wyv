@@ -1,51 +1,51 @@
 require stdout
 
 def iterate(a_z : Float, b_z : Float, a : Float, b : Float, c : Int) : String
-	(c > 200).ifTrue(
-			() => " ",
-			() => ((a_z*a_z - b_z*b_z + a)*(a_z*a_z - b_z*b_z + a) + (2.0*a_z*b_z + b)*(2.0*a_z*b_z + b) > 2.0).ifTrue(
-					() => encode(c),
-					() => iterate(a_z*a_z - b_z*b_z + a, 2.0*a_z*b_z + b, a, b, c + 1)
-				)
-		)		
+	if (c > 200)
+			" "
+		else
+			if ((a_z*a_z - b_z*b_z + a)*(a_z*a_z - b_z*b_z + a) + (2.0*a_z*b_z + b)*(2.0*a_z*b_z + b) > 2.0)
+					encode(c)
+				else
+					iterate(a_z*a_z - b_z*b_z + a, 2.0*a_z*b_z + b, a, b, c + 1)
 
 def encode(count : Int) : String
-	(count == 0).ifTrue(
-			() => "D",
-			() => (count < 10).ifTrue(
-				() => "C",
-				() => (count < 50).ifTrue(
-					() => "B",
-					() => (count < 200).ifTrue(
-						() => "A",
-						() => " "
-					)
-				)
-			)
-		)
+	if (count == 0)
+			"D"
+		else
+			if (count < 10)
+					"C"
+				else
+					if (count < 50)
+							"B"
+						else
+							if (count < 200)
+									"A"
+								else
+									" "
 
-def iterate_complex(a0 : Float, b0 : Float, currComplex : Float) : Unit
-	(currComplex > -1.0).ifTrue(
-		() => iter_complex_aux(a0, b0, currComplex),
-		() => stdout.print("")
-	)
+def iterateComplex(a0 : Float, b0 : Float, currComplex : Float) : Unit
+	if (currComplex > -1.0)
+			iterComplexAux(a0, b0, currComplex)
+		else
+			stdout.print("")
 
-def iter_complex_aux(a0 : Float, b0 : Float, currComplex : Float) : Unit
-	iterate_real(a0, b0, currComplex, -1.7)
-	iterate_complex(a0, b0, currComplex - 0.02)
+def iterComplexAux(a0 : Float, b0 : Float, currComplex : Float) : Unit
+	iterateReal(a0, b0, currComplex, -1.7)
+	iterateComplex(a0, b0, currComplex - 0.02)
 	
-def iterate_real(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
-	(currReal < 1.7).ifTrue(
-		() => iter_real_aux(a0, b0, currComplex, currReal),
-		() => stdout.println()
-	)
+def iterateReal(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
+	if (currReal < 1.7)
+			iterRealAux(a0, b0, currComplex, currReal)
+		else
+			stdout.println()
 
-def iter_real_aux(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
+def iterRealAux(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
 	stdout.print(iterate(currReal, currComplex, a0, b0, 0))
-	iterate_real(a0, b0, currComplex, currReal + 0.02)
+	iterateReal(a0, b0, currComplex, currReal + 0.02)
 
 def julia(a0 : Float, b0 : Float) : Unit
-	iterate_complex(a0, b0, 1.0)
+	iterateComplex(a0, b0, 1.0)
 
 julia(-1.0, 0.0) 
 stdout.println()
