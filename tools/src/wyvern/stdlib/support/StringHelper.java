@@ -11,7 +11,7 @@ public class StringHelper {
         return Integer.toString(x);
     }
     
-    public String ofCharacter(char x) {
-        return "" + x;
+    public String ofCharacter(char c) {
+        return "" + c;
     }
 }
