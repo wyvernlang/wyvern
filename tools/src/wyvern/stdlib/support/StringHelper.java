@@ -10,4 +10,12 @@ public class StringHelper {
     public String ofInt(int x) {
         return Integer.toString(x);
     }
+
+    public String ofCharacter(char c) {
+        return "" + c;
+    }
+
+    public String ofFloat(double d) {
+        return Double.toString(d);
+    }
 }
