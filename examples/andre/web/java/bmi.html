@@ -1,5 +1,5 @@
 <html>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 
 	<div>
 		<div>
@@ -7,18 +7,18 @@
 		</div>
 		<div>
 			<label id = "space">Age:</label>
-			<input name="AgeParam" type="text" required="required" width ="200px" aria-required="true">
+			<input id = "aparam" name="AgeParam" type="text" required="required" width ="200px" aria-required="true">
 		</div><br>
 		<div>
 			<label>Height (cm): </label>
-			<input name="HeightParam" type="text" required="required" aria-required="true"></textarea>
+			<input id="hparam" name="HeightParam" type="text" required="required" aria-required="true">
 		</div><br>
 		<div>
 			<label>Weight (kg): </label>
-			<input name="WeightParam" type="text" required="required" aria-required="true">
+			<input id="wparam" name="WeightParam" type="text" required="required" aria-required="true">
 		</div><br>
 		<div>
-			<input type="submit" value="Submit"></input>
+			<input type="submit" value="Submit">
 		</div>
 		</div>
 
