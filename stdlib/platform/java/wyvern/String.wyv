@@ -7,10 +7,6 @@ def equals(str1:String,str2:String):Boolean
 
 def ofInt(x : Int) : String
   utils.ofInt(x)
-  utils.ofInt(x)
 
 def ofFloat(f : Float) : String
   utils.ofFloat(f)
-
-def ofCharacter(c : Character) : String
-  utils.ofCharacter(c)
