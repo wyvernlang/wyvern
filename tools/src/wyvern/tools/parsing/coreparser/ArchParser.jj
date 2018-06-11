@@ -1,6 +1,7 @@
 options
 {
-    BUILD_PARSER = false;
+    //BUILD_PARSER = false;
+    STATIC = false;
     USER_TOKEN_MANAGER = true;
 }
 
@@ -8,8 +9,15 @@ PARSER_BEGIN(ArchParser)
 
 package wyvern.tools.parsing.coreparser;
 
-public class ArchParser
-{
+import java.util.*;
+
+public class ArchParser<AST,Type>   {
+    //*private ArchASTBuilder<AST,Type> build;
+    
+    //*public void setBuilder(ArchASTBuilder<AST,Type> builder) { build = builder; }
+    public static void main(String[] args)  {
+    
+    }
 }
 
 PARSER_END(ArchParser)
@@ -28,7 +36,6 @@ TOKEN : /* Keywords */
 | <PORT: "port">
 | <PROVIDES: "provides">
 | <REQUIRES: "requires">
-| <TARGET: "target">
 | <CONNECTOR: "connector">
 | <VAL: "val">
 | <ARCHITECTURE: "architecture">
@@ -59,11 +66,182 @@ TOKEN : /* Symbols */
 {
   <COLON: ":">
 | <DOT: ".">
+| <COMMA: ",">
 }
 
-/*void ArchDesc() :
+/** Root production. */
+void ArchDesc() :
+{ AST exp; }
 {
+    exp = ArchTypeDeclSeq()
 }
+
+AST ArchTypeDeclSeq() : 
+{ AST ast1; AST ast2; }
 {
-    <EOF>
-}*/
+    ast1 = ArchTypeDecls() 
+    ( ast2 = ArchTypeDecls() {  } )*
+    { return null; }
+    //{ return ast1; }
+}
+
+AST ArchTypeDecls() : 
+{ AST exp; }
+{
+    exp = ComponentTypeDecl()       { return null; }//{ return exp; }
+|
+    exp = ConnectorTypeDecl()       { return null; }//{ return exp; }
+|
+    exp = ArchitectureTypeDecl()    { return null; }//{ return exp; }
+}
+
+AST ComponentTypeDecl() : 
+{ Token name; boolean isExternal; AST exp1; AST exp2; }
+{
+    [ <EXTERNAL> { isExternal=true; } ] <COMPONENT> name=<IDENTIFIER>
+    <NEWLINE> <INDENT> exp1 = ComponentTypeDeclBody()
+            ( exp2 = ComponentTypeDeclBody() {  } )*
+            <DEDENT>
+    { return null; }//{ return build.componentTypeDecl(); }
+}
+
+AST ComponentTypeDeclBody() : 
+{ AST ast1; AST ast2; }
+{
+    ast1 = MemberDecls()            { return null; }//{ return ast1; }
+|
+    ast1 = ArchTypeDeclSeq()        { return null; }//{ return ast1; }
+|
+    ast1 = BindingDecls()           { return null; }//{ return ast1; }
+}
+
+AST ConnectorTypeDecl() : 
+{ Token name; AST exp1; AST exp2; }
+{
+    <CONNECTOR>
+    <NEWLINE> <INDENT> exp1 = MemberDecls()
+            ( exp2 = MemberDecls() {  } )*
+            <DEDENT>
+    { return null; }
+}
+
+AST ArchitectureTypeDecl() : 
+{ Token name; AST body; }
+{
+    <ARCHITECTURE> name=<IDENTIFIER>
+    <NEWLINE> <INDENT> body = ArchElemDeclSeq()
+            <DEDENT>
+    { return null; }//{ return build.architectureTypeDecl(); }
+}
+
+AST ArchElemDeclSeq() : 
+{ AST exp1; AST exp2; }
+{
+    exp1 = ArchElemDecls() 
+    (exp2 = ArchElemDecls() { } )*
+    { return null; }
+}
+
+AST ArchElemDecls() : 
+{ AST exp; }
+{
+    exp = ComponentDecls()      { return null; }//{ return exp; }
+|
+    exp = ConnectorDecls()      { return null; }//{ return exp; }
+|
+    exp = AttachmentDecls()     { return null; }//{ return exp; }
+|
+    exp = EntryPointDecls()     { return null; }//{ return exp; }
+}
+
+AST ComponentDecls() :
+{ Token type; Token name; boolean isExternal = false; List types; List names; }
+{
+    [<EXTERNAL> { isExternal = true; }] <COMPONENTS>
+    <NEWLINE> <INDENT> 
+            type=<IDENTIFIER> name=<IDENTIFIER> {  }
+            (<NEWLINE> type=<IDENTIFIER> name=<IDENTIFIER>)*
+            <DEDENT>
+    { return null; }
+}
+
+AST ConnectorDecls() : 
+{ Token type; Token name; boolean isExternal = false; }
+{
+    <CONNECTORS> 
+    <NEWLINE> <INDENT> 
+            type=<IDENTIFIER> name=<IDENTIFIER> { }
+            (<NEWLINE> type=<IDENTIFIER> name=<IDENTIFIER>)*
+            <DEDENT>
+    { return null; }
+}
+
+AST AttachmentDecls() : 
+{ String p1; String p2; Token cntr; }
+{
+    //allow for multiple cmp.prt in connect statement
+    <ATTACHMENTS>
+    <NEWLINE> <INDENT> 
+    <CONNECT> p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER>
+    ( <NEWLINE> p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER> {} )*
+            <DEDENT>
+    { return null; }
+}
+
+AST BindingDecls() :
+{ Token t; String b; }
+{
+    <BINDINGS>
+    <NEWLINE> <INDENT> t=<IDENTIFIER> <IS> b=Segment()
+    ( <NEWLINE> t=<IDENTIFIER> <IS> b=Segment() {} )*
+    { return null; }
+}
+
+AST EntryPointDecls() : 
+{ Token t; Token point; }
+{
+    <ENTRYPOINTS>
+    <NEWLINE> <INDENT> t=<IDENTIFER> <COLON> point=<IDENTIFIER>
+    ( <NEWLINE> t=<IDENTIFIER> <COLON> point=<IDENTIFIER> {} )*
+            <DEDENT>
+    { return null; }
+}
+
+AST MemberDecls() :
+{ AST exp1; AST exp2; }
+{
+    ( exp1 = ValDecl() | exp1 = PortDecl() )
+    ( exp2 = ValDecl() | exp2 = PortDecl() { } )*
+    { return null; }//{ return exp1; }
+}
+
+AST ValDecl() :
+{ Token t; Token name; }
+{
+    <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER>
+    { return null; }//{ return build.valDecl(); }
+}
+
+AST PortDecl() :
+{ Token p; Token req = null; Token prov = null; }
+{
+    <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> | 
+                        <PROVIDES> prov=<IDENTIFIER>) 
+    { return null; }//{ return build.portDecl(); }
+}
+
+String Segment() : 
+{ String s; Token t; }
+{
+    t=<IDENTIFIER> { s = t.image; }
+    ( <DOT> t=<IDENTIFIER> { s = s + "." + t.image; } )* 
+    { return null; }//{ return s; }
+}
+
+
+
+
+
+
+
+
