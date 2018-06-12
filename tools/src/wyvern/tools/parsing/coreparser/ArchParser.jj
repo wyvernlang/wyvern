@@ -10,13 +10,74 @@ PARSER_BEGIN(ArchParser)
 package wyvern.tools.parsing.coreparser;
 
 import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.StringReader;
+import wyvern.tools.lexing.archlexer.ArchLexer;
+import java.io.FileNotFoundException;
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import java.io.IOException;
+
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMPONENT;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.PORT;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.COLON;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.WHITESPACE;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.INDENT;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.DEDENT;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.IDENTIFIER;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.NEWLINE;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.PROVIDES;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.REQUIRES;
 
 public class ArchParser<AST,Type>   {
     //*private ArchASTBuilder<AST,Type> build;
-    
     //*public void setBuilder(ArchASTBuilder<AST,Type> builder) { build = builder; }
-    public static void main(String[] args)  {
     
+    public static String kindToName(int kind) {
+      switch (kind) {
+      case COMPONENT: return "COMPONENT";
+      case PORT: return "PORT";
+      case COLON: return "COLON";
+      case IDENTIFIER: return "IDENTIFIER";
+      case WHITESPACE: return "WHITESPACE";
+      case DEDENT: return "DEDENT";
+      case INDENT: return "INDENT";
+      case NEWLINE: return "NEWLINE";
+      case PROVIDES: return "PROVIDES";
+      case REQUIRES: return "REQUIRES";
+      default: return "UNKNOWN(" + kind + ")";
+      }
+    }
+    
+    public static void main(String []args) throws CopperParserException, IOException, FileNotFoundException {
+        BufferedReader source = new BufferedReader(new FileReader("C:\u005c\u005cUsers\u005c\u005cAmanda Liu\u005c\u005cwyvern\u005c\u005ctest.wyv"));
+        ArchParser wp = new ArchParser(
+                new WyvernTokenManager<ArchLexer, ArchParserConstants>(source, "test", ArchLexer.class,
+                        ArchParserConstants.class));
+
+        /*Full list of tokens as collected by the token manager
+        List<Token> tokens = new ArchLexer().parse(source, "test");
+        for (Token t: tokens) {
+          if (!kindToName(t.kind).equals("WHITESPACE")){
+            System.out.print(kindToName(t.kind) + ", ");
+          }
+        }*/
+        
+        //Parsing attempt
+        try {
+          wp.ArchDesc();
+        } catch (ParseException e)  {
+          e.printStackTrace();
+        }
+
+        /*What's left after parsing attempt*/
+        Token t = wp.getNextToken();
+        while (!kindToName(t.kind).equals("UNKNOWN(0)")){
+            System.out.print(kindToName(t.kind) + ", ");
+            t = wp.getNextToken();
+        }
+
     }
 }
 
@@ -105,22 +166,25 @@ AST ComponentTypeDecl() :
     { return null; }//{ return build.componentTypeDecl(); }
 }
 
+
 AST ComponentTypeDeclBody() : 
 { AST ast1; AST ast2; }
 {
     ast1 = MemberDecls()            { return null; }//{ return ast1; }
+
 |
-    ast1 = ArchTypeDeclSeq()        { return null; }//{ return ast1; }
+    ast1 = ArchTypeDecls()        { return null; }//{ return ast1; }
 |
     ast1 = BindingDecls()           { return null; }//{ return ast1; }
+
 }
 
 AST ConnectorTypeDecl() : 
 { Token name; AST exp1; AST exp2; }
 {
     <CONNECTOR>
-    <NEWLINE> <INDENT> exp1 = MemberDecls()
-            ( exp2 = MemberDecls() {  } )*
+    <NEWLINE> <INDENT> exp1 = ValDecl()
+    ( <NEWLINE> exp2 = ValDecl())*
             <DEDENT>
     { return null; }
 }
@@ -211,23 +275,22 @@ AST MemberDecls() :
 { AST exp1; AST exp2; }
 {
     ( exp1 = ValDecl() | exp1 = PortDecl() )
-    ( exp2 = ValDecl() | exp2 = PortDecl() { } )*
     { return null; }//{ return exp1; }
-}
-
-AST ValDecl() :
-{ Token t; Token name; }
-{
-    <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER>
-    { return null; }//{ return build.valDecl(); }
 }
 
 AST PortDecl() :
 { Token p; Token req = null; Token prov = null; }
 {
     <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> | 
-                        <PROVIDES> prov=<IDENTIFIER>) 
+                        <PROVIDES> prov=<IDENTIFIER>) <NEWLINE>
     { return null; }//{ return build.portDecl(); }
+}
+
+AST ValDecl() :
+{ Token t; Token name; }
+{
+    <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER> <NEWLINE>
+    { return null; }//{ return build.valDecl(); }
 }
 
 String Segment() : 
