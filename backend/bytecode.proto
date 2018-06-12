@@ -44,6 +44,7 @@ message Module {
     }
     message TypeModule {
         required TypeDesc typeDesc = 1;
+        optional Expression metadata = 2;
     }
     required string path = 1;
     oneof module {
@@ -132,6 +133,7 @@ message Declaration {
     message TypeDeclaration {
         required string name = 1;
         required TypeDesc typeDesc = 2;
+        optional Expression metadata = 3;
     }
     oneof declaration {
         VariableDeclaration variableDeclaration = 1;
