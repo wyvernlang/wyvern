@@ -14,4 +14,8 @@ public class StringHelper {
     public String ofFloat(double d) {
         return Double.toString(d);
     }
+
+    public String ofCharacter(char c) {
+        return "" + c;
+    }
 }
