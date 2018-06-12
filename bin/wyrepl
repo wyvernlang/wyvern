@@ -31,4 +31,4 @@ export WYVERN_HOME="$CP_HOME"
 # echo $WYV_CLASSPATH
 
 
-java -cp "$WYV_CLASSPATH" wyvern.tools.ReplServer $*
+java -cp "$WYV_CLASSPATH" wyvern.tools.REPL $*
