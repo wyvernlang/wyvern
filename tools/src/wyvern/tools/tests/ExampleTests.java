@@ -73,6 +73,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testAlgebra() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.algebra", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
     public void testDatatypes() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.datatypes", Util.stringType(), new StringLiteral("(x => x) unit"));
     }
