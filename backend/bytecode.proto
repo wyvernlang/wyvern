@@ -18,28 +18,22 @@ message Bytecode {
     // v
     message Version {
         required int32 magic = 1;
-        required string major = 2;
-        required string minor = 3;
+        required int32 major = 2;
+        required int32 minor = 3;
     }
     // i
     message Import {
-        enum ImportType {
-            METADATA = 1;
-            TYPE = 2;
-        }
-        optional ImportType importType = 1;
-        required string platform = 2;
-        required string path = 3;
-        required Type type = 4;
-        required string name = 5;
+        required bool isMetadataImport = 1;
+        required bool isTypeImport = 2;
+        required string platform = 3;
+        required string path = 4;
+        required Type type = 5;
+        required string name = 6;
     }
-    optional Version version = 1;
-    // required Version version = 1;
-    optional string path = 2;
-    // required string path = 2;
+    required Version version = 1;
+    required string path = 2;
     repeated Import imports = 3;
-    optional Module module = 4;
-    // required Module module = 4;
+    repeated Module modules = 4;
 }
 
 // M
@@ -62,11 +56,11 @@ message Module {
 message Expression {
     message NewExpression {
         required Type type = 1;
-        required string this = 2;
+        required string thisVariable = 2;
         repeated Declaration declarations = 3;
     }
     message CallExpression {
-        required Expression callee = 1;
+        required Expression receiver = 1;
         required string method = 2;
         repeated Expression arguments = 3;
     }
@@ -86,8 +80,13 @@ message Expression {
     }
     message Literal {
         oneof literal {
-            string string = 1;
-            bytes integer = 2;
+            string stringLiteral = 1;
+            bytes integerLiteral = 2;
+            double floatLiteral = 3;
+            bool booleanLiteral = 4;
+            // protobuf doesn't have char type. This may be better anyways due
+            // to unicode complexities and the shortcomings of Java's char.
+            string characterLiteral = 5;
         }
     }
     message MatchExpression {
