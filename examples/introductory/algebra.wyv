@@ -230,6 +230,7 @@ def simplify(t : Term) : TermStep
 
   def isSin2(a : Term) : Boolean
     match a:
+      _:Term => false
       a:Pow => if (floatEq(a.n, 2.0))
                  match a.u:
                    _:Term => false
@@ -239,6 +240,7 @@ def simplify(t : Term) : TermStep
 
   def isCos2(a : Term) : Boolean
     match a:
+      _:Term => false
       a:Pow => if (floatEq(a.n, 2.0))
                  match a.u:
                    _:Term => false
@@ -469,14 +471,16 @@ def printInfo(t : Term, xVal : Number, yVal : Number) : Unit
   bindings.put("y", yVal)
 
   def printInfo1(title : String, s : Term) : Unit
+    val sNew = fullySimplify(s)
+
     stdout.print("* " + title + ":\n    ")
     stdout.print(toString(s))
     stdout.print("\n  Fully simplified:\n    ")
-    stdout.print(toString(fullySimplify(s)))
+    stdout.print(toString(sNew))
     stdout.print(
       "\n  Evaluated @ (x = " + xString + ", y = " + yString + "):\n    "
     )
-    stdout.print(numberToString(eval(bindings, s)))
+    stdout.print(numberToString(eval(bindings, sNew)))
     stdout.print("\n")
 
   printDivider()
@@ -486,8 +490,21 @@ def printInfo(t : Term, xVal : Number, yVal : Number) : Unit
   printSmallDivider()
   printInfo1("Derivative w.r.t. y", d("y", t))
 
-printInfo(Sin(Pow(Variable("x"), 2.0)), 4.0, 5.0)
-printInfo(Log(e, Exp(e, Pow(Variable("y"), 3.0))), 4.0, 5.0)
-printInfo(Product(Variable("x"), Variable("y")), 4.0, 5.0)
+printInfo(
+  Sin(Pow(Variable("x"), 2.0)),
+  4.0, 5.0
+)
+printInfo(
+  Log(e, Exp(e, Pow(Variable("y"), 3.0))),
+  0.5, 2.0
+)
+printInfo(
+  Product(Variable("x"), Variable("y")),
+  3.0, 7.5
+)
+printInfo(
+  Sum(Pow(Sin(Variable("x")), 2.0), Pow(Cos(Variable("x")), 2.0)),
+  0.0, 0.0
+)
 
 printDivider()
