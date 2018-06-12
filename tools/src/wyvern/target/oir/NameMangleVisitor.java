@@ -15,10 +15,12 @@ import wyvern.target.oir.declarations.OIRMethod;
 import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
+import wyvern.target.oir.expressions.OIRCharacter;
 import wyvern.target.oir.expressions.OIRExpression;
 import wyvern.target.oir.expressions.OIRFFIImport;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
+import wyvern.target.oir.expressions.OIRFloat;
 import wyvern.target.oir.expressions.OIRIfThenElse;
 import wyvern.target.oir.expressions.OIRInteger;
 import wyvern.target.oir.expressions.OIRLet;
@@ -170,6 +172,10 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
     public OIRAST visit(NameMangleState state, OIRString oirString) {
         return oirString;
     }
+    
+    public OIRAST visit(NameMangleState state, OIRCharacter oirCharacter) {
+        return oirCharacter;
+    }
 
     public OIRAST visit(NameMangleState state, OIRVariable oirVariable) {
         if (!oirVariable.shouldMangle()) {
@@ -245,5 +251,9 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
 
     public OIRAST visit(NameMangleState state, OIRFFIImport oirImport) {
         return oirImport;
+    }
+
+    public OIRAST visit(NameMangleState state, OIRFloat oirFloat) {
+      return oirFloat;
     }
 }

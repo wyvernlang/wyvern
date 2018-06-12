@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.FileLocation;
@@ -33,4 +34,6 @@ public abstract class Type extends ASTNode implements IASTNode {
 
     // TODO: depth limit is hacky, find a more principled approach to avoidance
     public abstract Type doAvoid(String varName, TypeContext ctx, int depth);
+    public abstract boolean isTagged(TypeContext ctx);
+    public abstract boolean isTSubtypeOf(Type sourceType, TypeContext ctx, FailureReason reason);
 }

@@ -25,11 +25,13 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -126,7 +128,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, Case c) {
         Expression resultBody = (Expression) c.getBody().acceptVisitor(this, state);
-        Case result = new Case(c.getVarName(), c.getPattern(), resultBody);
+        Case result = new Case(c.getSite(), c.getPattern(), resultBody);
         result.copyMetadata(c);
         return result;
     }
@@ -153,7 +155,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             cases.add((Case) matchCase.acceptVisitor(this, state));
         }
 
-        Match result = new Match(matchExpr, elseExpr, cases);
+        Match result = new Match(matchExpr, elseExpr, cases, match.getLocation());
         result.copyMetadata(match);
         return result;
     }
@@ -279,6 +281,10 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     public ASTNode visit(PSVState state, StringLiteral stringLiteral) {
         return stringLiteral;
     }
+    
+    public ASTNode visit(PSVState state, CharacterLiteral characterLiteral) {
+        return characterLiteral;
+    }
 
     public ASTNode visit(PSVState state, DelegateDeclaration delegateDecl) {
         return delegateDecl;
@@ -369,5 +375,9 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     @Override
     public ASTNode visit(PSVState state, RefinementType type) {
         return type;
+    }
+
+    public ASTNode visit(PSVState state, FloatLiteral flt)  {
+      return flt;
     }
 }

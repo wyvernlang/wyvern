@@ -1,0 +1,29 @@
+tagged type Key
+    val u:Unit // do we really need this?
+
+type KeyedMap
+    tagged type MyKey extends Key
+        val u:Unit
+    def insert(v:Int):this.MyKey
+    def lookup(k:this.MyKey):Int
+    
+def makeMap():KeyedMap = new
+    tagged type MyKey extends Key
+        val u:Unit
+    /*def makeKey():this.MyKey = new
+        val u:Unit = unit*/
+    def insert(v:Int):this.MyKey = new (self) =>
+        val u:Unit = unit
+    def lookup(k:this.MyKey):Int = 0
+
+val m1:KeyedMap = makeMap()
+val m2:KeyedMap = makeMap()
+val k1:m1.MyKey = m1.insert(0)
+m1.lookup(k1)
+val aKey:Key = k1 // forget the detailed type
+
+// is k1 a valid key for m2, m1, or nothing?
+match aKey:
+    theKey:m2.MyKey => "m2"
+    theKey:m1.MyKey => "m1"
+    //default => "nothing" // TODO: implement me

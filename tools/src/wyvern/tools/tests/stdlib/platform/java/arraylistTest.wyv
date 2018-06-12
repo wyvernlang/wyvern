@@ -1,0 +1,42 @@
+require arraylist
+
+type ArrayList = arraylist.ArrayList
+
+val intList = arraylist.make[Int]()
+assert intList.isEmpty()
+assert intList.size() == 0
+
+intList.add(1)
+assert !intList.isEmpty()
+assert intList.size() == 1
+
+intList.add(2)
+assert intList.size() == 2
+
+intList.add(3)
+assert intList.size() == 3
+
+assert intList.get(0) == 1
+assert intList.get(1) == 2
+assert intList.get(2) == 3
+assert intList.size() == 3
+
+
+val stringList = arraylist.make[String]()
+assert stringList.isEmpty()
+assert stringList.size() == 0
+
+stringList.add("a")
+assert !stringList.isEmpty()
+assert stringList.size() == 1
+
+stringList.add("b")
+assert stringList.size() == 2
+
+stringList.add("c")
+assert stringList.size() == 3
+
+assert stringList.get(0) == "a"
+assert stringList.get(1) == "b"
+assert stringList.get(2) == "c"
+assert stringList.size() == 3

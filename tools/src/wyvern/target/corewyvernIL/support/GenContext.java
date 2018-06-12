@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.support;
 
 import static wyvern.tools.errors.ErrorMessage.VARIABLE_NOT_DECLARED;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Path;
@@ -27,15 +28,22 @@ public abstract class GenContext extends TypeContext {
 
     /** Extends the context with a variable-type mapping
      * returns the functional extension. */
-    public GenContext extend(String var, ValueType type) {
-        return new VarGenContext(var, new Variable(var), type, this);
+    public GenContext extend(BindingSite varBinding, ValueType type) {
+        return new VarGenContext(varBinding, new Variable(varBinding), type, this);
     }
 
     /** Extends the context with a variable-type mapping, where uses of the
      * variable are transformed to some possibly more complex expression
      * (typically var.field); returns the functional extension. */
-    public GenContext extend(String var, Expression expr, ValueType type) {
-        return new VarGenContext(var, expr, type, this);
+    public GenContext extend(BindingSite varBinding, Expression expr, ValueType type) {
+        return new VarGenContext(varBinding, expr, type, this);
+    }
+
+    /** Extends the context with a variable-type mapping, where uses of the
+     * variable are transformed to some possibly more complex expression
+     * (typically var.field); returns the functional extension. */
+    public GenContext extend(String varName, Expression expr, ValueType type) {
+        return new VarGenContext(varName, expr, type, this);
     }
 
     /** Looks up an expression to use in translation when varName occurs in the source
@@ -46,7 +54,7 @@ public abstract class GenContext extends TypeContext {
      */
     public final IExpr lookupExp(String varName, FileLocation loc) {
         try {
-            return getCallableExpr(varName).genExpr();
+            return getCallableExpr(varName).genExpr(loc);
         } catch (RuntimeException e) {
             ToolError.reportError(VARIABLE_NOT_DECLARED, loc, varName);
             throw new RuntimeException("impossible");

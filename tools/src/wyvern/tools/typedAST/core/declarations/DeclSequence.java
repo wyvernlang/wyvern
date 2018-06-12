@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 //import wyvern.targets.java.annotations.Val;
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -158,6 +159,7 @@ public class DeclSequence extends Sequence {
     @Override
     public void genTopLevel(TopLevelContext tlc) {
         String newName = GenContext.generateName();
+        BindingSite site = new BindingSite(newName);
 
         List<wyvern.target.corewyvernIL.decl.Declaration> decls =
                 new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
@@ -174,14 +176,14 @@ public class DeclSequence extends Sequence {
         }
 
         for (TypedAST seqAST : getDeclIterator()) {
-            ValueType type = new StructuralType(newName, declts);
-            GenContext incrCtx = newCtx.extend(newName, new Variable(newName), type);
+            ValueType type = new StructuralType(site, declts);
+            GenContext incrCtx = newCtx.extend(site, new Variable(newName), type);
             Declaration d = (Declaration) seqAST;
             declts.add(d.genILType(incrCtx));
         }
 
-        ValueType type = new StructuralType(newName, declts);
-        GenContext genCtx = newCtx.extend(newName, new Variable(newName), type);
+        ValueType type = new StructuralType(site, declts);
+        GenContext genCtx = newCtx.extend(site, new Variable(newName), type);
 
         // Do the translation using this updated context
         tlc.updateContext(genCtx);
@@ -198,14 +200,14 @@ public class DeclSequence extends Sequence {
         for (wyvern.target.corewyvernIL.decl.Declaration d: decls) {
             d.typeCheck(tlc.getContext(), tlc.getContext());
             if (d.containsResource(tlc.getContext())) {
-                type = new StructuralType(newName, declts, true);
+                type = new StructuralType(site, declts, true);
                 break;
             }
         }
 
         /* wrap the declarations into an object */
-        Expression newExp = new New(decls, newName, type, getLocation());
-        tlc.addLet(newName, type, newExp, true);
+        Expression newExp = new New(decls, site, type, getLocation());
+        tlc.addLet(site, type, newExp, true);
     }
 
     /**
@@ -215,9 +217,10 @@ public class DeclSequence extends Sequence {
      */
     public StructuralType inferStructuralType(GenContext ctx, String selfName) {
         boolean isResource = false;
+        BindingSite site = new BindingSite(selfName);
 
         // Fake an appropriate context.
-        GenContext ctxTemp = ctx.extend(selfName, new Variable(selfName), null);
+        GenContext ctxTemp = ctx.extend(site, new Variable(selfName), null);
 
         // Store the types for each declaration in this list.
         List<DeclType> declTypes = new LinkedList<DeclType>();

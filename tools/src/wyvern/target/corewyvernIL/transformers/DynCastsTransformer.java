@@ -25,10 +25,12 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -258,6 +260,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
     }
 
     @Override
+    public FloatLiteral visit(TypeContext ctx, FloatLiteral floatLiteral) {
+        return floatLiteral;
+    }
+
+    @Override
     public BooleanLiteral visit(TypeContext ctx, BooleanLiteral booleanLiteral) {
         return booleanLiteral;
     }
@@ -305,6 +312,11 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
     @Override
     public StringLiteral visit(TypeContext ctx, StringLiteral stringLiteral) {
         return stringLiteral;
+    }
+    
+    @Override
+    public CharacterLiteral visit(TypeContext ctx, CharacterLiteral characterLiteral) {
+        return characterLiteral;
     }
 
     @Override

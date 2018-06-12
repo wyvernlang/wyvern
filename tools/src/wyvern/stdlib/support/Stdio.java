@@ -23,4 +23,7 @@ public class Stdio {
     public void printBoolean(boolean b) {
         java.lang.System.out.print(b);
     }
+    public void printFloat(Double f) {
+        java.lang.System.out.print(f);
+    }
 }

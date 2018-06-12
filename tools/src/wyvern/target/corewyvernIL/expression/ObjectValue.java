@@ -10,9 +10,12 @@ import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.RuntimeError;
 import wyvern.tools.errors.ToolError;
 
 public class ObjectValue extends New implements Invokable {
@@ -43,11 +46,23 @@ public class ObjectValue extends New implements Invokable {
     public Value interpret(EvalContext ctx) {
         return this;
     }
+    
+    public Tag getTag() {
+        ValueType vt = this.getType();
+        while (vt instanceof RefinementType) {
+            vt = ((RefinementType) vt).getBase();
+        }
+        if (!(vt instanceof NominalType)) {
+            throw new RuntimeError("internal invariant: can only get the tag of a nominal type, did this typecheck?");
+        }
+        NominalType nt = (NominalType) vt;
+        return nt.getTag(this.getEvalCtx());
+    }
 
     @Override
     public Value invoke(String methodName, List<Value> args) {
         EvalContext methodCtx = evalCtx;
-        DefDeclaration dd = (DefDeclaration) findDecl(methodName);
+        DefDeclaration dd = (DefDeclaration) findDecl(methodName, false);
         if (dd != null) {
             if (args.size() != dd.getFormalArgs().size()) {
                 throw new RuntimeException("invoke called on " + methodName + " with " + args.size() + " arguments, "
@@ -67,10 +82,10 @@ public class ObjectValue extends New implements Invokable {
 
     @Override
     public Value getField(String fieldName) {
-        DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName);
+        DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName, false);
         if (decl != null) {
             return (Value) decl.getDefinition();
-        } else if (delegateTarget != null && delegateTarget.findDecl(fieldName) != null) {
+        } else if (delegateTarget != null && delegateTarget.findDecl(fieldName, false) != null) {
             return delegateTarget.getField(fieldName);
         }
 

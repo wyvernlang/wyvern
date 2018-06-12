@@ -61,7 +61,7 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
         // In most cases we can get a generator to do this for us.
         CallableExprGenerator cegReceiver = target.getCallableExpr(ctx);
         if (cegReceiver.getDeclType(ctx) != null) {
-            return cegReceiver.genExpr();
+            return cegReceiver.genExpr(target.getLocation());
         }
 
         // If the receiver is dynamic (signified by getDeclType being null),

@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.util.List;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -64,7 +65,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
     @Override
     public void genTopLevel(TopLevelContext tlc) {
         ValueType declType = getILValueType(tlc.getContext());
-        tlc.addLet(getName(), getILValueType(tlc.getContext()), definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
+        tlc.addLet(new BindingSite(getName()),
+                getILValueType(tlc.getContext()),
+                definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()),
+                false);
     }
 
     @Override
@@ -124,6 +128,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
                         new wyvern.target.corewyvernIL.expression.Variable(getName()), location);
         DeclType dt = genILType(tlc.getContext());
         tlc.addModuleDecl(decl, dt);
+    }
+
+    public String toString() {
+        return "val " + variableName + " = ...";
     }
 
     @Override

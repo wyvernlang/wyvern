@@ -6,6 +6,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
@@ -13,8 +14,16 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.RuntimeError;
 
 public abstract class ValueType extends Type implements IASTNode {
+    @Override
+    public boolean isTSubtypeOf(Type sourceType, TypeContext ctx, FailureReason reason) {
+        if (sourceType instanceof ValueType) {
+            return isSubtypeOf((ValueType) sourceType, ctx, reason);
+        }
+        return false;
+    }
     public ValueType() { }
     public ValueType(HasLocation hasLoc) {
         super(hasLoc);
@@ -144,5 +153,7 @@ public abstract class ValueType extends Type implements IASTNode {
         return doAvoid(varName, ctx, 0);
     }
     public static final int MAX_RECURSION_DEPTH = 10;
-    public abstract boolean isTagged(TypeContext ctx);
+    public Tag getTag(EvalContext ctx) {
+        throw new RuntimeError("internal error: getTag not implemented for things other than nominal types");
+    }
 }

@@ -23,10 +23,12 @@ import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.FFIType;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
+import wyvern.target.oir.expressions.OIRCharacter;
 import wyvern.target.oir.expressions.OIRExpression;
 import wyvern.target.oir.expressions.OIRFFIImport;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
+import wyvern.target.oir.expressions.OIRFloat;
 import wyvern.target.oir.expressions.OIRIfThenElse;
 import wyvern.target.oir.expressions.OIRInteger;
 import wyvern.target.oir.expressions.OIRLet;
@@ -626,6 +628,15 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
         }
         return strVal;
     }
+    
+    public String visit(EmitPythonState state, OIRCharacter oirCharacter) {
+        state.setCurrentLetVar("");
+        String strVal = "\"" + oirCharacter.getValue() + "\"";
+        if (state.isExpectingReturn()) {
+            return state.getReturnType() + " " + strVal;
+        }
+        return strVal;
+    }
 
     public String visit(EmitPythonState state, OIRVariable oirVariable) {
         state.setCurrentLetVar("");
@@ -782,5 +793,14 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
             //throw new RuntimeException("Python backend does not support non-python FFIs!");
         }
         return "import " + oirImport.getModule();
+    }
+
+    public String visit(EmitPythonState state, OIRFloat oirFloat) {
+      state.setCurrentLetVar("");
+      String strVal = oirFloat.getValue().toString();
+      if (state.isExpectingReturn()) {
+          return state.getReturnType() + " " + strVal;
+      }
+      return strVal;
     }
 }

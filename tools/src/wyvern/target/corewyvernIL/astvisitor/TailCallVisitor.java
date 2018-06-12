@@ -22,11 +22,13 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Let;
@@ -200,6 +202,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     public Void visit(Boolean inTailPosition, StringLiteral stringLiteral) {
         return null;
     }
+    
+    public Void visit(Boolean inTailPosition, CharacterLiteral characterLiteral) {
+        return null;
+    }
 
     public Void visit(Boolean inTailPosition, DelegateDeclaration delegateDecl) {
         return null;
@@ -299,6 +305,10 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
     public Void visit(Boolean state, RefinementType type) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Void visit(Boolean inTailPosition, FloatLiteral flt) {
+      return null;
     }
 
 }

@@ -1,0 +1,236 @@
+// Compiles untyped lambda calculus programs to Javascript
+// Usage: `wyvern lambdaCalculusToJS.wyv | node`
+// Lambda Calculus program hardcoded at bottom
+
+require stdout
+
+import wyvern.runtime
+import wyvern.option
+import wyvern.collections.list
+
+type Option = option.Option
+type List = list.List
+
+datatype Term
+    Var(name : String)
+    Lambda(v: String, body: Term)
+    Apply(left: Term, right: Term)
+
+
+def compileTerm(term : Term): String = match term:
+    v: Var => v.name
+    l: Lambda => "function(" + l.v + ") { return " + compileTerm(l.body) + "}"
+    a: Apply => compileTerm(a.left) + "(" + compileTerm(a.right) + ")"
+
+datatype Statement
+    Define(name: String, term: Term)
+    Print(term: Term)
+
+def compileStatement(s : Statement): String = match s:
+    d: Define => d.name + " = " + compileTerm(d.term)
+    p: Print => "console.log(function(n) { return n(function(x) { return x + 1 })(0)}(" + compileTerm(p.term) + "))"
+
+// Only strips spaces
+def lstrip(s : String) : String
+    if (s.length() == 0)
+            ""
+        elif (s.substring(0, 1) == " ")
+                lstrip(s.substring(1, s.length()))
+        else
+            s
+
+// Poor man's enum
+val EOF = 0
+val LPAREN = 1
+val RPAREN = 2
+val LAMBDA = 3
+val VAR = 4
+
+resource type Lexer
+    var input: String
+    def next(t: Int): Boolean
+    def skip(t: Int): Boolean
+    def token(t: Int): String
+
+type Chomp
+    val token : String
+    val tokType : Int
+    val rest : String
+
+def makeChomp(t : String, tt : Int, r : String): Chomp = new
+    val token = t
+    val tokType = tt
+    val rest = r
+
+def isLetter(s : String): Boolean
+    // No <=
+    ("@" < s && s < "[") || ("`" < s && s < "{")
+
+// Assumes vars are [A-z]+
+def findVarEnd(s : String) : Int
+    if (s.length() == 0)
+            0
+        else
+            val c = s.substring(0, 1)
+            if (isLetter(c))
+                    1 + findVarEnd(s.substring(1, s.length()))
+                else
+                    0
+
+def chompToken(string : String) : Chomp
+    val s = lstrip(string)
+    // No else if
+    if (s.length() == 0)
+            makeChomp("", EOF, "")
+        else
+            val rest = s.substring(1, s.length())
+            if (s.substring(0, 1) == "/")
+                    makeChomp("/", LAMBDA, rest)
+                elif (s.substring(0, 1) == "(")
+                        makeChomp("(", LPAREN, rest)
+                elif (s.substring(0, 1) == ")")
+                    makeChomp(")", RPAREN, rest)
+                else
+                    val i = findVarEnd(s)
+                    if (i == s.length())
+                            makeChomp(s.substring(0, i), VAR, "")
+                        else
+                            makeChomp(s.substring(0, i), VAR, s.substring(i, s.length()))
+
+def makeLexer(i: String): Lexer = new
+    var input : String = i
+    def next(t: Int): Boolean
+        val chomp = chompToken(this.input)
+        chomp.tokType == t
+    def skip(t: Int): Boolean
+        val chomp = chompToken(this.input)
+        if (chomp.tokType == t)
+            this.input = chomp.rest
+        chomp.tokType == t
+    def token(t: Int): String
+        val chomp = chompToken(this.input)
+        if (!(chomp.tokType == t))
+            assert false
+        this.input = chomp.rest
+        chomp.token
+
+def parseAtom(lex : Lexer): Option[Term]
+    if (lex.skip(LPAREN))
+            val term = parseTerm(lex)
+            lex.skip(RPAREN)
+            option.Some(term)
+        elif (lex.next(VAR))
+                val name = lex.token(VAR)
+                option.Some(Var(name))
+        else
+            option.None[Term]()
+
+def unwrap[T](o: Option[T]): T
+    o.getOrElse(() => runtime.fail("Unwrapped None"))
+
+def parseApplication2(lex : Lexer, lhs : Term): Term
+    val rhs = parseAtom(lex)
+    if (rhs.isDefined)
+            parseApplication2(lex, Apply(lhs, unwrap[Term](rhs)))
+        else
+            lhs
+
+def parseApplication(lex : Lexer) : Term
+    val lhs = parseAtom(lex)
+    // TODO: better error handling
+    parseApplication2(lex, unwrap[Term](lhs))
+
+def parseTerm(lex : Lexer) : Term
+    if (lex.skip(LAMBDA))
+            val name = lex.token(VAR)
+            val term = parseTerm(lex)
+            Lambda(name, term)
+        else
+            parseApplication(lex)
+
+def parseStatement(line : String) : Statement
+    val lexer = makeLexer(line)
+    val command = lexer.token(VAR)
+    if (command == "def")
+            val name = lexer.token(VAR)
+            Define(name, parseTerm(lexer))
+        else
+            Print(parseTerm(lexer))
+
+resource type Program
+    val statements : List[Statement]
+
+def makeProgram(s: List[Statement]): Program = new
+    val statements : List[Statement] = s
+
+def compileAndPrintStatement(statement : Statement): Unit
+    stdout.print(compileStatement(statement))
+    stdout.println()
+
+def compile(program : Program) : Unit
+    program.statements.do((s : Statement) => compileAndPrintStatement(s))
+
+def testCompile(program : Program) : String
+    var out: String = ""
+    program.statements.do((s : Statement) => out = out + compileStatement(s))
+    out
+
+// No file I/O
+val l = list.make[Statement]()
+
+// Two types of top level statements
+//   * def <var> <expr>  : defines a variable for future use
+//   * print <expr>      : prints an expression assuming it is a natural number
+
+// Variables are [A-z]+
+// A single slash (/) is a lambda
+// Sugar for multi-argument lambdas not implemented (you must curry manually)
+
+l.append(parseStatement("def tru /t /f t"))
+l.append(parseStatement("def fls /t /f f"))
+
+l.append(parseStatement("def pair /f /s /b b f s"))
+l.append(parseStatement("def fst /p p tru"))
+l.append(parseStatement("def snd /p p fls"))
+
+l.append(parseStatement("def Z /s /z z"))
+l.append(parseStatement("def S /n /s /z s (n s z)"))
+
+l.append(parseStatement("def plus /m /n /s /z m s (n s z)"))
+l.append(parseStatement("def times /m /n m (plus n) Z"))
+
+l.append(parseStatement("def zz pair Z Z"))
+l.append(parseStatement("def ss /p pair (snd p) (plus (S(Z)) (snd p))"))
+l.append(parseStatement("def prd /m fst (m ss zz)"))
+l.append(parseStatement("def minus /m /n n prd m"))
+
+l.append(parseStatement("def THREE S(S(S(Z)))"))
+l.append(parseStatement("def FOUR S(THREE)"))
+
+l.append(parseStatement("print plus THREE FOUR"))
+l.append(parseStatement("print times THREE FOUR"))
+l.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
+
+compile(makeProgram(l))
+
+// Assert for ExampleTests.java
+val testProgram = list.make[Statement]()
+testProgram.append(parseStatement("def tru /t /f t"))
+testProgram.append(parseStatement("def fls /t /f f"))
+testProgram.append(parseStatement("def pair /f /s /b b f s"))
+testProgram.append(parseStatement("def fst /p p tru"))
+testProgram.append(parseStatement("def snd /p p fls"))
+testProgram.append(parseStatement("def Z /s /z z"))
+testProgram.append(parseStatement("def S /n /s /z s (n s z)"))
+testProgram.append(parseStatement("def plus /m /n /s /z m s (n s z)"))
+testProgram.append(parseStatement("def times /m /n m (plus n) Z"))
+testProgram.append(parseStatement("def zz pair Z Z"))
+testProgram.append(parseStatement("def ss /p pair (snd p) (plus (S(Z)) (snd p))"))
+testProgram.append(parseStatement("def prd /m fst (m ss zz)"))
+testProgram.append(parseStatement("def minus /m /n n prd m"))
+testProgram.append(parseStatement("def THREE S(S(S(Z)))"))
+testProgram.append(parseStatement("def FOUR S(THREE)"))
+testProgram.append(parseStatement("print plus THREE FOUR"))
+testProgram.append(parseStatement("print times THREE FOUR"))
+testProgram.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
+assert testCompile(makeProgram(testProgram)) == "tru = function(t) { return function(f) { return t}}fls = function(t) { return function(f) { return f}}pair = function(f) { return function(s) { return function(b) { return b(f)(s)}}}fst = function(p) { return p(tru)}snd = function(p) { return p(fls)}Z = function(s) { return function(z) { return z}}S = function(n) { return function(s) { return function(z) { return s(n(s)(z))}}}plus = function(m) { return function(n) { return function(s) { return function(z) { return m(s)(n(s)(z))}}}}times = function(m) { return function(n) { return m(plus(n))(Z)}}zz = pair(Z)(Z)ss = function(p) { return pair(snd(p))(plus(S(Z))(snd(p)))}prd = function(m) { return fst(m(ss)(zz))}minus = function(m) { return function(n) { return n(prd)(m)}}THREE = S(S(S(Z)))FOUR = S(THREE)console.log(function(n) { return n(function(x) { return x + 1 })(0)}(plus(THREE)(FOUR)))console.log(function(n) { return n(function(x) { return x + 1 })(0)}(times(THREE)(FOUR)))console.log(function(n) { return n(function(x) { return x + 1 })(0)}(minus(times(THREE)(FOUR))(plus(THREE)(FOUR))))"

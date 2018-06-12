@@ -18,7 +18,6 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
-import wyvern.target.corewyvernIL.decltype.TaggedTypeMember;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -60,6 +59,7 @@ public final class Globals {
         // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
         javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
         javaWhiteList.add("wyvern.stdlib.support.Int.utils");
+        javaWhiteList.add("wyvern.stdlib.support.Float.utils");
         javaWhiteList.add("wyvern.stdlib.support.AST.utils");
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
@@ -122,6 +122,7 @@ public final class Globals {
         }
         GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), Globals.getSystemType());
         genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
+        genCtx = new TypeOrEffectGenContext("Float", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Character", "system", genCtx);
@@ -131,7 +132,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
         genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
-        genCtx = new VarGenContext("unit", Util.unitValue(), Util.unitType(), genCtx);
+        genCtx = new VarGenContext(new BindingSite("unit"), Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
         SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(genCtx);
@@ -163,11 +164,25 @@ public final class Globals {
         intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
+
+        List<DeclType> floatDeclTypes = new LinkedList<DeclType>();
+        floatDeclTypes.add(new DefDeclType("+", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("-", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("*", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("/", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("negate", Util.floatType(), Arrays.asList()));
+        floatDeclTypes.add(new DefDeclType("floor", Util.intType(), Arrays.asList()));
+
         ValueType intType = new StructuralType("intSelf", intDeclTypes);
         ValueType boolType = new StructuralType("boolean", boolDeclTypes);
+        ValueType floatType = new StructuralType("float", floatDeclTypes);
         declTypes.add(new ConcreteTypeMember("Int", intType));
         declTypes.add(new ConcreteTypeMember("Boolean", boolType));
         declTypes.add(new ConcreteTypeMember("Unit", Util.unitType()));
+        declTypes.add(new ConcreteTypeMember("Float", floatType));
 
         List<DeclType> stringDeclTypes = new LinkedList<DeclType>();
         stringDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
@@ -192,10 +207,10 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("Nothing", new BottomType()));
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
         ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType());
-        declTypes.add(new TaggedTypeMember("Platform", platformType));
+        declTypes.add(new ConcreteTypeMember("Platform", platformType));
         NominalType systemPlatform = new NominalType("system", "Platform");
         ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType());
-        declTypes.add(new TaggedTypeMember("Java", javaType));
+        declTypes.add(new ConcreteTypeMember("Java", javaType));
         //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
@@ -204,7 +219,7 @@ public final class Globals {
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
         ExtensibleTagType pythonTagType = new ExtensibleTagType(systemPlatform, pythonType);
         //declTypes.add(new ConcreteTypeMember("Python", pythonType));
-        declTypes.add(new TaggedTypeMember("Python", pythonTagType));
+        declTypes.add(new ConcreteTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));
         declTypes.add(new EffectDeclType("ffiEffect", null, null));
@@ -235,6 +250,7 @@ public final class Globals {
         // construct a type for the system object
         List<Declaration> decls = new LinkedList<Declaration>();
         decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Float", new NominalType("this", "Float"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));

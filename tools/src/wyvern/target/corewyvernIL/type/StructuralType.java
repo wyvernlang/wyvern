@@ -143,6 +143,9 @@ public class StructuralType extends ValueType {
             return true;
         }
         if (t instanceof NominalType) {
+            if (t.isTagged(ctx)) {
+                return false;
+            }
             StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
             if (st == null) {
                 if (!reason.isDefined()) {
@@ -159,7 +162,9 @@ public class StructuralType extends ValueType {
         }
 
         if (!(t instanceof StructuralType)) {
-            reason.setReason("cannot look up structural type for " + t.desugar(ctx));
+            if (!reason.isDefined()) {
+                reason.setReason("cannot look up structural type for " + t.desugar(ctx));
+            }
             return false;
         }
 
@@ -185,7 +190,9 @@ public class StructuralType extends ValueType {
 
         // a resource type is not a subtype of a non-resource type
         if (isResource(GenContext.empty()) && !st.isResource(GenContext.empty())) {
-            reason.setReason("the second type is not a resource");
+            if (!reason.isDefined()) {
+                reason.setReason("the second type is not a resource");
+            }
             return false;
         }
 

@@ -72,8 +72,12 @@ public class JavaValue extends AbstractValue implements Invokable {
     private Value javaToWyvern(Object result) {
         if (result instanceof Integer) {
             return new IntegerLiteral((Integer) result);
+        } else if (result instanceof Double) {
+            return new FloatLiteral((Double) result);
         } else if (result instanceof String) {
             return new StringLiteral((String) result);
+        } else if (result instanceof Character) {
+            return new CharacterLiteral((Character) result);
         } else if (result == null) {
             return Util.unitValue();
         } else if (result instanceof List) {
@@ -113,12 +117,19 @@ public class JavaValue extends AbstractValue implements Invokable {
                 return ((IntegerLiteral) arg).getFullValue();
             }
             return new Integer(((IntegerLiteral) arg).getValue());
+        } else if (arg instanceof FloatLiteral) {
+            if (hintClass != null && hintClass == Double.class) {
+                return ((FloatLiteral) arg).getFullValue();
+            }
+            return ((FloatLiteral) arg).getFullValue();
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
+        } else if (arg instanceof CharacterLiteral) {
+            return new Character(((CharacterLiteral) arg).getValue());
         } else if (arg instanceof ObjectValue) {
             // Check if arg looks like a list type
             ObjectValue wyvList = (ObjectValue) arg;
-            if (wyvList.findDecl("get") != null && wyvList.findDecl("length") != null) {
+            if (wyvList.findDecl("get", false) != null && wyvList.findDecl("length", false) != null) {
                 List<Value> javaList = new LinkedList<>();
                 int listLen = ((IntegerLiteral) (wyvList.invoke("length", new LinkedList<>()))).getValue();
                 for (int i = 0; i < listLen; i++) {

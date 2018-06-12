@@ -106,7 +106,7 @@ public class FieldSet extends Expression {
         ObjectValue object = (ObjectValue) objExprVal;
 
         // find the declaration corresponding to the field
-        Declaration decl = object.findDecl(fieldName);
+        Declaration decl = object.findDecl(fieldName, false);
         if (decl == null) {
             throw new RuntimeException("Runtime error: trying to set the undeclared field " + fieldName);
         }

@@ -1,0 +1,24 @@
+datatype Exp
+    Var(name:String)
+    Apply(fn:Exp, arg:Exp)
+    Lambda(varName:String, body:Exp)
+    Unit
+
+val u:Unit = Unit() // TODO1: get this to work without ()
+val v:Var = Var("x")
+val id:Lambda = Lambda("x", v)
+val idToUnit:Exp = Apply(id,u)
+
+val s:String = match idToUnit:
+    v:Var => v.name // TODO: allow binding sub-variable x
+    a:Apply => "apply" // TODO: allow leaving out "a:"
+    l:Lambda => l.varName
+    u:Unit => "unit"
+
+def prettyPrint(e:Exp):String = match e:
+    v:Var => v.name
+    a:Apply => prettyPrint(a.fn) + " " + prettyPrint(a.arg)
+    l:Lambda => "(" + l.varName + " => " + prettyPrint(l.body) + ")"
+    u:Unit => "unit"
+    
+prettyPrint(idToUnit)

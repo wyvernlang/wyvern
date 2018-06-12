@@ -15,6 +15,7 @@ import org.junit.experimental.categories.Category;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
 import wyvern.tools.errors.ToolError;
@@ -72,8 +73,18 @@ public class ExampleTests {
     }
 
     @Test
+    public void testDatatypes() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.datatypes", Util.stringType(), new StringLiteral("(x => x) unit"));
+    }
+
+    @Test
     public void testBox() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.box", Util.intType(), new IntegerLiteral(15));
+    }
+
+    @Test
+    public void testKeys() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.keys", Util.stringType(), new StringLiteral("m1"));
     }
 
     @Test
@@ -129,6 +140,11 @@ public class ExampleTests {
     @Test
     public void testListParameterized() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.listClient", Util.intType(), new IntegerLiteral(28));
+    }
+
+    @Test
+    public void testLambdaCalculus() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.lambdaCalculusToJS", null, null);
     }
 
     @Test
@@ -188,6 +204,21 @@ public class ExampleTests {
         PythonCompiler.wyvernHome.set("..");
         PythonCompiler.wyvernRoot.set(TestUtil.EXAMPLES_PATH + "web-server/python3/");
         PythonCompiler.main(args);
+    }
+
+    @Test
+    public void testBinarySearchTree() throws ParseException  {
+        TestUtil.doTestScriptModularly(PATH, "dataStructures.bsttest", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testMandelbrot() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.mandelbrot", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testJulia() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.julia", Util.unitType(), Util.unitValue());
     }
 
     @Test

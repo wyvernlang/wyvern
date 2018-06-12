@@ -1,6 +1,8 @@
 package wyvern.tools.tests;
 
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.CHARACTER_LITERAL;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DASH;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DATATYPE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEDENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEF;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DIVIDE;
@@ -14,10 +16,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.NEWLINE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.PLUS;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.RPAREN;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.SINGLE_LINE_COMMENT;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.STRING_LITERAL;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TILDE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.TYPE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.WHITESPACE;
-import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DATATYPE;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -79,12 +81,18 @@ public class LexingTests {
         return new WyvernLexer().parse(new StringReader(input), "test input");
     }
 
-    public List<Token> checkLex(String input, int[] kinds) throws IOException, CopperParserException {
-        List<Token> tokens = new WyvernLexer().parse(new StringReader(input), "test input");
+    public List<Token> checkKindsFromLex(String input, int[] kinds) throws IOException, CopperParserException {
+        List<Token> tokens = tryLex(input);
         checkKinds(kinds, tokens);
+        return tokens;
+    }
+
+    public List<Token> checkLex(String input, int[] kinds) throws IOException, CopperParserException {
+        List<Token> tokens = checkKindsFromLex(input, kinds);
         Assert.assertEquals(input, concat(tokens));
         return tokens;
     }
+
 
     /************************ TESTS HERE *****************************/
 
@@ -323,5 +331,11 @@ public class LexingTests {
         };
         checkLex(input, expected);
     }
-}
 
+    @Test
+    public void testCharacterLiterals() throws IOException, CopperParserException {
+        String input = "#'a'#\"b\"\"c\"'d'";
+        int[] expected = new int[] {CHARACTER_LITERAL, CHARACTER_LITERAL, STRING_LITERAL, STRING_LITERAL};
+        checkKindsFromLex(input, expected);
+    }
+}

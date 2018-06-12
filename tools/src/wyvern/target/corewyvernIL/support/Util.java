@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -21,6 +22,7 @@ public final class Util {
     private static ValueType theBooleanType = new NominalType("system", "Boolean");
     private static ValueType theEmptyType = new StructuralType("empty", new LinkedList<>());
     private static ValueType theIntType = new NominalType("system", "Int");
+    private static ValueType theFloatType = new NominalType("system", "Float");
     private static ValueType theCharType = new NominalType("system", "Character");
     private static ValueType theStringType = new NominalType("system", "String");
     private static ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
@@ -32,6 +34,9 @@ public final class Util {
     }
     public static ValueType emptyType() {
         return theEmptyType;
+    }
+    public static ValueType floatType() {
+      return theFloatType;
     }
     public static ValueType intType() {
         return theIntType;
@@ -71,5 +76,7 @@ public final class Util {
     public static Value intValue(int i) {
         return new IntegerLiteral(i);
     }
-
+    public static Value floatValue(double d)  {
+        return new FloatLiteral(d);
+    }
 }
