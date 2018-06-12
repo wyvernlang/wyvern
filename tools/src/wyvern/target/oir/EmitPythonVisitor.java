@@ -23,13 +23,14 @@ import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.FFIType;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
+import wyvern.target.oir.expressions.OIRCharacter;
 import wyvern.target.oir.expressions.OIRExpression;
 import wyvern.target.oir.expressions.OIRFFIImport;
 import wyvern.target.oir.expressions.OIRFieldGet;
 import wyvern.target.oir.expressions.OIRFieldSet;
+import wyvern.target.oir.expressions.OIRFloat;
 import wyvern.target.oir.expressions.OIRIfThenElse;
 import wyvern.target.oir.expressions.OIRInteger;
-import wyvern.target.oir.expressions.OIRFloat;
 import wyvern.target.oir.expressions.OIRLet;
 import wyvern.target.oir.expressions.OIRMethodCall;
 import wyvern.target.oir.expressions.OIRNew;
@@ -622,6 +623,15 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
     public String visit(EmitPythonState state, OIRString oirString) {
         state.setCurrentLetVar("");
         String strVal = "\"" + escapeString(oirString.getValue()) + "\"";
+        if (state.isExpectingReturn()) {
+            return state.getReturnType() + " " + strVal;
+        }
+        return strVal;
+    }
+    
+    public String visit(EmitPythonState state, OIRCharacter oirCharacter) {
+        state.setCurrentLetVar("");
+        String strVal = "\"" + oirCharacter.getValue() + "\"";
         if (state.isExpectingReturn()) {
             return state.getReturnType() + " " + strVal;
         }
