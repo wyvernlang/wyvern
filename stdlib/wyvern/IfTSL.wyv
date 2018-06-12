@@ -1,5 +1,6 @@
 module IfTSL
 
+import platform.java.debug
 import wyvern.internal.ast
 import wyvern.option
 import wyvern.util.matching.regex
@@ -7,10 +8,37 @@ import wyvern.internal.list              // We use wyvern.internal.list because 
 
 type AST = ast.AST
 
-def elseMatch(input : String) : regex.Match
-  val thenRegex = regex("^else\\s*\n")
-  val mOpt = thenRegex.findPrefixMatchOf(input)
-  mOpt.getOrElse(() => regex.makeMatch("", input))
+def getIndent(x : String): String
+  val f = x.substring(0, 1)
+  (f == " " || f == "	").ifTrue(() => f + getIndent(x.substring(1, x.length())), () => "")
+
+def indent(x : String, ind : String): String
+  (x.length() == 0).ifTrue(() => "",
+      () => (x.substring(0, 1) == "\n").ifTrue(() => "\n" + ind + indent(x.substring(1, x.length()), ind), () => x.substring(0, 1) + indent(x.substring(1, x.length()), ind)))
+
+def getToNewLine(x: String): String
+  (x.length() == 0).ifTrue(() => "",
+    () => (x.substring(0, 1) == "\n").ifTrue(
+      () => "",
+      () => x.substring(0, 1) + getToNewLine(x.substring(1, x.length()))))
+
+def indentAndMakeIf(x : String, cond : String): String
+  val ind = getIndent(x)
+  "if" + cond + "\n" + ind + indent(x, ind)
+
+def elifAST(input : String, ctx : system.Context): String
+  val elifRegex = regex("^elif\\s*\\(.*\\)\\s*\n")
+  val mOpt = elifRegex.findPrefixMatchOf(input)
+  val isElif = mOpt.isDefined
+  val em = mOpt.getOrElse( () => regex.makeMatch("", input)).after()
+  val cond = (input.length() < 4).ifTrue(() => "", () => getToNewLine(input.substring(4, input.length())))
+  isElif.ifTrue(() => indentAndMakeIf(em, cond), () => em)
+
+def elifOrElseAST(input : String, ctx : system.Context) : AST
+  val elseRegex = regex("^else\\s*\n")
+  val mOpt = elseRegex.findPrefixMatchOf(input)
+  val body = mOpt.map[String](x: regex.Match => x.after()).getOrElse(() => elifAST(input, ctx))
+  toUnitOrAST(body, ctx)
 
 def thenBlockMatch(input : String) : regex.Match
   val blockRegex = regex("(\\s[^\n]*\n)+")
@@ -41,9 +69,8 @@ resource type Blocks
     def parseTSL(input : String, ctx : system.Context) : option.Option
       val trimmedInput = ast.stripLeadingWhitespace(input, true)
       val trueMatch = thenBlockMatch(trimmedInput)
-      val em = elseMatch(trueMatch.after())
       val trueAST : AST = toUnitOrAST(trueMatch.matched(), ctx)
-      val falseAST : AST = toUnitOrAST(em.after(), ctx)
+      val falseAST : AST = elifOrElseAST(trueMatch.after(), ctx)
       val trueDefn = ast.defDeclaration("evalTrue", list.make[ast.FormalArg](), ast.types.dyn(), trueAST)
       val falseDefn = ast.defDeclaration("evalFalse", list.make[ast.FormalArg](), ast.types.dyn(), falseAST)
       val declList : list.List[ast.Decl] = list.make[ast.Decl]()
