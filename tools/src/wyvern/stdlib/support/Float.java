@@ -6,4 +6,8 @@ public class Float {
     public double from(String s) {
         return java.lang.Double.parseDouble(s.trim());
     }
+    
+    public double ofInt(int i) {
+        return (double) i;
+    }
 }

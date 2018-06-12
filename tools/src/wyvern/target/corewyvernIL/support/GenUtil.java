@@ -19,7 +19,20 @@ public final class GenUtil {
         if (javaClass.getName().equals("java.math.BigInteger")) {
             return Util.intType();
         }
+
+        if (javaClass.getName().equals("double")) {
+            return Util.floatType();
+        }
+
         if (javaClass.getName().equals("java.lang.Double")) {
+            return Util.floatType();
+        }
+
+        if (javaClass.getName().equals("float")) {
+            return Util.floatType();
+        }
+
+        if (javaClass.getName().equals("java.lang.Float")) {
             return Util.floatType();
         }
 
