@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -108,6 +109,17 @@ public class StructuralType extends ValueType {
                 dest.append("... }");
             }
         }
+    }
+
+    @Override
+    public BytecodeOuterClass.Type emitBytecodeType() {
+        BytecodeOuterClass.Type.Builder topType = BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Top);
+        BytecodeOuterClass.Type.CompoundType.Builder ct = BytecodeOuterClass.Type.CompoundType.newBuilder().setBase(topType).setSelfName(selfSite.getName())
+                .setStateful(resourceFlag);
+        for (DeclType d : declTypes) {
+            ct.addDeclTypes(d.emitBytecode());
+        }
+        return BytecodeOuterClass.Type.newBuilder().setCompoundType(ct).build();
     }
 
     public String getSelfName() {

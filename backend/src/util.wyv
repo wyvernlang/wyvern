@@ -1,0 +1,18 @@
+module util
+
+import wyvern.option
+import wyvern.collections.list
+
+type List = list.List
+type Option = option.Option
+
+def unwrap[T](o: Option[T]): T
+    o.getOrElse(() => runtime.fail("Unwrapped None"))
+
+def join(l: List[String], delim: String): String
+    if (l.length() == 0)
+            ""
+        else
+            var s: String = ""
+            l.do(e => s = s + e + delim)
+            s.substring(0,s.length()-delim.length())

@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.util.Arrays;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -40,6 +41,12 @@ public abstract class Expression extends ASTNode implements IASTNode, IExpr {
         return exprType;
 
     }
+
+    public BytecodeOuterClass.Expression emitBytecode() {
+        System.out.println("emitBytecode not implemented for " + this.getClass().getName());
+        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+    }
+
     protected void setExprType(ValueType exprType) {
         this.exprType = exprType;
     }

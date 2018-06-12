@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Tag;
@@ -62,6 +63,22 @@ public abstract class ValueType extends Type implements IASTNode {
 
     public final void doPrettyPrint(Appendable dest, String indent) throws IOException {
         doPrettyPrint(dest, indent, null);
+    }
+
+    // :BytecodeTypeHack
+    // Hack: Type (T in the bytecode) and ValueType (\tau in bytecode) have different bytecode representations
+    // but are in the same inheritance tree. Hence, for Type with have emitBytecodeTypeDesc() and in ValueType
+    // we have emitBytecodeType().
+    public BytecodeOuterClass.Type emitBytecodeType() {
+        System.out.println("emitBytecode not implemented for " + this.getClass().getName());
+        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+    }
+
+    // Sometimes, we want to generate a TypeDesc for a ValueType so we handle creating an untagged TypeDesc here
+    @Override
+    public final BytecodeOuterClass.TypeDesc emitBytecodeTypeDesc() {
+        BytecodeOuterClass.TypeDesc.CaseDesc.Builder cd = BytecodeOuterClass.TypeDesc.CaseDesc.newBuilder().setType(emitBytecodeType());
+        return BytecodeOuterClass.TypeDesc.newBuilder().setCaseDesc(cd).build();
     }
 
     @Override

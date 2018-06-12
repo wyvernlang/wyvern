@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# this is the command-line Wyvern transpiler to Python
-# Should work with either Python 2 or Python 3
-# usage: wypy FILENAME [-o OUTPUT_FILE] [-dIL] [-dAST]
+# this is the command-line Wyvern interpreter
 
 # portions of this script are adapted from the ant script
 
@@ -24,7 +22,6 @@ CP_HOME="$WYVERN_HOME"
 if $cygwin ; then
   CP_HOME=`cygpath --windows "$CP_HOME"`
   WYV_CLASSPATH="$CP_HOME/tools/build;$CP_HOME/tools/bin;$CP_HOME/tools/lib/CopperRuntime.jar;$CP_HOME/tools/lib/asm-debug-all-5.0.1.jar;$CP_HOME/tools/lib/junit-4.11.jar;$CP_HOME/tools/lib/protobuf-java-3.5.1.jar"
-
 else
   WYV_CLASSPATH="$CP_HOME/tools/build:$CP_HOME/tools/bin:$CP_HOME/tools/lib/CopperRuntime.jar:$CP_HOME/tools/lib/asm-debug-all-5.0.1.jar:$CP_HOME/tools/lib/junit-4.11.jar:$CP_HOME/tools/lib/protobuf-java-3.5.1.jar"
 fi
@@ -34,4 +31,4 @@ export WYVERN_HOME="$CP_HOME"
 # echo $WYV_CLASSPATH
 
 
-java -cp "$WYV_CLASSPATH" wyvern.tools.PythonCompiler $*
+java -cp "$WYV_CLASSPATH" wyvern.tools.BytecodeCompiler $*

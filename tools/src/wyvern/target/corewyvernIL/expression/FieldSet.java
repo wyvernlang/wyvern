@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
@@ -131,6 +132,14 @@ public class FieldSet extends Expression {
         dest.append('.').append(fieldName);
         dest.append(" = ");
         exprToAssign.doPrettyPrint(dest, indent);
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.AssignmentExpression.Builder ae = BytecodeOuterClass.Expression.AssignmentExpression.newBuilder()
+                .setExpression(((Expression) objectExpr).emitBytecode())
+                .setField(fieldName).setValue(((Expression) exprToAssign).emitBytecode());
+        return BytecodeOuterClass.Expression.newBuilder().setAssignmentExpression(ae).build();
     }
 
     @Override

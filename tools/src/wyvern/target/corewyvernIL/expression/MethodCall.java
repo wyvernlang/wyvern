@@ -2,11 +2,13 @@ package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -22,6 +24,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.support.ViewExtension;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -64,6 +67,35 @@ public class MethodCall extends Expression {
             arg.doPrettyPrint(dest, indent);
         }
         dest.append(')');
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        // Should match primitives in Globals.java
+        String[] primitives = {"Int", "Float", "String", "Character", "Boolean"};
+        if (receiverType instanceof NominalType && Arrays.asList(primitives).contains(((NominalType) receiverType).getTypeMember())) {
+            BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder pce = BytecodeOuterClass.Expression.PrimitiveCallExpression.newBuilder()
+                    .setMethod(methodName)
+                    .setPrimitiveType(((NominalType) receiverType).getTypeMember())
+                    .setReceiver(((Expression) objectExpr).emitBytecode());
+
+            for (IExpr expr : args) {
+                Expression e = (Expression) expr;
+                pce.addArguments(e.emitBytecode());
+            }
+            return BytecodeOuterClass.Expression.newBuilder().setPrimitiveCallExpression(pce).build();
+        } else {
+            BytecodeOuterClass.Expression.CallExpression.Builder ce = BytecodeOuterClass.Expression.CallExpression.newBuilder()
+                    .setMethod(methodName)
+                    .setReceiver(((Expression) objectExpr).emitBytecode());
+
+            for (IExpr expr : args) {
+                Expression e = (Expression) expr;
+                ce.addArguments(e.emitBytecode());
+            }
+            return BytecodeOuterClass.Expression.newBuilder().setCallExpression(ce).build();
+
+        }
     }
 
     public IExpr getObjectExpr() {

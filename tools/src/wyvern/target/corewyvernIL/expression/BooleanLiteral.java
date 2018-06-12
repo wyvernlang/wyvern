@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -54,6 +55,12 @@ public class BooleanLiteral extends Literal implements Invokable {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append(value ? "true" : "false");
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.Literal.Builder literal = BytecodeOuterClass.Expression.Literal.newBuilder().setBooleanLiteral(value);
+        return BytecodeOuterClass.Expression.newBuilder().setLiteral(literal).build();
     }
 
     @Override
