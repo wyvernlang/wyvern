@@ -7,22 +7,22 @@ protobuf.load("../bytecode.proto", function(err, root) {
     const Bytecode = root.lookupType('Bytecode');
 
     const bytecodeData = {
-        version: {major: "0", minor: "1"},
+        version: {magic: 42, major: 0, minor: 1},
         path: "com.example",
         imports: [],
-        module: {
-            expressionModule: {
-                path: "HelloWorld",
+        modules: [{
+            path: "HelloWorld",
+            valueModule: {
                 type: {
-                    specialType: root.lookupEnum("Type.SpecialType").values.Top
+                    simpleType: root.lookupEnum("Type.SimpleType").values.Top
                 },
                 expression: {
                     literal: {
-                        string: "Hello, world!"
+                        stringLiteral: "Hello, world!"
                     },
                 },
             },
-        },
+        }],
     };
 
     // Will throw if any of the required members are missing
@@ -37,5 +37,5 @@ protobuf.load("../bytecode.proto", function(err, root) {
     // Read it back
     var bytes = fs.readFileSync("bytecode");
     var bytecode = Bytecode.decode(bytes);
-    console.log(bytecode.module.expressionModule.expression.literal.string);
+    console.log(bytecode.modules[0].valueModule.expression.literal.stringLiteral);
 });
