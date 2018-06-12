@@ -29,6 +29,18 @@ import static wyvern.tools.parsing.coreparser.ArchParserConstants.IDENTIFIER;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.NEWLINE;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.PROVIDES;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.REQUIRES;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.CONNECTOR;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.VAL;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.ARCHITECTURE;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMPONENTS;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.CONNECTORS;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.AND;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.WITH;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.CONNECT;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.DOT;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.IS;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.ENTRYPOINTS;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.BINDINGS;
 
 public class ArchParser<AST,Type>   {
     //*private ArchASTBuilder<AST,Type> build;
@@ -36,6 +48,18 @@ public class ArchParser<AST,Type>   {
     
     public static String kindToName(int kind) {
       switch (kind) {
+      case IS: return "IS";
+      case BINDINGS: return "BINDINGS";
+      case ENTRYPOINTS: return "ENTRYPOINTS";
+      case CONNECT: return "CONNECT";
+      case DOT: return "DOT";
+      case AND: return "AND";
+      case WITH: return "WITH";
+      case CONNECTORS: return "CONNECTORS";
+      case COMPONENTS: return "COMPONENT";
+      case ARCHITECTURE: return "ARCHITECTURE";
+      case VAL: return "VAL";
+      case CONNECTOR: return "CONNECTOR";
       case COMPONENT: return "COMPONENT";
       case PORT: return "PORT";
       case COLON: return "COLON";
@@ -77,6 +101,8 @@ public class ArchParser<AST,Type>   {
             System.out.print(kindToName(t.kind) + ", ");
             t = wp.getNextToken();
         }
+        
+        System.out.println("PARSING DONE");
 
     }
 }
@@ -171,9 +197,8 @@ AST ComponentTypeDeclBody() :
 { AST ast1; AST ast2; }
 {
     ast1 = MemberDecls()            { return null; }//{ return ast1; }
-
 |
-    ast1 = ArchTypeDecls()        { return null; }//{ return ast1; }
+    ast1 = ArchTypeDecls()          { return null; }//{ return ast1; }
 |
     ast1 = BindingDecls()           { return null; }//{ return ast1; }
 
@@ -182,9 +207,9 @@ AST ComponentTypeDeclBody() :
 AST ConnectorTypeDecl() : 
 { Token name; AST exp1; AST exp2; }
 {
-    <CONNECTOR>
+    <CONNECTOR> name=<IDENTIFIER>
     <NEWLINE> <INDENT> exp1 = ValDecl()
-    ( <NEWLINE> exp2 = ValDecl())*
+    (exp2 = ValDecl())*
             <DEDENT>
     { return null; }
 }
@@ -223,8 +248,8 @@ AST ComponentDecls() :
 {
     [<EXTERNAL> { isExternal = true; }] <COMPONENTS>
     <NEWLINE> <INDENT> 
-            type=<IDENTIFIER> name=<IDENTIFIER> {  }
-            (<NEWLINE> type=<IDENTIFIER> name=<IDENTIFIER>)*
+            type=<IDENTIFIER> name=<IDENTIFIER> {} <NEWLINE>
+            (type=<IDENTIFIER> name=<IDENTIFIER> {} <NEWLINE>)*
             <DEDENT>
     { return null; }
 }
@@ -234,8 +259,8 @@ AST ConnectorDecls() :
 {
     <CONNECTORS> 
     <NEWLINE> <INDENT> 
-            type=<IDENTIFIER> name=<IDENTIFIER> { }
-            (<NEWLINE> type=<IDENTIFIER> name=<IDENTIFIER>)*
+            type=<IDENTIFIER> name=<IDENTIFIER> { } <NEWLINE>
+            (type=<IDENTIFIER> name=<IDENTIFIER> {} <NEWLINE>)*
             <DEDENT>
     { return null; }
 }
@@ -246,8 +271,8 @@ AST AttachmentDecls() :
     //allow for multiple cmp.prt in connect statement
     <ATTACHMENTS>
     <NEWLINE> <INDENT> 
-    <CONNECT> p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER>
-    ( <NEWLINE> p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER> {} )*
+    <CONNECT> p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER> <NEWLINE>
+              (p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER> <NEWLINE>)*
             <DEDENT>
     { return null; }
 }
@@ -256,8 +281,8 @@ AST BindingDecls() :
 { Token t; String b; }
 {
     <BINDINGS>
-    <NEWLINE> <INDENT> t=<IDENTIFIER> <IS> b=Segment()
-    ( <NEWLINE> t=<IDENTIFIER> <IS> b=Segment() {} )*
+    <NEWLINE> <INDENT> t=<IDENTIFIER> <IS> b=Segment() <NEWLINE>
+    (t=<IDENTIFIER> <IS> b=Segment() {} <NEWLINE> )*
     { return null; }
 }
 
@@ -265,8 +290,7 @@ AST EntryPointDecls() :
 { Token t; Token point; }
 {
     <ENTRYPOINTS>
-    <NEWLINE> <INDENT> t=<IDENTIFER> <COLON> point=<IDENTIFIER>
-    ( <NEWLINE> t=<IDENTIFIER> <COLON> point=<IDENTIFIER> {} )*
+    <NEWLINE> <INDENT> t=<IDENTIFER> <COLON> point=<IDENTIFIER> <NEWLINE>
             <DEDENT>
     { return null; }
 }
