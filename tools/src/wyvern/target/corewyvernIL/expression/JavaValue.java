@@ -76,6 +76,8 @@ public class JavaValue extends AbstractValue implements Invokable {
             return new FloatLiteral((Double) result);
         } else if (result instanceof String) {
             return new StringLiteral((String) result);
+        } else if (result instanceof Character) {
+            return new CharacterLiteral((Character) result);
         } else if (result == null) {
             return Util.unitValue();
         } else if (result instanceof List) {
@@ -122,6 +124,8 @@ public class JavaValue extends AbstractValue implements Invokable {
             return ((FloatLiteral) arg).getFullValue();
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
+        } else if (arg instanceof CharacterLiteral) {
+            return new Character(((CharacterLiteral) arg).getValue());
         } else if (arg instanceof ObjectValue) {
             // Check if arg looks like a list type
             ObjectValue wyvList = (ObjectValue) arg;

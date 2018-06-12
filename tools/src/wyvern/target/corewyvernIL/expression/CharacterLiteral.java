@@ -68,7 +68,7 @@ public class CharacterLiteral extends Literal implements Invokable {
 
     @Override
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
-        throw new RuntimeException("not implemented");
+        return emitILVisitor.visit(state, this);
     }
 
     @Override
