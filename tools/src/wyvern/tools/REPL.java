@@ -114,7 +114,8 @@ public class REPL {
 	            else{
 	                System.out.println("got here");
 	                if (!tempImports.isEmpty() || !tempFunctions.isEmpty()) {
-	                    parse(tempImports + "\n" + tempFunctions + "\n" + s + "\n" );
+	                    System.out.println(tempImports + "\n" + tempFunctions + "\n" + s + "\n" );
+	                    //parse(tempImports + "\n" + tempFunctions + "\n" + s + "\n" );
 	                    tempImports = ""; 
                         tempFunctions = "";
 	                }else {
