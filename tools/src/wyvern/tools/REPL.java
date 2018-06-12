@@ -1,6 +1,13 @@
 package wyvern.tools;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.Console;
+import java.io.EOFException;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.InetSocketAddress;
@@ -8,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -58,12 +66,26 @@ public class REPL {
 		
 	}
 	public static void main(String[] args) throws Exception {
-		String input = "require stdout\n\n"
-		        + "val x = \"kjsadfka\"\n"
-		        + "val y = 3\n";
-		
-		interepetProgram(input);
-		
+        Scanner scanner = new Scanner(System.in);
+        String input;
+        while(true) {
+            try {
+                input = scanner.nextLine();
+                if(input.equals("exit")) {
+                    System.exit(1);
+                }
+                else if(input.equals("ctx")) {
+                    System.out.println(programContext);
+                }else {
+                    Value v = interepetProgram(input);
+                    if(v != null) {
+                        System.out.println(v.toString());
+                    }
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 	
 	public static Value interepetProgram(String input) throws ParseException {
@@ -73,14 +95,12 @@ public class REPL {
 	        if (!(s.length()==0)) { //does not run code on empty lines
 	            if (s.split(" ").length == 1 && programContext != null && tempFunctions.isEmpty()) 
 	            { //assuming when user enters 1 word it refers to a val
-	                System.out.println("looking up var");
 	                Value result = programContext.lookupValue(s);
 	                return result;
 	            }
 	            else if(s.contains("def"))
 	            {
 	                tempFunctions = tempFunctions + s + "\n";
-	                System.out.println("found a function");
 	            }
 	            else if(s.contains("require"))
 	            {
@@ -91,19 +111,13 @@ public class REPL {
 	                System.out.println("adding to function");
 	                tempFunctions = tempFunctions + s + "\n";
 	            }
-	            else 
-	            {  
-	                if (!tempImports.isEmpty()) {
-	                    parse(tempImports + s + "\n");
-	                    tempImports = "";
-	                }else if(!tempFunctions.isEmpty())
-	                {
-	                    System.out.println("here");
-	                    parse(tempFunctions + "\n");
-	                    parse(s+ "\n");
+	            else{
+	                System.out.println("got here");
+	                if (!tempImports.isEmpty() || !tempFunctions.isEmpty()) {
+	                    parse(tempImports + "\n" + tempFunctions + "\n" + s + "\n" );
+	                    tempImports = ""; 
                         tempFunctions = "";
 	                }else {
-	                    System.out.println("here11111111111");
 	                    System.out.println("STARTED PROCESSING: " + s);
 	                    currentResult = parse(s + "\n");
 	                    System.out.println("FINISHED PROCESSING: " + s);
@@ -115,6 +129,9 @@ public class REPL {
 	}
 	
 	public static Value parse(String input) throws ParseException {
+	    if(input.length() == 0) {
+	        return null;
+	    }
 	    if (programContext == null){
 	        //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
 	        programContext = Globals.getStandardEvalContext();
@@ -128,8 +145,6 @@ public class REPL {
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
             programContext = result.getSecond();
-            System.out.println(programContext );
-            System.out.println(result.getFirst());
             return result.getFirst();
 	    }else {
 	       
@@ -143,7 +158,6 @@ public class REPL {
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
             programContext = result.getSecond();
-	        System.out.println(programContext);
 	        //System.out.println(result.getFirst());
 	        return result.getFirst();
 	        
