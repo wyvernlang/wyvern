@@ -210,6 +210,16 @@ public class ExampleTests {
     public void testBinarySearchTree() throws ParseException  {
         TestUtil.doTestScriptModularly(PATH, "dataStructures.bsttest", Util.unitType(), Util.unitValue());
     }
+    
+    @Test
+    public void testMandelbrot() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.mandelbrot", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testJulia() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.julia", Util.unitType(), Util.unitValue());
+    }
 
     @Test
     public void testIOLibServerClient() throws ParseException {
