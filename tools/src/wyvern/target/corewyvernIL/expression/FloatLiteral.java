@@ -70,6 +70,7 @@ public class FloatLiteral extends Literal implements Invokable  {
       case "*": return new FloatLiteral(this.value * ((FloatLiteral) args.get(0)).getFullValue());
       case "/": return new FloatLiteral(this.value / ((FloatLiteral) args.get(0)).getFullValue());
       case "negate": return new FloatLiteral(this.value * -1);
+      case "floor": return new IntegerLiteral((int) Math.floor(this.value));
       case "<": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) < 0);
       case ">": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) > 0);
       case "==": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) == 0);

@@ -38,6 +38,14 @@ public final class GenUtil {
         if (javaClass.getName().equals("java.lang.String")) {
             return Util.stringType();
         }
+        
+        if (javaClass.getName().equals("char")) {
+            return Util.charType();
+        }
+        
+        if (javaClass.getName().equals("java.lang.Character")) {
+            return Util.charType();
+        }
 
         if (javaClass.getName().equals("boolean")) {
             return Util.booleanType();

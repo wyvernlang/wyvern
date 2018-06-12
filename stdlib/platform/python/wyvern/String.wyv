@@ -11,3 +11,6 @@ def ofBoolean(b : Boolean) : String
 
 def ofFloat(f : Float) : String
   python.toString(f)
+
+def ofCharacter(c : Character) : String
+  python.toString(c)

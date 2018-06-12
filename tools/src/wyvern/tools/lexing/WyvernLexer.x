@@ -222,6 +222,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
  	:};
+ 	
+ 	terminal Token character_t ::= /#(("\\?.")|('\\?.'))/ {:
+ 		RESULT = token(CHARACTER_LITERAL, replaceEscapeSequences(lexeme.substring(2,lexeme.length()-1)));
+ 	:};
 
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
  	terminal Token cCurly_t ::= /\}/ {: RESULT = token(RBRACE,lexeme); :};
@@ -326,9 +330,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
-	          | floatingPoint_t:t {: RESULT =t; :}
-		  | booleanLit_t:t {: RESULT = t; :}
+	          | floatingPoint_t:t {: RESULT = t; :}
+	          | booleanLit_t:t {: RESULT = t; :}
 	          | shortString_t:t {: RESULT = t; :}
+	          | character_t:t {: RESULT = t; :}
 	          | inlinelit:lit {: RESULT = token(DSL_LITERAL,(String)lit); :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}

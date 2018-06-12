@@ -169,6 +169,7 @@ TOKEN : /* Symbols */
 TOKEN : /* Literals */
 {
   < STRING_LITERAL >
+| < CHARACTER_LITERAL >
 | < FLOATING_POINT_LITERAL >
 | < DECIMAL_LITERAL >
 | < BOOLEAN_LITERAL >
@@ -883,6 +884,8 @@ AST Literal() :
   lit = <FLOATING_POINT_LITERAL> { return build.floatLit(Float.parseFloat(lit.image), loc(lit)); }
 |
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
+|
+  lit = <CHARACTER_LITERAL>  { return build.characterLit(lit.image.charAt(0), loc(lit)); }
 |
   lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
 |
