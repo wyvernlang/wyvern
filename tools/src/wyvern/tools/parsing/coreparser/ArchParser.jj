@@ -41,6 +41,9 @@ import static wyvern.tools.parsing.coreparser.ArchParserConstants.DOT;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.IS;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.ENTRYPOINTS;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.BINDINGS;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.ATTACHMENTS;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMMA;
+import static wyvern.tools.parsing.coreparser.ArchParserConstants.MULTI_LINE_COMMENT;
 
 public class ArchParser<AST,Type>   {
     //*private ArchASTBuilder<AST,Type> build;
@@ -48,6 +51,9 @@ public class ArchParser<AST,Type>   {
     
     public static String kindToName(int kind) {
       switch (kind) {
+      case MULTI_LINE_COMMENT: return "MULTI_LINE_COMMENT";
+      case COMMA: return "COMMA";
+      case ATTACHMENTS: return "ATTACHMENTS";
       case IS: return "IS";
       case BINDINGS: return "BINDINGS";
       case ENTRYPOINTS: return "ENTRYPOINTS";
@@ -56,7 +62,7 @@ public class ArchParser<AST,Type>   {
       case AND: return "AND";
       case WITH: return "WITH";
       case CONNECTORS: return "CONNECTORS";
-      case COMPONENTS: return "COMPONENT";
+      case COMPONENTS: return "COMPONENTS";
       case ARCHITECTURE: return "ARCHITECTURE";
       case VAL: return "VAL";
       case CONNECTOR: return "CONNECTOR";
@@ -75,7 +81,12 @@ public class ArchParser<AST,Type>   {
     }
     
     public static void main(String []args) throws CopperParserException, IOException, FileNotFoundException {
-        BufferedReader source = new BufferedReader(new FileReader("C:\u005c\u005cUsers\u005c\u005cAmanda Liu\u005c\u005cwyvern\u005c\u005ctest.wyv"));
+        BufferedReader source = new BufferedReader(new FileReader("C:\u005c\u005cUsers\u005c\u005cAmanda Liu\u005c\u005cwyvern\u005c\u005c"
+                                                                        + "test.wyv"
+                                                                  //    + "example1.wyv"
+                                                                  //    + "example2.wyv"
+                                                                  //    + "example3.wyv"
+                                                                    ));
         ArchParser wp = new ArchParser(
                 new WyvernTokenManager<ArchLexer, ArchParserConstants>(source, "test", ArchLexer.class,
                         ArchParserConstants.class));
@@ -84,7 +95,7 @@ public class ArchParser<AST,Type>   {
         List<Token> tokens = new ArchLexer().parse(source, "test");
         for (Token t: tokens) {
           if (!kindToName(t.kind).equals("WHITESPACE")){
-            System.out.print(kindToName(t.kind) + ", ");
+            System.out.println(kindToName(t.kind));
           }
         }*/
         
@@ -98,11 +109,11 @@ public class ArchParser<AST,Type>   {
         /*What's left after parsing attempt*/
         Token t = wp.getNextToken();
         while (!kindToName(t.kind).equals("UNKNOWN(0)")){
-            System.out.print(kindToName(t.kind) + ", ");
+            System.out.println(kindToName(t.kind));
             t = wp.getNextToken();
         }
         
-        System.out.println("PARSING DONE");
+        System.out.println("~PARSING DONE~");
 
     }
 }
@@ -168,6 +179,9 @@ AST ArchTypeDeclSeq() :
 {
     ast1 = ArchTypeDecls() 
     ( ast2 = ArchTypeDecls() {  } )*
+    { return null; }
+|
+    <EOF>
     { return null; }
     //{ return ast1; }
 }
@@ -246,10 +260,10 @@ AST ArchElemDecls() :
 AST ComponentDecls() :
 { Token type; Token name; boolean isExternal = false; List types; List names; }
 {
-    [<EXTERNAL> { isExternal = true; }] <COMPONENTS>
+    <COMPONENTS>
     <NEWLINE> <INDENT> 
-            type=<IDENTIFIER> name=<IDENTIFIER> {} <NEWLINE>
-            (type=<IDENTIFIER> name=<IDENTIFIER> {} <NEWLINE>)*
+            type=<IDENTIFIER> name=<IDENTIFIER> ( <COMMA> <IDENTIFIER> )* <NEWLINE>
+            (type=<IDENTIFIER> name=<IDENTIFIER> ( <COMMA> <IDENTIFIER> )*  <NEWLINE>)*
             <DEDENT>
     { return null; }
 }
@@ -259,8 +273,8 @@ AST ConnectorDecls() :
 {
     <CONNECTORS> 
     <NEWLINE> <INDENT> 
-            type=<IDENTIFIER> name=<IDENTIFIER> { } <NEWLINE>
-            (type=<IDENTIFIER> name=<IDENTIFIER> {} <NEWLINE>)*
+            type=<IDENTIFIER> name=<IDENTIFIER> ( <COMMA> <IDENTIFIER> )* <NEWLINE>
+            (type=<IDENTIFIER> name=<IDENTIFIER> ( <COMMA> <IDENTIFIER> )*  <NEWLINE>)*
             <DEDENT>
     { return null; }
 }
@@ -271,8 +285,8 @@ AST AttachmentDecls() :
     //allow for multiple cmp.prt in connect statement
     <ATTACHMENTS>
     <NEWLINE> <INDENT> 
-    <CONNECT> p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER> <NEWLINE>
-              (p1=Segment() <AND> p2=Segment() <WITH> cntr=<IDENTIFIER> <NEWLINE>)*
+    <CONNECT> p1=Segment() <AND> p2=Segment() ( <AND> Segment() )* <WITH> cntr=<IDENTIFIER> <NEWLINE>
+              (p1=Segment() <AND> p2=Segment() ( <AND> Segment() )* <WITH> cntr=<IDENTIFIER> <NEWLINE>)*
             <DEDENT>
     { return null; }
 }
@@ -283,6 +297,7 @@ AST BindingDecls() :
     <BINDINGS>
     <NEWLINE> <INDENT> t=<IDENTIFIER> <IS> b=Segment() <NEWLINE>
     (t=<IDENTIFIER> <IS> b=Segment() {} <NEWLINE> )*
+    <DEDENT>
     { return null; }
 }
 
@@ -290,7 +305,8 @@ AST EntryPointDecls() :
 { Token t; Token point; }
 {
     <ENTRYPOINTS>
-    <NEWLINE> <INDENT> t=<IDENTIFER> <COLON> point=<IDENTIFIER> <NEWLINE>
+    <NEWLINE> <INDENT> <IDENTIFIER> <COLON> <IDENTIFIER> <NEWLINE>
+    (<IDENTIFIER> <COLON> <IDENTIFIER> <NEWLINE>)* 
             <DEDENT>
     { return null; }
 }
