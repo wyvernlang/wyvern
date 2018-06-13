@@ -1,6 +1,7 @@
 require stdout
 
 import wyvern.String
+import wyvern.Float
 
 def printDivider() : Unit
   stdout.print("========================================\n")
@@ -43,4 +44,15 @@ test(-1.25)
 test(-1.5)
 test(-1.75)
 
+printDivider()
+
+stdout.print("  More examples: ")
+
+val f1 : Float = Float.from("4.3")
+val f2 : Float = Float.ofInt(4)
+
+stdout.printFloat(f1)
+stdout.print(" ")
+stdout.printFloat(f2)
+stdout.println()
 printDivider()
