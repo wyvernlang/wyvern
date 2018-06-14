@@ -1,5 +1,8 @@
 package wyvern.tools.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -7,8 +10,10 @@ import org.junit.experimental.categories.Category;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
@@ -93,4 +98,18 @@ public class ModuleSystemTests {
     public void testSimpleADTWithRenamingRequire() throws ParseException {
         TestUtil.doTestScriptModularly("modules.simpleADTdriver3", Util.intType(), new IntegerLiteral(5));
     }
+    
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testCircularImports() throws ParseException {
+        String errorMessage = "testCircularImports should catch a ToolError of type ErrorMesasge.IMPORT_CYCLE";
+        try {
+            TestUtil.doTestScriptModularly("modules.circular1", Util.unitType(), Util.unitValue());
+            fail(errorMessage);
+        } catch (ToolError te) {
+            assertEquals(errorMessage, ErrorMessage.IMPORT_CYCLE, te.getTypecheckingErrorMessage());
+        }
+    }
+
+    
 }
