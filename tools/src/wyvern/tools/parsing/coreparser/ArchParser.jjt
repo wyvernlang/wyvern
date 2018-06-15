@@ -1,6 +1,8 @@
 options
 {
     //BUILD_PARSER = false;
+	MULTI = true;
+	VISITOR = true;
     STATIC = false;
     USER_TOKEN_MANAGER = true;
 }
@@ -45,10 +47,7 @@ import static wyvern.tools.parsing.coreparser.ArchParserConstants.ATTACHMENTS;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMMA;
 import static wyvern.tools.parsing.coreparser.ArchParserConstants.MULTI_LINE_COMMENT;
 
-public class ArchParser<AST,Type>   {
-    //*private ArchASTBuilder<AST,Type> build;
-    //*public void setBuilder(ArchASTBuilder<AST,Type> builder) { build = builder; }
-    
+public class ArchParser   { 
     public static String kindToName(int kind) {
       switch (kind) {
       case MULTI_LINE_COMMENT: return "MULTI_LINE_COMMENT";
@@ -82,10 +81,9 @@ public class ArchParser<AST,Type>   {
     
     public static void main(String []args) throws CopperParserException, IOException, FileNotFoundException {
         BufferedReader source = new BufferedReader(new FileReader("C:\u005c\u005cUsers\u005c\u005cAmanda Liu\u005c\u005cwyvern\u005c\u005c"
-                                                                        + "test.wyv"
-                                                                  //    + "example1.wyv"
-                                                                  //    + "example2.wyv"
-                                                                  //    + "example3.wyv"
+                                                                  //    + "example1.wyc"
+                                                                      + "example2.wyc"
+                                                                  //    + "example3.wyc"
                                                                     ));
         ArchParser wp = new ArchParser(
                 new WyvernTokenManager<ArchLexer, ArchParserConstants>(source, "test", ArchLexer.class,
@@ -169,13 +167,13 @@ TOKEN : /* Symbols */
 
 /** Root production. */
 void ArchDesc() :
-{ AST exp; }
+{ Node exp; }
 {
     exp = ArchTypeDeclSeq()
 }
 
 AST ArchTypeDeclSeq() : 
-{ AST ast1; AST ast2; }
+{ Node ast1; Node ast2; }
 {
     ast1 = ArchTypeDecls() 
     ( ast2 = ArchTypeDecls() {  } )*
@@ -186,8 +184,8 @@ AST ArchTypeDeclSeq() :
     //{ return ast1; }
 }
 
-AST ArchTypeDecls() : 
-{ AST exp; }
+Node ArchTypeDecls() : 
+{ Node exp; }
 {
     exp = ComponentTypeDecl()       { return null; }//{ return exp; }
 |
@@ -196,7 +194,7 @@ AST ArchTypeDecls() :
     exp = ArchitectureTypeDecl()    { return null; }//{ return exp; }
 }
 
-AST ComponentTypeDecl() : 
+Node ComponentTypeDecl() : 
 { Token name; boolean isExternal; AST exp1; AST exp2; }
 {
     [ <EXTERNAL> { isExternal=true; } ] <COMPONENT> name=<IDENTIFIER>
@@ -207,8 +205,8 @@ AST ComponentTypeDecl() :
 }
 
 
-AST ComponentTypeDeclBody() : 
-{ AST ast1; AST ast2; }
+Node ComponentTypeDeclBody() : 
+{ Node ast1; Node ast2; }
 {
     ast1 = MemberDecls()            { return null; }//{ return ast1; }
 |
@@ -218,8 +216,8 @@ AST ComponentTypeDeclBody() :
 
 }
 
-AST ConnectorTypeDecl() : 
-{ Token name; AST exp1; AST exp2; }
+Node ConnectorTypeDecl() : 
+{ Token name; Node exp1; Node exp2; }
 {
     <CONNECTOR> name=<IDENTIFIER>
     <NEWLINE> <INDENT> exp1 = ValDecl()
@@ -228,8 +226,8 @@ AST ConnectorTypeDecl() :
     { return null; }
 }
 
-AST ArchitectureTypeDecl() : 
-{ Token name; AST body; }
+Node ArchitectureTypeDecl() : 
+{ Token name; Node body; }
 {
     <ARCHITECTURE> name=<IDENTIFIER>
     <NEWLINE> <INDENT> body = ArchElemDeclSeq()
@@ -237,16 +235,16 @@ AST ArchitectureTypeDecl() :
     { return null; }//{ return build.architectureTypeDecl(); }
 }
 
-AST ArchElemDeclSeq() : 
-{ AST exp1; AST exp2; }
+Node ArchElemDeclSeq() : 
+{ Node exp1; Node exp2; }
 {
     exp1 = ArchElemDecls() 
     (exp2 = ArchElemDecls() { } )*
     { return null; }
 }
 
-AST ArchElemDecls() : 
-{ AST exp; }
+Node ArchElemDecls() : 
+{ Node exp; }
 {
     exp = ComponentDecls()      { return null; }//{ return exp; }
 |
@@ -257,7 +255,7 @@ AST ArchElemDecls() :
     exp = EntryPointDecls()     { return null; }//{ return exp; }
 }
 
-AST ComponentDecls() :
+Node ComponentDecls() :
 { Token type; Token name; boolean isExternal = false; List types; List names; }
 {
     <COMPONENTS>
@@ -268,7 +266,7 @@ AST ComponentDecls() :
     { return null; }
 }
 
-AST ConnectorDecls() : 
+Node ConnectorDecls() : 
 { Token type; Token name; boolean isExternal = false; }
 {
     <CONNECTORS> 
@@ -279,7 +277,7 @@ AST ConnectorDecls() :
     { return null; }
 }
 
-AST AttachmentDecls() : 
+Node AttachmentDecls() : 
 { String p1; String p2; Token cntr; }
 {
     //allow for multiple cmp.prt in connect statement
@@ -291,7 +289,7 @@ AST AttachmentDecls() :
     { return null; }
 }
 
-AST BindingDecls() :
+Node BindingDecls() :
 { Token t; String b; }
 {
     <BINDINGS>
@@ -301,7 +299,7 @@ AST BindingDecls() :
     { return null; }
 }
 
-AST EntryPointDecls() : 
+Node EntryPointDecls() : 
 { Token t; Token point; }
 {
     <ENTRYPOINTS>
@@ -311,14 +309,14 @@ AST EntryPointDecls() :
     { return null; }
 }
 
-AST MemberDecls() :
-{ AST exp1; AST exp2; }
+Node MemberDecls() :
+{ Node exp1; Node exp2; }
 {
     ( exp1 = ValDecl() | exp1 = PortDecl() )
     { return null; }//{ return exp1; }
 }
 
-AST PortDecl() :
+Node PortDecl() :
 { Token p; Token req = null; Token prov = null; }
 {
     <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> | 
@@ -326,7 +324,7 @@ AST PortDecl() :
     { return null; }//{ return build.portDecl(); }
 }
 
-AST ValDecl() :
+Node ValDecl() :
 { Token t; Token name; }
 {
     <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER> <NEWLINE>
