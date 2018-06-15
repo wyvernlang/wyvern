@@ -1,3 +1,0 @@
-// Imports circular1, which imports circular2, which imports circular1, ... 
-import modules.circular1
-2
