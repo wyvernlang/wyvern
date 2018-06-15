@@ -13,7 +13,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
@@ -22,7 +21,8 @@ public class ModuleSystemTests {
     private static final String BASE_PATH = TestUtil.BASE_PATH;
     private static final String PATH = BASE_PATH + "modules/";
 
-    @BeforeClass public static void setupResolver() {
+    @BeforeClass
+    public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
     }
@@ -35,42 +35,32 @@ public class ModuleSystemTests {
 
     @Test
     public void testADT() throws ParseException {
-        TestUtil.doTestScriptModularly("modules.listClient",
-                Util.intType(),
-                new IntegerLiteral(5));
+        TestUtil.doTestScriptModularly("modules.listClient", Util.intType(), new IntegerLiteral(5));
     }
 
     @Test
     public void testTransitiveAuthorityGood() throws ParseException {
-        TestUtil.doTestScriptModularly("modules.databaseClientGood",
-                Util.intType(),
-                new IntegerLiteral(1));
+        TestUtil.doTestScriptModularly("modules.databaseClientGood", Util.intType(), new IntegerLiteral(1));
     }
 
     @Test
     public void testTransitiveAuthorityBad() throws ParseException {
-        TestUtil.doTestScriptModularlyFailing("modules.databaseClientBad",
-                ErrorMessage.NO_SUCH_METHOD);
+        TestUtil.doTestScriptModularlyFailing("modules.databaseClientBad", ErrorMessage.NO_SUCH_METHOD);
     }
 
     @Test
     public void testTopLevelVars() throws ParseException {
-        TestUtil.doTestScriptModularly("modules.databaseUser",
-                Util.intType(),
-                new IntegerLiteral(10));
+        TestUtil.doTestScriptModularly("modules.databaseUser", Util.intType(), new IntegerLiteral(10));
     }
 
     @Test
     public void testTopLevelVarsWithAliasing() throws ParseException {
-        TestUtil.doTestScriptModularly("modules.databaseUserTricky",
-                Util.intType(),
-                new IntegerLiteral(10));
+        TestUtil.doTestScriptModularly("modules.databaseUserTricky", Util.intType(), new IntegerLiteral(10));
     }
 
     @Test
     public void testTopLevelVarGet() throws ParseException {
-        String source = "var v : Int = 5\n"
-                + "v\n";
+        String source = "var v : Int = 5\n" + "v\n";
 
         TestUtil.doTestInt(source, 5);
     }
@@ -78,9 +68,7 @@ public class ModuleSystemTests {
     @Test
     public void testTopLevelVarSet() throws ParseException {
 
-        String source = "var v : Int = 5\n"
-                + "v = 10\n"
-                + "v\n";
+        String source = "var v : Int = 5\n" + "v = 10\n" + "v\n";
         TestUtil.doTestInt(source, 10);
     }
 
@@ -98,18 +86,38 @@ public class ModuleSystemTests {
     public void testSimpleADTWithRenamingRequire() throws ParseException {
         TestUtil.doTestScriptModularly("modules.simpleADTdriver3", Util.intType(), new IntegerLiteral(5));
     }
-    
+
     @Test
-    @Category(CurrentlyBroken.class)
-    public void testCircularImports() throws ParseException {
-        String errorMessage = "testCircularImports should catch a ToolError of type ErrorMesasge.IMPORT_CYCLE";
+    public void testCyclicImports() throws ParseException {
+        String errorMessage = "testCyclicImports should catch a ToolError of type ErrorMesasge.IMPORT_CYCLE";
         try {
-            TestUtil.doTestScriptModularly("modules.circular1", Util.unitType(), Util.unitValue());
+            TestUtil.doTestScriptModularly("modules.cyclic.cyclic1a", Util.unitType(), Util.unitValue());
             fail(errorMessage);
         } catch (ToolError te) {
             assertEquals(errorMessage, ErrorMessage.IMPORT_CYCLE, te.getTypecheckingErrorMessage());
         }
     }
 
-    
+    @Test
+    public void testLongCyclicImport() throws ParseException {
+        String errorMessage = "testLongCyclicImports should catch a ToolError of type ErrorMesasge.IMPORT_CYCLE";
+        try {
+            TestUtil.doTestScriptModularly("modules.cyclic.cyclic2a", Util.unitType(), Util.unitValue());
+            fail(errorMessage);
+        } catch (ToolError te) {
+            assertEquals(errorMessage, ErrorMessage.IMPORT_CYCLE, te.getTypecheckingErrorMessage());
+        }
+    }
+
+    @Test
+    public void testCircularImportNotInvolvingTopLevel() throws ParseException {
+        String errorMessage = "testCyclicImports should catch a ToolError of type ErrorMesasge.IMPORT_CYCLE";
+        try {
+            TestUtil.doTestScriptModularly("modules.cyclic.cyclic3a", Util.unitType(), Util.unitValue());
+            fail(errorMessage);
+        } catch (ToolError te) {
+            assertEquals(errorMessage, ErrorMessage.IMPORT_CYCLE, te.getTypecheckingErrorMessage());
+        }
+    }
+
 }
