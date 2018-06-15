@@ -25,6 +25,12 @@ public class Module {
         return spec;
     }
 
+    /** Returns an expression representing this module or module def.  The expresison will evalute to an object.
+     * The object will be the module itself, or will have a single apply() method in the case that this is really
+     * a module def.
+     * 
+     * @return
+     */
     public Expression getExpression() {
         return (Expression) expr;
     }
