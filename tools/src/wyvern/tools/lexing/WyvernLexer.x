@@ -180,7 +180,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
     terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); flagTok = RESULT; :};
-    terminal Token defaultKwd_t ::= /default/ in (keywds);
+    terminal Token defaultKwd_t ::= /default/ in (keywds) {: RESULT = token(DEFLT,lexeme); :};
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
 
@@ -320,6 +320,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | comprisesKwd_t:t {: RESULT = t; :}
 	       | extendsKwd_t:t {: RESULT = t; :}
 	       | matchKwd_t:t {: RESULT = t; :}
+	       | defaultKwd_t:t {: RESULT = t; :}
 	       | taggedKwd_t:t {: RESULT = t; :}
 	       | importKwd_t:t {: RESULT = t; :}
 	       | instantiateKwd_t:t {: RESULT = t; :}
