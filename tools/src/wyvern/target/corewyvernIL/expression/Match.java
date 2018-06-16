@@ -62,7 +62,7 @@ public class Match extends Expression {
         if (elseExpr != null) {
             ValueType elseType = elseExpr.typeCheck(env, effectAccumulator);
             FailureReason reason = new FailureReason();
-            if (elseType.isSubtypeOf(getType(), env, reason)) {
+            if (!elseType.isSubtypeOf(getType(), env, reason)) {
                 ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, elseExpr, reason.getReason());
             }
         }
