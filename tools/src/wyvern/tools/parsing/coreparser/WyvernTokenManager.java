@@ -12,7 +12,7 @@ import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.lexing.LexerUtils;
+import wyvern.tools.arch.lexing.LexerUtils;
 
 public class WyvernTokenManager<Lexer extends SingleDFAEngine<List<Token>, CopperParserException>, ParserConstants> implements TokenManager {
     private Constructor<Lexer> lexerCtor;

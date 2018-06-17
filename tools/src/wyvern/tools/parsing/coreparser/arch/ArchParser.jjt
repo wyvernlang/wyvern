@@ -9,45 +9,23 @@ options
 
 PARSER_BEGIN(ArchParser)
 
-package wyvern.tools.parsing.coreparser;
+package wyvern.tools.parsing.coreparser.arch;
 
 import java.util.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.Reader;
-import java.io.StringReader;
-import wyvern.tools.lexing.archlexer.ArchLexer;
+import java.io.File;
+import wyvern.tools.arch.lexing.ArchLexer;
 import java.io.FileNotFoundException;
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
 import java.io.IOException;
-
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMPONENT;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.PORT;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.COLON;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.WHITESPACE;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.INDENT;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.DEDENT;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.IDENTIFIER;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.NEWLINE;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.PROVIDES;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.REQUIRES;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.CONNECTOR;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.VAL;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.ARCHITECTURE;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMPONENTS;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.CONNECTORS;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.AND;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.WITH;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.CONNECT;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.DOT;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.IS;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.ENTRYPOINTS;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.BINDINGS;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.ATTACHMENTS;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.COMMA;
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.MULTI_LINE_COMMENT;
+import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
+import wyvern.tools.parsing.coreparser.WyvernTokenManager;
+import wyvern.tools.parsing.coreparser.TokenManager;
+import wyvern.tools.parsing.coreparser.Token;
+import wyvern.tools.parsing.coreparser.ParseException;
 
 public class ArchParser   { 
+
     public static String kindToName(int kind) {
       switch (kind) {
       case MULTI_LINE_COMMENT: return "MULTI_LINE_COMMENT";
@@ -80,13 +58,24 @@ public class ArchParser   {
     }
     
     public static void main(String []args) throws CopperParserException, IOException, FileNotFoundException {
-        BufferedReader source = new BufferedReader(new FileReader("C:\u005c\u005cUsers\u005c\u005cAmanda Liu\u005c\u005cwyvern\u005c\u005c"
-                                                                  //    + "example1.wyc"
-                                                                      + "example2.wyc"
-                                                                  //    + "example3.wyc"
+        String root = System.getProperty("user.dir");
+        File example1, example2, example3;
+        if (root.substring(root.length() - 5).equals("tools"))  {
+          example1 = new File(root + "/../examples/architecture/example1.wyc");
+          example2 = new File(root + "/../examples/architecture/example2.wyc");
+          example3 = new File(root + "/../examples/architecture/example3.wyc");
+        } else  {
+          example1 = new File(root + "/../../examples/architecture/example1.wyc");
+          example2 = new File(root + "/../../examples/architecture/example2.wyc");
+          example3 = new File(root + "/../../examples/architecture/example3.wyc");
+        }
+        BufferedReader source = new BufferedReader(new FileReader(
+                                                                  //    example1
+                                                                      example2
+                                                                  //    example3
                                                                     ));
         ArchParser wp = new ArchParser(
-                new WyvernTokenManager<ArchLexer, ArchParserConstants>(source, "test", ArchLexer.class,
+                (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(source, "test", ArchLexer.class,
                         ArchParserConstants.class));
 
         /*Full list of tokens as collected by the token manager
@@ -166,13 +155,13 @@ TOKEN : /* Symbols */
 }
 
 /** Root production. */
-void ArchDesc() :
+void ArchDesc() #void :
 { Node exp; }
 {
     exp = ArchTypeDeclSeq()
 }
 
-AST ArchTypeDeclSeq() : 
+Node ArchTypeDeclSeq() : 
 { Node ast1; Node ast2; }
 {
     ast1 = ArchTypeDecls() 
@@ -184,7 +173,7 @@ AST ArchTypeDeclSeq() :
     //{ return ast1; }
 }
 
-Node ArchTypeDecls() : 
+Node ArchTypeDecls() #void : 
 { Node exp; }
 {
     exp = ComponentTypeDecl()       { return null; }//{ return exp; }
@@ -195,7 +184,7 @@ Node ArchTypeDecls() :
 }
 
 Node ComponentTypeDecl() : 
-{ Token name; boolean isExternal; AST exp1; AST exp2; }
+{ Token name; boolean isExternal; Node exp1; Node exp2; }
 {
     [ <EXTERNAL> { isExternal=true; } ] <COMPONENT> name=<IDENTIFIER>
     <NEWLINE> <INDENT> exp1 = ComponentTypeDeclBody()
@@ -205,7 +194,7 @@ Node ComponentTypeDecl() :
 }
 
 
-Node ComponentTypeDeclBody() : 
+Node ComponentTypeDeclBody() #void : 
 { Node ast1; Node ast2; }
 {
     ast1 = MemberDecls()            { return null; }//{ return ast1; }
@@ -243,7 +232,7 @@ Node ArchElemDeclSeq() :
     { return null; }
 }
 
-Node ArchElemDecls() : 
+Node ArchElemDecls() #void : 
 { Node exp; }
 {
     exp = ComponentDecls()      { return null; }//{ return exp; }
@@ -309,7 +298,7 @@ Node EntryPointDecls() :
     { return null; }
 }
 
-Node MemberDecls() :
+Node MemberDecls() #void :
 { Node exp1; Node exp2; }
 {
     ( exp1 = ValDecl() | exp1 = PortDecl() )
@@ -331,7 +320,7 @@ Node ValDecl() :
     { return null; }//{ return build.valDecl(); }
 }
 
-String Segment() : 
+String Segment() #void : 
 { String s; Token t; }
 {
     t=<IDENTIFIER> { s = t.image; }
