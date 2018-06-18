@@ -100,7 +100,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
             } else if (vt != null) {
                 ValueType nominalMatchType = expectedMatchType;
                 while (nominalMatchType instanceof RefinementType) {
-                    nominalMatchType = ((RefinementType)nominalMatchType).getBase();
+                    nominalMatchType = ((RefinementType) nominalMatchType).getBase();
                 }
                 if (!(vt.isSubtypeOf(nominalMatchType, ctx, reason))) {
                     ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, c.getAST(), vt.desugar(ctx), expectedMatchType.desugar(ctx), reason.getReason());
