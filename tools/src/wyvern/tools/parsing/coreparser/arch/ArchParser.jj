@@ -413,7 +413,7 @@ Node ComponentDecls() :
   ASTComponentDecls jjtn000 = new ASTComponentDecls(JJTCOMPONENTDECLS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/ Token type; Token name; boolean isExternal = false; List types; List names; }
+/*@egen*/ Token type; Token name; boolean isExternal = false; }
 {/*@bgen(jjtree) ComponentDecls */
     try {
 /*@egen*/

@@ -245,7 +245,7 @@ Node ArchElemDecls() #void :
 }
 
 Node ComponentDecls() :
-{ Token type; Token name; boolean isExternal = false; List types; List names; }
+{ Token type; Token name; boolean isExternal = false; }
 {
     <COMPONENTS>
     <NEWLINE> <INDENT> 
