@@ -1,0 +1,215 @@
+syntax = "proto2";
+
+// x : \tau (used in methods and method types)
+message MethodArgument {
+    required string variable = 1;
+    required Type type = 2;
+}
+
+// Variable declarations are either val or var
+enum VariableDeclarationType {
+    VAL = 1;
+    VAR = 2;
+}
+
+
+// b
+message Bytecode {
+    // v
+    message Version {
+        required int32 magic = 1;
+        required int32 major = 2;
+        required int32 minor = 3;
+    }
+    // i
+    message Import {
+        required bool isMetadataImport = 1;
+        required bool isTypeImport = 2;
+        required string platform = 3;
+        required string path = 4;
+        required Type type = 5;
+        required string name = 6;
+    }
+    required Version version = 1;
+    required string path = 2;
+    repeated Import imports = 3;
+    repeated Module modules = 4;
+}
+
+// M
+message Module {
+    message ValueModule {
+        required Type type = 1;
+        required Expression expression = 2;
+    }
+    message TypeModule {
+        required TypeDesc typeDesc = 1;
+        optional Expression metadata = 2;
+    }
+    required string path = 1;
+    oneof module {
+        ValueModule valueModule = 2;
+        TypeModule typeModule = 3;
+    }
+}
+
+// e
+message Expression {
+    message NewExpression {
+        required Type type = 1;
+        required string thisVariable = 2;
+        repeated Declaration declarations = 3;
+    }
+    message CallExpression {
+        required Expression receiver = 1;
+        required string method = 2;
+        repeated Expression arguments = 3;
+    }
+    message AccessExpression {
+        required Expression expression = 1;
+        required string field = 2;
+    }
+    message AssignmentExpression {
+        required Expression expression = 1;
+        required string field = 2;
+        required Expression value = 3;
+    }
+    message LetExpression {
+        required string variable = 1;
+        required Expression value = 2;
+        required Expression expression = 3;
+    }
+    message Literal {
+        oneof literal {
+            string stringLiteral = 1;
+            bytes integerLiteral = 2;
+            double floatLiteral = 3;
+            bool booleanLiteral = 4;
+            // protobuf doesn't have char type. This may be better anyways due
+            // to unicode complexities and the shortcomings of Java's char.
+            string characterLiteral = 5;
+        }
+    }
+    message MatchExpression {
+        message MatchArm {
+            required string variable = 1;
+            required string path = 2;
+            required Expression expression = 3;
+        }
+        required Expression expression = 1;
+        repeated MatchArm arms = 2;
+        optional Expression else = 3;
+    }
+    message SequenceExpression {
+        repeated Expression expressions = 1;
+    }
+    oneof expression {
+        string variable = 1;
+        NewExpression newExpression = 2;
+        CallExpression callExpression = 3;
+        AccessExpression accessExpression = 4;
+        AssignmentExpression assignmentExpression = 5;
+        LetExpression letExpression = 6;
+        Literal literal = 7;
+        MatchExpression matchExpression = 8;
+        SequenceExpression sequenceExpression = 9;
+    }
+}
+
+// d
+message Declaration {
+    message VariableDeclaration {
+        required VariableDeclarationType declarationType = 1;
+        required string variable = 2;
+        required Type type = 3;
+        required Expression initializer = 4;
+    }
+    message MethodDeclaration {
+        required string methodName = 1;
+        repeated MethodArgument arguments = 2;
+        required Type returnType = 3;
+        required Expression body = 4;
+    }
+    message TypeDeclaration {
+        required string name = 1;
+        required TypeDesc typeDesc = 2;
+        optional Expression metadata = 3;
+    }
+    oneof declaration {
+        VariableDeclaration variableDeclaration = 1;
+        MethodDeclaration methodDeclaration = 2;
+        TypeDeclaration typeDeclaration = 3;
+    }
+}
+
+// T
+message TypeDesc {
+    // c
+    message CaseDesc {
+        optional string extends = 1;
+        required Type type = 2;
+    }
+    message Tag {
+        // Length 0 means extag, otherwise datatag
+        repeated string paths = 1;
+    }
+    required CaseDesc caseDesc = 1;
+    optional Tag tag = 2;
+}
+
+// \tau
+message Type {
+    // \tau { x => \overline{\sigma} }_s
+    message CompoundType {
+        required Type base = 1;
+        required string this = 2;
+        repeated DeclType declTypes = 3;
+        required Statefulness statefulness = 4;
+    }
+    enum SimpleType {
+        Top = 1;
+        Nothing = 2;
+        Dyn = 3;
+    }
+    oneof type {
+        CompoundType declarationType = 1;
+        string path = 2;
+        SimpleType simpleType = 3;
+    }
+}
+
+// s
+enum Statefulness {
+    STATEFUL = 1;
+    PURE = 2;
+}
+
+// \sigma
+message DeclType {
+    message VariableDeclType {
+        required VariableDeclarationType declarationType = 1;
+        required string variable = 2;
+        required Type type = 3;
+    }
+    message MethodDeclType {
+        required string methodName = 1;
+        repeated MethodArgument arguments = 2;
+        required Type returnType = 3;
+    }
+    message DeclTypeDeclaration {
+        required string name = 1;
+        required TypeDesc typeDesc = 2;
+        optional Expression metadata = 3;
+    }
+    message OpaqueTypeDecl {
+        required string name = 1;
+        required Statefulness statefulness = 2;
+        optional Expression metadata = 3;
+    }
+    oneof declaration {
+        VariableDeclType variableDecl = 1;
+        MethodDeclType methodDecl = 2;
+        DeclTypeDeclaration declTypeDeclaration = 3;
+        OpaqueTypeDecl opaqueTypeDecl = 4;
+    }
+}

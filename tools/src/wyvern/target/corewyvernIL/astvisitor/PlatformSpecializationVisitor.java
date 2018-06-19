@@ -155,7 +155,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             cases.add((Case) matchCase.acceptVisitor(this, state));
         }
 
-        Match result = new Match(matchExpr, elseExpr, cases, match.getLocation());
+        Match result = new Match(matchExpr, elseExpr, cases, match.getType(), match.getLocation());
         result.copyMetadata(match);
         return result;
     }

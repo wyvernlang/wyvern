@@ -112,6 +112,7 @@ TOKEN : /* Keywords */
 | < TAGGED: "tagged" >
 | < MATCH: "match" >
 | < IMPORT: "import" >
+| < DEFLT: "default" >
 //| < : "" >
 // more here
 | < RESOURCE : "resource" >
@@ -658,9 +659,10 @@ AST ExpressionLine(boolean makeValDecl) :
 }
 
 Object CaseArm() :
-{ Token id; Token t; Token dslTok = null; AST exp = null; Type type; }
+{ Token id; Token t; Token dslTok = null; AST exp = null; Type type=null; }
 {
-  id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW>
+  ((id=<IDENTIFIER> <COLON> type=NonArrowType())
+  | id=<DEFLT>) t=<EQARROW>
   ( exp=ExpressionLine(false)
   | <NEWLINE> dslTok=DSLLines()
   ) {

@@ -12,6 +12,11 @@ public class TypedModuleSpec extends ModuleSpec {
         this.definedTypeName = typeName;
     }
 
+    /** Returns the signature of this module.
+     * In the case of a module def this signature will have a single method, apply().
+     * In the case the module defines a type, this signature will have a single type definition within it that is the type,
+     * and that type definition will have the name given by getDefinedTypeName().
+     */
     public ValueType getType() {
         return type;
     }

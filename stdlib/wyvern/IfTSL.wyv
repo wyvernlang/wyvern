@@ -12,9 +12,12 @@ def getIndent(x : String): String
   val f = x.substring(0, 1)
   (f == " " || f == "	").ifTrue(() => f + getIndent(x.substring(1, x.length())), () => "")
 
-def indent(x : String, ind : String): String
-  (x.length() == 0).ifTrue(() => "",
-      () => (x.substring(0, 1) == "\n").ifTrue(() => "\n" + ind + indent(x.substring(1, x.length()), ind), () => x.substring(0, 1) + indent(x.substring(1, x.length()), ind)))
+def indentHelper(x: String, ind: String, acc: String): String
+  (x.length() == 0).ifTrue(() => acc,
+      () => (x.substring(0, 1) == "\n").ifTrue(() => indentHelper(x.substring(1, x.length()), ind, acc + "\n" + ind), () => indentHelper(x.substring(1, x.length()), ind, acc + x.substring(0, 1))))
+
+def indent(x: String, ind: String): String
+  indentHelper(x, ind, "")
 
 def getToNewLine(x: String): String
   (x.length() == 0).ifTrue(() => "",

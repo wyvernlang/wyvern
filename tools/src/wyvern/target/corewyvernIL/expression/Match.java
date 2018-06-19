@@ -62,7 +62,7 @@ public class Match extends Expression {
         if (elseExpr != null) {
             ValueType elseType = elseExpr.typeCheck(env, effectAccumulator);
             FailureReason reason = new FailureReason();
-            if (elseType.isSubtypeOf(getType(), env, reason)) {
+            if (!elseType.isSubtypeOf(getType(), env, reason)) {
                 ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, elseExpr, reason.getReason());
             }
         }
@@ -70,11 +70,11 @@ public class Match extends Expression {
         // typecheck the other cases
         for (Case c : cases) {
             FailureReason reason = new FailureReason();
-            if (!c.getPattern().isSubtypeOf(matchType, env, reason)) {
+            if (!c.getAdaptedPattern(matchType).isSubtypeOf(matchType, env, reason)) {
                 ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, c, c.getPattern().desugar(env), matchType.desugar(env), reason.getReason());
             }
 
-            TypeContext caseCtx = env.extend(c.getSite(), c.getPattern());
+            TypeContext caseCtx = env.extend(c.getSite(), c.getAdaptedPattern(matchType));
             ValueType caseType = c.getBody().typeCheck(caseCtx, effectAccumulator);
             reason = new FailureReason();
             if (!caseType.isSubtypeOf(getType(), caseCtx, reason)) {

@@ -83,9 +83,17 @@ public class NominalType extends ValueType {
         }
     }
 
+    private static int nestingCount = 0;
+    
     private DeclType getSourceDeclType(TypeContext ctx) {
         final ValueType t = path.typeCheck(ctx, null);
+        nestingCount++;
+        if (nestingCount > 100) {
+            // check for excessive recursion failed
+            throw new RuntimeException("Internal error: recursion");
+        }
         final StructuralType structuralType = t.getStructuralType(ctx);
+        nestingCount--;
         // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
     }
@@ -186,7 +194,9 @@ public class NominalType extends ValueType {
                 return true;
             } else {
                 // report error in terms of original type
-                reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                if (!reason.isDefined()) {
+                    reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                }
                 return false;
             }
         }

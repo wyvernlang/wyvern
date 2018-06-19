@@ -359,7 +359,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public Object caseArm(String name, Type type, TypedAST exp,
             FileLocation loc) {
-        return new Case(name, type, exp);
+        return name.equals("default") ? new Case(exp) : new Case(name, type, exp);
     }
 
     @Override

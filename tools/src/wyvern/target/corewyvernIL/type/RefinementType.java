@@ -26,6 +26,19 @@ public class RefinementType extends ValueType {
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, String selfName) {
         this(base, declTypes, hasLoc, new BindingSite(selfName));
     }
+    
+    /** Applies the old refinement to this new base
+     * 
+     * @param base
+     * @param old
+     */
+    public RefinementType(ValueType base, RefinementType old) {
+        super(old);
+        this.base = base;
+        this.selfSite = old.selfSite;
+        this.declTypes = old.declTypes;
+        this.typeParams = old.typeParams;
+    }
 
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, BindingSite selfSite) {
         this.base = base;
@@ -68,6 +81,7 @@ public class RefinementType extends ValueType {
                 }
                 AbstractTypeMember m = (AbstractTypeMember) st.getDeclTypes().get(index);
                 declTypes.add(new ConcreteTypeMember(m.getName(), vt));
+                index++;
             }
         }
         return declTypes;
