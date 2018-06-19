@@ -58,8 +58,7 @@ public class REPL {
     private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
     
     private static EvalContext programContext = null;
-    private static String tempImports = "";
-    private static String tempFunctions = "";
+    private static String tempCode = "";
     //private static IExpr program = null;
 	
 	public REPL() {
@@ -76,7 +75,10 @@ public class REPL {
                 }
                 else if(input.equals("ctx")) {
                     System.out.println(programContext);
-                }else {
+                }else if(input.equals("clear")) {
+                    tempCode = "";
+                }
+                else {
                     Value v = interepetProgram(input);
                     if(v != null) {
                         System.out.println(v.toString());
@@ -86,43 +88,23 @@ public class REPL {
                 e.printStackTrace();
             }
         }
-    }
+   }
 	
 	public static Value interepetProgram(String input) throws ParseException {
 	    String lines[] = input.split("\\r?\\n");
 	    Value currentResult = null;
 	    for (String s: lines) {
 	        if (!(s.length()==0)) { //does not run code on empty lines
-	            if (s.split(" ").length == 1 && programContext != null && tempFunctions.isEmpty()) 
-	            { //assuming when user enters 1 word it refers to a val
-	                Value result = programContext.lookupValue(s);
-	                return result;
-	            }
-	            else if(s.contains("def"))
-	            {
-	                tempFunctions = tempFunctions + s + "\n";
-	            }
-	            else if(s.contains("require"))
-	            {
-	                tempImports = tempImports + s + "\n";
-	            }
-	            else if (s.contains("\t") && !tempFunctions.isEmpty())
-	            {
-	                System.out.println("adding to function");
-	                tempFunctions = tempFunctions + s + "\n";
-	            }
-	            else{
-	                System.out.println("got here");
-	                if (!tempImports.isEmpty() || !tempFunctions.isEmpty()) {
-	                    System.out.println(tempImports + "\n" + tempFunctions + "\n" + s + "\n" );
-	                    //parse(tempImports + "\n" + tempFunctions + "\n" + s + "\n" );
-	                    tempImports = ""; 
-                        tempFunctions = "";
-	                }else {
-	                    System.out.println("STARTED PROCESSING: " + s);
-	                    currentResult = parse(s + "\n");
-	                    System.out.println("FINISHED PROCESSING: " + s);
+	            try {
+	                if(tempCode.length() != 0) {
+	                    currentResult = parse(tempCode + s );
 	                }
+	                else {
+	                    currentResult = parse(s + "\n");
+	                }
+	            }
+	            catch(Exception e) {
+	                tempCode = tempCode + s + "\n";
 	            }
 	        }
 	    }
@@ -133,6 +115,17 @@ public class REPL {
 	    if(input.length() == 0) {
 	        return null;
 	    }
+	    if (input.split(" ").length == 1) 
+        {
+	        try {
+	            input = input.replace("\n", "");
+	            Value result = programContext.lookupValue(input);
+	            return result;
+	        }
+	        catch(Exception e){
+	            return null;
+	        }
+        }
 	    if (programContext == null){
 	        //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
 	        programContext = Globals.getStandardEvalContext();
@@ -146,6 +139,7 @@ public class REPL {
 	        
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
             programContext = result.getSecond();
+            tempCode = "";
             return result.getFirst();
 	    }else {
 	       
@@ -160,8 +154,8 @@ public class REPL {
 	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
             programContext = result.getSecond();
 	        //System.out.println(result.getFirst());
+            tempCode = "";
 	        return result.getFirst();
-	        
 	        //System.out.println(programContext.lookupValue("x"));
 	    }
 	}
