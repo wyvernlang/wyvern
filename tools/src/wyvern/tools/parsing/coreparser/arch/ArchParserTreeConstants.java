@@ -3,28 +3,26 @@ package wyvern.tools.parsing.coreparser.arch;
 
 public interface ArchParserTreeConstants
 {
-  public int JJTVOID = 0;
-  public int JJTARCHTYPEDECLSEQ = 1;
+  public int JJTARCHDESC = 0;
+  public int JJTVOID = 1;
   public int JJTCOMPONENTTYPEDECL = 2;
   public int JJTCONNECTORTYPEDECL = 3;
   public int JJTARCHITECTURETYPEDECL = 4;
-  public int JJTARCHELEMDECLSEQ = 5;
-  public int JJTCOMPONENTDECLS = 6;
-  public int JJTCONNECTORDECLS = 7;
-  public int JJTATTACHMENTDECLS = 8;
-  public int JJTBINDINGDECLS = 9;
-  public int JJTENTRYPOINTDECLS = 10;
-  public int JJTPORTDECL = 11;
-  public int JJTVALDECL = 12;
+  public int JJTCOMPONENTDECLS = 5;
+  public int JJTCONNECTORDECLS = 6;
+  public int JJTATTACHMENTDECLS = 7;
+  public int JJTBINDINGDECLS = 8;
+  public int JJTENTRYPOINTDECLS = 9;
+  public int JJTPORTDECL = 10;
+  public int JJTVALDECL = 11;
 
 
   public String[] jjtNodeName = {
+    "ArchDesc",
     "void",
-    "ArchTypeDeclSeq",
     "ComponentTypeDecl",
     "ConnectorTypeDecl",
     "ArchitectureTypeDecl",
-    "ArchElemDeclSeq",
     "ComponentDecls",
     "ConnectorDecls",
     "AttachmentDecls",
@@ -34,4 +32,4 @@ public interface ArchParserTreeConstants
     "ValDecl",
   };
 }
-/* JavaCC - OriginalChecksum=0d779f437f22f2f559c66b730825ed31 (do not edit this line) */
+/* JavaCC - OriginalChecksum=ebf8723db09d5e2f750ef113c9b642a0 (do not edit this line) */
