@@ -81,6 +81,7 @@ public class RefinementType extends ValueType {
                 }
                 AbstractTypeMember m = (AbstractTypeMember) st.getDeclTypes().get(index);
                 declTypes.add(new ConcreteTypeMember(m.getName(), vt));
+                index++;
             }
         }
         return declTypes;
