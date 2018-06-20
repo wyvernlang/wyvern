@@ -248,29 +248,69 @@ SimpleNode ArchElemDecls() #void :
     exp = EntryPointDecls()     { return null; }
 }
 
-SimpleNode ComponentDecls() :
-{ Token type; Token name; boolean isExternal = false; }
+SimpleNode ComponentDecls() #void :
+{ Token type; Token name; }
 {
     <COMPONENTS>
     <NEWLINE> <INDENT> 
-            ComponentDecl()
-            (ComponentDecl())*
+            ComponentDeclAux()
+            (ComponentDeclAux())*
             <DEDENT>
     { return null; }
 }
 
-SimpleNode ConnectorDecls() : 
-{ Token type; Token name; boolean isExternal = false; }
+SimpleNode ComponentDeclAux() #void : 
+{ String type = null; }
+{
+    type=ComponentDecl("")
+    (ComponentDecl(type))* <NEWLINE>
+    { return null; }
+}
+
+String ComponentDecl(String t) :
+{ Token type; Token name; }
+{
+    type=<IDENTIFIER> name=<IDENTIFIER>     { jjtThis.setType(type.image); 
+                                              jjtThis.setName(name.image); 
+                                              return type.image; }
+|
+    <COMMA> name=<IDENTIFIER>               { jjtThis.setType(t); 
+                                              jjtThis.setName(name.image); 
+                                              return t; }
+}
+
+SimpleNode ConnectorDecls() #void : 
+{ Token type; Token name; }
 {
     <CONNECTORS> 
     <NEWLINE> <INDENT> 
-            ConnectorDecl()
-            (ConnectorDecl())*
+            ConnectorDeclAux()
+            (ConnectorDeclAux())*
             <DEDENT>
     { return null; }
 }
 
-SimpleNode AttachmentDecls() : 
+SimpleNode ConnectorDeclAux() #void : 
+{ String type = null; }
+{
+    type=ConnectorDecl("")
+    (ConnectorDecl(type))* <NEWLINE>
+    { return null; }
+}
+
+String ConnectorDecl(String t) :
+{ Token type; Token name; }
+{
+    type=<IDENTIFIER> name=<IDENTIFIER>     { jjtThis.setType(type.image); 
+                                              jjtThis.setName(name.image); 
+                                              return type.image; }
+|
+    <COMMA> name=<IDENTIFIER>               { jjtThis.setType(t); 
+                                              jjtThis.setName(name.image); 
+                                              return t; }
+}
+
+SimpleNode AttachmentDecls() #void : 
 { String p1; String p2; Token cntr; }
 {
     <ATTACHMENTS>
@@ -281,7 +321,16 @@ SimpleNode AttachmentDecls() :
     { return null; }
 }
 
-SimpleNode BindingDecls() :
+SimpleNode AttachmentDecl() :
+{ String p1; String p2; Token cntr; }
+{
+    p1=Segment() <AND> p2=Segment() { jjtThis.addPort(p1); jjtThis.addPort(p2); }
+    ( <AND> p2=Segment() { jjtThis.addPort(p2); } )* <WITH> cntr=<IDENTIFIER> <NEWLINE>
+    { jjtThis.setConnector(cntr.image); }
+    { return null; }
+}
+
+SimpleNode BindingDecls() #void :
 { Token t; String b; }
 {
     <BINDINGS>
@@ -292,7 +341,15 @@ SimpleNode BindingDecls() :
     { return null; }
 }
 
-SimpleNode EntryPointDecls() : 
+SimpleNode BindingDecl() :
+{ Token name; String target; }
+{
+    name=<IDENTIFIER> <IS> target=Segment() <NEWLINE>
+    { jjtThis.setName(name.image); jjtThis.setTarget(target); }
+    { return null; }
+}
+
+SimpleNode EntryPointDecls() #void : 
 { Token t; Token point; }
 {
     <ENTRYPOINTS>
@@ -300,6 +357,14 @@ SimpleNode EntryPointDecls() :
          EntryPointDecl()
         (EntryPointDecl())* 
             <DEDENT>
+    { return null; }
+}
+
+SimpleNode EntryPointDecl() :
+{ Token name; Token action; }
+{
+    name=<IDENTIFIER> <COLON> action=<IDENTIFIER> <NEWLINE>
+    { jjtThis.setName(name.image); jjtThis.setAction(action.image); }
     { return null; }
 }
 
@@ -313,16 +378,18 @@ SimpleNode MemberDecls() #void :
 SimpleNode PortDecl() :
 { Token p; Token req = null; Token prov = null; }
 {
-    <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> | 
-                        <PROVIDES> prov=<IDENTIFIER>) <NEWLINE>
-    { return null; }//{ return build.portDecl(); }
+    <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> { jjtThis.setRequires(req.image); }| 
+                        <PROVIDES> prov=<IDENTIFIER> { jjtThis.setProvides(prov.image); }) <NEWLINE>
+    { jjtThis.setPort(p.image); }
+    { return null; }
 }
 
 SimpleNode ValDecl() :
 { Token t; Token name; }
 {
     <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER> <NEWLINE>
-    { return null; }//{ return build.valDecl(); }
+    { jjtThis.setName(name.image); jjtThis.setType(t.image); }
+    { return null; }
 }
 
 String Segment() #void : 
@@ -330,44 +397,9 @@ String Segment() #void :
 {
     t=<IDENTIFIER> { s = t.image; }
     ( <DOT> t=<IDENTIFIER> { s = s + "." + t.image; } )* 
-    { return null; }//{ return s; }
+    { return s; }
 }
 
-SimpleNode ComponentDecl() :
-{ Token  type; Token name; }
-{
-    type=<IDENTIFIER> name=<IDENTIFIER> ( <COMMA> <IDENTIFIER> )* <NEWLINE>
-    { return null; }
-}
-
-SimpleNode ConnectorDecl() :
-{ Token  type; Token name; }
-{
-    type=<IDENTIFIER> name=<IDENTIFIER> ( <COMMA> <IDENTIFIER> )* <NEWLINE>
-    { return null; }
-}
-
-SimpleNode AttachmentDecl() :
-{ String p1; String p2; Token cntr; List<String> ports = new LinkedList(); }
-{
-    p1=Segment() <AND> p2=Segment() { ports.add(p1); ports.add(p2); }
-    ( <AND> p2=Segment() { ports.add(p2); } )* <WITH> cntr=<IDENTIFIER> <NEWLINE>
-    { return null; }
-}
-
-SimpleNode EntryPointDecl() :
-{ Token name; Token action; }
-{
-    name=<IDENTIFIER> <COLON> action=<IDENTIFIER> <NEWLINE>
-    { return null; }
-}
-
-SimpleNode BindingDecl() :
-{ Token t; String b; }
-{
-    t=<IDENTIFIER> <IS> b=Segment() <NEWLINE>
-    { return null; }
-}
 
 
 

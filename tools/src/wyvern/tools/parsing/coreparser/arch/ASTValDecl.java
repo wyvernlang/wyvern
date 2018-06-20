@@ -2,8 +2,9 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=true,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package wyvern.tools.parsing.coreparser.arch;
 
-public
-class ASTValDecl extends SimpleNode {
+public class ASTValDecl extends SimpleNode {
+  private String name, type;
+
   public ASTValDecl(int id) {
     super(id);
   }
@@ -12,10 +13,32 @@ class ASTValDecl extends SimpleNode {
     super(p, id);
   }
 
+  public void setName(String n) {
+    name = n;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setType(String t) {
+    type = t;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public String toString() {
+    return "val " + name + " " + type;
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ArchParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=00353298c634bfb989c83b3f3ef1034e (do not edit this line) */
+/*
+ * JavaCC - OriginalChecksum=00353298c634bfb989c83b3f3ef1034e (do not edit this
+ * line)
+ */
