@@ -194,7 +194,9 @@ public class NominalType extends ValueType {
                 return true;
             } else {
                 // report error in terms of original type
-                reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                if (!reason.isDefined()) {
+                    reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                }
                 return false;
             }
         }
