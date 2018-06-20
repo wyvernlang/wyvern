@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public abstract class EvalContext extends TypeContext {
@@ -14,6 +15,13 @@ public abstract class EvalContext extends TypeContext {
         return lookupValue(varName).getType();
     }
 
+    @Override
+    public ValueType lookupTypeOf(Variable v) {
+        // TODO: fix me, use Variable
+        return lookupValue(v.getName()).getType();
+    }
+
+    
     @Override
     public String toString() {
         return "EvalContext[" + endToString();

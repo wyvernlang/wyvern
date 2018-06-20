@@ -41,6 +41,11 @@ public class MethodGenContext extends GenContext {
     }
 
     @Override
+    public ValueType lookupTypeOf(Variable v) {
+        return getNext().lookupTypeOf(v);
+    }
+
+    @Override
     public Path getContainerForTypeAbbrev(String typeName) {
         return getNext().getContainerForTypeAbbrev(typeName);
     }

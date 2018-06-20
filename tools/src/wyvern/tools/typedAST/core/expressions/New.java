@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -105,10 +106,11 @@ public class New extends AbstractExpressionAST implements CoreAST {
          * use of both.
          */
         ValueType type = null;
+        BindingSite site = structuralType.getSelfSite();
         if (expectedType != null) {
             if (expectedType.isTagged(ctx)) {
                 List<DeclType> declTypes = structuralType.getDeclTypes();
-                type = new RefinementType(expectedType, declTypes, this, self());
+                type = new RefinementType(expectedType, declTypes, this, site);
             } else {
                 type = structuralType;
             }
@@ -168,7 +170,7 @@ public class New extends AbstractExpressionAST implements CoreAST {
 
         return new wyvern.target.corewyvernIL.expression.New(
                 decls,
-                this.self(),
+                site,
                 type,
                 getLocation()
                 );
