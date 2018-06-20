@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarBindingContext extends TypeContext {
@@ -30,6 +31,24 @@ public class VarBindingContext extends TypeContext {
         } else {
             return previous.lookupTypeOf(varName);
         }
+    }
+    
+    @Override
+    public ValueType lookupTypeOf(Variable v) {
+        /*if (v.getSite() != null) {
+            if (v.getSite() == binding) {
+                return type;
+            } else {
+                return getNext().lookupTypeOf(v);
+            }
+        } else {*/
+            if (v.getName().equals(binding.getName())) {
+                v.siteFound(binding);
+                return type;
+            } else {
+                return getNext().lookupTypeOf(v);
+            }
+        //}
     }
 
     @Override

@@ -11,7 +11,11 @@ public class FormalArg extends ASTNode implements IASTNode {
     private ValueType type;
 
     public FormalArg(String name, ValueType type) {
-        this.site = new BindingSite(name);
+        this(new BindingSite(name), type);
+    }
+
+    public FormalArg(BindingSite s, ValueType type) {
+        this.site = s;
         this.type = type;
     }
 

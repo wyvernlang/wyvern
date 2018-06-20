@@ -84,9 +84,13 @@ public class Variable extends Expression implements Path {
         return name;
     }
 
+    public BindingSite getSite() {
+        return site;
+    }
+
     @Override
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
-        return env.lookupTypeOf(name);
+        return env.lookupTypeOf(this);
     }
 
     @Override
@@ -114,5 +118,10 @@ public class Variable extends Expression implements Path {
         Set<String> freeVars = new HashSet<>();
         freeVars.add(this.getName());
         return freeVars;
+    }
+    public void siteFound(BindingSite site2) {
+        if (this.site == null) {
+            this.site = site2;
+        }
     }
 }

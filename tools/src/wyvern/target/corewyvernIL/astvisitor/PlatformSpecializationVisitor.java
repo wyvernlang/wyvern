@@ -121,7 +121,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             ASTNode result = decl.acceptVisitor(this, state);
             newDecls.add((Declaration) result);
         }
-        New result = new New(newDecls, newExpr.getSelfName(), newExpr.getType(), newExpr.getLocation());
+        New result = new New(newDecls, newExpr.getSelfSite(), newExpr.getType(), newExpr.getLocation());
         result.copyMetadata(newExpr);
         return result;
     }

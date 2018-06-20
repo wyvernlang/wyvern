@@ -265,8 +265,8 @@ public class Application extends AbstractExpressionAST implements CoreAST {
                         .substring(DefDeclaration.GENERIC_PREFIX.length()),
                         inferredType)
                 );
-        ValueType actualArgType = new StructuralType("self", declTypes);
-        Expression newExp = new New(members, "self", actualArgType, null);
+        StructuralType actualArgType = new StructuralType("self", declTypes);
+        Expression newExp = new New(members, actualArgType.getSelfSite(), actualArgType, null);
         args.add(newExp);
     }
 

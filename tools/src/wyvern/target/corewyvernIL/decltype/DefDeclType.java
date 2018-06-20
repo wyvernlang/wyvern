@@ -155,7 +155,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public DeclType adapt(View v) {
         List<FormalArg> newArgs = new LinkedList<FormalArg>();
         for (FormalArg a : args) {
-            newArgs.add(new FormalArg(a.getName(), a.getType().adapt(v)));
+            newArgs.add(new FormalArg(a.getSite(), a.getType().adapt(v)));
         }
         if ((effectSet != null) && (effectSet.getEffects() != null)) {
             for (Effect e : effectSet.getEffects()) {
@@ -192,7 +192,7 @@ public class DefDeclType extends DeclTypeWithResult {
             if (!argT.equals(arg.getType())) {
                 changed = true;
             }
-            newArgs.add(new FormalArg(arg.getName(), argT));
+            newArgs.add(new FormalArg(arg.getSite(), argT));
         }
         if (!changed) {
             return this;
