@@ -11,7 +11,6 @@ PARSER_BEGIN(ArchParser)
 
 package wyvern.tools.parsing.coreparser.arch;
 
-import java.util.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
@@ -157,114 +156,106 @@ TOKEN : /* Symbols */
 
 /** Root production. */
 SimpleNode ArchDesc() :
-{ Node exp; }
+{  }
 {
-    exp = ArchTypeDeclSeq()
+    ArchTypeDeclSeq()
     { return jjtThis; }
 }
 
-Node ArchTypeDeclSeq() #void: 
-{ Node ast1; Node ast2; }
+void ArchTypeDeclSeq() #void: 
+{ }
 {
-    ast1 = ArchTypeDecls() 
-    ( ast2 = ArchTypeDecls() {  } )*
-    { return null; }
+    ArchTypeDecls() 
+    ( ArchTypeDecls() )*
 |
     <EOF>
-    { return null; }
 }
 
-Node ArchTypeDecls() #void : 
-{ Node exp; }
+void ArchTypeDecls() #void : 
+{ }
 {
-    exp = ComponentTypeDecl()       { return null; }//{ return exp; }
+    ComponentTypeDecl()       
 |
-    exp = ConnectorTypeDecl()       { return null; }//{ return exp; }
+    ConnectorTypeDecl()       
 |
-    exp = ArchitectureTypeDecl()    { return null; }//{ return exp; }
+    ArchitectureTypeDecl()    
 }
 
-SimpleNode ComponentTypeDecl() : 
-{ Token name; Node exp1; Node exp2; }
+void ComponentTypeDecl() : 
+{ Token name; }
 {
     [ <EXTERNAL> { jjtThis.setExternal(true); } ] <COMPONENT> name=<IDENTIFIER>
-    <NEWLINE> <INDENT> exp1 = ComponentTypeDeclBody()
-            ( exp2 = ComponentTypeDeclBody() {  } )*
+    <NEWLINE> <INDENT> ComponentTypeDeclBody()
+            ( ComponentTypeDeclBody() {  } )*
             <DEDENT>
     { jjtThis.setTypeName(name.image); }
-    { return jjtThis; }
 }
 
 
-Node ComponentTypeDeclBody() #void : 
-{ Node ast1; Node ast2; }
+void ComponentTypeDeclBody() #void : 
+{  }
 {
-    ast1 = MemberDecls()            { return null; }
+    MemberDecls()         
 |
-    ast1 = ArchTypeDecls()          { return null; }
+    ArchTypeDecls()         
 |
-    ast1 = BindingDecls()           { return null; }
+    BindingDecls()           
 
 }
 
-SimpleNode ConnectorTypeDecl() : 
-{ Token name; Node exp1; Node exp2; }
+void ConnectorTypeDecl() : 
+{ Token name; }
 {
     <CONNECTOR> name=<IDENTIFIER>
-    <NEWLINE> <INDENT> exp1 = ValDecl()
-    (exp2 = ValDecl())*
+    <NEWLINE> <INDENT> ValDecl()
+    (ValDecl())*
             <DEDENT>
     { jjtThis.setTypeName(name.image); }
-    { return jjtThis; }
 }
 
-SimpleNode ArchitectureTypeDecl() : 
-{ Token name; Node body; }
+void ArchitectureTypeDecl() : 
+{ Token name; }
 {
     <ARCHITECTURE> name=<IDENTIFIER>
-    <NEWLINE> <INDENT> body = ArchElemDeclSeq()
+    <NEWLINE> <INDENT> ArchElemDeclSeq()
             <DEDENT>
     { jjtThis.setTypeName(name.image); }
-    { return jjtThis; }
 }
 
-SimpleNode ArchElemDeclSeq() #void : 
-{ Node exp1; Node exp2; }
+void ArchElemDeclSeq() #void : 
+{  }
 {
-    exp1 = ArchElemDecls() 
-    (exp2 = ArchElemDecls() { } )*
-    { return null; }
+    ArchElemDecls() 
+    (ArchElemDecls() )*
 }
 
-SimpleNode ArchElemDecls() #void : 
-{ Node exp; }
+void ArchElemDecls() #void : 
+{  }
 {
-    exp = ComponentDecls()      { return null; }
+    ComponentDecls()      
 |
-    exp = ConnectorDecls()      { return null; }
+    ConnectorDecls()      
 |
-    exp = AttachmentDecls()     { return null; }
+    AttachmentDecls()     
 |
-    exp = EntryPointDecls()     { return null; }
+    EntryPointDecls()     
 }
 
-SimpleNode ComponentDecls() #void :
-{ Token type; Token name; }
+void ComponentDecls() #void :
+{  }
 {
     <COMPONENTS>
     <NEWLINE> <INDENT> 
             ComponentDeclAux()
             (ComponentDeclAux())*
             <DEDENT>
-    { return null; }
 }
 
-SimpleNode ComponentDeclAux() #void : 
+void ComponentDeclAux() #void : 
 { String type = null; }
 {
     type=ComponentDecl("")
     (ComponentDecl(type))* <NEWLINE>
-    { return null; }
 }
 
 String ComponentDecl(String t) :
@@ -279,23 +270,21 @@ String ComponentDecl(String t) :
                                               return t; }
 }
 
-SimpleNode ConnectorDecls() #void : 
-{ Token type; Token name; }
+void ConnectorDecls() #void : 
+{  }
 {
     <CONNECTORS> 
     <NEWLINE> <INDENT> 
             ConnectorDeclAux()
             (ConnectorDeclAux())*
             <DEDENT>
-    { return null; }
 }
 
-SimpleNode ConnectorDeclAux() #void : 
+void ConnectorDeclAux() #void : 
 { String type = null; }
 {
     type=ConnectorDecl("")
     (ConnectorDecl(type))* <NEWLINE>
-    { return null; }
 }
 
 String ConnectorDecl(String t) :
@@ -310,86 +299,77 @@ String ConnectorDecl(String t) :
                                               return t; }
 }
 
-SimpleNode AttachmentDecls() #void : 
-{ String p1; String p2; Token cntr; }
+void AttachmentDecls() #void : 
+{  }
 {
     <ATTACHMENTS>
     <NEWLINE> <INDENT> 
     <CONNECT> AttachmentDecl()
                 (AttachmentDecl())*
             <DEDENT>
-    { return null; }
 }
 
-SimpleNode AttachmentDecl() :
+void AttachmentDecl() :
 { String p1; String p2; Token cntr; }
 {
     p1=Segment() <AND> p2=Segment() { jjtThis.addPort(p1); jjtThis.addPort(p2); }
     ( <AND> p2=Segment() { jjtThis.addPort(p2); } )* <WITH> cntr=<IDENTIFIER> <NEWLINE>
     { jjtThis.setConnector(cntr.image); }
-    { return null; }
 }
 
-SimpleNode BindingDecls() #void :
-{ Token t; String b; }
+void BindingDecls() #void :
+{  }
 {
     <BINDINGS>
     <NEWLINE> <INDENT> 
         BindingDecl()
         (BindingDecl())*
     <DEDENT>
-    { return null; }
 }
 
-SimpleNode BindingDecl() :
+void BindingDecl() :
 { Token name; String target; }
 {
     name=<IDENTIFIER> <IS> target=Segment() <NEWLINE>
     { jjtThis.setName(name.image); jjtThis.setTarget(target); }
-    { return null; }
 }
 
-SimpleNode EntryPointDecls() #void : 
-{ Token t; Token point; }
+void EntryPointDecls() #void : 
+{  }
 {
     <ENTRYPOINTS>
     <NEWLINE> <INDENT>
          EntryPointDecl()
         (EntryPointDecl())* 
             <DEDENT>
-    { return null; }
 }
 
-SimpleNode EntryPointDecl() :
+void EntryPointDecl() :
 { Token name; Token action; }
 {
     name=<IDENTIFIER> <COLON> action=<IDENTIFIER> <NEWLINE>
     { jjtThis.setName(name.image); jjtThis.setAction(action.image); }
-    { return null; }
 }
 
-SimpleNode MemberDecls() #void :
-{ Node exp1; Node exp2; }
+void MemberDecls() #void :
+{  }
 {
-    ( exp1 = ValDecl() | exp1 = PortDecl() )
-    { return null; }
+    ( ValDecl() | PortDecl() )
 }
 
-SimpleNode PortDecl() :
+void PortDecl() :
 { Token p; Token req = null; Token prov = null; }
 {
     <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> { jjtThis.setRequires(req.image); }| 
                         <PROVIDES> prov=<IDENTIFIER> { jjtThis.setProvides(prov.image); }) <NEWLINE>
     { jjtThis.setPort(p.image); }
-    { return null; }
 }
 
-SimpleNode ValDecl() :
+void ValDecl() :
 { Token t; Token name; }
 {
     <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER> <NEWLINE>
     { jjtThis.setName(name.image); jjtThis.setType(t.image); }
-    { return null; }
 }
 
 String Segment() #void : 
