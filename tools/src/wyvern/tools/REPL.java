@@ -75,10 +75,13 @@ public class REPL {
                 }
                 else if(input.equals("ctx")) {
                     System.out.println(programContext);
-                }else if(input.equals("clear")) {
+                }
+                else if(input.equals("clear")) 
+                {
                     tempCode = "";
                 }
-                else {
+                else 
+                {
                     Value v = interepetProgram(input);
                     if(v != null) {
                         System.out.println(v.toString());
