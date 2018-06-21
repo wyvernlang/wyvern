@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class SubtypeAssumption extends TypeContext {
@@ -26,6 +27,12 @@ public class SubtypeAssumption extends TypeContext {
     public ValueType lookupTypeOf(String varName) {
         return next.lookupTypeOf(varName);
     }
+    
+    @Override
+    public ValueType lookupTypeOf(Variable v) {
+        return next.lookupTypeOf(v);
+    }
+
 
     @Override
     protected TypeContext getNext() {

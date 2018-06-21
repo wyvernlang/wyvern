@@ -974,14 +974,14 @@ public class ILTests {
                 + "    type heldType = system.Int\n"
                 + "    val element: this.heldType\n\n"
 
-                      + "def Identity(holder: IntHolder, passedType: holder.heldType) : holder.heldType\n"
-                      + "    holder.element\n\n"
+                + "def Identity(holder: IntHolder, passedType: holder.heldType) : holder.heldType\n"
+                + "    holder.element\n\n"
 
-                      + "val five: IntHolder = new\n"
-                      + "    type heldType = system.Int\n"
-                      + "    val element: this.heldType = 5\n\n"
+                + "val five: IntHolder = new\n"
+                + "    type heldType = system.Int\n"
+                + "    val element: this.heldType = 5\n\n"
 
-                      + "Identity(five, 5)";
+                + "Identity(five, 5)";
         TestUtil.doTest(source, null, new IntegerLiteral(5));
     }
 

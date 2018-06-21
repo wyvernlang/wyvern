@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.support;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public class VarGenContext extends GenContext {
@@ -59,6 +60,26 @@ public class VarGenContext extends GenContext {
     }
 
     @Override
+    public ValueType lookupTypeOf(Variable v) {
+        /*if (v.getSite() != null) {
+            if (v.getSite() == site) {
+                return type;
+            } else {
+                return getNext().lookupTypeOf(v);
+            }
+        } else {*/
+            if (v.getName().equals(name)) {
+                if (site != null) {
+                    v.siteFound(site);
+                }
+                return type;
+            } else {
+                return getNext().lookupTypeOf(v);
+            }
+        //}
+    }
+
+    @Override
     public Path getContainerForTypeAbbrev(String typeName) {
         return getNext().getContainerForTypeAbbrev(typeName);
     }
@@ -71,4 +92,5 @@ public class VarGenContext extends GenContext {
             return getNext().getCallableExprRec(varName, origCtx);
         }
     }
+
 }

@@ -238,7 +238,7 @@ public class MethodCall extends Expression {
                 calleeCtx = calleeCtx.extend(formalArg.getSite(), actualArgType);
                 IExpr e = args.get(i);
                 if (e instanceof Variable) {
-                    v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getName()), (Variable) e, v);
+                    v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getSite()), (Variable) e, v);
                 }
             }
 

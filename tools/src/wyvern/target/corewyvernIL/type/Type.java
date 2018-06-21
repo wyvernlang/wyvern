@@ -36,4 +36,15 @@ public abstract class Type extends ASTNode implements IASTNode {
     public abstract Type doAvoid(String varName, TypeContext ctx, int depth);
     public abstract boolean isTagged(TypeContext ctx);
     public abstract boolean isTSubtypeOf(Type sourceType, TypeContext ctx, FailureReason reason);
+    
+    public static boolean typesEquiv(ValueType t1, ValueType t2, TypeContext ctx, FailureReason reason) {
+        if (t1 == null && t2 == null) {
+            return true;
+        }
+        if (t1 == null || t2 == null) {
+            // one but not both is null
+            return false;
+        }
+        return t1.isSubtypeOf(t2, ctx, reason) && t2.isSubtypeOf(t1, ctx, reason);
+    }
 }

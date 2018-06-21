@@ -83,7 +83,7 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
         }
 
         // Don't bother recomputing the type--it will stay the same.
-        return new New(newDecls, newExpr.getSelfName(), newExpr.getType(), newExpr.getLocation());
+        return new New(newDecls, newExpr.getSelfSite(), newExpr.getType(), newExpr.getLocation());
     }
 
     @Override

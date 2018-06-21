@@ -114,13 +114,13 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
 
         // set up containsResources() properly by typechecking applyDef
         applyDef.typeCheck(ctx, ctx);
-        ValueType newType = new StructuralType(
+        StructuralType newType = new StructuralType(
                 LAMBDA_STRUCTUAL_DECL,
                 declTypes,
                 applyDef.containsResource(ctx)
                 );
 
-        return new New(declList, "@lambda-decl", newType, getLocation());
+        return new New(declList, newType.getSelfSite(), newType, getLocation());
     }
 
     public  void genTopLevel(TopLevelContext topLevelContext, ValueType expectedType) {

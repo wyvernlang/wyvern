@@ -1,8 +1,8 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
@@ -10,6 +10,19 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
 public class DataType extends TagType {
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append("datatype extends ");
+        NominalType parent = this.getParentType(); 
+        if (parent == null) {
+            dest.append("Top");
+        } else {
+            parent.doPrettyPrint(dest, indent);
+        }
+        dest.append(" comprises ");
+        dest.append(cases.toString());
+    }
+
     private List<NominalType> cases;
 
     public DataType(NominalType parentType, ValueType valueType, List<NominalType> cases) {
@@ -64,12 +77,23 @@ public class DataType extends TagType {
             return false;
         }
         DataType dt = (DataType) sourceType;
-        if (!(Objects.equals(this.getParentType(), dt.getParentType()))) {
+        if (!typesEquiv(this.getParentType(), dt.getParentType(), ctx, reason)) {
             return false;
         }
-        if (!this.getCases().equals(dt.getCases())) {
+        /*if (!(Objects.equals(this.getParentType(), dt.getParentType()))) {
             return false;
+        }*/
+        if (this.getCases().size() != dt.getCases().size()) {
+            return false;
+        }
+        for (int i = 0; i < this.getCases().size(); ++i) {
+            NominalType c1 = this.getCases().get(i);
+            NominalType c2 = dt.getCases().get(i);
+            if (!typesEquiv(c1, c2, ctx, reason)) {
+                return false;
+            }
         }
         return this.getValueType().isSubtypeOf(dt.getValueType(), ctx, reason);
     }
+    
 }

@@ -48,12 +48,12 @@ public class New extends Expression {
 
     /** computes the type itself, uses a don't care selfName */
     public New(List<NamedDeclaration> decls, FileLocation loc) {
-        this(decls, "dontcare", typeOf(decls), loc);
+        this(decls, new BindingSite("dontcare"), typeOf(decls), loc);
     }
 
-    public New(List<? extends Declaration> decls, String selfName, ValueType type, FileLocation loc) {
+    /*public New(List<? extends Declaration> decls, String selfName, ValueType type, FileLocation loc) {
         this(decls, new BindingSite(selfName), type, loc);
-    }
+    }*/
     public New(List<? extends Declaration> decls, BindingSite selfSite, ValueType type, FileLocation loc) {
         super(type, loc);
         this.decls = decls;

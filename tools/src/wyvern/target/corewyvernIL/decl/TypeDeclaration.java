@@ -25,6 +25,10 @@ public class TypeDeclaration extends NamedDeclaration {
         this.sourceType = sourceType;
         this.metadata = metadata;
     }
+    
+    public IExpr getMeta() {
+        return metadata;
+    }
 
     public Type getSourceType() {
         return sourceType;
