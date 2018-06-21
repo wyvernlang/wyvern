@@ -8,12 +8,12 @@ public interface ArchParserVisitor
   public Object visit(ASTComponentTypeDecl node, Object data);
   public Object visit(ASTConnectorTypeDecl node, Object data);
   public Object visit(ASTArchitectureTypeDecl node, Object data);
-  public Object visit(ASTComponentDecls node, Object data);
-  public Object visit(ASTConnectorDecls node, Object data);
-  public Object visit(ASTAttachmentDecls node, Object data);
-  public Object visit(ASTBindingDecls node, Object data);
-  public Object visit(ASTEntryPointDecls node, Object data);
+  public Object visit(ASTComponentDecl node, Object data);
+  public Object visit(ASTConnectorDecl node, Object data);
+  public Object visit(ASTAttachmentDecl node, Object data);
+  public Object visit(ASTBindingDecl node, Object data);
+  public Object visit(ASTEntryPointDecl node, Object data);
   public Object visit(ASTPortDecl node, Object data);
   public Object visit(ASTValDecl node, Object data);
 }
-/* JavaCC - OriginalChecksum=a5490dbb3d8cb8cd0196a8c7121cb319 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d1ed00e694c4f9cc2e7a09c1da530eb6 (do not edit this line) */

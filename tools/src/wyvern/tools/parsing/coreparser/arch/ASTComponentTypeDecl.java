@@ -6,7 +6,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.tools.errors.ToolError;
 
@@ -74,8 +73,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
         new File(wyvernPath));
 
     try {
-      Module mod = state.getResolver().resolveModule(typeName);
-      // Module typ = state.getResolver().resolveType(component);
+      state.getResolver().resolveModule(typeName);
     } catch (ToolError e) {
       System.out.println("Module not found");
       return false;

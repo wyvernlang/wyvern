@@ -11,13 +11,11 @@ public class ModuleCheckVisitor implements ArchParserVisitor {
   }
 
   public Object visit(ASTComponentTypeDecl node, Object data) {
-    // TODO Auto-generated method stub
-    return null;
+    return node.checkModule();
   }
 
   public Object visit(ASTConnectorTypeDecl node, Object data) {
-    // TODO Auto-generated method stub
-    return null;
+    return node.checkModule();
   }
 
   public Object visit(ASTArchitectureTypeDecl node, Object data) {
