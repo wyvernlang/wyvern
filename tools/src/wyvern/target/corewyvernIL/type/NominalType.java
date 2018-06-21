@@ -85,6 +85,21 @@ public class NominalType extends ValueType {
 
     private static int nestingCount = 0;
     
+    @Override
+    public boolean isTSubtypeOf(Type sourceType, TypeContext ctx, FailureReason reason) {
+        if (super.isTSubtypeOf(sourceType, ctx, reason)) {
+            return true;
+        }
+        // try looking up my source decl
+        DeclType t = getSourceDeclType(ctx);
+        if (t instanceof ConcreteTypeMember) {
+            ConcreteTypeMember ctm = (ConcreteTypeMember) t;
+            ctm.getSourceType().isTSubtypeOf(sourceType, ctx, reason);
+        }
+        return false;
+    }
+
+    
     private DeclType getSourceDeclType(TypeContext ctx) {
         final ValueType t = path.typeCheck(ctx, null);
         nestingCount++;

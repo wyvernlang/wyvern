@@ -61,7 +61,10 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
             return false;
         }
         ConcreteTypeMember ctm = (ConcreteTypeMember) dt;
-        return ctm.getName().equals(getName()) && this.getSourceType().isTSubtypeOf(ctm.getSourceType(), ctx, reason);
+        Type mySourceType = this.getSourceType();
+        Type theirSourceType = ctm.getSourceType();
+        boolean subtypeRelationship = mySourceType.isTSubtypeOf(theirSourceType, ctx, reason);
+        return ctm.getName().equals(getName()) && subtypeRelationship;
     }
 
     @Override
