@@ -75,7 +75,6 @@ public class ASTComponentTypeDecl extends SimpleNode {
     try {
       state.getResolver().resolveModule(typeName);
     } catch (ToolError e) {
-      System.out.println("Module not found");
       return false;
     }
     return true;

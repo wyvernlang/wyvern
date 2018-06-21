@@ -41,6 +41,7 @@ tools/src/wyvern/tools/parsing/coreparser/arch/TokenManager.java
 tools/src/wyvern/tools/parsing/coreparser/arch/TokenMgrError.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserConstants.java
+tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserTreeConstants.java
 tools/out
 tools/src/wyvern/target/llvm/autom4te.cache/
 tools/src/wyvern/target/llvm/.libs/

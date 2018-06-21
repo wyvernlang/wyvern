@@ -66,7 +66,6 @@ public class ASTConnectorTypeDecl extends SimpleNode {
     try {
       state.getResolver().resolveType(typeName);
     } catch (ToolError e) {
-      System.out.println("Module not found");
       return false;
     }
     return true;
