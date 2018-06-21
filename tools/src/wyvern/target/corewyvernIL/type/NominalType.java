@@ -94,7 +94,7 @@ public class NominalType extends ValueType {
         DeclType t = getSourceDeclType(ctx);
         if (t instanceof ConcreteTypeMember) {
             ConcreteTypeMember ctm = (ConcreteTypeMember) t;
-            ctm.getSourceType().isTSubtypeOf(sourceType, ctx, reason);
+            return ctm.getSourceType().isTSubtypeOf(sourceType, ctx, reason);
         }
         return false;
     }
