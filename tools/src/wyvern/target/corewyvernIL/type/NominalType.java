@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -298,6 +299,11 @@ public class NominalType extends ValueType {
         if (!(v instanceof ObjectValue)) {
             throw new RuntimeError("internal invariant: can only get the tag of part of an object, did this typecheck?");
         }
-        return new Tag((ObjectValue) v, this.getTypeMember());
+        ObjectValue object = (ObjectValue) v;
+        TypeDeclaration decl = (TypeDeclaration) object.findDecl(this.getTypeMember(), true);
+        if (decl.getSourceType() instanceof NominalType) {
+            return ((NominalType) decl.getSourceType()).getTag(object.getEvalCtx());
+        }
+        return new Tag(object, this.getTypeMember());
     }
 }
