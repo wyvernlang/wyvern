@@ -354,7 +354,9 @@ void EntryPointDecl() :
 void MemberDecls() #void :
 {  }
 {
-    ( ValDecl() | PortDecl() )
+    ValDecl() 
+| 
+    PortDecl() 
 }
 
 void PortDecl() :

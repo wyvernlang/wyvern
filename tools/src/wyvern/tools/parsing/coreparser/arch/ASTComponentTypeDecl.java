@@ -6,6 +6,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.tools.errors.ToolError;
 
@@ -42,7 +43,11 @@ public class ASTComponentTypeDecl extends SimpleNode {
   }
 
   public boolean checkModule() {
+    if (isExternal) {
+      return true;
+    }
     String rootLoc = null, wyvernPath = null;
+    Module mod = null;
 
     try {
       rootLoc = System.getenv("WYVERN_ROOT");
@@ -73,10 +78,13 @@ public class ASTComponentTypeDecl extends SimpleNode {
         new File(wyvernPath));
 
     try {
-      state.getResolver().resolveModule(typeName);
+      mod = state.getResolver().resolveModule(typeName);
     } catch (ToolError e) {
+      // do something with ToolError
       return false;
     }
+    // System.out.println((mod.getExpression()).getClass());
+
     return true;
   }
 
