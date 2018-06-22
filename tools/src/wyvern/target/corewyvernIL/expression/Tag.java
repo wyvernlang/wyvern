@@ -28,6 +28,6 @@ public class Tag {
             return null;
         }
         NominalType nt = ((TagType) td.getSourceType()).getParentType(null);
-        return nt == null ? null : nt.getTag(ctx);
+        return nt == null ? null : nt.getTag(object.getEvalCtx());
     }
 }
