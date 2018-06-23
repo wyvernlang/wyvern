@@ -204,11 +204,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                     // TODO: Better error message
                     ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);
                 }
-                importExp = new MethodCall(m.getExpression(), Util.APPLY_NAME, args, this);
 
                 // type is the result type of the module
                 type = modDeclType.getRawResultType();
                 final String internalName = m.getSpec().getInternalName();
+                Variable importVar = new Variable(internalName);
+                importExp = new MethodCall(/*m.getExpression()*/importVar, Util.APPLY_NAME, args, this);
                 ctx = resolver.extendGenContext(ctx, m.getDependencies());
                 if (!ctx.isPresent(internalName, true)) {
                     ctx = ctx.extend(internalName, new Variable(internalName), type);
@@ -262,7 +263,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         Pair<VarBinding, GenContext> bindingAndCtx = genBinding(tlc.getContext(), tlc.getDependencies());
         VarBinding binding = bindingAndCtx.getFirst();
         GenContext newCtx = bindingAndCtx.getSecond();
-        ValueType type = binding.getExpression().typeCheck(newCtx, null);
+        ValueType type = binding.getType(); //binding.getExpression().typeCheck(newCtx, null);
         tlc.addLet(binding.getSite(), type, binding.getExpression(), false);
         tlc.updateContext(newCtx);
     }
