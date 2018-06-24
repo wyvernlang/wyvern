@@ -5,6 +5,7 @@ package wyvern.tools.parsing.coreparser.arch;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
@@ -12,6 +13,7 @@ import wyvern.tools.errors.ToolError;
 
 public class ASTConnectorTypeDecl extends SimpleNode {
   private String typeName;
+  private HashMap<String, String> vals = new HashMap<>();
 
   public ASTConnectorTypeDecl(int id) {
     super(id);
@@ -31,6 +33,16 @@ public class ASTConnectorTypeDecl extends SimpleNode {
 
   public String toString() {
     return super.toString() + " " + typeName;
+  }
+
+  public void collectVals() {
+    for (Node child : children) {
+      if (child.getClass().equals("ASTValDecl")) {
+        String name = ((ASTValDecl) child).getName();
+        String type = ((ASTValDecl) child).getType();
+        vals.put(name, type);
+      }
+    }
   }
 
   public boolean checkModule() {
@@ -69,9 +81,10 @@ public class ASTConnectorTypeDecl extends SimpleNode {
       mod = state.getResolver().resolveType(typeName);
     } catch (ToolError e) {
       // do something with ToolError
+      e.printStackTrace();
       return false;
     }
-    // System.out.println((mod.getExpression()).getClass());
+
     return true;
   }
 

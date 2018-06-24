@@ -4,8 +4,11 @@ package wyvern.tools.parsing.coreparser.arch;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.ToolError;
+
 public class DeclCheckVisitor extends ArchParserVisitorAdapter {
-  private HashSet<String> componentTypes = new HashSet<>();
+  private HashMap<String, ASTComponentTypeDecl> componentTypes = new HashMap<>();
   private HashSet<String> connectorTypes = new HashSet<>();
 
   private HashMap<String, String> components = new HashMap<>();
@@ -19,9 +22,36 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     HashSet<String> ports = node.getAllPorts();
     if (!connectors.containsKey(connector)) {
       // connector not declared
+      ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
+          node.getLocation(), "connector", connector);
     }
     if (attachments.putIfAbsent(connector, ports) == null) {
       // duplicate connector use
+      ToolError.reportError(ErrorMessage.DUPLICATE_CONNECTOR_USE,
+          node.getLocation(), connector);
+    }
+
+    /* Check if ports are improperly declared */
+    for (String portFull : ports) {
+      String[] portParts = portFull.split(".");
+      String component = portParts[0];
+      String port = portParts[1];
+      // check component declaration exists
+      // get component type
+      String type = components.get(component);
+      if (type == null) {
+        ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
+            node.getLocation(), "component", component);
+      }
+      // check component of that type has port
+      ASTComponentTypeDecl typeDecl = componentTypes
+          .get(components.get(component));
+      if (!typeDecl.getReqs().containsKey(port)
+          && !typeDecl.getProvs().containsKey(port)) {
+        ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
+            node.getLocation(), "port", port);
+      }
+
     }
     return super.visit(node, data);
   }
@@ -36,6 +66,8 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     String type = node.getType();
     if (components.putIfAbsent(name, type) == null) {
       // duplicate members
+      ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER_NAMES,
+          node.getLocation(), name);
     }
     return super.visit(node, data);
   }
@@ -45,39 +77,40 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     String type = node.getType();
     if (connectors.putIfAbsent(name, type) == null) {
       // duplicate members
+      ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER_NAMES,
+          node.getLocation(), name);
     }
     return super.visit(node, data);
   }
 
   public Object visit(ASTComponentTypeDecl node, Object data) {
-    if (componentTypes.contains(node.getTypeName())) {
-      // type already exists
+    if (componentTypes.containsKey(node.getTypeName())) {
+      // type of this name has already been declared
+      ToolError.reportError(ErrorMessage.DUPLICATE_TYPE_DEFINITIONS,
+          node.getLocation(), node.getTypeName());
     }
-    if (!node.checkModule()) {
-      // module not found
-      System.out
-          .println("component module " + node.getTypeName() + " not found");
+    node.collectPorts();
+    if (node.checkModule()) {
+      // module def not found HANDLED IN CHECKMODULE
     } else {
-      componentTypes.add(node.getTypeName());
+      componentTypes.put(node.getTypeName(), node);
     }
     return super.visit(node, data);
   }
 
   public Object visit(ASTConnectorTypeDecl node, Object data) {
     if (connectorTypes.contains(node.getTypeName())) {
-      // type already exists
+      // type of this name has already been declared
+      ToolError.reportError(ErrorMessage.DUPLICATE_TYPE_DEFINITIONS,
+          node.getLocation(), node.getTypeName());
     }
+    node.collectVals();
     if (!node.checkModule()) {
-      // module not found
-      System.out.println("connector type " + node.getTypeName() + " not found");
+      // module not found HANDLED IN CHECKMODULE
     } else {
       connectorTypes.add(node.getTypeName());
     }
     return super.visit(node, data);
   }
 
-  public void showCounts() {
-    System.out.println("components: " + components.size());
-    System.out.println("connectors: " + connectors.size());
-  }
 }

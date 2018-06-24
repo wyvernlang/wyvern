@@ -5,14 +5,21 @@ package wyvern.tools.parsing.coreparser.arch;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
 
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
 public class ASTComponentTypeDecl extends SimpleNode {
   private boolean isExternal = false;
   private String typeName;
+  private HashMap<String, String> reqs = new HashMap<>();
+  private HashMap<String, String> provs = new HashMap<>();
 
   public ASTComponentTypeDecl(int id) {
     super(id);
@@ -20,6 +27,14 @@ public class ASTComponentTypeDecl extends SimpleNode {
 
   public ASTComponentTypeDecl(ArchParser p, int id) {
     super(p, id);
+  }
+
+  public HashMap<String, String> getReqs() {
+    return reqs;
+  }
+
+  public HashMap<String, String> getProvs() {
+    return provs;
   }
 
   public boolean isExternal() {
@@ -42,10 +57,26 @@ public class ASTComponentTypeDecl extends SimpleNode {
     return super.toString() + " " + typeName + " : " + isExternal;
   }
 
+  public void collectPorts() {
+    for (Node child : children) {
+      if (child.getClass().equals("ASTPortDecl")) {
+        String req = ((ASTPortDecl) child).getRequires();
+        String prov = ((ASTPortDecl) child).getProvides();
+        String name = ((ASTPortDecl) child).getPort();
+        if (req != null) {
+          reqs.put(name, req);
+        } else {
+          provs.put(name, prov);
+        }
+      }
+    }
+  }
+
   public boolean checkModule() {
     if (isExternal) {
       return true;
     }
+    /* Check that the .wyv file exists */
     String rootLoc = null, wyvernPath = null;
     Module mod = null;
 
@@ -79,11 +110,40 @@ public class ASTComponentTypeDecl extends SimpleNode {
 
     try {
       mod = state.getResolver().resolveModule(typeName);
+
+      /* Check that it's a module def */
+      Expression expr = mod.getExpression();
+      if (!expr.getType().toString().contains("apply()")) {
+        // throw error saying it's not a module def
+        ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, location,
+            typeName);
+        return false;
+      }
+
+      /* Check that it has the correct dependencies */
+      List<TypedModuleSpec> deps = mod.getDependencies();
+      if (deps.size() != reqs.size()) {
+        // throw error saying dependencies don't match
+        ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
+            location, typeName);
+        return false;
+      }
+      for (TypedModuleSpec dep : deps) {
+        String depName = dep.getDefinedTypeName();
+        if (!reqs.containsValue(depName)) {
+          // throw error saying dependencies don't match
+          ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
+              location, typeName);
+          return false;
+        }
+      }
+
+      /* Check that is exposes the correct fields */
+
     } catch (ToolError e) {
-      // do something with ToolError
+      e.printStackTrace();
       return false;
     }
-    // System.out.println((mod.getExpression()).getClass());
 
     return true;
   }

@@ -25,6 +25,7 @@ import wyvern.tools.parsing.coreparser.ParseException;
 
 public class ArchParser   { 
 
+    public static String fname;
     public static String kindToName(int kind) {
       switch (kind) {
       case MULTI_LINE_COMMENT: return "MULTI_LINE_COMMENT";
@@ -56,53 +57,58 @@ public class ArchParser   {
       }
     }
     
-    public static void main(String []args) throws CopperParserException, IOException, FileNotFoundException {
-        String root = System.getProperty("user.dir");
-        File example1, example2, example3;
-        if (root.substring(root.length() - 5).equals("tools"))  {
-          example1 = new File(root + "/../examples/architecture/example1.wyc");
-          example2 = new File(root + "/../examples/architecture/example2.wyc");
-          example3 = new File(root + "/../examples/architecture/example3.wyc");
-        } else  {
-          example1 = new File(root + "/../../examples/architecture/example1.wyc");
-          example2 = new File(root + "/../../examples/architecture/example2.wyc");
-          example3 = new File(root + "/../../examples/architecture/example3.wyc");
-        }
-        BufferedReader source = new BufferedReader(new FileReader(
-                                                                  //    example1
-                                                                      example2
-                                                                  //    example3
-                                                                    ));
-        ArchParser wp = new ArchParser(
-                (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(source, "test", ArchLexer.class,
-                        ArchParserConstants.class));
-
-        /*Full list of tokens as collected by the token manager
-        List<Token> tokens = new ArchLexer().parse(source, "test");
-        for (Token t: tokens) {
-          if (!kindToName(t.kind).equals("WHITESPACE")){
-            System.out.println(kindToName(t.kind));
-          }
-        }*/
-        
-        //Parsing attempt
-        try {
-          Node start = wp.ArchDesc();
-          ((SimpleNode) start).dump(">");
-        } catch (ParseException e)  {
-          e.printStackTrace();
-        }
-
-        /*What's left after parsing attempt*/
-        Token t = wp.getNextToken();
-        while (!kindToName(t.kind).equals("UNKNOWN(0)")){
-            System.out.println(kindToName(t.kind));
-            t = wp.getNextToken();
-        }
-        
-        System.out.println("~PARSING DONE~");
-
+    public static void main(String[] args)
+      throws CopperParserException, IOException, FileNotFoundException {
+    String root = System.getProperty("user.dir");
+    File example1, example2, example3, test;
+    if (root.substring(root.length() - 5).equals("tools")) {
+      example1 = new File(root + "/../examples/architecture/example1.wyc");
+      example2 = new File(root + "/../examples/architecture/example2.wyc");
+      example3 = new File(root + "/../examples/architecture/example3.wyc");
+      test = new File(root + "/../examples/architecture/test.wyc");
+    } else {
+      example1 = new File(root + "/../../examples/architecture/example1.wyc");
+      example2 = new File(root + "/../../examples/architecture/example2.wyc");
+      example3 = new File(root + "/../../examples/architecture/example3.wyc");
+      test = new File(root + "/../../examples/architecture/test.wyc");
     }
+    BufferedReader source = new BufferedReader(new FileReader(
+        // example1
+        // example2
+        // example3
+        test));
+    fname = test.getName();
+    ArchParser wp = new ArchParser(
+        (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(
+            source, "test", ArchLexer.class, ArchParserConstants.class));
+
+    /*
+     * Full list of tokens as collected by the token manager List<Token> tokens
+     * = new ArchLexer().parse(source, "test"); for (Token t: tokens) { if
+     * (!kindToName(t.kind).equals("WHITESPACE")){
+     * System.out.println(kindToName(t.kind)); } }
+     */
+
+    // Parsing attempt
+    try {
+      Node start = wp.ArchDesc();
+      // ((SimpleNode) start).dump(">");
+      DeclCheckVisitor visitor = new DeclCheckVisitor();
+      visitor.visit((ASTArchDesc) start, null);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+
+    /* What's left after parsing attempt */
+    Token t = wp.getNextToken();
+    while (!kindToName(t.kind).equals("UNKNOWN(0)")) {
+      System.out.println(kindToName(t.kind));
+      t = wp.getNextToken();
+    }
+
+    System.out.println("~PARSING DONE~");
+
+  }
 }
 
 PARSER_END(ArchParser)
@@ -159,6 +165,7 @@ SimpleNode ArchDesc() :
 {  }
 {
     ArchTypeDeclSeq()
+    { jjtThis.setLocation(fname, 0, 0); }
     { return jjtThis; }
 }
 
@@ -189,6 +196,7 @@ void ComponentTypeDecl() :
             ( ComponentTypeDeclBody() {  } )*
             <DEDENT>
     { jjtThis.setTypeName(name.image); }
+    { jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
 }
 
 
@@ -211,8 +219,10 @@ void ConnectorTypeDecl() :
     (ValDecl())*
             <DEDENT>
     { jjtThis.setTypeName(name.image); }
+    { jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
 }
 
+/*Errors*/
 void ArchitectureTypeDecl() : 
 { Token name; }
 {
@@ -263,10 +273,12 @@ String ComponentDecl(String t) :
 {
     type=<IDENTIFIER> name=<IDENTIFIER>     { jjtThis.setType(type.image); 
                                               jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
                                               return type.image; }
 |
     <COMMA> name=<IDENTIFIER>               { jjtThis.setType(t); 
                                               jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
                                               return t; }
 }
 
@@ -292,10 +304,12 @@ String ConnectorDecl(String t) :
 {
     type=<IDENTIFIER> name=<IDENTIFIER>     { jjtThis.setType(type.image); 
                                               jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
                                               return type.image; }
 |
     <COMMA> name=<IDENTIFIER>               { jjtThis.setType(t); 
                                               jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
                                               return t; }
 }
 
@@ -315,6 +329,7 @@ void AttachmentDecl() :
     p1=Segment() <AND> p2=Segment() { jjtThis.addPort(p1); jjtThis.addPort(p2); }
     ( <AND> p2=Segment() { jjtThis.addPort(p2); } )* <WITH> cntr=<IDENTIFIER> <NEWLINE>
     { jjtThis.setConnector(cntr.image); }
+    { jjtThis.setLocation(fname, cntr.beginLine, cntr.beginColumn); }
 }
 
 void BindingDecls() #void :
@@ -327,11 +342,14 @@ void BindingDecls() #void :
     <DEDENT>
 }
 
+/*Errors?*/
 void BindingDecl() :
 { Token name; String target; }
 {
     name=<IDENTIFIER> <IS> target=Segment() <NEWLINE>
-    { jjtThis.setName(name.image); jjtThis.setTarget(target); }
+    { jjtThis.setName(name.image); 
+      jjtThis.setTarget(target);
+      jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
 }
 
 void EntryPointDecls() #void : 
@@ -344,11 +362,14 @@ void EntryPointDecls() #void :
             <DEDENT>
 }
 
+/*Errors?*/
 void EntryPointDecl() :
 { Token name; Token action; }
 {
     name=<IDENTIFIER> <COLON> action=<IDENTIFIER> <NEWLINE>
-    { jjtThis.setName(name.image); jjtThis.setAction(action.image); }
+    { jjtThis.setName(name.image); 
+      jjtThis.setAction(action.image);
+      jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
 }
 
 void MemberDecls() #void :
@@ -359,19 +380,24 @@ void MemberDecls() #void :
     PortDecl() 
 }
 
+/*Errors?*/
 void PortDecl() :
-{ Token p; Token req = null; Token prov = null; }
+{ Token p; Token req = null; Token prov = null; Token startMark; }
 {
     <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> { jjtThis.setRequires(req.image); }| 
                         <PROVIDES> prov=<IDENTIFIER> { jjtThis.setProvides(prov.image); }) <NEWLINE>
     { jjtThis.setPort(p.image); }
+    { jjtThis.setLocation(fname, p.beginLine, p.beginColumn); }
 }
 
+/*Errors?*/
 void ValDecl() :
-{ Token t; Token name; }
+{ Token t; Token name; Token startMark; }
 {
     <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER> <NEWLINE>
-    { jjtThis.setName(name.image); jjtThis.setType(t.image); }
+    { jjtThis.setName(name.image); 
+      jjtThis.setType(t.image); 
+      jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
 }
 
 String Segment() #void : 

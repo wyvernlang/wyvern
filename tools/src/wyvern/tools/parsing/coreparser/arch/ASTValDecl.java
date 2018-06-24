@@ -37,6 +37,7 @@ public class ASTValDecl extends SimpleNode {
   public Object jjtAccept(ArchParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
   }
+
 }
 /*
  * JavaCC - OriginalChecksum=00353298c634bfb989c83b3f3ef1034e (do not edit this

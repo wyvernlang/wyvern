@@ -2,6 +2,8 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=true,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package wyvern.tools.parsing.coreparser.arch;
 
+import wyvern.tools.errors.FileLocation;
+
 public class SimpleNode implements Node {
 
   protected Node parent;
@@ -9,6 +11,7 @@ public class SimpleNode implements Node {
   protected int id;
   protected Object value;
   protected ArchParser parser;
+  protected FileLocation location;
 
   public SimpleNode(int i) {
     id = i;
@@ -17,6 +20,17 @@ public class SimpleNode implements Node {
   public SimpleNode(ArchParser p, int i) {
     this(i);
     parser = p;
+  }
+
+  public void setLocation(String filename, int line, int column) {
+    location = new FileLocation(filename, line, column);
+  }
+
+  public FileLocation getLocation() {
+    if (location != null) {
+      return location;
+    }
+    return FileLocation.UNKNOWN;
   }
 
   public void jjtOpen() {
