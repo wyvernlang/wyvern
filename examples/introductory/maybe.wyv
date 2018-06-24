@@ -1,0 +1,13 @@
+/* Defines a Haskell-like Maybe type, illustrating datatype definitions with type parameters.
+ * Note that the Wyvern standard library defines a similar type "Option", but the interface details differ.
+ */
+datatype Maybe[T]
+  Just(x : T)
+  Nothing
+  
+val x : Maybe[Int] = Just(15)
+val y : Maybe[Int] = Nothing[Int]()
+  
+match x:
+    j:Just => j.x
+    n:Nothing => 14

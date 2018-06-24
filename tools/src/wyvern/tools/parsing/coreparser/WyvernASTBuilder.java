@@ -136,8 +136,14 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             TypedAST constructArgs = valDeclType(nameCons, t, null);
             exps.add(constructArgs);
         }
+        if (generics != null) {
+            for (String typeName : generics) {
+                TypedAST typeDecl = typeAbbrevDecl(typeName, null, null, loc);
+                exps.add(typeDecl);
+            }
+        }
         body = new DeclSequence(exps);
-        return new TypeVarDecl(name,  (DeclSequence) body, null, null, loc, true, null);
+        return new TypeVarDecl(name,  (DeclSequence) body, null, null, null, loc, true, null);
     }
 
     @Override
@@ -155,56 +161,106 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
         //Reference<Value> meta = (metadata==null)?null:new Reference<Value>((Value)metadata);
         //return new TypeDeclaration(name, (DeclSequence) body, null, (TaggedInfo) tagInfo, loc);
-        return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, metadata, loc, isResource, selfName);
+        return new TypeVarDecl(name, (DeclSequence) body, (TaggedInfo) tagInfo, null, metadata, loc, isResource, selfName);
     }
 
     @Override
-    public TypedAST datatypeDecl(String name, TypedAST body, Object tagInfo, TypedAST metadata, FileLocation loc, boolean isResource, String selfName) {
+    public TypedAST datatypeDecl(String name,
+                                 List<String> generics,
+                                 TypedAST body,
+                                 Object tagInfo,
+                                 TypedAST metadata,
+                                 FileLocation loc,
+                                 boolean isResource,
+                                 String selfName) {
 
         LinkedList<TypedAST> exps = new LinkedList<>();
         LinkedList<TypedAST> ctors = new LinkedList<>();
 
+        /* Produce the declaration of the top-level datatype */
         LinkedList<Type> compriseList = new LinkedList<>();
         if (!(body instanceof DeclSequence)) {
             body = new DeclSequence(Arrays.asList(body));
         }
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
+            if (!(elem instanceof TypeVarDecl)) {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, elem, "Datatype declarations may only have datatype case declarations");
+            }
             String nameCons = ((TypeVarDecl) elem).getName();
             Type t = nominalType(nameCons, null);
             compriseList.add(t);
         }
-
         Object tagInfoComprise = tagInfo(null, compriseList);
-        TypedAST dt = new TypeVarDecl(name, new DeclSequence(), (TaggedInfo) tagInfoComprise, metadata, loc, isResource, selfName);
+        DeclSequence datatypeBody = new DeclSequence();
+        if (generics != null) {
+            // act as if these generics were added to the body of this constructor
+            LinkedList<TypedAST> newExps = makeGenericDecls(generics, loc);
+            datatypeBody = new DeclSequence(newExps);
+        }
+        TypedAST dt = new TypeVarDecl(name, datatypeBody, (TaggedInfo) tagInfoComprise, null, metadata, loc, isResource, selfName);
         exps.add(dt);
 
+        /* Produce declarations for the type constructors and value constructors */
         Type extended = nominalType(name, null);
         Object tagInfoExtend = tagInfo(extended, null);
-
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
+            /* The value constructor */
             String nameCons = ((TypeVarDecl) elem).getName();
             DeclSequence bodyCons = ((TypeVarDecl) elem).getBody();
-            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, null, null, isResource, null);
-            exps.add(cons);
-
             LinkedList<Object> args = new LinkedList<>();
+            LinkedList<String> constructorGenerics = new LinkedList<>();
+            Type constructorType = this.nominalType(nameCons, loc);
+            if (generics != null) {
+                // act as if these generics were added to the body of this constructor
+                LinkedList<TypedAST> newExps = makeGenericDecls(generics, loc);
+                LinkedList<Type> paramTypes = new LinkedList<>();
+                bodyCons.forEach(d -> newExps.add(d));
+                bodyCons = new DeclSequence(newExps);
+                for (String p : generics) {
+                    paramTypes.add(nominalType(p, loc));
+                }
+                constructorType = parameterizedType(constructorType, paramTypes, loc);
+            }
             TypedAST newBody = null;
             for (TypedAST ast : bodyCons) {
-                ValDeclaration vd = (ValDeclaration) ast;
-                args.add(this.formalArg(vd.getName(), vd.getType()));
-                TypedAST decl = this.valDecl(vd.getName(), vd.getType(), this.var(vd.getName(), loc), loc);
-                newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
+                if (ast instanceof ValDeclaration) {
+                    ValDeclaration vd = (ValDeclaration) ast;
+                    args.add(this.formalArg(vd.getName(), vd.getType()));
+                    TypedAST decl = this.valDecl(vd.getName(), vd.getType(), this.var(vd.getName(), loc), loc);
+                    newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
+                } else if (ast instanceof TypeAbbrevDeclaration) {
+                    TypeAbbrevDeclaration td = (TypeAbbrevDeclaration) ast;
+                    constructorGenerics.add(td.getName());
+                    TypedAST decl = typeAbbrevDecl(td.getName(), nominalType(td.getName(), td.getLocation()), null, td.getLocation());
+                    newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
+                } else {
+                    throw new RuntimeException("should be impossible");
+                }
             }
             TypedAST defBody = this.newObj(loc, nameCons);
             this.setNewBody(defBody, newBody);
-            TypedAST valueConstructor = this.defDecl(nameCons, this.nominalType(nameCons, loc), null, args, defBody, false, loc, null);
+            TypedAST valueConstructor = this.defDecl(nameCons, constructorType, constructorGenerics, args, defBody, false, loc, null);
             ctors.add(valueConstructor);
+            
+            /* The type constructor */
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, null, isResource, null);
+            exps.add(cons);
+
         }
 
         exps.addAll(ctors);
         body = new DeclSequence(exps);
 
         return body;
+    }
+
+    private LinkedList<TypedAST> makeGenericDecls(List<String> generics, FileLocation loc) {
+        LinkedList<TypedAST> newExps = new LinkedList<>();
+        for (String typeName : generics) {
+            TypedAST typeDecl = typeAbbrevDecl(typeName, null, null, loc);
+            newExps.add(typeDecl);
+        }
+        return newExps;
     }
 
     @Override
