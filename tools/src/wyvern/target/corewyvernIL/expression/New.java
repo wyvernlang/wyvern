@@ -146,7 +146,7 @@ public class New extends Expression {
         StructuralType actualT = new StructuralType(selfSite, dts);
         FailureReason r = new FailureReason();
         if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName(), r.getReason());
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
         }
 
         if (isResource && !requiredT.isResource(GenContext.empty())) {

@@ -128,6 +128,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testMaybe() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.maybe", Util.intType(), new IntegerLiteral(15));
+    }
+
+    @Test
     public void testCellModuleClient() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "modules.cellModuleClient", Util.intType(), new IntegerLiteral(2));
     }

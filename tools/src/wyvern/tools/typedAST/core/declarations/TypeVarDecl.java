@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.declarations;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
+import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -35,20 +37,20 @@ public class TypeVarDecl extends Declaration {
     private final DeclSequence bodyOriginal;
     private final FileLocation fileLocation;
     private final TypedAST metadata;
-    private TaggedInfo taggedInfo = null;
+    private List<String> generics;
     private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
     private String activeSelfName;
     private IExpr metadataExp = null;
 
     public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo,
-            TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName) {
+            List<String> generics, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName) {
         this.metadata = metadata;
         this.name = name;
         this.bodyOriginal = body;
         this.body = new TypeDeclaration(name, body, taggedInfo, fileLocation);
+        this.generics = generics == null ? new LinkedList<>() : generics;
         this.fileLocation = fileLocation;
-        this.taggedInfo = taggedInfo;
         this.resourceFlag = isResource;
         this.activeSelfName = selfName;
     }
@@ -88,6 +90,9 @@ public class TypeVarDecl extends Declaration {
     private wyvern.target.corewyvernIL.type.Type computeInternalILType(GenContext ctx) {
         TypeDeclaration td = this.body;
         GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
+        for (String param : generics) {
+            localCtx = new TypeOrEffectGenContext(param, getSelfName(), localCtx);
+        }
         TaggedInfo taggedInfo = td.getTaggedInfo();
         StructuralType thisType = new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
         if (taggedInfo == null) {
@@ -102,8 +107,9 @@ public class TypeVarDecl extends Declaration {
             if (children == null) {
                 return new ExtensibleTagType(parentType, thisType);
             } else {
+                final GenContext theCtx = localCtx; // final alias
                 List<NominalType> cases = children.stream()
-                                                  .map(child -> (NominalType) child.getILType(localCtx))
+                                                  .map(child -> (NominalType) child.getILType(theCtx))
                                                   .collect(Collectors.toList());
                 return new DataType(parentType, thisType, cases);
             }

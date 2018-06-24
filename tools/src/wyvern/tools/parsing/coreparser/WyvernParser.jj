@@ -424,12 +424,12 @@ AST TaggedTypeDeclaration() :
 
 AST DatatypeDeclaration() :
 { Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
-  Token selfName = null;
+  Token selfName = null; List<String> gentypes = null;
   Object tagInfo = null; boolean isResource = false;
 }
 {
   [<RESOURCE> { isResource = true; } ]
-  <DATATYPE> name=<IDENTIFIER>
+  <DATATYPE> name=<IDENTIFIER> [gentypes = GenericsDecl()]
   [ <LPAREN> <IDENTIFIER> <RPAREN> <ARROW> ]
   <NEWLINE> <INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
@@ -438,7 +438,7 @@ AST DatatypeDeclaration() :
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
     String self = null;
-	return build.datatypeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
+	return build.datatypeDecl(name.image, gentypes, body, tagInfo, metadata, loc(name), isResource, self);
   }
 }
 

@@ -17,7 +17,7 @@ interface ASTBuilder<AST, Type> {
     AST defDecl(String name, Type type, List<String> generics, List args, AST body, boolean isClassDef, FileLocation loc, String effects);
     AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 
-    AST datatypeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
+    AST datatypeDecl(String name, List<String> generics, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 
     AST delegateDecl(Type type, AST exp, FileLocation loc);
     AST effectDecl(String name, String effects, FileLocation loc);
