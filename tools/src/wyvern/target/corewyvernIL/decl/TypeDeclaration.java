@@ -72,4 +72,8 @@ public class TypeDeclaration extends NamedDeclaration {
         return new ConcreteTypeMember(getName(), sourceType, this.metadata);
     }
 
+    @Override
+    public boolean isTypeOrEffectDecl() {
+        return true;
+    }
 }

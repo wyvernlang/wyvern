@@ -68,4 +68,9 @@ public class EffectDeclaration extends NamedDeclaration {
         }
         return freeVars;
     }
+
+    @Override
+    public boolean isTypeOrEffectDecl() {
+        return true;
+    }
 }
