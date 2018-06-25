@@ -7,11 +7,19 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.DefDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
@@ -59,13 +67,13 @@ public class ASTComponentTypeDecl extends SimpleNode {
 
   public void collectPorts() {
     for (Node child : children) {
-      if (child.getClass().equals("ASTPortDecl")) {
+      if (child instanceof ASTPortDecl) {
         String req = ((ASTPortDecl) child).getRequires();
         String prov = ((ASTPortDecl) child).getProvides();
         String name = ((ASTPortDecl) child).getPort();
         if (req != null) {
           reqs.put(name, req);
-        } else {
+        } else if (prov != null) {
           provs.put(name, prov);
         }
       }
@@ -79,6 +87,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
     /* Check that the .wyv file exists */
     String rootLoc = null, wyvernPath = null;
     Module mod = null;
+    int checkCount = 0;
 
     try {
       rootLoc = System.getenv("WYVERN_ROOT");
@@ -117,7 +126,6 @@ public class ASTComponentTypeDecl extends SimpleNode {
         // throw error saying it's not a module def
         ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, location,
             typeName);
-        return false;
       }
 
       /* Check that it has the correct dependencies */
@@ -126,7 +134,6 @@ public class ASTComponentTypeDecl extends SimpleNode {
         // throw error saying dependencies don't match
         ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
             location, typeName);
-        return false;
       }
       for (TypedModuleSpec dep : deps) {
         String depName = dep.getDefinedTypeName();
@@ -134,18 +141,48 @@ public class ASTComponentTypeDecl extends SimpleNode {
           // throw error saying dependencies don't match
           ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
               location, typeName);
-          return false;
         }
       }
 
-      /* Check that is exposes the correct fields */
+      /* Check that it exposes the correct fields */
+      List<Declaration> decls = ((New) expr).getDecls().stream()
+          .filter(p -> p instanceof DefDeclaration)
+          .collect(Collectors.toList());
+      for (Declaration d : decls) {
+        DefDeclaration dd = (DefDeclaration) d;
+
+        List<DeclType> valdecltypes = ((StructuralType) (dd.getType()))
+            .getDeclTypes().stream().filter(p -> p instanceof ValDeclType)
+            .collect(Collectors.toList());
+
+        for (DeclType dt : valdecltypes) {
+          ValDeclType vdtype = (ValDeclType) dt;
+          String name = vdtype.getName();
+          String t = ((NominalType) vdtype.getSourceType()).getTypeMember();
+          if (provs.get(name) == null || !provs.get(name).equals(t)) {
+            // inconsistent fields
+            ToolError.reportError(
+                ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                typeName);
+          } else {
+            checkCount++;
+          }
+        }
+        if (checkCount != valdecltypes.size()) {
+          // inconsistent fields
+          ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
+              location, typeName);
+          return false;
+        }
+        return true;
+      }
 
     } catch (ToolError e) {
       e.printStackTrace();
       return false;
     }
-
     return true;
+
   }
 
   /** Accept the visitor. **/

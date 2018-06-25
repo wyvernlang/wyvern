@@ -25,7 +25,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
       ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
           node.getLocation(), "connector", connector);
     }
-    if (attachments.putIfAbsent(connector, ports) == null) {
+    if (attachments.putIfAbsent(connector, ports) != null) {
       // duplicate connector use
       ToolError.reportError(ErrorMessage.DUPLICATE_CONNECTOR_USE,
           node.getLocation(), connector);
@@ -64,7 +64,12 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
   public Object visit(ASTComponentDecl node, Object data) {
     String name = node.getName();
     String type = node.getType();
-    if (components.putIfAbsent(name, type) == null) {
+    if (!componentTypes.containsKey(type)) {
+      // component type not declared
+      ToolError.reportError(ErrorMessage.ARCH_TYPE_NOT_DEFINED,
+          node.getLocation(), "component", type);
+    }
+    if (components.putIfAbsent(name, type) != null) {
       // duplicate members
       ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER_NAMES,
           node.getLocation(), name);
@@ -75,7 +80,12 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
   public Object visit(ASTConnectorDecl node, Object data) {
     String name = node.getName();
     String type = node.getType();
-    if (connectors.putIfAbsent(name, type) == null) {
+    if (!connectorTypes.contains(type)) {
+      // connector type not declared
+      ToolError.reportError(ErrorMessage.ARCH_TYPE_NOT_DEFINED,
+          node.getLocation(), "connector", type);
+    }
+    if (connectors.putIfAbsent(name, type) != null) {
       // duplicate members
       ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER_NAMES,
           node.getLocation(), name);

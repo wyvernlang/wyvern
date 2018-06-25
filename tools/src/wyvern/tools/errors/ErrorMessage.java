@@ -123,10 +123,12 @@ public enum ErrorMessage {
     //ARCHITECTURE ERRORS
     DUPLICATE_MEMBER_NAMES("multiple members declared with name \"%ARG\"", 1),
     DUPLICATE_TYPE_DEFINITIONS("multiple types defined with name \"%ARG\"",1),
-    COMPONENT_DEPENDENCY_INCONSISTENCY("module def and component \"%ARG\" have inconsistent dependencies and ports",1),
+    COMPONENT_DEPENDENCY_INCONSISTENCY("module def and component \"%ARG\" have inconsistent dependencies/fields and ports",1),
     MODULE_DEF_NOT_FOUND("module def \"%ARG\" not found in current Wyvern path or the standard library",1),
     DUPLICATE_CONNECTOR_USE("connector \"%ARG\" has been used in multiple attachments",1),
-    MEMBER_NOT_DECLARED("%ARG \"%ARG\" has not been declared", 2);
+    MEMBER_NOT_DECLARED("%ARG \"%ARG\" has not been declared", 2),
+    ARCH_TYPE_NOT_DEFINED("%ARG type \"%ARG\" if not defined", 2),
+    CONNECTOR_VAL_INCONSISTENCY("type and connector \"%ARG\" have inconsistent val declarations",1);
        
     ErrorMessage(String message, int numArgs) {
         this.errorMessage = message;
