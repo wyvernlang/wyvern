@@ -14,7 +14,6 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
-import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -98,10 +97,10 @@ public class New extends Expression {
 
 
     /** Returns a declaration of the proper name, or null if not found.
-     * Searches separately for types and values, since these are in different namespaces. */
-    public Declaration findDecl(String name, boolean isType) {
+     * Searches separately for types/effects and values, since these are in different namespaces. */
+    public Declaration findDecl(String name, boolean isTypeOrEffect) {
         for (Declaration d : decls) {
-            if (name.equals(d.getName()) && isType == (d instanceof TypeDeclaration)) {
+            if (name.equals(d.getName()) && isTypeOrEffect == d.isTypeOrEffectDecl()) {
                 return d;
             }
         }
@@ -146,7 +145,7 @@ public class New extends Expression {
         StructuralType actualT = new StructuralType(selfSite, dts);
         FailureReason r = new FailureReason();
         if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.getSelfName(), requiredT.getSelfName(), r.getReason());
+            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
         }
 
         if (isResource && !requiredT.isResource(GenContext.empty())) {

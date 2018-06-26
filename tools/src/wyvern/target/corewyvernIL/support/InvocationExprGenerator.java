@@ -35,7 +35,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 
         List<DeclType> dts = receiverType.findDecls(operationName, ctx);
         // not interested in finding Type Decls (abstract or not)
-        dts.removeIf(cdt -> cdt.isTypeDecl());
+        dts.removeIf(cdt -> cdt.isTypeOrEffectDecl());
         if (dts.size() == 0) {
             boolean startsWith = iExpr.toString().startsWith("MOD$");
             DeclType applyDecl = receiverType.findDecl("apply", ctx);

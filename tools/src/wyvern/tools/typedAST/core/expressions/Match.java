@@ -128,7 +128,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
                 ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
             }
             if (expectedCaseType == null) {
-                expectedCaseType = caseType;
+                expectedCaseType = caseType.avoid(c.getVarName(), caseCtx);
             }
         }
         return new wyvern.target.corewyvernIL.expression.Match((Expression) matchExpr, elseExpr, casesIL, expectedCaseType, location);

@@ -173,7 +173,7 @@ public class StructuralType extends ValueType {
 
         TypeContext extendedCtx = ctx.extend(selfSite, this);
         for (DeclType dt : st.getDeclTypes()) {
-            DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
+            DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeOrEffectDecl() != dt.isTypeOrEffectDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
             if (candidateDT == null) {
                 if (!reason.isDefined()) {

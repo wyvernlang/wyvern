@@ -159,7 +159,7 @@ public class EffectDeclType extends DeclType implements IASTNode {
     }
 
     @Override
-    public boolean isTypeDecl() {
-        return false;
+    public boolean isTypeOrEffectDecl() {
+        return true;
     }
 }
