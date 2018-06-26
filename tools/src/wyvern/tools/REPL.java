@@ -33,6 +33,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.tools.ReplServer.MyHandler;
 import wyvern.tools.errors.ErrorMessage;
@@ -47,6 +48,7 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
+import wyvern.tools.typedAST.core.Script;
 
 public class REPL {
 	public static final String WYVERN_HOME = System.getenv("WYVERN_HOME");
@@ -60,6 +62,7 @@ public class REPL {
     private static EvalContext programContext = null;
     private static String tempCode = "";
     //private static IExpr program = null;
+    private static GenContext genContext = null;
 	
 	public REPL() {
 		
@@ -73,7 +76,10 @@ public class REPL {
                 if(input.equals("exit")) {
                     System.exit(1);
                 }
-                else if(input.equals("ctx")) {
+                else if(input.equals("genctx")) {
+                    System.out.println(genContext);
+                }
+                else if(input.equals("evalctx")) {
                     System.out.println(programContext);
                 }
                 else if(input.equals("clear")) 
@@ -82,7 +88,7 @@ public class REPL {
                 }
                 else 
                 {
-                    Value v = interepetProgram(input);
+                    Value v = interepetCode(input);
                     if(v != null) {
                         System.out.println(v.toString());
                     }
@@ -93,7 +99,7 @@ public class REPL {
         }
    }
 	
-	public static Value interepetProgram(String input) throws ParseException {
+	public static Value interepetCode(String input) throws ParseException {
 	    String lines[] = input.split("\\r?\\n");
 	    Value currentResult = null;
 	    for (String s: lines) {
@@ -108,6 +114,7 @@ public class REPL {
 	            }
 	            catch(Exception e) {
 	                tempCode = tempCode + s + "\n";
+	                e.printStackTrace();
 	            }
 	        }
 	    }
@@ -126,10 +133,11 @@ public class REPL {
 	            return result;
 	        }
 	        catch(Exception e){
+	            
 	            return null;
 	        }
         }
-	    if (programContext == null){
+	    if (programContext == null || genContext == null){
 	        //System.out.println("Inside OR, btw with pC = " + programContext + " p = " + program);
 	        programContext = Globals.getStandardEvalContext();
 	        ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
@@ -137,11 +145,13 @@ public class REPL {
 	                new File(BASE_PATH),
 	                new File(LIB_PATH)));
 	        final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-	        IExpr program =  ast.generateIL(genCtx, null, dependencies);
+	        TopLevelContext TLC =  ((Script) ast).generateTLC(genCtx, null, dependencies);
+	        SeqExpr program = (SeqExpr) TLC.getExpression();
 	        program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
-	        
-	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
+	        Pair<Value, EvalContext> result = program.interpretCtx(programContext);
+	        System.out.println("got here");
             programContext = result.getSecond();
+            genContext = TLC.getContext();
             tempCode = "";
             return result.getFirst();
 	    }else {
@@ -151,12 +161,14 @@ public class REPL {
 	                new File(BASE_PATH),
 	                new File(LIB_PATH)));
 	        final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
-	        IExpr program =  ast.generateIL(genCtx, null, dependencies);
+	        TopLevelContext TLC =  ((Script) ast).generateTLC(genCtx, null, dependencies);
+	        SeqExpr program = (SeqExpr) TLC.getExpression();
 	        program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
 	        
-	        Pair<Value, EvalContext> result = ((SeqExpr) program).interpretCtx(programContext);
+	        Pair<Value, EvalContext> result = program.interpretCtx(programContext);
+	        
             programContext = result.getSecond();
-	        //System.out.println(result.getFirst());
+            genContext = program.extendContext(genContext);
             tempCode = "";
 	        return result.getFirst();
 	        //System.out.println(programContext.lookupValue("x"));
