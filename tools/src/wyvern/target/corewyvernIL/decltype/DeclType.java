@@ -47,5 +47,5 @@ public abstract class DeclType extends ASTNode implements IASTNode {
      */
     public abstract DeclType doAvoid(String varName, TypeContext ctx, int count);
 
-    public abstract boolean isTypeDecl();
+    public abstract boolean isTypeOrEffectDecl();
 }

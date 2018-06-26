@@ -202,7 +202,7 @@ public class DefDeclType extends DeclTypeWithResult {
     }
 
     @Override
-    public boolean isTypeDecl() {
+    public boolean isTypeOrEffectDecl() {
         return false;
     }
 
