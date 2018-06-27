@@ -9,9 +9,9 @@ public class ThreadWrapper {
   public static final ThreadWrapper threadwrapper = new ThreadWrapper();
 
   private class WyvernRunnable implements Runnable {
-    ObjectValue value = null;
+    private ObjectValue value = null;
 
-    public WyvernRunnable(ObjectValue value) {
+    WyvernRunnable(ObjectValue value) {
       this.value = value;
     }
 
