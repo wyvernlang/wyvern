@@ -135,7 +135,7 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
     }
 
     @Override
-    public boolean isTypeDecl() {
+    public boolean isTypeOrEffectDecl() {
         return true;
     }
 }
