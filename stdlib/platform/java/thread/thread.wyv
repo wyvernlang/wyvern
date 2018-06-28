@@ -1,0 +1,65 @@
+require java
+
+import java:wyvern.stdlib.support.ThreadWrapper.threadwrapper
+import platform.java.thread.Runnable
+import platform.java.thread.ThreadGroup
+
+type Thread
+	val thread : Dyn
+	def start() : Unit
+	def join() : Unit
+	def activeCount() : Int
+	def currentThread() : Thread
+	def getId() : Int
+	def getName() : String
+	def getPriority() : Int
+	def getThreadGroup() : ThreadGroup
+	def interrupt() : Unit
+	def interrupted() : Boolean
+	def isAlive() : Boolean
+	def isDaemon() : Boolean
+	def isInterrupted() : Boolean
+	def setDaemon(d : Boolean) : Unit
+	def setName(name : String) : Unit
+	def setPriority(n : Int) : Unit
+	def toString() : String
+
+def sleep(time : Int) : Unit
+	threadwrapper.sleep(threadwrapper.bigIntToLong(time))
+
+def make(f : Runnable) : Thread = new
+	val thread : Dyn = threadwrapper.makeThread(f)
+	def start() : Unit
+		this.thread.start()
+	def join() : Unit
+		this.thread.join()
+	def activeCount() : Int
+		this.thread.activeCount()
+	def currentThread() : Thread
+		this.thread.currentThread()
+	def getId() : Int
+		this.thread.getId()
+	def getName() : String
+		this.thread.getName()
+	def getPriority() : Int
+		this.thread.getPriority()	
+	def getThreadGroup() : ThreadGroup
+		this.thread.getThreadGroup()
+	def interrupt() : Unit
+		this.thread.interrupt()
+	def interrupted() : Boolean
+		this.thread.interrupted()
+	def isAlive() : Boolean
+		this.thread.isAlive()
+	def isDaemon() : Boolean	
+		this.thread.isDaemon()
+	def isInterrupted() : Boolean
+		this.thread.isInterrupted()
+	def setDaemon(n : Boolean) : Unit
+		this.thread.setDaemon(n)
+	def setName(name : String) : Unit
+		this.thread.setName(name)
+	def setPriority(p : Int) : Unit
+		this.thread.setPriority(p)
+	def toString() : String
+		this.thread.toString()

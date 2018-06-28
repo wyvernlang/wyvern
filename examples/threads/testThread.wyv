@@ -1,25 +1,25 @@
 require stdout
-require platform.java.thread.threadHelper
 
-import platform.java.thread.Thread
+import platform.java.thread.thread
 import platform.java.thread.ThreadGroup
 
+
+
 def foo1() : Unit
-	assert threadHelper.currentThread().isAlive()
 	stdout.print("1")
-	threadHelper.sleep(100, -1)
+	thread.sleep(100)
 	stdout.print("2")
 
-var thread1 : Thread = threadHelper.make(() => foo1())
+var thread1 : thread.Thread = thread.make(() => foo1())
 
 def foo2() : Unit
-	threadHelper.join(thread1)
+	thread1.join()
 	assert !thread1.isAlive()
 	stdout.print("3")
 	stdout.print("4")
 	stdout.println()
 
-var thread2 : Thread = threadHelper.make(() => foo2())
+var thread2 : thread.Thread = thread.make(() => foo2())
 
 val g1 = thread1.getThreadGroup()
 val g2 = thread2.getThreadGroup()

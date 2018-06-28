@@ -1,5 +1,6 @@
 package wyvern.stdlib.support;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 import wyvern.target.corewyvernIL.expression.ObjectValue;
@@ -20,31 +21,15 @@ public class ThreadWrapper {
     }
   }
 
-  public Thread makeThread(ObjectValue value) {
+  public Object bigIntToLong(BigInteger m) {
+    return m.longValue();
+  }
+
+  public void sleep(long milli) throws InterruptedException {
+    Thread.sleep(milli);
+  }
+
+  public Object makeThread(ObjectValue value) {
     return new Thread(new WyvernRunnable(value));
-  }
-
-  public int activeCount() {
-    return Thread.activeCount();
-  }
-
-  public boolean interrupted() {
-    return Thread.interrupted();
-  }
-
-  public void sleep(int m, int n) throws InterruptedException {
-    if (n < 0) {
-      Thread.sleep(m);
-    } else {
-      Thread.sleep(m, n);
-    }
-  }
-
-  public Thread currentThread() {
-    return Thread.currentThread();
-  }
-
-  public void join(Thread t) throws InterruptedException {
-    t.join();
   }
 }
