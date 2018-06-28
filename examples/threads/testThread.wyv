@@ -1,11 +1,10 @@
 require stdout
-
-import platform.java.thread.thread
+require platform.java.thread.thread
 import platform.java.thread.ThreadGroup
 
 
-
 def foo1() : Unit
+	thread.currentThread().isAlive()
 	stdout.print("1")
 	thread.sleep(100)
 	stdout.print("2")
@@ -38,3 +37,4 @@ stdout.printInt(thread1.getPriority())
 stdout.println()
 stdout.print(thread1.toString())
 stdout.println()
+

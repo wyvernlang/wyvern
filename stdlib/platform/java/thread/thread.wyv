@@ -1,4 +1,4 @@
-require java
+module def thread(java : Java)
 
 import java:wyvern.stdlib.support.ThreadWrapper.threadwrapper
 import platform.java.thread.Runnable
@@ -9,13 +9,11 @@ type Thread
 	def start() : Unit
 	def join() : Unit
 	def activeCount() : Int
-	def currentThread() : Thread
 	def getId() : Int
 	def getName() : String
 	def getPriority() : Int
 	def getThreadGroup() : ThreadGroup
 	def interrupt() : Unit
-	def interrupted() : Boolean
 	def isAlive() : Boolean
 	def isDaemon() : Boolean
 	def isInterrupted() : Boolean
@@ -27,6 +25,12 @@ type Thread
 def sleep(time : Int) : Unit
 	threadwrapper.sleep(threadwrapper.bigIntToLong(time))
 
+def interrupted() : Boolean
+	threadwrapper.interrupted()
+
+def currentThread() : Thread
+	threadwrapper.currentThread()
+
 def make(f : Runnable) : Thread = new
 	val thread : Dyn = threadwrapper.makeThread(f)
 	def start() : Unit
@@ -35,8 +39,6 @@ def make(f : Runnable) : Thread = new
 		this.thread.join()
 	def activeCount() : Int
 		this.thread.activeCount()
-	def currentThread() : Thread
-		this.thread.currentThread()
 	def getId() : Int
 		this.thread.getId()
 	def getName() : String
@@ -47,8 +49,6 @@ def make(f : Runnable) : Thread = new
 		this.thread.getThreadGroup()
 	def interrupt() : Unit
 		this.thread.interrupt()
-	def interrupted() : Boolean
-		this.thread.interrupted()
 	def isAlive() : Boolean
 		this.thread.isAlive()
 	def isDaemon() : Boolean	

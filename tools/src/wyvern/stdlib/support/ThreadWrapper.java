@@ -32,4 +32,12 @@ public class ThreadWrapper {
   public Object makeThread(ObjectValue value) {
     return new Thread(new WyvernRunnable(value));
   }
+
+  public boolean interrupted() {
+    return Thread.interrupted();
+  }
+
+  public Object currentThread() {
+    return Thread.currentThread();
+  }
 }
