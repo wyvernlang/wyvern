@@ -1,0 +1,43 @@
+module def socket(java:Java)
+import java:SocketObj.skt
+
+
+// types
+
+type Socket
+    def getOutputStream():OutputStream
+    def getInputStream():InputStream
+    def close():Unit
+
+type ServerSocket
+    def accept():Socket
+
+type InputStream
+    def close():Unit
+
+type OutputStream
+    def close():Unit
+
+type OutputStreamWriter
+    def close():Unit
+
+type PrintWriter
+    def println():Unit
+    def flush():Unit
+
+//functions
+
+def makeServerSocket(port:Int): ServerSocket
+    skt.makeServerSocket(port)
+
+def makeSocket(hostname:String, port:Int):Socket
+    skt.makeSocket(hostname, port)
+
+def makePrintWriter(osw:OutputStreamWriter):PrintWriter
+    skt.makePrintWriter(osw)
+
+def makeOutputStreamWriter(soc:Socket):OutputStreamWriter
+    skt.makeOutputStreamWriter(soc)
+
+
+

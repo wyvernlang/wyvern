@@ -21,29 +21,6 @@ public class Server {
 	public static int PORT_NUM = 1254;
 	public static int POST_HEADER_LENGTH = 556;
 
-	public static void sendHTMLFile(PrintWriter out, String filename) {
-
-		File file = new File(filename);
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-			String htmlContent = "";
-			String line = "";
-			while((line = br.readLine()) != null) {
-				htmlContent+= line;
-			}
-			br.close();
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type: text/html");
-			out.println("");
-			out.println(htmlContent);
-			out.flush();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static void main(String[] args) {
 
@@ -105,6 +82,31 @@ public class Server {
 
 
 	}
+	
+	public static void sendHTMLFile(PrintWriter out, String filename) {
+
+		File file = new File(filename);
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+			String htmlContent = "";
+			String line = "";
+			while((line = br.readLine()) != null) {
+				htmlContent+= line;
+			}
+			br.close();
+			out.println("HTTP/1.0 200 OK");
+			out.println("Content-Type: text/html");
+			out.println("");
+			out.println(htmlContent);
+			out.flush();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	private static List<String> processPOST(String method) {
 

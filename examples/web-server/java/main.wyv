@@ -1,0 +1,13 @@
+require java
+require stdout
+import socket
+val sktobj = socket (java)
+
+val serverSocket = sktobj.makeServerSocket(1254)
+
+stdout.print("Waiting for a client connection...\n")
+
+val soc = serverSocket.accept()
+
+val writer = sktobj.makePrintWriter(sktobj.makeOutputStreamWriter(soc.getOutputStream()))
+writer.println("HELLO WORLD")
