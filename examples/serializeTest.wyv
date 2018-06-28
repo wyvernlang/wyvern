@@ -1,0 +1,14 @@
+require stdout
+require json
+require dataStructures.hashmap
+import cell
+
+val c2: cell.Cell = cell.make()
+val c : cell.Cell = cell.make()
+val jsonfile : json.JSON = json.serializeToJSON(c)
+//stdout.print(jsonfile.toString())
+
+json.deserializeFromJSON(jsonfile)
+//json.testCell(c)
+
+stdout.println()
