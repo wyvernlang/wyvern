@@ -1,4 +1,4 @@
-module def ThreadHelper(java : Java) 
+module def threadHelper(java : Java) 
 
 import java:wyvern.stdlib.support.ThreadWrapper.threadwrapper
 import platform.java.thread.Thread
