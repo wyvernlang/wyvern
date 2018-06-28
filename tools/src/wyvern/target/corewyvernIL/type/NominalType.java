@@ -4,19 +4,24 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Path;
+import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.RuntimeError;
 import wyvern.tools.errors.ToolError;
 
 public class NominalType extends ValueType {
@@ -79,8 +84,32 @@ public class NominalType extends ValueType {
         }
     }
 
+    private static int nestingCount = 0;
+    
+    @Override
+    public boolean isTSubtypeOf(Type sourceType, TypeContext ctx, FailureReason reason) {
+        if (super.isTSubtypeOf(sourceType, ctx, reason)) {
+            return true;
+        }
+        // try looking up my source decl
+        DeclType t = getSourceDeclType(ctx);
+        if (t instanceof ConcreteTypeMember) {
+            ConcreteTypeMember ctm = (ConcreteTypeMember) t;
+            return ctm.getSourceType().isTSubtypeOf(sourceType, ctx, reason);
+        }
+        return false;
+    }
+
+    
     private DeclType getSourceDeclType(TypeContext ctx) {
-        final StructuralType structuralType = path.typeCheck(ctx, null).getStructuralType(ctx);
+        final ValueType t = path.typeCheck(ctx, null);
+        nestingCount++;
+        if (nestingCount > 100) {
+            // check for excessive recursion failed
+            throw new RuntimeException("Internal error: recursion");
+        }
+        final StructuralType structuralType = t.getStructuralType(ctx);
+        nestingCount--;
         // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
     }
@@ -181,7 +210,9 @@ public class NominalType extends ValueType {
                 return true;
             } else {
                 // report error in terms of original type
-                reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                if (!reason.isDefined()) {
+                    reason.setReason("type " + this + " is abstract and cannot be checked to be a subtype of " + t);
+                }
                 return false;
             }
         }
@@ -194,6 +225,9 @@ public class NominalType extends ValueType {
 
     @Override
     public ValueType adapt(View v) {
+        if (v == null) {
+            return this;
+        }
         try {
             final Path newPath = path.adapt(v);
             return new NominalType(newPath, typeMember);
@@ -259,4 +293,17 @@ public class NominalType extends ValueType {
         return (dt instanceof ConcreteTypeMember) && ((ConcreteTypeMember) dt).getSourceType().isTagged(ctx);
     }
 
+    @Override
+    public Tag getTag(EvalContext ctx) {
+        Value v = this.getPath().interpret(ctx);
+        if (!(v instanceof ObjectValue)) {
+            throw new RuntimeError("internal invariant: can only get the tag of part of an object, did this typecheck?");
+        }
+        ObjectValue object = (ObjectValue) v;
+        TypeDeclaration decl = (TypeDeclaration) object.findDecl(this.getTypeMember(), true);
+        if (decl.getSourceType() instanceof NominalType) {
+            return ((NominalType) decl.getSourceType()).getTag(object.getEvalCtx());
+        }
+        return new Tag(object, this.getTypeMember());
+    }
 }

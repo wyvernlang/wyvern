@@ -11,6 +11,7 @@ import wyvern.target.oir.declarations.OIRMethodDeclaration;
 import wyvern.target.oir.declarations.OIRType;
 import wyvern.target.oir.expressions.OIRBoolean;
 import wyvern.target.oir.expressions.OIRCast;
+import wyvern.target.oir.expressions.OIRCharacter;
 import wyvern.target.oir.expressions.OIRExpression;
 import wyvern.target.oir.expressions.OIRFFIImport;
 import wyvern.target.oir.expressions.OIRFieldGet;
@@ -136,6 +137,12 @@ public class EmitLLVMVisitor extends EmitILVisitor<String> {
 
     @Override
     public String visit(OIREnvironment oirenv, OIRString oirString) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public String visit(OIREnvironment oirenv, OIRCharacter oirString) {
         // TODO Auto-generated method stub
         return null;
     }

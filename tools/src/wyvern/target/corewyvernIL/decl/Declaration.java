@@ -31,4 +31,9 @@ public abstract class Declaration extends ASTNode implements IASTNode {
     public abstract String getName();
 
     public abstract Set<String> getFreeVariables();
+
+    public boolean isTypeOrEffectDecl() {
+        // defaults to false
+        return false;
+    }
 }

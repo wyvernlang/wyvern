@@ -10,7 +10,6 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.Type;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public class TypeDeclaration extends NamedDeclaration {
@@ -25,6 +24,10 @@ public class TypeDeclaration extends NamedDeclaration {
         super(typeName, loc);
         this.sourceType = sourceType;
         this.metadata = metadata;
+    }
+    
+    public IExpr getMeta() {
+        return metadata;
     }
 
     public Type getSourceType() {
@@ -66,7 +69,11 @@ public class TypeDeclaration extends NamedDeclaration {
      */
     @Override
     public DeclType getDeclType() {
-        return new ConcreteTypeMember(getName(), (ValueType) (sourceType.getValueType()), this.metadata);
+        return new ConcreteTypeMember(getName(), sourceType, this.metadata);
     }
 
+    @Override
+    public boolean isTypeOrEffectDecl() {
+        return true;
+    }
 }

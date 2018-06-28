@@ -94,7 +94,7 @@ public class VarDeclType extends DeclTypeWithResult implements IASTNode {
     }
 
     @Override
-    public boolean isTypeDecl() {
+    public boolean isTypeOrEffectDecl() {
         return false;
     }
 }

@@ -180,7 +180,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
     terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); flagTok = RESULT; :};
-    terminal Token defaultKwd_t ::= /default/ in (keywds);
+    terminal Token defaultKwd_t ::= /default/ in (keywds) {: RESULT = token(DEFLT,lexeme); :};
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
 
@@ -221,6 +221,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
  	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
+ 	:};
+ 	
+ 	terminal Token character_t ::= /#(("\\?.")|('\\?.'))/ {:
+ 		RESULT = token(CHARACTER_LITERAL, replaceEscapeSequences(lexeme.substring(2,lexeme.length()-1)));
  	:};
 
  	terminal Token oCurly_t ::= /\{/ {: RESULT = token(LBRACE,lexeme); :};
@@ -316,6 +320,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | comprisesKwd_t:t {: RESULT = t; :}
 	       | extendsKwd_t:t {: RESULT = t; :}
 	       | matchKwd_t:t {: RESULT = t; :}
+	       | defaultKwd_t:t {: RESULT = t; :}
 	       | taggedKwd_t:t {: RESULT = t; :}
 	       | importKwd_t:t {: RESULT = t; :}
 	       | instantiateKwd_t:t {: RESULT = t; :}
@@ -326,9 +331,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 //	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
-	          | floatingPoint_t:t {: RESULT =t; :}
-		  | booleanLit_t:t {: RESULT = t; :}
+	          | floatingPoint_t:t {: RESULT = t; :}
+	          | booleanLit_t:t {: RESULT = t; :}
 	          | shortString_t:t {: RESULT = t; :}
+	          | character_t:t {: RESULT = t; :}
 	          | inlinelit:lit {: RESULT = token(DSL_LITERAL,(String)lit); :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}

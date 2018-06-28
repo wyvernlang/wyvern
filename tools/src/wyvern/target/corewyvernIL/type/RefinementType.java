@@ -11,7 +11,9 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -23,6 +25,19 @@ import wyvern.tools.errors.ToolError;
 public class RefinementType extends ValueType {
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, String selfName) {
         this(base, declTypes, hasLoc, new BindingSite(selfName));
+    }
+    
+    /** Applies the old refinement to this new base
+     * 
+     * @param base
+     * @param old
+     */
+    public RefinementType(ValueType base, RefinementType old) {
+        super(old);
+        this.base = base;
+        this.selfSite = old.selfSite;
+        this.declTypes = old.declTypes;
+        this.typeParams = old.typeParams;
     }
 
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, BindingSite selfSite) {
@@ -66,6 +81,7 @@ public class RefinementType extends ValueType {
                 }
                 AbstractTypeMember m = (AbstractTypeMember) st.getDeclTypes().get(index);
                 declTypes.add(new ConcreteTypeMember(m.getName(), vt));
+                index++;
             }
         }
         return declTypes;
@@ -124,6 +140,11 @@ public class RefinementType extends ValueType {
     /** Returns the self name if there is one, otherwise null */
     public String getSelfName() {
         return selfSite.getName();
+    }
+    
+    /** Returns the base type of this refinement */
+    public ValueType getBase() {
+        return base;
     }
 
     @Override
@@ -264,6 +285,11 @@ public class RefinementType extends ValueType {
     @Override
     public Value getMetadata(TypeContext ctx) {
         return base.getMetadata(ctx);
+    }
+
+    @Override
+    public Tag getTag(EvalContext ctx) {
+        return base.getTag(ctx);
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.Map;
 import wyvern.target.corewyvernIL.BindingSite;
 //import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
@@ -18,6 +19,7 @@ import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -68,10 +70,10 @@ public class TopLevelContext {
             }
         }
 
-        ValueType vt = new StructuralType(newName, moduleDeclTypes, isModule);
-        vt = adapt(vt, newName);
+        StructuralType vt = new StructuralType(newName, moduleDeclTypes, isModule);
+        vt = (StructuralType) adapt(vt, newName);
 
-        IExpr exp = new New(moduleDecls, newName, vt, null);
+        IExpr exp = new New(moduleDecls, vt.getSelfSite(), vt, null);
         addExpression(exp, vt);
 
         return getExpression();
@@ -119,8 +121,21 @@ public class TopLevelContext {
     }
 
     public void addModuleDecl(Declaration decl, DeclType dt) {
+        decl = copyTypes(decl);
         moduleDecls.add(decl);
         moduleDeclTypes.add(dt);
+    }
+
+    private Declaration copyTypes(Declaration decl) {
+        if (decl instanceof TypeDeclaration) {
+            TypeDeclaration td = (TypeDeclaration) decl;
+            return new TypeDeclaration(
+                    td.getName(),
+                    new NominalType(new Variable(getReceiverName()), td.getName(), decl.getLocation()),
+                    td.getMeta(),
+                    decl.getLocation());
+        }
+        return decl;
     }
 
     public String getReceiverName() {

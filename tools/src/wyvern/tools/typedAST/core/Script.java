@@ -36,8 +36,7 @@ public class Script extends AbstractExpressionAST implements CoreAST {
         return body.getLocation();
     }
 
-    @Override
-    public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+    public TopLevelContext generateTLC(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         TopLevelContext tlc = new TopLevelContext(ctx, expectedType);
         for (ImportDeclaration i: requires) {
             i.genTopLevel(tlc);
@@ -51,7 +50,12 @@ public class Script extends AbstractExpressionAST implements CoreAST {
         if (!newDeps.isEmpty()) {
             dependencies.addAll(newDeps);
         }
-        return tlc.getExpression();
+        return tlc;
+    }
+    
+    @Override
+    public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+        return this.generateTLC(ctx, expectedType, dependencies).getExpression();
     }
 
 }

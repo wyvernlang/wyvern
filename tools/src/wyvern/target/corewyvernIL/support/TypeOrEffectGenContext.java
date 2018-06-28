@@ -54,6 +54,11 @@ public class TypeOrEffectGenContext extends GenContext {
     }
 
     @Override
+    public ValueType lookupTypeOf(Variable v) {
+        return getNext().lookupTypeOf(v);
+    }
+
+    @Override
     public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
         return getNext().getCallableExprRec(varName, origCtx);
     }

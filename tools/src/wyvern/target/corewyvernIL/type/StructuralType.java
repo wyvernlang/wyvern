@@ -143,6 +143,9 @@ public class StructuralType extends ValueType {
             return true;
         }
         if (t instanceof NominalType) {
+            if (t.isTagged(ctx)) {
+                return false;
+            }
             StructuralType st = ((NominalType) t).getStructuralType(ctx, null);
             if (st == null) {
                 if (!reason.isDefined()) {
@@ -170,7 +173,7 @@ public class StructuralType extends ValueType {
 
         TypeContext extendedCtx = ctx.extend(selfSite, this);
         for (DeclType dt : st.getDeclTypes()) {
-            DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeDecl() != dt.isTypeDecl(), ctx);
+            DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeOrEffectDecl() != dt.isTypeOrEffectDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
             if (candidateDT == null) {
                 if (!reason.isDefined()) {

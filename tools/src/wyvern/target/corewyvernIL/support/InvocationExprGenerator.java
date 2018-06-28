@@ -35,7 +35,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 
         List<DeclType> dts = receiverType.findDecls(operationName, ctx);
         // not interested in finding Type Decls (abstract or not)
-        dts.removeIf(cdt -> cdt.isTypeDecl());
+        dts.removeIf(cdt -> cdt.isTypeOrEffectDecl());
         if (dts.size() == 0) {
             boolean startsWith = iExpr.toString().startsWith("MOD$");
             DeclType applyDecl = receiverType.findDecl("apply", ctx);
@@ -53,9 +53,9 @@ public class InvocationExprGenerator implements CallableExprGenerator {
     }
 
     @Override
-    public Expression genExpr() {
+    public Expression genExpr(FileLocation loc) {
         if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
-            return new FieldGet(receiver, declType.getName(), location);
+            return new FieldGet(receiver.locationHint(loc), declType.getName(), location);
         } else {
             ToolError.reportError(ErrorMessage.METHODS_MUST_BE_INVOKED, location);
             return null;
@@ -65,7 +65,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
     @Override
     public IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc) {
         if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
-            IExpr e = genExpr();
+            IExpr e = genExpr(loc.getLocation());
             return new MethodCall(e, Util.APPLY_NAME, args, loc);
         } else {
             return new MethodCall(receiver, declType.getName(), args, loc);
@@ -77,7 +77,7 @@ public class InvocationExprGenerator implements CallableExprGenerator {
         if (declType == null) {
             return null;
         } else if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
-            Expression e = genExpr();
+            Expression e = genExpr(null);
             ValueType vt = e.typeCheck(ctx, null);
             return (DefDeclType) vt.findDecl(Util.APPLY_NAME, ctx);
             // return (DefDeclType)vt.findDecl(Util.APPLY_NAME, ctx).adapt(View.from(receiver, ctx));

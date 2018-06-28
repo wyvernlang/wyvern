@@ -4,6 +4,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 
 /**
@@ -18,7 +19,7 @@ import wyvern.tools.errors.HasLocation;
  * @author aldrich
  */
 public interface CallableExprGenerator {
-    IExpr genExpr();
+    IExpr genExpr(FileLocation loc);
 
     IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc);
 

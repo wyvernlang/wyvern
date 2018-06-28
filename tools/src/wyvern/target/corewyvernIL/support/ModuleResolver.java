@@ -3,8 +3,10 @@ package wyvern.target.corewyvernIL.support;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -33,6 +35,7 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
@@ -49,6 +52,7 @@ public class ModuleResolver {
     private Path platformPath;
     private String platform;
     private Map<String, Module> moduleCache = new HashMap<String, Module>();
+    private Deque<String> modulesBeingResolved = new ArrayDeque<>();
     private InterpreterState state;
     private File rootDir;
     private File libDir;
@@ -141,13 +145,39 @@ public class ModuleResolver {
     }
 
     public Module resolveModule(String qualifiedName, boolean toplevel) {
+        checkNoCyclicDependencies(qualifiedName);
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, false);
+            modulesBeingResolved.add(qualifiedName);
             moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+            modulesBeingResolved.remove(qualifiedName);
         }
         return moduleCache.get(qualifiedName);
     }
 
+    /**
+     * Check if trying to resolve the specified module would introduce a cyclic dependency on itself.
+     * @param qualifiedName: the name of the module to resolve.
+     * @throws ToolError of type ErrorMessage.IMPORT_CYCLE: if there is a cyclic dependency. 
+     */
+    private void checkNoCyclicDependencies(String qualifiedName) {
+        if (modulesBeingResolved.contains(qualifiedName)) {
+            StringBuilder errorMessage = new StringBuilder(qualifiedName);
+            boolean foundQualifiedName = false; // used to ignore things not in the cycle
+            while (!modulesBeingResolved.isEmpty()) {
+                if (foundQualifiedName) {
+                    errorMessage.append(modulesBeingResolved.poll());
+                    errorMessage.append(" -> ");
+                } else if (modulesBeingResolved.poll().equals(qualifiedName)) {
+                    foundQualifiedName = true;
+                    errorMessage.append(" -> ");
+                }
+            }
+            errorMessage.append(qualifiedName);
+            ToolError.reportError(ErrorMessage.IMPORT_CYCLE,  HasLocation.UNKNOWN, errorMessage.toString());
+        }
+    }
+    
     /**
      * Turns dots into directory slashes.
      * Adds a .wyv at the end, and the root to the beginning

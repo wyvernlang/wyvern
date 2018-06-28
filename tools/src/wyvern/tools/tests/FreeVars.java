@@ -94,7 +94,7 @@ public class FreeVars {
         StructuralType typeOfDecls = new StructuralType("this", declTypes, true);
 
         // Turn into a New expression.
-        New newDecls = new New(decls, "this", typeOfDecls, null);
+        New newDecls = new New(decls, typeOfDecls.getSelfSite(), typeOfDecls, null);
 
         // Enclose with the declaration of y.
         Let assign5toY = new Let("y", systemInt(), new IntegerLiteral(5), newDecls);

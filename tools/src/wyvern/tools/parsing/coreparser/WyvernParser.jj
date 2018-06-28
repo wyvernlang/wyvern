@@ -112,6 +112,7 @@ TOKEN : /* Keywords */
 | < TAGGED: "tagged" >
 | < MATCH: "match" >
 | < IMPORT: "import" >
+| < DEFLT: "default" >
 //| < : "" >
 // more here
 | < RESOURCE : "resource" >
@@ -169,6 +170,7 @@ TOKEN : /* Symbols */
 TOKEN : /* Literals */
 {
   < STRING_LITERAL >
+| < CHARACTER_LITERAL >
 | < FLOATING_POINT_LITERAL >
 | < DECIMAL_LITERAL >
 | < BOOLEAN_LITERAL >
@@ -422,12 +424,12 @@ AST TaggedTypeDeclaration() :
 
 AST DatatypeDeclaration() :
 { Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
-  Token selfName = null;
+  Token selfName = null; List<String> gentypes = null;
   Object tagInfo = null; boolean isResource = false;
 }
 {
   [<RESOURCE> { isResource = true; } ]
-  <DATATYPE> name=<IDENTIFIER>
+  <DATATYPE> name=<IDENTIFIER> [gentypes = GenericsDecl()]
   [ <LPAREN> <IDENTIFIER> <RPAREN> <ARROW> ]
   <NEWLINE> <INDENT> body=DeclTypes()
                     [ <METADATA> metadata = ExpressionLine(false) ]
@@ -436,7 +438,7 @@ AST DatatypeDeclaration() :
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
     String self = null;
-	return build.datatypeDecl(name.image, body, tagInfo, metadata, loc(name), isResource, self);
+	return build.datatypeDecl(name.image, gentypes, body, tagInfo, metadata, loc(name), isResource, self);
   }
 }
 
@@ -657,9 +659,10 @@ AST ExpressionLine(boolean makeValDecl) :
 }
 
 Object CaseArm() :
-{ Token id; Token t; Token dslTok = null; AST exp = null; Type type; }
+{ Token id; Token t; Token dslTok = null; AST exp = null; Type type=null; }
 {
-  id=<IDENTIFIER> <COLON> type=NonArrowType() t=<EQARROW>
+  ((id=<IDENTIFIER> <COLON> type=NonArrowType())
+  | id=<DEFLT>) t=<EQARROW>
   ( exp=ExpressionLine(false)
   | <NEWLINE> dslTok=DSLLines()
   ) {
@@ -883,6 +886,8 @@ AST Literal() :
   lit = <FLOATING_POINT_LITERAL> { return build.floatLit(Float.parseFloat(lit.image), loc(lit)); }
 |
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
+|
+  lit = <CHARACTER_LITERAL>  { return build.characterLit(lit.image.charAt(0), loc(lit)); }
 |
   lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
 |

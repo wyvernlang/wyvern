@@ -256,7 +256,8 @@ public class AST {
             JavaValue fieldValue = (JavaValue) obj.getField("caseValue");
             cases.add((Case) fieldValue.getWrappedValue());
         }
-        return new Match(getExpr(matchObj), getExpr(elseObj), cases);
+        Expression expr = getExpr(matchObj);
+        return new Match(expr, getExpr(elseObj), cases, expr.getLocation());
     }
 
     public Case makeCase(String varName, ObjectValue pattern, ObjectValue body) {

@@ -90,7 +90,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
 
             // Need to do this to find out what the method name is.
             if (!(function instanceof Invocation)) {
-                receiver = exprGen.genExpr();
+                receiver = exprGen.genExpr(function.getLocation());
             } else {
                 Invocation invocation = (Invocation) function;
                 opName = invocation.getOperationName();
@@ -265,8 +265,8 @@ public class Application extends AbstractExpressionAST implements CoreAST {
                         .substring(DefDeclaration.GENERIC_PREFIX.length()),
                         inferredType)
                 );
-        ValueType actualArgType = new StructuralType("self", declTypes);
-        Expression newExp = new New(members, "self", actualArgType, null);
+        StructuralType actualArgType = new StructuralType("self", declTypes);
+        Expression newExp = new New(members, actualArgType.getSelfSite(), actualArgType, null);
         args.add(newExp);
     }
 

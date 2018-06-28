@@ -73,6 +73,11 @@ public class ExampleTests {
     }
 
     @Test
+    public void testAlgebra() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.algebra", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
     public void testDatatypes() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.datatypes", Util.stringType(), new StringLiteral("(x => x) unit"));
     }
@@ -80,6 +85,11 @@ public class ExampleTests {
     @Test
     public void testBox() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "introductory.box", Util.intType(), new IntegerLiteral(15));
+    }
+
+    @Test
+    public void testKeys() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.keys", Util.stringType(), new StringLiteral("m1"));
     }
 
     @Test
@@ -115,6 +125,11 @@ public class ExampleTests {
     @Test
     public void testCellClient() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "modules.cellClient", Util.intType(), new IntegerLiteral(7));
+    }
+
+    @Test
+    public void testMaybe() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "introductory.maybe", Util.intType(), new IntegerLiteral(15));
     }
 
     @Test
@@ -204,6 +219,16 @@ public class ExampleTests {
     @Test
     public void testBinarySearchTree() throws ParseException  {
         TestUtil.doTestScriptModularly(PATH, "dataStructures.bsttest", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testMandelbrot() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.mandelbrot", Util.unitType(), Util.unitValue());
+    }
+    
+    @Test
+    public void testJulia() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "rosetta.julia", Util.unitType(), Util.unitValue());
     }
 
     @Test

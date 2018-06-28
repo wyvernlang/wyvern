@@ -25,6 +25,7 @@ import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.FFI;
 import wyvern.target.corewyvernIL.expression.FFIImport;
@@ -120,7 +121,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             ASTNode result = decl.acceptVisitor(this, state);
             newDecls.add((Declaration) result);
         }
-        New result = new New(newDecls, newExpr.getSelfName(), newExpr.getType(), newExpr.getLocation());
+        New result = new New(newDecls, newExpr.getSelfSite(), newExpr.getType(), newExpr.getLocation());
         result.copyMetadata(newExpr);
         return result;
     }
@@ -154,7 +155,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             cases.add((Case) matchCase.acceptVisitor(this, state));
         }
 
-        Match result = new Match(matchExpr, elseExpr, cases);
+        Match result = new Match(matchExpr, elseExpr, cases, match.getType(), match.getLocation());
         result.copyMetadata(match);
         return result;
     }
@@ -279,6 +280,10 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, StringLiteral stringLiteral) {
         return stringLiteral;
+    }
+    
+    public ASTNode visit(PSVState state, CharacterLiteral characterLiteral) {
+        return characterLiteral;
     }
 
     public ASTNode visit(PSVState state, DelegateDeclaration delegateDecl) {

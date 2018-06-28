@@ -29,7 +29,8 @@ public abstract class DeclTypeWithResult extends DeclType {
     }
 
     public ValueType getResultType(View v) {
-        return getRawResultType().adapt(v);
+        ValueType t = getRawResultType(); 
+        return t.adapt(v);
     }
 
 
