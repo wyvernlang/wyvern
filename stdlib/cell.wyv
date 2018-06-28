@@ -1,0 +1,19 @@
+module cell
+
+type SubType
+	val x : Int
+
+type Cell
+	val bool : Boolean
+	val int : Int
+	val str : String
+	val flt : Float
+	val sub : SubType
+
+def make() : Cell = new
+	val bool = true
+	val int = 7
+	val str = "hi"
+	val flt = 1.1
+	val sub = new
+		val x = 8
