@@ -1,18 +1,19 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public class MethodGenContext extends GenContext {
-    private String objectName;
+    private BindingSite objectSite;
     private String methodName;
     private FileLocation loc;
 
-    public MethodGenContext(String methodName, String objectName, GenContext genContext, FileLocation loc) {
+    public MethodGenContext(String methodName, BindingSite objectSite, GenContext genContext, FileLocation loc) {
         super(genContext);
-        this.objectName = objectName;
+        this.objectSite = objectSite;
         this.methodName = methodName;
     }
 
@@ -32,7 +33,7 @@ public class MethodGenContext extends GenContext {
 
     @Override
     public String endToString() {
-        return methodName + " = " + objectName + '.' + methodName +  ", " + getNext().endToString();
+        return methodName + " = " + objectSite + '.' + methodName +  ", " + getNext().endToString();
     }
 
     @Override
@@ -53,7 +54,7 @@ public class MethodGenContext extends GenContext {
     @Override
     public CallableExprGenerator getCallableExprRec(String varName, GenContext origCtx) {
         if (this.methodName.equals(varName)) {
-            return new InvocationExprGenerator(new Variable(objectName), varName, origCtx, loc);
+            return new InvocationExprGenerator(new Variable(objectSite), varName, origCtx, loc);
         } else {
             return getNext().getCallableExprRec(varName, origCtx);
         }
