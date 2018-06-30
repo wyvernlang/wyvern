@@ -5,7 +5,7 @@ option java_package = "wyvern.stdlib.support.backend";
 // x : \tau (used in methods and method types)
 message MethodArgument {
     required string variable = 1;
-    required Type type = 2;
+    required Type type_ = 2;
 }
 
 // Variable declarations are either val or var
@@ -29,7 +29,7 @@ message Bytecode {
         required bool isTypeImport = 2;
         required string platform = 3;
         required string path = 4;
-        required Type type = 5;
+        required Type type_ = 5;
         required string name = 6;
     }
     required Version version = 1;
@@ -41,7 +41,7 @@ message Bytecode {
 // M
 message Module {
     message ValueModule {
-        required Type type = 1;
+        required Type type_ = 1;
         required Expression expression = 2;
     }
     message TypeModule {
@@ -58,20 +58,20 @@ message Module {
 // e
 message Expression {
     message NewExpression {
-        required Type type = 1;
+        required Type type_ = 1;
         required string selfName = 2;
         repeated Declaration declarations = 3;
     }
     message CallExpression {
         required Expression receiver = 1;
         required string method = 2;
-        repeated Expression arguments = 3;
+        repeated Expression arguments_ = 3;
     }
-    message PrimitiveCallExpression {
+    message StaticCallExpression {
         required Expression receiver = 1;
-        required string primitiveType = 2;
+        required string receiverType = 2;
         required string method = 3;
-        repeated Expression arguments = 4;
+        repeated Expression arguments_ = 4;
     }
     message AccessExpression {
         required Expression expression = 1;
@@ -116,7 +116,7 @@ message Expression {
         string variable = 1;
         NewExpression newExpression = 2;
         CallExpression callExpression = 3;
-        PrimitiveCallExpression primitiveCallExpression = 4;
+        StaticCallExpression staticCallExpression = 4;
         AccessExpression accessExpression = 5;
         AssignmentExpression assignmentExpression = 6;
         Literal literal = 7;
@@ -130,12 +130,12 @@ message Declaration {
     message VariableDeclaration {
         required VariableDeclarationType declarationType = 1;
         required string variable = 2;
-        required Type type = 3;
+        required Type type_ = 3;
         required Expression initializer = 4;
     }
     message MethodDeclaration {
         required string methodName = 1;
-        repeated MethodArgument arguments = 2;
+        repeated MethodArgument arguments_ = 2;
         required Type returnType = 3;
         required Expression body = 4;
     }
@@ -153,17 +153,13 @@ message Declaration {
 
 // T
 message TypeDesc {
-    // c
-    message CaseDesc {
-        optional string extends = 1;
-        required Type type = 2;
-    }
     message Tag {
         // Length 0 means extag, otherwise datatag
         repeated string paths = 1;
     }
-    required CaseDesc caseDesc = 1;
-    optional Tag tag = 2;
+    optional string extends_ = 1;
+    required Type type_ = 2;
+    optional Tag tag = 3;
 }
 
 // \tau
@@ -180,7 +176,7 @@ message Type {
         Nothing = 2;
         Dyn = 3;
     }
-    oneof type {
+    oneof type_ {
         CompoundType compoundType = 1;
         string path = 2;
         SimpleType simpleType = 3;
@@ -192,11 +188,11 @@ message DeclType {
     message VariableDeclType {
         required VariableDeclarationType declarationType = 1;
         required string variable = 2;
-        required Type type = 3;
+        required Type type_ = 3;
     }
     message MethodDeclType {
         required string methodName = 1;
-        repeated MethodArgument arguments = 2;
+        repeated MethodArgument arguments_ = 2;
         required Type returnType = 3;
     }
     message DeclTypeDeclaration {

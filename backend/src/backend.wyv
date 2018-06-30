@@ -1,10 +1,11 @@
-require bytecode
 require stdout
 
+import wyvern.BackendSupport
 import wyvern.collections.list
 import wyvern.option
 import wyvern.runtime
 
+import util
 import wyb_ast
 import rename
 import emit_js
@@ -14,10 +15,11 @@ type Option = option.Option
 
 def typeDescFromProtobuf(protobufTypeDesc: Dyn): wyb_ast.TypeDesc
     var ext: Option = option.None[String]()
-    if (protobufTypeDesc.getCaseDesc().hasExtends())
-        ext = option.Some[String](protobufTypeDesc.getCaseDesc().getExtends())
+    if (protobufTypeDesc.hasExtends())
+        ext = option.Some[String](protobufTypeDesc.getExtends())
+    val t = protobufTypeDesc.getType()
     //TODO: tag
-    wyb_ast.TypeDesc(ext, wyb_ast.TTop(), option.None[wyb_ast.Tag]())
+    wyb_ast.TypeDesc(ext, typeFromProtobuf(t), option.None[wyb_ast.Tag]())
 
 def typeFromProtobuf(protobufType: Dyn): wyb_ast.Type
     if (protobufType.hasCompoundType())
@@ -63,7 +65,7 @@ def declarationFromProtobuf(protobufDeclaration: Dyn): wyb_ast.Declaration
         elif (protobufDeclaration.hasMethodDeclaration())
             val md = protobufDeclaration.getMethodDeclaration()
             val mn = md.getMethodName()
-            val al: List[Dyn] = bytecode.dynToList(md.getArgumentsList())
+            val al: List[Dyn] = BackendSupport.dynToList(md.getArgumentsList())
             val args = al.map[wyb_ast.Argument]((a: Dyn) => argumentFromProtobuf(a))
             val rt = typeFromProtobuf(md.getReturnType())
             val body = expressionFromProtobuf(md.getBody())
@@ -83,7 +85,7 @@ def expressionFromProtobuf(protobufExpression: Dyn): wyb_ast.Expression
         elif (protobufExpression.hasLiteral())
             val l = protobufExpression.getLiteral()
             if (l.hasIntegerLiteral())
-                    wyb_ast.IntegerLiteral(bytecode.byteStringToInt(l.getIntegerLiteral()))
+                    wyb_ast.IntegerLiteral(BackendSupport.byteStringToInt(l.getIntegerLiteral()))
                 elif (l.hasStringLiteral())
                     wyb_ast.StringLiteral(l.getStringLiteral())
                 elif (l.hasBooleanLiteral())
@@ -96,27 +98,27 @@ def expressionFromProtobuf(protobufExpression: Dyn): wyb_ast.Expression
             val n = protobufExpression.getNewExpression()
             val t = typeFromProtobuf(n.getType())
             val v = n.getSelfName()
-            val dl: List[Dyn] = bytecode.dynToList(n.getDeclarationsList())
+            val dl: List[Dyn] = BackendSupport.dynToList(n.getDeclarationsList())
             val ds = dl.map[wyb_ast.Declaration]((d: Dyn) => declarationFromProtobuf(d))
             wyb_ast.NewExpression(t, v, ds)
         elif (protobufExpression.hasCallExpression())
             val c = protobufExpression.getCallExpression()
             val receiver = expressionFromProtobuf(c.getReceiver())
             val method = c.getMethod()
-            val al: List[Dyn] = bytecode.dynToList(c.getArgumentsList())
+            val al: List[Dyn] = BackendSupport.dynToList(c.getArgumentsList())
             val arguments = al.map[wyb_ast.Expression]((e: Dyn) => expressionFromProtobuf(e))
             wyb_ast.CallExpression(receiver, method, arguments)
-        elif (protobufExpression.hasPrimitiveCallExpression())
-            val pc = protobufExpression.getPrimitiveCallExpression()
-            val receiver = expressionFromProtobuf(pc.getReceiver())
-            val method = pc.getMethod()
-            val primitiveType = pc.getPrimitiveType()
-            val al: List[Dyn] = bytecode.dynToList(pc.getArgumentsList())
+        elif (protobufExpression.hasStaticCallExpression())
+            val sc = protobufExpression.getStaticCallExpression()
+            val receiver = expressionFromProtobuf(sc.getReceiver())
+            val method = sc.getMethod()
+            val receiverType = sc.getReceiverType()
+            val al: List[Dyn] = BackendSupport.dynToList(sc.getArgumentsList())
             val arguments = al.map[wyb_ast.Expression]((e: Dyn) => expressionFromProtobuf(e))
-            wyb_ast.PrimitiveCallExpression(receiver, primitiveType, method, arguments)
+            wyb_ast.StaticCallExpression(receiver, receiverType, method, arguments)
         elif (protobufExpression.hasSequenceExpression())
             val se = protobufExpression.getSequenceExpression()
-            val sl: List[Dyn] = bytecode.dynToList(se.getStatementsList())
+            val sl: List[Dyn] = BackendSupport.dynToList(se.getStatementsList())
             val statements = sl.map[wyb_ast.Statement]((s: Dyn) => statementFromProtobuf(s))
             wyb_ast.SequenceExpression(statements)
         elif (protobufExpression.hasMatchExpression())
@@ -125,7 +127,7 @@ def expressionFromProtobuf(protobufExpression: Dyn): wyb_ast.Expression
             var elseClause: Option[wyb_ast.Expression] = option.None[wyb_ast.Expression]()
             if (me.hasElse())
                 elseClause = option.Some(expressionFromProtobuf(me.getElse()))
-            val ml: List[Dyn] = bytecode.dynToList(me.getArmsList())
+            val ml: List[Dyn] = BackendSupport.dynToList(me.getArmsList())
             val arms = ml.map[wyb_ast.MatchArm]((s: Dyn) => matchArmFromProtobuf(s))
             wyb_ast.MatchExpression(e, arms, elseClause)
         elif (protobufExpression.hasAccessExpression())
@@ -149,13 +151,36 @@ def matchArmFromProtobuf(protobufMatchArm: Dyn): wyb_ast.MatchArm
     val e = expressionFromProtobuf(protobufMatchArm.getExpression())
     wyb_ast.MatchArm(v, p, e)
 
-
-val wyb = bytecode.loadBytecode("../examples/keys.wyb")
-val expression = wyb.getModules(0).getValueModule().getExpression()
-
-def compile(e: wyb_ast.Expression): String
+def compileExpression(e: wyb_ast.Expression): String
     val r = rename.visitExpression(e)
     emit_js.visitExpression(r)
 
-val e = expressionFromProtobuf(expression)
-stdout.print(compile(e))
+
+def compile(wyb: Dyn): Unit
+    stdout.print("const FFI_JAVA_PLATFORM_STUB = require(process.env.WYVERN_HOME + \"/backend/stdlib/support/hack_java_ffi\");\n")
+    def importLoop(i: Int, c: Int): Unit
+        if (i < c)
+            val imp = wyb.getImports(i)
+            val p: String = imp.getPath()
+            val n: String = imp.getName()
+            // Undesirable coupling with rename?
+            stdout.print("const " + rename.renameVariable("FFI_" + n) + " = require(process.env.WYVERN_HOME + \"/backend/" + util.replace(p, ".", "/") + "\");")
+            stdout.println()
+            importLoop(i + 1, c)
+    val c: Int = wyb.getImportsCount()
+    importLoop(0, c)
+
+    def moduleLoop(i: Int): Unit
+        val m = wyb.getModules(i)
+        val e = expressionFromProtobuf(m.getValueModule().getExpression())
+        val p = "MOD$" + m.getPath()
+        // Undesirable coupling with rename?
+        stdout.print("let " + rename.renameVariable(p) + " = " + compileExpression(e) + ";")
+        if (i > 0)
+            moduleLoop(i - 1)
+    val m: Int = wyb.getModulesCount()
+    moduleLoop(m - 1)
+
+val filename = BackendSupport.getFirstCommandLineArg()
+val wyb = BackendSupport.loadBytecode(filename)
+compile(wyb)

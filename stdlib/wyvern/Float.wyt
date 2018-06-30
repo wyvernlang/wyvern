@@ -1,0 +1,3 @@
+type Float
+  def from(str: String): Float
+  def ofInt(i : Int) : Float
