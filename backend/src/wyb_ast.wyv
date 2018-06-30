@@ -74,7 +74,7 @@ resource datatype Expression
     BooleanLiteral(b: Boolean)
     NewExpression(t: Type, thisVariable: String, declarations: List[Declaration])
     CallExpression(receiver: Expression, method: String, arguments: List[Expression])
-    PrimitiveCallExpression(receiver: Expression, primitiveType: String, method: String, arguments: List[Expression])
+    StaticCallExpression(receiver: Expression, receiverType: String, method: String, arguments: List[Expression])
     SequenceExpression(statements: List[Statement])
     MatchExpression(e: Expression, arms: List[MatchArm], elseClause: Option[Expression])
     AccessExpression(e: Expression, field: String)

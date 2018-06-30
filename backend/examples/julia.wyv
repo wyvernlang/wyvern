@@ -1,25 +1,7 @@
-// Prelude
-
-def doif(condition : Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) : Dyn
-  condition.ifTrue(() => tt.apply(), () => ff.apply())
-
-def doifblk(condition : Boolean, block:IfTSL.Blocks) : Dyn
-  condition.ifTrue(() => block.evalTrue(), () => block.evalFalse())
-
-val ifelseARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => doif(cond, tt, ff)
-val if = (cond:Boolean, blocks:IfTSL.Blocks) => doifblk(cond, blocks)
-
-// stub, overridden by js backend
-def print(x: Dyn): Unit
-    unit
-
-def println(): Unit
-    print("\n")
-
-// End prelude
+require stdout
 
 def iterate(a_z : Float, b_z : Float, a : Float, b : Float, c : Int) : String
-    if (c > 200)
+    if (c > 100)
             " "
         elif ((a_z*a_z - b_z*b_z + a)*(a_z*a_z - b_z*b_z + a) + (2.0*a_z*b_z + b)*(2.0*a_z*b_z + b) > 2.0)
             encode(c)
@@ -42,7 +24,7 @@ def iterateComplex(a0 : Float, b0 : Float, currComplex : Float) : Unit
     if (currComplex > -1.0)
             iterComplexAux(a0, b0, currComplex)
         else
-            print("")
+            stdout.print("")
 
 def iterComplexAux(a0 : Float, b0 : Float, currComplex : Float) : Unit
     iterateReal(a0, b0, currComplex, -1.7)
@@ -52,15 +34,15 @@ def iterateReal(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) :
     if (currReal < 1.7)
             iterRealAux(a0, b0, currComplex, currReal)
         else
-            println()
+            stdout.println()
 
 def iterRealAux(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
-    print(iterate(currReal, currComplex, a0, b0, 0))
+    stdout.print(iterate(currReal, currComplex, a0, b0, 0))
     iterateReal(a0, b0, currComplex, currReal + 0.02)
 
 def julia(a0 : Float, b0 : Float) : Unit
     iterateComplex(a0, b0, 1.0)
 
 julia(-1.0, 0.0)
-println()
+stdout.println()
 julia(0.26, 0.0)

@@ -6,16 +6,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
-import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.tools.errors.ToolError;
 
 public final class BytecodeCompiler {
     private BytecodeCompiler() { }
+    private static ArrayList<BytecodeOuterClass.Bytecode.Import> javascriptFFIImports = new ArrayList<>();
+
+    public static ArrayList<BytecodeOuterClass.Bytecode.Import> getJavascriptFFIImports() {
+        return javascriptFFIImports;
+    }
+
     /**
      * The bytecode compiler only supports 1 argument, which is the path to the Wyvern
      * file. If more arguments are supplied, it will exit with an error. Then,
@@ -56,33 +61,16 @@ public final class BytecodeCompiler {
                 System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
                 return;
             }
-            final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, rootDir, new File(wyvernPath));
+            final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVASCRIPT, rootDir, new File(wyvernPath));
             Module m = state.getResolver().load("unknown", filepath.toFile(), true);
-            IExpr program = m.getExpression();
 
-            try {
-                System.out.print(((Expression) program).prettyPrint());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println();
-
-            BytecodeOuterClass.Expression e = ((Expression) program).emitBytecode();
-            BytecodeOuterClass.Type topType = BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Top).build();
-            BytecodeOuterClass.Module.ValueModule v = BytecodeOuterClass.Module.ValueModule.newBuilder()
-                    .setType(m.getSpec().getType().emitBytecodeType())
-                    .setExpression(e).build();
-
-            BytecodeOuterClass.Bytecode.Builder builder = BytecodeOuterClass.Bytecode.newBuilder();
+            BytecodeOuterClass.Bytecode wyb = state.getResolver().emitBytecode(m, m.getDependencies());
 
             // Good enough
             String outputFile = filename.replace(".wyv", ".wyb");
 
             try {
-                builder.setVersion(BytecodeOuterClass.Bytecode.Version.newBuilder().setMagic(42).setMajor(0).setMinor(1).build())
-                        .setPath("com.test")
-                        .addModules(BytecodeOuterClass.Module.newBuilder().setPath("out").setValueModule(v).build()).build()
-                        .writeTo(new FileOutputStream(outputFile));
+                wyb.writeTo(new FileOutputStream(outputFile));
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

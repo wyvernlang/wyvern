@@ -3,7 +3,6 @@ module emit_js
 import wyvern.collections.list
 import wyvern.option
 import wyvern.String
-import platform.java.debug
 
 import wyb_ast
 import util
@@ -12,35 +11,38 @@ type Option = option.Option
 type List = list.List
 
 def visitTypeDeclaration(td: wyb_ast.TypeDeclaration): String
-    val defn = td.name + " = function() {};"
-    if (td.typeDesc.tdExtends.isDefined)
-            td.name + " = function() { var " + defn + "\n" + td.name + ".prototype = new " + util.unwrap[String](td.typeDesc.tdExtends) + "(); return " + td.name + ";}()"
+    val path: Option = match td.typeDesc.t:
+        tp: wyb_ast.TypePath => option.Some[String](tp.path)
+        default => option.None[String]()
+    var namedLocalPath: Boolean = false
+    if (path.isDefined )
+            val p = util.unwrap[String](path) 
+            val s = util.split(p, ".")
+            val f = util.unwrap[String](s.get(0))
+            if (!(f == "system"))
+                namedLocalPath = true
+    if (namedLocalPath)
+            td.name + " = " + util.unwrap[String](path)
         else
-            defn
+            val defn = td.name + " = function() {};"
+            if (td.typeDesc.tdExtends.isDefined)
+                    td.name + " = function() { let " + defn + "\n" + td.name + ".prototype = new " + util.unwrap[String](td.typeDesc.tdExtends) + "(); return " + td.name + ";}()"
+                else
+                    defn
 
 def visitDeclaration(d: wyb_ast.Declaration): String = match d:
     vd: wyb_ast.VariableDeclaration => vd.variable + " = " + visitExpression(vd.initializer) + ";"
     md: wyb_ast.MethodDeclaration => md.methodName + "= function(" + util.join(md.arguments.map[String](a => a.variable), ",")+ ") { return "  + visitExpression(md.body) + ";}" + "\n"
     td: wyb_ast.TypeDeclaration => visitTypeDeclaration(td)
 
-def visitStatement(s : wyb_ast.Statement): String = match s:
-    e: wyb_ast.E => visitExpression(e.expression)
-    d: wyb_ast.D => "var " + visitDeclaration(d.declaration)
-
 def ifTrue(cond: wyb_ast.Expression, trueArm: wyb_ast.Expression, falseArm: wyb_ast.Expression): String
     val c = visitExpression(cond)
     val t = visitExpression(trueArm)
     val f = visitExpression(falseArm)
-    // HACK: hard codes calling ._apply(), dependent on rename pass
-    "(function() { if (" + c + ") { return " + t + "._apply(); } else { return " + f + "._apply(); } })()"
+    "(function() { if (" + c + ") { return " + t + ".apply(); } else { return " + f + ".apply(); } })()"
 
 def visitCallExpression(c: wyb_ast.CallExpression): String
-    // HACK: hard codes looking for _print, dependent on rename pass
-    if (c.method == "_print")
-            val e = util.unwrap[wyb_ast.Expression](c.arguments.get(0))
-            "process.stdout.write(\"\"+" + visitExpression(e) + ")"
-        else
-            visitExpression(c.receiver) + "." + c.method + "(" + util.join(c.arguments.map[String](e => visitExpression(e)), ",") + ")"
+    visitExpression(c.receiver) + "." + c.method + "(" + util.join(c.arguments.map[String](e => visitExpression(e)), ",") + ")"
 
 
 // is this the best way to get the tag information off something that's
@@ -52,22 +54,37 @@ def newTypeExtends(nt: wyb_ast.Type): Option = match nt:
 
 def visitNewExpression(n: wyb_ast.NewExpression): String
     val ext = newTypeExtends(n.t)
-    val c = "function() {\nvar " + n.thisVariable + " = this; " + util.join(n.declarations.map[String](e => n.thisVariable + "." + visitDeclaration(e)), "\n") + "}"
+    val c = "function() {\nlet " + n.thisVariable + " = this; " + util.join(n.declarations.map[String](e => n.thisVariable + "." + visitDeclaration(e)), "\n") + "}"
     if (ext.isDefined)
             val e = util.unwrap[String](ext)
-            "new (function() { var c = " + c + "; c.prototype = new " + e + "(); return c;}())()"
+            "new (function() { let c = " + c + "; c.prototype = new " + e + "(); return c;}())()"
         else
             "new (" + c + ")()"
 
+def visitStatement(s : wyb_ast.Statement): String = match s:
+    e: wyb_ast.E => visitExpression(e.expression)
+    d: wyb_ast.D => "{ let " + visitDeclaration(d.declaration)
+
 def sequenceExpression(s: wyb_ast.SequenceExpression): String
-    def loop(statements: List[wyb_ast.Statement], i: Int, acc: String): String
-        val s = util.unwrap[wyb_ast.Statement](statements.get(i))
-        if (i > statements.length() - 2)
-                acc + "; return " + visitStatement(s) + ";"
+    def repeat(x: String, i: Int, acc: String): String
+        if (i == 0)
+                acc
             else
-                loop(statements, i + 1, acc + ";" + visitStatement(s))
+                repeat(x, i - 1, acc + x)
+    def loop(statements: List[wyb_ast.Statement], i: Int, lets: Int, acc: String): String
+        val s = util.unwrap[wyb_ast.Statement](statements.get(i))
+        val isLet = match s:
+            e: wyb_ast.E => 0
+            d: wyb_ast.D => 1
+        if (i > statements.length() - 2)
+                val return = match s:
+                    e: wyb_ast.E => "return "
+                    d: wyb_ast.D => ""
+                acc + "; " + return + visitStatement(s) + ";" + repeat("}", lets + isLet, "")
+            else
+                loop(statements, i + 1, lets + isLet, acc + ";" + visitStatement(s))
     assert s.statements.length() > 0
-    "(function(){" + loop(s.statements, 0, "") + "})()"
+    "(function(){" + loop(s.statements, 0, 0, "") + "})()"
 
 def unescape(s: String): String
     def loop(s: String, acc: String): String
@@ -87,6 +104,8 @@ def unescape(s: String): String
                 loop(s.substring(1, s.length()), acc + "\\r")
             elif (s.substring(0, 1) == "\t")
                 loop(s.substring(1, s.length()), acc + "\\t")
+            elif (s.substring(0, 1) == "\\")
+                loop(s.substring(1, s.length()), acc + "\\\\")
             else
                 loop(s.substring(1, s.length()), acc + s.substring(0, 1))
     loop(s, "")
@@ -100,20 +119,21 @@ def booleanToString(x: Boolean): String
 def isBinOp(m: String): Boolean
     m == '+' || m == '-' || m == '<' || m == '==' || m == '*' || m == '>' || m == '&&' || m == '||' || m == '/' || m == '%'
 
-// TODO: floor
-def visitPrimitiveCallExpression(e: wyb_ast.PrimitiveCallExpression): String
+def visitStaticCallExpression(e: wyb_ast.StaticCallExpression): String
     val op = e.method
     if (op == "negate")
             assert e.arguments.length() == 0
             "(-(" + visitExpression(e.receiver) + "))"
         elif (op == "!")
             assert e.arguments.length() == 0
-            "(-(" + visitExpression(e.receiver) + "))"
+            "(!(" + visitExpression(e.receiver) + "))"
         elif (op == "length")
             assert e.arguments.length() == 0
             "(" + visitExpression(e.receiver) + ").length"
         elif (op == "charAt" || op == "substring" || op == "concat")
             visitExpression(wyb_ast.CallExpression(e.receiver, op, e.arguments))
+        elif (op == "floor")
+            "Math.floor(" + visitExpression(e.receiver) + ")"
         elif (op == "ifTrue")
             val t = util.unwrap[wyb_ast.Expression](e.arguments.get(0))
             val f = util.unwrap[wyb_ast.Expression](e.arguments.get(1))
@@ -123,8 +143,7 @@ def visitPrimitiveCallExpression(e: wyb_ast.PrimitiveCallExpression): String
             val rhs = util.unwrap[wyb_ast.Expression](e.arguments.get(0))
             "(" + visitExpression(lhs) + ") " + op + " (" +  visitExpression(rhs) + ")"
         else
-            runtime.fail("visited unrecognized primitive op '" + op + "'in emit_js")
-            runtime.fail("visited unrecognized primitive op in emit_js")
+            runtime.fail("visited unrecognized static op '" + op + "' in emit_js")
 
 
 def visitExpression(e: wyb_ast.Expression): String = match e:
@@ -136,14 +155,16 @@ def visitExpression(e: wyb_ast.Expression): String = match e:
     n: wyb_ast.NewExpression => visitNewExpression(n)
     c: wyb_ast.CallExpression => visitCallExpression(c)
     s: wyb_ast.SequenceExpression => sequenceExpression(s)
-    poe: wyb_ast.PrimitiveCallExpression => visitPrimitiveCallExpression(poe)
-    me: wyb_ast.MatchExpression =>  "(function() { var e = " + visitExpression(me.e) +";" + visitMatchBody(me.arms, me.elseClause) + "})()"
+    poe: wyb_ast.StaticCallExpression => visitStaticCallExpression(poe)
+    me: wyb_ast.MatchExpression =>  "(function() { let __match = " + visitExpression(me.e) +";" + visitMatchBody(me.arms, me.elseClause) + "})()"
     ae: wyb_ast.AccessExpression => "(" + visitExpression(ae.e) + ")" + "." + ae.field
     ae: wyb_ast.AssignmentExpression => "(" + visitExpression(ae.e) + ")" + "." + ae.field + " = " + visitExpression(ae.v)
 
 def visitMatchBody(arms: List[wyb_ast.MatchArm], elseClause: Option[wyb_ast.Expression]): String
     var elseString: String = ""
     if (elseClause.isDefined)
-        elseString = "else { return " + visitExpression(util.unwrap[wyb_ast.Expression](elseClause)) + ";}"
-    util.join(arms.map[String](a => "if (e instanceof " + a.path + ") { var " + a.variable + " = e; return " + visitExpression(a.e) + ";}"), " else ") + elseString
+            elseString = "else { return " + visitExpression(util.unwrap[wyb_ast.Expression](elseClause)) + ";}"
+        else
+            elseString = "else { throw \"fell through match without else\"; }"
+    util.join(arms.map[String](a => "if (__match instanceof " + a.path + ") { let " + a.variable + " = __match; return " + visitExpression(a.e) + ";}"), " else ") + elseString
 

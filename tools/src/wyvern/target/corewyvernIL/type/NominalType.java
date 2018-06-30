@@ -157,7 +157,15 @@ public class NominalType extends ValueType {
 
     @Override
     public BytecodeOuterClass.Type emitBytecodeType() {
-        return BytecodeOuterClass.Type.newBuilder().setPath(getPath() + "." + getTypeMember()).build();
+        NominalType topType = new NominalType("system", "Unit");
+        NominalType dynType = new NominalType("system", "Dyn");
+        if (equals(topType)) {
+            return BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Top).build();
+        } else if (equals(dynType)) {
+            return BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Dyn).build();
+        } else {
+            return BytecodeOuterClass.Type.newBuilder().setPath(getPath() + "." + getTypeMember()).build();
+        }
     }
 
     @Override

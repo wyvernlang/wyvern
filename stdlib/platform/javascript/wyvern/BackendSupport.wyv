@@ -1,0 +1,27 @@
+module BackendSupport
+
+import wyvern.collections.list
+
+import javascript:stdlib.support.jsinterop
+import javascript:stdlib.support.bytecode
+
+type List = list.List
+
+def dynToList(l: Dyn): List
+    def loop(i: Int, len: Int, acc: List): List
+        if (i < len)
+                val e: Dyn = jsinterop.index(l, i)
+                acc.append(e)
+                loop(i + 1, len, acc)
+            else
+                acc
+    loop(0, jsinterop.length(l), list.make[Dyn]())
+
+def loadBytecode(path: String): Dyn
+    bytecode.loadBytecode(path)
+
+def byteStringToInt(x: Dyn): Int
+    jsinterop.bufferToInteger(x)
+
+def getFirstCommandLineArg(): String
+    jsinterop.getFirstCommandLineArg()

@@ -1,6 +1,7 @@
 package wyvern.stdlib.support.backend;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.CodedInputStream;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,7 +13,9 @@ public class BytecodeWrapper {
     public Object loadBytecode(String filename) {
         BytecodeOuterClass.Bytecode bytecode = null;
         try {
-            bytecode =  BytecodeOuterClass.Bytecode.parseFrom(new FileInputStream(filename));
+            CodedInputStream inputStream = CodedInputStream.newInstance(new FileInputStream(filename));
+            inputStream.setRecursionLimit(3000);
+            bytecode =  BytecodeOuterClass.Bytecode.parseFrom(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
