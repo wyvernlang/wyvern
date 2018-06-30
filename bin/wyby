@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# this is the command-line Wyvern interpreter
+
+# portions of this script are adapted from the ant script
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+# get the wyvern home directory
+PRG="$BASH_SOURCE"
+WYVERN_HOME=`dirname "$PRG"`/..
+
+# make it fully qualified
+WYVERN_HOME=`cd "$WYVERN_HOME" > /dev/null && pwd`
+CP_HOME="$WYVERN_HOME"
+
+# for cygwin, convert the classpath home directory to Windows form
+if $cygwin ; then
+  CP_HOME=`cygpath --windows "$CP_HOME"`
+  WYV_CLASSPATH="$CP_HOME/tools/build;$CP_HOME/tools/bin;$CP_HOME/tools/lib/CopperRuntime.jar;$CP_HOME/tools/lib/asm-debug-all-5.0.1.jar;$CP_HOME/tools/lib/junit-4.11.jar;$CP_HOME/tools/lib/protobuf-java-3.5.1.jar"
+else
+  WYV_CLASSPATH="$CP_HOME/tools/build:$CP_HOME/tools/bin:$CP_HOME/tools/lib/CopperRuntime.jar:$CP_HOME/tools/lib/asm-debug-all-5.0.1.jar:$CP_HOME/tools/lib/junit-4.11.jar:$CP_HOME/tools/lib/protobuf-java-3.5.1.jar"
+fi
+
+export WYVERN_HOME="$CP_HOME"
+# echo $CP_HOME
+# echo $WYV_CLASSPATH
+
+
+java -cp "$WYV_CLASSPATH" wyvern.tools.BytecodeCompiler $*

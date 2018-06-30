@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
@@ -78,6 +79,11 @@ public class Variable extends Expression implements Path {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append(name);
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        return BytecodeOuterClass.Expression.newBuilder().setVariable(name).build();
     }
 
     public String getName() {

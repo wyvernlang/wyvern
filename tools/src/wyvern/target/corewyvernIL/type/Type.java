@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.support.FailureReason;
@@ -31,6 +32,12 @@ public abstract class Type extends ASTNode implements IASTNode {
      * Checks if this type is well-formed, throwing an exception if not
      */
     public abstract void checkWellFormed(TypeContext ctx);
+
+    public BytecodeOuterClass.TypeDesc emitBytecodeTypeDesc() {
+
+        System.out.println("emitBytecode not implemented for " + this.getClass().getName());
+        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+    }
 
     // TODO: depth limit is hacky, find a more principled approach to avoidance
     public abstract Type doAvoid(String varName, TypeContext ctx, int depth);

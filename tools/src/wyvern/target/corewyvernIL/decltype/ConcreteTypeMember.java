@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.decltype;
 
 import java.io.IOException;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -110,6 +111,18 @@ public class ConcreteTypeMember extends DeclTypeWithResult implements DefinedTyp
         dest.append(indent).append("type ").append(getName()).append(" = ");
         getSourceType().doPrettyPrint(dest, indent);
         dest.append('\n');
+    }
+
+    @Override
+    public BytecodeOuterClass.DeclType emitBytecode() {
+
+        BytecodeOuterClass.TypeDesc td = getSourceType().emitBytecodeTypeDesc();
+
+        // TODO: serialize metadata
+        BytecodeOuterClass.DeclType.DeclTypeDeclaration.Builder dt = BytecodeOuterClass.DeclType.DeclTypeDeclaration.newBuilder().setName(getName())
+                .setTypeDesc(td);
+
+        return BytecodeOuterClass.DeclType.newBuilder().setDeclTypeDeclaration(dt).build();
     }
 
     @Override

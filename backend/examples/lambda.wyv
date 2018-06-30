@@ -1,0 +1,332 @@
+// Prelude
+
+def doif(condition : Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) : Dyn
+  condition.ifTrue(() => tt.apply(), () => ff.apply())
+
+def doifblk(condition : Boolean, block:IfTSL.Blocks) : Dyn
+  condition.ifTrue(() => block.evalTrue(), () => block.evalFalse())
+
+val ifelseARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => doif(cond, tt, ff)
+val if = (cond:Boolean, blocks:IfTSL.Blocks) => doifblk(cond, blocks)
+
+// stub, overridden by js backend
+def print(x: Dyn): Unit
+    unit
+
+def println(): Unit
+    print("\n")
+
+// End prelude
+
+type Option
+    type T
+    def map[U](f:this.T -> U):Option[U] // T -> U is a resource function type (as opposed to non-resource/pure with =>)
+    def flatMap[U](f:this.T -> Option[U]):Option[U]
+    def getOrElse(x1:Unit -> this.T):this.T
+    def orElse(x:Unit -> Option[this.T]):Option[this.T]
+    val isDefined:Boolean
+
+def Some[T](x:T):Option[T] = new
+    type T = T
+    def map[U](f:T -> U):Option[U] = Some[U](f(x))
+    def flatMap[U](f:T -> Option[U]):Option[U] = f(x)
+    def getOrElse(defaultValue:Unit -> T):T = x
+    val value:T = x
+    def orElse(x:Unit -> Option[T]):Option[T] = this
+    val isDefined:Boolean = true
+
+def None[T]():Option[T] = new
+    type T = T
+    def map[U](f:T -> U):Option[U] = None[U]()
+    def flatMap[U](f:T -> Option[U]):Option[U] = None[U]()
+    def getOrElse(defaultValue:Unit -> T):T = defaultValue()
+    def orElse(x:Unit -> Option[T]):Option[T] = x()
+    val isDefined:Boolean = false
+
+resource type List
+    type E
+    def append(e:this.E):Unit
+    def appendAll(other:List[this.E]):Unit
+    def find(pred:this.E -> Boolean):Option[this.E]
+    def length():Int
+    def get(n:Int):Option[this.E]
+    /** Removes the n'th element from the List; indexing starts with 0.
+     *  Returns true if the removal succeeded (i.e. if n was in range) */
+    def remove(n:Int):Boolean
+    def do(f:this.E -> Unit):Unit
+    def map[F](f:this.E -> F):List[F] // functional map
+
+
+def makeList[E]():List[E]
+    resource type Cell
+        var element:E
+        var next:Option[Cell]
+        def find(pred:E -> Boolean):Option[E]
+        def get(n:Int):Option[E]
+        def getCell(n:Int):Option[Cell]
+        def do(f:E -> Unit):Unit
+    def makeCell(e:E, n:Option):Cell = new (self) =>
+        var element:E = e
+        var next:Option[Cell] = n
+        def find(pred:E -> Boolean):Option[E]
+            pred(self.element).ifTrue(
+                () => Some[E](self.element),
+                () => self.next.flatMap[E]((c:Cell) => c.find(pred)))
+        def get(n:Int):Option[E]
+            (n == 0).ifTrue(
+                () => Some[E](self.element),
+                () => self.next.flatMap[E]((c:Cell) => c.get(n-1)))
+        def getCell(n:Int):Option[Cell]
+            (n == 0).ifTrue(
+                () => Some[Cell](self),
+                () => self.next.flatMap[Cell]((c:Cell) => c.getCell(n-1)))
+        def do(f:E -> Unit):Unit
+            f(self.element)
+            self.next.map[Unit](c:Cell => c.do(f))
+    def makeOneCell(e:E):Cell = makeCell(e, None[E]())
+    new (self) =>
+        type E = E
+        var first:Option[Cell] = None[Cell]()
+        var last:Option[Cell] = None[Cell]()
+        var size:Int = 0
+        def append(e:self.E):Unit
+            def thenCase():Unit
+                val cell = makeOneCell(e)
+                self.last.map[Unit](c:Cell => c.next = Some[Cell](cell))
+                self.last = Some[Cell](cell)
+            def elseCase():Unit
+                self.first = Some[Cell](makeOneCell(e))
+                self.last = self.first
+            self.first.isDefined.ifTrue(() => thenCase(), () => elseCase())
+            /*IfTSL.doif(self.first.isDefined, ~)
+              then
+                val cell = makeOneCell(e)
+                self.last.map[Unit](c:Cell => c.next = Some[Cell](cell))
+                self.last = Some[Cell](cell)
+              else
+                self.first = Some[Cell](makeOneCell(e))
+                self.last = self.first*/
+            self.size = self.size + 1
+        def appendAll(other:List[self.E]):Unit
+            other.do(e:self.E => self.append(e))
+        def find(pred:self.E -> Boolean):Option[E]
+            self.first.flatMap[E](c:Cell => c.find(pred))
+        def length():Int = self.size
+        def get(n:Int):Option[E] = self.first.flatMap[E](c:Cell => c.get(n))
+        def remove(n:Int):Boolean
+            def definitelyRemove():Boolean
+                var lastCell:Option[Cell] = None[Cell]()
+                def removeInMiddle():Unit
+                    val cellBefore = self.first.flatMap[Cell](c:Cell => c.getCell(n-1))
+                    cellBefore.map[Unit](c:Cell => c.next = c.next.flatMap[Cell](c2:Cell => c2.next))
+                    lastCell = cellBefore
+                (n == 0).ifTrue(
+                    () => self.first = self.first.flatMap[Cell](c:Cell => c.next),
+                    () => removeInMiddle()
+                )
+                (n == self.size - 1).ifTrue(
+                    () => self.last = lastCell,
+                    () => unit
+                )
+                self.size = self.size - 1
+                true
+            (n > self.size-1 || n < 0).ifTrue(
+                () => false,
+                () => definitelyRemove()
+            )
+        def do(f:E -> Unit):Unit = self.first.map[Unit](c:Cell => c.do(f))
+        def map[F](f:self.E -> F):List[F]
+            val newList:List[F] = makeList[F]()
+            self.do(e => newList.append(f(e)))
+            newList
+
+datatype Term
+    Var(name : String)
+    Lambda(v: String, body: Term)
+    Apply(left: Term, right: Term)
+
+
+def compileTerm(term : Term): String = match term:
+    v: Var => v.name
+    l: Lambda => "function(" + l.v + ") { return " + compileTerm(l.body) + "}"
+    a: Apply => compileTerm(a.left) + "(" + compileTerm(a.right) + ")"
+
+datatype Statement
+    Define(name: String, term: Term)
+    Print(term: Term)
+
+def compileStatement(s : Statement): String = match s:
+    d: Define => d.name + " = " + compileTerm(d.term)
+    p: Print => "console.log(function(n) { return n(function(x) { return x + 1 })(0)}(" + compileTerm(p.term) + "))"
+
+// Only strips spaces
+def lstrip(s : String) : String
+    if (s.length() == 0)
+            ""
+        elif (s.substring(0, 1) == " ")
+                lstrip(s.substring(1, s.length()))
+        else
+            s
+
+// Poor man's enum
+val EOF = 0
+val LPAREN = 1
+val RPAREN = 2
+val LAMBDA = 3
+val VAR = 4
+
+resource type Lexer
+    var input: String
+    def next(t: Int): Boolean
+    def skip(t: Int): Boolean
+    def token(t: Int): String
+
+type Chomp
+    val token : String
+    val tokType : Int
+    val rest : String
+
+def makeChomp(t : String, tt : Int, r : String): Chomp = new
+    val token = t
+    val tokType = tt
+    val rest = r
+
+def isLetter(s : String): Boolean
+    // No <=
+    ("@" < s && s < "[") || ("`" < s && s < "{")
+
+// Assumes vars are [A-z]+
+def findVarEnd(s : String) : Int
+    if (s.length() == 0)
+            0
+        else
+            val c = s.substring(0, 1)
+            if (isLetter(c))
+                    1 + findVarEnd(s.substring(1, s.length()))
+                else
+                    0
+
+def chompToken(string : String) : Chomp
+    val s = lstrip(string)
+    // No else if
+    if (s.length() == 0)
+            makeChomp("", EOF, "")
+        else
+            val rest = s.substring(1, s.length())
+            if (s.substring(0, 1) == "/")
+                    makeChomp("/", LAMBDA, rest)
+                elif (s.substring(0, 1) == "(")
+                        makeChomp("(", LPAREN, rest)
+                elif (s.substring(0, 1) == ")")
+                    makeChomp(")", RPAREN, rest)
+                else
+                    val i = findVarEnd(s)
+                    if (i == s.length())
+                            makeChomp(s.substring(0, i), VAR, "")
+                        else
+                            makeChomp(s.substring(0, i), VAR, s.substring(i, s.length()))
+
+def makeLexer(i: String): Lexer = new
+    var input : String = i
+    def next(t: Int): Boolean
+        val chomp = chompToken(this.input)
+        chomp.tokType == t
+    def skip(t: Int): Boolean
+        val chomp = chompToken(this.input)
+        if (chomp.tokType == t)
+            this.input = chomp.rest
+        chomp.tokType == t
+    def token(t: Int): String
+        val chomp = chompToken(this.input)
+        this.input = chomp.rest
+        chomp.token
+
+def parseAtom(lex : Lexer): Option[Term]
+    if (lex.skip(LPAREN))
+            val term = parseTerm(lex)
+            lex.skip(RPAREN)
+            Some(term)
+        elif (lex.next(VAR))
+                val name = lex.token(VAR)
+                Some(Var(name))
+        else
+            None[Term]()
+
+def unwrapTerm(o: Option[Term]): Term
+    o.getOrElse(() => Var("Unwrapped None"))
+
+def parseApplication2(lex : Lexer, lhs : Term): Term
+    val rhs = parseAtom(lex)
+    if (rhs.isDefined)
+            parseApplication2(lex, Apply(lhs, unwrapTerm(rhs)))
+        else
+            lhs
+
+def parseApplication(lex : Lexer) : Term
+    val lhs = parseAtom(lex)
+    // TODO: better error handling
+    parseApplication2(lex, unwrapTerm(lhs))
+
+def parseTerm(lex : Lexer) : Term
+    if (lex.skip(LAMBDA))
+            val name = lex.token(VAR)
+            val term = parseTerm(lex)
+            Lambda(name, term)
+        else
+            parseApplication(lex)
+
+def parseStatement(line : String) : Statement
+    val lexer = makeLexer(line)
+    val command = lexer.token(VAR)
+    if (command == "def")
+            val name = lexer.token(VAR)
+            Define(name, parseTerm(lexer))
+        else
+            Print(parseTerm(lexer))
+
+resource type Program
+    val statements : List[Statement]
+
+def makeProgram(s: List[Statement]): Program = new
+    val statements : List[Statement] = s
+
+def compileAndPrintStatement(statement : Statement): Unit
+    print(compileStatement(statement))
+    println()
+
+def compile(program : Program) : Unit
+    program.statements.do((s : Statement) => compileAndPrintStatement(s))
+
+def testCompile(program : Program) : String
+    var out: String = ""
+    program.statements.do((s : Statement) => out = out + compileStatement(s))
+    out
+
+val l = makeList[Statement]()
+
+l.append(parseStatement("def tru /t /f t"))
+l.append(parseStatement("def fls /t /f f"))
+
+l.append(parseStatement("def pair /f /s /b b f s"))
+l.append(parseStatement("def fst /p p tru"))
+l.append(parseStatement("def snd /p p fls"))
+
+l.append(parseStatement("def Z /s /z z"))
+l.append(parseStatement("def S /n /s /z s (n s z)"))
+
+l.append(parseStatement("def plus /m /n /s /z m s (n s z)"))
+l.append(parseStatement("def times /m /n m (plus n) Z"))
+
+l.append(parseStatement("def zz pair Z Z"))
+l.append(parseStatement("def ss /p pair (snd p) (plus (S(Z)) (snd p))"))
+l.append(parseStatement("def prd /m fst (m ss zz)"))
+l.append(parseStatement("def minus /m /n n prd m"))
+
+l.append(parseStatement("def THREE S(S(S(Z)))"))
+l.append(parseStatement("def FOUR S(THREE)"))
+
+l.append(parseStatement("print plus THREE FOUR"))
+l.append(parseStatement("print times THREE FOUR"))
+l.append(parseStatement("print minus (times THREE FOUR) (plus THREE FOUR)"))
+
+compile(makeProgram(l))

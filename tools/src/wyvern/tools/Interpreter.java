@@ -60,6 +60,7 @@ public final class Interpreter {
             final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, rootDir, new File(wyvernPath));
             Module m = state.getResolver().load("unknown", filepath.toFile(), true);
             IExpr program = m.getExpression();
+
             program = state.getResolver().wrap(program, m.getDependencies());
             program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", Globals.getGenContext(state));
 

@@ -219,7 +219,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token booleanor_t ::= /\|\|/ {: RESULT = token(BOOLEANOR,lexeme); :};
     terminal Token booleannot_t ::= /!/ {: RESULT = token(BOOLEANNOT,lexeme); :};
 
- 	terminal Token shortString_t ::= /(('([^'\n]|\\.|\\O[0-7])*')|("([^"\n]|\\.|\\O[0-7])*"))|(('([^']|\\.)*')|("([^"]|\\.)*"))/ {:
+	terminal Token shortString_t ::= /(('([^'\n\\]|\\.|\\O[0-7])*')|("([^"\n\\]|\\.|\\O[0-7])*"))|(('([^'\\]|\\.)*')|("([^"\\]|\\.)*"))/ {:
  		RESULT = token(STRING_LITERAL, replaceEscapeSequences(lexeme.substring(1,lexeme.length()-1)));
  	:};
  	

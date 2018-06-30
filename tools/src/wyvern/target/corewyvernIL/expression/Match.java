@@ -3,12 +3,14 @@ package wyvern.target.corewyvernIL.expression;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -87,6 +89,27 @@ public class Match extends Expression {
     @Override
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
         return emitILVisitor.visit(state, this);
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.MatchExpression.Builder matchExpression = BytecodeOuterClass.Expression.MatchExpression.newBuilder()
+                .setExpression(matchExpr.emitBytecode());
+
+        if (elseExpr != null) {
+            matchExpression.setElse(elseExpr.emitBytecode());
+        }
+        for (Case c: cases) {
+            NominalType pattern = c.getPattern();
+            String path = pattern.getPath() + "." + pattern.getTypeMember();
+            BytecodeOuterClass.Expression.MatchExpression.MatchArm.Builder arm = BytecodeOuterClass.Expression.MatchExpression.MatchArm.newBuilder()
+                    .setVariable(c.getVarName())
+                    .setPath(path)
+                    .setExpression(c.getBody().emitBytecode());
+
+            matchExpression.addArms(arm);
+        }
+        return BytecodeOuterClass.Expression.newBuilder().setMatchExpression(matchExpression).build();
     }
 
     @Override
