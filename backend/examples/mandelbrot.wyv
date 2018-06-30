@@ -1,0 +1,64 @@
+// Prelude
+
+def doif(condition : Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) : Dyn
+  condition.ifTrue(() => tt.apply(), () => ff.apply())
+
+def doifblk(condition : Boolean, block:IfTSL.Blocks) : Dyn
+  condition.ifTrue(() => block.evalTrue(), () => block.evalFalse())
+
+val ifelseARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => doif(cond, tt, ff)
+val if = (cond:Boolean, blocks:IfTSL.Blocks) => doifblk(cond, blocks)
+
+// stub, overridden by js backend
+def print(x: Dyn): Unit
+    unit
+
+def println(): Unit
+    print("\n")
+
+// End prelude
+
+def iterateMandelbrot(a_z : Float, b_z : Float, a : Float, b : Float, c : Int) : String
+    if (c > 200)
+            " "
+        elif ((a_z*a_z - b_z*b_z + a)*(a_z*a_z - b_z*b_z + a) + (2.0*a_z*b_z + b)*(2.0*a_z*b_z + b) > 2.0)
+            encode(c)
+        else
+            iterateMandelbrot(a_z*a_z - b_z*b_z + a, 2.0*a_z*b_z + b, a, b, c + 1)
+
+def encode(count : Int) : String
+    if (count == 0)
+            "D"
+        elif (count < 10)
+            "C"
+        elif (count < 50)
+            "B"
+        elif (count < 200)
+            "A"
+        else
+            " "
+
+//complex range [-1.0, 1.0] y axis
+//real range    [-2.0, 1.0] x axis
+
+def iterateComplex(currComplex : Float) : Unit
+    if (currComplex > -1.0)
+            iterComplexAux(currComplex)
+        else
+            print("")
+
+def iterComplexAux(currComplex : Float) : Unit
+    iterateReal(currComplex, -1.7)
+    iterateComplex(currComplex - 0.02)
+
+def iterateReal(currComplex : Float, currReal : Float) : Unit
+    if (currReal < 1.0)
+            iterRealAux(currComplex, currReal)
+        else
+            println()
+
+def iterRealAux(currComplex : Float, currReal : Float) : Unit
+    print(iterateMandelbrot(0.0, 0.0, currReal, currComplex, 0))
+    iterateReal(currComplex, currReal + 0.02)
+
+iterateComplex(1.0)

@@ -40,7 +40,7 @@ public class JObject implements FObject {
             Object result = bestMethod.invoke(jObject, argArray);
             return result;
         } else {
-            throw new RuntimeException("no applicable method!");
+            throw new RuntimeException("no applicable method '" + methodName + "'!");
         }
     }
 

@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/CopperRuntime.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/javatuples-1.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/protobuf-java-3.5.1"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

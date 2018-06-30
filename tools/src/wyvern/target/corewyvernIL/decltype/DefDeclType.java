@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
@@ -149,6 +150,16 @@ public class DefDeclType extends DeclTypeWithResult {
         }
         getRawResultType().doPrettyPrint(dest, newIndent);
         dest.append('\n');
+    }
+
+    @Override
+    public BytecodeOuterClass.DeclType emitBytecode() {
+        BytecodeOuterClass.DeclType.MethodDeclType.Builder mdt = BytecodeOuterClass.DeclType.MethodDeclType.newBuilder().setMethodName(getName())
+                .setReturnType(getRawResultType().emitBytecodeType());
+        for (FormalArg arg : getFormalArgs()) {
+            mdt.addArguments(arg.emitBytecode());
+        }
+        return BytecodeOuterClass.DeclType.newBuilder().setMethodDecl(mdt).build();
     }
 
     @Override

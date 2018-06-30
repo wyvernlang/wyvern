@@ -1,0 +1,81 @@
+module wyb_ast
+
+import wyvern.collections.list
+import wyvern.option
+
+type List = list.List
+type Option = option.Option
+
+resource datatype Tag
+    ExTag
+    DataTag(paths: List[String])
+
+resource type TypeDesc
+    val tdExtends: Option[String]
+    val t: Type
+    val tag: Option[Tag]
+
+def TypeDesc(ext: Option[String], ty: Type, ta: Option[Tag]): TypeDesc = new
+    val tdExtends = ext
+    val t = ty
+    val tag = ta
+
+datatype VariableDeclarationType
+    VarDeclaration
+    ValDeclaration
+
+resource datatype DeclType
+    VariableDeclType(declarationType: VariableDeclarationType, variable: String, t: Type)
+    MethodDeclType(methodName: String, arguments: List[Argument], returnType: Type)
+    // TODO: metadata
+    DeclTypeDeclaration(name: String, typeDesc: TypeDesc)
+    // TODO: metadata
+    OpaqueTypeDecl(name: String, stateful: Boolean)
+
+resource datatype Type
+    CompoundType(base: Type, selfName: String, declTypes: List[DeclType], stateful: Boolean)
+    TypePath(path: String)
+    TTop
+    TNothing
+    TDyn
+
+resource type Argument
+    val variable: String
+    val t: Type
+
+def Argument(va: String, ty: Type): Argument = new
+    val variable = va
+    val t = ty
+
+resource datatype Statement
+    E(expression: Expression)
+    D(declaration: Declaration)
+
+resource datatype Declaration
+    VariableDeclaration(declarationType: Int, variable: String, t: Type, initializer: Expression)
+    MethodDeclaration(methodName: String, arguments: List[Argument], returnType: Type, body: Expression)
+    TypeDeclaration(name: String, typeDesc: TypeDesc)
+
+resource type MatchArm
+    val variable: String
+    val path: String
+    val e: Expression
+
+def MatchArm(v: String, p: String, expr: Expression): MatchArm = new
+    val variable: String = v
+    val path: String = p
+    val e: Expression = expr
+
+resource datatype Expression
+    Var(v: String)
+    IntegerLiteral(i: Int)
+    FloatLiteral(f: Float)
+    StringLiteral(s: String)
+    BooleanLiteral(b: Boolean)
+    NewExpression(t: Type, thisVariable: String, declarations: List[Declaration])
+    CallExpression(receiver: Expression, method: String, arguments: List[Expression])
+    PrimitiveCallExpression(receiver: Expression, primitiveType: String, method: String, arguments: List[Expression])
+    SequenceExpression(statements: List[Statement])
+    MatchExpression(e: Expression, arms: List[MatchArm], elseClause: Option[Expression])
+    AccessExpression(e: Expression, field: String)
+    AssignmentExpression(e: Expression, field: String, v: Expression)

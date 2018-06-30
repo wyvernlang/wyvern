@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.decl;
 
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -29,6 +30,11 @@ public abstract class Declaration extends ASTNode implements IASTNode {
 
     /** Returns the name of this declaration, or null if this declaration is not named */
     public abstract String getName();
+
+    public BytecodeOuterClass.Declaration emitBytecode() {
+        System.out.println("emitBytecode not implemented for " + this.getClass().getName());
+        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+    }
 
     public abstract Set<String> getFreeVariables();
 

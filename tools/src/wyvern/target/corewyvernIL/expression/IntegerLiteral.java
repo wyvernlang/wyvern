@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.protobuf.ByteString;
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -57,6 +59,13 @@ public class IntegerLiteral extends Literal implements Invokable {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append(value.toString());
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.Literal.Builder l = BytecodeOuterClass.Expression.Literal.newBuilder()
+                .setIntegerLiteral(ByteString.copyFrom(value.toByteArray()));
+        return BytecodeOuterClass.Expression.newBuilder().setLiteral(l).build();
     }
 
     public int getValue() {

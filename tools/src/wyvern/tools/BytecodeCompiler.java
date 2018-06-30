@@ -1,26 +1,25 @@
 package wyvern.tools;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import wyvern.stdlib.Globals;
-import wyvern.target.corewyvernIL.ASTNode;
-import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
-import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
-import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.tools.errors.ToolError;
 
-public final class Interpreter {
-    private Interpreter() { }
+public final class BytecodeCompiler {
+    private BytecodeCompiler() { }
     /**
-     * The interpreter only supports 1 argument, which is the path to the Wyvern
+     * The bytecode compiler only supports 1 argument, which is the path to the Wyvern
      * file. If more arguments are supplied, it will exit with an error. Then,
-     * the file is read in to memory in it's entirety, before being executed in
+     * the file is read in to memory in it's entirety, before being compiled in
      * an empty context. The resulting value is printed to the screen.
      */
     public static void main(String[] args) {
@@ -35,7 +34,7 @@ public final class Interpreter {
             System.exit(1);
         }
         try {
-            String rootLoc = System.getenv("WYVERN_ROOT");
+            String rootLoc;
             if (wyvernRoot.get() != null) {
                 rootLoc = wyvernRoot.get();
             } else {
@@ -61,18 +60,38 @@ public final class Interpreter {
             Module m = state.getResolver().load("unknown", filepath.toFile(), true);
             IExpr program = m.getExpression();
 
-            program = state.getResolver().wrap(program, m.getDependencies());
-            program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", Globals.getGenContext(state));
+            try {
+                System.out.print(((Expression) program).prettyPrint());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println();
 
-            /*ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(filepath.toFile());
-            GenContext genCtx = Globals.getGenContext(state);
-            Expression program = ast.generateIL(genCtx, null);*/
-            TypeContext ctx = Globals.getStandardTypeContext();
-            program.typecheckNoAvoidance(ctx, null);
-            TailCallVisitor.annotate(program);
-            program.interpret(Globals.getStandardEvalContext());
-        /*} catch (ParseException e) {
-            System.err.println("Parse error: " + e.getMessage());*/
+            BytecodeOuterClass.Expression e = ((Expression) program).emitBytecode();
+            BytecodeOuterClass.Type topType = BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Top).build();
+            BytecodeOuterClass.Module.ValueModule v = BytecodeOuterClass.Module.ValueModule.newBuilder()
+                    .setType(m.getSpec().getType().emitBytecodeType())
+                    .setExpression(e).build();
+
+            BytecodeOuterClass.Bytecode.Builder builder = BytecodeOuterClass.Bytecode.newBuilder();
+
+            // Good enough
+            String outputFile = filename.replace(".wyv", ".wyb");
+
+            try {
+                builder.setVersion(BytecodeOuterClass.Bytecode.Version.newBuilder().setMagic(42).setMajor(0).setMinor(1).build())
+                        .setPath("com.test")
+                        .addModules(BytecodeOuterClass.Module.newBuilder().setPath("out").setValueModule(v).build()).build()
+                        .writeTo(new FileOutputStream(outputFile));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+
+            // Do we need this for bytecode generation?
+            // program = state.getResolver().wrap(program, m.getDependencies());
+            // program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", Globals.getGenContext(state));
+
         } catch (ToolError e) {
             System.err.println(e.getMessage());
         }
@@ -84,3 +103,4 @@ public final class Interpreter {
     // used to set WYVERN_ROOT when called programmatically
     public static final ThreadLocal<String> wyvernRoot = new ThreadLocal<String>();
 }
+

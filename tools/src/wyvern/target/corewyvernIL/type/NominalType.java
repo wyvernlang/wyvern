@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.type;
 import java.io.IOException;
 import java.util.Arrays;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
@@ -152,6 +153,11 @@ public class NominalType extends ValueType {
         } else {
             dest.append(desugared);
         }
+    }
+
+    @Override
+    public BytecodeOuterClass.Type emitBytecodeType() {
+        return BytecodeOuterClass.Type.newBuilder().setPath(getPath() + "." + getTypeMember()).build();
     }
 
     @Override
