@@ -3,12 +3,28 @@ require json
 require dataStructures.hashmap
 import cell
 
-val c2: cell.Cell = cell.make()
+// make a cell object
 val c : cell.Cell = cell.make()
+
+// serialize to JSON and print as JSON
 val jsonfile : json.JSON = json.serializeToJSON(c)
-//stdout.print(jsonfile.toString())
+stdout.print(jsonfile.toString())
 
-json.deserializeFromJSON(jsonfile)
-//json.testCell(c)
+// deserialize JSON object
+val deserialized : cell.Cell = json.deserializeFromJSON(jsonfile)
+stdout.println()
 
+// check preservation of object
+def display(x : cell.Cell) : Unit
+	stdout.printBoolean(x.bool)
+	stdout.println()
+	stdout.printInt(x.int)
+	stdout.println()
+	stdout.print(x.str)
+	stdout.println()
+	stdout.printFloat(x.flt)
+	stdout.println()
+	stdout.printInt(x.sub.x)
+
+display(deserialized)
 stdout.println()

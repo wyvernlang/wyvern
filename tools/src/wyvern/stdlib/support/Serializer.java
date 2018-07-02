@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.support.VarEvalContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -141,7 +142,7 @@ public class Serializer {
 
     ValueType exprType = new StructuralType("this", declTypes);
     ObjectValue top = new ObjectValue(decls, selfSite, exprType, null,
-        FileLocation.UNKNOWN, null);
+        FileLocation.UNKNOWN, new VarEvalContext(selfSite, null, null));
     return top;
   }
 

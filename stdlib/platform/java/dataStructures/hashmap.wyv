@@ -30,3 +30,4 @@ def make[T,S]() : HashMap[T,S]
 			self.hashmap.size()
 		def remove(key : self.U) : self.V
 			self.hashmap.remove(key)
+

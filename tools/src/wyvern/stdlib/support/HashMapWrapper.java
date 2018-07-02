@@ -11,5 +11,4 @@ public class HashMapWrapper {
   public <K, V> Object makeHashMap() {
     return new HashMap<K, V>();
   }
-
 }
