@@ -15,6 +15,3 @@ def serializeToJSON(obj : Dyn) : JSON = new
 
 def deserializeFromJSON(json : JSON) : Dyn
 	serializer.deserializeFromJSON(json.jsonmap)
-
-def testCell(obj : Dyn) : Unit
-	serializer.testCell(obj)

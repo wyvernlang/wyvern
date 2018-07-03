@@ -20,10 +20,12 @@ import wyvern.target.corewyvernIL.support.VarEvalContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 
 public class Serializer {
-  public static Serializer serializer = new Serializer();
+  public static final Serializer serializer = new Serializer();
 
   public Serializer() {
   }
@@ -32,7 +34,8 @@ public class Serializer {
     HashMap<String, Object> jsonmap = new HashMap<>();
     for (Declaration d : obj.getDecls()) {
       if (!(d instanceof ValDeclaration)) {
-        // throw error saying can't have def declaration
+        ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS,
+            FileLocation.UNKNOWN);
       }
       String name = d.getName();
       IExpr expr = ((ValDeclaration) d).getDefinition();
@@ -47,7 +50,8 @@ public class Serializer {
       } else if (expr instanceof ObjectValue) {
         jsonmap.put(name, makeJSONMap((ObjectValue) expr));
       } else {
-        // throw error saying has undefined type
+        ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS,
+            FileLocation.UNKNOWN);
       }
     }
     return jsonmap;
@@ -83,7 +87,8 @@ public class Serializer {
       } else if (value instanceof HashMap) {
         recToJSONString((HashMap) value, json, indent + 1);
       } else {
-        System.out.println("Weird type: " + value.getClass());
+        ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS,
+            FileLocation.UNKNOWN);
       }
       if (count < size) {
         count++;
@@ -144,12 +149,5 @@ public class Serializer {
     ObjectValue top = new ObjectValue(decls, selfSite, exprType, null,
         FileLocation.UNKNOWN, new VarEvalContext(selfSite, null, null));
     return top;
-  }
-
-  public void testCell(ObjectValue obj) {
-    for (DeclType dt : ((StructuralType) obj.getType()).getDeclTypes()) {
-      System.out.println("name: " + ((ValDeclType) dt).getName());
-      System.out.println("ValueType: " + ((ValDeclType) dt).getSourceType());
-    }
   }
 }
