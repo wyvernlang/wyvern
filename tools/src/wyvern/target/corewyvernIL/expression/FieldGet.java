@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DeclTypeWithResult;
@@ -32,6 +33,14 @@ public class FieldGet extends Expression implements Path {
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         objectExpr.doPrettyPrint(dest, indent);
         dest.append('.').append(fieldName);
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.AccessExpression.Builder ae = BytecodeOuterClass.Expression.AccessExpression.newBuilder()
+                .setExpression(((Expression) objectExpr).emitBytecode())
+                .setField(fieldName);
+        return BytecodeOuterClass.Expression.newBuilder().setAccessExpression(ae).build();
     }
 
     @Override

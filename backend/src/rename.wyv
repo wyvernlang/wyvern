@@ -1,0 +1,139 @@
+module rename
+
+import wyvern.option
+import wyvern.collections.list
+
+import wyb_ast
+import util
+
+type List = list.List
+type Option = option.Option
+
+def replaceAcc(s: String, c: String, replacement: String, acc: String): String
+    if (s == "")
+            acc
+        elif (s.substring(0, 1) == c)
+            replaceAcc(s.substring(1, s.length()), c, replacement, acc + replacement)
+        else
+            replaceAcc(s.substring(1, s.length()), c, replacement, acc + s.substring(0, 1))
+
+// c should be one character
+def replace(s: String, c: String, replacement: String): String
+    val x = replaceAcc(s, c, replacement, "")
+    if (x.length() == 0)
+        runtime.fail("tiny")
+    x
+
+def escapeVariable(s: String): String
+    replace(replace(s, "@", "at"), "-", "_")
+
+def renameVariable(s: String): String
+    "_" + escapeVariable(s)
+
+def renameTypename(s: String): String
+    "t_" + escapeVariable(s)
+
+def renameVariablePath(s: String): String
+    val l = split(s, ".")
+    val j = l.map[String](p => renameVariable(p))
+    util.join(j, ".")
+
+resource type VarInt
+    var x: Int
+
+def makeVarInt(n: Int): VarInt = new
+    var x: Int = n
+
+def renameTypenamePathHelper(v: VarInt, l: Int, s: String): String
+    var o: String = ""
+    if (v.x == l - 1)
+            o = renameTypename(s)
+        else
+            o = renameVariable(s)
+    v.x = v.x + 1
+    o
+
+def renameTypenamePath(s: String): String
+    val l = split(s, ".")
+    val len = l.length()
+    val i = makeVarInt(0)
+    val j = l.map[String](it: String => renameTypenamePathHelper(i, len, it))
+    util.join(j, ".")
+
+// assume delim is one character
+def split(s: String, delim: String) : List[String]
+    def loop(l: List[String], prev: Int, i: Int): List[String]
+        if(i == s.length())
+                l.append(s.substring(prev, i))
+                l
+            elif (s.substring(i, i+1) == delim)
+                if (prev == i)
+                        loop(l, i + 1, i +1)
+                    else
+                        l.append(s.substring(prev, i))
+                        loop(l, i + 1, i+1)
+            else
+                loop(l, prev, i+1)
+    loop(list.make[String](), 0, 0)
+
+def visitTag(tag: wyb_ast.Tag): wyb_ast.Tag = match tag:
+    e: wyb_ast.ExTag => e
+    dt: wyb_ast.DataTag => wyb_ast.DataTag(dt.paths.map[String](x => renameTypenamePath(x)))
+
+
+def visitTypeDesc(typeDesc: wyb_ast.TypeDesc): wyb_ast.TypeDesc
+    val tdExtends = typeDesc.tdExtends.map[String](s => renameTypenamePath(s))
+    val t = visitType(typeDesc.t)
+    val tag = typeDesc.tag.map[wyb_ast.Tag](x => visitTag(x))
+    wyb_ast.TypeDesc(tdExtends, t, tag)
+
+def visitType(t: wyb_ast.Type): wyb_ast.Type = match t:
+    // TODO: rename decltypes
+    ct: wyb_ast.CompoundType => wyb_ast.CompoundType(visitType(ct.base), renameTypenamePath(ct.selfName), ct.declTypes, ct.stateful)
+    tp: wyb_ast.TypePath => wyb_ast.TypePath(renameTypenamePath(tp.path))
+    top: wyb_ast.TTop => top
+
+def visitArgument(a: wyb_ast.Argument): wyb_ast.Argument
+    wyb_ast.Argument(renameVariable(a.variable), visitType(a.t))
+
+def visitArguments(arguments: List[wyb_ast.Argument]): List[wyb_ast.Argument]
+    arguments.map[wyb_ast.Argument](a => visitArgument(a))
+
+def visitStatement(s: wyb_ast.Statement): wyb_ast.Statement = match s:
+    e: wyb_ast.E => wyb_ast.E(visitExpression(e.expression))
+    d: wyb_ast.D => wyb_ast.D(visitDeclaration(d.declaration))
+
+def visitDeclaration(d: wyb_ast.Declaration): wyb_ast.Declaration = match d:
+    vd: wyb_ast.VariableDeclaration => wyb_ast.VariableDeclaration(vd.declarationType, renameVariable(vd.variable), visitType(vd.t), visitExpression(vd.initializer))
+    md: wyb_ast.MethodDeclaration => wyb_ast.MethodDeclaration(renameVariable(md.methodName), visitArguments(md.arguments), visitType(md.returnType), visitExpression(md.body))
+    td: wyb_ast.TypeDeclaration => wyb_ast.TypeDeclaration(renameTypename(td.name), visitTypeDesc(td.typeDesc))
+
+def visitExpression(e: wyb_ast.Expression): wyb_ast.Expression = match e:
+    v: wyb_ast.Var => wyb_ast.Var(renameVariable(v.v))
+    i: wyb_ast.IntegerLiteral => i
+    b: wyb_ast.BooleanLiteral => b
+    f: wyb_ast.FloatLiteral => f
+    s: wyb_ast.StringLiteral => s
+    ne: wyb_ast.NewExpression => wyb_ast.NewExpression(visitType(ne.t), renameVariable(ne.thisVariable), ne.declarations.map[wyb_ast.Declaration](d => visitDeclaration(d)))
+    ce: wyb_ast.CallExpression => wyb_ast.CallExpression(visitExpression(ce.receiver), renameVariable(ce.method), visitExpressions(ce.arguments))
+    pce: wyb_ast.PrimitiveCallExpression => wyb_ast.PrimitiveCallExpression(visitExpression(pce.receiver), pce.primitiveType, pce.method, visitExpressions(pce.arguments))
+    se: wyb_ast.SequenceExpression => wyb_ast.SequenceExpression(se.statements.map[wyb_ast.Statement](s => visitStatement(s)))
+    me: wyb_ast.MatchExpression => visitMatch(me)
+    ae: wyb_ast.AccessExpression => wyb_ast.AccessExpression(visitExpression(ae.e), renameVariable(ae.field))
+    ae: wyb_ast.AssignmentExpression => wyb_ast.AssignmentExpression(visitExpression(ae.e), renameVariable(ae.field), visitExpression(ae.v))
+
+def visitMatchArm(a: wyb_ast.MatchArm): wyb_ast.MatchArm
+    val v = renameVariable(a.variable)
+    val p = renameTypenamePath(a.path)
+    val e = visitExpression(a.e)
+    wyb_ast.MatchArm(v, p, e)
+
+def visitMatch(me: wyb_ast.MatchExpression): wyb_ast.MatchExpression
+    val e = visitExpression(me.e)
+    val arms = me.arms.map[wyb_ast.MatchArm](a => visitMatchArm(a))
+    val elseClause = me.elseClause.map[wyb_ast.Expression](x => visitExpression(x))
+    wyb_ast.MatchExpression(e, arms, elseClause)
+
+def visitExpressions(expressions: List[wyb_ast.Expression]): List[wyb_ast.Expression]
+    expressions.map[wyb_ast.Expression](e => visitExpression(e))
+

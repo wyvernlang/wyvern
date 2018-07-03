@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -58,6 +59,15 @@ public class TypeDeclaration extends NamedDeclaration {
     public String toString() {
         return "type declaration " + super.getName() + " = " + sourceType.toString();
     }*/
+
+    @Override
+    public BytecodeOuterClass.Declaration emitBytecode() {
+        BytecodeOuterClass.Declaration.TypeDeclaration.Builder td = BytecodeOuterClass.Declaration.TypeDeclaration.newBuilder()
+                .setName(getName())
+                .setTypeDesc(getSourceType().emitBytecodeTypeDesc());
+
+        return BytecodeOuterClass.Declaration.newBuilder().setTypeDeclaration(td).build();
+    }
 
     @Override
     public Set<String> getFreeVariables() {

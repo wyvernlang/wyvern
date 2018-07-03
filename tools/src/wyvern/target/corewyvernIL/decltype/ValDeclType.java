@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.decltype;
 
 import java.io.IOException;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
@@ -72,6 +73,15 @@ public class ValDeclType extends DeclTypeWithResult implements IASTNode {
         dest.append(indent).append("val ").append(getName()).append(" : ");
         getRawResultType().doPrettyPrint(dest, indent);
         dest.append('\n');
+    }
+
+    @Override
+    public BytecodeOuterClass.DeclType emitBytecode() {
+        BytecodeOuterClass.DeclType.VariableDeclType.Builder vdt = BytecodeOuterClass.DeclType.VariableDeclType.newBuilder()
+                .setDeclarationType(BytecodeOuterClass.VariableDeclarationType.VAL)
+                .setVariable(getName())
+                .setType(getRawResultType().emitBytecodeType());
+        return BytecodeOuterClass.DeclType.newBuilder().setVariableDecl(vdt).build();
     }
 
     @Override

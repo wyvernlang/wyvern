@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+option java_package = "wyvern.stdlib.support.backend";
+
 // x : \tau (used in methods and method types)
 message MethodArgument {
     required string variable = 1;
@@ -57,13 +59,19 @@ message Module {
 message Expression {
     message NewExpression {
         required Type type = 1;
-        required string thisVariable = 2;
+        required string selfName = 2;
         repeated Declaration declarations = 3;
     }
     message CallExpression {
         required Expression receiver = 1;
         required string method = 2;
         repeated Expression arguments = 3;
+    }
+    message PrimitiveCallExpression {
+        required Expression receiver = 1;
+        required string primitiveType = 2;
+        required string method = 3;
+        repeated Expression arguments = 4;
     }
     message AccessExpression {
         required Expression expression = 1;
@@ -73,11 +81,6 @@ message Expression {
         required Expression expression = 1;
         required string field = 2;
         required Expression value = 3;
-    }
-    message LetExpression {
-        required string variable = 1;
-        required Expression value = 2;
-        required Expression expression = 3;
     }
     message Literal {
         oneof literal {
@@ -101,15 +104,21 @@ message Expression {
         optional Expression else = 3;
     }
     message SequenceExpression {
-        repeated Expression expressions = 1;
+        message SequenceStatement {
+            oneof statement {
+                Expression expression = 1;
+                Declaration declaration = 2;
+            }
+        }
+        repeated SequenceStatement statements = 1;
     }
     oneof expression {
         string variable = 1;
         NewExpression newExpression = 2;
         CallExpression callExpression = 3;
-        AccessExpression accessExpression = 4;
-        AssignmentExpression assignmentExpression = 5;
-        LetExpression letExpression = 6;
+        PrimitiveCallExpression primitiveCallExpression = 4;
+        AccessExpression accessExpression = 5;
+        AssignmentExpression assignmentExpression = 6;
         Literal literal = 7;
         MatchExpression matchExpression = 8;
         SequenceExpression sequenceExpression = 9;
@@ -162,9 +171,9 @@ message Type {
     // \tau { x => \overline{\sigma} }_s
     message CompoundType {
         required Type base = 1;
-        required string this = 2;
+        required string selfName = 2;
         repeated DeclType declTypes = 3;
-        required Statefulness statefulness = 4;
+        required bool stateful = 4;
     }
     enum SimpleType {
         Top = 1;
@@ -172,16 +181,10 @@ message Type {
         Dyn = 3;
     }
     oneof type {
-        CompoundType declarationType = 1;
+        CompoundType compoundType = 1;
         string path = 2;
         SimpleType simpleType = 3;
     }
-}
-
-// s
-enum Statefulness {
-    STATEFUL = 1;
-    PURE = 2;
 }
 
 // \sigma
@@ -203,7 +206,7 @@ message DeclType {
     }
     message OpaqueTypeDecl {
         required string name = 1;
-        required Statefulness statefulness = 2;
+        required bool stateful = 2;
         optional Expression metadata = 3;
     }
     oneof declaration {

@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL;
 
 import java.io.IOException;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.type.ValueType;
 
@@ -35,6 +36,10 @@ public class FormalArg extends ASTNode implements IASTNode {
 
     public ValueType getType() {
         return type;
+    }
+
+    public BytecodeOuterClass.MethodArgument emitBytecode() {
+        return BytecodeOuterClass.MethodArgument.newBuilder().setVariable(getName()).setType(type.emitBytecodeType()).build();
     }
 
     @Override

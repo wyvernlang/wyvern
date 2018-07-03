@@ -1,0 +1,40 @@
+require stdout
+require platform.java.thread.thread
+import platform.java.thread.ThreadGroup
+
+
+def foo1() : Unit
+	thread.currentThread().isAlive()
+	stdout.print("1")
+	thread.sleep(100)
+	stdout.print("2")
+
+var thread1 : thread.Thread = thread.make(() => foo1())
+
+def foo2() : Unit
+	thread1.join()
+	assert !thread1.isAlive()
+	stdout.print("3")
+	stdout.print("4")
+	stdout.println()
+
+var thread2 : thread.Thread = thread.make(() => foo2())
+
+val g1 = thread1.getThreadGroup()
+val g2 = thread2.getThreadGroup()
+
+stdout.print(g1.toString())
+stdout.println()
+stdout.print(g2.toString())
+stdout.println()
+
+thread1.start()
+thread2.start()
+
+stdout.print(thread1.getName())
+stdout.println()
+stdout.printInt(thread1.getPriority())
+stdout.println()
+stdout.print(thread1.toString())
+stdout.println()
+

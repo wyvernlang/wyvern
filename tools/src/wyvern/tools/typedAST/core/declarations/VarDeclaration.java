@@ -129,9 +129,10 @@ public class VarDeclaration extends Declaration implements CoreAST {
         declarationTypes.add(getter.genILType(ctx));
         declarationTypes.add(setter.genILType(ctx));
         String newName = GenContext.generateName();
+        BindingSite site = new BindingSite(newName);
         // If it is a var declaration, it must be of resource type
         StructuralType structType = new StructuralType(newName, declarationTypes, true);
-        ctx = ctx.extend(newName, new Variable(newName), structType);
+        ctx = ctx.extend(site, new Variable(site), structType);
         tlc.updateContext(ctx);
 
         // Group getter and setter into a single declaration block.
@@ -145,7 +146,6 @@ public class VarDeclaration extends Declaration implements CoreAST {
         // Wrap declarations with a New expression and add to top-level.
         wyvern.target.corewyvernIL.expression.New newExp;
         newExp = new wyvern.target.corewyvernIL.expression.New(declarations, structType.getSelfSite(), structType, getLocation());
-        BindingSite site = new BindingSite(newName);
         tlc.addLet(site, structType, newExp, true);
 
         // Equate the var with a method call on its getter.

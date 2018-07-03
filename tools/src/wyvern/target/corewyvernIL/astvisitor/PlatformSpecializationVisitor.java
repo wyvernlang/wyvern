@@ -359,7 +359,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
             } else {
                 VarBinding vb = (VarBinding) hl;
                 IExpr expr = (IExpr) vb.getExpression().acceptVisitor(this, state);
-                newExpr.addBindingLast(new VarBinding(vb.getVarName(), vb.getType(), expr));
+                newExpr.addBindingLast(new VarBinding(vb.getSite(), vb.getType(), expr));
             }
         }
 

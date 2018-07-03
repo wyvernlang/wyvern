@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
@@ -139,6 +140,9 @@ public class RefinementType extends ValueType {
 
     /** Returns the self name if there is one, otherwise null */
     public String getSelfName() {
+        if (selfSite == null) {
+            return null;
+        }
         return selfSite.getName();
     }
     
@@ -282,6 +286,32 @@ public class RefinementType extends ValueType {
         }
         dest.append(']');
     }
+
+    @Override
+    public BytecodeOuterClass.Type emitBytecodeType() {
+        BytecodeOuterClass.Type base = getBase().emitBytecodeType();
+
+        // TODO: resourceFlag
+        // boolean resourceFlag = isResource(null);
+        boolean resourceFlag = false;
+
+        String selfName = getSelfName();
+        if (selfName == null) {
+            selfName = "null";
+        }
+
+        BytecodeOuterClass.Type.CompoundType.Builder ct = BytecodeOuterClass.Type.CompoundType.newBuilder()
+                .setBase(base).setSelfName(selfName).setStateful(resourceFlag);
+
+        if (declTypes != null) {
+            for (DeclType dt : declTypes) {
+                ct.addDeclTypes(dt.emitBytecode());
+            }
+        }
+
+        return BytecodeOuterClass.Type.newBuilder().setCompoundType(ct).build();
+    }
+
     @Override
     public Value getMetadata(TypeContext ctx) {
         return base.getMetadata(ctx);
