@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import java.io.IOException;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -30,6 +31,11 @@ public class DynamicType extends ValueType {
     @Override
     public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
         dest.append("Dyn");
+    }
+
+    @Override
+    public BytecodeOuterClass.Type emitBytecodeType() {
+        return BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Dyn).build();
     }
 
     @Override

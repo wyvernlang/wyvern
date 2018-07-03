@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
@@ -43,6 +44,16 @@ public class VarDeclaration extends DeclarationWithRHS {
         dest.append(" = ");
         getDefinition().doPrettyPrint(dest, indent);
         dest.append('\n');
+    }
+
+    @Override
+    public BytecodeOuterClass.Declaration emitBytecode() {
+        BytecodeOuterClass.Declaration.VariableDeclaration.Builder vd = BytecodeOuterClass.Declaration.VariableDeclaration.newBuilder()
+                .setDeclarationType(BytecodeOuterClass.VariableDeclarationType.VAR)
+                .setVariable(getName())
+                .setType(getType().emitBytecodeType())
+                .setInitializer(((Expression) getDefinition()).emitBytecode());
+        return BytecodeOuterClass.Declaration.newBuilder().setVariableDeclaration(vd).build();
     }
 
     @Override

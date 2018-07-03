@@ -1,5 +1,7 @@
 package wyvern.stdlib.support;
 
+import java.math.BigInteger;
+
 public class StringHelper {
     public static final StringHelper utils = new StringHelper();
 
@@ -7,8 +9,8 @@ public class StringHelper {
         return s1.equals(s2);
     }
 
-    public String ofInt(int x) {
-        return Integer.toString(x);
+    public String ofInt(BigInteger x) {
+        return x.toString();
     }
 
     public String ofFloat(double d) {

@@ -5,7 +5,9 @@ import static wyvern.tools.errors.ToolError.reportError;
 import java.io.IOException;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -34,6 +36,15 @@ public class VarBinding implements HasLocation {
         if (toReplace == null) {
             throw new RuntimeException();
         }
+    }
+
+    public BytecodeOuterClass.Declaration emitBytecode() {
+        BytecodeOuterClass.VariableDeclarationType var = BytecodeOuterClass.VariableDeclarationType.VAR;
+        BytecodeOuterClass.Declaration.VariableDeclaration.Builder vd = BytecodeOuterClass.Declaration.VariableDeclaration.newBuilder().setDeclarationType(var)
+                .setVariable(getVarName())
+                .setType(getType().emitBytecodeType())
+                .setInitializer(((Expression) expr).emitBytecode());
+        return BytecodeOuterClass.Declaration.newBuilder().setVariableDeclaration(vd).build();
     }
 
     public String getVarName() {

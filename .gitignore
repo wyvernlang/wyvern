@@ -74,3 +74,5 @@ tools/src/wyvern/target/llvm/configure
 tools/jacoco.exec
 tools/report
 node_modules
+*.wyb
+out.js

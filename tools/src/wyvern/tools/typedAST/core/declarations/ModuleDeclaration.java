@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -206,10 +207,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
         for (Module lt : loadedTypes) {
             // include the declaration itself
-            final String internalName = lt.getSpec().getInternalName();
-            methodContext = methodContext.extend(internalName, new Variable(internalName), lt.getSpec().getType());
+            final BindingSite internalSite = lt.getSpec().getSite();
+            methodContext = methodContext.extend(internalSite, new Variable(internalSite), lt.getSpec().getType());
             // include the type abbreviation
-            methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalName, methodContext);
+            methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalSite, methodContext);
             if (dependencies != null) {
                 dependencies.add(lt.getSpec());
                 dependencies.addAll(lt.getDependencies());

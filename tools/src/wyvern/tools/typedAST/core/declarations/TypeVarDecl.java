@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
@@ -36,6 +37,7 @@ public class TypeVarDecl extends Declaration {
     private final TypeDeclaration body;
     private final DeclSequence bodyOriginal;
     private final FileLocation fileLocation;
+    private BindingSite selfSite;
     private final TypedAST metadata;
     private List<String> generics;
     private boolean resourceFlag = false;
@@ -87,14 +89,21 @@ public class TypeVarDecl extends Declaration {
         return s;
     }
 
+    private BindingSite getSelfSite() {
+        if (selfSite == null) {
+            selfSite = new BindingSite(getSelfName());
+        }
+        return selfSite;
+    }
+
     private wyvern.target.corewyvernIL.type.Type computeInternalILType(GenContext ctx) {
         TypeDeclaration td = this.body;
-        GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfName()), null);
+        GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfSite()), null);
         for (String param : generics) {
-            localCtx = new TypeOrEffectGenContext(param, getSelfName(), localCtx);
+            localCtx = new TypeOrEffectGenContext(param, getSelfSite(), localCtx);
         }
         TaggedInfo taggedInfo = td.getTaggedInfo();
-        StructuralType thisType = new StructuralType(getSelfName(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+        StructuralType thisType = new StructuralType(getSelfSite(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
         if (taggedInfo == null) {
             return thisType;
         } else {

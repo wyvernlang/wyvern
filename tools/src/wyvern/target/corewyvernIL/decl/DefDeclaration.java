@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -12,6 +13,7 @@ import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.FailureReason;
@@ -162,6 +164,19 @@ public class DefDeclaration extends NamedDeclaration {
                         r.getReason());
             }
         }
+    }
+
+    @Override
+    public BytecodeOuterClass.Declaration emitBytecode() {
+        BytecodeOuterClass.Declaration.MethodDeclaration.Builder md = BytecodeOuterClass.Declaration.MethodDeclaration.newBuilder()
+                .setMethodName(getName())
+                .setReturnType(getType().emitBytecodeType())
+                .setBody(((Expression) body).emitBytecode());
+
+        for (FormalArg arg : formalArgs) {
+            md.addArguments(arg.emitBytecode());
+        }
+        return BytecodeOuterClass.Declaration.newBuilder().setMethodDeclaration(md).build();
     }
 
     @Override

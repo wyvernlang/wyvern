@@ -36,6 +36,8 @@
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
     <module name="Translation"/>
 
+    <module name="SuppressWithPlainTextCommentFilter"/>
+
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="FileLength"/>
@@ -45,6 +47,10 @@
     <module name="FileTabCharacter"/>
 
     <module name="TreeWalker">
+        <!-- Redundant with SuppressWithPlainTextCommentFilter above but  -->
+        <!-- saves 75% of lint time when added -->
+        <module name="SuppressionCommentFilter"/>
+
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="LocalFinalVariableName"/>

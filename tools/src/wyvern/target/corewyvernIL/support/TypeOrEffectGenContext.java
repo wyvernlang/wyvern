@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -23,10 +24,10 @@ public class TypeOrEffectGenContext extends GenContext {
         this.objName = objName;
     }
 
-    public TypeOrEffectGenContext(String typeName, String newName, GenContext genContext) {
+    public TypeOrEffectGenContext(String typeName, BindingSite site, GenContext genContext) {
         super(genContext);
         this.typeName = typeName;
-        this.objName = new Variable(newName);
+        this.objName = new Variable(site);
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
@@ -95,6 +96,20 @@ public class New extends Expression {
         }
     }
 
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Type type = getType().emitBytecodeType();
+        String selfName = getSelfName();
+
+        BytecodeOuterClass.Expression.NewExpression.Builder ne = BytecodeOuterClass.Expression.NewExpression.newBuilder()
+                .setSelfName(selfName)
+                .setType(type);
+
+        for (Declaration d : decls) {
+            ne.addDeclarations(d.emitBytecode());
+        }
+        return BytecodeOuterClass.Expression.newBuilder().setNewExpression(ne).build();
+    }
 
     /** Returns a declaration of the proper name, or null if not found.
      * Searches separately for types/effects and values, since these are in different namespaces. */
