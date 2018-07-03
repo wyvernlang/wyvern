@@ -1,10 +1,15 @@
-module def Server() : ServerIface
+module def Server(java : Java) 
 
 import CSIface
-import
+/*import dataStructures.hashmap
+val hashmap = hashmap(java)
+var hmap : hashmap.HashMap[String,String] = hashmap.make[String,String]()
+hmap.put("Hello", "World")*/
+
 val sendInfo : CSIface = new
 	def getVal(key : String) : String
-		" " 
+		val result = " "
+		result 
 
 def start() : Unit
 	unit

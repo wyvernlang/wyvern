@@ -1,2 +1,0 @@
-component  Component
-	port foo : provides Face

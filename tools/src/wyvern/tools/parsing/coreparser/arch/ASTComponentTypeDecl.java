@@ -122,7 +122,8 @@ public class ASTComponentTypeDecl extends SimpleNode {
 
       /* Check that it's a module def */
       Expression expr = mod.getExpression();
-      if (!expr.getType().toString().contains("apply()")) {
+      if (!expr.getType().toString().contains("apply(")) {
+        System.out.println(expr.getType().toString());
         // throw error saying it's not a module def
         ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, location,
             typeName);
@@ -130,15 +131,24 @@ public class ASTComponentTypeDecl extends SimpleNode {
 
       /* Check that it has the correct dependencies */
       List<TypedModuleSpec> deps = mod.getDependencies();
-      if (deps.size() != reqs.size()) {
+      if (deps.size() != reqs.size() + provs.size()) {
         // throw error saying dependencies don't match
+        System.out.println("deps: " + deps.size());
+        for (TypedModuleSpec s : deps) {
+          System.out.println(s);
+        }
+        System.out.println("reqs: " + reqs.size());
+        for (String s : reqs.keySet()) {
+          System.out.println(s);
+        }
         ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
             location, typeName);
       }
       for (TypedModuleSpec dep : deps) {
         String depName = dep.getDefinedTypeName();
-        if (!reqs.containsValue(depName)) {
+        if (!reqs.containsValue(depName) && !provs.containsValue(depName)) {
           // throw error saying dependencies don't match
+          System.out.println(depName);
           ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
               location, typeName);
         }
@@ -158,7 +168,8 @@ public class ASTComponentTypeDecl extends SimpleNode {
         for (DeclType dt : valdecltypes) {
           ValDeclType vdtype = (ValDeclType) dt;
           String name = vdtype.getName();
-          String t = ((NominalType) vdtype.getSourceType()).getTypeMember();
+          String t = ((NominalType) vdtype.getSourceType().getValueType())
+              .getTypeMember();
           if (provs.get(name) == null || !provs.get(name).equals(t)) {
             // inconsistent fields
             ToolError.reportError(

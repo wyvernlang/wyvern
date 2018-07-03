@@ -33,7 +33,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
 
     /* Check if ports are improperly declared */
     for (String portFull : ports) {
-      String[] portParts = portFull.split(".");
+      String[] portParts = portFull.split("\\.", 2);
       String component = portParts[0];
       String port = portParts[1];
       // check component declaration exists
@@ -100,7 +100,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
           node.getLocation(), node.getTypeName());
     }
     node.collectPorts();
-    if (node.checkModule()) {
+    if (!node.checkModule()) {
       // module def not found HANDLED IN CHECKMODULE
     } else {
       componentTypes.put(node.getTypeName(), node);

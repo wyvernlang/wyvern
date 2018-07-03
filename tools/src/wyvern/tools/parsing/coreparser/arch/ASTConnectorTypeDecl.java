@@ -6,22 +6,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import wyvern.target.corewyvernIL.VarBinding;
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.ValDeclType;
-import wyvern.target.corewyvernIL.expression.New;
-import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
-import wyvern.target.corewyvernIL.type.NominalType;
-import wyvern.target.corewyvernIL.type.StructuralType;
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class ASTConnectorTypeDecl extends SimpleNode {
@@ -91,62 +78,11 @@ public class ASTConnectorTypeDecl extends SimpleNode {
         new File(wyvernPath));
 
     try {
-      int checkCount = 0;
-      mod = state.getResolver().resolveType(typeName);
-      SeqExpr expr = (SeqExpr) mod.getExpression();
-
-      /* Check that the wyvern type vals match architecture vals */
-      List<HasLocation> varbindings = expr.getElements().stream()
-          .filter(p -> p instanceof VarBinding).collect(Collectors.toList());
-      for (HasLocation v : varbindings) {
-        New nExpr = (New) ((VarBinding) v).getExpression();
-        List<Declaration> typedeclarations = nExpr.getDecls().stream()
-            .filter(p -> p instanceof TypeDeclaration)
-            .collect(Collectors.toList());
-        for (Declaration d : typedeclarations) {
-          StructuralType st = (StructuralType) ((TypeDeclaration) d)
-              .getSourceType();
-          List<DeclType> valdecltypes = st.getDeclTypes().stream()
-              .filter(p -> p instanceof ValDeclType)
-              .collect(Collectors.toList());
-          for (DeclType dt : valdecltypes) {
-            String name = dt.getName();
-            String type = ((NominalType) ((ValDeclType) dt).getRawResultType())
-                .getTypeMember();
-            String ty;
-            if ((ty = vals.get(name)) != null) {
-              if (!ty.equals(type)) {
-                // connector val type mismatch
-                ToolError.reportError(ErrorMessage.CONNECTOR_VAL_INCONSISTENCY,
-                    location, typeName);
-                return false;
-              } else {
-                checkCount++;
-              }
-            } else {
-              // connector val not found
-              ToolError.reportError(ErrorMessage.CONNECTOR_VAL_INCONSISTENCY,
-                  location, typeName);
-              return false;
-            }
-          }
-          if (checkCount != vals.size()) {
-            ToolError.reportError(ErrorMessage.CONNECTOR_VAL_INCONSISTENCY,
-                location, typeName);
-            return false;
-          }
-          return true;
-        }
-      }
-    } catch (
-
-    ToolError e)
-
-    {
+      mod = state.getResolver().resolveType(typeName + "Properties");
+    } catch (ToolError e) {
       e.printStackTrace();
       return false;
     }
-
     return true;
 
   }
