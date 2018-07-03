@@ -430,7 +430,6 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testFact() throws ParseException {
         TestUtil.doTestScriptModularly("modules.module.bool-nat-fact", null, null);
 

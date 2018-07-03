@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -52,6 +53,13 @@ public class FloatLiteral extends Literal implements Invokable  {
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append(value.toString());
     }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.Literal.Builder literal = BytecodeOuterClass.Expression.Literal.newBuilder().setFloatLiteral(value);
+        return BytecodeOuterClass.Expression.newBuilder().setLiteral(literal).build();
+    }
+
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator)  {
       return Util.floatType();
     }

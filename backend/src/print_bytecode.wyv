@@ -1,0 +1,6 @@
+require bytecode
+require stdout
+
+val test = bytecode.loadBytecode("../examples/keys.wyb")
+val expression = test.getModules(0).getValueModule().getExpression()
+stdout.print(test.toString())

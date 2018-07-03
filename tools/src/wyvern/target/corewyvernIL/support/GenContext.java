@@ -103,19 +103,19 @@ public abstract class GenContext extends TypeContext {
      * @param ast the declaration of Wyvern Module System
      * @return a new functional environment which extends the mapping
      */
-    public GenContext rec(String newName, TypedAST ast) {
+    public GenContext rec(BindingSite site, TypedAST ast) {
         if (ast instanceof TypeVarDecl || ast instanceof EffectDeclaration) {
             String typeName = ((Declaration) ast).getName();
-            return new TypeOrEffectGenContext(typeName, newName, this);
+            return new TypeOrEffectGenContext(typeName, site, this);
         } else if (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
             //assert (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration);
             wyvern.tools.typedAST.core.declarations.DefDeclaration methodDecl = (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
             String methodName = methodDecl.getName();
-            return new MethodGenContext(methodName, newName, this, ast.getLocation());
+            return new MethodGenContext(methodName, site, this, ast.getLocation());
         } else {
             assert (ast instanceof TypeAbbrevDeclaration);
             TypeAbbrevDeclaration typeAbbrevDecl = (TypeAbbrevDeclaration) ast;
-            return new TypeOrEffectGenContext(typeAbbrevDecl.getName(), newName, this);
+            return new TypeOrEffectGenContext(typeAbbrevDecl.getName(), site, this);
         }
     }
 

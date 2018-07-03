@@ -1,0 +1,46 @@
+// stub; overridden by js backend
+def print(x: Dyn): Unit
+  unit
+
+def println(): Unit
+    print("\n")
+
+tagged type Key
+    val i:Int
+
+type KeyedMap
+    tagged type MyKey extends Key
+        val i:Int
+    def insert(v:Int):this.MyKey
+    def lookup(k:this.MyKey):Int
+
+def makeMap():KeyedMap = new
+    tagged type MyKey extends Key
+        val i:Int
+    def insert(v:Int):this.MyKey = new (self) =>
+        val i = v
+    def lookup(k:this.MyKey):Int = k.i
+
+val m1:KeyedMap = makeMap()
+val m2:KeyedMap = makeMap()
+
+val k1: Key = m1.insert(3)
+val k2: Key = m2.insert(5)
+val k3: Key = new
+    val i = 2
+
+match k1:
+    k:m1.MyKey => print("k1 is from m1")
+    k:m2.MyKey => print("k1 is from m2")
+    default => print("k1 is from nowhere")
+println()
+match k2:
+    k:m1.MyKey => print("k2 is from m1")
+    k:m2.MyKey => print("k2 is from m2")
+    default => print("k2 is from nowhere")
+println()
+match k3:
+    k:m1.MyKey => print("k3 is from m1")
+    k:m2.MyKey => print("k3 is from m2")
+    default => print("k3 is from nowhere")
+println()

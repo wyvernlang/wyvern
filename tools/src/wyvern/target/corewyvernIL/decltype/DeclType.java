@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.decltype;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -48,4 +49,9 @@ public abstract class DeclType extends ASTNode implements IASTNode {
     public abstract DeclType doAvoid(String varName, TypeContext ctx, int count);
 
     public abstract boolean isTypeOrEffectDecl();
+
+    public BytecodeOuterClass.DeclType emitBytecode() {
+        System.out.println("emitBytecode not implemented for " + this.getClass().getName());
+        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+    }
 }

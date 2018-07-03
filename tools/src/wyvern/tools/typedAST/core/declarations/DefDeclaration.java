@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -134,10 +135,11 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
             for (String s : this.generics) {
                 ValueType type = DefDeclaration.genericStructuralType(s);
                 String genName = GENERIC_PREFIX + s;
-                args.add(new FormalArg(genName, type));
+                BindingSite argSite = new BindingSite(genName);
+                args.add(new FormalArg(argSite, type));
 
-                ctx = new TypeOrEffectGenContext(s, genName, ctx);
-                ctx = ctx.extend(genName, new Variable(genName), type);
+                ctx = new TypeOrEffectGenContext(s, argSite, ctx);
+                ctx = ctx.extend(argSite, new Variable(argSite), type);
             }
         }
 
@@ -172,13 +174,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
             for (String s : this.generics) {
                 String genName = GENERIC_PREFIX + s;
+                BindingSite argSite = new BindingSite(genName);
                 ValueType type = DefDeclaration.genericStructuralType(s);
-                args.add(new FormalArg(genName, type));
+                args.add(new FormalArg(argSite, type));
 
-                methodContext = methodContext.extend(genName, new Variable(genName), type);
-                thisContext = thisContext.extend(genName, new Variable(genName), type);
-                methodContext = new TypeOrEffectGenContext(s, genName, methodContext);
-                thisContext = new TypeOrEffectGenContext(s, genName, thisContext); // TODO +s
+                methodContext = methodContext.extend(argSite, new Variable(argSite), type);
+                thisContext = thisContext.extend(argSite, new Variable(argSite), type);
+                methodContext = new TypeOrEffectGenContext(s, argSite, methodContext);
+                thisContext = new TypeOrEffectGenContext(s, argSite, thisContext); // TODO +s
             }
         }
 

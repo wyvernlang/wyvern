@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.decltype;
 
 import java.io.IOException;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
@@ -35,6 +36,14 @@ public class AbstractTypeMember extends DeclType implements IASTNode {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append(indent).append("type ").append(getName()).append('\n');
+    }
+
+    @Override
+    public BytecodeOuterClass.DeclType emitBytecode() {
+        BytecodeOuterClass.DeclType.OpaqueTypeDecl.Builder otd = BytecodeOuterClass.DeclType.OpaqueTypeDecl.newBuilder()
+                .setName(getName())
+                .setStateful(isResource);
+        return BytecodeOuterClass.DeclType.newBuilder().setOpaqueTypeDecl(otd).build();
     }
 
     @Override
