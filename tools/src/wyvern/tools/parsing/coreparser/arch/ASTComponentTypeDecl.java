@@ -131,16 +131,9 @@ public class ASTComponentTypeDecl extends SimpleNode {
 
       /* Check that it has the correct dependencies */
       List<TypedModuleSpec> deps = mod.getDependencies();
+
       if (deps.size() != reqs.size() + provs.size()) {
         // throw error saying dependencies don't match
-        System.out.println("deps: " + deps.size());
-        for (TypedModuleSpec s : deps) {
-          System.out.println(s);
-        }
-        System.out.println("reqs: " + reqs.size());
-        for (String s : reqs.keySet()) {
-          System.out.println(s);
-        }
         ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
             location, typeName);
       }
@@ -148,7 +141,6 @@ public class ASTComponentTypeDecl extends SimpleNode {
         String depName = dep.getDefinedTypeName();
         if (!reqs.containsValue(depName) && !provs.containsValue(depName)) {
           // throw error saying dependencies don't match
-          System.out.println(depName);
           ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
               location, typeName);
         }
