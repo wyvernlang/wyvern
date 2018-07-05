@@ -1,0 +1,2 @@
+resource type CSIface
+	def getVal(key : String) : String

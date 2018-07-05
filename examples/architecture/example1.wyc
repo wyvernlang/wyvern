@@ -1,5 +1,6 @@
 component Client
 	port getInfo: requires CSIface
+
 component Server
 	port sendInfo: provides CSIface
 

@@ -1,0 +1,4 @@
+module def Client(getInfo : CSIface) : ClientIface
+
+def start() : Unit	
+	getInfo.getVal("key")

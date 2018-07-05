@@ -1,0 +1,5 @@
+import CSIface
+
+resource type ServerIface
+	val sendInfo : CSIface
+	def start() : Unit

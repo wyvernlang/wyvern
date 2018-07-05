@@ -1,0 +1,10 @@
+module def Server() : ServerIface
+
+import CSIface
+import
+val sendInfo : CSIface = new
+	def getVal(key : String) : String
+		" " 
+
+def start() : Unit
+	unit
