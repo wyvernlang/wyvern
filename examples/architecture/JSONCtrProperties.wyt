@@ -1,3 +1,15 @@
+import wyvern.collections.list
+
+type IPAddress
+	val network : Int
+	val host1 : Int
+	val host2 : Int
+	val host3 : Int
+	val host4 : Int
+
 type JSONCtrProperties
-	val host : String
+	val host : IPAddress
 	val prt : Int
+/*	metadata new
+		def checkPortCompatability(l : list.List) : Boolean
+			true*/

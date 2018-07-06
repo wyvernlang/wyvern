@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -16,7 +17,6 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.modules.Module;
-import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -129,20 +129,28 @@ public class ASTComponentTypeDecl extends SimpleNode {
             typeName);
       }
 
-      /* Check that it has the correct dependencies */
-      List<TypedModuleSpec> deps = mod.getDependencies();
-
-      if (deps.size() != reqs.size() + provs.size()) {
-        // throw error saying dependencies don't match
-        ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
-            location, typeName);
-      }
-      for (TypedModuleSpec dep : deps) {
-        String depName = dep.getDefinedTypeName();
-        if (!reqs.containsValue(depName) && !provs.containsValue(depName)) {
-          // throw error saying dependencies don't match
-          ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
-              location, typeName);
+      /* Check for only for dependencies passed as args to module def */
+      if (expr instanceof New) {
+        for (Declaration d : ((New) expr).getDecls()) {
+          if (d instanceof DefDeclaration) {
+            List<FormalArg> args = ((DefDeclaration) d).getFormalArgs();
+            if (args.size() != reqs.size()) {
+              // inconsistent dependency errors
+              ToolError.reportError(
+                  ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                  typeName);
+            }
+            for (FormalArg f : args) {
+              String name = f.getName();
+              String type = ((NominalType) f.getType()).getTypeMember();
+              if (!reqs.get(name).equals(type)) {
+                // inconsistent dependency error
+                ToolError.reportError(
+                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                    typeName);
+              }
+            }
+          }
         }
       }
 
@@ -175,9 +183,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
           // inconsistent fields
           ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
               location, typeName);
-          return false;
         }
-        return true;
       }
 
     } catch (ToolError e) {
@@ -185,7 +191,6 @@ public class ASTComponentTypeDecl extends SimpleNode {
       return false;
     }
     return true;
-
   }
 
   /** Accept the visitor. **/

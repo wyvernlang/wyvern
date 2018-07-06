@@ -128,7 +128,7 @@ public enum ErrorMessage {
     DUPLICATE_CONNECTOR_USE("connector \"%ARG\" has been used in multiple attachments",1),
     MEMBER_NOT_DECLARED("%ARG \"%ARG\" has not been declared", 2),
     ARCH_TYPE_NOT_DEFINED("%ARG type \"%ARG\" if not defined", 2),
-    CONNECTOR_VAL_INCONSISTENCY("type and connector \"%ARG\" have inconsistent val declarations",1);
+    CONNECTOR_VAL_INCONSISTENCY("type properties and connector \"%ARG\" have inconsistent val declarations",1);
        
     ErrorMessage(String message, int numArgs) {
         this.errorMessage = message;

@@ -1,4 +1,4 @@
-module def Server(java : Java) 
+module def Server() 
 
 import CSIface
 /*import dataStructures.hashmap

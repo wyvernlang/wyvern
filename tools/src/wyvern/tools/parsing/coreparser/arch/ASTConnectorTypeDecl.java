@@ -7,8 +7,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import wyvern.target.corewyvernIL.VarBinding;
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.TypeDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 
 public class ASTConnectorTypeDecl extends SimpleNode {
@@ -79,6 +91,33 @@ public class ASTConnectorTypeDecl extends SimpleNode {
 
     try {
       mod = state.getResolver().resolveType(typeName + "Properties");
+      for (HasLocation i : ((SeqExpr) mod.getExpression()).getElements()) {
+        IExpr expr = ((VarBinding) i).getExpression();
+        if (expr instanceof New) {
+          New n = (New) expr;
+          for (Declaration d : n.getDecls()) {
+            if (d instanceof TypeDeclaration // contains metadata
+                && d.getName().equals(typeName + "Properties")) {
+              StructuralType t = (StructuralType) ((TypeDeclaration) d)
+                  .getSourceType();
+              for (DeclType dt : t.getDeclTypes()) {
+                ValDeclType vdt = (ValDeclType) dt;
+                String name = vdt.getName();
+                String type = ((NominalType) vdt.getSourceType())
+                    .getTypeMember();
+                if (!vals.get(name).equals(type)) {
+                  ToolError.reportError(
+                      ErrorMessage.CONNECTOR_VAL_INCONSISTENCY, location,
+                      typeName);
+                }
+              }
+              return true;
+            }
+          }
+          ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, location,
+              typeName);
+        }
+      }
     } catch (ToolError e) {
       e.printStackTrace();
       return false;
