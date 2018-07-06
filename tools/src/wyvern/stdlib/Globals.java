@@ -45,6 +45,7 @@ import wyvern.tools.tests.TestUtil;
 public final class Globals {
     private Globals() { }
     public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
+    public static final NominalType JAVASCRIPT_IMPORT_TYPE = new NominalType("system", "JavaScript");
     public static final NominalType PYTHON_IMPORT_TYPE = new NominalType("system", "Python");
     public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
     public static final boolean checkRuntimeTypes = false;
@@ -64,6 +65,8 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
         javaWhiteList.add("wyvern.stdlib.support.Sys.utils");
+        // @HACK
+        javaWhiteList.add("wyvern.stdlib.support.backend.BytecodeWrapper.bytecode");
     }
 
     private static boolean gettingPrelude = false;
@@ -132,6 +135,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("Dyn", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Java", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Python", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("JavaScript", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Platform", system, genCtx);
         genCtx = new VarGenContext(new BindingSite("unit"), Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
@@ -212,6 +216,8 @@ public final class Globals {
         NominalType systemPlatform = new NominalType("system", "Platform");
         ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType());
         declTypes.add(new ConcreteTypeMember("Java", javaType));
+        ExtensibleTagType javascriptType = new ExtensibleTagType(systemPlatform, Util.unitType());
+        declTypes.add(new ConcreteTypeMember("JavaScript", javascriptType));
         //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
@@ -260,6 +266,7 @@ public final class Globals {
         decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("JavaScript", new NominalType("this", "JavaScript"), FileLocation.UNKNOWN));
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
         ObjectValue systemVal = new ObjectValue(decls, new BindingSite("this"), getSystemType(), null, null, EvalContext.empty());
         return systemVal;

@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -24,6 +25,7 @@ import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -33,6 +35,7 @@ import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.BytecodeCompiler;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
@@ -384,6 +387,48 @@ public class ModuleResolver {
             }
         }
         return ctx;
+    }
+
+    public BytecodeOuterClass.Bytecode emitBytecode(Module module, List<TypedModuleSpec> dependencies) {
+        Module prelude = Globals.getPreludeModule();
+        SeqExpr preludeExpression = (SeqExpr) prelude.getExpression();
+
+        BytecodeOuterClass.Bytecode.Builder wyb = BytecodeOuterClass.Bytecode.newBuilder();
+        wyb.setVersion(BytecodeOuterClass.Bytecode.Version.newBuilder().setMagic(42)
+                .setMajor(0).setMinor(1))
+                .setPath("com.todo");
+
+        SeqExpr expressionWithPrelude = preludeExpression.clone();
+        expressionWithPrelude.merge(module.getExpression());
+
+        BytecodeOuterClass.Module.ValueModule.Builder v = BytecodeOuterClass.Module.ValueModule.newBuilder()
+                .setType(module.getSpec().getType().emitBytecodeType())
+                .setExpression(expressionWithPrelude.emitBytecode());
+
+        wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath("toplevel").setValueModule(v));
+
+        dependencies.addAll(prelude.getDependencies());
+        List<TypedModuleSpec> noDups = sortDependencies(dependencies);
+        for (TypedModuleSpec spec : noDups) {
+            Module dep = resolveModule(spec.getQualifiedName());
+            Expression e;
+            if (prelude.getDependencies().contains(spec)) {
+                e = dep.getExpression();
+            } else {
+                e = preludeExpression.clone();
+                ((SeqExpr) e).merge(dep.getExpression());
+            }
+
+            v = BytecodeOuterClass.Module.ValueModule.newBuilder()
+                    .setType(dep.getSpec().getType().emitBytecodeType())
+                    .setExpression(e.emitBytecode());
+
+            wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath(spec.getQualifiedName()).setValueModule(v));
+        }
+
+        wyb.addAllImports(BytecodeCompiler.getJavascriptFFIImports());
+
+        return wyb.build();
     }
 
     /** Wraps this program with all its dependencies.  Unlike wrapWitCtx, we do not cache values as we add dependencies.

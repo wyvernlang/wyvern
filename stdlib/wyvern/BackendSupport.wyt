@@ -1,0 +1,8 @@
+import wyvern.collections.list
+import wyvern.option
+
+type BackendSupport
+  def loadBytecode(path: String): Dyn
+  def byteStringToInt(byteString: Dyn): Int
+  def dynToList(o: Dyn): list.List
+  def getFirstCommandLineArg(): String

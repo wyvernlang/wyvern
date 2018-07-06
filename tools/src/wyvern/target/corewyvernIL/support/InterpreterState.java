@@ -14,6 +14,7 @@ public class InterpreterState {
 
     public static final String PLATFORM_PYTHON = "python";
     public static final String PLATFORM_JAVA = "java";
+    public static final String PLATFORM_JAVASCRIPT = "javascript";
 
     public InterpreterState(String platform, File rootDir, File libDir) {
         resolver = new ModuleResolver(platform, rootDir, libDir);

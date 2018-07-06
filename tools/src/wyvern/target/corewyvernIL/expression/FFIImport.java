@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -38,6 +39,20 @@ public class FFIImport extends Expression {
         dest.append(")");
     }
 
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        NominalType javaPlatform = new NominalType("system", "java");
+        NominalType javascriptPlatform = new NominalType("system", "javascript");
+        // @HACK: stub out java imports for prelude
+        if (getFFIType().equals(javaPlatform)) {
+            return BytecodeOuterClass.Expression.newBuilder().setVariable("FFI_JAVA_PLATFORM_STUB").build();
+        } else if (getFFIType().equals(javascriptPlatform)) {
+            return BytecodeOuterClass.Expression.newBuilder().setVariable("FFI_" + getPath()).build();
+        } else {
+            throw new UnsupportedOperationException("Unsupported ffiType for bytecode FFIImport");
+        }
+    }
+
     public String getPath() {
         return this.path;
     }
@@ -60,6 +75,9 @@ public class FFIImport extends Expression {
             } catch (ReflectiveOperationException e1) {
                 throw new RuntimeException(e1);
             }
+        } else if (this.ffiType.equals(new NominalType("system", "javascript"))) {
+            // @HACK - trying to run TSLs on .wyv containing javascript import
+            return new JavaValue(null, this.getType());
         } else {
             throw new RuntimeException("Cannot interpret FFI import of type" + this.ffiType.toString());
         }
