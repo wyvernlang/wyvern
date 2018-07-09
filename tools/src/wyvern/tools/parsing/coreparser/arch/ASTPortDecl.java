@@ -7,6 +7,8 @@ public class ASTPortDecl extends SimpleNode {
 
   public ASTPortDecl(int id) {
     super(id);
+    requires = "";
+    provides = "";
   }
 
   public ASTPortDecl(ArchParser p, int id) {

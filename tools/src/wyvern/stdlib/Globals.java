@@ -55,6 +55,7 @@ public final class Globals {
     private static Module preludeModule = null;
 
     static {
+        javaWhiteList.add("wyvern.stdlib.support.ArchAST.utils");
         // the whitelist that anyone can import without requiring java or becoming a resource module
         // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
         javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");

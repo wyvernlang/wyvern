@@ -1,3 +1,0 @@
-type Connector
-	val field : Int
-

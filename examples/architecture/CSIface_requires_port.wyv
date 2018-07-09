@@ -1,0 +1,14 @@
+module def CSIface_requires_port(tcpClient : io.Socket, jsonCtrProps : JSONCtrProperties, java : Java) : CSIface
+
+import io.io
+val io = io(java)
+
+def getVal(key : String) : String
+	val out = tcpClient.getOutputStream()
+	val in = tcpClient.getInputStream()
+	val outData = io.makeDataOutputStream(out)
+	val inData = io.makeDataInputStream(in)	
+//	out.writeUTF(StringToBytes(serializeToJSON(key)))
+	val returnVal = inData.readUTF()
+//	bytesToString(returnVal)
+	""

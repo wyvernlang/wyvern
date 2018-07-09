@@ -1,4 +1,7 @@
-import wyvern.collections.list
+import wyvern.internal.list
+import wyvern.archast
+import wyvern.ast
+import wyvern.option
 
 type IPAddress
 	val network : Int
@@ -11,5 +14,36 @@ type JSONCtrProperties
 	val host : IPAddress
 	val prt : Int
 /*	metadata new
-		def checkPortCompatability(l : list.List) : Boolean
-			true*/
+		def checkPortCompatability(l : list.List[archast.ArchAST]) : Boolean
+			type AAST = archast.ArchAST
+			type AST = ast.AST
+			if (l.length() == 2)	
+					val p1 : AAST = l.get(0)
+					val p2 : AAST = l.get(0)
+					var requires : String = ""
+					var provides : String = ""
+					if (p1.getRequires() == "")
+							if (p1.getProvides() == "")
+									false
+								else
+									provides = p1.getProvides()
+						else
+							requires = p1.getRequires()
+					if (requires == "")	
+							requires = p2.getRequires()
+						else	
+							provides = p2.getProvides()
+								
+					if (requires == provides)
+							true
+						else
+							false
+				else
+					false
+
+		def generateConnectorImpl(l : list.List[AAST]) : option.Option[AST]
+			checkPortCompatability(l)
+		
+		def generateConnectorInit() : option.Option[AST]
+			unit
+*/

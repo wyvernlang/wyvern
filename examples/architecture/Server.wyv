@@ -1,4 +1,4 @@
-module def Server() 
+module def Server() : TCPServer
 
 import CSIface
 /*import dataStructures.hashmap

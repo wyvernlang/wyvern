@@ -322,7 +322,7 @@ void MemberDecls() #void :
 
 /*Errors?*/
 void PortDecl() :
-{ Token p; Token req = null; Token prov = null; Token startMark; }
+{ Token p; Token req = ""; Token prov = ""; Token startMark; }
 {
     <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> { jjtThis.setRequires(req.image); }| 
                         <PROVIDES> prov=<IDENTIFIER> { jjtThis.setProvides(prov.image); }) <NEWLINE>

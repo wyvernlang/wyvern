@@ -1,7 +1,0 @@
-module def Component()
-
-type Face 
-	val x : Int
-
-val foo : Face = new
-	val x = 9
