@@ -10,10 +10,12 @@ type OutputStream
 
 type DataInputStream
     def readUTF():String
+    def readLine(): String
     def close():Unit
 
 type DataOutputStream
     def writeUTF(str:String):Unit
+    def writeBytes(str:String):Unit
     def close():Unit
 
 type Socket

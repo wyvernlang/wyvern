@@ -1,13 +1,28 @@
 require java
 require stdout
-import socket
-val sktobj = socket (java)
+import io
+import server
+val ioobj = io (java)
 
-val serverSocket = sktobj.makeServerSocket(1254)
+val serverSocket = ioobj.makeServerSocket(1254)
 
 stdout.print("Waiting for a client connection...\n")
 
 val soc = serverSocket.accept()
+stdout.print("Accepted a connection.\n")
 
-val writer = sktobj.makePrintWriter(sktobj.makeOutputStreamWriter(soc.getOutputStream()))
-writer.println("HELLO WORLD")
+// Get a communication stream associated with the socket
+val s1out = soc.getOutputStream()
+
+val dos = ioobj.makeDataOutputStream(s1out)
+server.welcomeMsg(dos)
+
+
+
+stdout.print("Wrote to DataOutputStream\n")
+
+// Close the connection but not the server socket
+dos.close()
+// Call to "s1out.close()" causes an error.
+// This call is not necessary, but was provided in the example cited.
+soc.close()
