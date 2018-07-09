@@ -13,15 +13,15 @@ fi
 
 (
 cd src/
-$WYBY backend.wyv
+rm -f main_js.wyb
+$WYBY main_js.wyv
 )
 echo "Self-bootstrapping"
 echo -n "time: "
-time node boot.js src/backend.wyb > nextboot.js || rm nextboot.js
-echo "Sanity check"
+time node boot.js src/main_js.wyb > selfboot.js || rm selfboot.js
+echo "Next boot"
 echo -n "time: "
-time node nextboot.js src/backend.wyb > sanitycheck.js || rm sanitycheck.js nextboot.js
-diff -q nextboot.js sanitycheck.js || (echo "sanity check failed" && exit 1)
+time node selfboot.js src/main_js.wyb > nextboot.js || rm selfboot.js nextboot.js
 mv boot.js boot.js.old
 mv nextboot.js boot.js
-rm sanitycheck.js
+rm selfboot.js

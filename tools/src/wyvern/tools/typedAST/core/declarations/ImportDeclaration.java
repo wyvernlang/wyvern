@@ -145,7 +145,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         } else if (scheme.equals("java")) {
             // we are not using Java like a capability in this branch, so check the whitelist!
             if (!Globals.checkSafeJavaImport(this.getUri().getSchemeSpecificPart())) {
-                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, this.getUri().getSchemeSpecificPart());
+                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, "java", this.getUri().getSchemeSpecificPart(), "java");
             }
             return FFI.doJavaImport(getUri(), ctx, this);
         } else if (this.getUri().getScheme().equals("python")) {
@@ -156,6 +156,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             ctx = ctx.extend(importName, new Variable(importName), Util.dynType());
             type = Util.dynType();
         } else if (this.getUri().getScheme().equals("javascript")) {
+            if (!Globals.checkSafeJavascriptImport(this.getUri().getSchemeSpecificPart())) {
+                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, "javascript", this.getUri().getSchemeSpecificPart(), "javascript");
+            }
             return FFI.doJavaScriptImport(getUri(), ctx, this);
         } else if (this.isRequire()) {
             // invariant: modules that require things won't call this

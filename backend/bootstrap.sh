@@ -6,9 +6,10 @@ WYVERN=$WYVERN_HOME/bin/wyvern
 
 (
 cd src/
-$WYBY backend.wyv
+rm -f main_js.wyb
+$WYBY main_js.wyv
 echo "Bootstrapping..."
-time $WYVERN backend.wyv > ../boot.js
+time $WYVERN main_java.wyv > ../boot.js
 ) || rm -f boot.js
 
 ./self-bootstrap.sh

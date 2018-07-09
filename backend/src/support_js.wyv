@@ -1,8 +1,9 @@
-module BackendSupport
+module def JavaScriptSupport(javascript: JavaScript): PlatformSupport
 
 import wyvern.collections.list
 
 import javascript:stdlib.support.jsinterop
+import javascript:stdlib.support.args
 import javascript:stdlib.support.bytecode
 
 type List = list.List
@@ -24,4 +25,4 @@ def byteStringToInt(x: Dyn): Int
     jsinterop.bufferToInteger(x)
 
 def getFirstCommandLineArg(): String
-    jsinterop.getFirstCommandLineArg()
+    args.getFirstCommandLineArg()

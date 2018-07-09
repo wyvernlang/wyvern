@@ -50,6 +50,7 @@ public final class Globals {
     public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
     public static final boolean checkRuntimeTypes = false;
     private static final Set<String> javaWhiteList = new HashSet<String>();
+    private static final Set<String> javascriptWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
     private static final BindingSite system = new BindingSite("system");
     private static SeqExpr prelude = null;
@@ -65,8 +66,15 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
         javaWhiteList.add("wyvern.stdlib.support.Sys.utils");
-        // @HACK
-        javaWhiteList.add("wyvern.stdlib.support.backend.BytecodeWrapper.bytecode");
+    }
+
+    static {
+        // the whitelist that anyone can import without requiring javascript or becoming a resource module
+        // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
+        javascriptWhiteList.add("stdlib.support.runtime");
+        javascriptWhiteList.add("stdlib.support.jsinterop");
+        javascriptWhiteList.add("stdlib.support.string");
+        javascriptWhiteList.add("stdlib.support.float");
     }
 
     private static boolean gettingPrelude = false;
@@ -113,6 +121,10 @@ public final class Globals {
 
     public static boolean checkSafeJavaImport(String packageName) {
         return javaWhiteList.contains(packageName);
+    }
+
+    public static boolean checkSafeJavascriptImport(String importPath) {
+        return javascriptWhiteList.contains(importPath);
     }
 
     public static GenContext getStandardGenContext() {

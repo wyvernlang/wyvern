@@ -10,11 +10,11 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
+import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.BytecodeCompiler;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.interop.FObject;
@@ -118,7 +118,7 @@ public class FFI extends AbstractValue {
                 .setPath(importPath)
                 .setName(importName)
                 .setType(type.emitBytecodeType()).build();
-        BytecodeCompiler.getJavascriptFFIImports().add(i);
+        InterpreterState.getLocalThreadInterpreter().getJavascriptFFIImports().add(i);
         return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx.extend(importName, new Variable(importName), type));
     }
 

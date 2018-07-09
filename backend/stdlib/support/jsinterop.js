@@ -17,7 +17,3 @@ exports.bufferToInteger = function(b) {
     }
     return n;
 }
-
-exports.getFirstCommandLineArg = function() {
-    return process.argv[2];
-}

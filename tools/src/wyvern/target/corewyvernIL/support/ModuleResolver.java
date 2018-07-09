@@ -35,7 +35,6 @@ import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.BytecodeCompiler;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
@@ -426,7 +425,7 @@ public class ModuleResolver {
             wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath(spec.getQualifiedName()).setValueModule(v));
         }
 
-        wyb.addAllImports(BytecodeCompiler.getJavascriptFFIImports());
+        wyb.addAllImports(InterpreterState.getLocalThreadInterpreter().getJavascriptFFIImports());
 
         return wyb.build();
     }

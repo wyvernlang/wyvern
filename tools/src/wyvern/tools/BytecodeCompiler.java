@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.modules.Module;
@@ -15,11 +14,6 @@ import wyvern.tools.errors.ToolError;
 
 public final class BytecodeCompiler {
     private BytecodeCompiler() { }
-    private static ArrayList<BytecodeOuterClass.Bytecode.Import> javascriptFFIImports = new ArrayList<>();
-
-    public static ArrayList<BytecodeOuterClass.Bytecode.Import> getJavascriptFFIImports() {
-        return javascriptFFIImports;
-    }
 
     /**
      * The bytecode compiler only supports 1 argument, which is the path to the Wyvern

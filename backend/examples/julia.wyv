@@ -28,7 +28,7 @@ def iterateComplex(a0 : Float, b0 : Float, currComplex : Float) : Unit
 
 def iterComplexAux(a0 : Float, b0 : Float, currComplex : Float) : Unit
     iterateReal(a0, b0, currComplex, -1.7)
-    iterateComplex(a0, b0, currComplex - 0.02)
+    iterateComplex(a0, b0, currComplex - 0.2)
 
 def iterateReal(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
     if (currReal < 1.7)
@@ -38,7 +38,7 @@ def iterateReal(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) :
 
 def iterRealAux(a0 : Float, b0 : Float, currComplex : Float, currReal : Float) : Unit
     stdout.print(iterate(currReal, currComplex, a0, b0, 0))
-    iterateReal(a0, b0, currComplex, currReal + 0.02)
+    iterateReal(a0, b0, currComplex, currReal + 0.2)
 
 def julia(a0 : Float, b0 : Float) : Unit
     iterateComplex(a0, b0, 1.0)

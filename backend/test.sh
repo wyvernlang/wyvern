@@ -22,6 +22,7 @@ for f in ${FILES[@]}; do
     DIR="$(dirname "$f")"
     FILE="$(basename "$f")"
     cd "$DIR"
+    rm -f "${f%.*}.wyb"
     $WYBY "$FILE"
     )
     echo -n "Time to compile: "

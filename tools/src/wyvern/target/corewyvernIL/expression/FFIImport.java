@@ -43,9 +43,14 @@ public class FFIImport extends Expression {
     public BytecodeOuterClass.Expression emitBytecode() {
         NominalType javaPlatform = new NominalType("system", "java");
         NominalType javascriptPlatform = new NominalType("system", "javascript");
-        // @HACK: stub out java imports for prelude
+        BytecodeOuterClass.Expression unit = BytecodeOuterClass.Expression.newBuilder().setNewExpression(
+                BytecodeOuterClass.Expression.NewExpression.newBuilder().setType(
+                        BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Top)
+                ).setSelfName("unitSelf")
+        ).build();
         if (getFFIType().equals(javaPlatform)) {
-            return BytecodeOuterClass.Expression.newBuilder().setVariable("FFI_JAVA_PLATFORM_STUB").build();
+            // @HACK: stub out java imports for prelude
+            return unit;
         } else if (getFFIType().equals(javascriptPlatform)) {
             return BytecodeOuterClass.Expression.newBuilder().setVariable("FFI_" + getPath()).build();
         } else {
@@ -77,6 +82,10 @@ public class FFIImport extends Expression {
             }
         } else if (this.ffiType.equals(new NominalType("system", "javascript"))) {
             // @HACK - trying to run TSLs on .wyv containing javascript import
+            return new JavaValue(null, this.getType());
+        } else if (this.ffiType.equals(new NominalType("system", "python"))) {
+            // @HACK - trying to run TSLs on .wyv containing python import
+            // This should have a more general solution when we create a staged prelude
             return new JavaValue(null, this.getType());
         } else {
             throw new RuntimeException("Cannot interpret FFI import of type" + this.ffiType.toString());

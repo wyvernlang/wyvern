@@ -31,7 +31,7 @@ def iterateComplex(currComplex : Float) : Unit
 
 def iterComplexAux(currComplex : Float) : Unit
     iterateReal(currComplex, -1.7)
-    iterateComplex(currComplex - 0.02)
+    iterateComplex(currComplex - 0.2)
 
 def iterateReal(currComplex : Float, currReal : Float) : Unit
     if (currReal < 1.0)
@@ -41,6 +41,6 @@ def iterateReal(currComplex : Float, currReal : Float) : Unit
 
 def iterRealAux(currComplex : Float, currReal : Float) : Unit
     stdout.print(iterateMandelbrot(0.0, 0.0, currReal, currComplex, 0))
-    iterateReal(currComplex, currReal + 0.02)
+    iterateReal(currComplex, currReal + 0.2)
 
 iterateComplex(1.0)
