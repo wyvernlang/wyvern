@@ -30,7 +30,17 @@ public class Serializer {
   public Serializer() {
   }
 
-  public HashMap<String, Object> makeJSONMap(ObjectValue obj) {
+  public HashMap<String, Object> makeJSONMap(Object obj) {
+    HashMap<String, Object> jsonmap = new HashMap<>();
+    if (obj instanceof ObjectValue) {
+      jsonmap.put("", recMakeJSONMap((ObjectValue) obj));
+    } else {
+      jsonmap.put("", obj);
+    }
+    return jsonmap;
+  }
+
+  public HashMap<String, Object> recMakeJSONMap(ObjectValue obj) {
     HashMap<String, Object> jsonmap = new HashMap<>();
     for (Declaration d : obj.getDecls()) {
       if (!(d instanceof ValDeclaration)) {
@@ -48,7 +58,7 @@ public class Serializer {
       } else if (expr instanceof IntegerLiteral) {
         jsonmap.put(name, ((IntegerLiteral) expr).getFullValue());
       } else if (expr instanceof ObjectValue) {
-        jsonmap.put(name, makeJSONMap((ObjectValue) expr));
+        jsonmap.put(name, recMakeJSONMap((ObjectValue) expr));
       } else {
         ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS,
             FileLocation.UNKNOWN);
@@ -57,6 +67,16 @@ public class Serializer {
     return jsonmap;
   }
 
+  /*
+   * public Object stringToJSONMap(String str) { HashMap<String, Object> jmap =
+   * new HashMap<>(); int whence = 0; int whither = str.length();
+   * recStringToJSONMap(str, jmap, whence, whither); return jmap; }
+   * 
+   * public void recStringToJSONMap(String str, HashMap<String, Object> jmap,
+   * int whence, int whither) {
+   * 
+   * }
+   */
   @SuppressWarnings("unchecked")
   public String toJSONString(Object obj) {
     HashMap<String, Object> hashmap = (HashMap<String, Object>) obj;
@@ -107,7 +127,17 @@ public class Serializer {
   }
 
   @SuppressWarnings("unchecked")
-  public ObjectValue deserializeFromJSON(HashMap<String, Object> jsonobj) {
+  public Object deserializeFromJSON(HashMap<String, Object> hmap) {
+    Object jsonmap = hmap.get("");
+    if (jsonmap instanceof HashMap) {
+      return recDeserializeFromJSON((HashMap<String, Object>) jsonmap);
+    } else {
+      return jsonmap;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public ObjectValue recDeserializeFromJSON(HashMap<String, Object> jsonobj) {
     BindingSite selfSite = new BindingSite("this");
     List<Declaration> decls = new LinkedList<>();
     List<DeclType> declTypes = new LinkedList<>();
@@ -135,7 +165,7 @@ public class Serializer {
         t = new NominalType("system", "Boolean");
         dt = new ValDeclType(key, t);
       } else if (value instanceof HashMap) {
-        def = deserializeFromJSON((HashMap<String, Object>) value);
+        def = recDeserializeFromJSON((HashMap<String, Object>) value);
         t = ((ObjectValue) def).getType();
       }
 
