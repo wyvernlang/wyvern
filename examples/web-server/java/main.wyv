@@ -1,8 +1,10 @@
 require java
 require stdout
 import io
+import fileio
 import server
 val ioobj = io (java)
+val fileioobj = fileio (java)
 
 val serverSocket = ioobj.makeServerSocket(1254)
 
@@ -13,16 +15,26 @@ stdout.print("Accepted a connection.\n")
 
 // Get a communication stream associated with the socket
 val s1out = soc.getOutputStream()
-
 val dos = ioobj.makeDataOutputStream(s1out)
-server.welcomeMsg(dos)
+server.sendHeaders(dos)
 
+val filename = "form.html"
+val bufferedReader = fileioobj.makeBufferedReader(filename)
+val msg = fileioobj.readFile(bufferedReader)
+server.sendHtmlFile(dos,msg)
 
-
+stdout.print("Sent Form to Client\n")
 stdout.print("Wrote to DataOutputStream\n")
 
+val soc2 = serverSocket.accept()
+val slin = soc2.getInputStream()
+val din = ioobj.makeDataInputStream(slin)
+val response = din.readLine()
+stdout.print(response)
+
+
 // Close the connection but not the server socket
-dos.close()
+//dos.close()
 // Call to "s1out.close()" causes an error.
 // This call is not necessary, but was provided in the example cited.
-soc.close()
+//soc.close()
