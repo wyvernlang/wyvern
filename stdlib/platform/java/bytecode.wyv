@@ -1,0 +1,14 @@
+module def bytecode(java: Java)
+
+import java:wyvern.stdlib.support.backend.BytecodeWrapper.bytecode
+
+import wyvern.collections.list
+
+def loadBytecode(path: String): Dyn
+	bytecode.loadBytecode(path)
+
+def byteStringToInt(byteString: Dyn): Int
+	bytecode.byteStringToInt(byteString)
+
+def dynToList(o: Dyn): list.List
+	bytecode.dynToList(o)

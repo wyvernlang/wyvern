@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -173,6 +174,26 @@ public class SeqExpr extends Expression {
             }
         }
         return new Pair<Value, EvalContext>(result, extendedCtx);
+    }
+
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.SequenceExpression.Builder sequence = BytecodeOuterClass.Expression.SequenceExpression.newBuilder();
+        for (HasLocation elem : elements) {
+            BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.Builder builder =
+                    BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.newBuilder();
+            if (elem instanceof VarBinding) {
+                VarBinding binding = (VarBinding)  elem;
+                builder.setDeclaration(binding.emitBytecode());
+            } else if (elem instanceof Expression) {
+                Expression e = (Expression) elem;
+                builder.setExpression(e.emitBytecode());
+            } else {
+                throw new RuntimeException("invariant broken");
+            }
+            sequence.addStatements(builder);
+        }
+        return BytecodeOuterClass.Expression.newBuilder().setSequenceExpression(sequence).build();
     }
 
     @Override

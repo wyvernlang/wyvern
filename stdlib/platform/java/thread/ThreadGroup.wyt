@@ -1,0 +1,12 @@
+resource type ThreadGroup
+	def activeGroupCount() : Int
+	def destroy() : Unit
+	def getMaxPriority() : Int
+	def getName() : String
+	def getParent() : ThreadGroup
+	def isDaemon() : Boolean
+	def interrupt() : Unit
+	def isDestroyed() : Boolean
+	def list() : Unit
+	def setDaemon(b : Boolean) : Unit
+	def toString() : String

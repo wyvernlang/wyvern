@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -54,6 +55,23 @@ public class DataType extends TagType {
             newCases.add((NominalType) t.adapt(v));
         }
         return new DataType(newCT, getValueType().adapt(v), newCases);
+    }
+
+    @Override
+    public BytecodeOuterClass.TypeDesc emitBytecodeTypeDesc() {
+        // TODO: everything is extag (which is signified by an empty tag)
+        BytecodeOuterClass.TypeDesc.Tag.Builder tag = BytecodeOuterClass.TypeDesc.Tag.newBuilder();
+
+        BytecodeOuterClass.Type type = getValueType().emitBytecodeType();
+
+        BytecodeOuterClass.TypeDesc.CaseDesc.Builder cd = BytecodeOuterClass.TypeDesc.CaseDesc.newBuilder().setType(type);
+
+        NominalType parentType = getParentType();
+        if (parentType != null) {
+            cd.setExtends(parentType.getPath() + "." + parentType.getTypeMember());
+        }
+
+        return BytecodeOuterClass.TypeDesc.newBuilder().setTag(tag).setCaseDesc(cd).build();
     }
 
     @Override

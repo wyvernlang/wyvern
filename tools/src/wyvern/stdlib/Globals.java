@@ -120,18 +120,19 @@ public final class Globals {
         if (state.getGenContext() != null) {
             return state.getGenContext();
         }
-        GenContext genCtx = new EmptyGenContext(state).extend("system", new Variable("system"), Globals.getSystemType());
-        genCtx = new TypeOrEffectGenContext("Int", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Float", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Unit", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("String", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Character", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Boolean", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Nothing", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Dyn", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Java", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Python", "system", genCtx);
-        genCtx = new TypeOrEffectGenContext("Platform", "system", genCtx);
+        // Additional primitives should also be added to primitive list in MethodCall.java bytecode generation
+        GenContext genCtx = new EmptyGenContext(state).extend(system, new Variable(system), Globals.getSystemType());
+        genCtx = new TypeOrEffectGenContext("Int", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Float", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Unit", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("String", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Character", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Boolean", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Nothing", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Dyn", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Java", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Python", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Platform", system, genCtx);
         genCtx = new VarGenContext(new BindingSite("unit"), Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
         SeqExpr sexpr = getPrelude();
@@ -223,13 +224,13 @@ public final class Globals {
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));
         declTypes.add(new EffectDeclType("ffiEffect", null, null));
-        ValueType systemType = new StructuralType("system", declTypes);
+        ValueType systemType = new StructuralType(system, declTypes);
         return systemType;
     }
 
     public static TypeContext getStandardTypeContext() {
         GenContext ctx = GenContext.empty();
-        ctx = ctx.extend("system", new Variable("system"), getSystemType());
+        ctx = ctx.extend(system, new Variable(system), getSystemType());
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
         SeqExpr sexpr = getPrelude();
         GenContext newCtx = sexpr.extendContext(ctx);

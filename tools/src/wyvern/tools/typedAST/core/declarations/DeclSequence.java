@@ -172,7 +172,7 @@ public class DeclSequence extends Sequence {
         for (TypedAST seqAST : getDeclIterator()) {
             Declaration d = (Declaration) seqAST;
             // TODO: refactor to make rec a method of Declaration
-            newCtx = newCtx.rec(newName, d); // extend the environment
+            newCtx = newCtx.rec(site, d); // extend the environment
         }
 
         for (TypedAST seqAST : getDeclIterator()) {
