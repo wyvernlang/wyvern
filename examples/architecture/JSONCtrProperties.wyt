@@ -1,4 +1,4 @@
-import wyvern.internal.list
+import wyvern.collections.list
 import wyvern.archast
 import wyvern.ast
 import wyvern.option
@@ -6,12 +6,12 @@ import wyvern.option
 type JSONCtrProperties
 	val host : String
 	val prt : Int
-/*	metadata new
-		def checkPortCompatability(l : list.List) : Boolean
+	metadata new
+		def checkPortCompatability(l : list.List[archast.PortDecl]) : Boolean
 			type PortDecl = archast.PortDecl
 			if (l.length() == 2)	
-					val p1 : PortDecl = l.get(0)
-					val p2 : PortDecl = l.get(0)
+					val p1 : option.Option[PortDecl] = l.get(0)
+					/*val p2 : PortDecl = l.get(0)
 					var requires : String = ""
 					var provides : String = ""
 					if (p1.portdecl.getRequires() == "")
@@ -29,7 +29,8 @@ type JSONCtrProperties
 					if (requires == provides)
 							true
 						else
-							false
+							false*/
+					true
 				else
 					false
-*/
+
