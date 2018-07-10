@@ -1,0 +1,10 @@
+require stdout
+require javascript
+
+import support_js
+import main
+
+val support = support_js.apply(javascript)
+val main = main.apply(stdout, support)
+
+main.main()

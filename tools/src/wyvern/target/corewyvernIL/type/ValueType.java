@@ -77,8 +77,7 @@ public abstract class ValueType extends Type implements IASTNode {
     // Sometimes, we want to generate a TypeDesc for a ValueType so we handle creating an untagged TypeDesc here
     @Override
     public final BytecodeOuterClass.TypeDesc emitBytecodeTypeDesc() {
-        BytecodeOuterClass.TypeDesc.CaseDesc.Builder cd = BytecodeOuterClass.TypeDesc.CaseDesc.newBuilder().setType(emitBytecodeType());
-        return BytecodeOuterClass.TypeDesc.newBuilder().setCaseDesc(cd).build();
+        return BytecodeOuterClass.TypeDesc.newBuilder().setType(emitBytecodeType()).build();
     }
 
     @Override

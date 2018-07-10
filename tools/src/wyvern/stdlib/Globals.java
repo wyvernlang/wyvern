@@ -45,10 +45,12 @@ import wyvern.tools.tests.TestUtil;
 public final class Globals {
     private Globals() { }
     public static final NominalType JAVA_IMPORT_TYPE = new NominalType("system", "Java");
+    public static final NominalType JAVASCRIPT_IMPORT_TYPE = new NominalType("system", "JavaScript");
     public static final NominalType PYTHON_IMPORT_TYPE = new NominalType("system", "Python");
     public static final NominalType PLATFORM_IMPORT_TYPE = new NominalType("system", "Platform");
     public static final boolean checkRuntimeTypes = false;
     private static final Set<String> javaWhiteList = new HashSet<String>();
+    private static final Set<String> javascriptWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
     private static final BindingSite system = new BindingSite("system");
     private static SeqExpr prelude = null;
@@ -64,6 +66,15 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
         javaWhiteList.add("wyvern.stdlib.support.Sys.utils");
+    }
+
+    static {
+        // the whitelist that anyone can import without requiring javascript or becoming a resource module
+        // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
+        javascriptWhiteList.add("stdlib.support.runtime");
+        javascriptWhiteList.add("stdlib.support.jsinterop");
+        javascriptWhiteList.add("stdlib.support.string");
+        javascriptWhiteList.add("stdlib.support.float");
     }
 
     private static boolean gettingPrelude = false;
@@ -112,6 +123,10 @@ public final class Globals {
         return javaWhiteList.contains(packageName);
     }
 
+    public static boolean checkSafeJavascriptImport(String importPath) {
+        return javascriptWhiteList.contains(importPath);
+    }
+
     public static GenContext getStandardGenContext() {
         return Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), new File(TestUtil.LIB_PATH)));
     }
@@ -132,6 +147,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("Dyn", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Java", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Python", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("JavaScript", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Platform", system, genCtx);
         genCtx = new VarGenContext(new BindingSite("unit"), Util.unitValue(), Util.unitType(), genCtx);
         genCtx = GenUtil.ensureJavaTypesPresent(genCtx);
@@ -212,6 +228,8 @@ public final class Globals {
         NominalType systemPlatform = new NominalType("system", "Platform");
         ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType());
         declTypes.add(new ConcreteTypeMember("Java", javaType));
+        ExtensibleTagType javascriptType = new ExtensibleTagType(systemPlatform, Util.unitType());
+        declTypes.add(new ConcreteTypeMember("JavaScript", javascriptType));
         //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
@@ -260,6 +278,7 @@ public final class Globals {
         decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("JavaScript", new NominalType("this", "JavaScript"), FileLocation.UNKNOWN));
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
         ObjectValue systemVal = new ObjectValue(decls, new BindingSite("this"), getSystemType(), null, null, EvalContext.empty());
         return systemVal;

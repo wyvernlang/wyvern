@@ -1,22 +1,4 @@
-// Prelude
-
-def doif(condition : Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) : Dyn
-  condition.ifTrue(() => tt.apply(), () => ff.apply())
-
-def doifblk(condition : Boolean, block:IfTSL.Blocks) : Dyn
-  condition.ifTrue(() => block.evalTrue(), () => block.evalFalse())
-
-val ifelseARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => doif(cond, tt, ff)
-val if = (cond:Boolean, blocks:IfTSL.Blocks) => doifblk(cond, blocks)
-
-// stub, overridden by js backend
-def print(x: Dyn): Unit
-    unit
-
-def println(): Unit
-    print("\n")
-
-// End prelude
+require stdout
 
 def fib(n: Int): Int
     if (n < 2)
@@ -28,8 +10,8 @@ def loop(i: Int): Unit
     if (i == 10)
             unit
         else
-            print(fib(i))
-            println()
+            stdout.printInt(fib(i))
+            stdout.println()
             loop(i + 1)
 
 loop(0)

@@ -145,7 +145,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         } else if (scheme.equals("java")) {
             // we are not using Java like a capability in this branch, so check the whitelist!
             if (!Globals.checkSafeJavaImport(this.getUri().getSchemeSpecificPart())) {
-                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, this.getUri().getSchemeSpecificPart());
+                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, "java", this.getUri().getSchemeSpecificPart(), "java");
             }
             return FFI.doJavaImport(getUri(), ctx, this);
         } else if (this.getUri().getScheme().equals("python")) {
@@ -155,6 +155,11 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                     new NominalType("system", "Dyn"));
             ctx = ctx.extend(importName, new Variable(importName), Util.dynType());
             type = Util.dynType();
+        } else if (this.getUri().getScheme().equals("javascript")) {
+            if (!Globals.checkSafeJavascriptImport(this.getUri().getSchemeSpecificPart())) {
+                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, "javascript", this.getUri().getSchemeSpecificPart(), "javascript");
+            }
+            return FFI.doJavaScriptImport(getUri(), ctx, this);
         } else if (this.isRequire()) {
             // invariant: modules that require things won't call this
             // so special case for scripts that require things
@@ -166,6 +171,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                 ctx = ctx.extend(importName, importExp, type);
             } else if (importName.equals("python")) {
                 type = Globals.PYTHON_IMPORT_TYPE;
+                importExp = new FFI(importName, type, this.getLocation());
+                ctx = ctx.extend(importName, importExp, type);
+            } else if (importName.equals("javascript")) {
+                type = Globals.JAVASCRIPT_IMPORT_TYPE;
                 importExp = new FFI(importName, type, this.getLocation());
                 ctx = ctx.extend(importName, importExp, type);
             } else if (importName.equals("platform")) {
@@ -200,6 +209,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                 } else if (argType.equals(Globals.PYTHON_IMPORT_TYPE)
                         || (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && resolver.getPlatform().equals("python"))) {
                     args.add(new FFI("python", Globals.PYTHON_IMPORT_TYPE, this.getLocation()));
+                } else if (argType.equals(Globals.JAVASCRIPT_IMPORT_TYPE)
+                        || (argType.equals(Globals.PLATFORM_IMPORT_TYPE) && resolver.getPlatform().equals("javascript"))) {
+                    args.add(new FFI("javascript", Globals.JAVASCRIPT_IMPORT_TYPE, this.getLocation()));
                 } else {
                     // TODO: Better error message
                     ToolError.reportError(ErrorMessage.SCRIPT_REQUIRED_MODULE_ONLY_JAVA, this);

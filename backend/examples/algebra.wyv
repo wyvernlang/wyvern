@@ -1,0 +1,509 @@
+require stdout
+
+import wyvern.String
+import wyvern.Float
+import wyvern.collections.map
+import wyvern.option
+
+//------------------------------------------------------------------------------
+// Types
+//------------------------------------------------------------------------------
+
+type Map = map.Map
+type Option = option.Option
+
+//------------------------------------------------------------------------------
+// Math Helpers
+//------------------------------------------------------------------------------
+
+val epsilon = 0.0001
+
+val nan = 0.0 / 0.0
+val pi  = 3.1415926535897
+val e   = 2.7182818284590
+
+def round(f : Float) : Int
+  (f + 0.5).floor()
+
+def abs(x : Float) : Float
+  if (x < 0.0)
+    x.negate()
+   else
+    x
+
+def floatEq(x : Float, y : Float) : Boolean
+  abs(x - y) < epsilon
+
+def isProbablyInt(x : Float) : Boolean
+  floatEq(x, Float.ofInt(round(x)))
+
+def intPow(x : Float, n : Float) : Float
+  def lp(total : Float, m : Float) : Float
+    if (m < 0.1)
+      total
+     else
+      lp(x * total, m - 1.0)
+  lp(1.0, n)
+
+def fac(n : Float) : Float
+  def lp(total : Float, m : Float) : Float
+    if (m < 0.1)
+      total
+     else
+      lp(total * m, m - 1.0)
+  lp(1.0, n)
+
+def summation(start : Float, end : Float, term : Float -> Float) : Float
+  def lp(total : Float, n : Float) : Float
+    if (n > end + 0.1)
+      total
+     else
+      lp(total + term(n), n + 1.0)
+  lp(0.0, start)
+
+// Works well for x in [-15, 15]
+def exp(x : Float) : Float
+  summation(0.0, 50.0,
+    n => intPow(x, n) / fac(n)
+  )
+
+// Works well for x in [-15, 15]
+def log(x : Float) : Float
+  val base = (x - 1.0) / (x + 1.0)
+  2.0 * summation(0.0, 50.0,
+    n => intPow(base, 2.0 * n + 1.0) / (2.0 * n + 1.0)
+  )
+
+// Works well for x in [-15, 15]
+def realPow(x : Float, y : Float) : Float
+  exp(y * log(x))
+
+// Works well for x in [-15, 15]
+def logBase(base : Float, x : Float) : Float
+  log(x) / log(base)
+
+// Returns x "mod" 2pi
+def trigNormalize(x : Float) : Float
+  if (x < 0.0)
+    trigNormalize(x + 2.0 * pi)
+   elif (x > 2.0 * pi)
+    trigNormalize(x - 2.0 * pi)
+   else
+    x
+
+def sin(x : Float) : Float
+  val xNew = trigNormalize(x)
+  summation(0.0, 50.0,
+    n => intPow(-1.0, n) * intPow(xNew, 2.0 * n + 1.0) / fac(2.0 * n + 1.0)
+  )
+
+def cos(x : Float) : Float
+  val xNew = trigNormalize(x)
+  summation(0.0, 50.0,
+    n => intPow(-1.0, n) * intPow(xNew, 2.0 * n) / fac(2.0 * n)
+  )
+
+//------------------------------------------------------------------------------
+// Term Type
+//------------------------------------------------------------------------------
+
+datatype Term
+  Constant(value : Float)
+  Variable(name : String)
+  Sum(u : Term, v : Term)
+  Product(u : Term, v : Term)
+  Pow(u : Term, n : Float)
+  Sin(u : Term)
+  Cos(u : Term)
+  Exp(b : Float, u : Term)
+  Log(b : Float, u : Term)
+
+// Wrappers to pass the functions around and for typechecking
+val Constant : Float => Term = value : Float => Constant(value)
+val Variable : String => Term = name : String => Variable(name)
+val Sum : Term * Term => Term = (u : Term, v : Term) => Sum(u, v)
+val Product : Term * Term => Term = (u : Term, v : Term) => Product(u, v)
+val Pow : Term * Float => Term = (u : Term, n : Float) => Pow(u, n)
+val Sin : Term => Term = u : Term => Sin(u)
+val Cos : Term => Term = u : Term => Cos(u)
+val Exp : Float * Term => Term = (b : Float, u : Term) => Exp(b, u)
+val Log : Float * Term => Term = (b : Float, u : Term) => Log(b, u)
+
+//------------------------------------------------------------------------------
+// String conversion
+//------------------------------------------------------------------------------
+
+def numberToString(x : Float) : String
+  if (isProbablyInt(x))
+    String.ofInt(round(x))
+   else
+    String.ofFormattedFloat("%.3f", x)
+
+def toString(t : Term) : String
+  def productWrap(s : Term) : String
+    match s:
+      s:Term => toString(s)
+      s:Sum => "(" + toString(s) + ")"
+
+  match t:
+    t:Constant => numberToString(t.value)
+    t:Variable => t.name
+    t:Sum => toString(t.u) + " + " + toString(t.v)
+    t:Product => match t.u:
+                   u:Term => productWrap(t.u) + " * " + productWrap(t.v)
+                   u:Constant => if (floatEq(u.value, -1.0))
+                                   "-" + toString(t.v)
+                                  else
+                                   numberToString(u.value) + toString(t.v)
+    t:Pow => match t.u:
+               u:Term => "(" + toString(t.u) + ")^" + numberToString(t.n)
+               u:Variable => toString(t.u) + "^" + numberToString(t.n)
+    t:Sin => "sin(" + toString(t.u) + ")"
+    t:Cos => "cos(" + toString(t.u) + ")"
+    t:Exp => numberToString(t.b) + "^(" + toString(t.u) + ")"
+    t:Log => "log[" + numberToString(t.b) + "](" + toString(t.u) + ")"
+
+//------------------------------------------------------------------------------
+// Differentiation
+//------------------------------------------------------------------------------
+
+def d(wrt : String, t : Term) : Term = match t:
+  t:Constant => Constant(0.0)
+  t:Variable => if (String.equals(t.name, wrt))
+                  Constant(1.0)
+                 else
+                  Constant(0.0)
+  t:Sum => Sum(d(wrt, t.u), d(wrt, t.v))
+  t:Product => Sum(Product(t.u, d(wrt, t.v)), Product(t.v, d(wrt, t.u)))
+  t:Pow => Product(Product(Constant(t.n), Pow(t.u, t.n - 1.0)), d(wrt, t.u))
+  t:Sin => Product(Cos(t.u), d(wrt, t.u))
+  t:Cos => Product(Product(Constant(-1.0), Sin(t.u)), d(wrt, t.u))
+  t:Exp => Product(Product(Exp(t.b, t.u), Log(e, Constant(t.b))), d(wrt, t.u))
+  t:Log => Product(Pow(Product(t.u, Log(e, Constant(t.b))), -1.0), d(wrt, t.u))
+
+//------------------------------------------------------------------------------
+// Simplification
+//------------------------------------------------------------------------------
+
+datatype TermStep
+  Step(term : Term)
+  NoStep
+
+// Wrappers to pass the functions around and for typechecking
+val Step : Term => TermStep = (t : Term) => Step(t)
+val NoStep : TermStep = NoStep()
+
+def firstMatch(ts : TermStep, otherwise : Unit => TermStep) : TermStep
+  match ts:
+    a:Step => ts
+    a:NoStep => otherwise()
+
+def trySimplify1(
+  u : Term, combiner : Term => Term, otherwise : Unit => TermStep
+) : TermStep
+  match simplify(u):
+    a:Step => Step(combiner(a.term))
+    a:NoStep => otherwise()
+
+def trySimplify2(
+  u : Term, v : Term,
+  combiner : Term * Term -> Term, otherwise : Unit => TermStep
+): TermStep
+  match simplify(u):
+    a:Step => Step(combiner(a.term, v))
+    a:NoStep => match simplify(v):
+                  b:Step => Step(combiner(u, b.term))
+                  b:NoStep => otherwise()
+
+def simplify(t : Term) : TermStep
+  def isConstant(a : Term, n : Float) : Boolean
+    match a:
+      _:Term => false
+      a:Constant => floatEq(a.value, n)
+
+  def isZero(a : Term) : Boolean
+    isConstant(a, 0.0)
+
+  def isOne(a : Term) : Boolean
+    isConstant(a, 1.0)
+
+  def isSin2(a : Term) : Boolean
+    match a:
+      _:Term => false
+      a:Pow => if (floatEq(a.n, 2.0))
+                 match a.u:
+                   _:Term => false
+                   u:Sin => true
+                else
+                 NoStep
+
+  def isCos2(a : Term) : Boolean
+    match a:
+      _:Term => false
+      a:Pow => if (floatEq(a.n, 2.0))
+                 match a.u:
+                   _:Term => false
+                   u:Cos => true
+                else
+                 NoStep
+
+  def simplifySum(a : Term, b : Term) : TermStep
+    def zeroSumRule() : TermStep
+      if (isZero(a))
+        Step(b)
+       elif (isZero(b))
+        Step(a)
+       else
+        NoStep
+
+    def constantSumRule() : TermStep
+      match a:
+        a:Term => NoStep
+        a:Constant => match b:
+                        b:Term => NoStep
+                        b:Constant => Step(Constant(a.value + b.value))
+
+    def pythagorasRule() : TermStep
+      if (isSin2(a) && isCos2(b) || isCos2(a) && isSin2(b))
+        Step(Constant(1.0))
+       else
+        NoStep
+
+    firstMatch(zeroSumRule(),
+      () => firstMatch(constantSumRule(),
+        () => pythagorasRule()
+      )
+    )
+
+  def simplifyProduct(a : Term, b : Term) : TermStep
+    def zeroProductRule() : TermStep
+      if (isZero(a))
+        Step(Constant(0.0))
+       elif (isZero(b))
+        Step(Constant(0.0))
+       else
+        NoStep
+
+    def oneProductRule() : TermStep
+      if (isOne(a))
+        Step(b)
+       elif (isOne(b))
+        Step(a)
+       else
+        NoStep
+
+    def constantProductRule() : TermStep
+      match a:
+        a:Term => NoStep
+        a:Constant => match b:
+                        b:Term => NoStep
+                        b:Constant => Step(Constant(a.value * b.value))
+
+    def leftConstantRule() : TermStep
+      match a:
+        a:Term => match b:
+                    b:Term => NoStep
+                    b:Constant => Step(Product(b, a))
+        a:Constant => NoStep
+
+    firstMatch(zeroProductRule(),
+      () => firstMatch(oneProductRule(),
+        () => firstMatch(constantProductRule(),
+          () => leftConstantRule()
+        )
+      )
+    )
+
+  def simplifyPow(u : Term, n : Float) : TermStep
+    def powerZeroRule() : TermStep
+      if (floatEq(n, 0.0))
+        Step(Constant(1.0))
+       else
+        NoStep
+
+    def powerOneRule() : TermStep
+      if (floatEq(n, 1.0))
+        Step(u)
+       else
+        NoStep
+
+    firstMatch(powerZeroRule(),
+      () => powerOneRule()
+    )
+
+  def simplifyExp(b : Float, u : Term) : TermStep
+    def expZeroPowRule() : TermStep
+      if (isZero(u))
+        Step(Constant(1.0))
+       else
+        NoStep
+
+    def expZeroBaseRule() : TermStep
+      if (floatEq(b, 0.0))
+        Step(Constant(0.0))
+       else
+        NoStep
+
+    def expOneBaseRule() : TermStep
+      if (floatEq(b, 1.0))
+        Step(Constant(1.0))
+       else
+        NoStep
+
+    def expInverseRule() : TermStep
+      match u:
+        u:Term => NoStep
+        u:Log => if (floatEq(b, u.b))
+                   Step(u.u)
+                  else
+                   NoStep
+
+    firstMatch(expZeroPowRule(),
+      () => firstMatch(expZeroBaseRule(),
+        () => firstMatch(expOneBaseRule(),
+          () => expInverseRule()
+        )
+      )
+    )
+
+  def simplifyLog(b : Float, u : Term) : TermStep
+    def logOneArgRule() : TermStep
+      if (isOne(u))
+        Step(Constant(0.0))
+       else
+        NoStep
+
+    def logZeroBaseRule() : TermStep
+      if (floatEq(b, 0.0))
+        Step(Constant(0.0))
+       else
+        NoStep
+
+    def logArgBaseRule() : TermStep
+      if (isConstant(u, b))
+        Step(Constant(1.0))
+       else
+        NoStep
+
+    def bringDownRule() : TermStep
+      match u:
+        u:Term => NoStep
+        u:Pow => Step(Product(Constant(u.n), Log(b, u.u)))
+        u:Exp => Step(Product(u.u, Log(b, Constant(u.b))))
+
+    firstMatch(logOneArgRule(),
+      () => firstMatch(logZeroBaseRule(),
+        () => firstMatch(logArgBaseRule(),
+          () => bringDownRule()
+        )
+      )
+    )
+
+  match t:
+    t:Constant => NoStep
+    t:Variable => NoStep
+    t:Sum => trySimplify2(t.u, t.v, Sum,
+      () => simplifySum(t.u, t.v)
+    )
+    t:Product => trySimplify2(t.u, t.v, Product,
+      () => simplifyProduct(t.u, t.v)
+    )
+    t:Pow => trySimplify1(t.u, uNew : Term => Pow(uNew, t.n),
+      () => simplifyPow(t.u, t.n)
+    )
+    t:Sin => trySimplify1(t.u, Sin,
+      () => NoStep
+    )
+    t:Cos => trySimplify1(t.u, Cos,
+      () => NoStep
+    )
+    t:Exp => trySimplify1(t.u, uNew : Term => Exp(t.b, uNew),
+      () => simplifyExp(t.b, t.u)
+    )
+    t:Log => trySimplify1(t.u, uNew : Term => Log(t.b, uNew),
+      () => simplifyLog(t.b, t.u)
+    )
+
+def fullySimplify(t : Term) : Term
+  match simplify(t):
+    a:Step => fullySimplify(a.term)
+    a:NoStep => t
+
+//------------------------------------------------------------------------------
+// Evaluation
+//------------------------------------------------------------------------------
+
+def eval(bindings : Map, t : Term) : Float = match t:
+  t:Constant => t.value
+  t:Variable => bindings.get(t.name).getOrElse(() => nan)
+  t:Sum => eval(bindings, t.u) + eval(bindings, t.v)
+  t:Product => eval(bindings, t.u) * eval(bindings, t.v)
+  t:Pow => realPow(eval(bindings, t.u), t.n)
+  t:Sin => sin(eval(bindings, t.u))
+  t:Cos => cos(eval(bindings, t.u))
+  t:Exp => realPow(t.b, eval(bindings, t.u))
+  t:Log => logBase(t.b, eval(bindings, t.u))
+
+//------------------------------------------------------------------------------
+// Examples
+//------------------------------------------------------------------------------
+
+val divider : String = "========================================"
+val divider2 : String = divider + divider
+
+val smallDivider : String = "-----"
+
+def printDivider() : Unit
+  stdout.print(divider2)
+  stdout.println()
+
+def printSmallDivider() : Unit
+  stdout.print(smallDivider)
+  stdout.println()
+
+def printInfo(t : Term, xVal : Float, yVal : Float) : Unit
+  val xString : String = numberToString(xVal)
+  val yString : String = numberToString(yVal)
+
+  var bindings : Map = map.make((x : String, y : String) => String.equals(x, y))
+  bindings.put("x", xVal)
+  bindings.put("y", yVal)
+
+  def printInfo1(title : String, s : Term) : Unit
+    val sNew = fullySimplify(s)
+
+    stdout.print("* " + title + ":\n    ")
+    stdout.print(toString(s))
+    stdout.print("\n  Fully simplified:\n    ")
+    stdout.print(toString(sNew))
+    stdout.print(
+      "\n  Evaluated @ (x = " + xString + ", y = " + yString + "):\n    "
+    )
+    stdout.print(numberToString(eval(bindings, sNew)))
+    stdout.print("\n")
+
+  printDivider()
+  printInfo1("Term", t)
+  printSmallDivider()
+  printInfo1("Derivative w.r.t. x", d("x", t))
+  printSmallDivider()
+  printInfo1("Derivative w.r.t. y", d("y", t))
+
+printInfo(
+  Sin(Pow(Variable("x"), 2.0)),
+  4.0, 5.0
+)
+printInfo(
+  Log(e, Exp(e, Pow(Variable("y"), 3.0))),
+  0.5, 2.0
+)
+printInfo(
+  Product(Variable("x"), Variable("y")),
+  3.0, 7.5
+)
+printInfo(
+  Sum(Pow(Sin(Variable("x")), 2.0), Pow(Cos(Variable("x")), 2.0)),
+  0.0, 0.0
+)
+
+printDivider()
