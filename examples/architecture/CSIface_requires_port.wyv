@@ -1,14 +1,17 @@
-module def CSIface_requires_port(tcpClient : io.Socket, jsonCtrProps : JSONCtrProperties, java : Java) : CSIface
+module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java) : CSIface
+// java is a dependency so is it a port?
 
 import io.io
+import json
+import io.Socket
 val io = io(java)
+val json = json(java)
 
 def getVal(key : String) : String
+	val tcpClient : Socket = io.makeSocket(jsonCtrProps.host, jsonCtrProps.prt) 
 	val out = tcpClient.getOutputStream()
 	val in = tcpClient.getInputStream()
 	val outData = io.makeDataOutputStream(out)
 	val inData = io.makeDataInputStream(in)	
-//	out.writeUTF(StringToBytes(serializeToJSON(key)))
-	val returnVal = inData.readUTF()
-//	bytesToString(returnVal)
-	""
+	outData.writeUTF((json.serializeToJSON(key)).toString())
+	inData.readUTF()

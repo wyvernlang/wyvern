@@ -3,36 +3,28 @@ import wyvern.archast
 import wyvern.ast
 import wyvern.option
 
-type IPAddress
-	val network : Int
-	val host1 : Int
-	val host2 : Int
-	val host3 : Int
-	val host4 : Int
-
 type JSONCtrProperties
-	val host : IPAddress
+	val host : String
 	val prt : Int
 /*	metadata new
-		def checkPortCompatability(l : list.List[archast.ArchAST]) : Boolean
-			type AAST = archast.ArchAST
-			type AST = ast.AST
+		def checkPortCompatability(l : list.List) : Boolean
+			type PortDecl = archast.PortDecl
 			if (l.length() == 2)	
-					val p1 : AAST = l.get(0)
-					val p2 : AAST = l.get(0)
+					val p1 : PortDecl = l.get(0)
+					val p2 : PortDecl = l.get(0)
 					var requires : String = ""
 					var provides : String = ""
-					if (p1.getRequires() == "")
-							if (p1.getProvides() == "")
+					if (p1.portdecl.getRequires() == "")
+							if (p1.portdecl.getProvides() == "")
 									false
 								else
-									provides = p1.getProvides()
+									provides = p1.portdecl.getProvides()
 						else
-							requires = p1.getRequires()
+							requires = p1.portdecl.getRequires()
 					if (requires == "")	
-							requires = p2.getRequires()
+							requires = p2.portdecl.getRequires()
 						else	
-							provides = p2.getProvides()
+							provides = p2.portdecl.getProvides()
 								
 					if (requires == provides)
 							true
@@ -40,10 +32,4 @@ type JSONCtrProperties
 							false
 				else
 					false
-
-		def generateConnectorImpl(l : list.List[AAST]) : option.Option[AST]
-			checkPortCompatability(l)
-		
-		def generateConnectorInit() : option.Option[AST]
-			unit
 */

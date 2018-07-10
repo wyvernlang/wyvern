@@ -3,7 +3,5 @@ module archast
 import wyvern.collections.list
 import wyvern.internal.archast
 
-type ArchAST = archast.ArchAST
-
-def portDecl(req : String, prov : String, name : String) : ArchAST
-	archast.portDecl(req, prov, name)
+type PortDecl 
+	val portdecl : archast.PortDecl

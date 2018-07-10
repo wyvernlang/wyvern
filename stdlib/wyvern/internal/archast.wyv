@@ -3,12 +3,7 @@ module archast
 import wyvern.internal.list
 import java:wyvern.stdlib.support.ArchAST.utils
 
-type ArchAST
-	val archast : Unit
-
-//?
-type Decl 
-	val decl : Unit
-
-def portDecl(req : String, prov : String, name : String) : ArchAST = new
-	val archast : Unit = utils.portDecl(req, prov, name)
+type PortDecl 
+	val portdecl : Unit
+	def getProvides() : String
+	def getRequires() : String

@@ -71,9 +71,9 @@ public class ASTComponentTypeDecl extends SimpleNode {
         String req = ((ASTPortDecl) child).getRequires();
         String prov = ((ASTPortDecl) child).getProvides();
         String name = ((ASTPortDecl) child).getPort();
-        if (req != null) {
+        if (req != "") {
           reqs.put(name, req);
-        } else if (prov != null) {
+        } else if (prov != "") {
           provs.put(name, prov);
         }
       }
@@ -160,29 +160,31 @@ public class ASTComponentTypeDecl extends SimpleNode {
           .collect(Collectors.toList());
       for (Declaration d : decls) {
         DefDeclaration dd = (DefDeclaration) d;
+        if (dd.getType() instanceof StructuralType) {
+          List<DeclType> valdecltypes = ((StructuralType) (dd.getType()))
+              .getDeclTypes().stream().filter(p -> p instanceof ValDeclType)
+              .collect(Collectors.toList());
 
-        List<DeclType> valdecltypes = ((StructuralType) (dd.getType()))
-            .getDeclTypes().stream().filter(p -> p instanceof ValDeclType)
-            .collect(Collectors.toList());
-
-        for (DeclType dt : valdecltypes) {
-          ValDeclType vdtype = (ValDeclType) dt;
-          String name = vdtype.getName();
-          String t = ((NominalType) vdtype.getSourceType().getValueType())
-              .getTypeMember();
-          if (provs.get(name) == null || !provs.get(name).equals(t)) {
+          for (DeclType dt : valdecltypes) {
+            ValDeclType vdtype = (ValDeclType) dt;
+            String name = vdtype.getName();
+            String t = ((NominalType) vdtype.getSourceType().getValueType())
+                .getTypeMember();
+            if (provs.get(name) == null || !provs.get(name).equals(t)) {
+              // inconsistent fields
+              ToolError.reportError(
+                  ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                  typeName);
+            } else {
+              checkCount++;
+            }
+          }
+          if (checkCount != valdecltypes.size()) {
             // inconsistent fields
             ToolError.reportError(
                 ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
                 typeName);
-          } else {
-            checkCount++;
           }
-        }
-        if (checkCount != valdecltypes.size()) {
-          // inconsistent fields
-          ToolError.reportError(ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY,
-              location, typeName);
         }
       }
 

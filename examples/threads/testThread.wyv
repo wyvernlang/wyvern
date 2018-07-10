@@ -1,6 +1,6 @@
 require stdout
-require platform.java.thread.thread
-import platform.java.thread.ThreadGroup
+require thread.thread
+import thread.ThreadGroup
 
 
 def foo1() : Unit

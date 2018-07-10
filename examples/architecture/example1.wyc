@@ -5,7 +5,7 @@ component Server
 	port sendInfo: provides CSIface
 
 connector JSONCtr
-	val host: IPAddress
+	val host: String
 	val prt: Int
 
 architecture ClientServer
