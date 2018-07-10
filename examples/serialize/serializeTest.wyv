@@ -8,12 +8,13 @@ val c : cell.Cell = cell.make()
 
 // serialize to JSON and print as JSON
 val jsonfile : json.JSON = json.serializeToJSON(c)
-stdout.print(jsonfile.toString())
+val jsonString : String = jsonfile.toString()
 
-// deserialize JSON object
-val deserialized : cell.Cell = json.deserializeFromJSON(jsonfile)
-stdout.println()
+// json from String obj
+val fromString : json.JSON = json.stringToJSON(jsonString)
 
+val deserialized : cell.Cell = json.deserializeFromJSON(fromString)
+	
 // check preservation of object
 def display(x : cell.Cell) : Unit
 	stdout.printBoolean(x.bool)
@@ -26,5 +27,16 @@ def display(x : cell.Cell) : Unit
 	stdout.println()
 	stdout.printInt(x.sub.x)
 
+stdout.print("Original: ")
+display(c)
+stdout.println()
+
+stdout.print(jsonString)
+stdout.println()
+
+stdout.print(fromString.toString())
+stdout.println()
+
+stdout.print("Deserialized: ")
 display(deserialized)
 stdout.println()

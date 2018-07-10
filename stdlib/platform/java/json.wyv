@@ -15,3 +15,8 @@ def serializeToJSON(obj : Dyn) : JSON = new
 
 def deserializeFromJSON(json : JSON) : Dyn
 	serializer.deserializeFromJSON(json.jsonmap)
+
+def stringToJSON(str : String) : JSON = new
+	val jsonmap = serializer.stringToJSONMap(str)
+	def toString() : String
+		serializer.toJSONString(this.jsonmap)
