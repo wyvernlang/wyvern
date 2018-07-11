@@ -1,4 +1,4 @@
-module def network05(stdout : Stdout) : effects.NetworkType01
+module def network05(stdout : Stdout) : effects.NetworkType
 effect send = {}
 effect receive = {}
 def sendData(data : String) : gibberish Unit

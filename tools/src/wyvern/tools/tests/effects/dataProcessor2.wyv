@@ -1,4 +1,4 @@
-module def dataProcessor2(net : effects.NetworkType01, stdout : Stdout)
+module def dataProcessor2(net : effects.NetworkType, stdout : Stdout)
 effect send = {} // same as net.send
 effect process = {net.receive, send}
 effect genN = {}

@@ -1,4 +1,4 @@
-module def dataProcessor3(net : effects.NetworkType01, stdout : Stdout)
+module def dataProcessor3(net : effects.NetworkType, stdout : Stdout)
 effect send = {net.send}
 effect process = {net.receive, gibberish}
 def processData() : {process} Unit

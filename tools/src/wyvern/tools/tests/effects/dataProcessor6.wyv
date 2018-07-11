@@ -1,4 +1,4 @@
-module def dataProcessor6(net : effects.NetworkType01, stdout : Stdout)
+module def dataProcessor6(net : effects.NetworkType, stdout : Stdout)
 effect genN = {}
 def genNum() : { genN } Int
     3

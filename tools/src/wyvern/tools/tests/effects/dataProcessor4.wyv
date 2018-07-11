@@ -1,4 +1,4 @@
-module def dataProcessor4(net : effects.NetworkType01, stdout : Stdout)
+module def dataProcessor4(net : effects.NetworkType, stdout : Stdout)
 effect send = {net.send}
 effect process = {net.receive, process} // recursive (should result in some error)
 def processData() : {process} Unit

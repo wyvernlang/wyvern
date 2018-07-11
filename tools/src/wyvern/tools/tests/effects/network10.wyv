@@ -1,5 +1,5 @@
 // for testing effects defined by pure modules
-module def network10(stdout : Stdout) : effects.NetworkType01
+module def network10(stdout : Stdout) : effects.NetworkType
 import effects.network10Effects as fx
 effect send = {fx.sendFx}
 effect receive = {fx.receiveFx}

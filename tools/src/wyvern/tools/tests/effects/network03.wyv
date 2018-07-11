@@ -1,4 +1,4 @@
-module def network03(stdout : Stdout) : effects.NetworkType01
+module def network03(stdout : Stdout) : effects.NetworkType
 effect send = {}
 effect receive = {}
 effect process = {}
