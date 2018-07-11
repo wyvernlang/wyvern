@@ -1,4 +1,4 @@
-module def fileIO2(java: Java): effects.FileIO2
+module def fileIO2(java: Java): effects.FileIO
 import java:wyvern.tools.tests.Illustrations.nativeFileIO
 import effects.fileIOEffects
 

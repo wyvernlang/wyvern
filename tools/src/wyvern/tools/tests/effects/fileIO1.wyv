@@ -1,4 +1,4 @@
-module def fileIO1(java: Java): effects.FileIO1
+module def fileIO1(java: Java): effects.FileIO
 import java:wyvern.tools.tests.Illustrations.nativeFileIO
 effect readF = {system.ffiEffect}
 effect writeF = {system.ffiEffect}
