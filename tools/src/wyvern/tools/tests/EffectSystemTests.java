@@ -47,11 +47,11 @@ public class EffectSystemTests {
     }
 
     @Test
-    public void testEffectNetwork01() throws ParseException {
+    public void testEffectNetwork() throws ParseException {
         /* Declared in type + module def;
          * Defined in module def;
          * Method annotations in both. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork", Util.unitType(), Util.unitValue());
     }
 
     @Test
@@ -162,11 +162,11 @@ public class EffectSystemTests {
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.unitType(), Util.unitValue());
     }
 
-//    @Test
-//    public void testEffectNetwork10() throws ParseException { /* Work-in-progress */
-//        /* For testing effects defined by a pure module. */
-//        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.unitType(), Util.unitValue());
-//    }
+    //    @Test
+    //    public void testEffectNetwork10() throws ParseException { /* Work-in-progress */
+    //        /* For testing effects defined by a pure module. */
+    //        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.unitType(), Util.unitValue());
+    //    }
 
     @Test
     public void testEffectNetwork11() throws ParseException {
