@@ -1,14 +1,11 @@
-module def dataProcessor5(net : effects.NetworkType, stdout : Stdout)
-effect send = {} // same as net.send
+module def dataProcessor5(net: effects.NetworkType)
+effect send = {}
 effect process = {net.receive, send}
 effect receive = {} // to add confusion to the mix
 effect genN = {}
-def genNum() : { genN, receive } Int
+def genNum(): { genN, receive } Int
     3
-def processData() : {process, genN, receive} Unit
-    stdout.print("dataProcessor5 w/ multiple layers of effect abstraction: \n")
-    val n : Int = genNum()
+def processData(): {process, genN, receive} String
+    val n: Int = genNum()
+    net.sendData("From dataProcessor5")
     net.receiveData()
-    stdout.print("data processed\n")
-    net.sendData("from dataProcessor5...") // send==net.send=={}
-    stdout.print("dataProcessor5 done!\n")

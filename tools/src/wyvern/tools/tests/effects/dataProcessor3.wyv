@@ -1,8 +1,5 @@
-module def dataProcessor3(net : effects.NetworkType, stdout : Stdout)
+module def dataProcessor3(net: effects.NetworkType)
 effect send = {net.send}
 effect process = {net.receive, gibberish}
-def processData() : {process} Unit
-    stdout.print("dataProcessor3 w/ multiple layers of effect abstraction: \n")
+def processData(): {process} String
     net.receiveData()
-    stdout.print("data processed\n")
-    stdout.print("dataProcessor3 w/ multiple layers of effect abstraction!\n")

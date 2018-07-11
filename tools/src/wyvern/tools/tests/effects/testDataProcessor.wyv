@@ -1,8 +1,6 @@
-require stdout
 import effects.network
 import effects.dataProcessor
 
-val n01 = network(stdout)
-
-val dp1 = dataProcessor(n01, stdout) // should work
-dp1.processData() // print "Data processor w/ effect abstraction: ", "data received", then "data processed"
+val n = network()
+val dp = dataProcessor(n)
+dp.processData()

@@ -1,6 +1,4 @@
-require stdout
 import effects.network
-
-val n = network(stdout)
-n.sendData("Network with effects")	// print "data sent: Network01 with effects"
-n.receiveData()		// print "data received"
+val n = network()
+n.sendData("Network with effects")
+n.receiveData()
