@@ -1,6 +1,3 @@
-/**
- * @author vzhao
- */
 package wyvern.target.corewyvernIL.effects;
 
 import java.util.HashSet;
@@ -20,15 +17,13 @@ import wyvern.tools.errors.ToolError;
 
 public class Effect {
     private Path path;
-    private String name;
-    private FileLocation loc;
+    private final String name;
+    private final FileLocation loc;
 
     public Effect(Path p, String n, FileLocation l) {
-        /*if (p != null && !(p instanceof Variable))
-            throw new RuntimeException();*/
-        this.path = p;
-        this.name = n;
-        this.loc = l;
+        path = p;
+        name = n;
+        loc = l;
     }
 
     public Path getPath() {
@@ -38,6 +33,7 @@ public class Effect {
     /** For effects defined in the same signature (whose paths are null until typechecked) */
     public void setPath(Path p) {
         if (!(p instanceof Variable)) {
+            ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, loc, name);
             throw new RuntimeException();
         }
         path = p;
@@ -50,7 +46,7 @@ public class Effect {
          * is made up for later in the compiling process; otherwise the effect is invalid and will be
          * caught by effectCheck() later. */
         if (getPath() == null) {
-            Path ePath = ctx.getContainerForTypeAbbrev(getName());
+            final Path ePath = ctx.getContainerForTypeAbbrev(getName());
             setPath(ePath); // may be null
         }
     }
@@ -63,9 +59,9 @@ public class Effect {
         return loc;
     }
 
-//    public DeclType getDeclType(EffectSet effectSet) {
-//        return new EffectDeclType(getName(), effectSet, getLocation());
-//    }
+    //    public DeclType getDeclType(EffectSet effectSet) {
+    //        return new EffectDeclType(getName(), effectSet, getLocation());
+    //    }
 
     @Override
     public String toString() {
@@ -89,7 +85,7 @@ public class Effect {
             return false;
         }
 
-        Effect eObj = (Effect) obj;
+        final Effect eObj = (Effect) obj;
         if (eObj.getName().equals(getName()) && eObj.getPath().equals(getPath())) {
             return true;
         }
@@ -100,8 +96,8 @@ public class Effect {
     public int hashCode() {
         final int prime = 67;
         int result = 1;
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getPath() == null) ? 0 : getPath().hashCode());
+        result = prime * result + (getName() == null ? 0 : getName().hashCode());
+        result = prime * result + (getPath() == null ? 0 : getPath().hashCode());
         return result;
     }
 
@@ -129,12 +125,12 @@ public class Effect {
             }
 
             vt = getPath().typeCheck(ctx, null);
-        } catch (RuntimeException ex) {
+        } catch (final RuntimeException ex) {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }
 
-        DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
-        if ((eDT == null) || (!(eDT instanceof EffectDeclType))) {
+        final DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
+        if (eDT == null || !(eDT instanceof EffectDeclType)) {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }
 
@@ -143,19 +139,19 @@ public class Effect {
 
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
         if (path.getFreeVariables().contains(varName)) {
-            EffectDeclType dt = this.findEffectDeclType(ctx);
+            final EffectDeclType dt = findEffectDeclType(ctx);
             if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1
                         && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
                     // avoid infinite loops, just in case
                     // TODO: make this more principled
-                    Set<Effect> s = new HashSet<Effect>();
+                    final Set<Effect> s = new HashSet<Effect>();
                     s.add(this);
                     return s;
                 }
                 // different effects, so call recursively
-                Set<Effect> s = new HashSet<Effect>();
-                for (Effect e : dt.getEffectSet().getEffects()) {
+                final Set<Effect> s = new HashSet<Effect>();
+                for (final Effect e : dt.getEffectSet().getEffects()) {
                     s.addAll(e.doAvoid(varName, ctx, count + 1));
                 }
                 return s;
@@ -164,7 +160,7 @@ public class Effect {
 
         // was best effort anyway
         // TODO: be more principled
-        Set<Effect> s = new HashSet<Effect>();
+        final Set<Effect> s = new HashSet<Effect>();
         s.add(this);
         return s;
     }
