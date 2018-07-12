@@ -83,8 +83,6 @@ public class ModuleResolver {
       searchPath.add(platformPath.toFile());
     }
     this.searchPath = searchPath;
-    // System.out.println(new File(rootDir + "/../examples/architecture"));
-    this.searchPath.add(new File(rootDir + "/../examples/architecture"));
   }
 
   public ModuleResolver(String platform, File rootDir, File libDir,
@@ -112,8 +110,6 @@ public class ModuleResolver {
       searchPath.add(platformPath.toFile());
     }
     this.searchPath = searchPath;
-    // System.out.println(new File(rootDir + "/../examples/architecture"));
-    this.searchPath.add(new File(rootDir + "/../examples/architecture"));
   }
 
   public void setInterpreterState(InterpreterState s) {
