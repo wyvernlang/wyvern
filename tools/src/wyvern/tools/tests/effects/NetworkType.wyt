@@ -1,5 +1,5 @@
 resource type NetworkType
   effect send
   effect receive
-  def sendData(data: String): {} Unit
+  def sendData(sd: String): {} Unit
   def receiveData(): {receive} String

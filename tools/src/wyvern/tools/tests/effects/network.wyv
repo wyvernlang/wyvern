@@ -2,7 +2,7 @@ module def network(): effects.NetworkType
 effect send = {}
 effect receive = {}
 var data: String = ""
-def sendData(d: String): {} Unit
-    data = d
+def sendData(sd: String): {} Unit
+    data = sd
 def receiveData(): {receive} String
     data
