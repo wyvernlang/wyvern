@@ -34,7 +34,6 @@ public class Effect {
     public void setPath(Path p) {
         if (!(p instanceof Variable)) {
             ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, loc, name);
-            throw new RuntimeException();
         }
         path = p;
     }
@@ -59,17 +58,16 @@ public class Effect {
         return loc;
     }
 
-    //    public DeclType getDeclType(EffectSet effectSet) {
-    //        return new EffectDeclType(getName(), effectSet, getLocation());
-    //    }
-
     @Override
     public String toString() {
         return (path == null ? "" : getPath().toString() + ".") + getName();
     }
 
     public Effect adapt(View v) {
-        return new Effect(getPath().adapt(v), name, loc);
+        if (path == null) {
+            ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, loc, name);
+        }
+        return new Effect(path.adapt(v), name, loc);
     }
 
     @Override
@@ -129,7 +127,7 @@ public class Effect {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }
 
-        final DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (ex. "effect receive = ")
+        final DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (e.g. "effect receive = ")
         if (eDT == null || !(eDT instanceof EffectDeclType)) {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }
