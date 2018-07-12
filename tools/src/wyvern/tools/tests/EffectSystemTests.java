@@ -230,17 +230,9 @@ public class EffectSystemTests {
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork17", Util.stringType(), new StringLiteral("Network17 with effects"));
     }
 
-    // Another test in which a third module takes in a data processor which takes in a network,
-    // so that the there's multiple (external) layers of effect abstraction?
     @Test
-    public void testObjNetwork00() throws ParseException {
-        /* Object notation with no effect annotations. */
-        TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    public void testObjNetwork01() throws ParseException {
-        /* Except for the "new" notation, should otherwise use the same parser code as modules. */
-        TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+    public void testObjNetwork() throws ParseException {
+        /* Object with effect annotations. */
+        TestUtil.doTestScriptModularly(PATH, "effects.objNetwork", Util.stringType(), new StringLiteral("ObjNetwork with effects"));
     }
 }
