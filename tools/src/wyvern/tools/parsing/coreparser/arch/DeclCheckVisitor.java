@@ -17,6 +17,8 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
   private HashMap<String, String> entrypoints = new HashMap<>();
   private HashMap<String, HashSet<String>> attachments = new HashMap<>();
 
+  private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
+
   public HashMap<String, ASTComponentTypeDecl> getComponentTypes() {
     return componentTypes;
   }
@@ -39,6 +41,10 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
 
   public HashMap<String, HashSet<String>> getAttachments() {
     return attachments;
+  }
+
+  public HashMap<String, ASTPortDecl> getPortDecls() {
+    return portdecls;
   }
 
   public Object visit(ASTAttachmentDecl node, Object data) {
@@ -77,6 +83,11 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
       }
 
     }
+    return super.visit(node, data);
+  }
+
+  public Object visit(ASTPortDecl node, Object data) {
+    portdecls.put(node.getPort(), node);
     return super.visit(node, data);
   }
 

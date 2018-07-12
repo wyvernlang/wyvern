@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
+import wyvern.stdlib.support.AST;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -57,11 +58,41 @@ public class ModuleResolver {
   private InterpreterState state;
   private File rootDir;
   private File libDir;
+  private HashMap<String, AST> mods;
 
   public ModuleResolver(String platform, File rootDir, File libDir) {
     this.platform = platform;
     this.rootDir = rootDir;
     this.libDir = libDir;
+    ArrayList<File> searchPath = new ArrayList<File>();
+    if (rootDir != null && !rootDir.isDirectory()) {
+      throw new RuntimeException("the root path \"" + rootDir
+          + "\" for the module resolver must be a directory");
+    }
+    if (libDir != null && !libDir.isDirectory()) {
+      throw new RuntimeException("the lib path \"" + libDir
+          + "\" for the module resolver must be a directory");
+    }
+    if (rootDir != null) {
+      searchPath.add(rootDir);
+    }
+    if (libDir != null) {
+      searchPath.add(libDir);
+      platformPath = libDir.toPath().resolve("platform").resolve(platform)
+          .toAbsolutePath();
+      searchPath.add(platformPath.toFile());
+    }
+    this.searchPath = searchPath;
+    // System.out.println(new File(rootDir + "/../examples/architecture"));
+    this.searchPath.add(new File(rootDir + "/../examples/architecture"));
+  }
+
+  public ModuleResolver(String platform, File rootDir, File libDir,
+      HashMap<String, AST> mods) {
+    this.platform = platform;
+    this.rootDir = rootDir;
+    this.libDir = libDir;
+    this.mods = mods;
     ArrayList<File> searchPath = new ArrayList<File>();
     if (rootDir != null && !rootDir.isDirectory()) {
       throw new RuntimeException("the root path \"" + rootDir

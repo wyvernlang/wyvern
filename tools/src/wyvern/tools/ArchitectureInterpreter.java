@@ -73,10 +73,6 @@ public class ArchitectureInterpreter {
             "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
         return;
       }
-      // Construct interpreter state
-      InterpreterState state = new InterpreterState(
-          InterpreterState.PLATFORM_JAVA, new File(rootLoc),
-          new File(wyvernPath));
 
       // Check architecture file
       File f = new File(rootLoc + "/" + filepath.toString());
@@ -88,6 +84,11 @@ public class ArchitectureInterpreter {
       Node start = wp.ArchDesc();
       DeclCheckVisitor visitor = new DeclCheckVisitor();
       visitor.visit((ASTArchDesc) start, null);
+
+      // Construct interpreter state
+      InterpreterState state = new InterpreterState(
+          InterpreterState.PLATFORM_JAVA, new File(rootLoc),
+          new File(wyvernPath));
 
       // Process connectors and begin generation
       HashSet<String> connectorTypes = visitor.getConnectorTypes();
@@ -120,6 +121,8 @@ public class ArchitectureInterpreter {
         for (DeclType dt : metadataStructure.getDeclTypes()) {
           if (dt instanceof DefDeclType) {
             DefDeclType defdecl = (DefDeclType) dt;
+
+            // ah
             List<Value> testArgs = new LinkedList<Value>();
             testArgs.add(new StringLiteral("Hello"));
             Value testReturnVal = ((Invokable) metadata)
