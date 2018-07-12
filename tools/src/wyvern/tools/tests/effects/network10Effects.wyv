@@ -1,4 +1,3 @@
-// for testing effects defined by pure modules
-module network10Effects //: effects.Network10EffectsType
+module network10Effects
 effect sendFx = {}
-effect receiveFx = {sendFx} // same as {}
+effect receiveFx = {system.ffiEffect}

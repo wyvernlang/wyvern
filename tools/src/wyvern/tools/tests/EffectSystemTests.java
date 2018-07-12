@@ -13,23 +13,7 @@ import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 /**
- * Test suite for the effect system (adapted from ExampleTests.java).
- *
- * Successful test cases have the following printout format:
- * "data sent: Network%d%d with(out) effects
- * data received"
- *
- * Test cases that should be broken are in the category of
- * @Category(CurrentlyBroken.class); test cases that should
- * be broken but pass for now due to unimplemented features
- * are commented as "work-in-progress".
- *
- * Comments related to effects: "declaration, definition, method annotation"
- * Appearance in Wyvern:
- * effect "declared_effect" = {"its_defined_effects"}
- * def method_name() : {"method_annotation_of_effects"} return_type
- *
- * @author vzhao
+ * Test suite for the effect system.
  */
 @Category(RegressionTests.class)
 public class EffectSystemTests {
@@ -117,136 +101,133 @@ public class EffectSystemTests {
 
     @Test
     public void testNetwork() throws ParseException {
-        /* Declared in type and module def;
-         * Defined in module def;
-         * Method annotations in both. */
+        /* Declared in type and module def; defined in module def; method annotations in both. */
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork", Util.stringType(), new StringLiteral("Network with effects"));
     }
 
     @Test
     public void testNetwork00() throws ParseException {
-        /* Type & module def with no annotations. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
+        /* Type and module def with no annotations. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.stringType(), new StringLiteral("Network00 without effects"));
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testNetwork02() throws ParseException {
-        /* No declarations. Undefined method annotations in module def (doesn't match the valid type signature,
+        /* No effect declarations. Undefined method annotations in module def (doesn't match the valid type signature,
          * to isolate testing for just method-checking in module def). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.unitType(), Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.stringType(), new StringLiteral("Network02 with effects"));
     }
 
     @Test
     public void testNetwork03() throws ParseException {
-        /* In addition to declarations (not defined) & method annotations in type, additional declaration &
-         * definition in module def. */
+        /* In addition to declarations (not defined) and method annotations in type,
+         * additional declaration and definition in module def. */
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.stringType(), new StringLiteral("Network03 with effects"));
     }
 
-    //    @Test
-    //    public void testNetwork10() throws ParseException { /* Work-in-progress */
-    //        /* For testing effects defined by a pure module. */
-    //        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.unitType(), Util.unitValue());
-    //    }
-
     @Test
-    @Category(CurrentlyBroken.class) // Parse error
+    @Category(CurrentlyBroken.class)
     public void testNetwork04() throws ParseException {
-        /* "gibberish" where "{}" should be in type's method header annotation. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.unitType(), Util.unitValue());
+        /* Parse error due to an effect annotation not being enclosed in "{}" in a method annotation;
+         * also the effect is undefined. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.stringType(), new StringLiteral("Network04 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class) // Parse error
+    @Category(CurrentlyBroken.class)
     public void testNetwork05() throws ParseException {
-        /* "gibberish" where "{}" should be in module def's method header annotation. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.unitType(), Util.unitValue());
+        /* Parse error due to an effect annotation not being enclosed in "{}" in a method annotation in a module;
+         * however, the effect is defined. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.stringType(), new StringLiteral("Network05 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class) // Parse error
+    @Category(CurrentlyBroken.class)
     public void testNetwork06() throws ParseException {
-        /* Bogus declaration ("effect send = stdout") in module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.unitType(), Util.unitValue());
+        /* Parse error due to an effect in the right-hand side of an effect definition not being enclosed in "{}" in a module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.stringType(), new StringLiteral("Network06 with effects"));
     }
 
     @Test
     public void testNetwork07() throws ParseException {
-        /* Declarations + 1 defined in type;
-         * Declarations + definitions in module def;
-         * Method annotations in both.
-         */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.unitType(), Util.unitValue());
+        /* Two effect declarations, one of which is defined in type; method annotations in both type and module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.stringType(), new StringLiteral("Network07 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class) // Invalid effect (actually DSL block instead)
+    @Category(CurrentlyBroken.class)
     public void testNetwork08() throws ParseException {
-        /* Like network07, but "effect receive = {{}}" */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.unitType(), Util.unitValue());
+        /* Invalid effect (actually DSL block instead) due to the module having "effect receive = {{}}". */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.stringType(), new StringLiteral("Network08 with effects"));
     }
 
     @Test
     public void testNetwork09() throws ParseException {
-        /* No method annotations despite declarations in type + module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork09", Util.unitType(), Util.unitValue());
+        /* No method annotations despite effect declarations in type and module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork09", Util.stringType(), new StringLiteral("Network09 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class) // Parse error (undefined effects in module def are taken care of by the parser)
+    @Category(CurrentlyBroken.class)
     public void testNetwork0A() throws ParseException {
-        /* Effect undefined in module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0A", Util.unitType(), Util.unitValue());
+        /* Parse error due to an effect being undefined in a module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0A", Util.stringType(), new StringLiteral("Network0A with effects"));
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testNetwork0B() throws ParseException {
-        /* Nonexistent effect in method annotation in type (not in module def,
-         * but error should be reported before module def is evaluated). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0B", Util.unitType(), Util.unitValue());
+        /* Nonexistent effect in method annotation in type (not in module,
+         * but error should be reported before module is evaluated). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0B", Util.stringType(), new StringLiteral("Network0B with effects"));
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testNetwork0C() throws ParseException {
-        /* Int included as effect in module annotation of type (not in module def,
-         * but error should be reported before module def is evaluated). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0C", Util.unitType(), Util.unitValue());
+        /* Int included as effect in module annotation of type (not in module,
+         * but error should be reported before module is evaluated). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0C", Util.stringType(), new StringLiteral("Network0C with effects"));
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testNetwork0D() throws ParseException {
-        /* Bogus declaration ("effect send = {something.hi}") in module def (something being not an object defined)
-         * for an effect that was left undefined in the type and not actually used
-         * in a method (so that we can be sure that the checking is happening upon declaration). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0D", Util.unitType(), Util.unitValue());
+        /* Bogus right-hand side of an effect definition in a module;
+         * the effect was left undefined in the type and isn't actually used
+         * in any method annotation (so that we can be sure that the checking is happening upon definition). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0D", Util.stringType(), new StringLiteral("Network0D with effects"));
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testNetwork0E() throws ParseException {
-        /* Bad declaration ("effect send = {stdout.hi}") in module def (stdout being an actual object that does
-         * not have the effect "hi" defined) for an effect that was left undefined in the type and not actually used
-         * in a method (so that we can be sure that the checking is happening upon declaration). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0E", Util.unitType(), Util.unitValue());
+        /* Trying to use a nonexistent effect of an object in scope in a module;
+         * the effect was left undefined in the type and is not actually used
+         * in any method annotation (so that we can be sure that the checking is happening upon definition). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0E", Util.stringType(), new StringLiteral("Network0E with effects"));
     }
 
     @Test
     @Category(CurrentlyBroken.class)
     public void testNetwork0F() throws ParseException {
-        /* Same as network01 but with incorrect effect definition (effect receive = {undefined}, should report error here)
-         * and method annotation (def sendData(data : String) : {error} Unit) -- both in type signature *only*, to isolate
-         * testing in type signature. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.unitType(), Util.unitValue());
+        /* Incorrect effect definition (effect receive = {something}, should report error here)
+         * and method annotation (def sendData(data : String) : {error} Unit) -- both in type signature *only*,
+         * to isolate testing in type signature. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.stringType(), new StringLiteral("Network0F with effects"));
+    }
+
+    @Test
+    public void testNetwork10() throws ParseException {
+        /* Globally available effects defined in a pure module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.stringType(), new StringLiteral("Network10 with effects"));
     }
 
     @Test
     public void testNetwork11() throws ParseException {
-        /* Same as network but with all effects defined in type and module def (for testing DataProcessor). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.unitType(), Util.unitValue());
+        /* All effects defined in type and module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.stringType(), new StringLiteral("Network11 with effects"));
     }
 
     // Another test in which a third module takes in a data processor which takes in a network,

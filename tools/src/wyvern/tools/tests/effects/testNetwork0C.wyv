@@ -1,6 +1,5 @@
-require stdout
 import effects.network0C
 
-val n0C = network0C(stdout)
-n0C.sendData("Network0C with effects")	// print "data sent: Network0C with effects"
-n0C.receiveData()		// print "data received"
+val n = network0C()
+n.sendData("Network0C with effects")
+n.receiveData()

@@ -1,10 +1,9 @@
-module def network0C(stdout : Stdout) : effects.NetworkType0C
+module def network0C(): effects.NetworkType0C
 effect send = {}
 effect receive = {}
-val n : Int = 3
-def sendData(data : String) : {} Unit
-    stdout.print("data sent: ")
-    stdout.print(data)
-    stdout.print("\n")
-def receiveData() : {receive} Unit
-    stdout.print("data received\n")
+var data: String = ""
+val n: Int = 3
+def sendData(sd: String): {} Unit
+    data = sd
+def receiveData(): {receive} String
+    data

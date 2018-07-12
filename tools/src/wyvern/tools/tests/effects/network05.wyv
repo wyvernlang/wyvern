@@ -1,9 +1,8 @@
-module def network05(stdout : Stdout) : effects.NetworkType
+module def network05(): effects.NetworkType
 effect send = {}
 effect receive = {}
-def sendData(data : String) : gibberish Unit
-    stdout.print("data sent: ")
-    stdout.print(data)
-    stdout.print("\n")
-def receiveData() : {receive} Unit
-    stdout.print("data received\n")
+var data: String = ""
+def sendData(sd: String): send Unit
+    data = sd
+def receiveData(): {receive} String
+    data
