@@ -7,7 +7,19 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 
+import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
+import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.arch.lexing.ArchLexer;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -55,7 +67,12 @@ public class ArchitectureInterpreter {
             "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
         return;
       }
+      // Construct interpreter state
+      InterpreterState state = new InterpreterState(
+          InterpreterState.PLATFORM_JAVA, new File(rootLoc),
+          new File(wyvernPath));
 
+      // Check architecture file
       File f = new File(rootLoc + "/" + filepath.toString());
       BufferedReader source = new BufferedReader(new FileReader(f));
       ArchParser wp = new ArchParser(
@@ -65,6 +82,32 @@ public class ArchitectureInterpreter {
       Node start = wp.ArchDesc();
       DeclCheckVisitor visitor = new DeclCheckVisitor();
       visitor.visit((ASTArchDesc) start, null);
+
+      // Process connectors and begin generation
+      HashSet<String> connectorTypes = visitor.getConnectorTypes();
+      for (String connector : connectorTypes) {
+        // Load the connector type module and get context
+        Module m = state.getResolver().resolveType(connector + "Properties");
+        GenContext genCtx = Globals.getGenContext(state);
+        EvalContext evalCtx = Globals.getStandardEvalContext();
+        SeqExpr mSeqExpr = state.getResolver().wrapWithCtx(m.getExpression(),
+            m.getDependencies(), evalCtx);
+        genCtx = mSeqExpr.extendContext(genCtx);
+        evalCtx = mSeqExpr.interpretCtx(evalCtx).getSecond();
+
+        // Get AST node
+        TypedModuleSpec mSpec = m.getSpec();
+        ValueType mType = mSpec.getType();
+        StructuralType mSType = mType.getStructuralType(genCtx);
+        ConcreteTypeMember connectorDecl = (ConcreteTypeMember) mSType
+            .findDecl(connector + "Properties", genCtx);
+
+        // Interpret type and get metadata
+        ConcreteTypeMember contype = (ConcreteTypeMember) connectorDecl
+            .interpret(evalCtx);
+        Value metadata = contype.getMetadataValue();
+      }
+
     } catch (ToolError e) {
       e.printStackTrace();
     } catch (FileNotFoundException e) {
@@ -72,7 +115,7 @@ public class ArchitectureInterpreter {
     } catch (ParseException e) {
       e.printStackTrace();
     }
-
+    System.out.println("~DONE~");
   }
 
   // used to set WYVERN_HOME when called programmatically

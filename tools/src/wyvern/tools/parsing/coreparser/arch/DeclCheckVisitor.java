@@ -17,6 +17,30 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
   private HashMap<String, String> entrypoints = new HashMap<>();
   private HashMap<String, HashSet<String>> attachments = new HashMap<>();
 
+  public HashMap<String, ASTComponentTypeDecl> getComponentTypes() {
+    return componentTypes;
+  }
+
+  public HashSet<String> getConnectorTypes() {
+    return connectorTypes;
+  }
+
+  public HashMap<String, String> getComponents() {
+    return components;
+  }
+
+  public HashMap<String, String> getConnectors() {
+    return connectors;
+  }
+
+  public HashMap<String, String> getEntrypoints() {
+    return entrypoints;
+  }
+
+  public HashMap<String, HashSet<String>> getAttachments() {
+    return attachments;
+  }
+
   public Object visit(ASTAttachmentDecl node, Object data) {
     String connector = node.getConnector();
     HashSet<String> ports = node.getAllPorts();

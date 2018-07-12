@@ -7,7 +7,9 @@ type JSONCtrProperties
 	val host : String
 	val prt : Int
 	metadata new
-		def checkPortCompatability(l : list.List[archast.PortDecl]) : Boolean
+		def test(str : String) : String
+			str
+		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Boolean
 			type PortDecl = archast.PortDecl
 			var p1 : PortDecl = archast.Nil
 			var p2 : PortDecl = archast.Nil
@@ -41,8 +43,12 @@ type JSONCtrProperties
 				else
 					false
 
-		def generateConnectorImpl() : Unit
-			unit
+		def generateConnectorImpl(l : list.List[archast.PortDecl]) : Unit //list.List[ast.AST]
+			if (this.checkPortCompatibility(l))
+					unit
+				else
+					unit
 
 		def generateConnectorInit() : Unit
 			unit
+
