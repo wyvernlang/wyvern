@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,11 +88,22 @@ public class ArchitectureInterpreter {
       // Construct interpreter state
       InterpreterState state = new InterpreterState(
           InterpreterState.PLATFORM_JAVA, new File(rootLoc),
-          new File(wyvernPath), visitor.getPortDecls());
+          new File(wyvernPath));
 
       // Process connectors and begin generation
-      HashSet<String> connectorTypes = visitor.getConnectorTypes();
-      for (String connector : connectorTypes) {
+
+      HashMap<String, String> connectors = visitor.getConnectors();
+      for (String connectorInstance : connectors.keySet()) {
+        String connector = connectors.get(connectorInstance);
+
+        HashSet<String> fullports = visitor.getAttachments()
+            .get(connectorInstance);
+        HashSet<String> ports = new HashSet<>();
+        for (String p : fullports) {
+          String[] pair = p.split(".");
+          ports.add(pair[1]);
+        }
+
         // Load the connector type module and get context
         Module m = state.getResolver().resolveType(connector + "Properties");
         GenContext genCtx = Globals.getGenContext(state);
@@ -116,7 +128,14 @@ public class ArchitectureInterpreter {
         StructuralType metadataStructure = metadataType
             .getStructuralType(genCtx);
 
+        // Prepare args for metadata methods
+        for (String port : ports) {
+          // create objectvalue of list of ASTPortDecls
+        }
+
         // Execute metadata
+        Value portCompatibility = null, connectorImpl = null,
+            connectorInit = null;
         for (DeclType dt : metadataStructure.getDeclTypes()) {
           if (dt instanceof DefDeclType) {
             DefDeclType defdecl = (DefDeclType) dt;
@@ -129,14 +148,20 @@ public class ArchitectureInterpreter {
 
             } else if (methodName.equals("generateConnectorInit")) {
 
+            } else {
+              // throw error here for presence of extra methods
             }
 
-            Value testReturnVal = ((Invokable) metadata)
-                .invoke(methodName, testArgs).executeIfThunk();
-            System.out.println(testReturnVal);
+            ((Invokable) metadata).invoke(methodName, testArgs)
+                .executeIfThunk();
           }
         }
+        if (portCompatibility == null || connectorImpl == null
+            || connectorInit == null) {
+          // throw error for the absence of certain methods
+        }
       }
+
     } catch (ToolError e) {
       e.printStackTrace();
     } catch (FileNotFoundException e) {
