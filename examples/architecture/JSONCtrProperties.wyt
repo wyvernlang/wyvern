@@ -9,7 +9,7 @@ type JSONCtrProperties
 	metadata new
 		def test(str : String) : String
 			str
-		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Boolean
+/*		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Boolean
 			type PortDecl = archast.PortDecl
 			var p1 : PortDecl = archast.Nil
 			var p2 : PortDecl = archast.Nil
@@ -51,4 +51,4 @@ type JSONCtrProperties
 
 		def generateConnectorInit() : Unit
 			unit
-
+*/

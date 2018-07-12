@@ -8,10 +8,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -106,6 +112,21 @@ public class ArchitectureInterpreter {
         ConcreteTypeMember contype = (ConcreteTypeMember) connectorDecl
             .interpret(evalCtx);
         Value metadata = contype.getMetadataValue();
+        ValueType metadataType = metadata.getType();
+        StructuralType metadataStructure = metadataType
+            .getStructuralType(genCtx);
+
+        // Execute metadata
+        for (DeclType dt : metadataStructure.getDeclTypes()) {
+          if (dt instanceof DefDeclType) {
+            DefDeclType defdecl = (DefDeclType) dt;
+            List<Value> testArgs = new LinkedList<Value>();
+            testArgs.add(new StringLiteral("Hello"));
+            Value testReturnVal = ((Invokable) metadata)
+                .invoke(defdecl.getName(), testArgs).executeIfThunk();
+            System.out.println(testReturnVal);
+          }
+        }
       }
 
     } catch (ToolError e) {
