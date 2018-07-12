@@ -2,5 +2,5 @@ import effects.network
 import effects.dataProcessor3
 
 val n = network()
-val dp = dataProcessor3(n, stdout)
+val dp = dataProcessor3(n)
 dp.processData()
