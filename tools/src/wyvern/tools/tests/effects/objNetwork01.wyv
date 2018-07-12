@@ -1,26 +1,17 @@
-require stdout
-
 resource type ObjNetworkType
   effect send
   effect receive
-  def sendData(data : String) : {} Unit
-  def receiveData() : {receive} Unit
+  def sendData(data: String): {} Unit
+  def receiveData(): {receive} String
 
-/*val objNetwork01:ObjNetworkType = new
+val objNetwork: ObjNetworkType = new
   effect send = {}
   effect receive = {}
-  def sendData(data : String) : {} Unit = stdout.print(data)
-  def receiveData() : {receive} Unit = stdout.print("data received\n") */
+  var data: String = ""
+  def sendData(data: String): {} Unit
+      this.data = data
+  def receiveData(): {this.receive} String
+      this.data
 
-val objNetwork01:ObjNetworkType = new
-  effect send = {}
-  effect receive = {}
-  def sendData(data : String) : {} Unit
-      stdout.print("data sent: ")
-      stdout.print(data)
-      stdout.print("\n")
-  def receiveData() : {this.receive} Unit
-      stdout.print("data received\n")
-
-objNetwork01.sendData("objNetwork01 with effects")
-objNetwork01.receiveData()
+objNetwork.sendData("ObjNetwork with effects")
+objNetwork.receiveData()
