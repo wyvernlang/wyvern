@@ -5,3 +5,6 @@ import wyvern.internal.archast
 
 type PortDecl 
 	val portdecl : archast.PortDecl
+
+val Nil : PortDecl = new
+	val portdecl = archast.Nil

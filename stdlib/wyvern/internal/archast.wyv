@@ -7,3 +7,10 @@ type PortDecl
 	val portdecl : Unit
 	def getProvides() : String
 	def getRequires() : String
+
+val Nil : PortDecl = new
+	val portdecl = unit
+	def getProvides() : String
+		"Nil"
+	def getRequires() : String
+		"Nil"

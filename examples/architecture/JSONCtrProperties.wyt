@@ -9,9 +9,16 @@ type JSONCtrProperties
 	metadata new
 		def checkPortCompatability(l : list.List[archast.PortDecl]) : Boolean
 			type PortDecl = archast.PortDecl
+			var p1 : PortDecl = archast.Nil
+			var p2 : PortDecl = archast.Nil
 			if (l.length() == 2)	
-					val p1 : option.Option[PortDecl] = l.get(0)
-					/*val p2 : PortDecl = l.get(0)
+					val op1 : option.Option[PortDecl] = l.get(0)
+					val op2 : option.Option[PortDecl] = l.get(1)
+					if (op1.isDefined && op2.isDefined)
+							p1 = op1.getOrElse(() => p1)
+							p1 = op2.getOrElse(() => p1)
+						else 
+							false
 					var requires : String = ""
 					var provides : String = ""
 					if (p1.portdecl.getRequires() == "")
@@ -29,8 +36,13 @@ type JSONCtrProperties
 					if (requires == provides)
 							true
 						else
-							false*/
+							false
 					true
 				else
 					false
 
+		def generateConnectorImpl() : Unit
+			unit
+
+		def generateConnectorInit() : Unit
+			unit

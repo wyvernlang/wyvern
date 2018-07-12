@@ -72,6 +72,7 @@ public class ArchitectureInterpreter {
     } catch (ParseException e) {
       e.printStackTrace();
     }
+
   }
 
   // used to set WYVERN_HOME when called programmatically
