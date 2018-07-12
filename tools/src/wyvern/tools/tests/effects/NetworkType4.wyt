@@ -1,0 +1,5 @@
+resource type NetworkType4
+  effect send
+  effect receive
+  def sendData(sd: String): {} Unit
+  def receiveData(): gibberish String

@@ -1,6 +1,0 @@
-resource type NetworkType0C
-  effect send
-  effect receive
-  val n: Int
-  def sendData(sd: String): {} Unit
-  def receiveData(): {n} String

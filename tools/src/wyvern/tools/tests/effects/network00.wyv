@@ -1,6 +1,0 @@
-module def network00(): effects.NetworkType00
-var data: String = ""
-def sendData(sd: String): Unit
-  data = sd
-def receiveData(): String
-  data

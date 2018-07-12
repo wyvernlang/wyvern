@@ -1,5 +1,0 @@
-import effects.network0A
-
-val n = network0A()
-n.sendData("Network0A with effects")
-n.receiveData()

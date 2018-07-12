@@ -1,0 +1,6 @@
+resource type NetworkType14
+  effect send
+  effect receive
+  val n: Int
+  def sendData(sd: String): {} Unit
+  def receiveData(): {n} String

@@ -1,6 +1,0 @@
-require stdout
-import effects.network0E
-
-val n = network0E(stdout)
-n.sendData("Network0E with effects")
-n.receiveData()

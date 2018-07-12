@@ -1,5 +1,0 @@
-resource type NetworkType0F
-  effect send
-  effect receive = {something}
-  def sendData(sd: String): {error} Unit
-  def receiveData(): {receive} String
