@@ -3,7 +3,7 @@ package wyvern.target.corewyvernIL.support;
 import java.io.File;
 import java.util.HashMap;
 
-import wyvern.stdlib.support.AST;
+import wyvern.tools.parsing.coreparser.arch.SimpleNode;
 
 public class InterpreterState {
   private static final ThreadLocal<InterpreterState> localInterpreter = new ThreadLocal<InterpreterState>() {
@@ -26,8 +26,8 @@ public class InterpreterState {
   }
 
   public InterpreterState(String platform, File rootDir, File libDir,
-      HashMap<String, AST> mods) {
-    resolver = new ModuleResolver(platform, rootDir, libDir, mods);
+      HashMap<String, SimpleNode> hashMap) {
+    resolver = new ModuleResolver(platform, rootDir, libDir, hashMap);
     resolver.setInterpreterState(this);
     localInterpreter.set(this);
   }

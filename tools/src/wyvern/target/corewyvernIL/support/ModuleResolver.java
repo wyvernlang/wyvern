@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import wyvern.stdlib.Globals;
-import wyvern.stdlib.support.AST;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -39,6 +38,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.parsing.coreparser.arch.SimpleNode;
 import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -58,7 +58,7 @@ public class ModuleResolver {
   private InterpreterState state;
   private File rootDir;
   private File libDir;
-  private HashMap<String, AST> mods;
+  private HashMap<String, SimpleNode> mods = null;
 
   public ModuleResolver(String platform, File rootDir, File libDir) {
     this.platform = platform;
@@ -86,11 +86,11 @@ public class ModuleResolver {
   }
 
   public ModuleResolver(String platform, File rootDir, File libDir,
-      HashMap<String, AST> mods) {
+      HashMap<String, SimpleNode> hashMap) {
     this.platform = platform;
     this.rootDir = rootDir;
     this.libDir = libDir;
-    this.mods = mods;
+    this.mods = hashMap;
     ArrayList<File> searchPath = new ArrayList<File>();
     if (rootDir != null && !rootDir.isDirectory()) {
       throw new RuntimeException("the root path \"" + rootDir

@@ -17,7 +17,6 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
-import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -88,7 +87,7 @@ public class ArchitectureInterpreter {
       // Construct interpreter state
       InterpreterState state = new InterpreterState(
           InterpreterState.PLATFORM_JAVA, new File(rootLoc),
-          new File(wyvernPath));
+          new File(wyvernPath), visitor.getPortDecls());
 
       // Process connectors and begin generation
       HashSet<String> connectorTypes = visitor.getConnectorTypes();
@@ -121,17 +120,23 @@ public class ArchitectureInterpreter {
         for (DeclType dt : metadataStructure.getDeclTypes()) {
           if (dt instanceof DefDeclType) {
             DefDeclType defdecl = (DefDeclType) dt;
-
-            // ah
+            String methodName = defdecl.getName();
             List<Value> testArgs = new LinkedList<Value>();
-            testArgs.add(new StringLiteral("Hello"));
+
+            if (methodName.equals("checkPortCompatibility")) {
+
+            } else if (methodName.equals("generateConnectorImpl")) {
+
+            } else if (methodName.equals("generateConnectorInit")) {
+
+            }
+
             Value testReturnVal = ((Invokable) metadata)
-                .invoke(defdecl.getName(), testArgs).executeIfThunk();
+                .invoke(methodName, testArgs).executeIfThunk();
             System.out.println(testReturnVal);
           }
         }
       }
-
     } catch (ToolError e) {
       e.printStackTrace();
     } catch (FileNotFoundException e) {
