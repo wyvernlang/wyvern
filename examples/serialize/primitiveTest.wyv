@@ -1,6 +1,5 @@
 require stdout
 require json
-require dataStructures.hashmap
 
 val c : String = "Hello"
 stdout.print("Original: ")
