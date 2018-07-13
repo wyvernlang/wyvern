@@ -112,9 +112,8 @@ public class EffectSystemTests {
     }
 
     @Test
-    public void testImportTypeBug() throws ParseException {
-        /* Object notation with no effect annotations. */
-        TestUtil.doTestScriptModularly(PATH, "effects.dummyBug", Util.intType(), new IntegerLiteral(1));
+    public void testFileIO3() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO3", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
