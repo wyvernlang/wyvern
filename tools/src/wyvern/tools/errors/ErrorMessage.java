@@ -114,7 +114,7 @@ public enum ErrorMessage {
 
     // effects errors
     MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: \"effect %ARG = {%ARG}\"", 2),
-    UNDEFINED_EFFECT("Effect \"%ARG\" is underfined", 1),
+    UNDEFINED_EFFECT("Effect \"%ARG\" is undefined", 1),
     EFFECT_NOT_IN_SCOPE("Effect \"%ARG\" not found in scope", 1),
     //    EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
     RECURSIVE_EFFECT("Effect \"%ARG\" is being defined recursively", 1),
