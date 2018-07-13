@@ -39,6 +39,8 @@ tools/src/wyvern/tools/parsing/coreparser/WyvernParserConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/Token.java
 tools/src/wyvern/tools/parsing/coreparser/arch/TokenManager.java
 tools/src/wyvern/tools/parsing/coreparser/arch/TokenMgrError.java
+tools/src/wyvern/tools/parsing/coreparser/arch/ParseException.java
+tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.jj
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserTreeConstants.java
