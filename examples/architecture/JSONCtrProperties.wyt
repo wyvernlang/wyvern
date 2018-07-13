@@ -1,3 +1,4 @@
+require arraylist
 import wyvern.collections.list
 import wyvern.archast
 import wyvern.ast
