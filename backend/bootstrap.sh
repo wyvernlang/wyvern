@@ -17,11 +17,11 @@ fi
 
 (
 cd src/
-rm -f main_js.wyb
-$WYBY main_js.wyv
+rm -f main.wyb
+$WYBY main.wyv
 echo "Bootstrapping..."
-time $WYVERN main_java.wyv > ../boot.js
-) || rm -f boot.js
+time $WYVERN main.wyv > ../boot.js
+) || (rm -f boot.js && exit 1)
 
 ./self-bootstrap.sh
 diff -q boot.js boot.js.old || (echo "sanity check failed" && exit 1)

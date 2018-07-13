@@ -388,24 +388,28 @@ public class ModuleResolver {
         return ctx;
     }
 
-    public BytecodeOuterClass.Bytecode emitBytecode(Module module, List<TypedModuleSpec> dependencies) {
+    public SeqExpr buildPreludedExpression(Expression expression) {
         Module prelude = Globals.getPreludeModule();
-        SeqExpr preludeExpression = (SeqExpr) prelude.getExpression();
+        SeqExpr expr = new SeqExpr();
+        expr.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+        expr.merge(prelude.getExpression());
+        expr.merge(expression);
+        return expr;
+    }
 
+    public BytecodeOuterClass.Bytecode emitBytecode(Module module, List<TypedModuleSpec> dependencies) {
         BytecodeOuterClass.Bytecode.Builder wyb = BytecodeOuterClass.Bytecode.newBuilder();
         wyb.setVersion(BytecodeOuterClass.Bytecode.Version.newBuilder().setMagic(42)
                 .setMajor(0).setMinor(1))
                 .setPath("com.todo");
 
-        SeqExpr expressionWithPrelude = preludeExpression.clone();
-        expressionWithPrelude.merge(module.getExpression());
-
         BytecodeOuterClass.Module.ValueModule.Builder v = BytecodeOuterClass.Module.ValueModule.newBuilder()
                 .setType(module.getSpec().getType().emitBytecodeType())
-                .setExpression(expressionWithPrelude.emitBytecode());
+                .setExpression(buildPreludedExpression(module.getExpression()).emitBytecode());
 
         wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath("toplevel").setValueModule(v));
 
+        Module prelude = Globals.getPreludeModule();
         dependencies.addAll(prelude.getDependencies());
         List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (TypedModuleSpec spec : noDups) {
@@ -414,8 +418,7 @@ public class ModuleResolver {
             if (prelude.getDependencies().contains(spec)) {
                 e = dep.getExpression();
             } else {
-                e = preludeExpression.clone();
-                ((SeqExpr) e).merge(dep.getExpression());
+                e = buildPreludedExpression(dep.getExpression());
             }
 
             v = BytecodeOuterClass.Module.ValueModule.newBuilder()

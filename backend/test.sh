@@ -6,7 +6,7 @@ set -e
 
 TIMEFORMAT='%3R'
 
-FILES=( "${@:-examples/*.wyv}" )
+FILES=( ${@:-examples/*.wyv} )
 
 WYBY=$WYVERN_HOME/bin/wyby
 
@@ -16,8 +16,8 @@ if [ ! -f boot.js ]; then
     exit 1
 fi
 
-for f in ${FILES[@]}; do
-    echo "running $f:"
+for f in "${FILES[@]}"; do
+    echo "running $f:" >&2
     (
     DIR="$(dirname "$f")"
     FILE="$(basename "$f")"
@@ -25,7 +25,7 @@ for f in ${FILES[@]}; do
     rm -f "${f%.*}.wyb"
     $WYBY "$FILE"
     )
-    echo -n "Time to compile: "
+    echo -n "Time to compile: " >&2
     time node boot.js "${f%.*}.wyb" > "${f%.*}.js"
     time node "${f%.*}.js"
 done

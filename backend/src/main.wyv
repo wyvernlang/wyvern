@@ -1,10 +1,19 @@
-module def compile(stdout: Stdout, support: PlatformSupport)
+require platform
+require stdout
 
+import support_js
+import support_java
 import from_protobuf
 import wyb_ast
 import rename
 import emit_js
 import util
+
+val plt: system.Platform = platform
+
+val support = match plt:
+    java: system.Java => support_java.apply(java)
+    javascript: system.JavaScript => support_js.apply(javascript)
 
 val from_protobuf = from_protobuf.apply(support)
 
@@ -36,7 +45,6 @@ def compile(wyb: Dyn): Unit
     val m: Int = wyb.getModulesCount()
     moduleLoop(m - 1)
 
-def main(): Unit
-    val filename = support.getFirstCommandLineArg()
-    val wyb = support.loadBytecode(filename)
-    compile(wyb)
+val filename = support.getFirstCommandLineArg()
+val wyb = support.loadBytecode(filename)
+compile(wyb)
