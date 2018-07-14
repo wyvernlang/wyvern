@@ -145,6 +145,31 @@ public class EffectSystemTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger3() throws ParseException {
+        /* The exact resource instance passed into a module functor is conditional
+         * (i.e. it is decided by an if statement). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger3", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testNested() throws ParseException {
+        /* An object in a module's immutable field defines an effect
+         * and uses it in a method annotation inside that object. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNested", Util.intType(), new IntegerLiteral(1));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testNested2() throws ParseException {
+        /* An object in a module's immutable field defines an effect
+         * and uses it in a method annotation inside that object.
+         * Then that effect is used from outside the module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNested2", Util.intType(), new IntegerLiteral(1));
+    }
+
+    @Test
     public void testNetwork() throws ParseException {
         /* Declared in type and module; defined in module; method annotations in both. */
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork", Util.stringType(), new StringLiteral("Network with effects"));

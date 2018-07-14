@@ -1,0 +1,2 @@
+import effects.nested
+nested.x.id(1)

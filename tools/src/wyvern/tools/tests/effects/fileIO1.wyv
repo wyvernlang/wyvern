@@ -9,4 +9,4 @@ def read(): {readF} Int
     nativeFileIO.read()
     
 def write(x: Int): {writeF} Int
-    nativeFileIO.write(x)
+    nativeFileIO.write(x) + 1
