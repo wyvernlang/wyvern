@@ -102,21 +102,21 @@ public class EffectSystemTests {
     }
 
     @Test
-    public void testFileIO1() throws ParseException {
+    public void testFileIO() throws ParseException {
         /* Globally available effects (i.e. system.ffiEffect) are used in effect definitions in module (only). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
+    public void testFileIO1() throws ParseException {
+        /* Effects defined in a pure module are used in effect definitions in module (only). */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO1", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
     public void testFileIO2() throws ParseException {
-        /* Effects defined in a pure module are used in effect definitions in module (only). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
-    }
-
-    @Test
-    public void testFileIO3() throws ParseException {
         /* Effects defined in a pure module are used in effect definitions in both type and module. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO3", Util.intType(), new IntegerLiteral(3));
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
