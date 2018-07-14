@@ -102,7 +102,7 @@ public class EffectSystemTests {
 
     @Test
     public void testFileIO() throws ParseException {
-        /* Globally available effects (i.e. system.ffiEffect) are used in effect definitions in module (only). */
+        /* Globally available effects (system.ffiEffect) are used in effect definitions in module (only). */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO", Util.intType(), new IntegerLiteral(3));
     }
 
@@ -117,6 +117,31 @@ public class EffectSystemTests {
     public void testFileIO2() throws ParseException {
         /* Effects defined in a pure module are used in effect definitions in both type and module. */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger() throws ParseException {
+        expectedException.expect(ToolError.class);
+        /* A method has an effect annotation involving a globally available effect (system.ffiEffect)
+         * in module but not in type. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger1() throws ParseException {
+        /* Globally available effect (system.ffiEffect) is used to annotate a method directly,
+         * without defining any local effects. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger1", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger2() throws ParseException {
+        expectedException.expect(ToolError.class);
+        /* A method has an effect annotation, involving a passed in resource, in module but not in type. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger2", Util.intType(), new IntegerLiteral(5));
     }
 
     @Test
