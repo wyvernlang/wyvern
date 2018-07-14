@@ -1,10 +1,11 @@
 module archast
 
-import wyvern.collections.list
-import wyvern.internal.archast
-
-type PortDecl 
-	val portdecl : archast.PortDecl
+type PortDecl
+	def getProvides() : String
+	def getRequires() : String
 
 val Nil : PortDecl = new
-	val portdecl = archast.Nil
+	def getProvides() : String
+		"Nil"
+	def getRequires() : String
+		"Nil"

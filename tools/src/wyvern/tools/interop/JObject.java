@@ -7,7 +7,7 @@ import java.util.List;
 public class JObject implements FObject {
   private Object jObject;
 
-  public JObject(Object wrapped) {
+  JObject(Object wrapped) {
     jObject = wrapped;
   }
 

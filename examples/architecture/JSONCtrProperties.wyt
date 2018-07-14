@@ -1,4 +1,4 @@
-require arraylist
+require stdout
 import wyvern.collections.list
 import wyvern.archast
 import wyvern.ast
@@ -8,8 +8,6 @@ type JSONCtrProperties
 	val host : String
 	val prt : Int
 	metadata new
-		def test(str : String) : String
-			str
 		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Boolean
 			type PortDecl = archast.PortDecl
 			var p1 : PortDecl = archast.Nil
@@ -24,17 +22,17 @@ type JSONCtrProperties
 							false
 					var requires : String = ""
 					var provides : String = ""
-					if (p1.portdecl.getRequires() == "")
-							if (p1.portdecl.getProvides() == "")
+					if (p1.getRequires() == "")
+							if (p1.getProvides() == "")
 									false
 								else
-									provides = p1.portdecl.getProvides()
+									provides = p1.getProvides()
 						else
-							requires = p1.portdecl.getRequires()
+							requires = p1.getRequires()
 					if (requires == "")	
-							requires = p2.portdecl.getRequires()
+							requires = p2.getRequires()
 						else	
-							provides = p2.portdecl.getProvides()
+							provides = p2.getProvides()
 								
 					if (requires == provides)
 							true
@@ -44,11 +42,23 @@ type JSONCtrProperties
 				else
 					false
 
-		def generateConnectorImpl(l : list.List[archast.PortDecl]) : Unit //list.List[ast.AST]
+		def generateConnectorImpl(l : list.List[archast.PortDecl]) : list.List[ast.AST]
 			if (this.checkPortCompatibility(l))
-					unit
+					var astList : list.List[ast.AST] = list.make[ast.AST]()
+					// go through both ports in the list
+					val p1 : archast.PortDecl = l.get(0).getOrElse(() => archast.Nil)
+					val p2 : archast.PortDecl = l.get(1).getOrElse(() => archast.Nil)
+
+					// start making the ASTs for generation
+					var clientAST : ast.AST 
+					var serverAST : ast.AST
+
+					// add ASTs to astList to be returned
+					astList.append(serverAST)
+					astList.append(clientAST)
+					astList
 				else
-					unit
+					list.make[ast.AST]()
 
 		def generateConnectorInit() : Unit
 			unit

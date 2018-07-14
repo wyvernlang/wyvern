@@ -18,10 +18,15 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
@@ -32,8 +37,11 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.arch.lexing.ArchLexer;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.JObject;
+import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.TokenManager;
 import wyvern.tools.parsing.coreparser.WyvernTokenManager;
@@ -109,7 +117,7 @@ public class ArchitectureInterpreter {
         HashSet<String> ports = new HashSet<>();
         List<ASTPortDecl> portobjs = new LinkedList<>();
         for (String p : fullports) {
-          String[] pair = p.split(".");
+          String[] pair = p.split("\\.");
           ports.add(pair[1]);
           portobjs.add(visitor.getPortDecls().get(pair[1]));
         }
@@ -156,17 +164,21 @@ public class ArchitectureInterpreter {
               connectorImpl = ((Invokable) metadata)
                   .invoke(methodName, testArgs).executeIfThunk();
             } else if (methodName.equals("generateConnectorInit")) {
-
+              // for now
+              connectorInit = portCompatibility;
             } else {
-              // throw error here for presence of extra methods
+              ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
+                  FileLocation.UNKNOWN, connector);
             }
 
           }
         }
         if (portCompatibility == null || connectorImpl == null
             || connectorInit == null) {
-          // throw error for the absence of certain methods
+          ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
+              FileLocation.UNKNOWN, connector);
         }
+
       }
 
     } catch (ToolError e) {
@@ -179,31 +191,31 @@ public class ArchitectureInterpreter {
     System.out.println("~DONE~");
   }
 
-  public static Value javaToWyvernList(List<ASTPortDecl> result) {
-    ObjectValue v = null;
-    try {
-      v = (ObjectValue) TestUtil.evaluate("import wyvern.collections.list\n"
-          + "import wyvern.archast\n" + "list.make[archast.PortDecl]()\n");
-      for (ASTPortDecl elem : result) {
-        List<Value> args = new LinkedList<>();
-
-        List<DeclType> decltypes = new LinkedList<>();
-        decltypes.add(new ValDeclType("portdecl", Util.unitType()));
-        decltypes.add(new DefDeclType("getRequires", Util.unitType(),
-            new LinkedList<FormalArg>()));
-        decltypes.add(new DefDeclType("getProvides", Util.unitType(),
-            new LinkedList<FormalArg>()));
-
-        JavaValue obj = new JavaValue(new JObject(elem),
-            new StructuralType("PortDecl", decltypes));
-        args.add(obj);
-
-        v.invoke("append", args);
+  public static Value javaToWyvernList(Object result) {
+    if (result instanceof List) {
+      ObjectValue v = null;
+      try {
+        v = (ObjectValue) TestUtil
+            .evaluate("import wyvern.collections.list\n" + "list.makeD()\n");
+        for (Object elem : (List<?>) result) {
+          List<Value> args = new LinkedList<>();
+          args.add(javaToWyvernList(elem));
+          v.invoke("append", args);
+        }
+      } catch (ParseException e) {
+        e.printStackTrace();
       }
-    } catch (ParseException e) {
-      e.printStackTrace();
+      return v;
+    } else if (result instanceof ASTPortDecl) {
+      List<DeclType> declTypes = new LinkedList<>();
+      declTypes.add(new DefDeclType("getRequires", Util.stringType(),new LinkedList<FormalArg>()));
+      declTypes.add(new DefDeclType("getProvides", Util.stringType(), new LinkedList<FormalArg>()));
+      StructuralType wyvPortDeclType = new StructuralType("PortDecl",declTypes);
+      return new JavaValue(JavaWrapper.wrapObject(result), wyvPortDeclType);
+    } else {
+      // throw error?
+      return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
     }
-    return v;
   }
 
   // used to set WYVERN_HOME when called programmatically
