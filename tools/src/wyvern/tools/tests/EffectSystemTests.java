@@ -95,7 +95,7 @@ public class EffectSystemTests {
     }
 
     @Test
-    public void testBasic2() throws ParseException {
+    public void testBasic1() throws ParseException {
         /* Uses a module that doesn't use any outside objects, types, or functions. */
         TestUtil.doTestScriptModularly(PATH, "effects.testBasic1", Util.stringType(), new StringLiteral("basic1.m5()"));
     }
