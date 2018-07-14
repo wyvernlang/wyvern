@@ -89,16 +89,15 @@ public class EffectSystemTests {
     }
 
     @Test
-    public void testDummy() throws ParseException {
-        /* Does not use any outside objects/types or functions */
-        TestUtil.doTestScriptModularly(PATH, "effects.dummyTest", Util.stringType(), new StringLiteral("dummyDef.m3()"));
+    public void testBasic() throws ParseException {
+        /* Does not use any outside objects, types, or functions */
+        TestUtil.doTestScriptModularly(PATH, "effects.testBasic", Util.stringType(), new StringLiteral("basic.m3()"));
     }
 
     @Test
-    public void testDummyTaker() throws ParseException {
-        /* Does not use any outside objects/types or functions other than dummyDef, which itself doesn't use any
-         * outside objects/types or functions. */
-        TestUtil.doTestScriptModularly(PATH, "effects.dummyTakerTest", Util.stringType(), new StringLiteral("dummyTakerDef.m5()"));
+    public void testBasic2() throws ParseException {
+        /* Uses a module that doesn't use any outside objects, types, or functions. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testBasic1", Util.stringType(), new StringLiteral("basic1.m5()"));
     }
 
     @Test
