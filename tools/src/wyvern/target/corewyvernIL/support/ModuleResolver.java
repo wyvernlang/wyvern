@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.Globals;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
@@ -60,6 +61,8 @@ public class ModuleResolver {
     private File rootDir;
     private File libDir;
     private HashMap<String, IExpr> modules;
+    private SeqExpr prelude = null;
+    private Module preludeModule = null;
 
     public ModuleResolver(String platform, File rootDir, File libDir) {
         this.platform = platform;
@@ -605,5 +608,23 @@ public class ModuleResolver {
 
         });
         return noDups;
+    }
+
+    public SeqExpr getPreludeIfPresent() {
+        return prelude;
+    }
+
+    public SeqExpr loadPrelude(File file) {
+        preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
+        prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
+        TailCallVisitor.annotate(prelude);
+        return prelude;
+    }
+
+    public Module getPreludeModule() {
+        if (prelude == null) {
+            Globals.getPrelude();
+        }
+        return preludeModule;
     }
 }

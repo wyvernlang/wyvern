@@ -5,7 +5,7 @@ package wyvern.tools.interop;
  */
 public final class Default {
     private Default() { }
-    private static Importer theImporter = new JavaImporter();
+    private static final Importer theImporter = new JavaImporter();
     public static Importer importer() {
         return theImporter;
     }
