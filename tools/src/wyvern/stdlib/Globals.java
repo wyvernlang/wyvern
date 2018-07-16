@@ -9,7 +9,6 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -33,8 +32,8 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.VarGenContext;
-import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.BottomType;
+import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -287,7 +286,7 @@ public final class Globals {
     }
 
     /** Resets all static state in the program.
-     * Should not matter, but sometimes it does.
+     * Should not matter, but sometimes it has in the past when testing.
      * The only static state should be the current InterpreterState.
      */
     public static void resetState() {

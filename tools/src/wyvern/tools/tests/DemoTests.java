@@ -1,6 +1,6 @@
 package wyvern.tools.tests;
 
-import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -26,7 +26,13 @@ public class DemoTests {
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
+        Globals.setUsePrelude(false);
     }
+
+    @AfterClass public static void teardown() {
+        Globals.setUsePrelude(true);  // restore the default to use the prelude
+    }
+
 
     @Test
     public void testSafeSQL() throws ParseException {
@@ -35,7 +41,9 @@ public class DemoTests {
 
     @Test
     public void testWebServer() throws ParseException {
+        Globals.setUsePrelude(true);
         TestUtil.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
+        Globals.setUsePrelude(false);
     }
 
     @Test

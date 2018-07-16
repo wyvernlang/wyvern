@@ -472,7 +472,6 @@ public class ModuleResolver {
             TypedModuleSpec spec = noDups.get(i);
             Module m = resolveModule(spec.getQualifiedName());
             Value v = m.getAsValue(ctx);
-            String internalName = m.getSpec().getInternalName();
             ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(m.getSpec().getSite(), type, v /*m.getExpression()*/, true);
@@ -510,7 +509,6 @@ public class ModuleResolver {
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
             Module m = resolveModule(spec.getQualifiedName());
-            String internalName = m.getSpec().getInternalName();
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }

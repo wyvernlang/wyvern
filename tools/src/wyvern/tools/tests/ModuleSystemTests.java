@@ -3,10 +3,12 @@ package wyvern.tools.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.ErrorMessage;
@@ -25,7 +27,13 @@ public class ModuleSystemTests {
     public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
+        Globals.setUsePrelude(false);
     }
+
+    @AfterClass public static void teardown() {
+        Globals.setUsePrelude(true);  // restore the default to use the prelude
+    }
+
 
     @Test
     public void testInst() throws ParseException {
