@@ -1,5 +1,4 @@
 module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java) : CSIface
-// java is a dependency so is it a port?
 
 import io.io
 import json

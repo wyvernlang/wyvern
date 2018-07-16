@@ -45,6 +45,7 @@ import wyvern.target.corewyvernIL.expression.Literal;
 import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -295,6 +296,24 @@ public class AST {
             // Extend parseTSL with a second argument (abstract type representing context)
             // TODO: Handle InterpreterState/GenContext
             return ast.generateIL(ctx, null, new LinkedList<TypedModuleSpec>());
+        } catch (ParseException e) {
+            System.err.println("Error when running parseExpression on input \"" + input + "\"");
+            throw e;
+        }
+    }
+    
+    public IExpr parseExpressionNoContext(String input) throws ParseException {
+        try {
+            wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod = 
+                    (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) 
+                    TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
+            ModuleDeclaration moduleDecl = (ModuleDeclaration) 
+                    mod.topLevelGen(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
+            List<NamedDeclaration> l = new LinkedList<>();
+            l.add(moduleDecl);
+            New module = new New(l, FileLocation.UNKNOWN);
+            System.out.println(module);
+            return module;
         } catch (ParseException e) {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");
             throw e;

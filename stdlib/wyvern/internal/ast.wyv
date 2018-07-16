@@ -110,6 +110,10 @@ def parseExpression(input : String, ctx : system.Context) : AST
   new
     val ast:Unit = utils.parseExpression(input, ctxDyn)
 
+def parseExpressionNoContext(input : String) : AST
+  new
+    val ast:Unit = utils.parseExpressionNoContext(input)
+
 def parseExpressionList(input : String, ctx : system.Context) : list.List[AST]
   val ctxDyn:Dyn = ctx
   def javaASTToWyvAST(jAST : Dyn):Dyn = new

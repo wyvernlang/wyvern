@@ -44,19 +44,15 @@ type JSONCtrProperties
 
 		def generateConnectorImpl(l : list.List[archast.PortDecl]) : list.List[ast.AST]
 			if (this.checkPortCompatibility(l))
-					var astList : list.List[ast.AST] = list.make[ast.AST]()
-					// go through both ports in the list
-					val p1 : archast.PortDecl = l.get(0).getOrElse(() => archast.Nil)
-					val p2 : archast.PortDecl = l.get(1).getOrElse(() => archast.Nil)
-
-					// start making the ASTs for generation
-					var clientAST : ast.AST 
-					var serverAST : ast.AST
-
-					// add ASTs to astList to be returned
-					astList.append(serverAST)
-					astList.append(clientAST)
-					astList
+					val portList = list.make[ast.AST]()
+						
+					val CSIface_requires_port = "module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java) : CSIface\nimport io.io\nimport json\nimport io.Socket\nval io = io(java)\nval json = json(java)\ndef getVal(key : String) : String\n\tval tcpClient : Socket = io.makeSocket(jsonCtrProps.host, jsonCtrProps.prt)\n\tval out = tcpClient.getOutputStream()\n\tval in = tcpClient.getInputStream()\n\tval outData = io.makeDataOutputStream(out)\n\tval inData = io.makeDataInputStream(in)\n\toutData.writeUTF((json.serializeToJSON(key)).toString())\n\tinData.readUTF()\n"
+					val CSIface_provides_port = ""
+					
+					val requiresAST = ast.parseExpressionNoContext(CSIface_requires_port)
+					
+					portList.append(requiresAST)
+					portList
 				else
 					list.make[ast.AST]()
 
