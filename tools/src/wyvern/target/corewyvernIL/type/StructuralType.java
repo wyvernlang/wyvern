@@ -58,7 +58,7 @@ public class StructuralType extends ValueType {
         }
     }
 
-    private static StructuralType emptyType = new StructuralType("IGNORE_ME", Collections.emptyList());
+    private static final StructuralType emptyType = new StructuralType("IGNORE_ME", Collections.emptyList());
 
     public static StructuralType getEmptyType() {
         return emptyType;

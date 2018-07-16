@@ -29,6 +29,9 @@ public class VarBinding implements HasLocation {
     }
 
     public VarBinding(BindingSite site, ValueType type, IExpr toReplace) {
+        /*if ("ASTIDENT$1".equals(site.getName())) {
+            System.out.flush();
+        }*/
         this.varName = site.getName();
         this.site = site;
         this.type = type;

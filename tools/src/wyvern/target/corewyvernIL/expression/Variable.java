@@ -127,6 +127,9 @@ public class Variable extends Expression implements Path {
     }
     public void siteFound(BindingSite site2) {
         if (this.site == null) {
+            /*if ("ASTIDENT$1".equals(this.name)) {
+                System.out.flush();
+            }*/
             this.site = site2;
         }
     }

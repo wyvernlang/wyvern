@@ -34,10 +34,10 @@ import wyvern.tools.tests.suites.RegressionTests;
 public class ExampleTests {
   private static final String PATH = TestUtil.EXAMPLES_PATH;
 
-  @Before
+  /*@Before
   public void setup() {
     Globals.resetPrelude();
-  }
+  }*/
 
   @BeforeClass
   public static void setupResolver() {

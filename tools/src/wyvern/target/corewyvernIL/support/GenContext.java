@@ -85,7 +85,7 @@ public abstract class GenContext extends TypeContext {
 
     protected abstract String endToString();
 
-    private static GenContext theEmpty = new EmptyGenContext();
+    private static final GenContext theEmpty = new EmptyGenContext();
 
     public static String generateName() {
         return "var_" + (count++);

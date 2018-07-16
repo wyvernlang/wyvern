@@ -15,10 +15,10 @@ import wyvern.tools.errors.ToolError;
 
 @Category(RegressionTests.class)
 public class StdlibTests {
-    @Before
+    /*@Before
     public void setup() {
         Globals.resetPrelude();
-    }
+    }*/
     @Test
     public void testRegex() throws ParseException {
         String input = ""

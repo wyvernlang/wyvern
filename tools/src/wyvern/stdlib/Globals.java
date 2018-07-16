@@ -53,8 +53,6 @@ public final class Globals {
     private static final Set<String> javascriptWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
     private static final BindingSite system = new BindingSite("system");
-    private static SeqExpr prelude = null;
-    private static Module preludeModule = null;
 
     static {
         // the whitelist that anyone can import without requiring java or becoming a resource module
@@ -85,25 +83,31 @@ public final class Globals {
         usePrelude = update;
     }
 
-    public static void resetPrelude() {
+    /*public static void resetPrelude() {
         prelude = null;
         gettingPrelude = false;
-    }
+    }*/
 
     public static Module getPreludeModule() {
         if (!usePrelude) {
             throw new RuntimeException("may not call getPreludeModule if preludes are disabled");
         }
-        if (prelude == null) {
-            getPrelude();
-        }
-        return preludeModule;
+        return ModuleResolver.getLocal().getPreludeModule();
     }
 
-    private static SeqExpr getPrelude() {
+    private static SeqExpr getPreludeIfPresent() {
+        InterpreterState s = InterpreterState.getLocalThreadInterpreter();
+        if (s == null) {
+            return null;
+        }
+        return s.getResolver().getPreludeIfPresent();
+    }
+    
+    public static SeqExpr getPrelude() {
         if (!usePrelude) {
             return new SeqExpr();
         }
+        SeqExpr prelude = getPreludeIfPresent();
         if (prelude == null) {
             if (gettingPrelude) {
                 return new SeqExpr();
@@ -111,10 +115,8 @@ public final class Globals {
             gettingPrelude = true;
             String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
             File file = new File(preludeLocation);
-
-            preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
-            prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
-            TailCallVisitor.annotate(prelude);
+            prelude = ModuleResolver.getLocal().loadPrelude(file);
+            gettingPrelude = false;
         }
         return prelude;
     }
@@ -258,7 +260,7 @@ public final class Globals {
     public static EvalContext getStandardEvalContext() {
         EvalContext ctx = EvalContext.empty();
         ctx = ctx.extend(system, Globals.getSystemValue());
-        SeqExpr sexpr = prelude;
+        SeqExpr sexpr = getPreludeIfPresent();
         if (sexpr != null) {
             ctx = sexpr.interpretCtx(ctx).getSecond();
         }
@@ -282,5 +284,13 @@ public final class Globals {
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
         ObjectValue systemVal = new ObjectValue(decls, new BindingSite("this"), getSystemType(), null, null, EvalContext.empty());
         return systemVal;
+    }
+
+    /** Resets all static state in the program.
+     * Should not matter, but sometimes it does.
+     * The only static state should be the current InterpreterState.
+     */
+    public static void resetState() {
+        InterpreterState.resetThreadLocalInterpreter();
     }
 }

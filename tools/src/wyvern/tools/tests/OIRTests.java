@@ -41,10 +41,10 @@ public class OIRTests {
     private static final String BASE_PATH = TestUtil.BASE_PATH;
     private static final String PATH = BASE_PATH + "modules/module/";
 
-    @Before
+    /*@Before
     public void setup() {
         Globals.resetPrelude();
-    }
+    }*/
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
