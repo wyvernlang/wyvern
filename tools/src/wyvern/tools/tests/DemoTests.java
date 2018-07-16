@@ -20,7 +20,7 @@ public class DemoTests {
 
     /*@Before
     public void setup() {
-        Globals.resetPrelude();
+        Globals.resetState();
     }*/
 
     @BeforeClass public static void setupResolver() {

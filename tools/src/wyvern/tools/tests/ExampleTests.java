@@ -24,7 +24,7 @@ public class ExampleTests {
 
   /*@Before
   public void setup() {
-    Globals.resetPrelude();
+    Globals.resetState();
   }*/
 
   @BeforeClass
