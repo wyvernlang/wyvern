@@ -180,6 +180,7 @@ public class ArchitectureInterpreter {
                             FileLocation.UNKNOWN, connector);
                 }
                 int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
+                List<Expression> portInstances = new LinkedList<>();
                 Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
                 // getFirst is an option
                 Value value = ((Invokable) getFirst).getField("value");
@@ -203,6 +204,7 @@ public class ArchitectureInterpreter {
                                 moduleName = ((ModuleDeclaration) decl).getName();
                             }
                             astLib.put(moduleName, newAST);
+                            portInstances.add(newAST);
                         }
                     } else {
                         // error?
@@ -210,6 +212,12 @@ public class ArchitectureInterpreter {
                 }
 
                 // generate initAST
+                List<Value> testArgs = new LinkedList<>();
+                testArgs.add(javaToWyvernList(portInstances));
+                connectorInit = ((Invokable) metadata)
+                        .invoke("generateConnectorInit", testArgs).executeIfThunk();
+
+                System.out.println(connectorInit);
 
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();

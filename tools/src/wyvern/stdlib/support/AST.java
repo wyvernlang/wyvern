@@ -67,7 +67,9 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.tests.TestUtil;
+import wyvern.tools.typedAST.core.Script;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
+import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
@@ -105,7 +107,7 @@ public class AST {
 
     public ValueType structuralType(String selfName, List<ObjectValue> declTypeObjs) {
         List<DeclType> declTypes = new LinkedList<>();
-        for (ObjectValue declType: declTypeObjs) {
+        for (ObjectValue declType : declTypeObjs) {
             JavaValue fieldValue = (JavaValue) declType.getField("declType");
             throw new RuntimeException("implementation needs to be fixed");
             //return (ValueType) fieldValue.getWrappedValue();
@@ -121,7 +123,7 @@ public class AST {
 
     public ValueType refinementType(List<ObjectValue> typeParamObjs, ObjectValue base) {
         List<ValueType> typeParams = new LinkedList<>();
-        for (ObjectValue obj: typeParamObjs) {
+        for (ObjectValue obj : typeParamObjs) {
             typeParams.add(getType(obj));
         }
         return new RefinementType(typeParams, getType(base), base);
@@ -181,7 +183,7 @@ public class AST {
 
     private List<FormalArg> getFormalArgs(List<ObjectValue> objs) {
         List<FormalArg> formalArgs = new LinkedList<>();
-        for (ObjectValue arg: objs) {
+        for (ObjectValue arg : objs) {
             final JavaValue fieldValue = (JavaValue) arg.getField("formalArg");
             formalArgs.add((FormalArg) fieldValue.getWrappedValue());
         }
@@ -199,7 +201,7 @@ public class AST {
     public ModuleDeclaration moduleDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType,
                                                ObjectValue body, List<String> dependencyURIs) throws URISyntaxException {
         List<Pair<ImportDeclaration, ValueType>> dependencies = new LinkedList<>();
-        for (String dependency: dependencyURIs) {
+        for (String dependency : dependencyURIs) {
             ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false);
             Pair<VarBinding, GenContext> bindingCtx = imp.genBinding(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
             dependencies.add(new Pair<ImportDeclaration, ValueType>(imp, bindingCtx.getFirst().getType()));
@@ -229,7 +231,7 @@ public class AST {
 
     public IExpr bind(List<ObjectValue> bindingObjects, ObjectValue inExpr) {
         List<VarBinding> bindings = new LinkedList<>();
-        for (ObjectValue bndObj: bindingObjects) {
+        for (ObjectValue bndObj : bindingObjects) {
             JavaValue fieldValue = (JavaValue) bndObj.getField("binding");
             bindings.add((VarBinding) fieldValue.getWrappedValue());
         }
@@ -258,7 +260,7 @@ public class AST {
 
     public IExpr matchExpr(ObjectValue matchObj, ObjectValue elseObj, List<ObjectValue> caseObjs) {
         List<Case> cases = new LinkedList<>();
-        for (ObjectValue obj: caseObjs) {
+        for (ObjectValue obj : caseObjs) {
             JavaValue fieldValue = (JavaValue) obj.getField("caseValue");
             cases.add((Case) fieldValue.getWrappedValue());
         }
@@ -306,7 +308,7 @@ public class AST {
             throw e;
         }
     }
-    
+
     public IExpr parseExpressionNoContext(String input) throws ParseException {
         try {
             String rootLoc;
@@ -330,16 +332,28 @@ public class AST {
                 System.err.println(
                         "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
             }
-            wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod = 
-                    (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) 
-                    TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
-            ModuleDeclaration moduleDecl = (ModuleDeclaration) 
-                    mod.topLevelGen(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                            new File(rootLoc), new File(wyvernPath))), new LinkedList<TypedModuleSpec>());
-            List<NamedDeclaration> l = new LinkedList<>();
-            l.add(moduleDecl);
-            New module = new New(l, FileLocation.UNKNOWN);
-            return module;
+            TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
+            if (typAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
+                wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod =
+                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration)
+                                TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
+                ModuleDeclaration moduleDecl = (ModuleDeclaration)
+                        mod.topLevelGen(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                                new File(rootLoc), new File(wyvernPath))), new LinkedList<TypedModuleSpec>());
+                List<NamedDeclaration> l = new LinkedList<>();
+                l.add(moduleDecl);
+                New module = new New(l, FileLocation.UNKNOWN);
+                return module;
+            } else if (typAST instanceof Script) {
+                Script script = (Script) typAST;
+                script.generateIL(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                        new File(rootLoc), new File(wyvernPath))), Util.unitType(), new LinkedList<TypedModuleSpec>());
+                // empty list of dependencies?
+                // is this context enough?
+                return null;
+            } else {
+                return null;
+            }
         } catch (ParseException e) {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");
             throw e;
@@ -353,7 +367,7 @@ public class AST {
         List<TypedAST> exprASTs = wp.ExpressionList();
         //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
 
-        for (TypedAST ast: exprASTs) {
+        for (TypedAST ast : exprASTs) {
             result.add(((ExpressionAST) ast).generateIL(ctx, null, new LinkedList<TypedModuleSpec>()));
         }
 
@@ -379,7 +393,8 @@ public class AST {
         return result.toString();
     }
 
-    /** Remove the least common whitespace prefix from all lines in [input].
+    /**
+     * Remove the least common whitespace prefix from all lines in [input].
      * Report an error if there is no common leading whitespace and mustStrip is set
      *
      * @param input

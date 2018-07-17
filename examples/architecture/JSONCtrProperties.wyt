@@ -59,11 +59,13 @@ type JSONCtrProperties
 				else
 					list.make[ast.AST]()
 
-		def generateConnectorInit(portInstances : list.List[ast.AST]) : Unit
+		def generateConnectorInit(portInstances : list.List[ast.AST]) : ast.AST
 			// in the future these should be retrieved from a deployment AST
 			val hostIP = "\"localhost\""
 			val hostport = "8000"
 			
-			val init = "val jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tvalprt : Int = " + hostport + "\n"
-			unit
+			val init = "import JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\n"
+//			val init = "val str : String = \"Hello World\""
+			val initAST = ast.parseExpressionNoContext(init)
+			initAST
 
