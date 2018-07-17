@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
@@ -34,6 +35,8 @@ import wyvern.tools.arch.lexing.ArchLexer;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.interop.FObject;
+import wyvern.tools.interop.JObject;
 import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.TokenManager;
@@ -172,7 +175,21 @@ public class ArchitectureInterpreter {
                     ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
                             FileLocation.UNKNOWN, connector);
                 }
-
+                List<Value> invokeArgs = new LinkedList<>();
+                invokeArgs.add(new IntegerLiteral(0));
+                Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
+                // getFirst is an option
+                Value value = ((Invokable) getFirst).getField("value");
+                // value is an internal.list
+                Value fromIList = ((Invokable) value).invoke("get", invokeArgs).executeIfThunk();
+                // fromIList is another other
+                Value option2 = ((Invokable) fromIList).getField("value");
+                // a wyvern AST !!!
+                JavaValue ast = (JavaValue) ((Invokable) option2).getField("ast");
+                // a JavaValue !!!!!!!!!!!!!!!!
+                JObject obj = (JObject) ast.getFObject();
+                Object trueAST = obj.getWrappedValue();
+                System.out.println(trueAST.getClass());
             }
 
         } catch (ToolError e) {

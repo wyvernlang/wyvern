@@ -47,7 +47,7 @@ type JSONCtrProperties
 					val portList = list.make[ast.AST]()
 						
 					val CSIface_requires_port = "module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java) : CSIface\nimport io.io\nimport json\nimport io.Socket\nval io = io(java)\nval json = json(java)\ndef getVal(key : String) : String\n\tval tcpClient : Socket = io.makeSocket(jsonCtrProps.host, jsonCtrProps.prt)\n\tval out = tcpClient.getOutputStream()\n\tval in = tcpClient.getInputStream()\n\tval outData = io.makeDataOutputStream(out)\n\tval inData = io.makeDataInputStream(in)\n\toutData.writeUTF((json.serializeToJSON(key)).toString())\n\tinData.readUTF()\n"
-					val test = "module def test(java : Java)\nimport stdout\nval a = \"A\"\ndef three() : Int\n\t3\n"
+					val test = "module def test(java : Java)\nimport stdout\nval stdout = stdout(java)\nval a = \"A\"\ndef three() : Int\n\tstdout.print(\"three\")\n\t3\n"
 					val CSIface_provides_port = ""
 					
 					val requiresAST = ast.parseExpressionNoContext(CSIface_requires_port)
@@ -57,6 +57,6 @@ type JSONCtrProperties
 				else
 					list.make[ast.AST]()
 
-		def generateConnectorInit() : Unit
+		def generateConnectorInit(portInstances : list.List[ast.AST]) : Unit
 			unit
 
