@@ -83,6 +83,11 @@ public class ArchitectureInterpreter {
                 return;
             }
 
+            // Construct interpreter state
+            InterpreterState state = new InterpreterState(
+                    InterpreterState.PLATFORM_JAVA, new File(rootLoc),
+                    new File(wyvernPath));
+
             // Check architecture file
             File f = new File(rootLoc + "/" + filepath.toString());
             BufferedReader source = new BufferedReader(new FileReader(f));
@@ -91,13 +96,8 @@ public class ArchitectureInterpreter {
                             source, "test", ArchLexer.class, ArchParserConstants.class));
             wp.fname = filename;
             Node start = wp.ArchDesc();
-            DeclCheckVisitor visitor = new DeclCheckVisitor();
+            DeclCheckVisitor visitor = new DeclCheckVisitor(state);
             visitor.visit((ASTArchDesc) start, null);
-
-            // Construct interpreter state
-            InterpreterState state = new InterpreterState(
-                    InterpreterState.PLATFORM_JAVA, new File(rootLoc),
-                    new File(wyvernPath));
 
             // Process connectors and begin generation
 
@@ -157,7 +157,6 @@ public class ArchitectureInterpreter {
                             testArgs.add(javaToWyvernList(portobjs));
                             connectorImpl = ((Invokable) metadata)
                                     .invoke(methodName, testArgs).executeIfThunk();
-                            System.out.println("generatedAST");
                         } else if (methodName.equals("generateConnectorInit")) {
                             // for now
                             connectorInit = portCompatibility;

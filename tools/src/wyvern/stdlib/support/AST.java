@@ -312,7 +312,6 @@ public class AST {
             List<NamedDeclaration> l = new LinkedList<>();
             l.add(moduleDecl);
             New module = new New(l, FileLocation.UNKNOWN);
-            System.out.println(module);
             return module;
         } catch (ParseException e) {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");

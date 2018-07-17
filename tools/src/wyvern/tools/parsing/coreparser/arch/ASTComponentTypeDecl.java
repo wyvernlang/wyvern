@@ -80,43 +80,12 @@ public class ASTComponentTypeDecl extends SimpleNode {
     }
   }
 
-  public boolean checkModule() {
+  public boolean checkModule(InterpreterState state) {
     if (isExternal) {
       return true;
     }
-    /* Check that the .wyv file exists */
-    String rootLoc = null, wyvernPath = null;
     Module mod = null;
     int checkCount = 0;
-
-    try {
-      rootLoc = System.getenv("WYVERN_ROOT");
-      if (rootLoc == null) {
-        rootLoc = System.getProperty("user.dir");
-      }
-
-      wyvernPath = System.getenv("WYVERN_HOME");
-      if (wyvernPath == null) {
-        System.err.println(
-            "must set WYVERN_HOME environmental variable to wyvern project directory");
-        return false;
-      }
-
-      wyvernPath += "/stdlib/";
-      // sanity check: is the wyvernPath a valid directory?
-      if (!Files.isDirectory(Paths.get(wyvernPath))) {
-        System.err.println(
-            "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
-        return false;
-      }
-    } catch (ToolError e) {
-      System.err.println(e.getMessage());
-    }
-
-    InterpreterState state = new InterpreterState(
-        InterpreterState.PLATFORM_JAVA, new File(rootLoc),
-        new File(wyvernPath));
-
     try {
       mod = state.getResolver().resolveModule(typeName);
 

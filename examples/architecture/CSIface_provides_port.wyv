@@ -1,9 +1,10 @@
 module def CSIface_provides_port(port : CSIface, tcpServer : io.ServerSocket, java : Java) 
 
 import thread.thread
+import thread.Thread
 import io.io
 import io.Socket
-import io.OutputStream
+import io.DataInputStream
 import io.DataOutputStream
 import json
 val thread = thread(java)
@@ -14,6 +15,11 @@ def run() : Unit
 	val socket : Socket = tcpServer.accept()
 	val outData : DataOutputStream = io.makeDataOutputStream(socket.getOutputStream())
 	val inData : DataInputStream = io.makeDataInputStream(socket.getInputStream())
-	val key : String = outData.readUTF()
+	val key : String = inData.readUTF()
 	//inData.write(port.getVal(json.deserializeFromJSON(key)))
 	run()	
+
+val runningThread : Thread = thread.make(() => run())
+
+def getThread() : Thread
+	runningThread
