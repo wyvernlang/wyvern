@@ -3,40 +3,42 @@
 package wyvern.tools.parsing.coreparser.arch;
 
 public class ASTValDecl extends SimpleNode {
-  private String name, type;
+    private String name, type;
 
-  public ASTValDecl(int id) {
-    super(id);
-  }
+    public ASTValDecl(int id) {
+        super(id);
+    }
 
-  public ASTValDecl(ArchParser p, int id) {
-    super(p, id);
-  }
+    public ASTValDecl(ArchParser p, int id) {
+        super(p, id);
+    }
 
-  public void setName(String n) {
-    name = n;
-  }
+    public void setName(String n) {
+        name = n;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setType(String t) {
-    type = t;
-  }
+    public void setType(String t) {
+        type = t;
+    }
 
-  public String getType() {
-    return type;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public String toString() {
-    return "val " + name + " " + type;
-  }
+    public String toString() {
+        return "val " + name + " " + type;
+    }
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ArchParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
+    /**
+     * Accept the visitor.
+     **/
+    public Object jjtAccept(ArchParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
+    }
 
 }
 /*

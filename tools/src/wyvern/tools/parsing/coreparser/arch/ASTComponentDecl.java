@@ -3,40 +3,42 @@
 package wyvern.tools.parsing.coreparser.arch;
 
 public class ASTComponentDecl extends SimpleNode {
-  private String type, name;
+    private String type, name;
 
-  public ASTComponentDecl(int id) {
-    super(id);
-  }
+    public ASTComponentDecl(int id) {
+        super(id);
+    }
 
-  public ASTComponentDecl(ArchParser p, int id) {
-    super(p, id);
-  }
+    public ASTComponentDecl(ArchParser p, int id) {
+        super(p, id);
+    }
 
-  public void setType(String t) {
-    type = t;
-  }
+    public void setType(String t) {
+        type = t;
+    }
 
-  public String getType() {
-    return type;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public void setName(String n) {
-    name = n;
-  }
+    public void setName(String n) {
+        name = n;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String toString() {
-    return type + " " + name;
-  }
+    public String toString() {
+        return type + " " + name;
+    }
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ArchParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
+    /**
+     * Accept the visitor.
+     **/
+    public Object jjtAccept(ArchParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
+    }
 }
 /*
  * JavaCC - OriginalChecksum=93f39b2437130e2f040b4c0a9133a630 (do not edit this

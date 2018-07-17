@@ -1,11 +1,14 @@
 package wyvern.stdlib.support;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -50,11 +53,13 @@ import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ILFactory;
+import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.ArchitectureInterpreter;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -304,11 +309,33 @@ public class AST {
     
     public IExpr parseExpressionNoContext(String input) throws ParseException {
         try {
+            String rootLoc;
+            if (ArchitectureInterpreter.wyvernRoot.get() != null) {
+                rootLoc = ArchitectureInterpreter.wyvernRoot.get();
+            } else {
+                rootLoc = System.getProperty("user.dir");
+            }
+            String wyvernPath = System.getenv("WYVERN_HOME");
+            if (wyvernPath == null) {
+                if (ArchitectureInterpreter.wyvernHome.get() != null) {
+                    wyvernPath = ArchitectureInterpreter.wyvernHome.get();
+                } else {
+                    System.err.println(
+                            "must set WYVERN_HOME environmental variable to wyvern project directory");
+                }
+            }
+            wyvernPath += "/stdlib/";
+            // sanity check: is the wyvernPath a valid directory?
+            if (!Files.isDirectory(Paths.get(wyvernPath))) {
+                System.err.println(
+                        "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
+            }
             wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod = 
                     (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) 
                     TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
             ModuleDeclaration moduleDecl = (ModuleDeclaration) 
-                    mod.topLevelGen(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
+                    mod.topLevelGen(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                            new File(rootLoc), new File(wyvernPath))), new LinkedList<TypedModuleSpec>());
             List<NamedDeclaration> l = new LinkedList<>();
             l.add(moduleDecl);
             New module = new New(l, FileLocation.UNKNOWN);

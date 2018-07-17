@@ -24,150 +24,152 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
 public class ASTComponentTypeDecl extends SimpleNode {
-  private boolean isExternal = false;
-  private String typeName;
-  private HashMap<String, String> reqs = new HashMap<>();
-  private HashMap<String, String> provs = new HashMap<>();
+    private boolean isExternal = false;
+    private String typeName;
+    private HashMap<String, String> reqs = new HashMap<>();
+    private HashMap<String, String> provs = new HashMap<>();
 
-  public ASTComponentTypeDecl(int id) {
-    super(id);
-  }
-
-  public ASTComponentTypeDecl(ArchParser p, int id) {
-    super(p, id);
-  }
-
-  public HashMap<String, String> getReqs() {
-    return reqs;
-  }
-
-  public HashMap<String, String> getProvs() {
-    return provs;
-  }
-
-  public boolean isExternal() {
-    return isExternal;
-  }
-
-  public void setExternal(boolean isExternal) {
-    this.isExternal = isExternal;
-  }
-
-  public String getTypeName() {
-    return typeName;
-  }
-
-  public void setTypeName(String t) {
-    typeName = t;
-  }
-
-  public String toString() {
-    return super.toString() + " " + typeName + " : " + isExternal;
-  }
-
-  public void collectPorts() {
-    for (Node child : children) {
-      if (child instanceof ASTPortDecl) {
-        String req = ((ASTPortDecl) child).getRequires();
-        String prov = ((ASTPortDecl) child).getProvides();
-        String name = ((ASTPortDecl) child).getPort();
-        if (req != "") {
-          reqs.put(name, req);
-        } else if (prov != "") {
-          provs.put(name, prov);
-        }
-      }
+    public ASTComponentTypeDecl(int id) {
+        super(id);
     }
-  }
 
-  public boolean checkModule(InterpreterState state) {
-    if (isExternal) {
-      return true;
+    public ASTComponentTypeDecl(ArchParser p, int id) {
+        super(p, id);
     }
-    Module mod = null;
-    int checkCount = 0;
-    try {
-      mod = state.getResolver().resolveModule(typeName);
 
-      /* Check that it's a module def */
-      Expression expr = mod.getExpression();
-      if (!expr.getType().toString().contains("apply(")) {
-        System.out.println(expr.getType().toString());
-        // throw error saying it's not a module def
-        ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, location,
-            typeName);
-      }
-
-      /* Check for only for dependencies passed as args to module def */
-      if (expr instanceof New) {
-        for (Declaration d : ((New) expr).getDecls()) {
-          if (d instanceof DefDeclaration) {
-            List<FormalArg> args = ((DefDeclaration) d).getFormalArgs();
-            if (args.size() != reqs.size()) {
-              // inconsistent dependency errors
-              ToolError.reportError(
-                  ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
-                  typeName);
-            }
-            for (FormalArg f : args) {
-              String name = f.getName();
-              String type = ((NominalType) f.getType()).getTypeMember();
-              if (!reqs.get(name).equals(type)) {
-                // inconsistent dependency error
-                ToolError.reportError(
-                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
-                    typeName);
-              }
-            }
-          }
-        }
-      }
-
-      /* Check that it exposes the correct fields */
-      List<Declaration> decls = ((New) expr).getDecls().stream()
-          .filter(p -> p instanceof DefDeclaration)
-          .collect(Collectors.toList());
-      for (Declaration d : decls) {
-        DefDeclaration dd = (DefDeclaration) d;
-        if (dd.getType() instanceof StructuralType) {
-          List<DeclType> valdecltypes = ((StructuralType) (dd.getType()))
-              .getDeclTypes().stream().filter(p -> p instanceof ValDeclType)
-              .collect(Collectors.toList());
-
-          for (DeclType dt : valdecltypes) {
-            ValDeclType vdtype = (ValDeclType) dt;
-            String name = vdtype.getName();
-            String t = ((NominalType) vdtype.getSourceType().getValueType())
-                .getTypeMember();
-            if (provs.get(name) == null || !provs.get(name).equals(t)) {
-              // inconsistent fields
-              ToolError.reportError(
-                  ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
-                  typeName);
-            } else {
-              checkCount++;
-            }
-          }
-          if (checkCount != valdecltypes.size()) {
-            // inconsistent fields
-            ToolError.reportError(
-                ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
-                typeName);
-          }
-        }
-      }
-
-    } catch (ToolError e) {
-      e.printStackTrace();
-      return false;
+    public HashMap<String, String> getReqs() {
+        return reqs;
     }
-    return true;
-  }
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ArchParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
+    public HashMap<String, String> getProvs() {
+        return provs;
+    }
+
+    public boolean isExternal() {
+        return isExternal;
+    }
+
+    public void setExternal(boolean isExternal) {
+        this.isExternal = isExternal;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String t) {
+        typeName = t;
+    }
+
+    public String toString() {
+        return super.toString() + " " + typeName + " : " + isExternal;
+    }
+
+    public void collectPorts() {
+        for (Node child : children) {
+            if (child instanceof ASTPortDecl) {
+                String req = ((ASTPortDecl) child).getRequires();
+                String prov = ((ASTPortDecl) child).getProvides();
+                String name = ((ASTPortDecl) child).getPort();
+                if (req != "") {
+                    reqs.put(name, req);
+                } else if (prov != "") {
+                    provs.put(name, prov);
+                }
+            }
+        }
+    }
+
+    public boolean checkModule(InterpreterState state) {
+        if (isExternal) {
+            return true;
+        }
+        Module mod = null;
+        int checkCount = 0;
+        try {
+            mod = state.getResolver().resolveModule(typeName);
+
+            /* Check that it's a module def */
+            Expression expr = mod.getExpression();
+            if (!expr.getType().toString().contains("apply(")) {
+                System.out.println(expr.getType().toString());
+                // throw error saying it's not a module def
+                ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, location,
+                        typeName);
+            }
+
+            /* Check for only for dependencies passed as args to module def */
+            if (expr instanceof New) {
+                for (Declaration d : ((New) expr).getDecls()) {
+                    if (d instanceof DefDeclaration) {
+                        List<FormalArg> args = ((DefDeclaration) d).getFormalArgs();
+                        if (args.size() != reqs.size()) {
+                            // inconsistent dependency errors
+                            ToolError.reportError(
+                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                    typeName);
+                        }
+                        for (FormalArg f : args) {
+                            String name = f.getName();
+                            String type = ((NominalType) f.getType()).getTypeMember();
+                            if (!reqs.get(name).equals(type)) {
+                                // inconsistent dependency error
+                                ToolError.reportError(
+                                        ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                        typeName);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Check that it exposes the correct fields */
+            List<Declaration> decls = ((New) expr).getDecls().stream()
+                    .filter(p -> p instanceof DefDeclaration)
+                    .collect(Collectors.toList());
+            for (Declaration d : decls) {
+                DefDeclaration dd = (DefDeclaration) d;
+                if (dd.getType() instanceof StructuralType) {
+                    List<DeclType> valdecltypes = ((StructuralType) (dd.getType()))
+                            .getDeclTypes().stream().filter(p -> p instanceof ValDeclType)
+                            .collect(Collectors.toList());
+
+                    for (DeclType dt : valdecltypes) {
+                        ValDeclType vdtype = (ValDeclType) dt;
+                        String name = vdtype.getName();
+                        String t = ((NominalType) vdtype.getSourceType().getValueType())
+                                .getTypeMember();
+                        if (provs.get(name) == null || !provs.get(name).equals(t)) {
+                            // inconsistent fields
+                            ToolError.reportError(
+                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                    typeName);
+                        } else {
+                            checkCount++;
+                        }
+                    }
+                    if (checkCount != valdecltypes.size()) {
+                        // inconsistent fields
+                        ToolError.reportError(
+                                ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                typeName);
+                    }
+                }
+            }
+
+        } catch (ToolError e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Accept the visitor.
+     **/
+    public Object jjtAccept(ArchParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
+    }
 }
 /*
  * JavaCC - OriginalChecksum=f5aec0da9432112df1e15710b91b7b28 (do not edit this

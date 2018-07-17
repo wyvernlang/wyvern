@@ -51,6 +51,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
         super();
         this.state = state;
     }
+
     public Object visit(ASTAttachmentDecl node, Object data) {
         String connector = node.getConnector();
         HashSet<String> ports = node.getAllPorts();
