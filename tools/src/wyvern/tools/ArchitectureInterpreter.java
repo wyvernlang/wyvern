@@ -14,12 +14,16 @@ import java.util.List;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
@@ -29,6 +33,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.arch.lexing.ArchLexer;
@@ -146,12 +151,12 @@ public class ArchitectureInterpreter {
                 // Execute metadata
                 Value portCompatibility = null, connectorImpl = null,
                         connectorInit = null;
+                HashMap<String, Expression> astLib = new HashMap<>();
                 for (DeclType dt : metadataStructure.getDeclTypes()) {
                     if (dt instanceof DefDeclType) {
                         DefDeclType defdecl = (DefDeclType) dt;
                         String methodName = defdecl.getName();
                         List<Value> testArgs = new LinkedList<Value>();
-
                         if (methodName.equals("checkPortCompatibility")) {
                             testArgs.add(javaToWyvernList(portobjs));
                             portCompatibility = ((Invokable) metadata)
@@ -167,7 +172,6 @@ public class ArchitectureInterpreter {
                             ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
                                     FileLocation.UNKNOWN, connector);
                         }
-
                     }
                 }
                 if (portCompatibility == null || connectorImpl == null
@@ -175,23 +179,47 @@ public class ArchitectureInterpreter {
                     ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
                             FileLocation.UNKNOWN, connector);
                 }
-                List<Value> invokeArgs = new LinkedList<>();
-                invokeArgs.add(new IntegerLiteral(0));
+                int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
                 Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
                 // getFirst is an option
                 Value value = ((Invokable) getFirst).getField("value");
                 // value is an internal.list
-                Value fromIList = ((Invokable) value).invoke("get", invokeArgs).executeIfThunk();
-                // fromIList is another other
-                Value option2 = ((Invokable) fromIList).getField("value");
-                // a wyvern AST !!!
-                JavaValue ast = (JavaValue) ((Invokable) option2).getField("ast");
-                // a JavaValue !!!!!!!!!!!!!!!!
-                JObject obj = (JObject) ast.getFObject();
-                Object trueAST = obj.getWrappedValue();
-                System.out.println(trueAST.getClass());
-            }
+                for (int i = 0; i < numPortAST; i++) {
+                    List<Value> invokeArgs = new LinkedList<>();
+                    invokeArgs.add(new IntegerLiteral(i));
+                    Value fromIList = ((Invokable) value).invoke("get", invokeArgs).executeIfThunk();
+                    // fromIList is another other
+                    Value option2 = ((Invokable) fromIList).getField("value");
+                    // a wyvern AST !!!
+                    JavaValue ast = (JavaValue) ((Invokable) option2).getField("ast");
+                    // a JavaValue !!!!!!!!!!!!!!!!
+                    JObject obj = (JObject) ast.getFObject();
+                    Object javaAST = obj.getWrappedValue();
+                    if (javaAST instanceof New) {
+                        New newAST = (New) javaAST;
+                        String moduleName = null;
+                        for (Declaration decl : newAST.getDecls()) {
+                            if (decl instanceof ModuleDeclaration) {
+                                moduleName = ((ModuleDeclaration) decl).getName();
+                            }
+                            astLib.put(moduleName, newAST);
+                        }
+                    } else {
+                        // error?
+                    }
+                }
 
+                // generate initAST
+
+                // find and call entrypoints
+                HashMap<String, String> entrypoints = visitor.getEntrypoints();
+                for (String component : entrypoints.keySet()) {
+                    String entrypoint = entrypoints.get(component);
+
+                    String initScript = component + "." + entrypoint + "()";
+
+                }
+            }
         } catch (ToolError e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -223,6 +251,8 @@ public class ArchitectureInterpreter {
             declTypes.add(new DefDeclType("getProvides", Util.stringType(), new LinkedList<FormalArg>()));
             StructuralType wyvPortDeclType = new StructuralType("PortDecl", declTypes);
             return new JavaValue(JavaWrapper.wrapObject(result), wyvPortDeclType);
+        } else if (result instanceof New) {
+            return new JavaValue(JavaWrapper.wrapObject(result), new NominalType("ast", "AST"));
         } else {
             // throw error?
             return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
