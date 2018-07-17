@@ -64,14 +64,15 @@ public class DataType extends TagType {
 
         BytecodeOuterClass.Type type = getValueType().emitBytecodeType();
 
-        BytecodeOuterClass.TypeDesc.CaseDesc.Builder cd = BytecodeOuterClass.TypeDesc.CaseDesc.newBuilder().setType(type);
+        BytecodeOuterClass.TypeDesc.Builder typeDesc = BytecodeOuterClass.TypeDesc.newBuilder().setTag(tag)
+                .setType(type);
 
         NominalType parentType = getParentType();
         if (parentType != null) {
-            cd.setExtends(parentType.getPath() + "." + parentType.getTypeMember());
+            typeDesc.setExtends(parentType.getPath() + "." + parentType.getTypeMember());
         }
 
-        return BytecodeOuterClass.TypeDesc.newBuilder().setTag(tag).setCaseDesc(cd).build();
+        return typeDesc.build();
     }
 
     @Override

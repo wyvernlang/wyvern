@@ -1,0 +1,11 @@
+module runtime
+
+import python:sys
+
+def assertion(description:String, expression:Boolean):Unit
+    expression.ifTrue(
+	() => unit,
+	() => sys.exit(description))
+
+def fail(description:String):Nothing
+    sys.exit(description)

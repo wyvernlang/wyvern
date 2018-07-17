@@ -1,0 +1,22 @@
+module String
+
+import javascript:stdlib.support.string
+
+def equals(str1:String,str2:String):Boolean
+  string.testEqual(str1,str2)
+
+def ofInt(x : Int) : String
+  string.ofInt(x)
+
+def ofFloat(f : Float) : String
+  string.ofFloat(f)
+
+// The format parameter should contain a Java format string, as specified in
+// https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#syntax.
+// Note that *only one* parameter may be referenced in the format string, and it
+// must be a floating-point type (e.g. "%.2f").
+def ofFormattedFloat(format : String, f : Float) : String
+  string.ofFormattedFloat(format, f)
+
+def ofCharacter(c : Character) : String
+  string.ofCharacter(c)

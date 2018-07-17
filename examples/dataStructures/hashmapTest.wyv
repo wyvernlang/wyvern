@@ -1,0 +1,33 @@
+require dataStructures.hashmap
+require stdout
+
+var hmap : hashmap.HashMap[String,Int] = hashmap.make[String,Int]()
+
+def record(entry : String) : Unit
+	if (hmap.containsKey(entry))
+			var i : Int = hmap.get(entry)
+			hmap.put(entry, i + 1)
+		else
+			hmap.put(entry, 1)
+
+record("Dmitri")
+record("Wolfgang")
+record("Johannes")
+record("Johannes")
+record("Franz")
+
+stdout.print("Adding Dmitri, Wolfgang, Johannes, Franz, and Johannes")
+stdout.println()
+stdout.print("Dmitri count:\t")
+stdout.printInt(hmap.get("Dmitri"))
+stdout.println()
+stdout.print("Johannes count:\t")
+stdout.printInt(hmap.get("Johannes"))
+stdout.println()
+stdout.print("Clearing hashmap...")
+stdout.println()
+hmap.clear()
+assert hmap.size()==0
+stdout.print("HashMap size :\t" )
+stdout.printInt(hmap.size())
+stdout.println()

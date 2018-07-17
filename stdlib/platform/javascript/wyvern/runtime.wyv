@@ -1,0 +1,11 @@
+module runtime
+
+import javascript:stdlib.support.runtime
+
+def assertion(description:String, expression:Boolean):Unit
+    expression.ifTrue(
+	() => unit,
+	() => runtime.fail(description))
+
+def fail(description:String):Nothing
+    runtime.fail(description)
