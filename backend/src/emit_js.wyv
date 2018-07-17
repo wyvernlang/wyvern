@@ -30,9 +30,15 @@ def visitTypeDeclaration(td: wyb_ast.TypeDeclaration): String
                 else
                     defn
 
+def visitMethodDeclaration(md: wyb_ast.MethodDeclaration, selfName: Option[String]): String
+    var selfDeclaration: String = ""
+    if (selfName.isDefined)
+        selfDeclaration = "let " + util.unwrap[String](selfName) + " = this;"
+    md.methodName + "= function(" + util.join(md.arguments.map[String](a => a.variable), ",")+ ") { " + selfDeclaration + "return "  + visitExpression(md.body) + ";}" + "\n"
+
 def visitDeclaration(d: wyb_ast.Declaration): String = match d:
     vd: wyb_ast.VariableDeclaration => vd.variable + " = " + visitExpression(vd.initializer) + ";"
-    md: wyb_ast.MethodDeclaration => md.methodName + "= function(" + util.join(md.arguments.map[String](a => a.variable), ",")+ ") { return "  + visitExpression(md.body) + ";}" + "\n"
+    md: wyb_ast.MethodDeclaration => visitMethodDeclaration(md, option.None[String]())
     td: wyb_ast.TypeDeclaration => visitTypeDeclaration(td)
 
 def ifTrue(cond: wyb_ast.Expression, trueArm: wyb_ast.Expression, falseArm: wyb_ast.Expression): String
@@ -53,13 +59,20 @@ def newTypeExtends(nt: wyb_ast.Type): Option = match nt:
     default => option.None[String]()
 
 def visitNewExpression(n: wyb_ast.NewExpression): String
+    val onThis = list.make[String]()
+    val onPrototype = list.make[String]()
+    def do(d: wyb_ast.Declaration, onThis: List[String], onPrototype: List[String]): Unit
+        match d:
+            md: wyb_ast.MethodDeclaration => onPrototype.append(visitMethodDeclaration(md, option.Some(n.thisVariable)))
+            default => onThis.append(visitDeclaration(d))
+    n.declarations.do((d: wyb_ast.Declaration) => do(d, onThis, onPrototype))
+    val c = "function() {\nlet " + n.thisVariable + " = this; " + util.join(onThis.map[String](s => n.thisVariable + "." + s), "\n") + "}"
     val ext = newTypeExtends(n.t)
-    val c = "function() {\nlet " + n.thisVariable + " = this; " + util.join(n.declarations.map[String](e => n.thisVariable + "." + visitDeclaration(e)), "\n") + "}"
+    var prototypeDeclaration: String = ""
     if (ext.isDefined)
-            val e = util.unwrap[String](ext)
-            "new (function() { let c = " + c + "; c.prototype = new " + e + "(); return c;}())()"
-        else
-            "new (" + c + ")()"
+        val e = util.unwrap[String](ext)
+        prototypeDeclaration = "__c.prototype = new " + e + "();"
+    "new (function() { let __c = " + c + ";" + prototypeDeclaration + util.join(onPrototype.map[String](s => "__c.prototype." + s), "\n") + " return __c;}())()"
 
 def visitStatement(s : wyb_ast.Statement): String = match s:
     e: wyb_ast.E => visitExpression(e.expression)
