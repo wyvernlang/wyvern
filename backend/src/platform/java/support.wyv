@@ -1,4 +1,4 @@
-module def JavaSupport(java: Java): PlatformSupport
+module def support(java: Java): PlatformSupport
 
 import java:wyvern.stdlib.support.backend.BytecodeWrapper.bytecode
 

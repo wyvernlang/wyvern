@@ -51,7 +51,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
  */
 public class ModuleResolver {
     private List<File> searchPath;
-    private Path platformPath;
+    private List<Path> platformPath;
     private String platform;
     private Map<String, Module> moduleCache = new HashMap<String, Module>();
     private Deque<String> modulesBeingResolved = new ArrayDeque<>();
@@ -63,6 +63,7 @@ public class ModuleResolver {
         this.platform = platform;
         this.rootDir = rootDir;
         this.libDir = libDir;
+        this.platformPath = new ArrayList<>();
         ArrayList<File> searchPath = new ArrayList<File>();
         if (rootDir != null && !rootDir.isDirectory()) {
             throw new RuntimeException("the root path \"" + rootDir + "\" for the module resolver must be a directory");
@@ -72,12 +73,13 @@ public class ModuleResolver {
         }
         if (rootDir != null) {
             searchPath.add(rootDir);
+            platformPath.add(rootDir.toPath().resolve("platform").resolve(platform).toAbsolutePath());
         }
         if (libDir != null) {
             searchPath.add(libDir);
-            platformPath = libDir.toPath().resolve("platform").resolve(platform).toAbsolutePath();
-            searchPath.add(platformPath.toFile());
+            platformPath.add(libDir.toPath().resolve("platform").resolve(platform).toAbsolutePath());
         }
+        searchPath.addAll(platformPath.stream().map(path -> path.toFile()).collect(Collectors.toList()));
         this.searchPath = searchPath;
     }
 
@@ -310,7 +312,7 @@ public class ModuleResolver {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
-        if (file.toPath().toAbsolutePath().startsWith(platformPath)) {
+        if (platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
             // if the type is in functor form
             if (moduleType instanceof StructuralType
                     && ((StructuralType) moduleType).getDeclTypes().size() == 1

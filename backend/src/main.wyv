@@ -1,19 +1,14 @@
 require platform
 require stdout
 
-import support_js
-import support_java
+import support
 import from_protobuf
 import wyb_ast
 import rename
 import emit_js
 import util
 
-val plt: system.Platform = platform
-
-val support = match plt:
-    java: system.Java => support_java.apply(java)
-    javascript: system.JavaScript => support_js.apply(javascript)
+val support = support.apply(platform)
 
 val from_protobuf = from_protobuf.apply(support)
 
