@@ -27,10 +27,19 @@ import wyvern.tools.errors.ToolError;
 public class Serializer {
     public static final Serializer serializer = new Serializer();
 
-    public Serializer() {
+    public Serializer() { }
+
+    public HashMap<String, Object> makeJSONMap(Object obj) {
+        HashMap<String, Object> jsonmap = new HashMap<>();
+        if (obj instanceof ObjectValue) {
+            jsonmap.put("", recMakeJSONMap((ObjectValue) obj));
+        } else {
+            jsonmap.put("", obj);
+        }
+        return jsonmap;
     }
 
-    public HashMap<String, Object> makeJSONMap(ObjectValue obj) {
+    private HashMap<String, Object> recMakeJSONMap(ObjectValue obj) {
         HashMap<String, Object> jsonmap = new HashMap<>();
         for (Declaration d : obj.getDecls()) {
             if (!(d instanceof ValDeclaration)) {
@@ -48,13 +57,88 @@ public class Serializer {
             } else if (expr instanceof IntegerLiteral) {
                 jsonmap.put(name, ((IntegerLiteral) expr).getFullValue());
             } else if (expr instanceof ObjectValue) {
-                jsonmap.put(name, makeJSONMap((ObjectValue) expr));
+                jsonmap.put(name, recMakeJSONMap((ObjectValue) expr));
             } else {
                 ToolError.reportError(ErrorMessage.QUALIFIED_TYPES_ONLY_FIELDS,
                         FileLocation.UNKNOWN);
             }
         }
         return jsonmap;
+    }
+
+    public Object stringToJSONMap(String str) {
+        HashMap<String, Object> jmap = new HashMap<>();
+        HashMap<String, Object> inner = new HashMap<>();
+        str = str.substring(2, str.length() - 2).trim();
+        String[] pair = str.split(":\\s", 2);
+        String key = pair[0].substring(1, pair[0].length() - 1);
+        String val = pair[1];
+        recStringToJSONMap(key, val, inner);
+        if (inner.keySet().size() == 1 && inner.containsKey("")) {
+            jmap = inner;
+        } else {
+            jmap.put("", inner);
+        }
+        return jmap;
+    }
+
+    private void recStringToJSONMap(String key, String val,
+                                    HashMap<String, Object> jmap) {
+        key = key.trim();
+        val = val.trim();
+        if (val.indexOf("{") == 0 && val.lastIndexOf("}") == val.length() - 1) {
+            val = val.substring(1, val.length() - 1);
+            if (!val.contains("{") || !val.contains("}")) {
+                recStringToJSONMap(key, val, jmap);
+            } else {
+                int openBrace = val.indexOf("{");
+                int closeBrace = val.lastIndexOf("}");
+
+                String before = val.substring(0, openBrace - 3);
+                int quote = before.lastIndexOf("\"");
+                String k = before.substring(quote + 1);
+                before = before.substring(0, quote);
+                recStringToJSONMap(k, before, jmap);
+
+                String v = val.substring(openBrace, closeBrace + 1).trim();
+                HashMap<String, Object> inner = new HashMap<>();
+                recStringToJSONMap(k, v, inner);
+                jmap.put(k, inner);
+
+                String after = val.substring(closeBrace + 1);
+                after = (after.charAt(0) == ',') ? after.substring(1) : after;
+                recStringToJSONMap(k, after, jmap);
+            }
+        } else {
+            String[] entries = val.split(",\n");
+            for (String entry : entries) {
+                String[] pair = entry.split(":\\s");
+                if (pair.length == 2) {
+                    String k = pair[0].trim();
+                    k = k.substring(1, k.length() - 1);
+                    String v = (pair[1].charAt(pair[1].length() - 1) == ',')
+                            ? pair[1].substring(0, pair[1].length() - 1)
+                            : pair[1];
+                    v = v.trim();
+                    jmap.put(k, matchPrimValue(v));
+                } else {
+                    jmap.put("", matchPrimValue(pair[0]));
+                }
+            }
+        }
+    }
+
+    private Object matchPrimValue(String value) {
+        if (value.equals("true") | value.equals("false")) {
+            return new Boolean(value);
+        } else if (value.matches("[0-9]+")) {
+            return new BigInteger(value);
+        } else if (value.matches(
+                "([0].[0-9]*)|([1-9][0-9]*.[0-9]+)|(.[0-9]+)|([1-9][0-9]*.)")) {
+            return new Double(value);
+        } else {
+            return value.substring(1, value.length() - 1);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -107,7 +191,18 @@ public class Serializer {
     }
 
     @SuppressWarnings("unchecked")
-    public ObjectValue deserializeFromJSON(HashMap<String, Object> jsonobj) {
+    public Object deserializeFromJSON(HashMap<String, Object> hmap) {
+        Object jsonmap = hmap.get("");
+        if (jsonmap instanceof HashMap) {
+            return recDeserializeFromJSON((HashMap<String, Object>) jsonmap);
+        } else {
+            return jsonmap;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectValue recDeserializeFromJSON(
+            HashMap<String, Object> jsonobj) {
         BindingSite selfSite = new BindingSite("this");
         List<Declaration> decls = new LinkedList<>();
         List<DeclType> declTypes = new LinkedList<>();
@@ -135,7 +230,7 @@ public class Serializer {
                 t = new NominalType("system", "Boolean");
                 dt = new ValDeclType(key, t);
             } else if (value instanceof HashMap) {
-                def = deserializeFromJSON((HashMap<String, Object>) value);
+                def = recDeserializeFromJSON((HashMap<String, Object>) value);
                 t = ((ObjectValue) def).getType();
             }
 
